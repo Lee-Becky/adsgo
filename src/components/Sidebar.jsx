@@ -1,12 +1,12 @@
 import { Layout, Image, Sparkles, BarChart3, Settings, Users, DollarSign, Search, FileText } from 'lucide-react'
 
-const Sidebar = () => {
+const Sidebar = ({ isMobile, onClose }) => {
   const menuItems = [
     { icon: Image, label: 'Ad Management', active: true },
   ]
 
   return (
-    <div className="w-64 bg-white border-r border-border flex flex-col">
+    <div className="w-64 h-full bg-white border-r border-border flex flex-col">
       {/* Logo */}
       <div className="p-6 border-b border-border">
         <h1 className="text-2xl font-bold text-primary">AdsGo</h1>
@@ -32,6 +32,15 @@ const Sidebar = () => {
 
       {/* User Profile */}
       <div className="p-4 border-t border-border">
+        {isMobile && (
+          <button
+            onClick={onClose}
+            className="w-full flex items-center gap-2 text-gray-600 hover:text-primary transition-colors mb-3"
+          >
+            <X size={20} />
+            <span className="text-sm">关闭菜单</span>
+          </button>
+        )}
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-semibold">
             U

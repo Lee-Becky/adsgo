@@ -1,6 +1,5 @@
 import { useState } from 'react'
-import Sidebar from './components/Sidebar'
-import Header from './components/Header'
+import MainLayout from './components/MainLayout'
 import FilterSection from './components/FilterSection'
 import OverallAnalysis from './components/OverallAnalysis'
 import OptimizePreferences from './components/OptimizePreferences'
@@ -8,7 +7,6 @@ import CampaignTable from './components/CampaignTable'
 import CampaignAnalysisModal from './components/CampaignAnalysisModal'
 import BudgetReasonModal from './components/BudgetReasonModal'
 import BudgetEditModal from './components/BudgetEditModal'
-import GlobalDemoOverlay from './components/GlobalDemoOverlay'
 
 function App() {
   const [selectedCampaign, setSelectedCampaign] = useState(null)
@@ -53,58 +51,46 @@ function App() {
   }
 
   return (
-    <div className="flex min-h-screen bg-background">
-      {/* Sidebar */}
-      <Sidebar />
-
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col relative">
-        {/* Header */}
-        <Header />
-
-        {/* Main Content Area - Scrollable */}
-        <div className="flex-1 p-6 overflow-auto">
-          {/* Overall Analysis and Optimize Preferences - Side by Side */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-            {/* Today's Overview - Takes 2/3 of the space */}
-            <div className="lg:col-span-2 h-full">
-              <OverallAnalysis />
-            </div>
-
-            {/* Optimize Preferences - Takes 1/3 of the space */}
-            <div className="lg:col-span-1 h-full">
-              <OptimizePreferences />
-            </div>
+    <>
+      <MainLayout
+        showDemoOverlay={!isConnected}
+        onDemoConnect={() => setIsConnected(true)}
+        onDemoCreate={() => setIsConnected(true)}
+      >
+      {/* Main Content Area - Scrollable */}
+      <div className="p-6">
+        {/* Overall Analysis and Optimize Preferences - Side by Side */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+          {/* Today's Overview - Takes 2/3 of the space */}
+          <div className="lg:col-span-2 h-full">
+            <OverallAnalysis />
           </div>
 
-          {/* Filter and Data Section - Connected visually */}
-          <div className="bg-white rounded-xl border border-border shadow-sm overflow-hidden">
-            {/* Filter Section - Light background for visual differentiation */}
-            <div className="p-5 border-b border-border bg-gray-50">
-              <FilterSection />
-            </div>
-
-            {/* Campaign Table - White background */}
-            <CampaignTable 
-              budgetStatus={budgetStatus}
-              onBudgetStatusChange={setBudgetStatus}
-              onCampaignClick={handleCampaignClick}
-              onBudgetReasonClick={handleBudgetReasonClick}
-              onBudgetEditClick={handleBudgetEditClick}
-              onMoreInsights={handleMoreInsights}
-            />
+          {/* Optimize Preferences - Takes 1/3 of the space */}
+          <div className="lg:col-span-1 h-full">
+            <OptimizePreferences />
           </div>
-
         </div>
 
-        {/* Global Demo Overlay - Only covers content area, not sidebar, fixed to viewport */}
-        {!isConnected && (
-          <GlobalDemoOverlay 
-            onConnect={() => setIsConnected(true)}
-            onCreate={() => setIsConnected(true)}
+        {/* Filter and Data Section - Connected visually */}
+        <div className="bg-white rounded-xl border border-border shadow-sm overflow-hidden">
+          {/* Filter Section - Light background for visual differentiation */}
+          <div className="p-5 border-b border-border bg-gray-50">
+            <FilterSection />
+          </div>
+
+          {/* Campaign Table - White background */}
+          <CampaignTable 
+            budgetStatus={budgetStatus}
+            onBudgetStatusChange={setBudgetStatus}
+            onCampaignClick={handleCampaignClick}
+            onBudgetReasonClick={handleBudgetReasonClick}
+            onBudgetEditClick={handleBudgetEditClick}
+            onMoreInsights={handleMoreInsights}
           />
-        )}
+        </div>
       </div>
+
 
       {/* Campaign Analysis Modal */}
       <CampaignAnalysisModal
@@ -129,7 +115,9 @@ function App() {
         onSave={handleBudgetSave}
         onUpdateBudgetStatus={handleUpdateBudgetStatus}
       />
-    </div>
+      </MainLayout>
+
+    </>
   )
 }
 
