@@ -8,6 +8,7 @@ import CampaignTable from './components/CampaignTable'
 import CampaignAnalysisModal from './components/CampaignAnalysisModal'
 import BudgetReasonModal from './components/BudgetReasonModal'
 import BudgetEditModal from './components/BudgetEditModal'
+import GlobalDemoOverlay from './components/GlobalDemoOverlay'
 
 function App() {
   const [selectedCampaign, setSelectedCampaign] = useState(null)
@@ -16,6 +17,7 @@ function App() {
   const [budgetReasonData, setBudgetReasonData] = useState(null)
   const [showBudgetEdit, setShowBudgetEdit] = useState(false)
   const [budgetStatus, setBudgetStatus] = useState({})
+  const [isConnected, setIsConnected] = useState(false) // Demo mode: false = preview, true = connected
 
   const handleCampaignClick = (campaign) => {
     setSelectedCampaign(campaign)
@@ -56,11 +58,11 @@ function App() {
       <Sidebar />
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col relative">
         {/* Header */}
         <Header />
 
-        {/* Main Content Area */}
+        {/* Main Content Area - Scrollable */}
         <div className="flex-1 p-6 overflow-auto">
           {/* Overall Analysis and Optimize Preferences - Side by Side */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
@@ -92,7 +94,16 @@ function App() {
               onMoreInsights={handleMoreInsights}
             />
           </div>
+
         </div>
+
+        {/* Global Demo Overlay - Only covers content area, not sidebar, fixed to viewport */}
+        {!isConnected && (
+          <GlobalDemoOverlay 
+            onConnect={() => setIsConnected(true)}
+            onCreate={() => setIsConnected(true)}
+          />
+        )}
       </div>
 
       {/* Campaign Analysis Modal */}
