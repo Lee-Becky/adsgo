@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { SpeedInsights } from '@vercel/speed-insights/react'
 import MainLayout from './components/MainLayout'
 import FilterSection from './components/FilterSection'
 import OverallAnalysis from './components/OverallAnalysis'
@@ -117,6 +118,8 @@ function App() {
       />
       </MainLayout>
 
+      {/* Vercel Speed Insights */}
+      <SpeedInsights />
     </>
   )
 }
