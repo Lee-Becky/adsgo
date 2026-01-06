@@ -1,8 +1,15 @@
-import { Layout, Image, Sparkles, BarChart3, Settings, Users, DollarSign, Search, FileText } from 'lucide-react'
+import { useState } from 'react'
+import { Layout, Image, Sparkles, BarChart3, Settings, Users, DollarSign, Search, FileText, ChevronDown, X, Plus } from 'lucide-react'
 
-const Sidebar = ({ isMobile, onClose }) => {
+const Sidebar = ({ isMobile, onClose, currentPage, onPageChange }) => {
+  const [selectedBrand, setSelectedBrand] = useState('neopets')
+  const [isBrandDropdownOpen, setIsBrandDropdownOpen] = useState(false)
+  
+  const brands = ['neopets', 'gaming studio', 'tech brand']
+  
   const menuItems = [
-    { icon: Image, label: 'Ad Management', active: true },
+    { icon: Image, label: 'Ad Management', active: currentPage === 'dashboard' },
+    { icon: FileText, label: 'Drafts', active: currentPage === 'drafts' },
   ]
 
   return (
@@ -13,22 +20,97 @@ const Sidebar = ({ isMobile, onClose }) => {
         <p className="text-sm text-gray-500 mt-1">广告管理平台</p>
       </div>
 
+      {/* Brand Switcher */}
+      <div className="px-4 py-3 border-b border-border relative">
+        <button 
+          onClick={() => setIsBrandDropdownOpen(!isBrandDropdownOpen)}
+          className="w-full flex items-center justify-between gap-2 px-3 py-2 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+        >
+          <div className="flex items-center gap-2">
+            <span className="text-2xl">🐾</span>
+            <span className="font-medium text-gray-900">{selectedBrand}</span>
+          </div>
+          <ChevronDown size={16} className={`text-gray-600 transition-transform ${isBrandDropdownOpen ? 'rotate-180' : ''}`} />
+        </button>
+        
+        {/* Brand Dropdown */}
+        {isBrandDropdownOpen && (
+          <div className="absolute left-4 right-4 top-full mt-2 bg-white border border-border rounded-lg shadow-lg z-50 overflow-hidden">
+            <div className="p-2">
+              {brands.map((brand) => (
+                <button
+                  key={brand}
+                  onClick={() => {
+                    setSelectedBrand(brand)
+                    setIsBrandDropdownOpen(false)
+                  }}
+                  className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
+                    selectedBrand === brand ? 'bg-primary/10 text-primary' : 'hover:bg-gray-50 text-gray-900'
+                  }`}
+                >
+                  <span className="text-xl">🐾</span>
+                  <span className="font-medium">{brand}</span>
+                </button>
+              ))}
+              <div className="border-t border-border my-2"></div>
+              <button
+                onClick={() => {
+                  setIsBrandDropdownOpen(false)
+                  // TODO: 实现创建新品牌的逻辑
+                }}
+                className="w-full flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-primary/10 text-primary transition-colors"
+              >
+                <Plus size={16} />
+                <span className="font-medium">New brand</span>
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+
       {/* Navigation */}
       <nav className="flex-1 p-4 space-y-1">
-        {menuItems.map((item, index) => (
-          <button
-            key={index}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
-              item.active
-                ? 'bg-primary text-white'
-                : 'text-gray-600 hover:bg-gray-100'
-            }`}
-          >
-            <item.icon size={20} />
-            <span className="font-medium">{item.label}</span>
-          </button>
-        ))}
+        {menuItems.map((item, index) => {
+          let pageKey
+          if (item.label === 'Ad Management') {
+            pageKey = 'dashboard'
+          } else if (item.label === 'Drafts') {
+            pageKey = 'drafts'
+          } else {
+            pageKey = 'settings'
+          }
+          
+          return (
+            <button
+              key={index}
+              onClick={() => onPageChange(pageKey)}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+                item.active
+                  ? 'bg-primary text-white'
+                  : 'text-gray-600 hover:bg-gray-100'
+              }`}
+            >
+              <item.icon size={20} />
+              <span className="font-medium">{item.label}</span>
+            </button>
+          )
+        })}
       </nav>
+
+      {/* Settings Menu - Just above User Profile */}
+      <div className="px-4 py-2">
+        <button
+          onClick={() => onPageChange('settings')}
+          className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+            currentPage === 'settings'
+              ? 'bg-primary text-white'
+              : 'text-gray-600 hover:bg-gray-100'
+          }`}
+        >
+          <Settings size={20} />
+          <span className="font-medium">Settings</span>
+        </button>
+      </div>
 
       {/* User Profile */}
       <div className="p-4 border-t border-border">

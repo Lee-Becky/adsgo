@@ -7,6 +7,8 @@ import CampaignTable from './components/CampaignTable'
 import CampaignAnalysisModal from './components/CampaignAnalysisModal'
 import BudgetReasonModal from './components/BudgetReasonModal'
 import BudgetEditModal from './components/BudgetEditModal'
+import BrandManagement from './components/BrandManagement'
+import Drafts from './components/Drafts'
 
 function App() {
   const [selectedCampaign, setSelectedCampaign] = useState(null)
@@ -16,6 +18,7 @@ function App() {
   const [showBudgetEdit, setShowBudgetEdit] = useState(false)
   const [budgetStatus, setBudgetStatus] = useState({})
   const [isConnected, setIsConnected] = useState(false) // Demo mode: false = preview, true = connected
+  const [currentPage, setCurrentPage] = useState('dashboard') // 'dashboard' or 'settings'
 
   const handleCampaignClick = (campaign) => {
     setSelectedCampaign(campaign)
@@ -50,15 +53,22 @@ function App() {
     setBudgetStatus(prev => ({ ...prev, [id]: status }))
   }
 
+  const handlePageChange = (page) => {
+    setCurrentPage(page)
+  }
+
   return (
     <>
       <MainLayout
-        showDemoOverlay={!isConnected}
+        showDemoOverlay={!isConnected && currentPage === 'dashboard'}
         onDemoConnect={() => setIsConnected(true)}
         onDemoCreate={() => setIsConnected(true)}
+        currentPage={currentPage}
+        onPageChange={handlePageChange}
       >
       {/* Main Content Area - Scrollable */}
-      <div className="p-6">
+      {currentPage === 'dashboard' ? (
+        <div className="p-6">
         {/* Overall Analysis and Optimize Preferences - Side by Side */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
           {/* Today's Overview - Takes 2/3 of the space */}
@@ -90,7 +100,11 @@ function App() {
           />
         </div>
       </div>
-
+      ) : currentPage === 'drafts' ? (
+        <Drafts />
+      ) : (
+        <BrandManagement />
+      )}
 
       {/* Campaign Analysis Modal */}
       <CampaignAnalysisModal
