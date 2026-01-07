@@ -9,6 +9,7 @@ import BudgetReasonModal from './components/BudgetReasonModal'
 import BudgetEditModal from './components/BudgetEditModal'
 import BrandManagement from './components/BrandManagement'
 import Drafts from './components/Drafts'
+import DataFetchingModal from './components/DataFetchingModal'
 
 function App() {
   const [selectedCampaign, setSelectedCampaign] = useState(null)
@@ -17,7 +18,9 @@ function App() {
   const [budgetReasonData, setBudgetReasonData] = useState(null)
   const [showBudgetEdit, setShowBudgetEdit] = useState(false)
   const [budgetStatus, setBudgetStatus] = useState({})
+  const [autoExecuteRecommendations, setAutoExecuteRecommendations] = useState(false)
   const [isConnected, setIsConnected] = useState(false) // Demo mode: false = preview, true = connected
+  const [isDataFetching, setIsDataFetching] = useState(false) // Data fetching state
   const [currentPage, setCurrentPage] = useState('dashboard') // 'dashboard' or 'settings'
 
   const handleCampaignClick = (campaign) => {
@@ -60,14 +63,18 @@ function App() {
   return (
     <>
       <MainLayout
-        showDemoOverlay={!isConnected && currentPage === 'dashboard'}
-        onDemoConnect={() => setIsConnected(true)}
-        onDemoCreate={() => setIsConnected(true)}
+        showDemoOverlay={!isConnected && !isDataFetching && currentPage === 'dashboard'}
+        onDemoConnect={() => setIsDataFetching(true)}
+        onDemoCreate={() => setIsDataFetching(true)}
         currentPage={currentPage}
         onPageChange={handlePageChange}
       >
       {/* Main Content Area - Scrollable */}
-      {currentPage === 'dashboard' ? (
+      {isDataFetching ? (
+        <div className="p-6 min-h-screen">
+          {/* Empty content while data is being fetched */}
+        </div>
+      ) : currentPage === 'dashboard' ? (
         <div className="p-6">
         {/* Overall Analysis and Optimize Preferences - Side by Side */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
@@ -97,6 +104,8 @@ function App() {
             onBudgetReasonClick={handleBudgetReasonClick}
             onBudgetEditClick={handleBudgetEditClick}
             onMoreInsights={handleMoreInsights}
+            autoExecuteRecommendations={autoExecuteRecommendations}
+            onAutoExecuteToggle={setAutoExecuteRecommendations}
           />
         </div>
       </div>
@@ -104,6 +113,18 @@ function App() {
         <Drafts />
       ) : (
         <BrandManagement />
+      )}
+
+      {/* Data Fetching Modal */}
+      {isDataFetching && (
+        <DataFetchingModal
+          onGenerateCreative={() => console.log('Generate Creative clicked')}
+          onNewCampaign={() => console.log('New Campaign clicked')}
+          onViewDemo={() => {
+            setIsDataFetching(false)
+            setIsConnected(true)
+          }}
+        />
       )}
 
       {/* Campaign Analysis Modal */}

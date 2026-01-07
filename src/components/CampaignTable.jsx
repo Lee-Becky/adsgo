@@ -1,13 +1,41 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { ToggleLeft, ToggleRight, ChevronDown, ChevronRight, Edit, ArrowRight } from 'lucide-react'
 import AdsetDetailModal from './AdsetDetailModal'
 import FeedbackModal from './FeedbackModal'
 
-const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, onBudgetReasonClick, onBudgetEditClick, onMoreInsights }) => {
+const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, onBudgetReasonClick, onBudgetEditClick, onMoreInsights, autoExecuteRecommendations, onAutoExecuteToggle }) => {
   const [feedbackOpen, setFeedbackOpen] = useState(false)
   const [feedbackTarget, setFeedbackTarget] = useState(null)
   const [selectedAdset, setSelectedAdset] = useState(null)
   const [isAdsetDetailOpen, setIsAdsetDetailOpen] = useState(false)
+  
+  // Auto-apply all pending recommendations when autoExecuteRecommendations is enabled
+  useEffect(() => {
+    if (autoExecuteRecommendations) {
+      campaigns.forEach(campaign => {
+        const status = budgetStatus[campaign.id] || 'pending'
+        if (status === 'pending' && campaign.status !== 'Paused') {
+          onBudgetStatusChange(prev => ({ 
+            ...prev, 
+            [campaign.id]: 'auto_applied' 
+          }))
+        }
+        
+        // Also auto-apply adset recommendations if budgetLevel is 'adset'
+        if (campaign.budgetLevel === 'adset') {
+          campaign.adsets.forEach(adset => {
+            const adsetStatus = budgetStatus[adset.id] || 'pending'
+            if (adsetStatus === 'pending' && adset.status !== 'Paused') {
+              onBudgetStatusChange(prev => ({ 
+                ...prev, 
+                [adset.id]: 'auto_applied' 
+              }))
+            }
+          })
+        }
+      })
+    }
+  }, [autoExecuteRecommendations, budgetStatus])
   
   const [campaigns, setCampaigns] = useState([
     {
@@ -413,7 +441,10 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
   }
 
   const handleApprove = (id) => {
-    onBudgetStatusChange(prev => ({ ...prev, [id]: 'approved' }))
+    onBudgetStatusChange(prev => ({ 
+      ...prev, 
+      [id]: autoExecuteRecommendations ? 'auto_applied' : 'approved' 
+    }))
   }
 
   const handleReject = (id) => {
@@ -478,6 +509,8 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
     switch (status) {
       case 'approved':
         return <span className="text-[10px] font-bold text-green-600 bg-green-100 px-2 py-0.5 rounded">Approved</span>
+      case 'auto_applied':
+        return <span className="text-[10px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded border border-primary/20">Auto-applied</span>
       case 'rejected':
         return <span className="text-[10px] font-bold text-red-600 bg-red-100 px-2 py-0.5 rounded">Rejected</span>
       case 'invalid_modified':
@@ -489,6 +522,43 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
 
   return (
     <>
+      {/* Auto-Execute Toggle */}
+      <div className="px-4 py-3 bg-white border-b border-border">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
+              <img 
+                src="https://www.adsgo.ai/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Frobot-active.7003b4d8.png&w=256&q=75" 
+                alt="AI Robot" 
+                width="24" 
+                height="24"
+                className="inline-block"
+              />
+              <div className="flex flex-col">
+                <span className="text-sm font-semibold text-gray-900">Auto-apply Recommendations</span>
+                <span className="text-[11px] text-gray-500">Automatically apply budget suggestions</span>
+              </div>
+              <button
+                onClick={() => onAutoExecuteToggle && onAutoExecuteToggle(!autoExecuteRecommendations)}
+                className="text-gray-400 hover:text-primary transition-colors"
+                title="Toggle auto-apply recommendations"
+              >
+                {autoExecuteRecommendations ? (
+                  <ToggleRight size={32} className="text-green-500" />
+                ) : (
+                  <ToggleLeft size={32} className="text-gray-400" />
+                )}
+              </button>
+            </div>
+            {autoExecuteRecommendations && (
+              <span className="text-xs font-medium text-green-700 bg-green-50 px-3 py-1 rounded-full border border-green-200">
+                ✓ Enabled - Recommended budget will be applied automatically.
+              </span>
+            )}
+          </div>
+        </div>
+      </div>
+
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead className="bg-gray-50">
@@ -624,7 +694,7 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
                               <div className="text-xs font-bold text-primary">
                                 {formatCurrency(campaign.suggestedBudget)}
                               </div>
-                              {campaign.status !== 'Paused' && status === 'pending' && (
+                              {campaign.status !== 'Paused' && status === 'pending' && !autoExecuteRecommendations && (
                                 <div className="flex gap-1">
                                   <button
                                     onClick={() => handleReject(campaign.id)}
@@ -640,7 +710,12 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
                                   </button>
                                 </div>
                               )}
-                              {status === 'approved' && (
+                              {autoExecuteRecommendations && status === 'pending' && (
+                                <div className="flex items-center gap-1">
+                                  {getStatusBadge('auto_applied')}
+                                </div>
+                              )}
+                              {(status === 'approved' || status === 'auto_applied') && (
                                 <div className="flex items-center gap-1">
                                   {getStatusBadge(status)}
                                 </div>
