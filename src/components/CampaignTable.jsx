@@ -534,7 +534,6 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
               />
               <div className="flex flex-col">
                 <span className="text-sm font-semibold text-gray-900">Auto-apply Recommendations</span>
-                <span className="text-[11px] text-gray-500">Automatically apply budget suggestions</span>
               </div>
               <button
                 onClick={() => onAutoExecuteToggle && onAutoExecuteToggle(!autoExecuteRecommendations)}
