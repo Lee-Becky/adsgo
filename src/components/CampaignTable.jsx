@@ -21,18 +21,16 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
           }))
         }
         
-        // Also auto-apply adset recommendations if budgetLevel is 'adset'
-        if (campaign.budgetLevel === 'adset') {
-          campaign.adsets.forEach(adset => {
-            const adsetStatus = budgetStatus[adset.id] || 'pending'
-            if (adsetStatus === 'pending' && adset.status !== 'Paused') {
-              onBudgetStatusChange(prev => ({ 
-                ...prev, 
-                [adset.id]: 'auto_applied' 
-              }))
-            }
-          })
-        }
+        // Auto-apply adset recommendations (for all adsets with budget recommendations)
+        campaign.adsets.forEach(adset => {
+          const adsetStatus = budgetStatus[adset.id] || 'pending'
+          if (adsetStatus === 'pending' && adset.status !== 'Paused' && adset.budgetReason) {
+            onBudgetStatusChange(prev => ({ 
+              ...prev, 
+              [adset.id]: 'auto_applied' 
+            }))
+          }
+        })
       })
     }
   }, [autoExecuteRecommendations, budgetStatus])
@@ -889,7 +887,7 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
                                         </button>
                                       </div>
                                     )}
-                                    {adsetStatus === 'approved' && (
+                                    {(adsetStatus === 'approved' || adsetStatus === 'auto_applied') && (
                                       <div className="flex items-center gap-1">
                                         {getStatusBadge(adsetStatus)}
                                       </div>
