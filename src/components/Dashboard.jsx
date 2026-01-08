@@ -734,10 +734,16 @@ const Dashboard = ({ selectedBrand, onPageChange, onEditBrandConfig }) => {
 
             {/* Action Buttons */}
             <div className="space-y-3 mt-4">
-              <button className="w-full py-3 bg-primary text-white rounded-lg font-medium hover:bg-primary-hover transition-colors">
+              <button 
+                onClick={() => onPageChange('dashboard')}
+                className="w-full py-3 bg-primary text-white rounded-lg font-medium hover:bg-primary-hover transition-colors"
+              >
               View budget adjustment suggestions
               </button>
-              <button className="w-full py-3 border-2 border-primary text-primary rounded-lg font-medium hover:bg-primary/5 transition-colors">
+              <button 
+                onClick={() => onPageChange('insights')}
+                className="w-full py-3 border-2 border-primary text-primary rounded-lg font-medium hover:bg-primary/5 transition-colors"
+              >
               View new campaign suggestions
               </button>
             </div>

@@ -11,6 +11,7 @@ import BrandManagement from './components/BrandManagement'
 import Drafts from './components/Drafts'
 import DataFetchingModal from './components/DataFetchingModal'
 import Dashboard from './components/Dashboard'
+import AdInsights from './components/AdInsights'
 
 function App() {
   const [selectedCampaign, setSelectedCampaign] = useState(null)
@@ -164,6 +165,8 @@ function App() {
       </div>
       ) : currentPage === 'drafts' ? (
         <Drafts />
+      ) : currentPage === 'insights' ? (
+        <AdInsights />
       ) : (
         <BrandManagement editingBrand={editingBrand} onClearEditingBrand={handleClearEditingBrand} />
       )}

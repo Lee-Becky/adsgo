@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Layout, Image, Sparkles, BarChart3, Settings, Users, DollarSign, Search, FileText, ChevronDown, X, Plus } from 'lucide-react'
+import { Layout, Image, Sparkles, BarChart3, Settings, Users, DollarSign, Search, FileText, ChevronDown, X, Plus, Lightbulb } from 'lucide-react'
 
 const Sidebar = ({ isMobile, onClose, currentPage, onPageChange, selectedBrand, onBrandChange }) => {
   const [isBrandDropdownOpen, setIsBrandDropdownOpen] = useState(false)
@@ -9,6 +9,7 @@ const Sidebar = ({ isMobile, onClose, currentPage, onPageChange, selectedBrand, 
   const menuItems = [
     { icon: Layout, label: 'Dashboard', active: currentPage === 'overview' },
     { icon: Image, label: 'Ad Management', active: currentPage === 'dashboard' },
+    { icon: Lightbulb, label: 'Ad Insights', active: currentPage === 'insights' },
     { icon: FileText, label: 'Drafts', active: currentPage === 'drafts' },
   ]
 
@@ -76,6 +77,8 @@ const Sidebar = ({ isMobile, onClose, currentPage, onPageChange, selectedBrand, 
             pageKey = 'overview'
           } else if (item.label === 'Ad Management') {
             pageKey = 'dashboard'
+          } else if (item.label === 'Ad Insights') {
+            pageKey = 'insights'
           } else if (item.label === 'Drafts') {
             pageKey = 'drafts'
           } else {

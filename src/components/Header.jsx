@@ -13,6 +13,11 @@ const Header = ({ toggleSidebar, isMobile, currentPage }) => {
           title: 'Ad Management',
           subtitle: '管理和优化您的广告活动'
         }
+      case 'insights':
+        return {
+          title: 'Ad Insights',
+          subtitle: '洞察并提供建议发布的新campaigns'
+        }
       case 'drafts':
         return {
           title: 'Drafts',
