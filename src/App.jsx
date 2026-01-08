@@ -113,7 +113,7 @@ function App() {
   return (
     <>
       <MainLayout
-        showDemoOverlay={!isConnected && !isDataFetching && currentPage === 'dashboard'}
+        showDemoOverlay={!isConnected && !isDataFetching && (currentPage === 'dashboard' || currentPage === 'overview')}
         onDemoConnect={() => setIsDataFetching(true)}
         onDemoCreate={() => setIsDataFetching(true)}
         currentPage={currentPage}
@@ -127,7 +127,11 @@ function App() {
           {/* Empty content while data is being fetched */}
         </div>
       ) : currentPage === 'overview' ? (
-        <Dashboard selectedBrand={selectedBrand} onPageChange={handlePageChange} onEditBrandConfig={handleEditBrandConfig} />
+        <Dashboard 
+          selectedBrand={selectedBrand} 
+          onPageChange={handlePageChange} 
+          onEditBrandConfig={handleEditBrandConfig}
+        />
       ) : currentPage === 'dashboard' ? (
         <div className="p-6">
         {/* Overall Analysis and Optimize Preferences - Side by Side */}
