@@ -21,8 +21,10 @@ function App() {
   const [showBudgetEdit, setShowBudgetEdit] = useState(false)
   const [budgetStatus, setBudgetStatus] = useState({})
   const [autoExecuteRecommendations, setAutoExecuteRecommendations] = useState(false)
-  const [isConnected, setIsConnected] = useState(false) // Demo mode: false = preview, true = connected
-  const [isDataFetching, setIsDataFetching] = useState(false) // Data fetching state
+  const [isOverviewConnected, setIsOverviewConnected] = useState(false) // Dashboard page connection state
+  const [isOverviewDataFetching, setIsOverviewDataFetching] = useState(false) // Dashboard page data fetching state
+  const [isDashboardConnected, setIsDashboardConnected] = useState(false) // Ad Manager page connection state
+  const [isDashboardDataFetching, setIsDashboardDataFetching] = useState(false) // Ad Manager page data fetching state
   const [currentPage, setCurrentPage] = useState('overview') // 'overview', 'dashboard', 'drafts', or 'settings'
   const [selectedBrand, setSelectedBrand] = useState('neopets')
   const [editingBrand, setEditingBrand] = useState(null)
@@ -113,16 +115,31 @@ function App() {
   return (
     <>
       <MainLayout
-        showDemoOverlay={!isConnected && !isDataFetching && (currentPage === 'dashboard' || currentPage === 'overview')}
-        onDemoConnect={() => setIsDataFetching(true)}
-        onDemoCreate={() => setIsDataFetching(true)}
+        showDemoOverlay={
+          (currentPage === 'overview' && !isOverviewConnected && !isOverviewDataFetching) ||
+          (currentPage === 'dashboard' && !isDashboardConnected && !isDashboardDataFetching)
+        }
+        onDemoConnect={() => {
+          if (currentPage === 'overview') {
+            setIsOverviewDataFetching(true)
+          } else if (currentPage === 'dashboard') {
+            setIsDashboardDataFetching(true)
+          }
+        }}
+        onDemoCreate={() => {
+          if (currentPage === 'overview') {
+            setIsOverviewDataFetching(true)
+          } else if (currentPage === 'dashboard') {
+            setIsDashboardDataFetching(true)
+          }
+        }}
         currentPage={currentPage}
         onPageChange={handlePageChange}
         selectedBrand={selectedBrand}
         onBrandChange={setSelectedBrand}
       >
       {/* Main Content Area - Scrollable */}
-      {isDataFetching ? (
+      {(currentPage === 'overview' && isOverviewDataFetching) || (currentPage === 'dashboard' && isDashboardDataFetching) ? (
         <div className="p-6 min-h-screen">
           {/* Empty content while data is being fetched */}
         </div>
@@ -176,13 +193,23 @@ function App() {
       )}
 
       {/* Data Fetching Modal */}
-      {isDataFetching && (
+      {(currentPage === 'overview' && isOverviewDataFetching) && (
         <DataFetchingModal
           onGenerateCreative={() => console.log('Generate Creative clicked')}
           onNewCampaign={() => console.log('New Campaign clicked')}
           onViewDemo={() => {
-            setIsDataFetching(false)
-            setIsConnected(true)
+            setIsOverviewDataFetching(false)
+            setIsOverviewConnected(true)
+          }}
+        />
+      )}
+      {(currentPage === 'dashboard' && isDashboardDataFetching) && (
+        <DataFetchingModal
+          onGenerateCreative={() => console.log('Generate Creative clicked')}
+          onNewCampaign={() => console.log('New Campaign clicked')}
+          onViewDemo={() => {
+            setIsDashboardDataFetching(false)
+            setIsDashboardConnected(true)
           }}
         />
       )}

@@ -8,7 +8,7 @@ const Sidebar = ({ isMobile, onClose, currentPage, onPageChange, selectedBrand, 
   
   const menuItems = [
     { icon: Layout, label: 'Dashboard', active: currentPage === 'overview' },
-    { icon: Image, label: 'Ad Management', active: currentPage === 'dashboard' },
+    { icon: Image, label: 'Ad Manager', active: currentPage === 'dashboard' },
     { icon: Lightbulb, label: 'Ad Insights', active: currentPage === 'insights' },
     { icon: FileText, label: 'Drafts', active: currentPage === 'drafts' },
   ]
@@ -75,7 +75,7 @@ const Sidebar = ({ isMobile, onClose, currentPage, onPageChange, selectedBrand, 
           let pageKey
           if (item.label === 'Dashboard') {
             pageKey = 'overview'
-          } else if (item.label === 'Ad Management') {
+          } else if (item.label === 'Ad Manager') {
             pageKey = 'dashboard'
           } else if (item.label === 'Ad Insights') {
             pageKey = 'insights'

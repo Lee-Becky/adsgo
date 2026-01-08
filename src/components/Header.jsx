@@ -10,7 +10,7 @@ const Header = ({ toggleSidebar, isMobile, currentPage }) => {
         }
       case 'dashboard':
         return {
-          title: 'Ad Management',
+          title: 'Ad Manager',
           subtitle: '管理和优化您的广告活动'
         }
       case 'insights':
