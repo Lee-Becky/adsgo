@@ -2,8 +2,11 @@ import { useState } from 'react'
 import { Plus, Pencil } from 'lucide-react'
 import BrandDetailEdit from './BrandDetailEdit'
 
-const BrandManagement = () => {
-  const [editingBrand, setEditingBrand] = useState(null)
+const BrandManagement = ({ editingBrand: externalEditingBrand, onClearEditingBrand }) => {
+  const [internalEditingBrand, setInternalEditingBrand] = useState(null)
+  
+  // Use external editingBrand if provided, otherwise use internal state
+  const editingBrand = externalEditingBrand || internalEditingBrand
   
   // 模拟品牌数据
   const brands = [
@@ -40,17 +43,21 @@ const BrandManagement = () => {
   ]
 
   const handleEdit = (brand) => {
-    setEditingBrand(brand)
+    setInternalEditingBrand(brand)
   }
 
   const handleSave = (updatedBrand) => {
     console.log('Saving brand:', updatedBrand)
     // TODO: 实际保存逻辑
-    setEditingBrand(null)
+    setInternalEditingBrand(null)
   }
 
   const handleCancelEdit = () => {
-    setEditingBrand(null)
+    setInternalEditingBrand(null)
+    // If editing brand came from external source (e.g., Dashboard), notify parent to clear it
+    if (externalEditingBrand && onClearEditingBrand) {
+      onClearEditingBrand()
+    }
   }
 
   if (editingBrand) {

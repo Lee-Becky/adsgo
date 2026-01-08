@@ -3,6 +3,11 @@ import { Bell, HelpCircle, Menu } from 'lucide-react'
 const Header = ({ toggleSidebar, isMobile, currentPage }) => {
   const getPageInfo = () => {
     switch (currentPage) {
+      case 'overview':
+        return {
+          title: 'Dashboard',
+          subtitle: '广告活动概览与实时优化'
+        }
       case 'dashboard':
         return {
           title: 'Ad Management',
@@ -20,8 +25,8 @@ const Header = ({ toggleSidebar, isMobile, currentPage }) => {
         }
       default:
         return {
-          title: 'Ad Management',
-          subtitle: '管理和优化您的广告活动'
+          title: 'Dashboard',
+          subtitle: '广告活动概览与实时优化'
         }
     }
   }

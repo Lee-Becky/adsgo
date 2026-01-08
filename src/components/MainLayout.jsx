@@ -4,7 +4,7 @@ import Sidebar from './Sidebar'
 import Header from './Header'
 import GlobalDemoOverlay from './GlobalDemoOverlay'
 
-const MainLayout = ({ children, showDemoOverlay, onDemoConnect, onDemoCreate, currentPage, onPageChange }) => {
+const MainLayout = ({ children, showDemoOverlay, onDemoConnect, onDemoCreate, currentPage, onPageChange, selectedBrand, onBrandChange }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
 
@@ -50,7 +50,7 @@ const MainLayout = ({ children, showDemoOverlay, onDemoConnect, onDemoCreate, cu
           ${isMobile ? (isSidebarOpen ? 'translate-x-0' : '-translate-x-full') : 'translate-x-0'}
         `}
       >
-        <Sidebar isMobile={isMobile} onClose={toggleSidebar} currentPage={currentPage} onPageChange={onPageChange} />
+        <Sidebar isMobile={isMobile} onClose={toggleSidebar} currentPage={currentPage} onPageChange={onPageChange} selectedBrand={selectedBrand} onBrandChange={onBrandChange} />
       </aside>
 
       {/* Main Content Wrapper */}

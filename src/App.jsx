@@ -10,6 +10,7 @@ import BudgetEditModal from './components/BudgetEditModal'
 import BrandManagement from './components/BrandManagement'
 import Drafts from './components/Drafts'
 import DataFetchingModal from './components/DataFetchingModal'
+import Dashboard from './components/Dashboard'
 
 function App() {
   const [selectedCampaign, setSelectedCampaign] = useState(null)
@@ -21,7 +22,9 @@ function App() {
   const [autoExecuteRecommendations, setAutoExecuteRecommendations] = useState(false)
   const [isConnected, setIsConnected] = useState(false) // Demo mode: false = preview, true = connected
   const [isDataFetching, setIsDataFetching] = useState(false) // Data fetching state
-  const [currentPage, setCurrentPage] = useState('dashboard') // 'dashboard' or 'settings'
+  const [currentPage, setCurrentPage] = useState('overview') // 'overview', 'dashboard', 'drafts', or 'settings'
+  const [selectedBrand, setSelectedBrand] = useState('neopets')
+  const [editingBrand, setEditingBrand] = useState(null)
 
   const handleCampaignClick = (campaign) => {
     setSelectedCampaign(campaign)
@@ -60,6 +63,52 @@ function App() {
     setCurrentPage(page)
   }
 
+  const handleClearEditingBrand = () => {
+    setEditingBrand(null)
+  }
+
+  const handleEditBrandConfig = () => {
+    // Find the brand object based on selectedBrand name
+    const brands = [
+      {
+        id: 1,
+        name: 'neopets',
+        logo: '🐾',
+        industry: 'Gaming',
+        dailyBudget: '$500',
+        convGoal: 'Max conversions-purchase',
+        kpi: 'ROAS > 400%',
+        color: 'bg-purple-500'
+      },
+      {
+        id: 2,
+        name: 'gaming studio',
+        logo: '🎮',
+        industry: 'Gaming',
+        dailyBudget: '$1,200',
+        convGoal: 'Max conversions-signup',
+        kpi: 'CPA <= 30.00 USD',
+        color: 'bg-blue-500'
+      },
+      {
+        id: 3,
+        name: 'tech brand',
+        logo: '💻',
+        industry: 'Technology',
+        dailyBudget: '$2,000',
+        convGoal: 'Max leads',
+        kpi: 'CPA <= 100.00 USD',
+        color: 'bg-green-500'
+      }
+    ]
+    
+    const brand = brands.find(b => b.name === selectedBrand)
+    if (brand) {
+      setEditingBrand(brand)
+      setCurrentPage('settings')
+    }
+  }
+
   return (
     <>
       <MainLayout
@@ -68,12 +117,16 @@ function App() {
         onDemoCreate={() => setIsDataFetching(true)}
         currentPage={currentPage}
         onPageChange={handlePageChange}
+        selectedBrand={selectedBrand}
+        onBrandChange={setSelectedBrand}
       >
       {/* Main Content Area - Scrollable */}
       {isDataFetching ? (
         <div className="p-6 min-h-screen">
           {/* Empty content while data is being fetched */}
         </div>
+      ) : currentPage === 'overview' ? (
+        <Dashboard selectedBrand={selectedBrand} onPageChange={handlePageChange} onEditBrandConfig={handleEditBrandConfig} />
       ) : currentPage === 'dashboard' ? (
         <div className="p-6">
         {/* Overall Analysis and Optimize Preferences - Side by Side */}
@@ -112,7 +165,7 @@ function App() {
       ) : currentPage === 'drafts' ? (
         <Drafts />
       ) : (
-        <BrandManagement />
+        <BrandManagement editingBrand={editingBrand} onClearEditingBrand={handleClearEditingBrand} />
       )}
 
       {/* Data Fetching Modal */}

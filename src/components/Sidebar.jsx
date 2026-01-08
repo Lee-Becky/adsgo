@@ -1,13 +1,13 @@
 import { useState } from 'react'
 import { Layout, Image, Sparkles, BarChart3, Settings, Users, DollarSign, Search, FileText, ChevronDown, X, Plus } from 'lucide-react'
 
-const Sidebar = ({ isMobile, onClose, currentPage, onPageChange }) => {
-  const [selectedBrand, setSelectedBrand] = useState('neopets')
+const Sidebar = ({ isMobile, onClose, currentPage, onPageChange, selectedBrand, onBrandChange }) => {
   const [isBrandDropdownOpen, setIsBrandDropdownOpen] = useState(false)
   
   const brands = ['neopets', 'gaming studio', 'tech brand']
   
   const menuItems = [
+    { icon: Layout, label: 'Dashboard', active: currentPage === 'overview' },
     { icon: Image, label: 'Ad Management', active: currentPage === 'dashboard' },
     { icon: FileText, label: 'Drafts', active: currentPage === 'drafts' },
   ]
@@ -41,7 +41,7 @@ const Sidebar = ({ isMobile, onClose, currentPage, onPageChange }) => {
                 <button
                   key={brand}
                   onClick={() => {
-                    setSelectedBrand(brand)
+                    onBrandChange(brand)
                     setIsBrandDropdownOpen(false)
                   }}
                   className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
@@ -72,7 +72,9 @@ const Sidebar = ({ isMobile, onClose, currentPage, onPageChange }) => {
       <nav className="flex-1 p-4 space-y-1">
         {menuItems.map((item, index) => {
           let pageKey
-          if (item.label === 'Ad Management') {
+          if (item.label === 'Dashboard') {
+            pageKey = 'overview'
+          } else if (item.label === 'Ad Management') {
             pageKey = 'dashboard'
           } else if (item.label === 'Drafts') {
             pageKey = 'drafts'
