@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react'
-import { ToggleLeft, ToggleRight, ChevronDown, ChevronRight, Edit, ArrowRight } from 'lucide-react'
+import React, { useState, useEffect, useMemo } from 'react'
+import { ToggleLeft, ToggleRight, ChevronDown, ChevronRight, Edit, ArrowRight, ChevronUp, ChevronDown as ChevronDownIcon } from 'lucide-react'
 import AdsetDetailModal from './AdsetDetailModal'
 import FeedbackModal from './FeedbackModal'
 
@@ -8,6 +8,12 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
   const [feedbackTarget, setFeedbackTarget] = useState(null)
   const [selectedAdset, setSelectedAdset] = useState(null)
   const [isAdsetDetailOpen, setIsAdsetDetailOpen] = useState(false)
+  
+  // Sorting state
+  const [sortConfig, setSortConfig] = useState({
+    key: 'spend',
+    direction: 'desc' // 'asc' or 'desc'
+  })
   
   // Auto-apply all pending recommendations when autoExecuteRecommendations is enabled
   useEffect(() => {
@@ -426,6 +432,28 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
     }
   ])
 
+  // Sort campaigns
+  const sortedCampaigns = useMemo(() => {
+    const sorted = [...campaigns].sort((a, b) => {
+      const aValue = a[sortConfig.key]
+      const bValue = b[sortConfig.key]
+      
+      if (sortConfig.direction === 'asc') {
+        return aValue - bValue
+      } else {
+        return bValue - aValue
+      }
+    })
+    return sorted
+  }, [campaigns, sortConfig])
+
+  const handleSort = (key) => {
+    setSortConfig(prev => ({
+      key,
+      direction: prev.key === key && prev.direction === 'desc' ? 'asc' : 'desc'
+    }))
+  }
+
   const toggleCampaign = (id) => {
     setCampaigns(campaigns.map(c => 
       c.id === id ? { ...c, enabled: !c.enabled } : c
@@ -518,6 +546,28 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
     }
   }
 
+  // Sortable header component - always show sort icon
+  const SortableHeader = ({ children, sortKey, className }) => {
+    const isSorted = sortConfig.key === sortKey
+    const sortIcon = isSorted ? (
+      sortConfig.direction === 'asc' ? <ChevronUp size={12} /> : <ChevronDownIcon size={12} />
+    ) : (
+      <ChevronDownIcon size={12} className="text-gray-300" />
+    )
+    
+    return (
+      <th 
+        onClick={() => handleSort(sortKey)}
+        className={`${className} cursor-pointer hover:bg-gray-100 transition-colors select-none`}
+      >
+        <div className="flex items-center gap-1">
+          {children}
+          <span className={isSorted ? 'text-primary' : 'text-gray-300'}>{sortIcon}</span>
+        </div>
+      </th>
+    )
+  }
+
   return (
     <>
       {/* Auto-Execute Toggle */}
@@ -560,61 +610,61 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
         <table className="w-full">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 min-w-[60px]">
+              <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 min-w-[60px] sticky top-0 bg-gray-50 z-10 shadow-sm">
                 Off/On
               </th>
-              <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 min-w-[180px]">
+              <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 min-w-[180px] sticky top-0 bg-gray-50 z-10 shadow-sm">
                 Campaign
               </th>
-              <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 min-w-[100px]">
+              <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 min-w-[100px] sticky top-0 bg-gray-50 z-10 shadow-sm">
                 Daily Budget
               </th>
-              <th className="px-2 py-2 text-center text-xs font-bold text-primary min-w-[320px]">
+              <th className="px-2 py-2 text-center text-xs font-bold text-primary min-w-[320px] sticky top-0 bg-gray-50 z-10 shadow-sm">
                 <div className="flex flex-col items-center gap-1">
                   <span>Optimize</span>
                   <span className="text-[10px] text-gray-400">Updated: January 4, 2026, 13:24:56 (UTC-8)</span>
                 </div>
               </th>
-            <th className="px-2 py-2 text-left text-xs font-bold text-primary min-w-[100px]">
-              Conv. goal
-            </th>
-              <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 min-w-[90px]">
+              <th className="px-2 py-2 text-left text-xs font-bold text-primary min-w-[100px] sticky top-0 bg-gray-50 z-10 shadow-sm">
+                Conv. goal
+              </th>
+              <SortableHeader sortKey="spend" className="px-2 py-2 text-left text-xs font-medium text-gray-600 min-w-[90px] sticky top-0 bg-gray-50 z-10 shadow-sm">
                 Spend
-              </th>
-              <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 min-w-[100px]">
+              </SortableHeader>
+              <SortableHeader sortKey="impressions" className="px-2 py-2 text-left text-xs font-medium text-gray-600 min-w-[100px] sticky top-0 bg-gray-50 z-10 shadow-sm">
                 Impressions
-              </th>
-              <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 min-w-[70px]">
+              </SortableHeader>
+              <SortableHeader sortKey="cpm" className="px-2 py-2 text-left text-xs font-medium text-gray-600 min-w-[70px] sticky top-0 bg-gray-50 z-10 shadow-sm">
                 CPM
-              </th>
-              <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 min-w-[70px]">
+              </SortableHeader>
+              <SortableHeader sortKey="clicks" className="px-2 py-2 text-left text-xs font-medium text-gray-600 min-w-[70px] sticky top-0 bg-gray-50 z-10 shadow-sm">
                 Clicks
-              </th>
-              <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 min-w-[70px]">
+              </SortableHeader>
+              <SortableHeader sortKey="cpc" className="px-2 py-2 text-left text-xs font-medium text-gray-600 min-w-[70px] sticky top-0 bg-gray-50 z-10 shadow-sm">
                 CPC
-              </th>
-              <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 min-w-[60px]">
+              </SortableHeader>
+              <SortableHeader sortKey="ctr" className="px-2 py-2 text-left text-xs font-medium text-gray-600 min-w-[60px] sticky top-0 bg-gray-50 z-10 shadow-sm">
                 CTR
-              </th>
-              <th className="px-2 py-2 text-left text-xs font-bold text-primary min-w-[70px]">
+              </SortableHeader>
+              <SortableHeader sortKey="results" className="px-2 py-2 text-left text-xs font-bold text-primary min-w-[70px] sticky top-0 bg-gray-50 z-10 shadow-sm">
                 Conversions
-              </th>
-              <th className="px-2 py-2 text-left text-xs font-bold text-primary min-w-[110px]">
+              </SortableHeader>
+              <SortableHeader sortKey="costPerResult" className="px-2 py-2 text-left text-xs font-bold text-primary min-w-[110px] sticky top-0 bg-gray-50 z-10 shadow-sm">
                 Cost/conv.
-              </th>
-              <th className="px-2 py-2 text-left text-xs font-bold text-primary min-w-[70px]">
+              </SortableHeader>
+              <SortableHeader sortKey="resultCvr" className="px-2 py-2 text-left text-xs font-bold text-primary min-w-[70px] sticky top-0 bg-gray-50 z-10 shadow-sm">
                 Conv. rate
-              </th>
-              <th className="px-2 py-2 text-left text-xs font-bold text-primary min-w-[100px]">
+              </SortableHeader>
+              <SortableHeader sortKey="resultValue" className="px-2 py-2 text-left text-xs font-bold text-primary min-w-[100px] sticky top-0 bg-gray-50 z-10 shadow-sm">
                 Conv. value
-              </th>
-              <th className="px-2 py-2 text-left text-xs font-bold text-primary min-w-[70px]">
+              </SortableHeader>
+              <SortableHeader sortKey="resultRoas" className="px-2 py-2 text-left text-xs font-bold text-primary min-w-[70px] sticky top-0 bg-gray-50 z-10 shadow-sm">
                 ROAS
-              </th>
+              </SortableHeader>
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
-            {campaigns.map((campaign) => {
+            {sortedCampaigns.map((campaign) => {
               const status = budgetStatus[campaign.id] || 'pending'
               
               return (
@@ -640,12 +690,9 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
                           <div className="flex items-center gap-2 mb-1">
                             {campaign.platform && getPlatformLogo(campaign.platform)}
                           </div>
-                          <button
-                            onClick={() => onCampaignClick(campaign)}
-                            className="font-medium text-gray-900 hover:text-primary transition-colors text-xs"
-                          >
+                          <span className="font-medium text-gray-900 text-xs">
                             {campaign.campaign}
-                          </button>
+                          </span>
                           <div className="mt-1">
                             <span className={`badge ${
                               campaign.status === 'Active' ? 'badge-success' :
@@ -852,7 +899,7 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
                                 <Edit size={14} />
                               </button>
                             </div>
-                          )}
+                          )}  
                         </td>
                         <td className="px-2 py-2">
                           {campaign.budgetLevel === 'campaign' ? (

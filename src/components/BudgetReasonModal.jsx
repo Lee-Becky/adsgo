@@ -111,7 +111,7 @@ const BudgetReasonModal = ({ isOpen, onClose, campaign, reason }) => {
         />
         
         {/* Right Drawer */}
-        <div className="absolute right-0 top-0 h-full w-full max-w-lg bg-white shadow-2xl overflow-y-auto transform transition-transform">
+        <div className="absolute right-0 top-0 h-full w-full max-w-5xl bg-white shadow-2xl overflow-y-auto transform transition-transform">
           {/* Header */}
           <div className={`px-6 py-4 border-b border-border flex items-center justify-between sticky top-0 bg-white z-10 ${getTypeColor(reason.type)}`}>
             <div className="flex items-center gap-3">
@@ -151,30 +151,97 @@ const BudgetReasonModal = ({ isOpen, onClose, campaign, reason }) => {
               </div>
             </div>
 
-            {/* Key Metrics */}
-            <div className="grid grid-cols-3 gap-4 mb-6">
-              <div className="bg-white border border-border rounded-lg p-4 text-center">
-                <p className="text-sm text-gray-600 mb-1">ROI</p>
-                <p className="text-2xl font-bold text-primary">{reason.metrics?.roi || '-'}</p>
-                <p className="text-xs text-gray-500 mt-1">{reason.metrics?.change || '-'}</p>
+            {/* Performance Comparison vs Industry Average */}
+            <div className="mb-6">
+              <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <CheckCircle size={18} className="text-green-600" />
+                Performance vs Industry Average
+              </h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="bg-gradient-to-br from-primary/5 to-purple-500/5 rounded-lg p-4 border border-primary/20">
+                  <p className="text-xs text-gray-600 mb-1">ROI</p>
+                  <div className="flex items-end gap-2">
+                    <p className="text-2xl font-bold text-primary">{reason.metrics?.roi || '-'}</p>
+                    <span className={`text-xs font-semibold ${parseFloat(reason.metrics?.roi || 0) > 3 ? 'text-green-600' : 'text-red-600'}`}>
+                      {parseFloat(reason.metrics?.roi || 0) > 3 ? '↑ Above' : '↓ Below'}
+                    </span>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">Industry: 3.0</p>
+                </div>
+                <div className="bg-gradient-to-br from-primary/5 to-purple-500/5 rounded-lg p-4 border border-primary/20">
+                  <p className="text-xs text-gray-600 mb-1">CTR</p>
+                  <div className="flex items-end gap-2">
+                    <p className="text-2xl font-bold text-primary">2.8%</p>
+                    <span className="text-xs font-semibold text-green-600">↑ Above</span>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">Industry: 2.0%</p>
+                </div>
+                <div className="bg-gradient-to-br from-primary/5 to-purple-500/5 rounded-lg p-4 border border-primary/20">
+                  <p className="text-xs text-gray-600 mb-1">CVR</p>
+                  <div className="flex items-end gap-2">
+                    <p className="text-2xl font-bold text-primary">3.5%</p>
+                    <span className="text-xs font-semibold text-green-600">↑ Above</span>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">Industry: 2.5%</p>
+                </div>
+                <div className="bg-gradient-to-br from-primary/5 to-purple-500/5 rounded-lg p-4 border border-primary/20">
+                  <p className="text-xs text-gray-600 mb-1">CPA</p>
+                  <div className="flex items-end gap-2">
+                    <p className="text-2xl font-bold text-primary">¥36.00</p>
+                    <span className="text-xs font-semibold text-green-600">↓ Better</span>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">Industry: ¥42.00</p>
+                </div>
               </div>
-              <div className="bg-white border border-border rounded-lg p-4 text-center">
-                <p className="text-sm text-gray-600 mb-1">Cost Change</p>
-                <p className="text-2xl font-bold text-primary">{reason.metrics?.costChange || '-'}</p>
-                <p className="text-xs text-gray-500 mt-1">vs Last Week</p>
-              </div>
-              <div className="bg-white border border-border rounded-lg p-4 text-center">
-                <p className="text-sm text-gray-600 mb-1">Status</p>
-                <p className={`text-2xl font-bold ${
-                  reason.type === 'increase' ? 'text-green-600' :
-                  reason.type === 'decrease' ? 'text-red-600' :
-                  'text-yellow-600'
-                }`}>
-                  {reason.type === 'increase' ? 'Excellent' :
-                   reason.type === 'decrease' ? 'Needs Improvement' :
-                   'Stable'}
-                </p>
-                <p className="text-xs text-gray-500 mt-1">Performance</p>
+            </div>
+
+            {/* Weekly Trend Analysis */}
+            <div className="mb-6">
+              <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <CheckCircle size={18} className="text-blue-600" />
+                7-Day Trend Analysis
+              </h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="bg-white border border-border rounded-lg p-4">
+                  <p className="text-xs text-gray-600 mb-1">Spend Trend</p>
+                  <div className="flex items-center justify-between">
+                    <p className="text-xl font-bold text-gray-900">¥{campaign.spend}</p>
+                    <span className="text-xs font-semibold text-green-600 bg-green-50 px-2 py-1 rounded">
+                      {reason.metrics?.change || '+15%'}
+                    </span>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">vs Last Week</p>
+                </div>
+                <div className="bg-white border border-border rounded-lg p-4">
+                  <p className="text-xs text-gray-600 mb-1">Impressions</p>
+                  <div className="flex items-center justify-between">
+                    <p className="text-xl font-bold text-gray-900">{(campaign.impressions / 1000).toFixed(0)}K</p>
+                    <span className="text-xs font-semibold text-green-600 bg-green-50 px-2 py-1 rounded">
+                      +12%
+                    </span>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">Growth Rate</p>
+                </div>
+                <div className="bg-white border border-border rounded-lg p-4">
+                  <p className="text-xs text-gray-600 mb-1">Conversions</p>
+                  <div className="flex items-center justify-between">
+                    <p className="text-xl font-bold text-gray-900">{campaign.results}</p>
+                    <span className="text-xs font-semibold text-green-600 bg-green-50 px-2 py-1 rounded">
+                      +18%
+                    </span>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">Growth Rate</p>
+                </div>
+                <div className="bg-white border border-border rounded-lg p-4">
+                  <p className="text-xs text-gray-600 mb-1">ROAS</p>
+                  <div className="flex items-center justify-between">
+                    <p className="text-xl font-bold text-gray-900">{campaign.resultRoas}</p>
+                    <span className="text-xs font-semibold text-green-600 bg-green-50 px-2 py-1 rounded">
+                      +23%
+                    </span>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">Improvement</p>
+                </div>
               </div>
             </div>
 
