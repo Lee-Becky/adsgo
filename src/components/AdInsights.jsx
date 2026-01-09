@@ -383,7 +383,7 @@ const AdInsights = ({ onPageChange }) => {
                   style={{ height: '550px' }}
                 >
                   {/* 动效背景容器 - 留边距 */}
-                  <div className="absolute inset-[12px] rounded-xl overflow-hidden" style={{ 
+                  <div className="absolute inset-[16px] rounded-xl overflow-hidden" style={{ 
                     background: 'radial-gradient(circle at center, #c3a2fe 0%, #7135f4 50%, #4f46e5 100%)',
                     zIndex: 0 
                   }}>
@@ -402,15 +402,15 @@ const AdInsights = ({ onPageChange }) => {
                     }}></div>
 
                     {/* 中心引擎 */}
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120px] h-[120px] z-[5] flex flex-col items-center justify-center text-center">
-                      <div className="absolute w-[140%] h-[140%] bg-[#8B5CF6] blur-[40px] opacity-[0.3]" style={{ 
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[100px] h-[100px] z-[5] flex flex-col items-center justify-center text-center">
+                      <div className="absolute w-[120%] h-[120%] bg-[#8B5CF6] blur-[30px] opacity-[0.3]" style={{ 
                         animation: 'core-pulse 3s infinite ease-in-out' 
                       }}></div>
-                      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5" className="relative z-[2]">
+                      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5" className="relative z-[2]">
                         <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" strokeLinecap="round" strokeLinejoin="round"/>
                       </svg>
                       <div className="relative z-[2] text-white mt-2">
-                        <div className="text-[14px] font-extrabold opacity-[0.9] tracking-[1px]">NEW CAMPAIGNS</div>
+                        <div className="text-[14px] font-extrabold opacity-[0.9] tracking-[1px]">More Recommendations</div>
                         <div className="text-[9px] opacity-[0.5] mt-1">AdsGo has been generated</div>
                       </div>
                     </div>
@@ -487,7 +487,7 @@ const AdInsights = ({ onPageChange }) => {
                           <rect fill="#f59e0b" x="35" y="15" width="5" height="35" />
                           <path d="M35 10l2 4 4 2-4 2-2 4-2-4-4-2 4-2z" fill="#fff" />
                         </svg>
-                        <div className="text-[8px] text-white mt-[5px] font-medium opacity-[0.7]">Insights</div>
+                        <div className="text-[7px] text-white mt-[4px] font-medium opacity-[0.7]">Insights</div>
                       </div>
                     </div>
                   </div>
@@ -498,12 +498,12 @@ const AdInsights = ({ onPageChange }) => {
                     <p className="text-sm text-gray-600 text-center mb-4">
                       More AI regeneration campaigns in drafts
                     </p>
-                    <div className="flex items-center gap-2 text-sm font-semibold text-[#7033f5] hover:text-[#8B5CF6] transition-colors">
+                    <button className="flex items-center gap-2 text-sm font-semibold text-white bg-gradient-to-r from-[#8B5CF6] to-[#7033f5] px-6 py-2.5 rounded-full hover:shadow-lg transition-all hover:scale-105">
                       Go to Drafts
                       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                       </svg>
-                    </div>
+                    </button>
                   </div>
                 </div>
               </div>
@@ -976,20 +976,20 @@ const AdInsights = ({ onPageChange }) => {
         }
 
         @keyframes float-vibrate {
-          0%, 100% { margin-top: -35px; }
-          50% { margin-top: -45px; }
+          0%, 100% { margin-top: -30px; }
+          50% { margin-top: -40px; }
         }
 
         @keyframes emit-card {
           0% { transform: translate(-50%, -50%) scale(0) rotate(0); opacity: 0; }
           30% { opacity: 0.8; }
-          100% { transform: translate(-150%, -200%) scale(1.5) rotate(-15deg); opacity: 0; }
+          100% { transform: translate(-100%, -150%) scale(1.2) rotate(-15deg); opacity: 0; }
         }
 
         @keyframes emit-card-alt {
           0% { transform: translate(-50%, -50%) scale(0) rotate(0); opacity: 0; }
           30% { opacity: 0.8; }
-          100% { transform: translate(120%, -180%) scale(1.5) rotate(15deg); opacity: 0; }
+          100% { transform: translate(80%, -130%) scale(1.2) rotate(15deg); opacity: 0; }
         }
 
         @keyframes drift {
