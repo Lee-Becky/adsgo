@@ -25,7 +25,9 @@ function App() {
   const [isOverviewDataFetching, setIsOverviewDataFetching] = useState(false) // Dashboard page data fetching state
   const [isDashboardConnected, setIsDashboardConnected] = useState(false) // Ad Manager page connection state
   const [isDashboardDataFetching, setIsDashboardDataFetching] = useState(false) // Ad Manager page data fetching state
-  const [currentPage, setCurrentPage] = useState('overview') // 'overview', 'dashboard', 'drafts', or 'settings'
+  const [isInsightsConnected, setIsInsightsConnected] = useState(false) // Ad Insights page connection state
+  const [isInsightsDataFetching, setIsInsightsDataFetching] = useState(false) // Ad Insights page data fetching state
+  const [currentPage, setCurrentPage] = useState('overview') // 'overview', 'dashboard', 'drafts', 'insights', or 'settings'
   const [selectedBrand, setSelectedBrand] = useState('neopets')
   const [editingBrand, setEditingBrand] = useState(null)
 
@@ -117,13 +119,16 @@ function App() {
       <MainLayout
         showDemoOverlay={
           (currentPage === 'overview' && !isOverviewConnected && !isOverviewDataFetching) ||
-          (currentPage === 'dashboard' && !isDashboardConnected && !isDashboardDataFetching)
+          (currentPage === 'dashboard' && !isDashboardConnected && !isDashboardDataFetching) ||
+          (currentPage === 'insights' && !isInsightsConnected && !isInsightsDataFetching)
         }
         onDemoConnect={() => {
           if (currentPage === 'overview') {
             setIsOverviewDataFetching(true)
           } else if (currentPage === 'dashboard') {
             setIsDashboardDataFetching(true)
+          } else if (currentPage === 'insights') {
+            setIsInsightsDataFetching(true)
           }
         }}
         onDemoCreate={() => {
@@ -131,6 +136,8 @@ function App() {
             setIsOverviewDataFetching(true)
           } else if (currentPage === 'dashboard') {
             setIsDashboardDataFetching(true)
+          } else if (currentPage === 'insights') {
+            setIsInsightsDataFetching(true)
           }
         }}
         currentPage={currentPage}
@@ -139,7 +146,7 @@ function App() {
         onBrandChange={setSelectedBrand}
       >
       {/* Main Content Area - Scrollable */}
-      {(currentPage === 'overview' && isOverviewDataFetching) || (currentPage === 'dashboard' && isDashboardDataFetching) ? (
+      {(currentPage === 'overview' && isOverviewDataFetching) || (currentPage === 'dashboard' && isDashboardDataFetching) || (currentPage === 'insights' && isInsightsDataFetching) ? (
         <div className="p-6 min-h-screen">
           {/* Empty content while data is being fetched */}
         </div>
@@ -210,6 +217,16 @@ function App() {
           onViewDemo={() => {
             setIsDashboardDataFetching(false)
             setIsDashboardConnected(true)
+          }}
+        />
+      )}
+      {(currentPage === 'insights' && isInsightsDataFetching) && (
+        <DataFetchingModal
+          onGenerateCreative={() => console.log('Generate Creative clicked')}
+          onNewCampaign={() => console.log('New Campaign clicked')}
+          onViewDemo={() => {
+            setIsInsightsDataFetching(false)
+            setIsInsightsConnected(true)
           }}
         />
       )}

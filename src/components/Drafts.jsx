@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Edit, Send, Filter, Calendar, ChevronLeft, ChevronRight, X, Check, Info, Sparkles, ToggleLeft, ToggleRight } from 'lucide-react'
+import { Edit, Send, Filter, Calendar, ChevronLeft, ChevronRight, X, Check, Info, Sparkles, ToggleLeft, ToggleRight, Trash2 } from 'lucide-react'
 
 const Drafts = () => {
   const [dataPeriod, setDataPeriod] = useState('Today')
@@ -8,6 +8,8 @@ const Drafts = () => {
   const [showCalendar, setShowCalendar] = useState(false)
   const [editingBudget, setEditingBudget] = useState(null)
   const [tempBudget, setTempBudget] = useState('')
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
+  const [campaignToDelete, setCampaignToDelete] = useState(null)
 
   // Initialize with Today's dates
   useEffect(() => {
@@ -246,6 +248,24 @@ const Drafts = () => {
   const handlePublish = (id) => {
     console.log('Publish draft:', id)
     // TODO: 实现发布逻辑
+  }
+
+  const handleDelete = (id) => {
+    setCampaignToDelete(id)
+    setDeleteConfirmOpen(true)
+  }
+
+  const handleDeleteConfirm = () => {
+    if (campaignToDelete !== null) {
+      setDraftCampaigns(prev => prev.filter(campaign => campaign.id !== campaignToDelete))
+      setCampaignToDelete(null)
+      setDeleteConfirmOpen(false)
+    }
+  }
+
+  const handleDeleteCancel = () => {
+    setCampaignToDelete(null)
+    setDeleteConfirmOpen(false)
   }
 
   const handleBudgetEditStart = (id, currentBudget) => {
@@ -627,7 +647,7 @@ const Drafts = () => {
                     </div>
                   </td>
                   <td className="px-4 py-4">
-                    <div className="flex gap-2">
+                    <div className="flex flex-col gap-2">
                       <button
                         onClick={() => handleEdit(campaign.id)}
                         className="flex items-center gap-1 px-3 py-1.5 bg-white border border-border rounded-lg text-sm text-gray-700 hover:bg-gray-50 hover:text-primary transition-colors"
@@ -641,6 +661,13 @@ const Drafts = () => {
                       >
                         <Send size={14} />
                         Publish
+                      </button>
+                      <button
+                        onClick={() => handleDelete(campaign.id)}
+                        className="flex items-center gap-1 px-3 py-1.5 bg-red-50 text-red-600 rounded-lg text-sm hover:bg-red-100 transition-colors"
+                      >
+                        <Trash2 size={14} />
+                        Delete
                       </button>
                     </div>
                   </td>
@@ -666,6 +693,31 @@ const Drafts = () => {
           </div>
         )}
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {deleteConfirmOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/50" onClick={handleDeleteCancel}></div>
+          <div className="relative bg-white rounded-xl shadow-lg p-6 w-full max-w-md mx-4">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Delete campaign draft</h3>
+            <p className="text-gray-600 mb-6">Once deleted, it cannot be recovered. Confirm deletion?</p>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={handleDeleteCancel}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-border rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                No
+              </button>
+              <button
+                onClick={handleDeleteConfirm}
+                className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors"
+              >
+                Yes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
