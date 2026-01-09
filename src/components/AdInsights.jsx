@@ -380,7 +380,7 @@ const AdInsights = ({ onPageChange }) => {
                 <div 
                   onClick={() => onPageChange('drafts')}
                   className="ad-card more-recommendations-card cursor-pointer hover:shadow-lg transition-shadow overflow-hidden relative"
-                  style={{ minHeight: '550px' }}
+                  style={{ height: '550px' }}
                 >
                   {/* 动效背景容器 - 留边距 */}
                   <div className="absolute inset-[12px] rounded-xl overflow-hidden" style={{ 
@@ -617,7 +617,7 @@ const AdInsights = ({ onPageChange }) => {
           flex-direction: column;
           font-size: 12px;
           position: relative;
-          min-height: 550px;
+          height: 550px;
         }
 
         .ad-audience-top {
