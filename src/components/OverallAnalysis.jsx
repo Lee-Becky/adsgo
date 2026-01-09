@@ -12,7 +12,7 @@ const OverallAnalysis = () => {
             <h2 className="text-lg font-bold text-gray-900">Today's Overview</h2>
             <span className="text-xs font-bold text-gray-600">Updated: January 4, 2026, 13:24:56 (UTC-8)</span>
           </div>
-          <p className="text-sm text-gray-500 mt-0.5">Based on last 7 days data</p>
+          <p className="text-sm text-gray-500 mt-0.5">Based on last 14 days data</p>
         </div>
       </div>
 

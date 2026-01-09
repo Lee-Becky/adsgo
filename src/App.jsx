@@ -187,7 +187,7 @@ function App() {
       ) : currentPage === 'drafts' ? (
         <Drafts />
       ) : currentPage === 'insights' ? (
-        <AdInsights />
+        <AdInsights onPageChange={handlePageChange} />
       ) : (
         <BrandManagement editingBrand={editingBrand} onClearEditingBrand={handleClearEditingBrand} />
       )}
