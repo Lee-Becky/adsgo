@@ -106,9 +106,9 @@ const RecommendationCard = ({ card, isExpanded, onToggle, onEdit, onPublish, sta
         <div className="ad-audience-top">
           {isLookalike ? (
             <>
-              <div className="flex items-center gap-2 mb-2 flex-wrap">
-                <span className="aud-name">{card.audience}</span>
-                <div className="aud-group aud-group-hover" title="类似受众 (US, 3% to 5%) - AdsGo已付费客户1222">
+              <div className="flex items-center gap-2 mb-2 min-w-0">
+                <span className="aud-name flex-shrink-0">{card.audience}</span>
+                <div className="aud-group aud-group-hover min-w-0 overflow-hidden" title="类似受众 (US, 3% to 5%) - AdsGo已付费客户1222">
                   <span className="aud-content-tag aud-content-tag-long">类似受众 (US, 3% to 5%) - AdsGo已付费客户1222</span>
                 </div>
               </div>
@@ -191,7 +191,7 @@ const RecommendationCard = ({ card, isExpanded, onToggle, onEdit, onPublish, sta
         {/* Media */}
         {card.hasImage ? (
           <div className="ad-media-area media-filled">
-            <img src={IMAGE_POOL[card.currentImgIndex % IMAGE_POOL.length]} alt="Ad visual" />
+            <img src={IMAGE_POOL[card.currentImgIndex % IMAGE_POOL.length]} alt="Ad visual" style={{ width: '100%', height: 'auto', objectFit: 'cover' }} />
           </div>
         ) : (
           <div className="media-empty">
@@ -302,6 +302,11 @@ const AdInsights = ({ onPageChange }) => {
     setExpandedTags(prev => ({ ...prev, [cardId]: !prev[cardId] }));
   };
 
+  const handleEdit = (cardId) => {
+    setSelectedCardId(cardId);
+    setEditDrawerOpen(true);
+  };
+
   const handlePublish = (cardId) => {
     if (!campaignStatus[cardId]) {
       setCampaignStatus(prev => ({ ...prev, [cardId]: 'manual' }));
@@ -311,16 +316,16 @@ const AdInsights = ({ onPageChange }) => {
   const displayedCards = CAMPAIGN_CARDS.filter(card => ['01', '03', '05'].includes(card.id));
 
   return (
-    <div className="min-h-screen bg-background p-6 font-sans">
+    <div className="min-h-screen bg-background p-4 md:p-6 font-sans">
       <SvgIcons />
       
       <div className="flex-1">
-        <div className="bg-white rounded-xl border border-border shadow-sm p-6">
+        <div className="bg-white rounded-xl border border-border shadow-sm p-4 md:p-6">
           
           {/* Platform Selector */}
-          <div className="flex justify-between items-center mb-6">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
             <div className="flex-1 flex justify-start">
-              <div className="bg-gray-100 p-0.5 rounded-full flex gap-1">
+              <div className="bg-gray-100 p-0.5 rounded-full flex gap-1 flex-wrap justify-center sm:justify-start">
                 {['Meta', 'Google', 'TikTok', 'Bing'].map(p => (
                   <button
                     key={p}
@@ -340,11 +345,13 @@ const AdInsights = ({ onPageChange }) => {
           </div>
 
           {/* Launch Recommendation */}
-          <div className="py-6 px-2">
-            <div className="flex items-center gap-2.5 mb-4 px-2">
-              <div className="w-1 h-[18px] rounded" style={{ background: 'linear-gradient(180deg, #8B5CF6, #4F46E5)' }}></div>
-              <h2 className="text-lg font-bold text-gray-900 tracking-tight">Launch Recommendation</h2>
-              <div className="flex items-center gap-2 ml-4 px-3 py-1.5 rounded-full border border-gray-200 bg-gray-50">
+          <div className="py-4 md:py-6 px-2">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 mb-4 px-2">
+              <div className="flex items-center gap-2.5 flex-shrink-0">
+                <div className="w-1 h-[18px] rounded" style={{ background: 'linear-gradient(180deg, #8B5CF6, #4F46E5)' }}></div>
+                <h2 className="text-base md:text-lg font-bold text-gray-900 tracking-tight">Launch Recommendation</h2>
+              </div>
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-gray-200 bg-gray-50 flex-shrink-0">
                 <div className="flex items-center text-gray-700 text-sm font-semibold">
                   <img src="https://www.adsgo.ai/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Frobot-active.7003b4d8.png&w=256&q=75" alt="AI Robot" className="w-5 h-5 mr-1.5" />
                   Auto-launch:
@@ -356,20 +363,23 @@ const AdInsights = ({ onPageChange }) => {
                   <div className={`w-[18px] h-[18px] bg-white rounded-full transition-transform ${autoRegen ? 'translate-x-5' : 'translate-x-0'}`} />
                 </div>
                 <span className={`text-xs font-semibold ${autoRegen ? 'text-green-600' : 'text-gray-500'}`}>
-                  {autoRegen ? 'Enabled' : 'Disabled'}
+                  {autoRegen 
+                    ? 'Enabled - Recommended campaigns will be launched automatically.' 
+                    : 'Disabled - Recommended campaigns need to be published manually.'
+                  }
                 </span>
               </div>
             </div>
 
             {/* Campaign Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
               {displayedCards.map((card) => (
                 <RecommendationCard
                   key={card.id}
                   card={card}
                   isExpanded={expandedTags[card.id]}
                   onToggle={toggleTags}
-                  onEdit={setSelectedCardId}
+                  onEdit={handleEdit}
                   onPublish={handlePublish}
                   status={campaignStatus[card.id]}
                 />
@@ -379,8 +389,7 @@ const AdInsights = ({ onPageChange }) => {
               <div className="campaign-wrapper">
                 <div 
                   onClick={() => onPageChange('drafts')}
-                  className="ad-card more-recommendations-card cursor-pointer hover:shadow-lg transition-shadow overflow-hidden relative"
-                  style={{ height: '550px' }}
+                  className="ad-card more-recommendations-card cursor-pointer hover:shadow-lg transition-shadow overflow-hidden relative flex flex-col"
                 >
                   {/* 动效背景容器 - 留边距 */}
                   <div className="absolute inset-[16px] rounded-xl overflow-hidden" style={{ 
@@ -511,7 +520,7 @@ const AdInsights = ({ onPageChange }) => {
           </div>
 
           {/* Audience & Page Insights */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 py-6 px-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-4 md:gap-6 py-4 md:py-6 px-2">
             <InsightBlock
               title="Audience Insight"
               data={AUDIENCE_INSIGHTS}
@@ -527,12 +536,12 @@ const AdInsights = ({ onPageChange }) => {
           </div>
 
           {/* Creative Insight */}
-          <div className="py-6 px-2">
+          <div className="py-4 md:py-6 px-2">
             <SectionTitle>Creative Insight</SectionTitle>
             <div className="flex flex-col p-2 gap-2 bg-gray-50 border border-border rounded-2xl">
-              <div className="w-full bg-white p-4 rounded-xl">
+              <div className="w-full bg-white p-3 md:p-4 rounded-xl">
                 <div className="text-gray-900 text-base font-bold mb-3">Creative Performance</div>
-                <div className="w-full h-[320px]">
+                <div className="w-full h-[280px] md:h-[320px]">
                   <ResponsiveContainer width="100%" height="100%">
                     <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
                       <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
@@ -545,9 +554,9 @@ const AdInsights = ({ onPageChange }) => {
                 </div>
               </div>
 
-              <div className="flex flex-col w-full p-4 gap-4 bg-white rounded-xl">
+              <div className="flex flex-col w-full p-3 md:p-4 gap-4 bg-white rounded-xl">
                 <div className="text-gray-900 text-base font-bold">Top Ads</div>
-                <div className="flex gap-12 overflow-x-auto pb-4 no-scrollbar">
+                <div className="flex gap-6 md:gap-12 overflow-x-auto pb-4 no-scrollbar">
                   {TOP_ADS.map((ad, index) => (
                     <CreativeAdCard key={ad.id} ad={ad} index={index} />
                   ))}
@@ -563,7 +572,7 @@ const AdInsights = ({ onPageChange }) => {
         <div className="fixed inset-0 bg-black/50 z-50 flex justify-center items-end" onClick={() => setEditDrawerOpen(false)}>
           <div className="w-full max-w-full h-[95vh] bg-white rounded-t-2xl shadow-lg flex flex-col overflow-hidden animate-slide-up" onClick={(e) => e.stopPropagation()}>
             <div className="p-5 border-b flex justify-between items-center">
-              <h3 className="text-lg font-bold">Edit Campaign {selectedCardId}</h3>
+              <h3 className="text-lg font-bold">Edit Campaign</h3>
               <button 
                 className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors"
                 onClick={() => setEditDrawerOpen(false)}
@@ -617,7 +626,11 @@ const AdInsights = ({ onPageChange }) => {
           flex-direction: column;
           font-size: 12px;
           position: relative;
-          height: 550px;
+          height: 100%;
+        }
+
+        .more-recommendations-card {
+          height: 100%;
         }
 
         .ad-audience-top {
@@ -654,23 +667,16 @@ const AdInsights = ({ onPageChange }) => {
           font-size: 11px;
           padding: 3px 8px;
           border-radius: 6px;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          max-width: 100%;
         }
 
         .aud-content-tag-long {
-          background: #F5F1FF;
-          border: 1px solid #E0E7FF;
-          color: #7033f5;
-          font-weight: 700;
-          font-size: 10px;
-          padding: 3px 8px;
-          border-radius: 6px;
-          max-width: 200px;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
-          cursor: help;
-          position: relative;
+          max-width: 100%;
         }
+
 
         .aud-content-tag-long::after {
           content: attr(title);
@@ -687,7 +693,7 @@ const AdInsights = ({ onPageChange }) => {
           z-index: 1000;
           opacity: 0;
           visibility: hidden;
-          transition: opacity 0.2s, visibility 0.2s;
+          transition: opacity 0.2s, visibility: 0.0s;
           pointer-events: none;
         }
 
@@ -812,10 +818,14 @@ const AdInsights = ({ onPageChange }) => {
           font-size: 11px;
           font-weight: 600;
           color: #111827;
-          cursor: default;
+          cursor: pointer;
           display: flex;
           align-items: center;
           gap: 4px;
+        }
+
+        .btn-edit:hover {
+          background: #E5E7EB;
         }
 
         .btn-publish-card {
@@ -914,12 +924,21 @@ const AdInsights = ({ onPageChange }) => {
           align-items: center;
           border-bottom-left-radius: 16px;
           border-bottom-right-radius: 16px;
+          gap: 8px;
+        }
+
+        .cta-left {
+          flex: 1;
+          min-width: 0;
         }
 
         .cta-left h5 {
           font-size: 13px;
           font-weight: 700;
           color: #111827;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
         }
 
         .cta-left p {
@@ -927,10 +946,14 @@ const AdInsights = ({ onPageChange }) => {
           color: #6B7280;
           min-height: 14px;
           margin-top: 2px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
         }
 
         .cta-wrapper {
           position: relative;
+          flex-shrink: 0;
         }
 
         .btn-shop-fixed {
@@ -942,6 +965,7 @@ const AdInsights = ({ onPageChange }) => {
           font-weight: 700;
           color: #111827;
           cursor: default;
+          white-space: nowrap;
         }
 
         .ad-social {
@@ -950,6 +974,7 @@ const AdInsights = ({ onPageChange }) => {
           justify-content: space-between;
           border-top: 1px solid #F3F4F6;
           color: #6B7280;
+          overflow: hidden;
         }
 
         .social-item {
@@ -959,6 +984,11 @@ const AdInsights = ({ onPageChange }) => {
           font-size: 12px;
           font-weight: 600;
           cursor: pointer;
+          flex: 1;
+          justify-content: center;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
         }
 
         /* 动效关键帧 */
