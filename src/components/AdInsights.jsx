@@ -379,19 +379,126 @@ const AdInsights = ({ onPageChange }) => {
               <div className="campaign-wrapper">
                 <div 
                   onClick={() => onPageChange('drafts')}
-                  className="ad-card more-recommendations-card cursor-pointer hover:shadow-lg transition-shadow"
+                  className="ad-card more-recommendations-card cursor-pointer hover:shadow-lg transition-shadow overflow-hidden relative"
+                  style={{ minHeight: '550px' }}
                 >
-                  <div className="flex flex-col items-center justify-center h-full min-h-[550px] p-8">
-                    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#8B5CF6] to-[#7033f5] flex items-center justify-center mb-4">
-                      <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  {/* 动效背景容器 - 留边距 */}
+                  <div className="absolute inset-[12px] rounded-xl overflow-hidden" style={{ 
+                    background: 'radial-gradient(circle at center, #c3a2fe 0%, #7135f4 50%, #4f46e5 100%)',
+                    zIndex: 0 
+                  }}>
+                    {/* 背景微粒 */}
+                    <div className="absolute w-[2px] h-[2px] bg-white rounded-full opacity-[0.1]" style={{ 
+                      left: '20%', 
+                      animation: 'drift 8s infinite linear' 
+                    }}></div>
+                    <div className="absolute w-[3px] h-[3px] bg-white rounded-full opacity-[0.1]" style={{ 
+                      left: '70%', 
+                      animation: 'drift 12s infinite linear' 
+                    }}></div>
+                    <div className="absolute w-[1px] h-[1px] bg-white rounded-full opacity-[0.1]" style={{ 
+                      left: '40%', 
+                      animation: 'drift 15s infinite linear' 
+                    }}></div>
+
+                    {/* 中心引擎 */}
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120px] h-[120px] z-[5] flex flex-col items-center justify-center text-center">
+                      <div className="absolute w-[140%] h-[140%] bg-[#8B5CF6] blur-[40px] opacity-[0.3]" style={{ 
+                        animation: 'core-pulse 3s infinite ease-in-out' 
+                      }}></div>
+                      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5" className="relative z-[2]">
+                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" strokeLinecap="round" strokeLinejoin="round"/>
                       </svg>
+                      <div className="relative z-[2] text-white mt-2">
+                        <div className="text-[14px] font-extrabold opacity-[0.9] tracking-[1px]">NEW CAMPAIGNS</div>
+                        <div className="text-[9px] opacity-[0.5] mt-1">AdsGo has been generated</div>
+                      </div>
                     </div>
+
+                    {/* 裂变幻影效果 */}
+                    <div className="absolute w-[80px] h-[40px] bg-[rgba(255,255,255,0.15)] border border-[rgba(255,255,255,0.3)] rounded-[8px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 scale-0 opacity-0 z-[1] pointer-events-none" style={{ 
+                      animation: 'emit-card 4s infinite 0s' 
+                    }}></div>
+                    <div className="absolute w-[80px] h-[40px] bg-[rgba(255,255,255,0.15)] border border-[rgba(255,255,255,0.3)] rounded-[8px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 scale-0 opacity-0 z-[1] pointer-events-none" style={{ 
+                      animation: 'emit-card-alt 4s infinite 1s' 
+                    }}></div>
+                    <div className="absolute w-[80px] h-[40px] bg-[rgba(255,255,255,0.15)] border border-[rgba(255,255,255,0.3)] rounded-[8px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 scale-0 opacity-0 z-[1] pointer-events-none" style={{ 
+                      animation: 'emit-card 4s infinite 2.5s' 
+                    }}></div>
+
+                    {/* 元素环绕系统 */}
+                    <div className="absolute w-full h-full" style={{ animation: 'system-rotate 30s linear infinite' }}>
+                      {/* 1. Audiences */}
+                      <div className="absolute w-[70px] h-[70px] bg-[rgba(255,255,255,0.08)] backdrop-blur-[8px] border border-[rgba(255,255,255,0.2)] rounded-[20px] flex flex-col items-center justify-center" style={{ 
+                        top: '15%', 
+                        left: '50%', 
+                        marginLeft: '-35px', 
+                        borderBottom: '2px solid #0ea5e9',
+                        animation: 'counter-rotate 30s linear infinite, float-vibrate 4s infinite ease-in-out' 
+                      }}>
+                        <svg width="30" height="30" viewBox="0 0 64 64">
+                          <circle fill="#0ea5e9" cx="32" cy="24" r="8" />
+                          <path fill="#0ea5e9" d="M16 50c0-6 8-10 16-10s16 4 16 10" opacity="0.6" />
+                        </svg>
+                        <div className="text-[8px] text-white mt-[5px] font-medium opacity-[0.7]">Audiences</div>
+                      </div>
+
+                      {/* 2. Creatives */}
+                      <div className="absolute w-[70px] h-[70px] bg-[rgba(255,255,255,0.08)] backdrop-blur-[8px] border border-[rgba(255,255,255,0.2)] rounded-[20px] flex flex-col items-center justify-center" style={{ 
+                        bottom: '15%', 
+                        left: '50%', 
+                        marginLeft: '-35px', 
+                        borderBottom: '2px solid #8B5CF6',
+                        animation: 'counter-rotate 30s linear infinite, float-vibrate 4s infinite ease-in-out' 
+                      }}>
+                        <svg width="30" height="30" viewBox="0 0 64 64">
+                          <rect x="18" y="18" width="28" height="28" rx="4" fill="#8B5CF6" />
+                          <circle cx="32" cy="32" r="6" fill="#000" opacity="0.2" />
+                        </svg>
+                        <div className="text-[8px] text-white mt-[5px] font-medium opacity-[0.7]">Creatives</div>
+                      </div>
+
+                      {/* 3. Ad copys */}
+                      <div className="absolute w-[70px] h-[70px] bg-[rgba(255,255,255,0.08)] backdrop-blur-[8px] border border-[rgba(255,255,255,0.2)] rounded-[20px] flex flex-col items-center justify-center" style={{ 
+                        left: '15%', 
+                        top: '50%', 
+                        marginTop: '-35px', 
+                        borderBottom: '2px solid #10b981',
+                        animation: 'counter-rotate 30s linear infinite, float-vibrate 4s infinite ease-in-out' 
+                      }}>
+                        <svg width="30" height="30" viewBox="0 0 64 64">
+                          <path d="M15 15h34v34H15z" stroke="#10b981" strokeWidth="3" fill="none" />
+                          <path d="M22 25h20M22 35h20M22 45h10" stroke="#fff" strokeWidth="2" />
+                        </svg>
+                        <div className="text-[8px] text-white mt-[5px] font-medium opacity-[0.7]">Ad copys</div>
+                      </div>
+
+                      {/* 4. AI Insights */}
+                      <div className="absolute w-[70px] h-[70px] bg-[rgba(255,255,255,0.08)] backdrop-blur-[8px] border border-[rgba(255,255,255,0.2)] rounded-[20px] flex flex-col items-center justify-center" style={{ 
+                        right: '15%', 
+                        top: '50%', 
+                        marginTop: '-35px', 
+                        borderBottom: '2px solid #f59e0b',
+                        animation: 'counter-rotate 30s linear infinite, float-vibrate 4s infinite ease-in-out' 
+                      }}>
+                        <svg width="30" height="30" viewBox="0 0 64 64">
+                          <rect fill="#f59e0b" x="15" y="35" width="5" height="15" />
+                          <rect fill="#f59e0b" x="25" y="25" width="5" height="25" />
+                          <rect fill="#f59e0b" x="35" y="15" width="5" height="35" />
+                          <path d="M35 10l2 4 4 2-4 2-2 4-2-4-4-2 4-2z" fill="#fff" />
+                        </svg>
+                        <div className="text-[8px] text-white mt-[5px] font-medium opacity-[0.7]">Insights</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 内容层 - 放在底部，白色背景 */}
+                  <div className="absolute bottom-0 left-0 right-0 z-[10] bg-white rounded-b-[16px] p-6 flex flex-col items-center justify-center border-t border-gray-100">
                     <h3 className="text-base font-bold text-gray-900 mb-2 whitespace-nowrap">View More AI-auto campaigns</h3>
                     <p className="text-sm text-gray-600 text-center mb-4">
-                    More AI regeneration campaigns in drafts
+                      More AI regeneration campaigns in drafts
                     </p>
-                    <div className="flex items-center gap-2 text-sm font-semibold text-[#7033f5]">
+                    <div className="flex items-center gap-2 text-sm font-semibold text-[#7033f5] hover:text-[#8B5CF6] transition-colors">
                       Go to Drafts
                       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -852,6 +959,42 @@ const AdInsights = ({ onPageChange }) => {
           font-size: 12px;
           font-weight: 600;
           cursor: pointer;
+        }
+
+        /* 动效关键帧 */
+        @keyframes core-pulse {
+          0%, 100% { transform: scale(1); opacity: 0.2; }
+          50% { transform: scale(1.2); opacity: 0.4; }
+        }
+
+        @keyframes system-rotate {
+          to { transform: rotate(360deg); }
+        }
+
+        @keyframes counter-rotate {
+          to { transform: rotate(-360deg); }
+        }
+
+        @keyframes float-vibrate {
+          0%, 100% { margin-top: -35px; }
+          50% { margin-top: -45px; }
+        }
+
+        @keyframes emit-card {
+          0% { transform: translate(-50%, -50%) scale(0) rotate(0); opacity: 0; }
+          30% { opacity: 0.8; }
+          100% { transform: translate(-150%, -200%) scale(1.5) rotate(-15deg); opacity: 0; }
+        }
+
+        @keyframes emit-card-alt {
+          0% { transform: translate(-50%, -50%) scale(0) rotate(0); opacity: 0; }
+          30% { opacity: 0.8; }
+          100% { transform: translate(120%, -180%) scale(1.5) rotate(15deg); opacity: 0; }
+        }
+
+        @keyframes drift {
+          from { transform: translateY(500px); }
+          to { transform: translateY(-100px); }
         }
       `}</style>
     </div>
