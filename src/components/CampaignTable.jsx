@@ -82,7 +82,7 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
           dailyBudget: 200,
           suggestedBudget: 200,
           budgetReason: null,
-          location: 'United States',
+          locations: ['US'],
           spend: 1296,
           impressions: 50000,
           cpm: 25.92,
@@ -103,7 +103,7 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
           dailyBudget: 300,
           suggestedBudget: 300,
           budgetReason: null,
-          location: 'Canada',
+          locations: ['CA'],
           spend: 1944,
           impressions: 75000,
           cpm: 25.92,
@@ -158,7 +158,7 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
             detailedReason: 'Adset 1 shows excellent performance with improved CTR and conversion rate.',
             metrics: { roi: 3.2, change: '+20%', costChange: '-10%' }
           },
-          location: 'United Kingdom',
+          locations: ['UK'],
           spend: 945,
           impressions: 42500,
           cpm: 22.24,
@@ -188,7 +188,7 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
             detailedReason: 'Adset 2 performance is below target, consider reducing budget.',
             metrics: { roi: 2.1, change: '-15%', costChange: '+5%' }
           },
-          location: 'United Kingdom',
+          locations: ['UK'],
           spend: 945,
           impressions: 42500,
           cpm: 22.24,
@@ -243,7 +243,7 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
           dailyBudget: 200,
           suggestedBudget: 200,
           budgetReason: null,
-          location: 'France',
+          locations: ['FR'],
           spend: 1260,
           impressions: 90000,
           cpm: 14,
@@ -264,7 +264,7 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
           dailyBudget: 200,
           suggestedBudget: 200,
           budgetReason: null,
-          location: 'Germany',
+          locations: ['DE'],
           spend: 1260,
           impressions: 90000,
           cpm: 14,
@@ -319,7 +319,7 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
             detailedReason: 'The Adset ROI is 1.8, below target (2.0). CPC is high (¥2.5), conversion rate is low (1.5%).',
             metrics: { roi: 1.8, change: '-15%', costChange: '+25%' }
           },
-          location: 'Japan',
+          locations: ['JP'],
           spend: 600,
           impressions: 22500,
           cpm: 26.67,
@@ -349,7 +349,7 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
             detailedReason: 'The Adset ROI is 1.8, below target (2.0). CPC is high (¥2.5), conversion rate is low (1.5%).',
             metrics: { roi: 1.8, change: '-15%', costChange: '+25%' }
           },
-          location: 'Japan',
+          locations: ['JP'],
           spend: 600,
           impressions: 22500,
           cpm: 26.67,
@@ -404,7 +404,7 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
           dailyBudget: 175,
           suggestedBudget: 175,
           budgetReason: null,
-          location: 'Australia',
+          locations: ['AU'],
           spend: 1050,
           impressions: 47500,
           cpm: 22.11,
@@ -425,7 +425,7 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
           dailyBudget: 175,
           suggestedBudget: 175,
           budgetReason: null,
-          location: 'Australia',
+          locations: ['AU'],
           spend: 1050,
           impressions: 47500,
           cpm: 22.11,
@@ -586,6 +586,63 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
         textClass: 'text-gray-700'
       }
     }
+  }
+
+  const getCampaignLocations = (campaign) => {
+    const allLocations = campaign.adsets.flatMap(adset => adset.locations || [])
+    const uniqueLocations = [...new Set(allLocations)]
+    return uniqueLocations
+  }
+
+  const LocationTags = ({ locations, maxVisible = 3 }) => {
+    if (!locations || locations.length === 0) return <span className="text-xs text-gray-400">-</span>
+    
+    const visibleLocations = locations.slice(0, maxVisible)
+    const hasMore = locations.length > maxVisible
+    
+    return (
+      <div className="group relative">
+        <div className="flex flex-wrap gap-1 max-h-12 overflow-hidden">
+          {visibleLocations.map((loc, idx) => (
+            <span 
+              key={idx}
+              className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-blue-50 text-blue-700 border border-blue-200"
+            >
+              {loc}
+            </span>
+          ))}
+          {hasMore && (
+            <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-gray-100 text-gray-600 border border-gray-200">
+              +{locations.length - maxVisible}
+            </span>
+          )}
+        </div>
+        {hasMore && (
+          <div className="absolute z-50 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-opacity duration-200 top-full left-0 mt-1 p-2 bg-white border border-gray-200 rounded-lg shadow-lg max-w-xs">
+            <div className="flex flex-wrap gap-1">
+              {locations.map((loc, idx) => (
+                <span 
+                  key={idx}
+                  className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-blue-50 text-blue-700 border border-blue-200"
+                >
+                  {loc}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    )
+  }
+
+  const ConversionGoalTag = ({ goal }) => {
+    if (!goal) return <span className="text-xs text-gray-400">-</span>
+    
+    return (
+      <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-purple-50 text-purple-700 border border-purple-200">
+        {goal}
+      </span>
+    )
   }
 
   // Sortable header component - always show sort icon
@@ -856,18 +913,11 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
                         </div>
                       )}
                     </td>
-                    <td className="px-2 py-3 text-xs text-gray-600">
-                      {(() => {
-                        const campaignLocations = [...new Set(
-                          campaign.adsets
-                            .map(adset => adset.location)
-                            .filter(Boolean)
-                        )].join(', ');
-                        return campaignLocations || '-';
-                      })()}
+                    <td className="px-2 py-3">
+                      <LocationTags locations={getCampaignLocations(campaign)} />
                     </td>
-                    <td className="px-2 py-3 text-xs text-gray-600">
-                      Sales
+                    <td className="px-2 py-3">
+                      <ConversionGoalTag goal="Sales" />
                     </td>
                     <td className="px-2 py-3 font-medium text-gray-900 text-xs">
                       {formatCurrency(campaign.spend)}
@@ -1042,11 +1092,11 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
                             )
                           )}
                         </td>
-                        <td className="px-2 py-2 text-xs text-gray-600">
-                          {adset.location || '-'}
+                        <td className="px-2 py-2">
+                          <LocationTags locations={adset.locations || []} />
                         </td>
-                        <td className="px-2 py-2 text-xs text-gray-600">
-                          Max Conversions-Purchase
+                        <td className="px-2 py-2">
+                          <ConversionGoalTag goal="Max Conversions-Purchase" />
                         </td>
                         <td className="px-2 py-2 font-medium text-gray-700 text-xs">
                           {formatCurrency(adset.spend)}
