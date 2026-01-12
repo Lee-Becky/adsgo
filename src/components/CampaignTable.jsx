@@ -724,7 +724,7 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
                   <span className="text-[10px] text-gray-400">Updated: January 4, 2026, 13:24:56 (UTC-8)</span>
                 </div>
               </th>
-              <th className="px-2 py-2 text-left text-xs font-bold text-primary min-w-[120px] sticky top-0 bg-gray-50 z-10 shadow-sm">
+              <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 min-w-[120px] sticky top-0 bg-gray-50 z-10 shadow-sm">
                 Locations
               </th>
               <th className="px-2 py-2 text-left text-xs font-bold text-primary min-w-[100px] sticky top-0 bg-gray-50 z-10 shadow-sm">
