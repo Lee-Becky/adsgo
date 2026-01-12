@@ -546,6 +546,38 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
     }
   }
 
+  const getBudgetCardColor = (suggestedBudget, currentBudget, status) => {
+    // If status is not pending, return gray
+    if (status !== 'pending') {
+      return {
+        bgClass: 'bg-gray-100',
+        borderClass: 'border-gray-300',
+        textClass: 'text-gray-700'
+      }
+    }
+    
+    // Compare suggested budget with current budget
+    if (suggestedBudget > currentBudget) {
+      return {
+        bgClass: 'bg-red-50',
+        borderClass: 'border-red-300',
+        textClass: 'text-red-700'
+      }
+    } else if (suggestedBudget < currentBudget) {
+      return {
+        bgClass: 'bg-green-50',
+        borderClass: 'border-green-300',
+        textClass: 'text-green-700'
+      }
+    } else {
+      return {
+        bgClass: 'bg-gray-100',
+        borderClass: 'border-gray-300',
+        textClass: 'text-gray-700'
+      }
+    }
+  }
+
   // Sortable header component - always show sort icon
   const SortableHeader = ({ children, sortKey, className }) => {
     const isSorted = sortConfig.key === sortKey
@@ -730,14 +762,17 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
                     <td className="px-2 py-3">
                       {campaign.budgetLevel === 'campaign' ? (
                         <div className={`space-y-2 ${status !== 'pending' ? 'opacity-50' : ''}`}>
-                          <div className="p-2 bg-primary/5 rounded-lg border border-primary/20">
-                            <div className="text-[10px] text-primary font-semibold mb-1">
-                              Recommended budget
-                            </div>
-                            <div className="flex items-center justify-between gap-2">
-                              <div className="text-xs font-bold text-primary">
-                                {formatCurrency(campaign.suggestedBudget)}
-                              </div>
+                          {(() => {
+                            const cardColor = getBudgetCardColor(campaign.suggestedBudget, campaign.dailyBudget, status)
+                            return (
+                              <div className={`p-2 ${cardColor.bgClass} rounded-lg border ${cardColor.borderClass}`}>
+                                <div className={`text-[10px] ${cardColor.textClass} font-semibold mb-1`}>
+                                  Recommended budget
+                                </div>
+                                <div className="flex items-center justify-between gap-2">
+                                  <div className={`text-xs font-bold ${cardColor.textClass}`}>
+                                    {formatCurrency(campaign.suggestedBudget)}
+                                  </div>
                               {campaign.status !== 'Paused' && status === 'pending' && !autoExecuteRecommendations && (
                                 <div className="flex gap-1">
                                   <button
@@ -775,7 +810,9 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
                                 </div>
                               )}
                             </div>
-                          </div>
+                              </div>
+                            )
+                          })()}
                           <div className="border-t border-border pt-1">
                             {campaign.budgetReason.reasons.map((reason, idx) => (
                               <div key={idx} className="text-[10px] text-gray-600 flex items-start gap-0.5 mb-0.5 leading-tight">
@@ -909,14 +946,17 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
                           ) : (
                             adset.budgetReason && (
                               <div className={`space-y-2 ${adsetStatus !== 'pending' ? 'opacity-50' : ''}`}>
-                                <div className="p-2 bg-primary/5 rounded-lg border border-primary/20">
-                                  <div className="text-[10px] text-primary font-semibold mb-1">
-                                    Recommended budget
-                                  </div>
-                                  <div className="flex items-center justify-between gap-2">
-                                    <div className="text-xs font-bold text-primary">
-                                      {formatCurrency(adset.suggestedBudget)}
-                                    </div>
+                                {(() => {
+                                  const cardColor = getBudgetCardColor(adset.suggestedBudget, adset.dailyBudget, adsetStatus)
+                                  return (
+                                    <div className={`p-2 ${cardColor.bgClass} rounded-lg border ${cardColor.borderClass}`}>
+                                      <div className={`text-[10px] ${cardColor.textClass} font-semibold mb-1`}>
+                                        Recommended budget
+                                      </div>
+                                      <div className="flex items-center justify-between gap-2">
+                                        <div className={`text-xs font-bold ${cardColor.textClass}`}>
+                                          {formatCurrency(adset.suggestedBudget)}
+                                        </div>
                                     {adset.status !== 'Paused' && adsetStatus === 'pending' && (
                                       <div className="flex gap-1">
                                         <button
@@ -949,7 +989,9 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
                                       </div>
                                     )}
                                   </div>
-                                </div>
+                                    </div>
+                                  )
+                                })()}
                                 <div className="border-t border-border pt-1">
                                   {adset.budgetReason.reasons.map((reason, idx) => (
                                     <div key={idx} className="text-[10px] text-gray-600 flex items-start gap-0.5 mb-0.5 leading-tight">
