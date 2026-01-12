@@ -82,6 +82,7 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
           dailyBudget: 200,
           suggestedBudget: 200,
           budgetReason: null,
+          location: 'United States',
           spend: 1296,
           impressions: 50000,
           cpm: 25.92,
@@ -102,6 +103,7 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
           dailyBudget: 300,
           suggestedBudget: 300,
           budgetReason: null,
+          location: 'Canada',
           spend: 1944,
           impressions: 75000,
           cpm: 25.92,
@@ -156,6 +158,7 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
             detailedReason: 'Adset 1 shows excellent performance with improved CTR and conversion rate.',
             metrics: { roi: 3.2, change: '+20%', costChange: '-10%' }
           },
+          location: 'United Kingdom',
           spend: 945,
           impressions: 42500,
           cpm: 22.24,
@@ -185,6 +188,7 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
             detailedReason: 'Adset 2 performance is below target, consider reducing budget.',
             metrics: { roi: 2.1, change: '-15%', costChange: '+5%' }
           },
+          location: 'United Kingdom',
           spend: 945,
           impressions: 42500,
           cpm: 22.24,
@@ -239,6 +243,7 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
           dailyBudget: 200,
           suggestedBudget: 200,
           budgetReason: null,
+          location: 'France',
           spend: 1260,
           impressions: 90000,
           cpm: 14,
@@ -259,6 +264,7 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
           dailyBudget: 200,
           suggestedBudget: 200,
           budgetReason: null,
+          location: 'Germany',
           spend: 1260,
           impressions: 90000,
           cpm: 14,
@@ -313,6 +319,7 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
             detailedReason: 'The Adset ROI is 1.8, below target (2.0). CPC is high (¥2.5), conversion rate is low (1.5%).',
             metrics: { roi: 1.8, change: '-15%', costChange: '+25%' }
           },
+          location: 'Japan',
           spend: 600,
           impressions: 22500,
           cpm: 26.67,
@@ -342,6 +349,7 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
             detailedReason: 'The Adset ROI is 1.8, below target (2.0). CPC is high (¥2.5), conversion rate is low (1.5%).',
             metrics: { roi: 1.8, change: '-15%', costChange: '+25%' }
           },
+          location: 'Japan',
           spend: 600,
           impressions: 22500,
           cpm: 26.67,
@@ -396,6 +404,7 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
           dailyBudget: 175,
           suggestedBudget: 175,
           budgetReason: null,
+          location: 'Australia',
           spend: 1050,
           impressions: 47500,
           cpm: 22.11,
@@ -416,6 +425,7 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
           dailyBudget: 175,
           suggestedBudget: 175,
           budgetReason: null,
+          location: 'Australia',
           spend: 1050,
           impressions: 47500,
           cpm: 22.11,
@@ -657,6 +667,9 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
                   <span className="text-[10px] text-gray-400">Updated: January 4, 2026, 13:24:56 (UTC-8)</span>
                 </div>
               </th>
+              <th className="px-2 py-2 text-left text-xs font-bold text-primary min-w-[120px] sticky top-0 bg-gray-50 z-10 shadow-sm">
+                Locations
+              </th>
               <th className="px-2 py-2 text-left text-xs font-bold text-primary min-w-[100px] sticky top-0 bg-gray-50 z-10 shadow-sm">
                 Conv. goal
               </th>
@@ -844,6 +857,16 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
                       )}
                     </td>
                     <td className="px-2 py-3 text-xs text-gray-600">
+                      {(() => {
+                        const campaignLocations = [...new Set(
+                          campaign.adsets
+                            .map(adset => adset.location)
+                            .filter(Boolean)
+                        )].join(', ');
+                        return campaignLocations || '-';
+                      })()}
+                    </td>
+                    <td className="px-2 py-3 text-xs text-gray-600">
                       Sales
                     </td>
                     <td className="px-2 py-3 font-medium text-gray-900 text-xs">
@@ -1018,6 +1041,9 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
                               </div>
                             )
                           )}
+                        </td>
+                        <td className="px-2 py-2 text-xs text-gray-600">
+                          {adset.location || '-'}
                         </td>
                         <td className="px-2 py-2 text-xs text-gray-600">
                           Max Conversions-Purchase
