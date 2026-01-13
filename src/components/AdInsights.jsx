@@ -94,14 +94,39 @@ const PageListItem = ({ item, i }) => (
   </div>
 );
 
-const RecommendationCard = ({ card, isExpanded, onToggle, onEdit, onPublish, status }) => {
+const RecommendationCard = ({ card, isExpanded, onToggle, onEdit, onPublish, status, cardIndex }) => {
   const isLookalike = card.audience === 'Lookalike Audience';
   const tagsArr = card.interests.split(',');
   const showExpandArrow = !isLookalike && tagsArr.length > 4;
+  const isPublished = !!status;
 
   return (
     <div className="campaign-wrapper">
-      <div className="ad-card">
+      {/* External Header with Index Badge and Actions */}
+      <div className="campaign-external-header">
+        <div className="campaign-index-group">
+          <div className={`campaign-index-badge ${isPublished ? 'is-published' : ''}`}>
+            {String(cardIndex + 1).padStart(2, '0')}
+          </div>
+          <span className="campaign-subtitle">CAMPAIGN</span>
+        </div>
+        {isPublished ? (
+          <div className={`status-badge-tag ${status === 'manual' ? 'status-manual' : 'status-auto'}`}>
+            {status === 'manual' ? 'Published (Manual)' : 'Published (Auto)'}
+          </div>
+        ) : (
+          <div className="external-actions">
+            <button className="btn-edit-ghost" onClick={() => onEdit(card.id)}>
+              <i className="fas fa-pen"></i>
+            </button>
+            <button className="btn-publish-external" onClick={() => onPublish(card.id)}>
+              Publish
+            </button>
+          </div>
+        )}
+      </div>
+
+      <div className={`ad-card ${isPublished ? 'is-published' : ''}`}>
         {/* Audience Info */}
         <div className="ad-audience-top">
           {isLookalike ? (
@@ -155,7 +180,7 @@ const RecommendationCard = ({ card, isExpanded, onToggle, onEdit, onPublish, sta
           )}
         </div>
 
-        {/* Header */}
+        {/* Header - Simplified */}
         <div className="ad-header">
           <div className="ad-user-info">
             <div className="ad-avatar"><i className="fas fa-asterisk"></i></div>
@@ -164,22 +189,6 @@ const RecommendationCard = ({ card, isExpanded, onToggle, onEdit, onPublish, sta
               <p>Sponsored · <i className="fas fa-globe-americas"></i></p>
             </div>
           </div>
-          {status ? (
-            <div className="published-status">
-              <span className={`status-badge ${status === 'manual' ? 'status-manual' : 'status-auto'}`}>
-                Published({status === 'manual' ? 'Manual' : 'Auto'})
-              </span>
-            </div>
-          ) : (
-            <div className="ad-header-buttons">
-              <button className="btn-edit" onClick={() => onEdit(card.id)}>
-                <i className="fas fa-pen"></i> Edit
-              </button>
-              <button className="btn-publish-card" onClick={() => onPublish(card.id)}>
-                Publish
-              </button>
-            </div>
-          )}
         </div>
 
         {/* Body - 2 lines only */}
@@ -345,177 +354,186 @@ const AdInsights = ({ onPageChange }) => {
           </div>
 
           {/* Launch Recommendation */}
-          <div className="py-4 md:py-6 px-2">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 mb-4 px-2">
-              <div className="flex items-center gap-2.5 flex-shrink-0">
-                <div className="w-1 h-[18px] rounded" style={{ background: 'linear-gradient(180deg, #8B5CF6, #4F46E5)' }}></div>
-                <h2 className="text-base md:text-lg font-bold text-gray-900 tracking-tight">Launch Recommendation</h2>
-              </div>
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-gray-200 bg-gray-50 flex-shrink-0">
-                <div className="flex items-center text-gray-700 text-sm font-semibold">
-                  <img src="https://www.adsgo.ai/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Frobot-active.7003b4d8.png&w=256&q=75" alt="AI Robot" className="w-5 h-5 mr-1.5" />
-                  Auto-launch:
+          <div className="py-6 md:py-8 px-2">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 mb-8 px-2">
+                <div className="flex items-center gap-2.5 flex-shrink-0">
+                  <div className="w-1 h-[18px] rounded" style={{ background: 'linear-gradient(180deg, #8B5CF6, #4F46E5)' }}></div>
+                  <h2 className="text-base md:text-lg font-bold text-gray-900 tracking-tight">Launch Recommendation</h2>
                 </div>
-                <div 
-                  className={`w-11 h-[22px] rounded-full p-[2px] cursor-pointer transition-colors ${autoRegen ? 'bg-[#7033f5]' : 'bg-gray-300'}`}
-                  onClick={() => setAutoRegen(!autoRegen)}
-                >
-                  <div className={`w-[18px] h-[18px] bg-white rounded-full transition-transform ${autoRegen ? 'translate-x-5' : 'translate-x-0'}`} />
+                <div className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-gray-200 bg-gray-50 flex-shrink-0">
+                  <div className="flex items-center text-gray-700 text-sm font-semibold">
+                    <img src="https://www.adsgo.ai/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Frobot-active.7003b4d8.png&w=256&q=75" alt="AI Robot" className="w-5 h-5 mr-1.5" />
+                    Auto-launch:
+                  </div>
+                  <div 
+                    className={`w-11 h-[22px] rounded-full p-[2px] cursor-pointer transition-colors ${autoRegen ? 'bg-[#7033f5]' : 'bg-gray-300'}`}
+                    onClick={() => setAutoRegen(!autoRegen)}
+                  >
+                    <div className={`w-[18px] h-[18px] bg-white rounded-full transition-transform ${autoRegen ? 'translate-x-5' : 'translate-x-0'}`} />
+                  </div>
+                  <span className={`text-xs font-semibold ${autoRegen ? 'text-green-600' : 'text-gray-500'}`}>
+                    {autoRegen 
+                      ? 'Enabled - Recommended campaigns will be launched automatically.' 
+                      : 'Disabled - Recommended campaigns need to be published manually.'
+                    }
+                  </span>
                 </div>
-                <span className={`text-xs font-semibold ${autoRegen ? 'text-green-600' : 'text-gray-500'}`}>
-                  {autoRegen 
-                    ? 'Enabled - Recommended campaigns will be launched automatically.' 
-                    : 'Disabled - Recommended campaigns need to be published manually.'
-                  }
-                </span>
               </div>
-            </div>
 
-            {/* Campaign Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
-              {displayedCards.map((card) => (
-                <RecommendationCard
-                  key={card.id}
-                  card={card}
-                  isExpanded={expandedTags[card.id]}
-                  onToggle={toggleTags}
-                  onEdit={handleEdit}
-                  onPublish={handlePublish}
-                  status={campaignStatus[card.id]}
-                />
-              ))}
+              {/* Campaign Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+                {displayedCards.map((card, index) => (
+                  <RecommendationCard
+                    key={card.id}
+                    card={card}
+                    isExpanded={expandedTags[card.id]}
+                    onToggle={toggleTags}
+                    onEdit={handleEdit}
+                    onPublish={handlePublish}
+                    status={campaignStatus[card.id]}
+                    cardIndex={index}
+                  />
+                ))}
 
-              {/* More Recommendations Card - same height as other cards */}
-              <div className="campaign-wrapper">
-                <div 
-                  onClick={() => onPageChange('drafts')}
-                  className="ad-card more-recommendations-card cursor-pointer hover:shadow-lg transition-shadow overflow-hidden relative flex flex-col"
-                >
-                  {/* 动效背景容器 - 留边距 */}
-                  <div className="absolute inset-[16px] rounded-xl overflow-hidden" style={{ 
-                    background: 'radial-gradient(circle at center, #c3a2fe 0%, #7135f4 50%, #4f46e5 100%)',
-                    zIndex: 0 
-                  }}>
-                    {/* 背景微粒 */}
-                    <div className="absolute w-[2px] h-[2px] bg-white rounded-full opacity-[0.1]" style={{ 
-                      left: '20%', 
-                      animation: 'drift 8s infinite linear' 
-                    }}></div>
-                    <div className="absolute w-[3px] h-[3px] bg-white rounded-full opacity-[0.1]" style={{ 
-                      left: '70%', 
-                      animation: 'drift 12s infinite linear' 
-                    }}></div>
-                    <div className="absolute w-[1px] h-[1px] bg-white rounded-full opacity-[0.1]" style={{ 
-                      left: '40%', 
-                      animation: 'drift 15s infinite linear' 
-                    }}></div>
-
-                    {/* 中心引擎 */}
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[100px] h-[100px] z-[5] flex flex-col items-center justify-center text-center">
-                      <div className="absolute w-[120%] h-[120%] bg-[#8B5CF6] blur-[30px] opacity-[0.3]" style={{ 
-                        animation: 'core-pulse 3s infinite ease-in-out' 
+                {/* More Recommendations Card - same height as other cards */}
+                <div className="campaign-wrapper">
+                  <div 
+                    onClick={() => onPageChange('drafts')}
+                    className="ad-card more-recommendations-card cursor-pointer hover:shadow-lg transition-shadow overflow-hidden relative flex flex-col"
+                  >
+                    {/* 动效背景容器 - 留边距 */}
+                    <div className="absolute inset-[16px] rounded-xl overflow-hidden" style={{ 
+                      background: 'radial-gradient(circle at center, #c3a2fe 0%, #7135f4 50%, #4f46e5 100%)',
+                      zIndex: 0 
+                    }}>
+                      {/* 背景微粒 */}
+                      <div className="absolute w-[2px] h-[2px] bg-white rounded-full opacity-[0.1]" style={{ 
+                        left: '20%', 
+                        animation: 'drift 8s infinite linear' 
                       }}></div>
-                      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5" className="relative z-[2]">
-                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
-                      <div className="relative z-[2] text-white mt-2">
-                        <div className="text-[14px] font-extrabold opacity-[0.9] tracking-[1px]">More Recommendations</div>
-                        <div className="text-[9px] opacity-[0.5] mt-1">AdsGo has been generated</div>
+                      <div className="absolute w-[3px] h-[3px] bg-white rounded-full opacity-[0.1]" style={{ 
+                        left: '70%', 
+                        animation: 'drift 12s infinite linear' 
+                      }}></div>
+                      <div className="absolute w-[1px] h-[1px] bg-white rounded-full opacity-[0.1]" style={{ 
+                        left: '40%', 
+                        animation: 'drift 15s infinite linear' 
+                      }}></div>
+
+                      {/* 中心引擎 */}
+                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[100px] h-[100px] z-[5] flex flex-col items-center justify-center text-center">
+                        <div className="absolute w-[120%] h-[120%] bg-[#8B5CF6] blur-[30px] opacity-[0.3]" style={{ 
+                          animation: 'core-pulse 3s infinite ease-in-out' 
+                        }}></div>
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5" className="relative z-[2]">
+                          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                        <div className="relative z-[2] text-white mt-2">
+                          <div className="text-[14px] font-extrabold opacity-[0.9] tracking-[1px]">More Recommendations</div>
+                          <div className="text-[9px] opacity-[0.5] mt-1">AdsGo has been generated</div>
+                        </div>
+                      </div>
+
+                      {/* 裂变幻影效果 */}
+                      <div className="absolute w-[80px] h-[40px] bg-[rgba(255,255,255,0.15)] border border-[rgba(255,255,255,0.3)] rounded-[8px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 scale-0 opacity-0 z-[1] pointer-events-none" style={{ 
+                        animation: 'emit-card 4s infinite 0s' 
+                      }}></div>
+                      <div className="absolute w-[80px] h-[40px] bg-[rgba(255,255,255,0.15)] border border-[rgba(255,255,255,0.3)] rounded-[8px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 scale-0 opacity-0 z-[1] pointer-events-none" style={{ 
+                        animation: 'emit-card-alt 4s infinite 1s' 
+                      }}></div>
+                      <div className="absolute w-[80px] h-[40px] bg-[rgba(255,255,255,0.15)] border border-[rgba(255,255,255,0.3)] rounded-[8px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 scale-0 opacity-0 z-[1] pointer-events-none" style={{ 
+                        animation: 'emit-card 4s infinite 2.5s' 
+                      }}></div>
+
+                      {/* 元素环绕系统 */}
+                      <div className="absolute w-full h-full" style={{ animation: 'system-rotate 30s linear infinite' }}>
+                        {/* 1. Audiences */}
+                        <div className="absolute w-[70px] h-[70px] bg-[rgba(255,255,255,0.08)] backdrop-blur-[8px] border border-[rgba(255,255,255,0.2)] rounded-[20px] flex flex-col items-center justify-center" style={{ 
+                          top: '15%', 
+                          left: '50%', 
+                          marginLeft: '-35px', 
+                          borderBottom: '2px solid #0ea5e9',
+                          animation: 'counter-rotate 30s linear infinite, float-vibrate 4s infinite ease-in-out' 
+                        }}>
+                          <svg width="30" height="30" viewBox="0 0 64 64">
+                            <circle fill="#0ea5e9" cx="32" cy="24" r="8" />
+                            <path fill="#0ea5e9" d="M16 50c0-6 8-10 16-10s16 4 16 10" opacity="0.6" />
+                          </svg>
+                          <div className="text-[8px] text-white mt-[5px] font-medium opacity-[0.7]">Audiences</div>
+                        </div>
+
+                        {/* 2. Creatives */}
+                        <div className="absolute w-[70px] h-[70px] bg-[rgba(255,255,255,0.08)] backdrop-blur-[8px] border border-[rgba(255,255,255,0.2)] rounded-[20px] flex flex-col items-center justify-center" style={{ 
+                          bottom: '15%', 
+                          left: '50%', 
+                          marginLeft: '-35px', 
+                          borderBottom: '2px solid #8B5CF6',
+                          animation: 'counter-rotate 30s linear infinite, float-vibrate 4s infinite ease-in-out' 
+                        }}>
+                          <svg width="30" height="30" viewBox="0 0 64 64">
+                            <rect x="18" y="18" width="28" height="28" rx="4" fill="#8B5CF6" />
+                            <circle cx="32" cy="32" r="6" fill="#000" opacity="0.2" />
+                          </svg>
+                          <div className="text-[8px] text-white mt-[5px] font-medium opacity-[0.7]">Creatives</div>
+                        </div>
+
+                        {/* 3. Ad copys */}
+                        <div className="absolute w-[70px] h-[70px] bg-[rgba(255,255,255,0.08)] backdrop-blur-[8px] border border-[rgba(255,255,255,0.2)] rounded-[20px] flex flex-col items-center justify-center" style={{ 
+                          left: '15%', 
+                          top: '50%', 
+                          marginTop: '-35px', 
+                          borderBottom: '2px solid #10b981',
+                          animation: 'counter-rotate 30s linear infinite, float-vibrate 4s infinite ease-in-out' 
+                        }}>
+                          <svg width="30" height="30" viewBox="0 0 64 64">
+                            <path d="M15 15h34v34H15z" stroke="#10b981" strokeWidth="3" fill="none" />
+                            <path d="M22 25h20M22 35h20M22 45h10" stroke="#fff" strokeWidth="2" />
+                          </svg>
+                          <div className="text-[8px] text-white mt-[5px] font-medium opacity-[0.7]">Ad copys</div>
+                        </div>
+
+                        {/* 4. AI Insights */}
+                        <div className="absolute w-[70px] h-[70px] bg-[rgba(255,255,255,0.08)] backdrop-blur-[8px] border border-[rgba(255,255,255,0.2)] rounded-[20px] flex flex-col items-center justify-center" style={{ 
+                          right: '15%', 
+                          top: '50%', 
+                          marginTop: '-35px', 
+                          borderBottom: '2px solid #f59e0b',
+                          animation: 'counter-rotate 30s linear infinite, float-vibrate 4s infinite ease-in-out' 
+                        }}>
+                          <svg width="30" height="30" viewBox="0 0 64 64">
+                            <rect fill="#f59e0b" x="15" y="35" width="5" height="15" />
+                            <rect fill="#f59e0b" x="25" y="25" width="5" height="25" />
+                            <rect fill="#f59e0b" x="35" y="15" width="5" height="35" />
+                            <path d="M35 10l2 4 4 2-4 2-2 4-2-4-4-2 4-2z" fill="#fff" />
+                          </svg>
+                          <div className="text-[7px] text-white mt-[4px] font-medium opacity-[0.7]">Insights</div>
+                        </div>
                       </div>
                     </div>
 
-                    {/* 裂变幻影效果 */}
-                    <div className="absolute w-[80px] h-[40px] bg-[rgba(255,255,255,0.15)] border border-[rgba(255,255,255,0.3)] rounded-[8px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 scale-0 opacity-0 z-[1] pointer-events-none" style={{ 
-                      animation: 'emit-card 4s infinite 0s' 
-                    }}></div>
-                    <div className="absolute w-[80px] h-[40px] bg-[rgba(255,255,255,0.15)] border border-[rgba(255,255,255,0.3)] rounded-[8px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 scale-0 opacity-0 z-[1] pointer-events-none" style={{ 
-                      animation: 'emit-card-alt 4s infinite 1s' 
-                    }}></div>
-                    <div className="absolute w-[80px] h-[40px] bg-[rgba(255,255,255,0.15)] border border-[rgba(255,255,255,0.3)] rounded-[8px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 scale-0 opacity-0 z-[1] pointer-events-none" style={{ 
-                      animation: 'emit-card 4s infinite 2.5s' 
-                    }}></div>
-
-                    {/* 元素环绕系统 */}
-                    <div className="absolute w-full h-full" style={{ animation: 'system-rotate 30s linear infinite' }}>
-                      {/* 1. Audiences */}
-                      <div className="absolute w-[70px] h-[70px] bg-[rgba(255,255,255,0.08)] backdrop-blur-[8px] border border-[rgba(255,255,255,0.2)] rounded-[20px] flex flex-col items-center justify-center" style={{ 
-                        top: '15%', 
-                        left: '50%', 
-                        marginLeft: '-35px', 
-                        borderBottom: '2px solid #0ea5e9',
-                        animation: 'counter-rotate 30s linear infinite, float-vibrate 4s infinite ease-in-out' 
-                      }}>
-                        <svg width="30" height="30" viewBox="0 0 64 64">
-                          <circle fill="#0ea5e9" cx="32" cy="24" r="8" />
-                          <path fill="#0ea5e9" d="M16 50c0-6 8-10 16-10s16 4 16 10" opacity="0.6" />
+                    {/* 内容层 - 放在底部，白色背景 */}
+                    <div className="absolute bottom-0 left-0 right-0 z-[10] bg-white rounded-b-[16px] p-6 flex flex-col items-center justify-center border-t border-gray-100">
+                      <h3 className="text-base font-bold text-gray-900 mb-2 whitespace-nowrap">View More AI-auto campaigns</h3>
+                      <p className="text-sm text-gray-600 text-center mb-4">
+                        More AI regeneration campaigns in drafts
+                      </p>
+                      <button className="flex items-center gap-2 text-sm font-semibold text-white bg-gradient-to-r from-[#8B5CF6] to-[#7033f5] px-6 py-2.5 rounded-full hover:shadow-lg transition-all hover:scale-105">
+                        Go to Drafts
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                         </svg>
-                        <div className="text-[8px] text-white mt-[5px] font-medium opacity-[0.7]">Audiences</div>
-                      </div>
-
-                      {/* 2. Creatives */}
-                      <div className="absolute w-[70px] h-[70px] bg-[rgba(255,255,255,0.08)] backdrop-blur-[8px] border border-[rgba(255,255,255,0.2)] rounded-[20px] flex flex-col items-center justify-center" style={{ 
-                        bottom: '15%', 
-                        left: '50%', 
-                        marginLeft: '-35px', 
-                        borderBottom: '2px solid #8B5CF6',
-                        animation: 'counter-rotate 30s linear infinite, float-vibrate 4s infinite ease-in-out' 
-                      }}>
-                        <svg width="30" height="30" viewBox="0 0 64 64">
-                          <rect x="18" y="18" width="28" height="28" rx="4" fill="#8B5CF6" />
-                          <circle cx="32" cy="32" r="6" fill="#000" opacity="0.2" />
-                        </svg>
-                        <div className="text-[8px] text-white mt-[5px] font-medium opacity-[0.7]">Creatives</div>
-                      </div>
-
-                      {/* 3. Ad copys */}
-                      <div className="absolute w-[70px] h-[70px] bg-[rgba(255,255,255,0.08)] backdrop-blur-[8px] border border-[rgba(255,255,255,0.2)] rounded-[20px] flex flex-col items-center justify-center" style={{ 
-                        left: '15%', 
-                        top: '50%', 
-                        marginTop: '-35px', 
-                        borderBottom: '2px solid #10b981',
-                        animation: 'counter-rotate 30s linear infinite, float-vibrate 4s infinite ease-in-out' 
-                      }}>
-                        <svg width="30" height="30" viewBox="0 0 64 64">
-                          <path d="M15 15h34v34H15z" stroke="#10b981" strokeWidth="3" fill="none" />
-                          <path d="M22 25h20M22 35h20M22 45h10" stroke="#fff" strokeWidth="2" />
-                        </svg>
-                        <div className="text-[8px] text-white mt-[5px] font-medium opacity-[0.7]">Ad copys</div>
-                      </div>
-
-                      {/* 4. AI Insights */}
-                      <div className="absolute w-[70px] h-[70px] bg-[rgba(255,255,255,0.08)] backdrop-blur-[8px] border border-[rgba(255,255,255,0.2)] rounded-[20px] flex flex-col items-center justify-center" style={{ 
-                        right: '15%', 
-                        top: '50%', 
-                        marginTop: '-35px', 
-                        borderBottom: '2px solid #f59e0b',
-                        animation: 'counter-rotate 30s linear infinite, float-vibrate 4s infinite ease-in-out' 
-                      }}>
-                        <svg width="30" height="30" viewBox="0 0 64 64">
-                          <rect fill="#f59e0b" x="15" y="35" width="5" height="15" />
-                          <rect fill="#f59e0b" x="25" y="25" width="5" height="25" />
-                          <rect fill="#f59e0b" x="35" y="15" width="5" height="35" />
-                          <path d="M35 10l2 4 4 2-4 2-2 4-2-4-4-2 4-2z" fill="#fff" />
-                        </svg>
-                        <div className="text-[7px] text-white mt-[4px] font-medium opacity-[0.7]">Insights</div>
-                      </div>
+                      </button>
                     </div>
-                  </div>
-
-                  {/* 内容层 - 放在底部，白色背景 */}
-                  <div className="absolute bottom-0 left-0 right-0 z-[10] bg-white rounded-b-[16px] p-6 flex flex-col items-center justify-center border-t border-gray-100">
-                    <h3 className="text-base font-bold text-gray-900 mb-2 whitespace-nowrap">View More AI-auto campaigns</h3>
-                    <p className="text-sm text-gray-600 text-center mb-4">
-                      More AI regeneration campaigns in drafts
-                    </p>
-                    <button className="flex items-center gap-2 text-sm font-semibold text-white bg-gradient-to-r from-[#8B5CF6] to-[#7033f5] px-6 py-2.5 rounded-full hover:shadow-lg transition-all hover:scale-105">
-                      Go to Drafts
-                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </button>
                   </div>
                 </div>
               </div>
+          </div>
+
+          {/* Section Divider - Full-width Bar */}
+          <div className="section-divider-fullwidth">
+            <div className="divider-bar-content">
+              <span className="divider-bar-icon"><i className="fas fa-chart-line"></i></span>
+              <span className="divider-bar-text">Last 3 days data analysis & insights</span>
             </div>
           </div>
 
@@ -612,8 +630,141 @@ const AdInsights = ({ onPageChange }) => {
         .campaign-wrapper {
           display: flex;
           flex-direction: column;
-          gap: 8px;
+          gap: 12px;
           transition: all 0.3s;
+        }
+
+        .campaign-external-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 0;
+          margin-bottom: 4px;
+        }
+
+        .campaign-index-group {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+        }
+
+        .campaign-index-badge {
+          width: 32px;
+          height: 32px;
+          border-radius: 8px;
+          background: linear-gradient(135deg, #F5F1FF 0%, #E0E7FF 100%);
+          border: 1px solid #D1D5DB;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 13px;
+          font-weight: 700;
+          color: #7033f5;
+          letter-spacing: -0.02em;
+        }
+
+        .campaign-index-badge.is-published {
+          background: linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 100%);
+          border-color: #10B981;
+          color: #059669;
+        }
+
+        .campaign-subtitle {
+          font-size: 11px;
+          font-weight: 500;
+          color: #9CA3AF;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+        }
+
+        .external-actions {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+        }
+
+        .btn-edit-ghost {
+          width: 32px;
+          height: 32px;
+          border: 1px solid #E5E7EB;
+          background: transparent;
+          border-radius: 8px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #6B7280;
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+
+        .btn-edit-ghost:hover {
+          background: #F3F4F6;
+          color: #374151;
+          border-color: #D1D5DB;
+        }
+
+        .btn-publish-external {
+          background: linear-gradient(135deg, #8B5CF6 0%, #7033f5 100%);
+          background-size: 200% 200%;
+          border: none;
+          padding: 7px 18px;
+          border-radius: 10px;
+          font-size: 12px;
+          font-weight: 600;
+          color: white;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          gap: 5px;
+          box-shadow: 0 2px 12px rgba(112, 51, 245, 0.2), 0 0 0 0 rgba(112, 51, 245, 0.4);
+          transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+          animation: gradient-pulse 3s ease infinite, initial-glow 0.6s ease-out;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .btn-publish-external::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+          transition: left 0.5s;
+        }
+
+        .btn-publish-external:hover::before {
+          left: 100%;
+        }
+
+        .btn-publish-external:hover {
+          box-shadow: 0 6px 24px rgba(112, 51, 245, 0.35), 0 0 0 4px rgba(112, 51, 245, 0.15);
+          transform: translateY(-2px) scale(1.02);
+        }
+
+        @keyframes gradient-pulse {
+          0%, 100% {
+            background-position: 0% 50%;
+          }
+          50% {
+            background-position: 100% 50%;
+          }
+        }
+
+        @keyframes initial-glow {
+          0% {
+            box-shadow: 0 0 0 0 rgba(112, 51, 245, 0.7);
+            transform: scale(0.95);
+          }
+          50% {
+            box-shadow: 0 0 0 10px rgba(112, 51, 245, 0);
+            transform: scale(1);
+          }
+          100% {
+            box-shadow: 0 2px 12px rgba(112, 51, 245, 0.2);
+            transform: scale(1);
+          }
         }
 
         .ad-card {
@@ -621,12 +772,123 @@ const AdInsights = ({ onPageChange }) => {
           border: 1px solid #E5E7EB;
           border-radius: 16px;
           overflow: visible;
-          box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+          box-shadow: 0 4px 24px -4px rgba(0,0,0,0.06);
           display: flex;
           flex-direction: column;
           font-size: 12px;
           position: relative;
           height: 100%;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .ad-card:hover {
+          box-shadow: 0 8px 32px -4px rgba(0,0,0,0.1);
+        }
+
+        .ad-card.is-published {
+          background: white;
+          border-color: #E0E7FF;
+          opacity: 0.75;
+          filter: grayscale(0.15) brightness(0.98);
+          pointer-events: none;
+        }
+
+        .ad-card.is-published::before {
+          content: '';
+          position: absolute;
+          left: 0;
+          top: 0;
+          bottom: 0;
+          width: 4px;
+          background: linear-gradient(180deg, #7033f5 0%, #8B5CF6 100%);
+          border-top-left-radius: 16px;
+          border-bottom-left-radius: 16px;
+        }
+
+        .ad-card.is-published .ad-audience-top {
+          background: #FAF9FF;
+          border-bottom-color: #E5E7EB;
+        }
+
+        .ad-card.is-published .ad-cta-section {
+          background: #FAF9FF;
+        }
+
+        .status-badge-tag {
+          padding: 5px 12px;
+          border-radius: 12px;
+          font-size: 11px;
+          font-weight: 600;
+          letter-spacing: 0.02em;
+        }
+
+        .status-badge-tag.status-manual {
+          background: #F5F1FF;
+          border: 1px solid #E0E7FF;
+          color: #7033f5;
+        }
+
+        .status-badge-tag.status-auto {
+          background: #ECFDF5;
+          border: 1px solid #D1FAE5;
+          color: #059669;
+        }
+
+        /* Section Divider - Full-width Bar */
+        .section-divider-fullwidth {
+          position: relative;
+          margin: 40px -1rem 32px 0;
+          padding: 0;
+          height: 36px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        @media (min-width: 768px) {
+          .section-divider-fullwidth {
+            margin: 40px -1.5rem 32px 0;
+          }
+        }
+
+        .section-divider-fullwidth::before {
+          content: '';
+          position: absolute;
+          left: 0;
+          right: 0;
+          top: 0;
+          height: 100%;
+          background: linear-gradient(180deg, #F5F1FF 0%, #EDE7FF 100%);
+          border-top: 1px solid #E0D5FF;
+          border-bottom: 1px solid #E0D5FF;
+        }
+
+        .divider-bar-content {
+          position: relative;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          z-index: 1;
+        }
+
+        .divider-bar-icon {
+          width: 20px;
+          height: 20px;
+          border-radius: 4px;
+          background: linear-gradient(135deg, #F5F1FF 0%, #E0E7FF 100%);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #7033f5;
+          font-size: 10px;
+        }
+
+        .divider-bar-text {
+          font-size: 11px;
+          font-weight: 700;
+          letter-spacing: 0.12em;
+          color: #64748B;
+          text-transform: uppercase;
         }
 
         .more-recommendations-card {
@@ -634,11 +896,15 @@ const AdInsights = ({ onPageChange }) => {
         }
 
         .ad-audience-top {
-          background: #F8F9FF;
-          padding: 12px 14px;
-          border-bottom: 1px solid #E0E7FF;
+          background: white;
+          padding: 14px 16px;
+          border-bottom: 1px solid #F3F4F6;
           border-top-left-radius: 16px;
           border-top-right-radius: 16px;
+        }
+
+        .ad-audience-top:hover {
+          background: #FAFBFC;
         }
 
         .aud-name {
@@ -676,7 +942,6 @@ const AdInsights = ({ onPageChange }) => {
         .aud-content-tag-long {
           max-width: 100%;
         }
-
 
         .aud-content-tag-long::after {
           content: attr(title);
@@ -828,36 +1093,10 @@ const AdInsights = ({ onPageChange }) => {
           background: #E5E7EB;
         }
 
-        .btn-publish-card {
-          background: linear-gradient(90deg, #8B5CF6, #7033f5);
-          border: none;
-          padding: 6px 16px;
-          border-radius: 20px;
-          font-size: 11px;
-          font-weight: 600;
-          color: white;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          gap: 4px;
-          box-shadow: 0 2px 8px rgba(124, 58, 237, 0.25);
-          transition: all 0.2s;
-        }
-
-        .btn-publish-card:hover {
-          box-shadow: 0 4px 12px rgba(124, 58, 237, 0.35);
-          transform: translateY(-1px);
-        }
-
-        .published-status {
-          display: flex;
-          align-items: center;
-        }
-
         .status-badge {
-          padding: 6px 12px;
-          border-radius: 20px;
-          font-size: 11px;
+          padding: 5px 10px;
+          border-radius: 12px;
+          font-size: 10px;
           font-weight: 600;
         }
 

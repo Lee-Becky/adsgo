@@ -99,6 +99,9 @@ const OptimizePreferences = () => {
             <p className="text-xs text-gray-700 leading-relaxed">
               If you want adsgo to monitor and provide timely optimization suggestions for your trigger rules based on your optimization rules, please configure it now;
             </p>
+            <p className="text-xs text-red-700 leading-relaxed">
+              eg: Pause when the campaign's 7-day ROAS is less than 200%.
+            </p>
           </div>
         )}
       </div>
