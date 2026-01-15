@@ -2,27 +2,57 @@ import { useState } from 'react'
 import { X, Minus, Plus } from 'lucide-react'
 
 const RuleConfigModal = ({ isOpen, onClose, onSave }) => {
+  const MAX_RULES = 10
+  const MAX_RULE_LENGTH = 100
+  
   const [rules, setRules] = useState([])
   const [newRule, setNewRule] = useState('')
   const [editingRules, setEditingRules] = useState([])
+  const [errorMessage, setErrorMessage] = useState('')
 
   const handleAddRule = () => {
-    if (newRule.trim()) {
-      const updatedRules = [...editingRules, newRule.trim()]
-      setEditingRules(updatedRules)
-      setNewRule('')
+    setErrorMessage('')
+    
+    // Check if maximum rules reached
+    if (editingRules.length >= MAX_RULES) {
+      setErrorMessage(`Maximum ${MAX_RULES} rules allowed`)
+      return
     }
+    
+    // Check if rule is empty
+    if (!newRule.trim()) {
+      setErrorMessage('Please enter a rule')
+      return
+    }
+    
+    // Check rule length
+    if (newRule.trim().length > MAX_RULE_LENGTH) {
+      setErrorMessage(`Rule must be ${MAX_RULE_LENGTH} characters or less`)
+      return
+    }
+    
+    const updatedRules = [...editingRules, newRule.trim()]
+    setEditingRules(updatedRules)
+    setNewRule('')
   }
 
   const handleDeleteRule = (index) => {
     const updatedRules = editingRules.filter((_, i) => i !== index)
     setEditingRules(updatedRules)
+    setErrorMessage('')
   }
 
   const handleUpdateRule = (index, value) => {
+    // Check rule length
+    if (value.length > MAX_RULE_LENGTH) {
+      setErrorMessage(`Rule must be ${MAX_RULE_LENGTH} characters or less`)
+      return
+    }
+    
     const updatedRules = [...editingRules]
     updatedRules[index] = value
     setEditingRules(updatedRules)
+    setErrorMessage('')
   }
 
   const handleSave = () => {
@@ -95,7 +125,12 @@ const RuleConfigModal = ({ isOpen, onClose, onSave }) => {
           </div>
 
           <div className="border-t border-slate-100 pt-2">
-            <h3 className="text-sm font-bold text-slate-800 mb-4 uppercase tracking-tight">Your Rules</h3>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-sm font-bold text-slate-800 uppercase tracking-tight">Your Rules</h3>
+              <span className="text-xs text-slate-500 font-medium">
+                {editingRules.length}/{MAX_RULES}
+              </span>
+            </div>
             {editingRules.length === 0 ? (
               <div className="text-center py-8 bg-slate-50 rounded-lg border border-dashed border-slate-200 text-gray-400 text-xs">
                 No rules configured yet.
@@ -104,12 +139,23 @@ const RuleConfigModal = ({ isOpen, onClose, onSave }) => {
               <div className="space-y-3">
                 {editingRules.map((rule, index) => (
                   <div key={index} className="flex items-start gap-2">
-                    <input
-                      type="text"
-                      value={rule}
-                      onChange={(e) => handleUpdateRule(index, e.target.value)}
-                      className="flex-1 px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 text-sm"
-                    />
+                    <div className="flex-1 relative">
+                      <input
+                        type="text"
+                        value={rule}
+                        onChange={(e) => handleUpdateRule(index, e.target.value)}
+                        className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600/20 text-sm pr-16 ${
+                          rule.length > MAX_RULE_LENGTH 
+                            ? 'border-red-500 focus:border-red-500' 
+                            : 'border-border focus:border-blue-600'
+                        }`}
+                      />
+                      <span className={`absolute right-3 top-1/2 -translate-y-1/2 text-xs font-medium ${
+                        rule.length > MAX_RULE_LENGTH ? 'text-red-500' : 'text-slate-400'
+                      }`}>
+                        {rule.length}/{MAX_RULE_LENGTH}
+                      </span>
+                    </div>
                     <button
                       onClick={() => handleDeleteRule(index)}
                       className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
@@ -125,22 +171,65 @@ const RuleConfigModal = ({ isOpen, onClose, onSave }) => {
 
           {/* Add New Rule */}
           <div className="mt-4 pt-4 border-t border-border">
+            {errorMessage && (
+              <div className="mb-3 p-3 bg-red-50 border border-red-200 rounded-lg">
+                <p className="text-xs text-red-700 font-medium">{errorMessage}</p>
+              </div>
+            )}
             <div className="flex items-start gap-2">
-              <input
-                type="text"
-                value={newRule}
-                onChange={(e) => setNewRule(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleAddRule()}
-                placeholder="Add new optimization rule..."
-                className="flex-1 px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 text-sm"
-              />
+              <div className="flex-1 relative">
+                <input
+                  type="text"
+                  value={newRule}
+                  onChange={(e) => setNewRule(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && handleAddRule()}
+                  placeholder="Add new optimization rule..."
+                  disabled={editingRules.length >= MAX_RULES}
+                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 text-sm pr-16 ${
+                    editingRules.length >= MAX_RULES
+                      ? 'border-slate-300 bg-slate-50 cursor-not-allowed'
+                      : newRule.length > MAX_RULE_LENGTH
+                      ? 'border-red-500 focus:border-red-500 focus:ring-red-600/20'
+                      : 'border-border focus:border-blue-600 focus:ring-blue-600/20'
+                  }`}
+                />
+                <span className={`absolute right-3 top-1/2 -translate-y-1/2 text-xs font-medium ${
+                  newRule.length > MAX_RULE_LENGTH ? 'text-red-500' : 'text-slate-400'
+                }`}>
+                  {newRule.length}/{MAX_RULE_LENGTH}
+                </span>
+              </div>
               <button
                 onClick={handleAddRule}
-                className="p-2 bg-blue-600 text-white hover:bg-blue-700 rounded-lg transition-colors"
+                disabled={editingRules.length >= MAX_RULES || !newRule.trim()}
+                className={`p-2 rounded-lg transition-colors ${
+                  editingRules.length >= MAX_RULES || !newRule.trim()
+                    ? 'bg-slate-300 text-slate-500 cursor-not-allowed'
+                    : 'bg-blue-600 text-white hover:bg-blue-700'
+                }`}
                 title="Add rule"
               >
                 <Plus size={16} />
               </button>
+            </div>
+            <div className="mt-2 flex items-center gap-2">
+              <div className="flex-1 h-1 bg-slate-200 rounded-full overflow-hidden">
+                <div 
+                  className={`h-full transition-all ${
+                    editingRules.length >= MAX_RULES 
+                      ? 'bg-red-500' 
+                      : editingRules.length >= MAX_RULES * 0.8
+                      ? 'bg-amber-500'
+                      : 'bg-blue-500'
+                  }`}
+                  style={{ width: `${(editingRules.length / MAX_RULES) * 100}%` }}
+                />
+              </div>
+              <span className="text-xs text-slate-500 font-medium whitespace-nowrap">
+                {editingRules.length >= MAX_RULES 
+                  ? 'Limit reached' 
+                  : `${MAX_RULES - editingRules.length} remaining`}
+              </span>
             </div>
           </div>
         </div>
