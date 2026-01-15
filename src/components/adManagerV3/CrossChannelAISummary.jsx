@@ -240,16 +240,16 @@ const CrossChannelAISummary = ({
       <div className="lg:col-span-2 bg-slate-50/50 border border-blue-100 rounded-2xl p-4 shadow-sm flex flex-col h-full">
         <div className="flex items-center justify-between border-b border-slate-200 pb-1.5 mb-5 shrink-0">
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2">
-              <Sparkles size={16} className="text-blue-500" />
-              <div className="flex items-baseline gap-3">
-                <h3 className="text-base font-black text-slate-800 tracking-wide">Today's Overview</h3>
-                <div className="flex items-center gap-1.5 px-2 py-0.5 bg-blue-100/50 rounded-full text-[11px] font-black text-blue-600 border border-blue-200">
-                  <Clock size={10} />
-                  <span>{lastUpdated}</span>
+              <div className="flex items-center gap-2">
+                <Sparkles size={16} className="text-blue-500" />
+                <div className="flex items-baseline gap-3">
+                  <h3 className="text-base font-black text-slate-800 tracking-wide">Omnichannel Overview</h3>
+                  <div className="flex items-center gap-1.5 px-2 py-0.5 bg-blue-100/50 rounded-full text-[11px] font-black text-blue-600 border border-blue-200">
+                    <Clock size={10} />
+                    <span>{lastUpdated}</span>
+                  </div>
                 </div>
               </div>
-            </div>
             <div className="flex gap-2 relative">
               <div 
                 className="relative group"
