@@ -42,9 +42,13 @@ const AdManagerV3 = ({ onEditBrandConfig, selectedBrand }) => {
     setShowBudgetReason(true)
   }
 
-  const handleBudgetSave = (campaignId, budgetData) => {
-    console.log('Saving budget:', campaignId, budgetData)
-    // TODO: 实际的预算保存逻辑
+  const handleBudgetSave = (campaignId, newBudget, editMode) => {
+    console.log('Saving budget:', campaignId, newBudget, editMode)
+    setCampaigns(prevCampaigns => 
+      prevCampaigns.map(c => 
+        c.id === campaignId ? { ...c, dailyBudget: newBudget } : c
+      )
+    )
   }
 
   const handleUpdateBudgetStatus = (id, status) => {

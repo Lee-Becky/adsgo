@@ -1,21 +1,21 @@
-import { useState } from 'react'
-import { X, DollarSign } from 'lucide-react'
+import { useState, useRef, useEffect } from 'react'
+import { X, DollarSign, Sparkles, Info } from 'lucide-react'
 
 const BudgetEditModal = ({ isOpen, onClose, campaign, onSave, onUpdateBudgetStatus }) => {
+  const [budget, setBudget] = useState(0)
   const [modificationReason, setModificationReason] = useState('')
+  const [isFocused, setIsFocused] = useState(false)
   
+  useEffect(() => {
+    if (campaign) {
+      setBudget(campaign.dailyBudget || 0)
+    }
+  }, [campaign])
+
   if (!isOpen || !campaign) return null
 
-  // 判断编辑模式
   const getEditMode = () => {
-    if (campaign.budgetLevel === 'campaign') {
-      return 'campaign'
-    }
-    // 对于 adset 层级，只支持编辑单个 adset
-    if (campaign.isAdset) {
-      return 'single-adset'
-    }
-    // 不再支持 all-adsets 模式，默认返回 single-adset
+    if (campaign.budgetLevel === 'campaign') return 'campaign'
     return 'single-adset'
   }
 
@@ -23,37 +23,13 @@ const BudgetEditModal = ({ isOpen, onClose, campaign, onSave, onUpdateBudgetStat
 
   const handleSubmit = (e) => {
     e.preventDefault()
+    const newBudget = parseFloat(budget)
+    const suggestedBudget = campaign.suggestedBudget
     
-    const formData = new FormData(e.target)
+    onSave(campaign.id, newBudget, currentEditMode)
     
-    if (currentEditMode === 'campaign') {
-      // 预算在 campaign 层：编辑单个 campaign 预算
-      const newBudget = parseFloat(formData.get('budget'))
-      const suggestedBudget = campaign.suggestedBudget
-      
-      onSave(campaign.id, newBudget, 'campaign')
-      
-      // 检查是否与建议预算不一致
-      if (newBudget !== suggestedBudget) {
-        // 更新状态为 invalid_modified
-        if (onUpdateBudgetStatus) {
-          onUpdateBudgetStatus(campaign.id, 'invalid_modified')
-        }
-      }
-    } else {
-      // 编辑单个 adset 预算
-      const newBudget = parseFloat(formData.get(`budget-${campaign.id}`))
-      const suggestedBudget = campaign.suggestedBudget
-      
-      onSave(campaign.id, newBudget, 'single-adset')
-      
-      // 检查是否与建议预算不一致
-      if (newBudget !== suggestedBudget) {
-        // 更新状态为 invalid_modified
-        if (onUpdateBudgetStatus) {
-          onUpdateBudgetStatus(campaign.id, 'invalid_modified')
-        }
-      }
+    if (newBudget !== suggestedBudget && onUpdateBudgetStatus) {
+      onUpdateBudgetStatus(campaign.id, 'invalid_modified')
     }
     
     setModificationReason('')
@@ -61,145 +37,145 @@ const BudgetEditModal = ({ isOpen, onClose, campaign, onSave, onUpdateBudgetStat
   }
 
   const formatCurrency = (value) => {
-    return `¥${value.toFixed(2)}`
+    return new Intl.NumberFormat('zh-CN', {
+      style: 'currency',
+      currency: 'CNY',
+      minimumFractionDigits: 2
+    }).format(value)
   }
 
+  const applyRecommendation = () => {
+    if (campaign.suggestedBudget) {
+      setBudget(campaign.suggestedBudget)
+    }
+  }
+
+  const budgetDiff = budget - campaign.dailyBudget
+
   return (
-    <>
-      <div className="fixed inset-0 z-50">
-        <div 
-          className="absolute inset-0 bg-black/50"
-          onClick={onClose}
-        />
-        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg bg-white rounded-xl shadow-2xl max-h-[90vh] overflow-y-auto">
-          <div className="px-6 py-4 border-b border-border flex items-center justify-between sticky top-0 bg-white z-10">
-            <h2 className="text-lg font-bold text-gray-900">
-              {currentEditMode === 'campaign' ? 'Edit Campaign Budget' : 'Edit Adset Budget'}
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+      {/* Dim Overlay */}
+      <div 
+        className="absolute inset-0 bg-slate-900/60 backdrop-blur-[2px]"
+        onClick={onClose}
+      />
+      
+      {/* Modal Content */}
+      <div className="relative w-full max-w-[440px] bg-white rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-150">
+        
+        {/* Header */}
+        <div className="px-6 pt-6 pb-4 flex items-start justify-between border-b border-slate-50">
+          <div>
+            <div className="flex items-center gap-2 mb-0.5">
+              <span className="text-[10px] font-bold text-indigo-500 uppercase tracking-widest">
+                {currentEditMode === 'campaign' ? 'Campaign Budget' : 'Ad Set Budget'}
+              </span>
+            </div>
+            <h2 className="text-lg font-bold text-slate-800 line-clamp-1">
+              {campaign.campaign || campaign.name}
             </h2>
-            <button
-              onClick={onClose}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+          </div>
+          <button
+            onClick={onClose}
+            className="p-1.5 hover:bg-slate-100 rounded-lg transition-colors text-slate-400"
+          >
+            <X size={18} />
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="p-6">
+          
+          {/* Budget Input Area */}
+          <div className="mb-6">
+            <div className="flex items-center justify-between mb-2">
+              <label className="text-sm font-semibold text-slate-600">Daily Budget</label>
+              <span className="text-xs text-slate-400">Current: {formatCurrency(campaign.dailyBudget)}</span>
+            </div>
+            
+            <div 
+              className={`relative flex items-center transition-all duration-200 rounded-xl border-2 ${
+                isFocused 
+                ? 'border-indigo-500 bg-white ring-4 ring-indigo-50' 
+                : 'border-slate-100 bg-slate-50 hover:border-slate-200'
+              }`}
             >
-              <X size={20} className="text-gray-500" />
-            </button>
+              <div className="pl-4 pr-2 text-slate-400">
+                <DollarSign size={20} />
+              </div>
+              <input
+                type="number"
+                value={budget}
+                onChange={(e) => setBudget(e.target.value)}
+                onFocus={() => setIsFocused(true)}
+                onBlur={() => setIsFocused(false)}
+                step="0.01"
+                min="0"
+                className="w-full bg-transparent py-4 text-2xl font-bold text-slate-900 outline-none placeholder:text-slate-300"
+                placeholder="0.00"
+                required
+                autoFocus
+              />
+              {budgetDiff !== 0 && (
+                <div className={`absolute right-4 px-2 py-1 rounded text-[10px] font-bold ${budgetDiff > 0 ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'}`}>
+                  {budgetDiff > 0 ? '+' : ''}{formatCurrency(budgetDiff)}
+                </div>
+              )}
+            </div>
+
+            {/* AI Recommendation - Subtle Version */}
+            {campaign.suggestedBudget && (
+              <div className="mt-3 flex items-center justify-between px-1">
+                <div className="flex items-center gap-1.5 text-slate-500">
+                  <Sparkles size={12} className="text-indigo-400" />
+                  <span className="text-xs">Recommended: <span className="font-semibold text-slate-700">{formatCurrency(campaign.suggestedBudget)}</span></span>
+                </div>
+                <button
+                  type="button"
+                  onClick={applyRecommendation}
+                  className="text-xs font-bold text-indigo-600 hover:text-indigo-700 hover:underline transition-colors"
+                >
+                  Apply AI Suggestion
+                </button>
+              </div>
+            )}
           </div>
 
-          <form onSubmit={handleSubmit} className="p-6">
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                {currentEditMode === 'campaign' ? 'Campaign' : 'Adset'}
+          {/* Reason Field - Simplified */}
+          <div className="mb-8">
+            <div className="flex items-center gap-1.5 mb-2 px-1">
+              <Info size={13} className="text-slate-400" />
+              <label htmlFor="reason" className="text-xs font-medium text-slate-500">
+                Reason (Optional)
               </label>
-              <p className="text-gray-400 font-medium">{campaign.campaign || campaign.name}</p>
             </div>
+            <textarea
+              id="reason"
+              value={modificationReason}
+              onChange={(e) => setModificationReason(e.target.value)}
+              placeholder="Briefly state the reason for adjustment..."
+              className="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-sm text-slate-600 focus:bg-white focus:border-indigo-500 outline-none transition-all resize-none min-h-[70px]"
+            />
+          </div>
 
-            {currentEditMode === 'campaign' ? (
-              // 预算在 campaign 层：编辑单个 campaign 预算
-              <>
-                <div className="mb-6">
-                  <div className="mb-6">
-                    <label htmlFor="budget" className="block text-sm font-medium text-gray-700 mb-2">
-                      Daily Budget
-                    </label>
-                    <div className="relative">
-                      <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
-                      <input
-                        type="number"
-                        id="budget"
-                        name="budget"
-                        defaultValue={campaign.dailyBudget}
-                        step="0.01"
-                        min="0"
-                        className="w-full pl-10 pr-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none [-moz-appearance:textfield]"
-                        required
-                      />
-                    </div>
-                    {campaign.suggestedBudget && campaign.suggestedBudget !== campaign.dailyBudget && (
-                      <div className="mt-2">
-                        <p className="text-sm font-semibold text-indigo-600">
-                          Recommended budget: {formatCurrency(campaign.suggestedBudget)} /day
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                  <div>
-                    <label htmlFor="reason" className="block text-xs text-gray-600 mb-2">
-                      Reason for manual modification (optional)
-                    </label>
-                    <textarea
-                      id="reason"
-                      value={modificationReason}
-                      onChange={(e) => setModificationReason(e.target.value)}
-                      placeholder="Enter reason..."
-                      className="w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary text-xs min-h-[60px] resize-y"
-                    />
-                  </div>
-                </div>
-              </>
-            ) : (
-              // 编辑单个 adset 预算
-              <>
-                <div className="mb-6">
-                  <div className="mb-6">
-                    <label htmlFor={`budget-${campaign.id}`} className="block text-sm font-medium text-gray-700 mb-2">
-                      Daily Budget
-                    </label>
-                    <div className="relative">
-                      <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
-                      <input
-                        type="number"
-                        id={`budget-${campaign.id}`}
-                        name={`budget-${campaign.id}`}
-                        defaultValue={campaign.dailyBudget}
-                        step="0.01"
-                        min="0"
-                        className="w-full pl-10 pr-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none [-moz-appearance:textfield]"
-                        required
-                      />
-                    </div>
-                    {campaign.suggestedBudget && campaign.suggestedBudget !== campaign.dailyBudget && (
-                      <div className="mt-2">
-                        <p className="text-sm font-semibold text-indigo-600">
-                          Recommended budget: {formatCurrency(campaign.suggestedBudget)} /day
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                  <div>
-                    <label htmlFor="reason" className="block text-xs text-gray-600 mb-2">
-                      Reason for manual modification (optional)
-                    </label>
-                    <textarea
-                      id="reason"
-                      value={modificationReason}
-                      onChange={(e) => setModificationReason(e.target.value)}
-                      placeholder="Enter reason..."
-                      className="w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary text-xs min-h-[60px] resize-y"
-                    />
-                  </div>
-                </div>
-              </>
-            )}
-
-            <div className="flex gap-3">
-              <button
-                type="button"
-                onClick={onClose}
-                className="flex-1 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="flex-1 px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors"
-              >
-                Save
-              </button>
-            </div>
-          </form>
-        </div>
+          {/* Simplified Footer Actions */}
+          <div className="flex gap-3">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-5 py-3 text-sm font-semibold text-slate-500 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="flex-1 px-5 py-3 text-sm font-bold text-white bg-indigo-600 rounded-xl hover:bg-indigo-700 shadow-md shadow-indigo-100 transition-all active:scale-[0.98]"
+            >
+              Save Changes
+            </button>
+          </div>
+        </form>
       </div>
-
-    </>
+    </div>
   )
 }
 
