@@ -10,7 +10,7 @@ const Sidebar = ({ isMobile, onClose, currentPage, onPageChange, selectedBrand, 
   
   const menuItems = [
     { icon: Layout, label: 'Dashboard', active: currentPage === 'overview' },
-    { icon: Layers, label: 'Ad Manager V3.0', active: currentPage === 'adManagerV3' },
+    { icon: Layers, label: 'Ad Manager', active: currentPage === 'adManagerV3' },
     { icon: Lightbulb, label: 'Ad Insights', active: currentPage === 'insights' },
     { icon: FileText, label: 'Drafts', active: currentPage === 'drafts' },
   ]
@@ -81,7 +81,7 @@ const Sidebar = ({ isMobile, onClose, currentPage, onPageChange, selectedBrand, 
           let pageKey
           if (item.label === 'Dashboard') {
             pageKey = 'overview'
-          } else if (item.label === 'Ad Manager V3.0') {
+          } else if (item.label === 'Ad Manager') {
             pageKey = 'adManagerV3'
           } else if (item.label === 'Ad Insights') {
             pageKey = 'insights'

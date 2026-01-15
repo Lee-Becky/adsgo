@@ -119,40 +119,16 @@ function App() {
   return (
     <>
       <MainLayout
-        showDemoOverlay={
-          (currentPage === 'overview' && !isOverviewConnected && !isOverviewDataFetching) ||
-          (currentPage === 'dashboard' && !isDashboardConnected && !isDashboardDataFetching) ||
-          (currentPage === 'insights' && !isInsightsConnected && !isInsightsDataFetching)
-        }
-        onDemoConnect={() => {
-          if (currentPage === 'overview') {
-            setIsOverviewDataFetching(true)
-          } else if (currentPage === 'dashboard') {
-            setIsDashboardDataFetching(true)
-          } else if (currentPage === 'insights') {
-            setIsInsightsDataFetching(true)
-          }
-        }}
-        onDemoCreate={() => {
-          if (currentPage === 'overview') {
-            setIsOverviewDataFetching(true)
-          } else if (currentPage === 'dashboard') {
-            setIsDashboardDataFetching(true)
-          } else if (currentPage === 'insights') {
-            setIsInsightsDataFetching(true)
-          }
-        }}
+        showDemoOverlay={false}
+        onDemoConnect={() => {}}
+        onDemoCreate={() => {}}
         currentPage={currentPage}
         onPageChange={handlePageChange}
         selectedBrand={selectedBrand}
         onBrandChange={setSelectedBrand}
       >
       {/* Main Content Area - Scrollable */}
-      {(currentPage === 'overview' && isOverviewDataFetching) || (currentPage === 'dashboard' && isDashboardDataFetching) || (currentPage === 'insights' && isInsightsDataFetching) ? (
-        <div className="p-6 min-h-screen">
-          {/* Empty content while data is being fetched */}
-        </div>
-      ) : currentPage === 'overview' ? (
+      {currentPage === 'overview' ? (
         <Dashboard 
           selectedBrand={selectedBrand} 
           onPageChange={handlePageChange} 
@@ -208,37 +184,6 @@ function App() {
         <BrandManagement editingBrand={editingBrand} onClearEditingBrand={handleClearEditingBrand} />
       )}
 
-      {/* Data Fetching Modal */}
-      {(currentPage === 'overview' && isOverviewDataFetching) && (
-        <DataFetchingModal
-          onGenerateCreative={() => console.log('Generate Creative clicked')}
-          onNewCampaign={() => console.log('New Campaign clicked')}
-          onViewDemo={() => {
-            setIsOverviewDataFetching(false)
-            setIsOverviewConnected(true)
-          }}
-        />
-      )}
-      {(currentPage === 'dashboard' && isDashboardDataFetching) && (
-        <DataFetchingModal
-          onGenerateCreative={() => console.log('Generate Creative clicked')}
-          onNewCampaign={() => console.log('New Campaign clicked')}
-          onViewDemo={() => {
-            setIsDashboardDataFetching(false)
-            setIsDashboardConnected(true)
-          }}
-        />
-      )}
-      {(currentPage === 'insights' && isInsightsDataFetching) && (
-        <DataFetchingModal
-          onGenerateCreative={() => console.log('Generate Creative clicked')}
-          onNewCampaign={() => console.log('New Campaign clicked')}
-          onViewDemo={() => {
-            setIsInsightsDataFetching(false)
-            setIsInsightsConnected(true)
-          }}
-        />
-      )}
 
       {/* Campaign Analysis Modal */}
       <CampaignAnalysisModal

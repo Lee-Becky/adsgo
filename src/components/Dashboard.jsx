@@ -735,7 +735,7 @@ const Dashboard = ({ selectedBrand, onPageChange, onEditBrandConfig }) => {
             {/* Action Buttons */}
             <div className="space-y-3 mt-4">
               <button 
-                onClick={() => onPageChange('dashboard')}
+                onClick={() => onPageChange('adManagerV3')}
                 className="w-full py-3 bg-primary text-white rounded-lg font-medium hover:bg-primary-hover transition-colors"
               >
               View budget adjustment suggestions
