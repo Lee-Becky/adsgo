@@ -101,14 +101,14 @@ const FilterSection = () => {
               setDataPeriod('Custom')
             }
           }}
-          className="relative p-1 text-sm rounded hover:bg-primary/10 transition-colors"
+          className="relative p-1 text-sm rounded hover:bg-indigo-50 transition-colors"
         >
           {day}
-          {isStart && <span className="absolute bottom-0 left-1/2 -translate-x-1/2 text-[8px] text-primary font-bold">START</span>}
-          {isEnd && <span className="absolute bottom-0 left-1/2 -translate-x-1/2 text-[8px] text-primary font-bold">END</span>}
-          {isStart && !isEnd && <div className="absolute inset-0 bg-primary/20 rounded"></div>}
-          {isEnd && <div className="absolute inset-0 bg-primary/20 rounded"></div>}
-          {isInRange && <div className="absolute inset-0 bg-primary/5 rounded"></div>}
+          {isStart && <span className="absolute bottom-0 left-1/2 -translate-x-1/2 text-[8px] text-indigo-600 font-bold">START</span>}
+          {isEnd && <span className="absolute bottom-0 left-1/2 -translate-x-1/2 text-[8px] text-indigo-600 font-bold">END</span>}
+          {isStart && !isEnd && <div className="absolute inset-0 bg-indigo-100 rounded"></div>}
+          {isEnd && <div className="absolute inset-0 bg-indigo-100 rounded"></div>}
+          {isInRange && <div className="absolute inset-0 bg-indigo-50 rounded"></div>}
         </button>
       )
     }
@@ -128,7 +128,7 @@ const FilterSection = () => {
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Platform
           </label>
-          <select className="w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none text-sm">
+          <select className="w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none text-sm">
             <option>All Platforms</option>
             <option>Google Ads</option>
             <option>Facebook Ads</option>
@@ -142,7 +142,7 @@ const FilterSection = () => {
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Account
           </label>
-          <select className="w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none text-sm">
+          <select className="w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none text-sm">
             <option>All Accounts</option>
             <option>Account 1</option>
             <option>Account 2</option>
@@ -155,7 +155,7 @@ const FilterSection = () => {
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Campaign Status
           </label>
-          <select className="w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none text-sm">
+          <select className="w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none text-sm">
             <option>All Status</option>
             <option>Active</option>
             <option>Paused</option>
@@ -171,7 +171,7 @@ const FilterSection = () => {
           <div className="relative">
             <button
               onClick={() => setShowCalendar(!showCalendar)}
-              className="w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none text-sm text-left flex items-center justify-between"
+              className="w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none text-sm text-left flex items-center justify-between"
             >
               <span>{customStartDate && customEndDate ? `${formatDate(customStartDate)} - ${formatDate(customEndDate)}` : dataPeriod}</span>
               <Calendar size={16} className="text-gray-400" />
@@ -188,7 +188,7 @@ const FilterSection = () => {
                         onClick={() => handlePeriodClick(option.value)}
                         className={`px-3 py-2 text-xs rounded-lg text-left transition-colors ${
                           dataPeriod === option.value
-                            ? 'bg-primary text-white'
+                            ? 'bg-indigo-600 text-white'
                             : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                         }`}
                       >
@@ -238,7 +238,7 @@ const FilterSection = () => {
                   </button>
                   <button
                     onClick={() => setShowCalendar(false)}
-                    className="flex-1 px-4 py-2 text-sm font-medium text-white bg-primary rounded-lg hover:bg-primary-hover transition-colors"
+                    className="flex-1 px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors"
                   >
                     Confirm
                   </button>

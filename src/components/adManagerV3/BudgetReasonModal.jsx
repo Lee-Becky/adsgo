@@ -6,6 +6,7 @@ import { ComposedChart, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
 const BudgetReasonModal = ({ isOpen, onClose, campaign, reason }) => {
   const [feedbackOpen, setFeedbackOpen] = useState(false)
   const [showRawTable, setShowRawTable] = useState(false)
+  const [showAllHistory, setShowAllHistory] = useState(false)
   
   if (!isOpen || !campaign || !reason) return null
 
@@ -99,10 +100,10 @@ const BudgetReasonModal = ({ isOpen, onClose, campaign, reason }) => {
       const budget = campaign.dailyBudget || 500
       const spendRatio = 0.8 + Math.random() * 0.4
       const spend = budget * spendRatio
-      const impressions = Math.floor(spend * 40 + Math.random() * 10000)
-      const clicks = Math.floor(impressions * (0.02 + Math.random() * 0.02))
-      const conversions = Math.floor(clicks * (0.01 + Math.random() * 0.02))
-      const purchases = Math.floor(conversions * (0.3 + Math.random() * 0.4))
+      const impressions = Math.max(1, Math.floor(spend * 40 + Math.random() * 10000))
+      const clicks = Math.max(1, Math.floor(impressions * (0.02 + Math.random() * 0.02)))
+      const conversions = Math.max(1, Math.floor(clicks * (0.01 + Math.random() * 0.02)))
+      const purchases = Math.max(1, Math.floor(conversions * (0.3 + Math.random() * 0.4)))
       
       history.push({
         date: dateStr,
@@ -116,7 +117,7 @@ const BudgetReasonModal = ({ isOpen, onClose, campaign, reason }) => {
         cpa: spend / conversions,
         purchases: purchases,
         cpp: spend / purchases,
-        operation: i === 0 || i === 7 ? 'Budget Adjustment' : null
+        operation: i === 0 || i === 7 || i === 3 || i === 10 ? 'Budget Adjustment' : null
       })
     }
     return history
@@ -148,7 +149,7 @@ const BudgetReasonModal = ({ isOpen, onClose, campaign, reason }) => {
     const intercept = (sumY - slope * sumX) / n
     
     const rNum = (n * sumXY - sumX * sumY)
-    const rDen = Math.sqrt((n * sumXX - sumX * sumX) * (n * sumYY - sumY * sumY))
+    const rDen = Math.sqrt(Math.max(0, (n * sumXX - sumX * sumX) * (n * sumYY - sumY * sumY)))
     const rSquared = rDen === 0 ? 0 : Math.pow(rNum / rDen, 2)
 
     return { slope, rSquared, avg: sumY / n }
@@ -166,7 +167,7 @@ const BudgetReasonModal = ({ isOpen, onClose, campaign, reason }) => {
     return <Minus size={14} className="text-slate-400" />
   }
 
-  const opHistory = history14.filter(d => d.operation).slice(0, 2).map((op, idx) => {
+  const opHistoryAll = history14.filter(d => d.operation).sort((a, b) => new Date(b.date) - new Date(a.date)).map((op, idx) => {
     const opIndex = history14.findIndex(d => d.date === op.date)
     const getAvg = (start, end) => {
       const slice = history14.slice(Math.max(0, start), Math.min(history14.length, end))
@@ -180,12 +181,16 @@ const BudgetReasonModal = ({ isOpen, onClose, campaign, reason }) => {
     return {
       date: op.date.slice(5),
       action: op.operation,
-      changeAmt: idx === 0 ? '+¥200' : '-¥800',
-      changePct: idx === 0 ? '+16.7%' : '-100%',
-      before: getAvg(opIndex - 2, opIndex),
-      after: getAvg(opIndex + 1, opIndex + 3)
+      fromBudget: idx % 2 === 0 ? 1200 : 2000,
+      toBudget: idx % 2 === 0 ? 1400 : 1200,
+      changeAmt: idx % 2 === 0 ? '+¥200' : '-¥800',
+      changePct: idx % 2 === 0 ? '+16.7%' : '-40.0%',
+      before: getAvg(opIndex - 1, opIndex),
+      after: getAvg(opIndex + 1, opIndex + 2)
     }
   })
+
+  const opHistory = showAllHistory ? opHistoryAll : opHistoryAll.slice(0, 3)
 
   const calculatePeriodStats = (days) => {
     const periodData = history14.slice(-days)
@@ -279,6 +284,11 @@ const BudgetReasonModal = ({ isOpen, onClose, campaign, reason }) => {
     return `¥${value.toFixed(2)}`
   }
 
+  const formatFullDateTime = (date) => {
+    const pad = (n) => String(n).padStart(2, '0')
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`
+  }
+
   return (
     <>
       <div className="fixed inset-0 z-50">
@@ -299,8 +309,8 @@ const BudgetReasonModal = ({ isOpen, onClose, campaign, reason }) => {
               <div>
                 <div className="flex items-center gap-2">
                   <h2 className="text-xl font-bold text-gray-900">Optimization Detail</h2>
-                  <span className="px-2 py-0.5 bg-gray-100 text-gray-500 text-[10px] font-medium rounded-full border border-gray-200">
-                    {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  <span className="px-3 py-1 bg-gray-100 text-gray-500 text-[10px] font-medium rounded-full border border-gray-200">
+                    Updated: {formatFullDateTime(new Date())}
                   </span>
                 </div>
                 <p className="text-gray-600 text-sm mt-1">{campaign.campaign || campaign.name}</p>
@@ -344,11 +354,14 @@ const BudgetReasonModal = ({ isOpen, onClose, campaign, reason }) => {
                             <span className="text-[10px] bg-blue-600 text-white px-1.5 py-0.5 rounded font-black">{op.date}</span>
                             <span className="text-xs font-bold text-slate-700">{op.action}</span>
                           </div>
-                          <span className="text-[10px] font-bold text-slate-400">Change: <span className="text-blue-600">{op.changeAmt} ({op.changePct})</span></span>
+                          <div className="flex items-center gap-2">
+                            <span className="text-[10px] font-bold text-slate-500 italic">¥{op.fromBudget} ➔ ¥{op.toBudget}</span>
+                            <span className="text-[10px] font-bold text-slate-400">Change: <span className="text-blue-600">{op.changeAmt} ({op.changePct})</span></span>
+                          </div>
                         </div>
                         <div className="grid grid-cols-2 gap-4 divide-x divide-slate-200">
                           <div>
-                            <p className="text-[9px] text-slate-400 font-bold uppercase mb-1">Avg. 2 Days Before</p>
+                            <p className="text-[9px] text-slate-400 font-bold uppercase mb-1">1 day before adjustment</p>
                             <div className="flex justify-between text-[10px] font-bold text-slate-600">
                               <span>ROAS: {op.before.roas.toFixed(1)}x</span>
                               <span>CPA: ¥{op.before.cpa.toFixed(0)}</span>
@@ -356,7 +369,7 @@ const BudgetReasonModal = ({ isOpen, onClose, campaign, reason }) => {
                             </div>
                           </div>
                           <div className="pl-4">
-                            <p className="text-[9px] text-slate-400 font-bold uppercase mb-1">Avg. 2 Days After</p>
+                            <p className="text-[9px] text-slate-400 font-bold uppercase mb-1">1 day after adjustment</p>
                             <div className="flex justify-between text-[10px] font-bold text-green-600">
                               <span>ROAS: {op.after.roas.toFixed(1)}x</span>
                               <span>CPA: ¥{op.after.cpa.toFixed(0)}</span>
@@ -366,6 +379,19 @@ const BudgetReasonModal = ({ isOpen, onClose, campaign, reason }) => {
                         </div>
                       </div>
                     )) : <div className="py-4 text-center text-slate-400 text-xs italic">No optimization history in the last 14 days</div>}
+                    
+                    {opHistoryAll.length > 3 && (
+                      <button 
+                        onClick={() => setShowAllHistory(!showAllHistory)}
+                        className="w-full py-2 flex items-center justify-center gap-2 text-indigo-600 hover:text-indigo-700 text-xs font-bold bg-indigo-50 hover:bg-indigo-100 rounded-xl transition-colors border border-indigo-100"
+                      >
+                        {showAllHistory ? (
+                          <>Show less history <ChevronUp size={14} /></>
+                        ) : (
+                          <>View more history <ChevronDown size={14} /></>
+                        )}
+                      </button>
+                    )}
                   </div>
                 </div>
 
@@ -491,7 +517,7 @@ const BudgetReasonModal = ({ isOpen, onClose, campaign, reason }) => {
               </section>
 
               <section>
-                <h4 className="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2"><Target size={16} className="text-blue-500" /> Conversion Funnel Comparison (US • Add-to-cart)</h4>
+                <h4 className="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2"><Target size={16} className="text-blue-500" /> Conversion Funnel Comparison (VS Brand benchmark)</h4>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-4">
                     <p className="text-[10px] font-black text-slate-400 text-center">This Campaign Performance</p>
@@ -522,7 +548,7 @@ const BudgetReasonModal = ({ isOpen, onClose, campaign, reason }) => {
             </div>
           </div>
 
-          {/* Footer - Reject/Approve Buttons */}
+          {/* Footer - Disagree/Approve Buttons */}
           <div className="px-6 py-4 border-t border-border bg-gray-50 sticky bottom-0">
             {status === 'pending' && (
               <div className="flex gap-3">

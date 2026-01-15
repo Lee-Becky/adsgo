@@ -61,7 +61,7 @@ const FeedbackModal = ({ isOpen, onClose, onConfirm, title, buttonText }) => {
             disabled={!feedback.trim()}
             className="flex-1 py-3 rounded-lg font-medium text-white bg-red-600 hover:bg-red-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
           >
-            {buttonText || 'Confirm Reject'}
+            {buttonText || 'Submit'}
           </button>
         </div>
       </div>

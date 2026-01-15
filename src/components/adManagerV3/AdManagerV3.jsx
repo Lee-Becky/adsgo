@@ -4,11 +4,12 @@ import RuleConfigModal from './RuleConfigModal'
 import FilterSection from './FilterSection'
 import CampaignTable from './CampaignTable'
 import BudgetEditModal from './BudgetEditModal'
-import BudgetReasonModal from '../BudgetReasonModal'
+import BudgetReasonModal from './BudgetReasonModal'
 import { MOCK_GOALS } from '../../services/adManager/mockData'
 
 const AdManagerV3 = ({ onEditBrandConfig, selectedBrand }) => {
   const [budgetStatus, setBudgetStatus] = useState({})
+  const [lastUpdated, setLastUpdated] = useState('2026-01-15 13:29')
   const [autoExecuteRecommendations, setAutoExecuteRecommendations] = useState(false)
   const [selectedCampaign, setSelectedCampaign] = useState(null)
   const [showCampaignAnalysis, setShowCampaignAnalysis] = useState(false)
@@ -17,6 +18,7 @@ const AdManagerV3 = ({ onEditBrandConfig, selectedBrand }) => {
   const [showBudgetEdit, setShowBudgetEdit] = useState(false)
   const [showConfigModal, setShowConfigModal] = useState(false)
   const [goals] = useState(MOCK_GOALS)
+  const [campaigns, setCampaigns] = useState([])
 
   const handleCampaignClick = (campaign) => {
     setSelectedCampaign(campaign)
@@ -68,6 +70,10 @@ const AdManagerV3 = ({ onEditBrandConfig, selectedBrand }) => {
         goals={goals}
         onEditBrandConfig={onEditBrandConfig}
         brandName={selectedBrand}
+        campaigns={campaigns}
+        onCampaignsChange={setCampaigns}
+        lastUpdated={lastUpdated}
+        onUpdateLastUpdated={setLastUpdated}
       />
 
       {/* Rule Config Modal */}
@@ -110,6 +116,9 @@ const AdManagerV3 = ({ onEditBrandConfig, selectedBrand }) => {
           onBudgetEditClick={handleBudgetEditClick}
           onMoreInsights={handleMoreInsights}
           autoExecuteRecommendations={autoExecuteRecommendations}
+          campaigns={campaigns}
+          onCampaignsChange={setCampaigns}
+          lastUpdated={lastUpdated}
         />
       </div>
     </div>

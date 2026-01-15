@@ -65,62 +65,63 @@ const RuleConfigModal = ({ isOpen, onClose, onSave }) => {
         </div>
 
         {/* Content */}
-        <div className="p-6 overflow-y-auto max-h-[60vh]">
-          {editingRules.length === 0 ? (
-            <div className="space-y-4">
-              <div className="text-center py-2 text-gray-400 text-sm">
-                No rules configured yet. Add your first rule below.
-              </div>
-              
-              {/* Example Rules */}
-              <div className="bg-blue-50 border border-blue-100 rounded-lg p-4">
-                <h3 className="text-sm font-semibold text-blue-800 mb-3 flex items-center gap-2">
-                  <span className="w-2 h-2 bg-blue-600 rounded-full"></span>
-                  Example Rules
-                </h3>
-                <div className="space-y-3">
-                  <div className="flex items-start gap-3 bg-white rounded-md p-3 border border-blue-200">
-                    <span className="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center text-xs font-bold">1</span>
-                    <p className="text-xs text-gray-700 leading-relaxed">
-                      <span className="font-semibold text-blue-700">ROAS {'<'} 1.5</span> in the last 3 days, reduce <span className="font-semibold text-blue-700">adset/campaign budget by 50%</span>
-                    </p>
-                  </div>
-                  <div className="flex items-start gap-3 bg-white rounded-md p-3 border border-blue-200">
-                    <span className="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center text-xs font-bold">2</span>
-                    <p className="text-xs text-gray-700 leading-relaxed">
-                      <span className="font-semibold text-blue-700">$100 spent</span> without any <span className="font-semibold text-blue-700">add to cart</span>, <span className="font-semibold text-red-600">directly close</span> the adset/campaign
-                    </p>
-                  </div>
-                  <div className="flex items-start gap-3 bg-white rounded-md p-3 border border-blue-200">
-                    <span className="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center text-xs font-bold">3</span>
-                    <p className="text-xs text-gray-700 leading-relaxed">
-                      <span className="font-semibold text-blue-700">Cost Per Leads {'<'} $5.2</span> today AND yesterday's Cost Per Leads is <span className="font-semibold text-blue-700">below average</span>, increase budget by <span className="font-semibold text-green-600">+20% or +$10</span>
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ) : (
+        <div className="p-6 overflow-y-auto max-h-[60vh] space-y-6">
+          {/* Example Rules - Always displayed as requested */}
+          <div className="bg-blue-50 border border-blue-100 rounded-lg p-4">
+            <h3 className="text-sm font-semibold text-blue-800 mb-3 flex items-center gap-2">
+              <span className="w-2 h-2 bg-blue-600 rounded-full"></span>
+              Example Rules
+            </h3>
             <div className="space-y-3">
-              {editingRules.map((rule, index) => (
-                <div key={index} className="flex items-start gap-2">
-                  <input
-                    type="text"
-                    value={rule}
-                    onChange={(e) => handleUpdateRule(index, e.target.value)}
-                    className="flex-1 px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 text-sm"
-                  />
-                  <button
-                    onClick={() => handleDeleteRule(index)}
-                    className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                    title="Delete rule"
-                  >
-                    <Minus size={16} />
-                  </button>
-                </div>
-              ))}
+          <div className="flex items-start gap-3 bg-white rounded-md p-3 border border-blue-200">
+            <span className="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center text-xs font-bold">1</span>
+            <p className="text-xs text-gray-700 leading-relaxed">
+              <span className="font-semibold text-blue-700">ROAS {'<'} 1.5</span> in the last 3 days, reduce <span className="font-semibold text-blue-700">adset/campaign budget by 50%</span>
+            </p>
+          </div>
+              <div className="flex items-start gap-3 bg-white rounded-md p-3 border border-blue-200">
+                <span className="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center text-xs font-bold">2</span>
+                <p className="text-xs text-gray-700 leading-relaxed">
+                  <span className="font-semibold text-blue-700">$100 spent</span> without any <span className="font-semibold text-blue-700">add to cart</span>, <span className="font-semibold text-red-600">directly close</span> the adset/campaign
+                </p>
+              </div>
+              <div className="flex items-start gap-3 bg-white rounded-md p-3 border border-blue-200">
+                <span className="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center text-xs font-bold">3</span>
+                <p className="text-xs text-gray-700 leading-relaxed">
+                  <span className="font-semibold text-blue-700">Cost Per Leads {'<'} $5.2</span> today AND yesterday's Cost Per Leads is <span className="font-semibold text-blue-700">below average</span>, increase budget by <span className="font-semibold text-green-600">+20% or +$10</span>
+                </p>
+              </div>
             </div>
-          )}
+          </div>
+
+          <div className="border-t border-slate-100 pt-2">
+            <h3 className="text-sm font-bold text-slate-800 mb-4 uppercase tracking-tight">Your Rules</h3>
+            {editingRules.length === 0 ? (
+              <div className="text-center py-8 bg-slate-50 rounded-lg border border-dashed border-slate-200 text-gray-400 text-xs">
+                No rules configured yet.
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {editingRules.map((rule, index) => (
+                  <div key={index} className="flex items-start gap-2">
+                    <input
+                      type="text"
+                      value={rule}
+                      onChange={(e) => handleUpdateRule(index, e.target.value)}
+                      className="flex-1 px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 text-sm"
+                    />
+                    <button
+                      onClick={() => handleDeleteRule(index)}
+                      className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                      title="Delete rule"
+                    >
+                      <Minus size={16} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
 
           {/* Add New Rule */}
           <div className="mt-4 pt-4 border-t border-border">
