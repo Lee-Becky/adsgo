@@ -12,6 +12,8 @@ import Drafts from './components/Drafts'
 import DataFetchingModal from './components/DataFetchingModal'
 import Dashboard from './components/Dashboard'
 import AdInsights from './components/AdInsights'
+import AdManagerV2 from './components/adManagerV2/AdManagerV2'
+import AdManagerV3 from './components/adManagerV3/AdManagerV3'
 
 function App() {
   const [selectedCampaign, setSelectedCampaign] = useState(null)
@@ -195,6 +197,13 @@ function App() {
         <Drafts />
       ) : currentPage === 'insights' ? (
         <AdInsights onPageChange={handlePageChange} />
+      ) : currentPage === 'adManagerV2' ? (
+        <AdManagerV2 />
+      ) : currentPage === 'adManagerV3' ? (
+        <AdManagerV3 
+          onEditBrandConfig={handleEditBrandConfig}
+          selectedBrand={selectedBrand}
+        />
       ) : (
         <BrandManagement editingBrand={editingBrand} onClearEditingBrand={handleClearEditingBrand} />
       )}

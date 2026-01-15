@@ -10,8 +10,18 @@ const Header = ({ toggleSidebar, isMobile, currentPage }) => {
         }
       case 'dashboard':
         return {
-          title: 'Ad Manager',
+          title: 'ad manager',
           subtitle: '管理和优化您的广告活动'
+        }
+      case 'adManagerV2':
+        return {
+          title: 'ad manager',
+          subtitle: 'AI 驱动的全渠道广告管理平台'
+        }
+      case 'adManagerV3':
+        return {
+          title: 'ad manager',
+          subtitle: 'AI 驱动的全渠道广告管理平台'
         }
       case 'insights':
         return {
