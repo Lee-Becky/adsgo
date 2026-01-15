@@ -1,18 +1,22 @@
 import { useState } from 'react'
-import { Layout, Image, Sparkles, BarChart3, Settings, Users, DollarSign, Search, FileText, ChevronDown, X, Plus, Lightbulb, Layers } from 'lucide-react'
+import { Layout, Image, Sparkles, BarChart3, Settings, Users, DollarSign, Search, FileText, ChevronDown, X, Plus, Lightbulb, Layers, Archive, ChevronRight } from 'lucide-react'
 
 const Sidebar = ({ isMobile, onClose, currentPage, onPageChange, selectedBrand, onBrandChange }) => {
   const [isBrandDropdownOpen, setIsBrandDropdownOpen] = useState(false)
   
   const brands = ['neopets', 'gaming studio', 'tech brand']
   
+  const [isDeprecatedOpen, setIsDeprecatedOpen] = useState(false)
+  
   const menuItems = [
     { icon: Layout, label: 'Dashboard', active: currentPage === 'overview' },
-    { icon: Image, label: 'Ad Manager V1.0', active: currentPage === 'dashboard' },
-    { icon: Layers, label: 'Ad Manager V2.0', active: currentPage === 'adManagerV2' },
     { icon: Layers, label: 'Ad Manager V3.0', active: currentPage === 'adManagerV3' },
     { icon: Lightbulb, label: 'Ad Insights', active: currentPage === 'insights' },
     { icon: FileText, label: 'Drafts', active: currentPage === 'drafts' },
+  ]
+  
+  const deprecatedItems = [
+    { icon: Image, label: 'Ad Manager V1.0', pageKey: 'dashboard' },
   ]
 
   return (
@@ -77,10 +81,6 @@ const Sidebar = ({ isMobile, onClose, currentPage, onPageChange, selectedBrand, 
           let pageKey
           if (item.label === 'Dashboard') {
             pageKey = 'overview'
-          } else if (item.label === 'Ad Manager V1.0') {
-            pageKey = 'dashboard'
-          } else if (item.label === 'Ad Manager V2.0') {
-            pageKey = 'adManagerV2'
           } else if (item.label === 'Ad Manager V3.0') {
             pageKey = 'adManagerV3'
           } else if (item.label === 'Ad Insights') {
@@ -106,6 +106,41 @@ const Sidebar = ({ isMobile, onClose, currentPage, onPageChange, selectedBrand, 
             </button>
           )
         })}
+        
+        {/* 废弃页面 */}
+        <div className="mt-4">
+          <button
+            onClick={() => setIsDeprecatedOpen(!isDeprecatedOpen)}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+              isDeprecatedOpen
+                ? 'bg-gray-100 text-gray-900'
+                : 'text-gray-600 hover:bg-gray-100'
+            }`}
+          >
+            <Archive size={20} />
+            <span className="font-medium">废弃页面</span>
+            <ChevronRight size={16} className={`ml-auto transition-transform ${isDeprecatedOpen ? 'rotate-90' : ''}`} />
+          </button>
+          
+          {isDeprecatedOpen && (
+            <div className="ml-4 mt-1 space-y-1">
+              {deprecatedItems.map((item, index) => (
+                <button
+                  key={index}
+                  onClick={() => onPageChange(item.pageKey)}
+                  className={`w-full flex items-center gap-3 px-4 py-2 rounded-lg transition-all ${
+                    currentPage === item.pageKey
+                      ? 'bg-primary text-white'
+                      : 'text-gray-600 hover:bg-gray-100'
+                  }`}
+                >
+                  <item.icon size={18} />
+                  <span className="font-medium text-sm">{item.label}</span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
       </nav>
 
       {/* Settings Menu - Just above User Profile */}
