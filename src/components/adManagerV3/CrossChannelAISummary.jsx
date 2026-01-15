@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { 
   Sparkles, Zap, Cpu, BrainCircuit, ShieldCheck, AlertTriangle, Bot, Edit2, Target, 
   TrendingUp, TrendingDown, Minus, ArrowRight, Clock, RefreshCw, Coins, Infinity,
-  User, Radar, Plus
+  User, Radar, Plus, ChevronDown, ChevronUp, Eye
 } from 'lucide-react';
 
 // Platform icon URLs
@@ -62,6 +62,7 @@ const CrossChannelAISummary = ({
 }) => {
   const [hoveredPlatform, setHoveredPlatform] = useState(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(false);
   const [mockStats, setMockStats] = useState({
     increase: 7,
     decrease: 4,
@@ -209,9 +210,33 @@ const CrossChannelAISummary = ({
     : 0;
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8 items-stretch">
-      
-      {/* Left Column: AI Summary (2/3 Width) */}
+    <div className="mb-8">
+      {/* Header with Title and Expand/Collapse Button */}
+      <div className="flex justify-between items-center mb-2">
+        <div className="flex items-center gap-2">
+          <Eye size={16} className="text-blue-500" />
+          <h2 className="text-sm font-black text-slate-800 tracking-wide">Dashboard Insights</h2>
+        </div>
+        <button
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-all shadow-sm text-slate-600 hover:text-slate-800 group"
+        >
+          <span className="text-[11px] font-bold">{isCollapsed ? 'Expand Overview' : 'Collapse Overview'}</span>
+          {isCollapsed ? (
+            <ChevronDown size={14} className="group-hover:translate-y-0.5 transition-transform" />
+          ) : (
+            <ChevronUp size={14} className="group-hover:-translate-y-0.5 transition-transform" />
+          )}
+        </button>
+      </div>
+
+      {/* Collapsible Content */}
+      <div 
+        className={`grid grid-cols-1 lg:grid-cols-3 gap-4 items-stretch transition-all duration-500 ease-in-out ${
+          isCollapsed ? 'opacity-0 max-h-0 overflow-hidden -translate-y-2' : 'opacity-100 max-h-[2000px]'
+        }`}
+      >
+        {/* Left Column: AI Summary (2/3 Width) */}
       <div className="lg:col-span-2 bg-slate-50/50 border border-blue-100 rounded-2xl p-4 shadow-sm flex flex-col h-full">
         <div className="flex items-center justify-between border-b border-slate-200 pb-1.5 mb-5 shrink-0">
           <div className="flex items-center gap-4">
@@ -559,6 +584,7 @@ const CrossChannelAISummary = ({
             </div>
           </div>
         </div>
+      </div>
       </div>
     </div>
   );
