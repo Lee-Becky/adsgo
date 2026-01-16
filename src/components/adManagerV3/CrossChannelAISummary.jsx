@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { 
   Sparkles, Zap, Cpu, BrainCircuit, ShieldCheck, AlertTriangle, Bot, Edit2, Target, 
   TrendingUp, TrendingDown, Minus, ArrowRight, Clock, RefreshCw, Coins, Infinity,
-  User, Radar, Plus, ChevronDown, ChevronUp, Eye
+  User, Radar, Plus, ChevronDown, ChevronUp
 } from 'lucide-react';
 
 // Platform icon URLs
@@ -58,11 +58,16 @@ const CrossChannelAISummary = ({
   onEditBrandConfig,
   campaigns = [],
   lastUpdated,
-  onUpdateLastUpdated
+  onUpdateLastUpdated,
+  isCollapsed = false,
+  activeTab = 'meta'
 }) => {
   const [hoveredPlatform, setHoveredPlatform] = useState(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [analysisCooldown, setAnalysisCooldown] = useState(null);
+  const [cooldownIntervalId, setCooldownIntervalId] = useState(null);
+  const [tick, setTick] = useState(0);
+  const [hoveredCard, setHoveredCard] = useState(null);
   const [mockStats, setMockStats] = useState({
     increase: 7,
     decrease: 4,
@@ -73,8 +78,19 @@ const CrossChannelAISummary = ({
   });
 
   const handleManualAnalysis = () => {
-    if (isAnalyzing) return;
+    if (isAnalyzing || analysisCooldown) return;
     setIsAnalyzing(true);
+    
+    // Start 4-hour cooldown immediately
+    const cooldownEndTime = Date.now() + 4 * 60 * 60 * 1000; // 4 hours in milliseconds
+    setAnalysisCooldown(cooldownEndTime);
+    
+    // Start countdown timer
+    const intervalId = setInterval(() => {
+      setTick(prev => prev + 1); // Force re-render every second
+    }, 1000);
+    
+    setCooldownIntervalId(intervalId);
     
     // Simulate analysis process
     setTimeout(() => {
@@ -95,6 +111,52 @@ const CrossChannelAISummary = ({
       }));
     }, 5000);
   };
+
+  // Format cooldown time
+  const formatCooldownTime = (endTime) => {
+    if (!endTime) return null;
+    const remaining = endTime - Date.now();
+    if (remaining <= 0) {
+      // Clear cooldown when time is up
+      if (analysisCooldown) {
+        setAnalysisCooldown(null);
+        if (cooldownIntervalId) {
+          clearInterval(cooldownIntervalId);
+          setCooldownIntervalId(null);
+        }
+      }
+      return null;
+    }
+    
+    const hours = Math.floor(remaining / (60 * 60 * 1000));
+    const minutes = Math.floor((remaining % (60 * 60 * 1000)) / (60 * 1000));
+    const seconds = Math.floor((remaining % (60 * 1000)) / 1000);
+    
+    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+  };
+
+  // Cleanup interval on unmount
+  React.useEffect(() => {
+    return () => {
+      if (cooldownIntervalId) {
+        clearInterval(cooldownIntervalId);
+      }
+    };
+  }, [cooldownIntervalId]);
+
+  // Check if cooldown has expired
+  React.useEffect(() => {
+    if (analysisCooldown) {
+      const remaining = analysisCooldown - Date.now();
+      if (remaining <= 0) {
+        setAnalysisCooldown(null);
+        if (cooldownIntervalId) {
+          clearInterval(cooldownIntervalId);
+          setCooldownIntervalId(null);
+        }
+      }
+    }
+  }, [tick, analysisCooldown, cooldownIntervalId]);
 
   const metaAccounts = [
     { name: 'AdsGo Official', id: '1234567890' },
@@ -211,25 +273,6 @@ const CrossChannelAISummary = ({
 
   return (
     <div className="mb-8">
-      {/* Header with Title and Expand/Collapse Button */}
-      <div className="flex justify-between items-center mb-2">
-        <div className="flex items-center gap-2">
-          <Eye size={16} className="text-blue-500" />
-          <h2 className="text-sm font-black text-slate-800 tracking-wide">Dashboard Insights</h2>
-        </div>
-        <button
-          onClick={() => setIsCollapsed(!isCollapsed)}
-          className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-all shadow-sm text-slate-600 hover:text-slate-800 group"
-        >
-          <span className="text-[11px] font-bold">{isCollapsed ? 'Expand Overview' : 'Collapse Overview'}</span>
-          {isCollapsed ? (
-            <ChevronDown size={14} className="group-hover:translate-y-0.5 transition-transform" />
-          ) : (
-            <ChevronUp size={14} className="group-hover:-translate-y-0.5 transition-transform" />
-          )}
-        </button>
-      </div>
-
       {/* Collapsible Content */}
       <div 
         className={`grid grid-cols-1 lg:grid-cols-3 gap-4 items-stretch transition-all duration-500 ease-in-out ${
@@ -243,160 +286,114 @@ const CrossChannelAISummary = ({
               <div className="flex items-center gap-2">
                 <Sparkles size={16} className="text-blue-500" />
                 <div className="flex items-baseline gap-3">
-                  <h3 className="text-base font-black text-slate-800 tracking-wide">Omnichannel Overview</h3>
+                  <h3 className="text-base font-black text-slate-800 tracking-wide">Meta Ads Insights Brief</h3>
                   <div className="flex items-center gap-1.5 px-2 py-0.5 bg-blue-100/50 rounded-full text-[11px] font-black text-blue-600 border border-blue-200">
                     <Clock size={10} />
                     <span>{lastUpdated}</span>
                   </div>
                 </div>
               </div>
-            <div className="flex gap-2 relative">
-              <div 
-                className="relative group"
-                onMouseEnter={() => setHoveredPlatform('meta')}
-                onMouseLeave={() => setHoveredPlatform(null)}
-              >
-                <div className="flex items-center gap-1.5 px-3 py-1 bg-blue-50 border border-blue-100 rounded text-xs font-bold text-blue-700 cursor-pointer hover:bg-blue-100 transition-colors">
-                  <img src={META_ICON_URL} alt="Meta" className="w-4 h-4 rounded" />
-                  Meta
-                </div>
-                {hoveredPlatform === 'meta' && (
-                  <div className="absolute top-full left-0 mt-2 bg-white border border-slate-200 rounded-lg shadow-lg p-3 z-50 min-w-[200px]">
-                    <div className="text-xs font-bold text-slate-800 mb-2 pb-1 border-b border-slate-100">Meta Accounts Connected</div>
-                    {metaAccounts.map((account, index) => (
-                      <div key={index} className="text-xs text-slate-600 py-1 flex justify-between">
-                        <span>{account.name}</span>
-                        <span className="text-slate-400">({account.id})</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-              <div 
-                className="relative group"
-                onMouseEnter={() => setHoveredPlatform('google')}
-                onMouseLeave={() => setHoveredPlatform(null)}
-              >
-                <div className="flex items-center gap-1.5 px-3 py-1 bg-red-50 border border-red-100 rounded text-xs font-bold text-red-700 cursor-pointer hover:bg-red-100 transition-colors">
-                  <img src={GOOGLE_ICON_URL} alt="Google" className="w-4 h-4 rounded" />
-                  Google
-                </div>
-                {hoveredPlatform === 'google' && (
-                  <div className="absolute top-full left-0 mt-2 bg-white border border-slate-200 rounded-lg shadow-lg p-3 z-50 min-w-[200px]">
-                    <div className="text-xs font-bold text-slate-800 mb-2 pb-1 border-b border-slate-100">Google Accounts Connected</div>
-                    {googleAccounts.map((account, index) => (
-                      <div key={index} className="text-xs text-slate-600 py-1 flex justify-between">
-                        <span>{account.name}</span>
-                        <span className="text-slate-400">({account.id})</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
+            {/* Meta and Google platform tags removed - logic preserved */}
           </div>
           
           <div className="flex items-center gap-3">
-            {/* Optimization Goal moved here - Removed Purple */}
-            <div className="flex items-center gap-2 px-3 py-1 bg-white border border-blue-100 rounded-full shadow-sm">
-              <Target size={12} className="text-blue-600" />
-              <span className="text-[10px] font-bold text-slate-600">
-                DailyBudget$500, Purchase, ROAS{'>'}5
-              </span>
-              <button 
-                onClick={onEditBrandConfig}
-                className="p-0.5 hover:bg-blue-50 rounded transition-colors text-slate-300 hover:text-blue-600"
-                title="Edit Goal"
-              >
-                <Edit2 size={10} />
-              </button>
-            </div>
-
-            <button 
-              onClick={onRuleLibraryClick}
-              className="flex items-center gap-1.5 px-3 py-1 rounded-full transition-all shadow-sm border bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
-            >
-              <Zap size={10} className="text-blue-500" />
-              <span className="text-[10px] font-black tracking-tight">Rule Library</span>
-            </button>
+            {/* Edit Goal button completely removed from UI - logic preserved */}
+            {/* Rule Library button removed - logic preserved */}
           </div>
         </div>
 
-        <div className="grid grid-cols-4 gap-3 mb-4 shrink-0">
-          <div className="bg-white border border-slate-100 rounded-xl p-2.5 shadow-sm flex flex-col justify-center">
-            <p className="text-[11px] font-black text-slate-400 tracking-tight mb-1">Spend</p>
-            <div className="flex items-baseline gap-1">
-              <span className="text-xs font-bold text-slate-500">¥</span>
-              <p className="text-lg font-black text-slate-900 leading-none">{totalSpend.toLocaleString(undefined, {maximumFractionDigits: 0})}</p>
-            </div>
-          </div>
-          <div className="bg-blue-50/50 border border-blue-100 rounded-xl p-2.5 shadow-sm flex flex-col justify-center">
-            <p className="text-[11px] font-black text-blue-400 tracking-tight mb-1">Event1s</p>
-            <p className="text-lg font-black text-blue-700 leading-none">{totalEvent1s.toLocaleString()}</p>
-          </div>
-          <div className="bg-emerald-50/50 border border-emerald-100 rounded-xl p-2.5 shadow-sm flex flex-col justify-center">
-            <p className="text-[11px] font-black text-emerald-500 tracking-tight mb-1">CPA (Event1)</p>
-            <div className="flex items-baseline gap-1">
-              <span className="text-xs font-bold text-emerald-600/50">¥</span>
-              <p className="text-lg font-black text-emerald-700 leading-none">{avgCpaEvent1.toFixed(2)}</p>
-            </div>
-          </div>
-          <div className="bg-amber-50/50 border border-amber-100 rounded-xl p-2.5 shadow-sm flex flex-col justify-center">
-            <p className="text-[11px] font-black text-amber-500 tracking-tight mb-1">ROAS</p>
-            <p className="text-lg font-black text-amber-700 leading-none">{avgRoas.toFixed(2)}x</p>
-          </div>
-        </div>
+        <div className="grid grid-cols-[60%_40%] gap-4 mb-4 shrink-0 relative">
+          {/* Divider Line */}
+          <div className="absolute left-[60%] top-0 bottom-0 w-px bg-slate-200 -translate-x-1/2"></div>
 
-          <div className="flex-grow overflow-hidden flex flex-col">
-            <div className="flex items-center justify-between gap-1.5 mb-5 mt-2 shrink-0 border-b border-slate-100 pb-2.5">
-              <div className="flex items-center gap-2">
-                <BrainCircuit size={20} className="text-blue-600" />
-                <span className="text-base font-black text-slate-900 tracking-wide">AI Summary</span>
+          {/* Left Column: 4 Metric Cards + Summary */}
+          <div className="flex flex-col gap-4 pr-4">
+            {/* 4 Metric Cards - Single Row 4 Columns */}
+            <div className="grid grid-cols-4 gap-3">
+              <div className="bg-white border border-slate-100 rounded-xl p-2.5 shadow-sm flex flex-col justify-center">
+                <p className="text-[11px] font-black text-slate-400 tracking-tight mb-1">Spend</p>
+                <div className="flex items-baseline gap-1">
+                  <span className="text-xs font-bold text-slate-500">¥</span>
+                  <p className="text-lg font-black text-slate-900 leading-none">{totalSpend.toLocaleString(undefined, {maximumFractionDigits: 0})}</p>
+                </div>
+              </div>
+              <div className="bg-blue-50/50 border border-blue-100 rounded-xl p-2.5 shadow-sm flex flex-col justify-center">
+                <p className="text-[11px] font-black text-blue-400 tracking-tight mb-1">Event1s</p>
+                <p className="text-lg font-black text-blue-700 leading-none">{totalEvent1s.toLocaleString()}</p>
+              </div>
+              <div className="bg-emerald-50/50 border border-emerald-100 rounded-xl p-2.5 shadow-sm flex flex-col justify-center">
+                <p className="text-[11px] font-black text-emerald-500 tracking-tight mb-1">CPA (Event1)</p>
+                <div className="flex items-baseline gap-1">
+                  <span className="text-xs font-bold text-emerald-600/50">¥</span>
+                  <p className="text-lg font-black text-emerald-700 leading-none">{avgCpaEvent1.toFixed(2)}</p>
+                </div>
+              </div>
+              <div className="bg-amber-50/50 border border-amber-100 rounded-xl p-2.5 shadow-sm flex flex-col justify-center">
+                <p className="text-[11px] font-black text-amber-500 tracking-tight mb-1">ROAS</p>
+                <p className="text-lg font-black text-amber-700 leading-none">{avgRoas.toFixed(2)}x</p>
               </div>
             </div>
-          
-          <div className="flex-grow overflow-y-auto pr-1.5 scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent">
-            {/* Summary Section */}
-            <div className="mb-5">
-              <p className="text-xs text-slate-700 font-medium leading-relaxed">{aiInsights.summary}</p>
-            </div>
 
-            {/* Split Layout: Key Highlights & Potential Risks */}
-            <div className="flex gap-4">
-              {/* Key Highlights */}
-              <div className="flex-1">
-                <div className="flex items-center gap-1.5 mb-3">
+            {/* Summary Section with Title */}
+            <div className="flex flex-col gap-3">
+              <div className="flex items-center gap-2 py-1">
+                <BrainCircuit size={16} className="text-blue-600" />
+                <span className="text-sm font-black text-slate-800 tracking-wide">AI Summary</span>
+              </div>
+              <div className="space-y-2">
+                <p className="text-xs text-slate-700 font-medium leading-relaxed">{aiInsights.summary}</p>
+                <div className="space-y-1.5">
+                  <div className="flex items-start gap-2">
+                    <span className="text-blue-600 font-bold text-sm">→</span>
+                    <p className="text-xs text-slate-600 font-medium leading-snug flex-1">预算调优：根据 Meta 渠道当前的 CVR 表现，AI 建议对前 20% 的高效系列进行 15%-25% 的阶梯式增量。</p>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="text-amber-600 font-bold text-sm">→</span>
+                    <p className="text-xs text-slate-600 font-medium leading-snug flex-1">风险预警：监测到 Meta 账户下部分系列 CPM 出现 10% 以上波动，建议密切观察其后端转化稳定性。</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Right Column: Key Highlights & Potential Risks (Vertical) */}
+          <div className="pl-4 overflow-y-auto pr-1.5 scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent">
+            {/* Key Highlights */}
+            <div className="mb-4">
+              <div className="bg-white border border-green-200 rounded-xl p-3 shadow-sm">
+                <div className="flex items-center gap-1.5 mb-3 pb-2 border-b border-green-100 shrink-0">
                   <ShieldCheck size={14} className="text-green-600" />
                   <span className="text-xs font-black text-green-700 tracking-wide">Key Highlights</span>
                 </div>
-                <div className="space-y-2">
-                  {aiInsights.highlights.map((highlight, index) => (
-                    <div key={`highlight-${index}`} className="flex items-start gap-2">
-                      <div className="mt-1.5 shrink-0 w-1 h-1 rounded-full bg-green-600" />
-                      <p className="text-[11px] text-slate-700 font-semibold leading-normal">{highlight}</p>
-                    </div>
-                  ))}
+                <div className="max-h-[120px] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-transparent">
+                  <div className="space-y-2">
+                    {aiInsights.highlights.map((highlight, index) => (
+                      <div key={`highlight-${index}`} className="bg-green-50/50 border border-green-100 rounded-lg px-2 py-1.5 flex items-start gap-2">
+                        <div className="mt-0.5 shrink-0 w-0.5 h-0.5 rounded-full bg-green-600" />
+                        <p className="text-[9px] text-slate-700 font-semibold leading-snug flex-1">{highlight}</p>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
+            </div>
 
-              {/* Divider Line */}
-              <div className="hidden lg:block">
-                <div className="h-full border-r border-slate-200"></div>
-              </div>
-
-              {/* Potential Risks */}
-              <div className="flex-1">
-                <div className="flex items-center gap-1.5 mb-3">
+            {/* Potential Risks */}
+            <div>
+              <div className="bg-white border border-amber-200 rounded-xl p-3 shadow-sm">
+                <div className="flex items-center gap-1.5 mb-3 pb-2 border-b border-amber-100 shrink-0">
                   <AlertTriangle size={14} className="text-amber-600" />
                   <span className="text-xs font-black text-amber-700 tracking-wide">Potential Risks</span>
                 </div>
-                <div className="space-y-2">
-                  {aiInsights.key_insights.map((insight, index) => (
-                    <div key={`insight-${index}`} className="flex items-start gap-2">
-                      <div className="mt-1.5 shrink-0 w-1 h-1 rounded-full bg-amber-600" />
-                      <p className="text-[11px] text-slate-700 font-semibold leading-normal">{insight}</p>
-                    </div>
-                  ))}
+                <div className="max-h-[120px] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-transparent">
+                  <div className="space-y-2">
+                    {aiInsights.key_insights.map((insight, index) => (
+                      <div key={`insight-${index}`} className="bg-amber-50/50 border border-amber-100 rounded-lg px-2 py-1.5 flex items-start gap-2">
+                        <div className="mt-0.5 shrink-0 w-0.5 h-0.5 rounded-full bg-amber-600" />
+                        <p className="text-[9px] text-slate-700 font-semibold leading-snug flex-1">{insight}</p>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
@@ -425,14 +422,26 @@ const CrossChannelAISummary = ({
               <div className="relative group/tooltip">
                 <button 
                   onClick={handleManualAnalysis}
-                  disabled={isAnalyzing}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 border border-slate-200 rounded-lg bg-white hover:bg-slate-50 transition-all shadow-sm group ${isAnalyzing ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  disabled={isAnalyzing || analysisCooldown}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 border border-slate-200 rounded-lg bg-white hover:bg-slate-50 transition-all shadow-sm group relative overflow-hidden ${(isAnalyzing || analysisCooldown) ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
                   <Sparkles size={12} className={`${isAnalyzing ? 'text-slate-300' : 'text-blue-500'} group-hover:scale-110 transition-transform`} />
                   <span className="text-[11px] font-bold text-slate-600">Manual Analysis</span>
+                  
+                  {/* Cooldown Overlay */}
+                  {analysisCooldown && (
+                    <div className="absolute inset-0 bg-slate-900/60 flex items-center justify-center z-10 backdrop-blur-sm">
+                      <div className="flex items-center gap-1.5">
+                        <Clock size={10} className="text-white" />
+                        <span className="text-[10px] font-black text-white tracking-wider">
+                          {formatCooldownTime(analysisCooldown)}
+                        </span>
+                      </div>
+                    </div>
+                  )}
                 </button>
                 <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-slate-800 text-white text-[9px] rounded opacity-0 group-hover/tooltip:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
-                  It will take about 3 minutes.
+                  {analysisCooldown ? 'Cooldown period' : 'It will take about 3 minutes.'}
                 </div>
               </div>
               <button 
@@ -479,27 +488,6 @@ const CrossChannelAISummary = ({
               </div>
               <span className="text-xs font-black text-slate-800 tracking-tight">Budget Optimization Allocation</span>
             </div>
-            
-            {/* Range Axis */}
-            <div className="mb-6 relative pt-2">
-              <div className="flex justify-between items-center mb-1 px-1">
-                <span className="text-[9px] font-bold text-slate-400">Spend Limit Range</span>
-                <span className="text-[9px] font-black text-slate-700">¥0 - ¥{budgetStats.totalCurrentBudget.toLocaleString()}</span>
-              </div>
-              <div className="h-1.5 w-full bg-slate-100 rounded-full relative overflow-hidden">
-                {/* Yellow to Green Gradient Bar - NO PURPLE */}
-                <div className="absolute inset-0 bg-gradient-to-r from-yellow-300 via-emerald-400 to-emerald-500 opacity-80" />
-                
-                {/* Marker line for suggested - Widened and matching suggested card color */}
-                <div 
-                  className="absolute top-0 h-full w-1 bg-blue-600 z-10 shadow-[0_0_4px_rgba(37,99,235,0.5)]"
-                  style={{ left: `${Math.min(suggestedBudgetPercentage, 100)}%`, transform: 'translateX(-50%)' }}
-                />
-              </div>
-              {/* Scale points */}
-              <div className="absolute top-[22px] left-[75%] w-px h-2.5 bg-slate-300" />
-              <div className="absolute top-[22px] right-0 w-px h-2.5 bg-emerald-500" />
-            </div>
 
             {/* Comparative Boxes */}
             <div className="flex items-center gap-3">
@@ -523,24 +511,41 @@ const CrossChannelAISummary = ({
           </div>
 
           {/* Bottom Functional Grid */}
-          <div className="grid grid-cols-2 gap-3 mt-auto">
-            {/* Copilot + Manual Card */}
+          <div className="grid grid-cols-2 gap-3 mt-auto relative">
+            {/* Daily Analysis Card */}
             <div 
-              className={`group relative border-2 rounded-2xl p-3.5 flex flex-col items-center text-center transition-all duration-500 cursor-pointer overflow-hidden ${!autoApply ? 'bg-blue-50 border-blue-500 shadow-[0_10px_20px_rgba(59,130,246,0.1)] scale-[1.02]' : 'bg-white border-slate-100 hover:border-blue-200'}`}
+              className={`group border-2 rounded-2xl p-3.5 flex flex-col items-center text-center transition-all duration-300 cursor-pointer ${!autoApply ? 'bg-blue-50 border-blue-500 shadow-[0_10px_20px_rgba(59,130,246,0.1)] scale-[1.02]' : 'bg-white border-slate-100 hover:border-blue-200'}`}
               onClick={() => autoApply && onAutoApplyToggle()}
+              onMouseEnter={() => setHoveredCard('daily')}
+              onMouseLeave={() => setHoveredCard(null)}
             >
-              <div className={`mb-3 p-2 rounded-xl transition-all duration-500 relative z-10 flex items-center gap-1 ${!autoApply ? 'bg-white shadow-sm' : 'bg-blue-50'}`}>
-                <User size={16} className={!autoApply ? 'text-blue-600' : 'text-blue-400'} />
-                <Plus size={10} className="text-blue-300" />
-                <Bot size={16} className={!autoApply ? 'text-blue-600' : 'text-blue-400'} />
+              {/* Custom Animated Logo for Daily Analysis */}
+              <div className={`mb-3 transition-all duration-300 relative z-10`}>
+                <div className={`relative w-16 h-16 rounded-2xl flex items-center justify-center ${!autoApply ? 'bg-white shadow-lg shadow-blue-200/50' : 'bg-blue-50'}`}>
+                  {/* Animated Calendar Icon */}
+                  <div className={`absolute ${!autoApply ? 'animate-pulse' : ''}`}>
+                    <svg 
+                      viewBox="0 0 24 24" 
+                      fill="none" 
+                      className={`w-8 h-8 ${!autoApply ? 'text-blue-600' : 'text-blue-400'}`}
+                      style={{ animation: !autoApply ? 'scalePulse 2s ease-in-out infinite' : 'none' }}
+                    >
+                      <rect x="3" y="4" width="18" height="18" rx="2" strokeWidth="2" stroke="currentColor" fill="none"/>
+                      <path d="M16 2V6M8 2V6M3 10H21" strokeWidth="2" stroke="currentColor" strokeLinecap="round"/>
+                      <circle cx="12" cy="16" r="3" strokeWidth="2" stroke="currentColor" fill="none" className={!autoApply ? 'animate-ping' : ''} opacity="0.5"/>
+                      <circle cx="12" cy="16" r="1.5" fill="currentColor" className={!autoApply ? 'animate-pulse' : ''}/>
+                    </svg>
+                  </div>
+                  {/* Pulse Ring Effect */}
+                  {!autoApply && (
+                    <div className="absolute inset-0 rounded-2xl border-2 border-blue-400 animate-ping opacity-20" />
+                  )}
+                </div>
               </div>
               
-              <p className={`text-[13px] font-black mb-1.5 tracking-tight relative z-10 italic ${!autoApply ? 'text-blue-700' : 'text-slate-800'}`}>Copilot + Manual</p>
-              <p className={`text-[9px] font-bold leading-snug mb-3 px-1 relative z-10 min-h-[36px] ${!autoApply ? 'text-blue-600/70' : 'text-slate-400'}`}>
-                Daily analysis with suggested adjustments requiring your <span className={!autoApply ? 'text-blue-700 underline underline-offset-2' : ''}>Manual Approval</span>.
-              </p>
+              <p className={`text-[13px] font-black mb-1.5 tracking-tight ${!autoApply ? 'text-blue-700' : 'text-slate-800'}`}>Daily Analysis</p>
               
-              <div className={`mt-auto flex items-center gap-1.5 px-3 py-1 rounded-full border transition-all duration-500 relative z-10 ${!autoApply ? 'bg-blue-600 border-blue-600 text-white shadow-md' : 'bg-slate-50 border-slate-100 text-slate-300'}`}>
+              <div className={`mt-auto flex items-center gap-1.5 px-3 py-1 rounded-full border transition-all duration-300 ${!autoApply ? 'bg-blue-600 border-blue-600 text-white shadow-md' : 'bg-slate-50 border-slate-100 text-slate-300'}`}>
                 <div className={`w-1.5 h-1.5 rounded-full ${!autoApply ? 'bg-white animate-pulse shadow-[0_0_8px_rgba(255,255,255,0.8)]' : 'bg-slate-300'}`} />
                 <span className="text-[10px] font-black tracking-widest">{!autoApply ? 'RUNNING' : 'STANDBY'}</span>
               </div>
@@ -548,14 +553,30 @@ const CrossChannelAISummary = ({
 
             {/* AI Autopilot Card */}
             <div 
-              className={`group relative border-2 rounded-2xl p-3.5 flex flex-col items-center text-center transition-all duration-500 cursor-pointer overflow-hidden ${autoApply ? 'bg-slate-900 border-slate-800 shadow-[0_15px_30px_rgba(0,0,0,0.3)] scale-[1.05] z-10' : 'bg-white border-slate-100 hover:border-indigo-200 opacity-90'}`}
+              className={`group border-2 rounded-2xl p-3.5 flex flex-col items-center text-center transition-all duration-300 cursor-pointer ${autoApply ? 'bg-slate-900 border-slate-800 shadow-[0_15px_30px_rgba(0,0,0,0.3)] scale-[1.05] z-10' : 'bg-white border-slate-100 hover:border-indigo-200 opacity-90'}`}
               onClick={() => !autoApply && onAutoApplyToggle()}
+              onMouseEnter={() => setHoveredCard('autopilot')}
+              onMouseLeave={() => setHoveredCard(null)}
             >
-              {/* Promotion Badge when not active */}
+              {/* Promotion Badge when not active - Animated to attract attention */}
               {!autoApply && (
-                <div className="absolute top-2 right-2 z-20">
-                  <div className="bg-indigo-600 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full animate-bounce shadow-lg flex items-center gap-1">
-                    <Infinity size={8} />
+                <div className="absolute top-2 right-2 z-20 animate-pulse">
+                  <div className="bg-indigo-600 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full shadow-lg flex items-center gap-1">
+                    <svg 
+                      viewBox="0 0 1024 1024" 
+                      version="1.1" 
+                      xmlns="http://www.w3.org/2000/svg" 
+                      className="w-3 h-3"
+                    >
+                      <path 
+                        d="M935.485542 139.264L524.329062 2.02752a39.19872 39.19872 0 0 0-24.7808 0L88.494182 139.28448A39.8336 39.8336 0 0 0 61.440102 177.13152v396.3904c0 43.88864 21.05344 94.94528 62.54592 151.7568 32.39936 44.29824 77.824 92.83584 131.35872 140.32896 46.53056 41.24672 97.36192 80.0768 143.11424 109.3632C475.136102 1024 502.906982 1024 512.020582 1024c9.1136 0 36.864 0 113.31584-48.14848 45.9776-28.95872 96.84992-67.3792 143.19616-108.21632 53.6576-47.22688 99.16416-95.66208 131.52256-140.288 41.472-56.9344 62.50496-108.70784 62.50496-153.8048V177.152c0-17.2032-10.91584-32.48128-27.07456-37.888z m-51.87584 434.2784c0 18.75968-7.8848 52.16256-45.7728 104.79616-28.18048 39.2192-68.608 82.6368-116.9408 125.56288-42.3936 37.6832-89.21088 73.48224-131.82976 100.82304-46.12096 29.61408-70.4512 38.35904-77.04576 39.5264-6.63552-1.20832-30.96576-10.17856-77.2096-40.3456-42.45504-27.72992-89.2928-64-131.87072-102.13376-100.352-89.86624-162.6112-177.29536-162.6112-228.20864v-367.616l371.65056-124.08832 371.65056 124.1088-0.02048 367.57504z" 
+                        fill="currentColor"
+                      />
+                      <path 
+                        d="M335.380582 489.10336a40.61184 40.61184 0 0 0-3.60448 41.5744c6.5536 13.43488 19.90656 21.9136 34.54976 21.93408h192.73728l-150.36416 202.752a40.61184 40.61184 0 0 0-4.95616 39.424c5.3248 13.1072 17.08032 22.30272 30.80192 24.08448a38.23616 38.23616 0 0 0 35.71712-15.38048l197.67296-266.52672a40.61184 40.61184 0 0 0 3.8912-41.71776 38.6048 38.6048 0 0 0-34.67264-22.07744h-193.59744l119.27552-163.90144a40.42752 40.42752 0 0 0-7.84384-55.6032 38.03136 38.03136 0 0 0-54.14912 8.04864l-165.4784 227.38944z" 
+                        fill="currentColor"
+                      />
+                    </svg>
                     7*24H
                   </div>
                 </div>
@@ -568,23 +589,53 @@ const CrossChannelAISummary = ({
                 </div>
               )}
               
-              <div className="mb-3 transition-all duration-500 relative z-10">
-                <RealisticRadar active={autoApply} />
+              <div className="mb-3 transition-all duration-300 relative z-10">
+                {/* Infinity Icon Logo for AI Autopilot */}
+                <div className={`relative w-16 h-16 rounded-2xl flex items-center justify-center ${autoApply ? 'bg-slate-800 shadow-lg shadow-indigo-500/30' : 'bg-white shadow-lg shadow-indigo-200/50'}`}>
+                  {/* Infinity Icon - Static when inactive, rotating when active */}
+                  <div className={`relative ${autoApply ? 'animate-[spin_3s_linear_infinite]' : ''}`}>
+                    <Infinity 
+                      size={36} 
+                      className={`${autoApply ? 'text-indigo-400' : 'text-indigo-600'}`}
+                    />
+                  </div>
+                  {/* Glow Effect when active */}
+                  {autoApply && (
+                    <div className="absolute inset-0 rounded-2xl bg-indigo-500/10 animate-pulse" />
+                  )}
+                </div>
               </div>
               
-              <p className={`text-[13px] font-black mb-1.5 tracking-tight relative z-10 italic ${autoApply ? 'text-white' : 'text-slate-800'}`}>AI Autopilot</p>
-              <p className={`text-[9px] font-bold leading-snug mb-3 px-1 relative z-10 min-h-[36px] ${autoApply ? 'text-slate-400' : 'text-slate-400'}`}>
-                Full <span className={autoApply ? 'text-indigo-400 underline underline-offset-2' : ''}>Autonomous Optimization</span> with 24/7 monitoring to maximize ROAS.
-              </p>
+              <p className={`text-[13px] font-black mb-1.5 tracking-tight ${autoApply ? 'text-white' : 'text-slate-800'}`}>AI Autopilot</p>
               
-              <div className={`mt-auto flex items-center gap-1.5 px-3 py-1 rounded-full border transition-all duration-500 relative z-10 ${autoApply ? 'bg-indigo-600 border-indigo-500 text-white shadow-[0_0_10px_rgba(79,70,229,0.5)]' : 'bg-slate-50 border-slate-100 text-slate-300'}`}>
+              <div className={`mt-auto flex items-center gap-1.5 px-3 py-1 rounded-full border transition-all duration-300 ${autoApply ? 'bg-indigo-600 border-indigo-500 text-white shadow-[0_0_10px_rgba(79,70,229,0.5)]' : 'bg-slate-50 border-slate-100 text-slate-300'}`}>
                 <div className={`w-1.5 h-1.5 rounded-full ${autoApply ? 'bg-green-400 animate-ping shadow-[0_0_8px_rgba(74,222,128,0.8)]' : 'bg-slate-300'}`} />
                 <span className="text-[10px] font-black tracking-widest">{autoApply ? 'RUNNING' : 'STANDBY'}</span>
               </div>
             </div>
           </div>
+
+          {/* Floating Tooltips - Outside cards, above the grid */}
+          <div className="absolute -top-16 left-0 right-0 flex justify-around pointer-events-none">
+            {/* Daily Analysis Tooltip */}
+            <div className={`transition-opacity duration-300 ${hoveredCard === 'daily' ? 'opacity-100' : 'opacity-0'}`}>
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 px-4 py-2.5 bg-slate-900 text-white text-[10px] font-medium rounded-xl whitespace-nowrap z-50 max-w-[250px] shadow-xl border border-slate-700">
+                Daily analysis with suggested adjustments requiring your Manual Approval.
+                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-slate-900" />
+              </div>
+            </div>
+
+            {/* AI Autopilot Tooltip */}
+            <div className={`transition-opacity duration-300 ${hoveredCard === 'autopilot' ? 'opacity-100' : 'opacity-0'}`}>
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 px-4 py-2.5 bg-slate-900 text-white text-[10px] font-medium rounded-xl whitespace-nowrap z-50 max-w-[250px] shadow-xl border border-slate-700">
+                Full Autonomous Optimization with 24/7 monitoring to maximize ROAS.
+                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-slate-900" />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
+
       </div>
     </div>
   );

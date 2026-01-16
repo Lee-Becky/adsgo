@@ -299,7 +299,7 @@ const BudgetReasonModal = ({ isOpen, onClose, campaign, reason }) => {
         />
         
         {/* Right Drawer */}
-        <div className="absolute right-0 top-0 h-full w-full max-w-5xl bg-white shadow-2xl overflow-y-auto transform transition-transform">
+        <div className="absolute right-0 top-0 h-full w-[40vw] min-w-[400px] max-w-[800px] bg-white shadow-2xl overflow-y-auto transform transition-transform">
           {/* Header */}
           <div className={`px-6 py-4 border-b border-border flex items-center justify-between sticky top-0 bg-white z-10 ${getTypeColor(reason.type)}`}>
             <div className="flex items-center gap-3">

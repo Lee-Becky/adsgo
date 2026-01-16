@@ -254,7 +254,7 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
       cvrEvent2: 0.89,
       purchases: 12,
       cpaPurchase: 210,
-      cvrPurchase: 0.44,
+      cvrPurchase: 0.43,
       purchaseValue: 18900,
       roas: 7.5,
       expanded: false,
@@ -2606,17 +2606,17 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
                                   {campaign.status !== 'Paused' && status === 'pending' && (
                                     <div className="flex gap-1">
                                       <button
+                                        onClick={() => handleApprove(campaign.id)}
+                                        className="text-[10px] bg-indigo-600 text-white px-1.5 py-0.5 rounded hover:bg-indigo-700 transition-colors"
+                                      >
+                                        Approve
+                                      </button>
+                                      <button
                                         onClick={() => handleReject(campaign.id)}
                                         className="text-gray-400 hover:text-red-600 transition-colors"
                                         title="Reject"
                                       >
                                         <ThumbsDown size={14} />
-                                      </button>
-                                      <button
-                                        onClick={() => handleApprove(campaign.id)}
-                                        className="text-[10px] bg-indigo-600 text-white px-1.5 py-0.5 rounded hover:bg-indigo-700 transition-colors"
-                                      >
-                                        Approve
                                       </button>
                                     </div>
                                   )}
@@ -2830,20 +2830,20 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
                                         {adset.status !== 'Paused' && adsetStatus === 'pending' && (
                                           <div className="flex gap-1">
                                             <button
+                                              onClick={() => handleApprove(adset.id)}
+                                              className="text-[10px] bg-indigo-600 text-white px-1.5 py-0.5 rounded hover:bg-indigo-700 transition-colors"
+                                            >
+                                              Approve
+                                            </button>
+                                            <button
                                               onClick={() => handleReject(adset.id)}
                                               className="text-gray-400 hover:text-red-600 transition-colors"
                                               title="Reject"
                                             >
                                               <ThumbsDown size={14} />
                                             </button>
-                                            <button
-                                              onClick={() => handleApprove(adset.id)}
-                                              className="text-[10px] bg-indigo-600 text-white px-1.5 py-0.5 rounded hover:bg-indigo-700 transition-colors"
-                                            >
-                                              Approve
-                                            </button>
-                                            </div>
-                                        )}
+                                          </div>
+                                          )}
                                         {(adsetStatus === 'approved' || adsetStatus === 'auto_applied' || adsetStatus === 'rejected' || adsetStatus === 'invalid_modified') && (
                                           <div className="flex items-center gap-1">
                                             {getStatusBadge(adsetStatus)}
@@ -2935,7 +2935,7 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
                         </td>
                         <td className="px-2 py-2 text-xs text-gray-600 text-left">
                           <div className="flex flex-col items-start">
-                            <span className="font-medium text-gray-700 text-xs">{formatCurrency(adset.cpaPurchase)}</span>
+                            <span className="font-medium text-gray-900 text-xs">{formatCurrency(adset.cpaPurchase)}</span>
                             <span className="text-[10px] text-gray-400">{adset.cvrPurchase.toFixed(2)}%</span>
                           </div>
                         </td>

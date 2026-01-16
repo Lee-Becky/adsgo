@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import DashboardInsightsHeader from './DashboardInsightsHeader'
 import CrossChannelAISummary from './CrossChannelAISummary'
 import RuleConfigModal from './RuleConfigModal'
 import FilterSection from './FilterSection'
@@ -11,6 +12,7 @@ const AdManagerV3 = ({ onEditBrandConfig, selectedBrand }) => {
   const [budgetStatus, setBudgetStatus] = useState({})
   const [lastUpdated, setLastUpdated] = useState('2026-01-15 13:29')
   const [autoExecuteRecommendations, setAutoExecuteRecommendations] = useState(false)
+  const [isSummaryCollapsed, setIsSummaryCollapsed] = useState(false)
   const [selectedCampaign, setSelectedCampaign] = useState(null)
   const [showCampaignAnalysis, setShowCampaignAnalysis] = useState(false)
   const [showBudgetReason, setShowBudgetReason] = useState(false)
@@ -19,6 +21,7 @@ const AdManagerV3 = ({ onEditBrandConfig, selectedBrand }) => {
   const [showConfigModal, setShowConfigModal] = useState(false)
   const [goals] = useState(MOCK_GOALS)
   const [campaigns, setCampaigns] = useState([])
+  const [activeTab, setActiveTab] = useState('meta')
 
   const handleCampaignClick = (campaign) => {
     setSelectedCampaign(campaign)
@@ -62,23 +65,39 @@ const AdManagerV3 = ({ onEditBrandConfig, selectedBrand }) => {
 
   return (
     <div className="p-6">
-      {/* Cross-Channel AI Summary */}
-      <CrossChannelAISummary
-        totalSpend={125000}
-        totalEvent1s={3200}
-        avgCpaEvent1={39.06}
-        avgRoas={3.8}
+      {/* Dashboard Insights Header - Independent Component */}
+      <DashboardInsightsHeader
         onRuleLibraryClick={() => setShowConfigModal(true)}
-        autoApply={autoExecuteRecommendations}
-        onAutoApplyToggle={() => setAutoExecuteRecommendations(!autoExecuteRecommendations)}
-        goals={goals}
         onEditBrandConfig={onEditBrandConfig}
-        brandName={selectedBrand}
-        campaigns={campaigns}
-        onCampaignsChange={setCampaigns}
-        lastUpdated={lastUpdated}
-        onUpdateLastUpdated={setLastUpdated}
+        onCollapseToggle={() => setIsSummaryCollapsed(!isSummaryCollapsed)}
+        isCollapsed={isSummaryCollapsed}
+        onActiveTabChange={setActiveTab}
+        activeTab={activeTab}
       />
+
+      {/* Cross-Channel AI Summary - with margin - Hide when activeTab is 'all' or 'google' */}
+      {activeTab !== 'all' && activeTab !== 'google' && (
+        <div className="mt-4">
+          <CrossChannelAISummary
+            totalSpend={125000}
+            totalEvent1s={3200}
+            avgCpaEvent1={39.06}
+            avgRoas={3.8}
+            onRuleLibraryClick={() => setShowConfigModal(true)}
+            autoApply={autoExecuteRecommendations}
+            onAutoApplyToggle={() => setAutoExecuteRecommendations(!autoExecuteRecommendations)}
+            goals={goals}
+            onEditBrandConfig={onEditBrandConfig}
+            brandName={selectedBrand}
+            campaigns={campaigns}
+            onCampaignsChange={setCampaigns}
+            lastUpdated={lastUpdated}
+            onUpdateLastUpdated={setLastUpdated}
+            isCollapsed={isSummaryCollapsed}
+            activeTab={activeTab}
+          />
+        </div>
+      )}
 
       {/* Rule Config Modal */}
       <RuleConfigModal
@@ -104,8 +123,8 @@ const AdManagerV3 = ({ onEditBrandConfig, selectedBrand }) => {
         reason={budgetReasonData}
       />
 
-      {/* Filter and Data Section - Connected visually */}
-      <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+      {/* Filter and Data Section - Connected visually - Add margin when CrossChannelAISummary is hidden */}
+      <div className={`bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden ${activeTab === 'all' || activeTab === 'google' ? 'mt-4' : ''}`}>
         {/* Filter Section - Light background for visual differentiation */}
         <div className="p-5 border-b border-slate-100 bg-gray-50">
           <FilterSection />

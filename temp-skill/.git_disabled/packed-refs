@@ -1,0 +1,14 @@
+# pack-refs with: peeled fully-peeled sorted 
+f00bba64b5caa9c89687ed0c69080c1ae015f10a refs/remotes/origin/chore/mit-license
+010b4bb1493c5d7ad5b6e5c1f5ec2db3b25d1a32 refs/remotes/origin/feat/copilot-support
+f15bb83f53ef6c0925ea2a98c6a816c6d6bc9422 refs/remotes/origin/feat/kiro-support
+0967edf62cc7ac19eafe8ddc53ac318a030a9a18 refs/remotes/origin/main
+ea22839044f98dfac6d6feb0ff7cc7a11757a59e refs/remotes/origin/release/cli-v1.5.0
+77d47409c43852001c881fc2afe8e23a368fa2aa refs/tags/v1.0.0
+66a376c7521728f6a66c686b0460c75a3610a3f1 refs/tags/v1.0.1
+939818b024efabd59b726beb2530e073f0fb3ea7 refs/tags/v1.2.0
+528138c76fc5547f21ba35b5650a7ff8826a3dcb refs/tags/v1.2.1
+44a17c2028b91ed6014fd33550a382ee1173aacb refs/tags/v1.2.2
+9149e5f2fa474325991958cff32ab9bea3394402 refs/tags/v1.8.0
+408df9076646c4651d75334d787b33bf34118f5e refs/tags/v1.9.0
+539d52c424c18a14626601a0494ff70561b86d8b refs/tags/v2.0.0
