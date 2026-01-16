@@ -191,8 +191,8 @@ const DashboardInsightsHeader = ({
               <span className="text-[10px] font-black tracking-tight">Rules Library</span>
             </button>
 
-            {/* Collapse/Expand Button - Hide when activeTab is 'all' or 'google' */}
-            {activeTab !== 'all' && activeTab !== 'google' && (
+            {/* Collapse/Expand Button - Hide when activeTab is 'google' */}
+            {activeTab !== 'google' && (
               <button
                 onClick={onCollapseToggle}
                 className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-all shadow-sm text-slate-600 hover:text-slate-800 group"
@@ -243,11 +243,34 @@ const DashboardInsightsHeader = ({
 
             {/* Body */}
             <div className="p-6">
-              {/* Current Goal */}
-              <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
-                <div className="flex items-center gap-2 mb-2">
+              {/* Current Goal - Structured Card */}
+              <div className="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 rounded-2xl border border-indigo-100 shadow-sm overflow-hidden">
+                <div className="p-5">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Target size={16} className="text-indigo-600" />
+                    <h4 className="text-sm font-bold text-indigo-900">Current Optimization Goal</h4>
+                  </div>
+                  
+                  {/* Row 1: Daily Budget */}
+                  <div className="mb-3 pb-3 border-b border-indigo-200/50">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-semibold text-indigo-700">Daily Budget</span>
+                      <span className="text-sm font-bold text-indigo-900">$500</span>
+                    </div>
+                  </div>
+                  
+                  {/* Row 2: Purchase & ROAS */}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-semibold text-indigo-700">Purchase</span>
+                      <span className="text-sm font-bold text-indigo-900">Conversion Goal</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <span className="text-xs font-semibold text-indigo-700">ROAS Target</span>
+                      <span className="text-sm font-bold text-green-600">{'>'} 5</span>
+                    </div>
+                  </div>
                 </div>
-                <p className="text-sm font-bold text-slate-800">DailyBudget$500, Purchase, ROAS{'>'}5</p>
               </div>
             </div>
 

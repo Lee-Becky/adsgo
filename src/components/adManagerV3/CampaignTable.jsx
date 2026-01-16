@@ -3,7 +3,7 @@ import { ToggleLeft, ToggleRight, ChevronDown, ChevronRight, Edit, ArrowRight, C
 import AdsetDetailModal from './AdsetDetailModal'
 import FeedbackModal from './FeedbackModal'
 
-const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, onBudgetReasonClick, onBudgetEditClick, onMoreInsights, autoExecuteRecommendations, campaigns: externalCampaigns, onCampaignsChange, lastUpdated }) => {
+const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, onBudgetReasonClick, onBudgetEditClick, onMoreInsights, autoExecuteRecommendations, campaigns: externalCampaigns, onCampaignsChange, lastUpdated, activeTab }) => {
   const [feedbackOpen, setFeedbackOpen] = useState(false)
   const [feedbackTarget, setFeedbackTarget] = useState(null)
   const [selectedAdset, setSelectedAdset] = useState(null)
@@ -740,7 +740,7 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
       cpc: 0.75,
       ctr: 4.0,
       event1s: 32,
-      cpaEvent1: 75,
+                                                                                    cpaEvent1: 75,
       cvrEvent1: 1.0,
       event2s: 20,
       cpaEvent2: 120,
@@ -1980,9 +1980,19 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
   const campaigns = externalCampaigns.length > 0 ? externalCampaigns : internalCampaigns
   const setCampaigns = onCampaignsChange || setInternalCampaigns
 
-  // Sort campaigns
+  // Filter campaigns based on activeTab
+  const filteredCampaigns = useMemo(() => {
+    if (activeTab === 'meta') {
+      return campaigns.filter(campaign => campaign.platform === 'Meta')
+    } else if (activeTab === 'google') {
+      return campaigns.filter(campaign => campaign.platform === 'Google')
+    }
+    return campaigns
+  }, [campaigns, activeTab])
+
+  // Sort campaigns (use filtered campaigns)
   const sortedCampaigns = useMemo(() => {
-    const sorted = [...campaigns].sort((a, b) => {
+    const sorted = [...filteredCampaigns].sort((a, b) => {
       const aValue = a[sortConfig.key]
       const bValue = b[sortConfig.key]
       
@@ -1993,7 +2003,7 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
       }
     })
     return sorted
-  }, [campaigns, sortConfig])
+  }, [filteredCampaigns, sortConfig])
 
   // Get paginated campaigns
   const paginatedCampaigns = useMemo(() => {
@@ -2002,16 +2012,16 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
     return sortedCampaigns.slice(startIndex, endIndex)
   }, [sortedCampaigns, currentPage])
 
-  // Calculate total pages
-  const totalPages = Math.ceil(campaigns.length / itemsPerPage)
+  // Calculate total pages (use filtered campaigns)
+  const totalPages = Math.ceil(filteredCampaigns.length / itemsPerPage)
 
-  // Calculate summary data
+  // Calculate summary data (use filtered campaigns)
   const summaryData = useMemo(() => {
-    const activeCampaigns = campaigns.filter(c => c.enabled)
+    const activeCampaigns = filteredCampaigns.filter(c => c.enabled)
     const activeAdsets = activeCampaigns.flatMap(c => c.adsets.filter(a => a.enabled))
     
     // Calculate total daily budget for active campaigns and adsets
-    const totalDailyBudget = campaigns.reduce((sum, c) => {
+    const totalDailyBudget = filteredCampaigns.reduce((sum, c) => {
       if (!c.enabled) return sum
       if (c.budgetLevel === 'campaign') {
         return sum + c.dailyBudget
@@ -2024,33 +2034,33 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
     }, 0)
     
     return {
-      totalCampaigns: campaigns.length,
+      totalCampaigns: filteredCampaigns.length,
       activeCampaigns: activeCampaigns.length,
-      totalSpend: campaigns.reduce((sum, c) => sum + c.spend, 0),
-      totalImpressions: campaigns.reduce((sum, c) => sum + c.impressions, 0),
-      totalClicks: campaigns.reduce((sum, c) => sum + c.clicks, 0),
-      avgCPM: campaigns.reduce((sum, c) => sum + c.cpm, 0) / campaigns.length,
-      avgCPC: campaigns.reduce((sum, c) => sum + c.cpc, 0) / campaigns.length,
-      avgCTR: campaigns.reduce((sum, c) => sum + c.ctr, 0) / campaigns.length,
-      totalEvent1s: campaigns.reduce((sum, c) => sum + c.event1s, 0),
-      avgCPAEvent1: campaigns.reduce((sum, c) => sum + c.cpaEvent1, 0) / campaigns.length,
-      avgCVREvent1: campaigns.reduce((sum, c) => sum + c.cvrEvent1, 0) / campaigns.length,
-      totalEvent2s: campaigns.reduce((sum, c) => sum + c.event2s, 0),
-      avgCPAEvent2: campaigns.reduce((sum, c) => sum + c.cpaEvent2, 0) / campaigns.length,
-      avgCVREvent2: campaigns.reduce((sum, c) => sum + c.cvrEvent2, 0) / campaigns.length,
-      totalPurchases: campaigns.reduce((sum, c) => sum + c.purchases, 0),
-      avgCPAPurchase: campaigns.reduce((sum, c) => sum + c.cpaPurchase, 0) / campaigns.length,
-      avgCVRPurchase: campaigns.reduce((sum, c) => sum + c.cvrPurchase, 0) / campaigns.length,
-      totalPurchaseValue: campaigns.reduce((sum, c) => sum + c.purchaseValue, 0),
-      avgROAS: campaigns.reduce((sum, c) => sum + c.roas, 0) / campaigns.length,
+      totalSpend: filteredCampaigns.reduce((sum, c) => sum + c.spend, 0),
+      totalImpressions: filteredCampaigns.reduce((sum, c) => sum + c.impressions, 0),
+      totalClicks: filteredCampaigns.reduce((sum, c) => sum + c.clicks, 0),
+      avgCPM: filteredCampaigns.reduce((sum, c) => sum + c.cpm, 0) / filteredCampaigns.length,
+      avgCPC: filteredCampaigns.reduce((sum, c) => sum + c.cpc, 0) / filteredCampaigns.length,
+      avgCTR: filteredCampaigns.reduce((sum, c) => sum + c.ctr, 0) / filteredCampaigns.length,
+      totalEvent1s: filteredCampaigns.reduce((sum, c) => sum + c.event1s, 0),
+      avgCPAEvent1: filteredCampaigns.reduce((sum, c) => sum + c.cpaEvent1, 0) / filteredCampaigns.length,
+      avgCVREvent1: filteredCampaigns.reduce((sum, c) => sum + c.cvrEvent1, 0) / filteredCampaigns.length,
+      totalEvent2s: filteredCampaigns.reduce((sum, c) => sum + c.event2s, 0),
+      avgCPAEvent2: filteredCampaigns.reduce((sum, c) => sum + c.cpaEvent2, 0) / filteredCampaigns.length,
+      avgCVREvent2: filteredCampaigns.reduce((sum, c) => sum + c.cvrEvent2, 0) / filteredCampaigns.length,
+      totalPurchases: filteredCampaigns.reduce((sum, c) => sum + c.purchases, 0),
+      avgCPAPurchase: filteredCampaigns.reduce((sum, c) => sum + c.cpaPurchase, 0) / filteredCampaigns.length,
+      avgCVRPurchase: filteredCampaigns.reduce((sum, c) => sum + c.cvrPurchase, 0) / filteredCampaigns.length,
+      totalPurchaseValue: filteredCampaigns.reduce((sum, c) => sum + c.purchaseValue, 0),
+      avgROAS: filteredCampaigns.reduce((sum, c) => sum + c.roas, 0) / filteredCampaigns.length,
       totalDailyBudget
     }
-  }, [campaigns])
+  }, [filteredCampaigns])
 
-  // Auto-apply all pending recommendations when autoExecuteRecommendations is enabled
+  // Auto-apply all pending recommendations when autoExecuteRecommendations is enabled (use filtered campaigns)
   useEffect(() => {
     if (autoExecuteRecommendations) {
-      campaigns.forEach(campaign => {
+      filteredCampaigns.forEach(campaign => {
         const status = budgetStatus[campaign.id] || 'pending'
         if (status === 'pending' && campaign.status !== 'Paused') {
           onBudgetStatusChange(prev => ({ 
@@ -2071,7 +2081,7 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
         })
       })
     }
-  }, [autoExecuteRecommendations, budgetStatus])
+  }, [autoExecuteRecommendations, budgetStatus, filteredCampaigns])
 
   const handleSort = (key) => {
     setSortConfig(prev => ({
@@ -2586,90 +2596,110 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
                       )}
                     </td>
                     <td className="px-2 py-3">
-                      {campaign.budgetLevel === 'campaign' ? (
-                        campaign.status === 'Paused' ? (
-                          <div className="text-xs text-gray-400 font-semibold">
-                            --
-                          </div>
-                        ) : (
-                          <div className={`${status !== 'pending' ? 'opacity-50' : ''}`}>
-                            {(() => {
-                              const budgetChange = getBudgetChangeInfo(campaign.suggestedBudget, campaign.dailyBudget)
-                              return (
-                                <div className="flex flex-col items-start gap-2">
-                                  <div className="flex items-center gap-1">
-                                    {budgetChange.icon}
-                                    <span className={`text-xs font-bold ${budgetChange.colorClass}`}>
-                                      {formatCurrency(campaign.suggestedBudget)}
-                                    </span>
-                                  </div>
-                                  {campaign.status !== 'Paused' && status === 'pending' && (
-                                    <div className="flex gap-1">
-                                      <button
-                                        onClick={() => handleApprove(campaign.id)}
-                                        className="text-[10px] bg-indigo-600 text-white px-1.5 py-0.5 rounded hover:bg-indigo-700 transition-colors"
-                                      >
-                                        Approve
-                                      </button>
-                                      <button
-                                        onClick={() => handleReject(campaign.id)}
-                                        className="text-gray-400 hover:text-red-600 transition-colors"
-                                        title="Reject"
-                                      >
-                                        <ThumbsDown size={14} />
-                                      </button>
-                                    </div>
-                                  )}
-                                  {(status === 'approved' || status === 'auto_applied' || status === 'rejected' || status === 'invalid_modified') && (
+                      {campaign.platform === 'Meta' ? (
+                        campaign.budgetLevel === 'campaign' ? (
+                          campaign.status === 'Paused' ? (
+                            <div className="text-xs text-gray-400 font-semibold">
+                              --
+                            </div>
+                          ) : (
+                            <div className={`${status !== 'pending' ? 'opacity-50' : ''}`}>
+                              {(() => {
+                                const budgetChange = getBudgetChangeInfo(campaign.suggestedBudget, campaign.dailyBudget)
+                                return (
+                                  <div className="flex flex-col items-start gap-2">
                                     <div className="flex items-center gap-1">
-                                      {getStatusBadge(status)}
+                                      {budgetChange.icon}
+                                      <span className={`text-xs font-bold ${budgetChange.colorClass}`}>
+                                        {formatCurrency(campaign.suggestedBudget)}
+                                      </span>
                                     </div>
-                                  )}
-                                </div>
-                              )
-                            })()}
+                                    {campaign.status !== 'Paused' && status === 'pending' && (
+                                      <div className="flex gap-1">
+                                        <button
+                                          onClick={() => handleApprove(campaign.id)}
+                                          className="text-[10px] bg-indigo-600 text-white px-1.5 py-0.5 rounded hover:bg-indigo-700 transition-colors"
+                                        >
+                                          Approve
+                                        </button>
+                                        <button
+                                          onClick={() => handleReject(campaign.id)}
+                                          className="text-gray-400 hover:text-red-600 transition-colors"
+                                          title="Reject"
+                                        >
+                                          <ThumbsDown size={14} />
+                                        </button>
+                                      </div>
+                                    )}
+                                    {(status === 'approved' || status === 'auto_applied' || status === 'rejected' || status === 'invalid_modified') && (
+                                      <div className="flex items-center gap-1">
+                                        {getStatusBadge(status)}
+                                      </div>
+                                    )}
+                                  </div>
+                                )
+                              })()}
+                            </div>
+                          )
+                        ) : (
+                          <div className="text-[10px] text-indigo-600 font-semibold italic p-2">
+                            Budget suggestions in adset
                           </div>
                         )
                       ) : (
-                        <div className="text-[10px] text-indigo-600 font-semibold italic p-2">
-                          Budget suggestions in adset
+                        <div className="flex items-center justify-center py-3">
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-gray-100 border border-gray-200">
+                            <span className="text-[9px] font-medium text-gray-500">
+                              Coming soon
+                            </span>
+                          </span>
                         </div>
                       )}
                     </td>
                     <td className="px-2 py-3">
-                      {campaign.budgetLevel === 'campaign' ? (
-                        campaign.status === 'Paused' ? (
-                          <div className="text-xs text-gray-400 font-semibold">
-                            --
-                          </div>
-                        ) : (
-                          <div className="flex items-center gap-1">
-                            <div className="flex-1 space-y-2">
-                              {campaign.budgetReason.reasons.map((reason, idx) => (
-                                <div key={idx} className="text-[10px] text-gray-600 flex items-start gap-0.5 mb-0.5 leading-tight">
-                                  <span className="text-indigo-600 mt-0.5">•</span>
-                                  <span>{reason}</span>
-                                </div>
-                              ))}
+                      {campaign.platform === 'Meta' ? (
+                        campaign.budgetLevel === 'campaign' ? (
+                          campaign.status === 'Paused' ? (
+                            <div className="text-xs text-gray-400 font-semibold">
+                              --
                             </div>
-                            <button
-                              onClick={() => onMoreInsights && onMoreInsights({ 
-                                ...campaign, 
-                                status, 
-                                handleApprove, 
-                                handleReject,
-                                onBudgetStatusChange 
-                              })}
-                              className="text-indigo-600 hover:text-indigo-700 transition-colors"
-                              title="More Insights"
-                            >
-                              <Eye size={16} />
-                            </button>
+                          ) : (
+                            <div className="flex items-center gap-1">
+                              <div className="flex-1 space-y-2">
+                                {campaign.budgetReason.reasons.map((reason, idx) => (
+                                  <div key={idx} className="text-[10px] text-gray-600 flex items-start gap-0.5 mb-0.5 leading-tight">
+                                    <span className="text-indigo-600 mt-0.5">•</span>
+                                    <span>{reason}</span>
+                                  </div>
+                                ))}
+                              </div>
+                              <button
+                                onClick={() => onMoreInsights && onMoreInsights({ 
+                                  ...campaign, 
+                                  status, 
+                                  handleApprove, 
+                                  handleReject,
+                                  onBudgetStatusChange 
+                                })}
+                                className="text-indigo-600 hover:text-indigo-700 transition-colors"
+                                title="More Insights"
+                              >
+                                <Eye size={16} />
+                              </button>
+                            </div>
+                          )
+                        ) : (
+                          <div className="text-xs text-gray-500 italic">
+                            Budget adjustment suggestions are available at adset level.
                           </div>
                         )
                       ) : (
-                        <div className="text-xs text-gray-500 italic">
-                          Budget adjustment suggestions are available at adset level.
+                        <div className="flex items-center justify-center py-3">
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-gray-100 border border-gray-200">
+                            <span className="text-[9px] font-medium text-gray-500">
+                              Coming soon
+                            </span>
+                          </span>
                         </div>
                       )}
                     </td>
@@ -2805,93 +2835,113 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
                           )}  
                         </td>
                         <td className="px-2 py-2">
-                          {campaign.budgetLevel === 'campaign' ? (
-                            <div className="text-[10px] text-gray-500 italic">
-                              Intelligent budget allocation to more advantageous adsets
-                            </div>
+                          {campaign.platform === 'Meta' ? (
+                            campaign.budgetLevel === 'campaign' ? (
+                              <div className="text-[10px] text-gray-500 italic">
+                                Intelligent budget allocation to more advantageous adsets
+                              </div>
+                            ) : (
+                              adset.status === 'Paused' ? (
+                                <div className="text-xs text-gray-400 font-semibold">
+                                  --
+                                </div>
+                              ) : (
+                                adset.budgetReason && (
+                                  <div className={`${adsetStatus !== 'pending' ? 'opacity-50' : ''}`}>
+                                    {(() => {
+                                      const budgetChange = getBudgetChangeInfo(adset.suggestedBudget, adset.dailyBudget)
+                                      return (
+                                        <div className="flex flex-col items-start gap-2">
+                                          <div className="flex items-center gap-1">
+                                            {budgetChange.icon}
+                                            <span className={`text-xs font-bold ${budgetChange.colorClass}`}>
+                                              {formatCurrency(adset.suggestedBudget)}
+                                            </span>
+                                          </div>
+                                          {adset.status !== 'Paused' && adsetStatus === 'pending' && (
+                                            <div className="flex gap-1">
+                                              <button
+                                                onClick={() => handleApprove(adset.id)}
+                                                className="text-[10px] bg-indigo-600 text-white px-1.5 py-0.5 rounded hover:bg-indigo-700 transition-colors"
+                                              >
+                                                Approve
+                                              </button>
+                                              <button
+                                                onClick={() => handleReject(adset.id)}
+                                                className="text-gray-400 hover:text-red-600 transition-colors"
+                                                title="Reject"
+                                              >
+                                                <ThumbsDown size={14} />
+                                              </button>
+                                            </div>
+                                            )}
+                                          {(adsetStatus === 'approved' || adsetStatus === 'auto_applied' || adsetStatus === 'rejected' || adsetStatus === 'invalid_modified') && (
+                                            <div className="flex items-center gap-1">
+                                              {getStatusBadge(adsetStatus)}
+                                            </div>
+                                          )}
+                                        </div>
+                                      )
+                                    })()}
+                                  </div>
+                                )
+                              )
+                            )
                           ) : (
+                            <div className="flex items-center justify-center py-2">
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-gray-100 border border-gray-200">
+                                <span className="text-[9px] font-medium text-gray-500">
+                                  Coming soon
+                                </span>
+                              </span>
+                            </div>
+                          )}
+                        </td>
+                        <td className="px-2 py-2">
+                          {campaign.platform === 'Meta' ? (
                             adset.status === 'Paused' ? (
                               <div className="text-xs text-gray-400 font-semibold">
                                 --
                               </div>
                             ) : (
-                              adset.budgetReason && (
-                                <div className={`${adsetStatus !== 'pending' ? 'opacity-50' : ''}`}>
-                                  {(() => {
-                                    const budgetChange = getBudgetChangeInfo(adset.suggestedBudget, adset.dailyBudget)
-                                    return (
-                                      <div className="flex flex-col items-start gap-2">
-                                        <div className="flex items-center gap-1">
-                                          {budgetChange.icon}
-                                          <span className={`text-xs font-bold ${budgetChange.colorClass}`}>
-                                            {formatCurrency(adset.suggestedBudget)}
-                                          </span>
-                                        </div>
-                                        {adset.status !== 'Paused' && adsetStatus === 'pending' && (
-                                          <div className="flex gap-1">
-                                            <button
-                                              onClick={() => handleApprove(adset.id)}
-                                              className="text-[10px] bg-indigo-600 text-white px-1.5 py-0.5 rounded hover:bg-indigo-700 transition-colors"
-                                            >
-                                              Approve
-                                            </button>
-                                            <button
-                                              onClick={() => handleReject(adset.id)}
-                                              className="text-gray-400 hover:text-red-600 transition-colors"
-                                              title="Reject"
-                                            >
-                                              <ThumbsDown size={14} />
-                                            </button>
-                                          </div>
-                                          )}
-                                        {(adsetStatus === 'approved' || adsetStatus === 'auto_applied' || adsetStatus === 'rejected' || adsetStatus === 'invalid_modified') && (
-                                          <div className="flex items-center gap-1">
-                                            {getStatusBadge(adsetStatus)}
-                                          </div>
-                                        )}
-                                      </div>
-                                    )
-                                  })()}
+                              adset.budgetReason ? (
+                                <div className="flex items-center gap-1">
+                                  <div className="flex-1 space-y-2">
+                                {adset.budgetReason.reasons.map((reason, idx) => (
+                                  <div key={idx} className="text-[10px] text-gray-600 flex items-start gap-0.5 mb-0.5 leading-tight">
+                                    <span className="text-indigo-600 mt-0.5">•</span>
+                                    <span>{reason}</span>
+                                  </div>
+                                ))}
+                              </div>
+                              <button
+                                onClick={() => onMoreInsights && onMoreInsights({ 
+                                  ...adset, 
+                                  status: adsetStatus, 
+                                  handleApprove, 
+                                  handleReject,
+                                  onBudgetStatusChange 
+                                })}
+                                className="text-indigo-600 hover:text-indigo-700 transition-colors"
+                                title="More Insights"
+                              >
+                                    <Eye size={16} />
+                                  </button>
+                                </div>
+                              ) : (
+                                <div className="text-xs text-gray-500 italic">
+                                  No budget adjustment suggestions.
                                 </div>
                               )
                             )
-                          )}  
-                        </td>
-                        <td className="px-2 py-2">
-                          {adset.status === 'Paused' ? (
-                            <div className="text-xs text-gray-400 font-semibold">
-                              --
-                            </div>
                           ) : (
-                            adset.budgetReason ? (
-                              <div className="flex items-center gap-1">
-                                <div className="flex-1 space-y-2">
-                              {adset.budgetReason.reasons.map((reason, idx) => (
-                                <div key={idx} className="text-[10px] text-gray-600 flex items-start gap-0.5 mb-0.5 leading-tight">
-                                  <span className="text-indigo-600 mt-0.5">•</span>
-                                  <span>{reason}</span>
-                                </div>
-                              ))}
+                            <div className="flex items-center justify-center py-2">
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-gray-100 border border-gray-200">
+                                <span className="text-[9px] font-medium text-gray-500">
+                                  Coming soon
+                                </span>
+                              </span>
                             </div>
-                            <button
-                              onClick={() => onMoreInsights && onMoreInsights({ 
-                                ...adset, 
-                                status: adsetStatus, 
-                                handleApprove, 
-                                handleReject,
-                                onBudgetStatusChange 
-                              })}
-                              className="text-indigo-600 hover:text-indigo-700 transition-colors"
-                              title="More Insights"
-                            >
-                                  <Eye size={16} />
-                                </button>
-                              </div>
-                            ) : (
-                              <div className="text-xs text-gray-500 italic">
-                                No budget adjustment suggestions.
-                              </div>
-                            )
                           )}
                         </td>
                         <td className="px-2 py-2 font-medium text-gray-700 text-xs">

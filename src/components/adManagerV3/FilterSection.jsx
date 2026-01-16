@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
-import { Calendar, Filter, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Calendar, Filter, ChevronLeft, ChevronRight, ChevronDown, Check } from 'lucide-react'
 
-const FilterSection = () => {
+const FilterSection = ({ activeTab }) => {
   const [dataPeriod, setDataPeriod] = useState('Today')
   const [customStartDate, setCustomStartDate] = useState('')
   const [customEndDate, setCustomEndDate] = useState('')
@@ -122,46 +122,42 @@ const FilterSection = () => {
         <h3 className="font-semibold text-gray-900">Filters</h3>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        {/* Platform */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Platform
-          </label>
-          <select className="w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none text-sm">
-            <option>All Platforms</option>
-            <option>Google Ads</option>
-            <option>Facebook Ads</option>
-            <option>TikTok Ads</option>
-            <option>Display Ads</option>
-          </select>
-        </div>
+      <div className={`grid grid-cols-1 ${activeTab === 'all' ? 'md:grid-cols-4' : 'md:grid-cols-3'} gap-4`}>
+        {/* Platform - Hide when activeTab is not 'all' (omnichannel) */}
+        {activeTab === 'all' && (
+          <CustomSelect
+            label="Platform"
+            options={[
+              { label: 'All Platforms', value: 'all' },
+              { label: 'Google Ads', value: 'google' },
+              { label: 'Facebook Ads', value: 'facebook' },
+              { label: 'TikTok Ads', value: 'tiktok' },
+              { label: 'Display Ads', value: 'display' }
+            ]}
+          />
+        )}
 
         {/* Account */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Account
-          </label>
-          <select className="w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none text-sm">
-            <option>All Accounts</option>
-            <option>Account 1</option>
-            <option>Account 2</option>
-            <option>Account 3</option>
-          </select>
-        </div>
+        <CustomSelect
+          label="Account"
+          options={[
+            { label: 'All Accounts', value: 'all' },
+            { label: 'Account 1', value: 'account1' },
+            { label: 'Account 2', value: 'account2' },
+            { label: 'Account 3', value: 'account3' }
+          ]}
+        />
 
         {/* Campaign Status */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Campaign Status
-          </label>
-          <select className="w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none text-sm">
-            <option>All Status</option>
-            <option>Active</option>
-            <option>Paused</option>
-            <option>Completed</option>
-          </select>
-        </div>
+        <CustomSelect
+          label="Campaign Status"
+          options={[
+            { label: 'All Status', value: 'all' },
+            { label: 'Active', value: 'active' },
+            { label: 'Paused', value: 'paused' },
+            { label: 'Completed', value: 'completed' }
+          ]}
+        />
 
         {/* Data Period */}
         <div>
@@ -247,6 +243,52 @@ const FilterSection = () => {
             )}
           </div>
         </div>
+      </div>
+    </div>
+  )
+}
+
+const CustomSelect = ({ label, options }) => {
+  const [isOpen, setIsOpen] = useState(false)
+  const [selectedOption, setSelectedOption] = useState(options[0])
+
+  return (
+    <div>
+      <label className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">
+        {label}
+      </label>
+      <div className="relative">
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="w-full px-3 py-2.5 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none text-sm text-left flex items-center justify-between hover:border-indigo-300 transition-all shadow-sm"
+        >
+          <span className="font-medium text-gray-700">{selectedOption.label}</span>
+          <ChevronDown size={16} className={`text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+        </button>
+
+        {isOpen && (
+          <div className="absolute top-full left-0 mt-1 w-full bg-white border border-gray-200 rounded-xl shadow-lg z-50 overflow-hidden">
+            <div className="py-1">
+              {options.map((option) => (
+                <button
+                  key={option.value}
+                  onClick={() => {
+                    setSelectedOption(option)
+                    setIsOpen(false)
+                  }}
+                  className={`w-full px-3 py-2 text-left text-sm flex items-center justify-between hover:bg-indigo-50 transition-colors ${
+                    selectedOption.value === option.value ? 'bg-indigo-50 text-indigo-700 font-medium' : 'text-gray-700'
+                  }`}
+                >
+                  <span>{option.label}</span>
+                  {selectedOption.value === option.value && (
+                    <Check size={14} className="text-indigo-600" />
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )

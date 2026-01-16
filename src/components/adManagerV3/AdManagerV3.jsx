@@ -75,8 +75,8 @@ const AdManagerV3 = ({ onEditBrandConfig, selectedBrand }) => {
         activeTab={activeTab}
       />
 
-      {/* Cross-Channel AI Summary - with margin - Hide when activeTab is 'all' or 'google' */}
-      {activeTab !== 'all' && activeTab !== 'google' && (
+      {/* Cross-Channel AI Summary - with margin - Show when activeTab is 'all' or 'meta' */}
+      {activeTab !== 'google' && (
         <div className="mt-4">
           <CrossChannelAISummary
             totalSpend={125000}
@@ -127,7 +127,7 @@ const AdManagerV3 = ({ onEditBrandConfig, selectedBrand }) => {
       <div className={`bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden ${activeTab === 'all' || activeTab === 'google' ? 'mt-4' : ''}`}>
         {/* Filter Section - Light background for visual differentiation */}
         <div className="p-5 border-b border-slate-100 bg-gray-50">
-          <FilterSection />
+          <FilterSection activeTab={activeTab} />
         </div>
 
         {/* Campaign Table - White background */}
@@ -142,6 +142,7 @@ const AdManagerV3 = ({ onEditBrandConfig, selectedBrand }) => {
           campaigns={campaigns}
           onCampaignsChange={setCampaigns}
           lastUpdated={lastUpdated}
+          activeTab={activeTab}
         />
       </div>
     </div>
