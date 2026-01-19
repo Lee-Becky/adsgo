@@ -21,6 +21,9 @@ const BudgetEditModal = ({ isOpen, onClose, campaign, onSave, onUpdateBudgetStat
 
   const currentEditMode = getEditMode()
 
+  // Check if platform is NOT Meta (hide AI recommendations and reason for non-Meta platforms)
+  const isNonMetaPlatform = campaign.platform !== 'Meta' && (campaign.parentCampaign?.platform !== 'Meta')
+
   const handleSubmit = (e) => {
     e.preventDefault()
     const newBudget = parseFloat(budget)
@@ -122,8 +125,8 @@ const BudgetEditModal = ({ isOpen, onClose, campaign, onSave, onUpdateBudgetStat
               )}
             </div>
 
-            {/* AI Recommendation - Subtle Version */}
-            {campaign.suggestedBudget && (
+            {/* AI Recommendation - Subtle Version - Hide for non-Meta platforms */}
+            {campaign.suggestedBudget && !isNonMetaPlatform && (
               <div className="mt-3 flex items-center justify-between px-1">
                 <div className="flex items-center gap-1.5 text-slate-500">
                   <Sparkles size={12} className="text-indigo-400" />
@@ -140,22 +143,24 @@ const BudgetEditModal = ({ isOpen, onClose, campaign, onSave, onUpdateBudgetStat
             )}
           </div>
 
-          {/* Reason Field - Simplified */}
-          <div className="mb-8">
-            <div className="flex items-center gap-1.5 mb-2 px-1">
-              <Info size={13} className="text-slate-400" />
-              <label htmlFor="reason" className="text-xs font-medium text-slate-500">
-                Reason (Optional)
-              </label>
+          {/* Reason Field - Simplified - Hide for non-Meta platforms */}
+          {!isNonMetaPlatform && (
+            <div className="mb-8">
+              <div className="flex items-center gap-1.5 mb-2 px-1">
+                <Info size={13} className="text-slate-400" />
+                <label htmlFor="reason" className="text-xs font-medium text-slate-500">
+                  Reason (Optional)
+                </label>
+              </div>
+              <textarea
+                id="reason"
+                value={modificationReason}
+                onChange={(e) => setModificationReason(e.target.value)}
+                placeholder="Briefly state the reason for adjustment..."
+                className="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-sm text-slate-600 focus:bg-white focus:border-indigo-500 outline-none transition-all resize-none min-h-[70px]"
+              />
             </div>
-            <textarea
-              id="reason"
-              value={modificationReason}
-              onChange={(e) => setModificationReason(e.target.value)}
-              placeholder="Briefly state the reason for adjustment..."
-              className="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-sm text-slate-600 focus:bg-white focus:border-indigo-500 outline-none transition-all resize-none min-h-[70px]"
-            />
-          </div>
+          )}
 
           {/* Simplified Footer Actions */}
           <div className="flex gap-3">
