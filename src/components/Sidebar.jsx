@@ -24,7 +24,7 @@ const Sidebar = ({ isMobile, onClose, currentPage, onPageChange, selectedBrand, 
       {/* Logo */}
       <div className="p-6 border-b border-border">
         <h1 className="text-2xl font-bold text-primary">AdsGo</h1>
-        <p className="text-sm text-gray-500 mt-1">Ad Management Platform</p>
+        <p className="text-sm text-gray-500 mt-1">24H AI Advertising Expert</p>
       </div>
 
       {/* Brand Switcher */}
