@@ -183,7 +183,7 @@ const BudgetReasonModal = ({ isOpen, onClose, campaign, reason }) => {
       action: op.operation,
       fromBudget: idx % 2 === 0 ? 1200 : 2000,
       toBudget: idx % 2 === 0 ? 1400 : 1200,
-      changeAmt: idx % 2 === 0 ? '+¥200' : '-¥800',
+      changeAmt: idx % 2 === 0 ? '+$200' : '-$800',
       changePct: idx % 2 === 0 ? '+16.7%' : '-40.0%',
       before: getAvg(opIndex - 1, opIndex),
       after: getAvg(opIndex + 1, opIndex + 2)
@@ -235,7 +235,7 @@ const BudgetReasonModal = ({ isOpen, onClose, campaign, reason }) => {
 
     const cpaTrend = ((p1.cpa - p14.cpa) / p14.cpa) * 100
     if (cpaTrend < -10) {
-      insights.push({ icon: <TrendingDown className="text-green-500" />, text: `CPA efficiency improvement: Last 1 day CPA (¥${p1.cpa.toFixed(1)}) decreased by ${Math.abs(cpaTrend).toFixed(1)}% compared to 14-day average, model entered positive feedback cycle.` })
+      insights.push({ icon: <TrendingDown className="text-green-500" />, text: `CPA efficiency improvement: Last 1 day CPA ($${p1.cpa.toFixed(1)}) decreased by ${Math.abs(cpaTrend).toFixed(1)}% compared to 14-day average, model entered positive feedback cycle.` })
     } else if (cpaTrend > 10) {
       insights.push({ icon: <TrendingUp className="text-red-500" />, text: `Core metric warning: Last 1 day CPA increased by ${cpaTrend.toFixed(1)}% compared to 14-day average, KPI achievement rate declined, need to check creative fatigue.` })
     }
@@ -271,9 +271,9 @@ const BudgetReasonModal = ({ isOpen, onClose, campaign, reason }) => {
   const periodicInsights = getPeriodicAnalysisInsights()
 
   const comparisonRows = [
-    { l: 'Total Spend (Daily Avg)', f: (p) => `¥${p.spendTotal.toFixed(0)} (${p.spendAvg.toFixed(0)})` },
+    { l: 'Total Spend (Daily Avg)', f: (p) => `$${p.spendTotal.toFixed(0)} (${p.spendAvg.toFixed(0)})` },
     { l: 'Total Conversions (Daily Avg)', f: (p) => `${p.convTotal.toFixed(0)} (${p.convAvg.toFixed(0)})` },
-    { l: 'KPI Achievement (CPA/ROAS)', f: (p) => `¥${p.cpa.toFixed(1)}` },
+    { l: 'KPI Achievement (CPA/ROAS)', f: (p) => `$${p.cpa.toFixed(1)}` },
     { l: 'KPI Achievement Rate', f: (p) => `${p.cpaAchievement.toFixed(0)}%` },
     { l: 'KPI Achievement Rank', f: (p) => `${p.rank}/12 (Top ${((p.rank / 12) * 100).toFixed(0)}%)` },
     { l: 'CTR (vs Avg)', f: (p) => `${p.ctr.toFixed(2)}% (vs ${periods['14d'].ctr.toFixed(2)}%)` },
@@ -281,7 +281,7 @@ const BudgetReasonModal = ({ isOpen, onClose, campaign, reason }) => {
   ]
 
   const formatCurrency = (value) => {
-    return `¥${value.toFixed(2)}`
+    return `$${value.toFixed(2)}`
   }
 
   const formatFullDateTime = (date) => {
@@ -335,7 +335,7 @@ const BudgetReasonModal = ({ isOpen, onClose, campaign, reason }) => {
                   <div className="grid grid-cols-2 gap-4">
                     <div className="bg-white/10 p-3 rounded-xl border border-white/5">
                       <p className="text-[10px] text-slate-400 font-black uppercase">Recommended Budget</p>
-                      <p className="text-xl font-black text-green-400">¥{campaign.suggestedBudget || campaign.dailyBudget}</p>
+                      <p className="text-xl font-black text-green-400">${campaign.suggestedBudget || campaign.dailyBudget}</p>
                     </div>
                     <div className="bg-white/10 p-3 rounded-xl border border-white/5">
                       <p className="text-[10px] text-slate-400 font-black uppercase">Expected Improvement</p>
@@ -355,7 +355,7 @@ const BudgetReasonModal = ({ isOpen, onClose, campaign, reason }) => {
                             <span className="text-xs font-bold text-slate-700">{op.action}</span>
                           </div>
                           <div className="flex items-center gap-2">
-                            <span className="text-[10px] font-bold text-slate-500 italic">¥{op.fromBudget} ➔ ¥{op.toBudget}</span>
+                            <span className="text-[10px] font-bold text-slate-500 italic">${op.fromBudget} ➔ ${op.toBudget}</span>
                             <span className="text-[10px] font-bold text-slate-400">Change: <span className="text-blue-600">{op.changeAmt} ({op.changePct})</span></span>
                           </div>
                         </div>
@@ -364,7 +364,7 @@ const BudgetReasonModal = ({ isOpen, onClose, campaign, reason }) => {
                             <p className="text-[9px] text-slate-400 font-bold uppercase mb-1">1 day before adjustment</p>
                             <div className="flex justify-between text-[10px] font-bold text-slate-600">
                               <span>ROAS: {op.before.roas.toFixed(1)}x</span>
-                              <span>CPA: ¥{op.before.cpa.toFixed(0)}</span>
+                              <span>CPA: ${op.before.cpa.toFixed(0)}</span>
                               <span>Conv: {op.before.conv.toFixed(0)}</span>
                             </div>
                           </div>
@@ -372,7 +372,7 @@ const BudgetReasonModal = ({ isOpen, onClose, campaign, reason }) => {
                             <p className="text-[9px] text-slate-400 font-bold uppercase mb-1">1 day after adjustment</p>
                             <div className="flex justify-between text-[10px] font-bold text-green-600">
                               <span>ROAS: {op.after.roas.toFixed(1)}x</span>
-                              <span>CPA: ¥{op.after.cpa.toFixed(0)}</span>
+                              <span>CPA: ${op.after.cpa.toFixed(0)}</span>
                               <span>Conv: {op.after.conv.toFixed(0)}</span>
                             </div>
                           </div>
@@ -412,7 +412,7 @@ const BudgetReasonModal = ({ isOpen, onClose, campaign, reason }) => {
                           {history14.map((d, i) => (
                             <tr key={i} className="hover:bg-blue-50/30">
                               <td className="p-2 border-r border-slate-100 font-medium">{d.date.slice(5)}</td>
-                              <td className="p-2">¥{d.budget}</td><td className="p-2">¥{d.spend.toFixed(0)}</td><td className="p-2">¥{d.cpm.toFixed(1)}</td><td className="p-2">¥{d.cpc.toFixed(1)}</td><td className="p-2">{(d.clicks/d.impressions*100).toFixed(1)}%</td><td className="p-2">{d.conversions.toFixed(0)}</td><td className="p-2">¥{d.cpa.toFixed(1)}</td><td className="p-2">{(d.conversions/d.clicks*100).toFixed(1)}%</td><td className="p-2">{d.purchases.toFixed(0)}</td><td className="p-2">¥{d.cpp.toFixed(1)}</td><td className="p-2">{(d.purchases/d.conversions*100).toFixed(1)}%</td>
+                              <td className="p-2">${d.budget}</td><td className="p-2">${d.spend.toFixed(0)}</td><td className="p-2">${d.cpm.toFixed(1)}</td><td className="p-2">${d.cpc.toFixed(1)}</td><td className="p-2">{(d.clicks/d.impressions*100).toFixed(1)}%</td><td className="p-2">{d.conversions.toFixed(0)}</td><td className="p-2">${d.cpa.toFixed(1)}</td><td className="p-2">{(d.conversions/d.clicks*100).toFixed(1)}%</td><td className="p-2">{d.purchases.toFixed(0)}</td><td className="p-2">${d.cpp.toFixed(1)}</td><td className="p-2">{(d.purchases/d.conversions*100).toFixed(1)}%</td>
                             </tr>
                           ))}
                         </tbody>
@@ -474,17 +474,17 @@ const BudgetReasonModal = ({ isOpen, onClose, campaign, reason }) => {
                       <Legend iconType="circle" wrapperStyle={{ fontSize: '8px', paddingTop: '20px' }} />
                       
                       <Bar yAxisId="installs" dataKey="conversions" name="Daily Installs" fill="#f8fafc" barSize={22} radius={[4, 4, 0, 0]} />
-                      <Line yAxisId="metrics" type="monotone" dataKey="cpa" name="CPA (¥)" stroke="#8b5cf6" strokeWidth={2} dot={{r:2, fill: '#8b5cf6', strokeWidth: 0}} />
+                      <Line yAxisId="metrics" type="monotone" dataKey="cpa" name="CPA ($)" stroke="#8b5cf6" strokeWidth={2} dot={{r:2, fill: '#8b5cf6', strokeWidth: 0}} />
                       <Line yAxisId="metrics" type="monotone" dataKey="roas" name="ROAS (x)" stroke="#3b82f6" strokeWidth={2} dot={{r:2, fill: '#3b82f6', strokeWidth: 0}} />
-                      <Line yAxisId="metrics" type="monotone" dataKey="cpm" name="CPM (¥)" stroke="#10b981" strokeWidth={2} dot={{r:2, fill: '#10b981', strokeWidth: 0}} />
+                      <Line yAxisId="metrics" type="monotone" dataKey="cpm" name="CPM ($)" stroke="#10b981" strokeWidth={2} dot={{r:2, fill: '#10b981', strokeWidth: 0}} />
                     </ComposedChart>
                   </ResponsiveContainer>
                 </div>
 
                 <div className="mt-4 grid grid-cols-3 gap-3">
                   {[
-                    { label: 'CPM Trend Analysis', data: trends.cpm, color: 'text-green-600', prefix: '¥' },
-                    { label: 'CPA Trend Analysis', data: trends.cpa, color: 'text-purple-600', prefix: '¥' },
+                    { label: 'CPM Trend Analysis', data: trends.cpm, color: 'text-green-600', prefix: '$' },
+                    { label: 'CPA Trend Analysis', data: trends.cpa, color: 'text-purple-600', prefix: '$' },
                     { label: 'ROAS Trend Analysis', data: trends.roas, color: 'text-blue-600', prefix: '' },
                   ].map((item, idx) => (
                     <div key={idx} className="bg-slate-50 border border-slate-100 rounded-xl p-3 flex flex-col justify-between">
@@ -522,11 +522,11 @@ const BudgetReasonModal = ({ isOpen, onClose, campaign, reason }) => {
                   <div className="space-y-4">
                     <p className="text-[10px] font-black text-slate-400 text-center">This Campaign Performance</p>
                     {[
-                      { l: 'Spend', v: `¥${campFunnel.spend.toFixed(0)}`, w: 'w-full', c: 'bg-blue-600' },
-                      { l: 'Impressions (CPM)', v: `¥${campFunnel.cpm.toFixed(1)}`, w: 'w-[90%]', c: 'bg-blue-500', comp: compare(campFunnel.cpm, benchFunnel.cpm, true) },
-                      { l: `Clicks (CPC/CTR)`, v: `¥${campFunnel.cpc.toFixed(1)} / ${campFunnel.ctr.toFixed(1)}%`, w: 'w-[75%]', c: 'bg-blue-400', comp: compare(campFunnel.ctr, benchFunnel.ctr) },
-                      { l: `Conversions (CPA/CVR1)`, v: `¥${campFunnel.cpa.toFixed(1)} / ${campFunnel.cvr1.toFixed(1)}%`, w: 'w-[60%]', c: 'bg-blue-300', comp: compare(campFunnel.cvr1, benchFunnel.cvr1) },
-                      { l: `Purchases (CPP/P.Rate)`, v: `¥${campFunnel.cpp.toFixed(1)} / ${campFunnel.pRate.toFixed(1)}%`, w: 'w-[45%]', c: 'bg-blue-200', comp: compare(campFunnel.pRate, benchFunnel.pRate) },
+                      { l: 'Spend', v: `$${campFunnel.spend.toFixed(0)}`, w: 'w-full', c: 'bg-blue-600' },
+                      { l: 'Impressions (CPM)', v: `$${campFunnel.cpm.toFixed(1)}`, w: 'w-[90%]', c: 'bg-blue-500', comp: compare(campFunnel.cpm, benchFunnel.cpm, true) },
+                      { l: `Clicks (CPC/CTR)`, v: `$${campFunnel.cpc.toFixed(1)} / ${campFunnel.ctr.toFixed(1)}%`, w: 'w-[75%]', c: 'bg-blue-400', comp: compare(campFunnel.ctr, benchFunnel.ctr) },
+                      { l: `Conversions (CPA/CVR1)`, v: `$${campFunnel.cpa.toFixed(1)} / ${campFunnel.cvr1.toFixed(1)}%`, w: 'w-[60%]', c: 'bg-blue-300', comp: compare(campFunnel.cvr1, benchFunnel.cvr1) },
+                      { l: `Purchases (CPP/P.Rate)`, v: `$${campFunnel.cpp.toFixed(1)} / ${campFunnel.pRate.toFixed(1)}%`, w: 'w-[45%]', c: 'bg-blue-200', comp: compare(campFunnel.pRate, benchFunnel.pRate) },
                     ].map((item, idx) => (
                       <div key={idx} className="flex flex-col items-center">
                         <div className={`${item.w} h-10 ${item.c} rounded flex items-center justify-center text-white font-bold text-[9px] relative shadow-sm`}>
@@ -539,7 +539,7 @@ const BudgetReasonModal = ({ isOpen, onClose, campaign, reason }) => {
                   <div className="space-y-4 opacity-40">
                     <p className="text-[10px] font-black text-slate-400 text-center">Brand Same-Goal Campaign Benchmark Performance</p>
                     {[
-                      { v: `¥${benchFunnel.spend.toFixed(0)}`, w: 'w-full' }, { v: `¥${benchFunnel.cpm.toFixed(1)}`, w: 'w-[90%]' }, { v: `¥${benchFunnel.cpc.toFixed(1)} / ${benchFunnel.ctr.toFixed(1)}%`, w: 'w-[75%]' }, { v: `¥${benchFunnel.cpa.toFixed(1)} / ${benchFunnel.cvr1.toFixed(1)}%`, w: 'w-[60%]' }, { v: `¥${benchFunnel.cpp.toFixed(1)} / ${benchFunnel.pRate.toFixed(1)}%`, w: 'w-[45%]' },
+                      { v: `$${benchFunnel.spend.toFixed(0)}`, w: 'w-full' }, { v: `$${benchFunnel.cpm.toFixed(1)}`, w: 'w-[90%]' }, { v: `$${benchFunnel.cpc.toFixed(1)} / ${benchFunnel.ctr.toFixed(1)}%`, w: 'w-[75%]' }, { v: `$${benchFunnel.cpa.toFixed(1)} / ${benchFunnel.cvr1.toFixed(1)}%`, w: 'w-[60%]' }, { v: `$${benchFunnel.cpp.toFixed(1)} / ${benchFunnel.pRate.toFixed(1)}%`, w: 'w-[45%]' },
                     ].map((item, idx) => (<div key={idx} className="flex flex-col items-center"><div className={`${item.w} h-10 bg-slate-300 rounded flex items-center justify-center text-slate-600 font-bold text-[9px]`}>{item.v}</div></div>))}
                   </div>
                 </div>

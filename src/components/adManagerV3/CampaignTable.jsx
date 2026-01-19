@@ -38,7 +38,7 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
           'Conversion cost decreased by 15%, efficiency significantly improved',
           'Traffic growth trend obvious, recommend increasing budget'
         ],
-        detailedReason: 'The Campaign ROI increased from 3.2 to 4.2 in the past 7 days, conversion cost decreased by 15%. Traffic growth trend is obvious, recommend increasing daily budget from ¥500 to ¥800 to get more quality traffic.',
+        detailedReason: 'The Campaign ROI increased from 3.2 to 4.2 in the past 7 days, conversion cost decreased by 15%. Traffic growth trend is obvious, recommend increasing daily budget from $500 to $800 to get more quality traffic.',
         metrics: { roi: 4.2, change: '+31%', costChange: '-15%' }
       },
       spend: 3240,
@@ -237,7 +237,7 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
           'Impressions and clicks steadily growing',
           'ROI reached 3.5, recommend expanding brand exposure'
         ],
-        detailedReason: 'The Campaign CVR reached 3.5%, far above industry average (2.0%). Impressions and clicks are steadily growing, ROI reached 3.5. Recommend decreasing daily budget from ¥400 to ¥200 to optimize cost efficiency.',
+        detailedReason: 'The Campaign CVR reached 3.5%, far above industry average (2.0%). Impressions and clicks are steadily growing, ROI reached 3.5. Recommend decreasing daily budget from $400 to $200 to optimize cost efficiency.',
         metrics: { roi: 3.5, change: '+20%', costChange: '-10%' }
       },
       spend: 2520,
@@ -356,10 +356,10 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
             type: 'decrease',
             reasons: [
               'ROI is 1.8, below target (2.0)',
-              'CPC high (¥2.5), cost偏高',
+              'CPC high ($2.5), cost偏高',
               'Conversion rate low (1.5%), recommend reevaluating'
             ],
-            detailedReason: 'The Adset ROI is 1.8, below target (2.0). CPC is high (¥2.5), conversion rate is low (1.5%).',
+            detailedReason: 'The Adset ROI is 1.8, below target (2.0). CPC is high ($2.5), conversion rate is low (1.5%).',
             metrics: { roi: 1.8, change: '-15%', costChange: '+25%' }
           },
           locations: ['JP'],
@@ -392,10 +392,10 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
             type: 'decrease',
             reasons: [
               'ROI is 1.8, below target (2.0)',
-              'CPC high (¥2.5), cost偏高',
+              'CPC high ($2.5), cost偏高',
               'Conversion rate low (1.5%), recommend reevaluating'
             ],
-            detailedReason: 'The Adset ROI is 1.8, below target (2.0). CPC is high (¥2.5), conversion rate is low (1.5%).',
+            detailedReason: 'The Adset ROI is 1.8, below target (2.0). CPC is high ($2.5), conversion rate is low (1.5%).',
             metrics: { roi: 1.8, change: '-15%', costChange: '+25%' }
           },
           locations: ['JP'],
@@ -528,7 +528,7 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
         type: 'increase',
         reasons: [
           'Video completion rate increased by 25%',
-          'CPV decreased from ¥0.15 to ¥0.12',
+          'CPV decreased from $0.15 to $0.12',
           'Strong engagement metrics observed'
         ],
         detailedReason: 'Video completion rate improved significantly, CPV decreased. Recommend increasing budget to maximize reach.',
@@ -925,7 +925,7 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
       budgetReason: {
         type: 'maintain',
         reasons: [
-          'Lead cost stable at ¥25 per lead',
+          'Lead cost stable at $25 per lead',
           'Quality leads above 85%',
           'Consistent performance maintained'
         ],
@@ -2163,7 +2163,7 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
   }
 
   const formatCurrency = (value) => {
-    return `¥${value.toFixed(2)}`
+    return `$${value.toFixed(2)}`
   }
 
   const formatNumber = (value) => {

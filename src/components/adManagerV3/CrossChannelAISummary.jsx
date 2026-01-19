@@ -194,7 +194,7 @@ const CrossChannelAISummary = ({
       };
     } else {
       return {
-        summary: `AI analysis complete. Current account performance is stable. Recommended total budget of ¥${mockStats.totalSuggestedBudget} is in effect. CTR remains around 2.8%, and CPA has been optimized to ¥38.5.`,
+        summary: `AI analysis complete. Current account performance is stable. Recommended total budget of $${mockStats.totalSuggestedBudget} is in effect. CTR remains around 2.8%, and CPA has been optimized to $38.5.`,
         highlights: [
           `${mockStats.increase} Campaigns identified with scaling potential during analysis period. Recommend increasing budget to get more conversions.`,
           `Current conversion cost decreased by 12.5% compared to 24 hours ago. Recommend maintaining current strategy.`,
@@ -314,7 +314,7 @@ const CrossChannelAISummary = ({
               <div className="bg-white border border-slate-100 rounded-xl p-2.5 shadow-sm flex flex-col justify-center">
                 <p className="text-[11px] font-black text-slate-400 tracking-tight mb-1">Spend</p>
                 <div className="flex items-baseline gap-1">
-                  <span className="text-xs font-bold text-slate-500">¥</span>
+                  <span className="text-xs font-bold text-slate-500">$</span>
                   <p className="text-lg font-black text-slate-900 leading-none">{totalSpend.toLocaleString(undefined, {maximumFractionDigits: 0})}</p>
                 </div>
               </div>
@@ -325,7 +325,7 @@ const CrossChannelAISummary = ({
               <div className="bg-emerald-50/50 border border-emerald-100 rounded-xl p-2.5 shadow-sm flex flex-col justify-center">
                 <p className="text-[11px] font-black text-emerald-500 tracking-tight mb-1">CPA (Event1)</p>
                 <div className="flex items-baseline gap-1">
-                  <span className="text-xs font-bold text-emerald-600/50">¥</span>
+                  <span className="text-xs font-bold text-emerald-600/50">$</span>
                   <p className="text-lg font-black text-emerald-700 leading-none">{avgCpaEvent1.toFixed(2)}</p>
                 </div>
               </div>
