@@ -6,9 +6,12 @@ import FilterSection from './FilterSection'
 import CampaignTable from './CampaignTable'
 import BudgetEditModal from './BudgetEditModal'
 import BudgetReasonModal from './BudgetReasonModal'
+import BrandDataOverlay from '../BrandDataOverlay'
 import { MOCK_GOALS } from '../../services/adManager/mockData'
 
 const AdManagerV3 = ({ onEditBrandConfig, selectedBrand }) => {
+  // Brand data status: 'no-accounts' | 'fetching' | 'no-data' | 'success'
+  const [brandDataStatus, setBrandDataStatus] = useState('no-accounts')
   const [budgetStatus, setBudgetStatus] = useState({})
   const [lastUpdated, setLastUpdated] = useState('2026-01-15 13:29')
   const [autoExecuteRecommendations, setAutoExecuteRecommendations] = useState(false)
@@ -61,6 +64,44 @@ const AdManagerV3 = ({ onEditBrandConfig, selectedBrand }) => {
   const handleRuleSave = (rules) => {
     console.log('Saved rules:', rules)
     // 可以在这里保存规则到状态或发送到后端
+  }
+
+  // Handle connect account
+  const handleConnectAccount = () => {
+    // TODO: Implement connect account logic
+    console.log('Connect account clicked')
+    // For demo, simulate fetching
+    setBrandDataStatus('fetching')
+  }
+
+  // Handle create campaign
+  const handleCreateCampaign = () => {
+    // TODO: Implement create campaign logic
+    console.log('Create campaign clicked')
+    // For demo, simulate fetching
+    setBrandDataStatus('fetching')
+  }
+
+  // Handle retry data fetch
+  const handleRetry = () => {
+    console.log('Retry data fetch')
+    setBrandDataStatus('fetching')
+    // Simulate data fetch
+    setTimeout(() => {
+      setBrandDataStatus('success')
+    }, 2000)
+  }
+
+  // Handle view demo (normal state)
+  const handleViewDemo = () => {
+    console.log('View demo clicked')
+    setBrandDataStatus('success')
+  }
+
+  // Handle view error
+  const handleViewError = () => {
+    console.log('View error clicked')
+    setBrandDataStatus('no-data')
   }
 
   return (

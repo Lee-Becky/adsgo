@@ -21,6 +21,7 @@ import {
   PLATFORM_LOGOS
 } from '../constants/adInsightsData';
 import { Icon, SvgIcons } from './AdInsightsIcons';
+import BrandDataOverlay from './BrandDataOverlay';
 
 // --- Sub Components ---
 
@@ -285,6 +286,8 @@ const CreativeAdCard = ({ ad, index }) => (
 // --- Main Component ---
 
 const AdInsights = ({ onPageChange }) => {
+  // Brand data status: 'no-accounts' | 'fetching' | 'no-data' | 'success'
+  const [brandDataStatus, setBrandDataStatus] = useState('no-accounts');
   const [selectedPlatform, setSelectedPlatform] = useState('Meta');
   const [autoRegen, setAutoRegen] = useState(false);
   const [expandedTags, setExpandedTags] = useState({});
@@ -323,6 +326,44 @@ const AdInsights = ({ onPageChange }) => {
   };
 
   const displayedCards = CAMPAIGN_CARDS.filter(card => ['01', '03', '05'].includes(card.id));
+
+  // Handle connect account
+  const handleConnectAccount = () => {
+    // TODO: Implement connect account logic
+    console.log('Connect account clicked')
+    // For demo, simulate fetching
+    setBrandDataStatus('fetching')
+  }
+
+  // Handle create campaign
+  const handleCreateCampaign = () => {
+    // TODO: Implement create campaign logic
+    console.log('Create campaign clicked')
+    // For demo, simulate fetching
+    setBrandDataStatus('fetching')
+  }
+
+  // Handle retry data fetch
+  const handleRetry = () => {
+    console.log('Retry data fetch')
+    setBrandDataStatus('fetching')
+    // Simulate data fetch
+    setTimeout(() => {
+      setBrandDataStatus('success')
+    }, 2000)
+  }
+
+  // Handle view demo (normal state)
+  const handleViewDemo = () => {
+    console.log('View demo clicked')
+    setBrandDataStatus('success')
+  }
+
+  // Handle view error
+  const handleViewError = () => {
+    console.log('View error clicked')
+    setBrandDataStatus('no-data')
+  }
 
   return (
     <div className="min-h-screen bg-background p-4 md:p-6 font-sans">

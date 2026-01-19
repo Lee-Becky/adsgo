@@ -16,7 +16,8 @@ import {
   ChevronLeft,
   ChevronRight,
   BarChart3,
-  Sparkles
+  Sparkles,
+  Clock
 } from 'lucide-react'
 import { 
   AreaChart, 
@@ -27,8 +28,11 @@ import {
   Tooltip, 
   ResponsiveContainer 
 } from 'recharts'
+import BrandDataOverlay from './BrandDataOverlay'
 
 const Dashboard = ({ selectedBrand, onPageChange, onEditBrandConfig }) => {
+  // Brand data status: 'no-accounts' | 'fetching' | 'no-data' | 'success'
+  const [brandDataStatus, setBrandDataStatus] = useState('no-accounts')
   const [dataPeriod, setDataPeriod] = useState('Last 7 days')
   const [customStartDate, setCustomStartDate] = useState('')
   const [customEndDate, setCustomEndDate] = useState('')
@@ -178,7 +182,7 @@ const Dashboard = ({ selectedBrand, onPageChange, onEditBrandConfig }) => {
     { key: 'cpm', label: 'CPM', value: '$8.50', color: '#D946EF' },
     { key: 'ctr', label: 'CTR', value: '2.1%', color: '#10B981' },
     { key: 'cost_conv', label: 'Cost/conv.', value: '$4.20', color: '#F59E0B' },
-    { key: 'roas', label: 'ROAS', value: '420%', color: '#3B82F6' },
+    { key: 'roas', label: 'ROAS', value: '4.2', color: '#3B82F6' },
   ]
 
   const handleMetricToggle = (metricKey) => {
@@ -239,9 +243,11 @@ const Dashboard = ({ selectedBrand, onPageChange, onEditBrandConfig }) => {
                 <span className="text-sm font-bold text-gray-900">
                   {entry.name === 'Spend' || entry.name === 'CPM' || entry.name === 'Cost/conv.' 
                     ? `$${entry.value}` 
-                    : entry.name === 'CTR' || entry.name === 'ROAS'
+                    : entry.name === 'CTR'
                       ? `${entry.value}%`
-                      : entry.value
+                      : entry.name === 'ROAS'
+                        ? entry.value
+                        : entry.value
                   }
                 </span>
               </div>
@@ -291,11 +297,25 @@ const Dashboard = ({ selectedBrand, onPageChange, onEditBrandConfig }) => {
       const cpm = (spend / impressions) * 1000
       const cpc = spend / clicks
       const ctr = (clicks / impressions) * 100
-      const conversions = Math.floor(clicks * (0.03 + Math.random() * 0.05))
-      const costConv = spend / conversions
-      const convRate = (conversions / clicks) * 100
-      const convValue = conversions * (10 + Math.random() * 5)
-      const roas = convValue / spend
+      
+      // Event1s data
+      const event1s = Math.floor(clicks * (0.03 + Math.random() * 0.05))
+      const cpaEvent1s = event1s > 0 ? spend / event1s : 0
+      const cvrEvent1s = clicks > 0 ? (event1s / clicks) * 100 : 0
+      
+      // Event2s data
+      const event2s = Math.floor(clicks * (0.02 + Math.random() * 0.04))
+      const cpaEvent2s = event2s > 0 ? spend / event2s : 0
+      const cvrEvent2s = clicks > 0 ? (event2s / clicks) * 100 : 0
+      
+      // Event3s data
+      const event3s = Math.floor(clicks * (0.01 + Math.random() * 0.03))
+      const cpaEvent3s = event3s > 0 ? spend / event3s : 0
+      const cvrEvent3s = clicks > 0 ? (event3s / clicks) * 100 : 0
+      
+      // Purchase value and ROAS
+      const purchaseValue = Math.floor(event3s * (15 + Math.random() * 10))
+      const roas = spend > 0 ? purchaseValue / spend : 0
       
       data.push({
         date: dateLabel,
@@ -306,10 +326,16 @@ const Dashboard = ({ selectedBrand, onPageChange, onEditBrandConfig }) => {
         clicks: clicks,
         cpc: cpc.toFixed(2),
         ctr: ctr.toFixed(2),
-        conversions: conversions,
-        costConv: costConv.toFixed(2),
-        convRate: convRate.toFixed(2),
-        convValue: convValue.toFixed(2),
+        event1s: event1s,
+        cpaEvent1s: cpaEvent1s.toFixed(2),
+        cvrEvent1s: cvrEvent1s.toFixed(2),
+        event2s: event2s,
+        cpaEvent2s: cpaEvent2s.toFixed(2),
+        cvrEvent2s: cvrEvent2s.toFixed(2),
+        event3s: event3s,
+        cpaEvent3s: cpaEvent3s.toFixed(2),
+        cvrEvent3s: cvrEvent3s.toFixed(2),
+        purchaseValue: purchaseValue,
         roas: roas.toFixed(2)
       })
       
@@ -321,150 +347,46 @@ const Dashboard = ({ selectedBrand, onPageChange, onEditBrandConfig }) => {
 
   const dailyPerformanceData = generateDailyPerformanceData()
 
+  // Handle connect account
+  const handleConnectAccount = () => {
+    // TODO: Implement connect account logic
+    console.log('Connect account clicked')
+    // For demo, simulate fetching
+    setBrandDataStatus('fetching')
+  }
+
+  // Handle create campaign
+  const handleCreateCampaign = () => {
+    // TODO: Implement create campaign logic
+    console.log('Create campaign clicked')
+    // For demo, simulate fetching
+    setBrandDataStatus('fetching')
+  }
+
+  // Handle retry data fetch
+  const handleRetry = () => {
+    console.log('Retry data fetch')
+    setBrandDataStatus('fetching')
+    // Simulate data fetch
+    setTimeout(() => {
+      setBrandDataStatus('success')
+    }, 2000)
+  }
+
+  // Handle view demo (normal state)
+  const handleViewDemo = () => {
+    console.log('View demo clicked')
+    setBrandDataStatus('success')
+  }
+
+  // Handle view error
+  const handleViewError = () => {
+    console.log('View error clicked')
+    setBrandDataStatus('no-data')
+  }
+
   return (
     <div className="min-h-screen bg-background p-6">
-      {/* Top Banner - Intelligently optimized config */}
-      <div className="bg-gradient-to-r from-primary/5 via-purple-50/50 to-blue-50/30 rounded-xl border border-primary/20 shadow-lg p-6 mb-6">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-primary/10 rounded-lg">
-              <Layout className="text-primary" size={24} />
-            </div>
-            <div>
-              <h2 className="text-xl font-bold text-gray-900">Intelligently optimized config</h2>
-              <p className="text-sm text-gray-600 mt-1">AdsGo will monitor, analyze, and intelligently optimize based on the following configuration.</p>
-            </div>
-          </div>
-          <button 
-            onClick={onEditBrandConfig}
-            className="flex items-center gap-2 px-3 py-1.5 border border-primary text-primary rounded-lg hover:bg-primary/5 transition-colors text-sm font-medium"
-          >
-            <Edit2 size={14} />
-            Edit
-          </button>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-          <div className="flex flex-col gap-2 p-3 bg-gray-50 rounded-lg">
-            <p className="text-xs text-gray-500 uppercase font-semibold">Monitoring ad accounts</p>
-            
-            {/* Meta Accounts */}
-            <div 
-              className="relative"
-              onMouseEnter={() => setHoveredAccount('meta')}
-              onMouseLeave={() => setHoveredAccount(null)}
-            >
-              <div className="flex items-center gap-2 cursor-help">
-                <img 
-                  src={accounts.meta.logoUrl} 
-                  alt="Meta" 
-                  className="w-5 h-5"
-                />
-                <span className="text-sm font-medium text-gray-900 truncate max-w-[150px]">
-                  {accounts.meta.accounts.slice(0, 2).map(acc => `${acc.name} (${acc.id})`).join(', ')}
-                  {accounts.meta.accounts.length > 2 && '...'}
-                </span>
-              </div>
-              
-              {/* Hover Tooltip */}
-              {hoveredAccount === 'meta' && (
-                <div className="absolute left-0 top-full mt-2 z-50 bg-white border border-border rounded-lg shadow-xl p-3 min-w-[280px]">
-                  <div className="flex items-center gap-2 mb-2 pb-2 border-b border-border">
-                    <img 
-                      src={accounts.meta.logoUrl} 
-                      alt="Meta" 
-                      className="w-4 h-4"
-                    />
-                    <span className="text-sm font-semibold text-gray-900">Meta Accounts</span>
-                  </div>
-                  <div className="space-y-1">
-                    {accounts.meta.accounts.map((account, idx) => (
-                      <div key={idx} className="text-xs text-gray-700">
-                        {account.name} ({account.id})
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-            
-            {/* Google Accounts */}
-            <div 
-              className="relative"
-              onMouseEnter={() => setHoveredAccount('google')}
-              onMouseLeave={() => setHoveredAccount(null)}
-            >
-              <div className="flex items-center gap-2 cursor-help">
-                <img 
-                  src={accounts.google.logoUrl} 
-                  alt="Google" 
-                  className="w-5 h-5"
-                />
-                <span className="text-sm font-medium text-gray-900 truncate max-w-[150px]">
-                  {accounts.google.accounts.slice(0, 2).map(acc => `${acc.name} (${acc.id})`).join(', ')}
-                  {accounts.google.accounts.length > 2 && '...'}
-                </span>
-              </div>
-              
-              {/* Hover Tooltip */}
-              {hoveredAccount === 'google' && (
-                <div className="absolute left-0 top-full mt-2 z-50 bg-white border border-border rounded-lg shadow-xl p-3 min-w-[280px]">
-                  <div className="flex items-center gap-2 mb-2 pb-2 border-b border-border">
-                    <img 
-                      src={accounts.google.logoUrl} 
-                      alt="Google" 
-                      className="w-4 h-4"
-                    />
-                    <span className="text-sm font-semibold text-gray-900">Google Accounts</span>
-                  </div>
-                  <div className="space-y-1">
-                    {accounts.google.accounts.map((account, idx) => (
-                      <div key={idx} className="text-xs text-gray-700">
-                        {account.name} ({account.id})
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-
-          <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
-            <Target className="text-gray-600 mt-1" size={20} />
-            <div>
-              <p className="text-xs text-gray-500 uppercase font-semibold">Conv. goal</p>
-              <p className="text-sm font-medium text-gray-900 mt-1 flex items-center gap-2">
-                Max conversions-purchase
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
-            <TrendingUp className="text-gray-600 mt-1" size={20} />
-            <div>
-              <p className="text-xs text-gray-500 uppercase font-semibold">KPI</p>
-              <p className="text-sm font-medium text-gray-900 mt-1">ROAS 200%</p>
-            </div>
-          </div>
-
-          <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
-            <DollarSign className="text-gray-600 mt-1" size={20} />
-            <div>
-              <p className="text-xs text-gray-500 uppercase font-semibold">Daily Budget</p>
-              <p className="text-sm font-medium text-gray-900 mt-1">200 USD</p>
-            </div>
-          </div>
-
-          <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
-            <Globe className="text-gray-600 mt-1" size={20} />
-            <div>
-              <p className="text-xs text-gray-500 uppercase font-semibold">Target Locations</p>
-              <p className="text-sm font-medium text-gray-900 mt-1">US, UK, CA...</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
         {/* AI Optimization Section - Left Column (2/3) */}
@@ -641,8 +563,10 @@ const Dashboard = ({ selectedBrand, onPageChange, onEditBrandConfig }) => {
                         tickFormatter={(value) => {
                           if (metricKey === 'spend' || metricKey === 'cpm' || metricKey === 'cost_conv') {
                             return `$${value.toFixed(2)}`
-                          } else if (metricKey === 'ctr' || metricKey === 'roas') {
+                          } else if (metricKey === 'ctr') {
                             return `${value.toFixed(1)}%`
+                          } else if (metricKey === 'roas') {
+                            return value.toFixed(1)
                           }
                           return value.toFixed(1)
                         }}
@@ -690,7 +614,7 @@ const Dashboard = ({ selectedBrand, onPageChange, onEditBrandConfig }) => {
           </div>
         </div>
 
-        {/* Today's Overview - Right Column (1/3) */}
+        {/* Optimization Overview - Right Column (1/3) */}
         <div className="lg:col-span-1">
           <div className="bg-white rounded-xl border border-border shadow-sm p-6 h-full flex flex-col">
             <div className="flex items-center justify-between mb-4">
@@ -699,11 +623,14 @@ const Dashboard = ({ selectedBrand, onPageChange, onEditBrandConfig }) => {
                   <Sparkles className="text-primary" size={20} />
                 </div>
                 <div>
-                  <h2 className="text-lg font-bold text-gray-900">Today's Overview</h2>
-                  <p className="text-xs text-gray-500 mt-0.5">Based on last 7 days data</p>
+                  <h2 className="text-lg font-bold text-gray-900">Optimization Overview</h2>
+                  <p className="text-xs text-gray-500 mt-0.5">Based on last 14 days data</p>
                 </div>
               </div>
-              <span className="text-xs font-bold text-gray-600">Updated: January 4, 2026, 13:24:56</span>
+              <div className="flex items-center gap-2 text-xs font-bold text-gray-600">
+                <Clock className="text-gray-500" size={12} />
+                <span>2026-01-15 13:29:35</span>
+              </div>
             </div>
 
             <div className="space-y-3 flex-1">
@@ -713,7 +640,7 @@ const Dashboard = ({ selectedBrand, onPageChange, onEditBrandConfig }) => {
               
               <div className="grid grid-cols-1 gap-3">
                 <div className="pl-3 border-l-4 border-green-500">
-                  <p className="text-xs font-semibold text-gray-900 mb-1">Today's Highlights</p>
+                  <p className="text-xs font-semibold text-gray-900 mb-1">Key Highlights</p>
                   <ul className="text-xs text-gray-600 space-y-0.5">
                     <li>• Brand promotion Campaign ROI reached 4.2, exceeding target by 40%</li>
                     <li>• Display ad CVR reached 3.5%, industry leading</li>
@@ -722,7 +649,7 @@ const Dashboard = ({ selectedBrand, onPageChange, onEditBrandConfig }) => {
                 </div>
 
                 <div className="pl-3 border-l-4 border-yellow-500">
-                  <p className="text-xs font-semibold text-gray-900 mb-1">Key Insights</p>
+                  <p className="text-xs font-semibold text-gray-900 mb-1">Potential Risks</p>
                   <ul className="text-xs text-gray-600 space-y-0.5">
                     <li>• Search ad CTR still below industry average (1.2% vs 2.5%), keywords need optimization</li>
                     <li>• Facebook Ads cost is high, recommend reevaluating投放 strategy</li>
@@ -761,36 +688,38 @@ const Dashboard = ({ selectedBrand, onPageChange, onEditBrandConfig }) => {
             <thead>
               <tr className="border-b border-border">
                 <th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">Date</th>
-                <th className="text-right py-3 px-4 text-sm font-semibold text-gray-600">Daily Budget</th>
-                <th className="text-right py-3 px-4 text-sm font-semibold text-gray-600">Spend</th>
-                <th className="text-right py-3 px-4 text-sm font-semibold text-gray-600">Impressions</th>
-                <th className="text-right py-3 px-4 text-sm font-semibold text-gray-600">CPM</th>
-                <th className="text-right py-3 px-4 text-sm font-semibold text-gray-600">Clicks</th>
-                <th className="text-right py-3 px-4 text-sm font-semibold text-gray-600">CPC</th>
-                <th className="text-right py-3 px-4 text-sm font-semibold text-gray-600">CTR</th>
-                <th className="text-right py-3 px-4 text-sm font-semibold" style={{ color: '#7033F5' }}>Conversions</th>
-                <th className="text-right py-3 px-4 text-sm font-semibold" style={{ color: '#7033F5' }}>Cost/conv.</th>
-                <th className="text-right py-3 px-4 text-sm font-semibold" style={{ color: '#7033F5' }}>Conv. rate</th>
-                <th className="text-right py-3 px-4 text-sm font-semibold" style={{ color: '#7033F5' }}>Conv. value</th>
-                <th className="text-right py-3 px-4 text-sm font-semibold" style={{ color: '#7033F5' }}>ROAS</th>
+                <th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">Daily Budget</th>
+                <th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">Spend</th>
+                <th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">Impressions</th>
+                <th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">CPM</th>
+                <th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">Clicks</th>
+                <th className="text-left py-3 px-4 text-sm font-bold text-blue-600">CPC<br/><span className="font-normal text-gray-500 text-xs">(CTR)</span></th>
+                <th className="text-left py-3 px-4 text-sm font-bold text-blue-600">Event1s</th>
+                <th className="text-left py-3 px-4 text-sm font-bold text-blue-600">CPA-Event1s<br/><span className="font-normal text-gray-500 text-xs">(CVR)</span></th>
+                <th className="text-left py-3 px-4 text-sm font-bold text-blue-600">Event2s</th>
+                <th className="text-left py-3 px-4 text-sm font-bold text-blue-600">CPA-Event2s<br/><span className="font-normal text-gray-500 text-xs">(CVR)</span></th>
+                <th className="text-left py-3 px-4 text-sm font-bold text-blue-600">Event3s</th>
+                <th className="text-left py-3 px-4 text-sm font-bold text-blue-600">CPA-Event3s<br/><span className="font-normal text-gray-500 text-xs">(CVR)</span></th>
+                <th className="text-left py-3 px-4 text-sm font-bold text-blue-600">Purchase value<br/><span className="font-normal text-gray-500 text-xs">(ROAS)</span></th>
               </tr>
             </thead>
             <tbody>
               {dailyPerformanceData.map((row, index) => (
                 <tr key={index} className="border-b border-border hover:bg-gray-50">
-                  <td className="py-3 px-4 text-sm font-medium text-gray-900">{row.date}</td>
-                  <td className="py-3 px-4 text-sm text-gray-900 text-right">${row.dailyBudget}</td>
-                  <td className="py-3 px-4 text-sm text-gray-900 text-right">${row.spend}</td>
-                  <td className="py-3 px-4 text-sm text-gray-900 text-right">{row.impressions.toLocaleString()}</td>
-                  <td className="py-3 px-4 text-sm text-gray-900 text-right">${row.cpm}</td>
-                  <td className="py-3 px-4 text-sm text-gray-900 text-right">{row.clicks.toLocaleString()}</td>
-                  <td className="py-3 px-4 text-sm text-gray-900 text-right">${row.cpc}</td>
-                  <td className="py-3 px-4 text-sm text-gray-900 text-right">{row.ctr}%</td>
-                  <td className="py-3 px-4 text-sm text-gray-900 text-right">{row.conversions}</td>
-                  <td className="py-3 px-4 text-sm text-gray-900 text-right">${row.costConv}</td>
-                  <td className="py-3 px-4 text-sm text-gray-900 text-right">{row.convRate}%</td>
-                  <td className="py-3 px-4 text-sm text-gray-900 text-right">${row.convValue}</td>
-                  <td className="py-3 px-4 text-sm text-gray-900 text-right">{row.roas}</td>
+                  <td className="py-3 px-4 text-sm font-medium text-gray-900 text-left">{row.date}</td>
+                  <td className="py-3 px-4 text-sm text-gray-900 text-left">${row.dailyBudget}</td>
+                  <td className="py-3 px-4 text-sm text-gray-900 text-left">${row.spend}</td>
+                  <td className="py-3 px-4 text-sm text-gray-900 text-left">{row.impressions.toLocaleString()}</td>
+                  <td className="py-3 px-4 text-sm text-gray-900 text-left">${row.cpm}</td>
+                  <td className="py-3 px-4 text-sm text-gray-900 text-left">{row.clicks.toLocaleString()}</td>
+                  <td className="py-3 px-4 text-sm text-gray-900 text-left">${row.cpc}<br/><span className="text-gray-500 text-xs">{row.ctr}%</span></td>
+                  <td className="py-3 px-4 text-sm text-gray-900 text-left">{row.event1s}</td>
+                  <td className="py-3 px-4 text-sm text-gray-900 text-left">${row.cpaEvent1s}<br/><span className="text-gray-500 text-xs">{row.cvrEvent1s}%</span></td>
+                  <td className="py-3 px-4 text-sm text-gray-900 text-left">{row.event2s}</td>
+                  <td className="py-3 px-4 text-sm text-gray-900 text-left">${row.cpaEvent2s}<br/><span className="text-gray-500 text-xs">{row.cvrEvent2s}%</span></td>
+                  <td className="py-3 px-4 text-sm text-gray-900 text-left">{row.event3s}</td>
+                  <td className="py-3 px-4 text-sm text-gray-900 text-left">${row.cpaEvent3s}<br/><span className="text-gray-500 text-xs">{row.cvrEvent3s}%</span></td>
+                  <td className="py-3 px-4 text-sm text-gray-900 text-left">${row.purchaseValue}<br/><span className="text-gray-500 text-xs">{row.roas}</span></td>
                 </tr>
               ))}
             </tbody>
