@@ -176,7 +176,7 @@ const DashboardInsightsHeader = ({
               >
                 <Target size={12} className="text-blue-600" />
                 <span className="text-[10px] font-bold text-slate-600">
-                  DailyBudget$500, Purchase, ROAS{'>'}5
+                  US,UK; Budget500$; ROAS{'>'}5
                 </span>
                 <Edit2 size={10} className="text-slate-400" />
               </button>
@@ -242,32 +242,46 @@ const DashboardInsightsHeader = ({
             </div>
 
             {/* Body */}
-            <div className="p-6">
-              {/* Current Goal - Structured Card */}
+            <div className="p-6 space-y-4">
+              {/* First Goal Card - US,UK */}
               <div className="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 rounded-2xl border border-indigo-100 shadow-sm overflow-hidden">
                 <div className="p-5">
                   <div className="flex items-center gap-2 mb-3">
                     <Target size={16} className="text-indigo-600" />
-                    <h4 className="text-sm font-bold text-indigo-900">Current Optimization Goal</h4>
+                    <h4 className="text-sm font-bold text-indigo-900">US,UK</h4>
                   </div>
                   
-                  {/* Row 1: Daily Budget */}
-                  <div className="mb-3 pb-3 border-b border-indigo-200/50">
+                  {/* Core Info: Locations, Budget, Target KPI */}
+                  <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-semibold text-indigo-700">Daily Budget</span>
-                      <span className="text-sm font-bold text-indigo-900">$500</span>
+                      <span className="text-xs font-semibold text-indigo-700">Budget</span>
+                      <span className="text-sm font-bold text-indigo-900">$500/day</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-semibold text-indigo-700">Target KPI</span>
+                      <span className="text-sm font-bold text-green-600">ROAS {'>'} 5</span>
                     </div>
                   </div>
+                </div>
+              </div>
+
+              {/* Second Goal Card - Global */}
+              <div className="bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 rounded-2xl border border-emerald-100 shadow-sm overflow-hidden">
+                <div className="p-5">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Globe size={16} className="text-emerald-600" />
+                    <h4 className="text-sm font-bold text-emerald-900">Global</h4>
+                  </div>
                   
-                  {/* Row 2: Purchase & ROAS */}
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-semibold text-indigo-700">Purchase</span>
-                      <span className="text-sm font-bold text-indigo-900">Conversion Goal</span>
+                  {/* Core Info: Locations, Budget, Target KPI */}
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-semibold text-emerald-700">Budget</span>
+                      <span className="text-sm font-bold text-emerald-900">$1000/day</span>
                     </div>
-                    <div className="flex items-center gap-1">
-                      <span className="text-xs font-semibold text-indigo-700">ROAS Target</span>
-                      <span className="text-sm font-bold text-green-600">{'>'} 5</span>
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-semibold text-emerald-700">Target KPI</span>
+                      <span className="text-sm font-bold text-green-600">Cost Per AddToCart {'<='} $20</span>
                     </div>
                   </div>
                 </div>

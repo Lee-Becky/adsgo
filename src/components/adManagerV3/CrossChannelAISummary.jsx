@@ -81,20 +81,21 @@ const CrossChannelAISummary = ({
     if (isAnalyzing || analysisCooldown) return;
     setIsAnalyzing(true);
     
-    // Start 4-hour cooldown immediately
-    const cooldownEndTime = Date.now() + 4 * 60 * 60 * 1000; // 4 hours in milliseconds
-    setAnalysisCooldown(cooldownEndTime);
-    
-    // Start countdown timer
-    const intervalId = setInterval(() => {
-      setTick(prev => prev + 1); // Force re-render every second
-    }, 1000);
-    
-    setCooldownIntervalId(intervalId);
-    
     // Simulate analysis process
     setTimeout(() => {
       setIsAnalyzing(false);
+      
+      // Start 4-hour cooldown after analysis completes
+      const cooldownEndTime = Date.now() + 4 * 60 * 60 * 1000; // 4 hours in milliseconds
+      setAnalysisCooldown(cooldownEndTime);
+      
+      // Start countdown timer
+      const intervalId = setInterval(() => {
+        setTick(prev => prev + 1); // Force re-render every second
+      }, 1000);
+      
+      setCooldownIntervalId(intervalId);
+      
       const now = new Date();
       const timeStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
       
@@ -423,33 +424,32 @@ const CrossChannelAISummary = ({
                 <button 
                   onClick={handleManualAnalysis}
                   disabled={isAnalyzing || analysisCooldown}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 border border-slate-200 rounded-lg bg-white hover:bg-slate-50 transition-all shadow-sm group relative overflow-hidden ${(isAnalyzing || analysisCooldown) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 border border-slate-200 rounded-lg bg-white hover:bg-slate-50 transition-all shadow-sm group relative overflow-hidden ${isAnalyzing ? 'opacity-70 cursor-wait' : ''} ${analysisCooldown ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
-                  <Sparkles size={12} className={`${isAnalyzing ? 'text-slate-300' : 'text-blue-500'} group-hover:scale-110 transition-transform`} />
-                  <span className="text-[11px] font-bold text-slate-600">Manual Analysis</span>
-                  
-                  {/* Cooldown Overlay */}
-                  {analysisCooldown && (
-                    <div className="absolute inset-0 bg-slate-900/60 flex items-center justify-center z-10 backdrop-blur-sm">
-                      <div className="flex items-center gap-1.5">
-                        <Clock size={10} className="text-white" />
-                        <span className="text-[10px] font-black text-white tracking-wider">
-                          {formatCooldownTime(analysisCooldown)}
-                        </span>
-                      </div>
-                    </div>
+                  {isAnalyzing ? (
+                    // Analyzing state: spinning refresh icon
+                    <>
+                      <RefreshCw size={12} className="text-blue-500 animate-spin" />
+                      <span className="text-[11px] font-bold text-slate-600">Analyzing...</span>
+                    </>
+                  ) : analysisCooldown ? (
+                    // Cooldown state: show countdown
+                    <>
+                      <Clock size={12} className="text-blue-500" />
+                      <span className="text-[11px] font-bold text-slate-600">{formatCooldownTime(analysisCooldown)}</span>
+                    </>
+                  ) : (
+                    // Normal state
+                    <>
+                      <RefreshCw size={12} className="text-blue-500 group-hover:scale-110 transition-transform" />
+                      <span className="text-[11px] font-bold text-slate-600">Manual Analysis</span>
+                    </>
                   )}
                 </button>
                 <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-slate-800 text-white text-[9px] rounded opacity-0 group-hover/tooltip:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
-                  {analysisCooldown ? 'Cooldown period' : 'It will take about 3 minutes.'}
+                  {isAnalyzing ? 'AI is analyzing your data...' : analysisCooldown ? 'Cooldown period' : 'It will take about 3 minutes.'}
                 </div>
               </div>
-              <button 
-                className={`p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-all ${isAnalyzing ? 'text-blue-500 animate-spin bg-blue-50' : ''}`}
-                disabled={isAnalyzing}
-              >
-                <RefreshCw size={14} />
-              </button>
             </div>
           </div>
           
