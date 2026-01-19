@@ -564,14 +564,14 @@ const AdInsights = ({ onPageChange }) => {
                         </div>
                       </div>
 
-                      {/* 裂变幻影效果 */}
-                      <div className="absolute w-[80px] h-[40px] bg-[rgba(255,255,255,0.15)] border border-[rgba(255,255,255,0.3)] rounded-[8px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 scale-0 opacity-0 z-[1] pointer-events-none" style={{ 
+                      {/* 裂变幻影效果 - 从外层区域发射，避开中心文案 */}
+                      <div className="absolute w-[80px] h-[40px] bg-[rgba(255,255,255,0.15)] border border-[rgba(255,255,255,0.3)] rounded-[8px] top-[15%] left-[10%] scale-0 opacity-0 z-[1] pointer-events-none" style={{ 
                         animation: 'emit-card 4s infinite 0s' 
                       }}></div>
-                      <div className="absolute w-[80px] h-[40px] bg-[rgba(255,255,255,0.15)] border border-[rgba(255,255,255,0.3)] rounded-[8px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 scale-0 opacity-0 z-[1] pointer-events-none" style={{ 
+                      <div className="absolute w-[80px] h-[40px] bg-[rgba(255,255,255,0.15)] border border-[rgba(255,255,255,0.3)] rounded-[8px] top-[15%] right-[10%] scale-0 opacity-0 z-[1] pointer-events-none" style={{ 
                         animation: 'emit-card-alt 4s infinite 1s' 
                       }}></div>
-                      <div className="absolute w-[80px] h-[40px] bg-[rgba(255,255,255,0.15)] border border-[rgba(255,255,255,0.3)] rounded-[8px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 scale-0 opacity-0 z-[1] pointer-events-none" style={{ 
+                      <div className="absolute w-[80px] h-[40px] bg-[rgba(255,255,255,0.15)] border border-[rgba(255,255,255,0.3)] rounded-[8px] top-[15%] left-[50%] -translate-x-1/2 scale-0 opacity-0 z-[1] pointer-events-none" style={{ 
                         animation: 'emit-card 4s infinite 2.5s' 
                       }}></div>
 
@@ -1438,15 +1438,49 @@ const AdInsights = ({ onPageChange }) => {
         }
 
         @keyframes emit-card {
-          0% { transform: translate(-50%, -50%) scale(0) rotate(0); opacity: 0; }
-          30% { opacity: 0.8; }
-          100% { transform: translate(-100%, -150%) scale(1.2) rotate(-15deg); opacity: 0; }
+          0% { 
+            transform: translate(0, 0) scale(0.3) rotate(0deg); 
+            opacity: 0; 
+          }
+          20% { 
+            transform: translate(20px, 40px) scale(0.6) rotate(-10deg); 
+            opacity: 0.6; 
+          }
+          50% { 
+            transform: translate(60px, 100px) scale(1.0) rotate(-20deg); 
+            opacity: 0.9; 
+          }
+          80% { 
+            transform: translate(100px, 160px) scale(1.3) rotate(-30deg); 
+            opacity: 0.5; 
+          }
+          100% { 
+            transform: translate(140px, 200px) scale(0.5) rotate(-45deg); 
+            opacity: 0; 
+          }
         }
 
         @keyframes emit-card-alt {
-          0% { transform: translate(-50%, -50%) scale(0) rotate(0); opacity: 0; }
-          30% { opacity: 0.8; }
-          100% { transform: translate(80%, -130%) scale(1.2) rotate(15deg); opacity: 0; }
+          0% { 
+            transform: translate(0, 0) scale(0.3) rotate(0deg); 
+            opacity: 0; 
+          }
+          20% { 
+            transform: translate(-20px, 40px) scale(0.6) rotate(10deg); 
+            opacity: 0.6; 
+          }
+          50% { 
+            transform: translate(-60px, 100px) scale(1.0) rotate(20deg); 
+            opacity: 0.9; 
+          }
+          80% { 
+            transform: translate(-100px, 160px) scale(1.3) rotate(30deg); 
+            opacity: 0.5; 
+          }
+          100% { 
+            transform: translate(-140px, 200px) scale(0.5) rotate(45deg); 
+            opacity: 0; 
+          }
         }
 
         @keyframes drift {

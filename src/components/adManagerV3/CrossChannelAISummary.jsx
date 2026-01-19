@@ -177,35 +177,35 @@ const CrossChannelAISummary = ({
     
     if (isInitial) {
       return {
-        summary: "品牌Hifami唯一Campaign已于01-12暂停，暂停前7日CPA=$0.69超目标37%，CTR提升至2.55%但CVR下滑至12.33%，ROAS=0存在归因异常需紧急修复",
+        summary: "The only Campaign for brand Hifami was paused on 01-12. Before pausing, the 7-day CPA was $0.69, exceeding the target by 37%. CTR improved to 2.55% but CVR dropped to 12.33%. ROAS is 0, indicating an attribution anomaly that needs urgent fixing.",
         highlights: [
-          "CTR从14日均1.97%提升至7日均2.55%，最高达2.88%，流量质量显著改善，增长29.4%",
-          "7日累计转化1,093次，日均转化156次，数据量充足可支持决策优化",
-          "CPA从14日均$0.71优化至7日均$0.69，成本控制有改善趋势但仍超目标37%",
-          "预算利用率7日均95.84%，接近饱和，具备良好的投放基础"
+          "CTR improved from 14-day average of 1.97% to 7-day average of 2.55%, reaching a high of 2.88%, with significant improvement in traffic quality, growing by 29.4%",
+          "7-day cumulative conversions: 1,093, with daily average of 156 conversions, sufficient data volume to support optimization decisions",
+          "CPA optimized from 14-day average of $0.71 to 7-day average of $0.69, showing improving cost control trend but still 37% above target",
+          "Budget utilization rate at 7-day average of 95.84%, approaching saturation, with good foundation for ad delivery"
         ],
         key_insights: [
-          "ROAS持续为0存在技术性异常，购买事件未回传或归因配置错误，无法评估真实ROI，建议紧急排查SDK集成和归因窗口设置",
-          "CVR从17.60%持续下滑至11.33%，降幅35.6%，与CTR提升形成反差，建议优化落地页加载速度和注册流程，A/B测试用户体验",
-          "CPM从$1.80上涨至$2.44，涨幅35.6%，市场竞争加剧挤压利润空间，建议测试新流量渠道或调整投放时段降低成本",
-          "CPA目标$0.5031过于激进，历史最优$0.65仍超标29%，建议调整目标至$0.65-$0.70或优化流量质量",
-          "Campaign于01-12暂停，暂停前CPA=$0.70已是近期最优，建议修复ROAS归因后评估重启可行性，避免盲目暂停优质Campaign"
+          "ROAS remains at 0, indicating a technical anomaly. Purchase events are not being tracked back or attribution configuration is incorrect, making it impossible to evaluate true ROI. Recommend urgently investigating SDK integration and attribution window settings",
+          "CVR continuously declined from 17.60% to 11.33%, a drop of 35.6%, forming a contrast with CTR improvement. Recommend optimizing landing page load speed and registration process, A/B test user experience",
+          "CPM increased from $1.80 to $2.44, a rise of 35.6%. Market competition intensified, squeezing profit margins. Recommend testing new traffic channels or adjusting ad delivery time slots to reduce costs",
+          "CPA target of $0.5031 is too aggressive. Historical best of $0.65 still exceeds target by 29%. Recommend adjusting target to $0.65-$0.70 or optimizing traffic quality",
+          "Campaign paused on 01-12. Before pausing, CPA of $0.70 was the recent optimal level. Recommend evaluating feasibility of restart after fixing ROAS attribution, avoid blindly pausing high-quality Campaigns"
         ]
       };
     } else {
       return {
-        summary: `AI 分析完成。当前账户表现稳定，建议总预算 ¥${mockStats.totalSuggestedBudget} 已生效。CTR 保持在 2.8% 左右，CPA 已优化至 ¥38.5。`,
+        summary: `AI analysis complete. Current account performance is stable. Recommended total budget of ¥${mockStats.totalSuggestedBudget} is in effect. CTR remains around 2.8%, and CPA has been optimized to ¥38.5.`,
         highlights: [
-          `分析期间发现 ${mockStats.increase} 个 Campaign 具备扩容潜力，建议增加预算以获取更多转化。`,
-          `当前转化成本相比 24 小时前下降了 12.5%，建议继续保持当前策略。`,
-          "流量质量指数回升至 8.5/10，Meta 渠道表现尤为突出。",
-          `预算利用率健康，主要集中在 ROAS > ${avgRoas} 的优质广告组。`
+          `${mockStats.increase} Campaigns identified with scaling potential during analysis period. Recommend increasing budget to get more conversions.`,
+          `Current conversion cost decreased by 12.5% compared to 24 hours ago. Recommend maintaining current strategy.`,
+          "Traffic quality index improved to 8.5/10, with Meta channel performing particularly well.",
+          `Budget utilization is healthy, mainly concentrated on high-quality ad sets with ROAS > ${avgRoas}.`
         ],
         key_insights: [
-          "建议加大对 Google Search Ads 的投入，该渠道展现了更强的稳定性。",
-          "部分广告组出现素材疲劳现象，建议下周更新创意素材。",
-          "针对 CPA 超标的广告组已自动实施减预算策略，风险可控。",
-          "系统正在持续监控实时竞价变动，确保预算分配在最优时段。"
+          "Recommend increasing investment in Google Search Ads, which demonstrates stronger stability.",
+          "Some ad sets show creative fatigue. Recommend updating creative assets next week.",
+          "Budget reduction strategy has been automatically implemented for ad sets exceeding CPA targets, with controllable risk.",
+          "System is continuously monitoring real-time bid changes to ensure budget allocation at optimal time slots."
         ]
       };
     }
@@ -346,11 +346,11 @@ const CrossChannelAISummary = ({
                 <div className="space-y-1.5">
                   <div className="flex items-start gap-2">
                     <span className="text-blue-600 font-bold text-sm">→</span>
-                    <p className="text-xs text-slate-600 font-medium leading-snug flex-1">预算调优：根据 Meta 渠道当前的 CVR 表现，AI 建议对前 20% 的高效系列进行 15%-25% 的阶梯式增量。</p>
+                    <p className="text-xs text-slate-600 font-medium leading-snug flex-1">Budget optimization: Based on current CVR performance on Meta channel, AI recommends implementing tiered increments of 15%-25% for the top 20% high-performing series.</p>
                   </div>
                   <div className="flex items-start gap-2">
                     <span className="text-amber-600 font-bold text-sm">→</span>
-                    <p className="text-xs text-slate-600 font-medium leading-snug flex-1">风险预警：监测到 Meta 账户下部分系列 CPM 出现 10% 以上波动，建议密切观察其后端转化稳定性。</p>
+                    <p className="text-xs text-slate-600 font-medium leading-snug flex-1">Risk warning: Detected fluctuations of over 10% in CPM for some series under Meta account. Recommend closely monitoring backend conversion stability.</p>
                   </div>
                 </div>
               </div>

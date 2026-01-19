@@ -57,9 +57,9 @@ function App() {
 
   const handleBudgetSave = (campaignId, budgetData) => {
     console.log('Saving budget:', campaignId, budgetData)
-    // TODO: 实际的预算保存逻辑
-    // 如果 budgetData 是数字，说明是 campaign 层预算
-    // 如果 budgetData 是数组，说明是 adset 层预算
+    // TODO: Implement actual budget saving logic
+    // If budgetData is a number, it's a campaign-level budget
+    // If budgetData is an array, it's an adset-level budget
   }
 
   const handleUpdateBudgetStatus = (id, status) => {

@@ -35,7 +35,7 @@ const OverallAnalysis = () => {
               <p className="text-xs font-semibold text-gray-900 mb-1">Key Insights</p>
               <ul className="text-xs text-gray-600 space-y-0.5">
                 <li>• Search ad CTR still below industry average (1.2% vs 2.5%), keywords need optimization</li>
-                <li>• Facebook Ads cost is high, recommend reevaluating投放 strategy</li>
+                <li>• Facebook Ads cost is high, recommend reevaluating launch strategy</li>
                 <li>• Overall traffic quality stable, invalid click rate decreased by 8%</li>
               </ul>
             </div>

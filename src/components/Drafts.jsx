@@ -242,12 +242,12 @@ const Drafts = () => {
 
   const handleEdit = (id) => {
     console.log('Edit draft:', id)
-    // TODO: 实现编辑逻辑
+    // TODO: Implement edit logic
   }
 
   const handlePublish = (id) => {
     console.log('Publish draft:', id)
-    // TODO: 实现发布逻辑
+    // TODO: Implement publish logic
   }
 
   const handleDelete = (id) => {

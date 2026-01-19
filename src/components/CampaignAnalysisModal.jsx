@@ -9,7 +9,7 @@ const CampaignAnalysisModal = ({ isOpen, onClose, campaign }) => {
         {/* Header */}
         <div className="px-6 py-4 border-b border-border flex items-center justify-between bg-gradient-to-r from-primary to-purple-600 text-white">
           <div>
-            <h2 className="text-xl font-bold">Campaign 分析</h2>
+            <h2 className="text-xl font-bold">Campaign Analysis</h2>
             <p className="text-white/80 text-sm mt-1">{campaign.campaign}</p>
           </div>
           <button
@@ -31,18 +31,18 @@ const CampaignAnalysisModal = ({ isOpen, onClose, campaign }) => {
               </div>
               <p className="text-2xl font-bold text-green-600">{campaign.budgetReason?.metrics?.roi || 3.2}</p>
               <p className="text-sm text-gray-600 mt-1">
-                {campaign.budgetReason?.metrics?.change || '+10%'} vs 上周
+                {campaign.budgetReason?.metrics?.change || '+10%'} vs last week
               </p>
             </div>
 
             <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
               <div className="flex items-center gap-2 mb-2">
                 <DollarSign size={18} className="text-blue-600" />
-                <span className="font-semibold text-gray-700">转化成本</span>
+                <span className="font-semibold text-gray-700">Conversion Cost</span>
               </div>
               <p className="text-2xl font-bold text-blue-600">¥{campaign.costPerConversion}</p>
               <p className="text-sm text-gray-600 mt-1">
-                {campaign.budgetReason?.metrics?.costChange || '-5%'} vs 上周
+                {campaign.budgetReason?.metrics?.costChange || '-5%'} vs last week
               </p>
             </div>
 
@@ -53,18 +53,18 @@ const CampaignAnalysisModal = ({ isOpen, onClose, campaign }) => {
               </div>
               <p className="text-2xl font-bold text-purple-600">{campaign.ctr}%</p>
               <p className="text-sm text-gray-600 mt-1">
-                {campaign.ctr > 2 ? '+0.3% vs 上周' : '-0.2% vs 上周'}
+                {campaign.ctr > 2 ? '+0.3% vs last week' : '-0.2% vs last week'}
               </p>
             </div>
 
             <div className="bg-orange-50 rounded-lg p-4 border border-orange-200">
               <div className="flex items-center gap-2 mb-2">
                 <TrendingUp size={18} className="text-orange-600" />
-                <span className="font-semibold text-gray-700">转化率</span>
+                <span className="font-semibold text-gray-700">Conversion Rate</span>
               </div>
               <p className="text-2xl font-bold text-orange-600">{campaign.cvr}%</p>
               <p className="text-sm text-gray-600 mt-1">
-                {campaign.cvr > 3 ? '+0.5% vs 上周' : '-0.1% vs 上周'}
+                {campaign.cvr > 3 ? '+0.5% vs last week' : '-0.1% vs last week'}
               </p>
             </div>
           </div>
@@ -73,32 +73,32 @@ const CampaignAnalysisModal = ({ isOpen, onClose, campaign }) => {
           <div className="bg-gradient-to-r from-primary/5 to-purple-500/5 rounded-lg p-5 mb-6 border border-primary/20">
             <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
               <span className="text-2xl">🤖</span>
-              AI 深度分析
+              AI Deep Analysis
             </h3>
             <div className="space-y-4">
               <div>
                 <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
                   <CheckCircle size={16} className="text-green-600" />
-                  优势分析
+                  Strengths Analysis
                 </h4>
                 <ul className="text-sm text-gray-700 space-y-1 ml-6">
-                  <li>• 转化成本低于行业平均水平 15%</li>
-                  <li>• CTR 表现优异，广告创意吸引力强</li>
-                  <li>• 受众定位精准，转化率高</li>
-                  <li>• 流量质量稳定，无效点击率低</li>
+                  <li>• Conversion cost is 15% below industry average</li>
+                  <li>• CTR performance is excellent, ad creative appeal is strong</li>
+                  <li>• Audience targeting is precise, conversion rate is high</li>
+                  <li>• Traffic quality is stable, invalid click rate is low</li>
                 </ul>
               </div>
 
               <div>
                 <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
                   <AlertTriangle size={16} className="text-yellow-600" />
-                  改进建议
+                  Improvement Suggestions
                 </h4>
                 <ul className="text-sm text-gray-700 space-y-1 ml-6">
-                  <li>• 可尝试增加广告创意多样性，避免创意疲劳</li>
-                  <li>• 考虑拓展新的受众细分，扩大覆盖范围</li>
-                  <li>• 优化落地页加载速度，提升转化率</li>
-                  <li>• 测试不同的出价策略，寻找最优方案</li>
+                  <li>• Try increasing ad creative diversity, avoid creative fatigue</li>
+                  <li>• Consider expanding new audience segments, expand coverage</li>
+                  <li>• Optimize landing page load speed, improve conversion rate</li>
+                  <li>• Test different bidding strategies, find the optimal solution</li>
                 </ul>
               </div>
             </div>
@@ -106,7 +106,7 @@ const CampaignAnalysisModal = ({ isOpen, onClose, campaign }) => {
 
           {/* Performance Trend */}
           <div className="mb-6">
-            <h3 className="font-bold text-gray-900 mb-3">表现趋势</h3>
+            <h3 className="font-bold text-gray-900 mb-3">Performance Trends</h3>
             <div className="bg-gray-50 rounded-lg p-4">
               <div className="flex items-end justify-between h-40 gap-2">
                 {[65, 72, 68, 75, 80, 78, 85].map((value, index) => (
@@ -124,22 +124,22 @@ const CampaignAnalysisModal = ({ isOpen, onClose, campaign }) => {
 
           {/* Detailed Metrics */}
           <div>
-            <h3 className="font-bold text-gray-900 mb-3">详细指标</h3>
+            <h3 className="font-bold text-gray-900 mb-3">Detailed Metrics</h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="bg-white border border-border rounded-lg p-4">
-                <p className="text-sm text-gray-600 mb-1">总花费</p>
+                <p className="text-sm text-gray-600 mb-1">Total Spend</p>
                 <p className="text-xl font-bold text-gray-900">¥{campaign.spend}</p>
               </div>
               <div className="bg-white border border-border rounded-lg p-4">
-                <p className="text-sm text-gray-600 mb-1">展示量</p>
+                <p className="text-sm text-gray-600 mb-1">Impressions</p>
                 <p className="text-xl font-bold text-gray-900">{campaign.impressions.toLocaleString()}</p>
               </div>
               <div className="bg-white border border-border rounded-lg p-4">
-                <p className="text-sm text-gray-600 mb-1">点击量</p>
+                <p className="text-sm text-gray-600 mb-1">Clicks</p>
                 <p className="text-xl font-bold text-gray-900">{Math.round(campaign.impressions * campaign.ctr / 100).toLocaleString()}</p>
               </div>
               <div className="bg-white border border-border rounded-lg p-4">
-                <p className="text-sm text-gray-600 mb-1">转化数</p>
+                <p className="text-sm text-gray-600 mb-1">Conversions</p>
                 <p className="text-xl font-bold text-gray-900">{campaign.conversions}</p>
               </div>
             </div>
@@ -152,10 +152,10 @@ const CampaignAnalysisModal = ({ isOpen, onClose, campaign }) => {
             onClick={onClose}
             className="px-4 py-2 text-gray-700 hover:bg-gray-200 rounded-lg transition-colors font-medium"
           >
-            关闭
+            Close
           </button>
           <button className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-hover transition-colors font-medium">
-            优化建议
+            Optimization Recommendations
           </button>
         </div>
       </div>

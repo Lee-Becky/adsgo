@@ -26,13 +26,13 @@ const BrandDataOverlay = ({
             <div className="text-center mb-8">
               <div className="inline-flex items-center gap-2 bg-gradient-to-r from-primary to-purple-600 text-white px-4 py-2 rounded-full mb-4 shadow-lg">
                 <Rocket size={20} />
-                <span className="text-base font-bold">开始使用 AdsGo</span>
+                <span className="text-base font-bold">Get Started with AdsGo</span>
               </div>
               <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3">
-                连接广告账号，开启智能优化
+                Connect Ad Accounts, Enable Smart Optimization
               </h1>
               <p className="text-base text-gray-600 max-w-2xl mx-auto">
-                选择您的开始方式，立即体验 AI 驱动的广告管理
+                Choose your starting point and experience AI-driven ad management immediately
               </p>
             </div>
 
@@ -48,32 +48,32 @@ const BrandDataOverlay = ({
                     <Database size={32} className="text-white" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-bold text-gray-900 mb-1">连接广告账号</h2>
-                    <p className="text-gray-500 text-sm">同步现有广告数据</p>
+                    <h2 className="text-xl font-bold text-gray-900 mb-1">Connect Ad Account</h2>
+                    <p className="text-gray-500 text-sm">Sync existing ad data</p>
                   </div>
                 </div>
                 
                 <p className="text-gray-600 mb-4 leading-relaxed text-sm">
-                  已有 Google、Meta 或 TikTok 广告账号？立即连接，获取实时 AI 预算优化建议和性能洞察。
+                  Already have Google, Meta, or TikTok ad accounts? Connect now to get real-time AI budget optimization recommendations and performance insights.
                 </p>
                 
                 <ul className="space-y-2 mb-6">
                   <li className="flex items-center gap-2 text-gray-700 text-sm">
                     <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
-                    <span>自动导入所有活跃广告系列</span>
+                    <span>Auto-import all active campaigns</span>
                   </li>
                   <li className="flex items-center gap-2 text-gray-700 text-sm">
                     <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
-                    <span>AI 分析历史表现数据</span>
+                    <span>AI analyzes historical performance data</span>
                   </li>
                   <li className="flex items-center gap-2 text-gray-700 text-sm">
                     <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
-                    <span>获取个性化预算建议</span>
+                    <span>Get personalized budget recommendations</span>
                   </li>
                 </ul>
 
                 <button className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-primary to-purple-600 text-white text-base font-semibold py-3 rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all shadow-lg hover:shadow-xl group-hover:scale-[1.02]">
-                  <span>立即连接</span>
+                  <span>Connect Now</span>
                   <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
                 </button>
               </div>
@@ -88,32 +88,32 @@ const BrandDataOverlay = ({
                     <Rocket size={32} className="text-white" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-bold text-gray-900 mb-1">新建广告系列</h2>
-                    <p className="text-gray-500 text-sm">从零开始创建</p>
+                    <h2 className="text-xl font-bold text-gray-900 mb-1">Create New Campaign</h2>
+                    <p className="text-gray-500 text-sm">Start from scratch</p>
                   </div>
                 </div>
                 
                 <p className="text-gray-600 mb-4 leading-relaxed text-sm">
-                  准备开始新的广告活动？使用我们的 AI 助手，几分钟内即可设置并启动优化的广告系列。
+                  Ready to start a new ad campaign? Use our AI assistant to set up and launch optimized campaigns in minutes.
                 </p>
                 
                 <ul className="space-y-2 mb-6">
                   <li className="flex items-center gap-2 text-gray-700 text-sm">
                     <div className="w-1.5 h-1.5 bg-purple-500 rounded-full"></div>
-                    <span>AI 引导的广告系列设置向导</span>
+                    <span>AI-guided campaign setup wizard</span>
                   </li>
                   <li className="flex items-center gap-2 text-gray-700 text-sm">
                     <div className="w-1.5 h-1.5 bg-purple-500 rounded-full"></div>
-                    <span>智能预算推荐</span>
+                    <span>Smart budget recommendations</span>
                   </li>
                   <li className="flex items-center gap-2 text-gray-700 text-sm">
                     <div className="w-1.5 h-1.5 bg-purple-500 rounded-full"></div>
-                    <span>跨平台一键发布</span>
+                    <span>One-click cross-platform publishing</span>
                   </li>
                 </ul>
 
                 <button className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white text-base font-semibold py-3 rounded-lg hover:from-pink-600 hover:to-purple-600 transition-all shadow-lg hover:shadow-xl group-hover:scale-[1.02]">
-                  <span>开始创建</span>
+                  <span>Start Creating</span>
                   <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
                 </button>
               </div>
@@ -141,7 +141,7 @@ const BrandDataOverlay = ({
           {/* Title */}
           <div className="mb-4">
             <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
-              正在拉取数据
+              Fetching Data
             </h1>
             <div className="w-20 h-0.5 bg-gradient-to-r from-primary to-purple-600 mx-auto rounded-full"></div>
           </div>
@@ -149,18 +149,18 @@ const BrandDataOverlay = ({
           {/* Content */}
           <div className="mb-6">
             <p className="text-lg text-gray-700 leading-relaxed mb-2">
-              数据正在获取并分析中，请稍后...
+              Data is being fetched and analyzed, please wait...
             </p>
             <p className="text-sm text-gray-500">
-              我们正在从连接的广告账号同步最新的广告数据
+              We are syncing the latest ad data from your connected ad accounts
             </p>
           </div>
 
           {/* Loading Progress Indicator */}
           <div className="max-w-md mx-auto mb-6">
             <div className="flex justify-between text-sm text-gray-500 mb-2">
-              <span>数据同步中</span>
-              <span className="animate-pulse">处理中...</span>
+              <span>Data Syncing</span>
+              <span className="animate-pulse">Processing...</span>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
               <div className="bg-gradient-to-r from-primary to-purple-600 h-2 rounded-full animate-[loading_2s_ease-in-out_infinite]" style={{ width: '60%' }}></div>
@@ -206,7 +206,7 @@ const BrandDataOverlay = ({
           {/* Title */}
           <div className="mb-4">
             <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
-              数据获取异常
+              Data Fetching Error
             </h1>
             <div className="w-20 h-0.5 bg-gradient-to-r from-orange-500 to-red-500 mx-auto rounded-full"></div>
           </div>
@@ -214,14 +214,14 @@ const BrandDataOverlay = ({
           {/* Content */}
           <div className="mb-6">
             <p className="text-lg text-gray-700 leading-relaxed mb-3">
-              请检查连接账户是否有活跃中的广告
+              Please check if your connected account has active ads
             </p>
             <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 max-w-md mx-auto">
               <p className="text-sm text-gray-600 mb-2">
-                <span className="font-semibold text-orange-700">若有活跃广告：</span>请点击重试按钮重新获取数据
+                <span className="font-semibold text-orange-700">If you have active ads:</span> Please click the retry button to fetch data again
               </p>
               <p className="text-sm text-gray-600">
-                <span className="font-semibold text-orange-700">若无活跃广告：</span>请发布广告后即可查看数据
+                <span className="font-semibold text-orange-700">If no active ads:</span> Please publish ads first to view data
               </p>
             </div>
           </div>
@@ -232,7 +232,7 @@ const BrandDataOverlay = ({
             className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-primary to-purple-600 text-white text-base font-semibold py-3 px-8 rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all shadow-lg hover:shadow-xl hover:scale-[1.02] cursor-pointer group"
           >
             <RefreshCw size={16} className="group-hover:rotate-180 transition-transform duration-500" />
-            <span>重新获取数据</span>
+            <span>Retry Fetching Data</span>
           </button>
         </div>
       </div>

@@ -8,7 +8,7 @@ const BrandManagement = ({ editingBrand: externalEditingBrand, onClearEditingBra
   // Use external editingBrand if provided, otherwise use internal state
   const editingBrand = externalEditingBrand || internalEditingBrand
   
-  // 模拟品牌数据
+  // Mock brand data
   const brands = [
     {
       id: 1,
@@ -48,7 +48,7 @@ const BrandManagement = ({ editingBrand: externalEditingBrand, onClearEditingBra
 
   const handleSave = (updatedBrand) => {
     console.log('Saving brand:', updatedBrand)
-    // TODO: 实际保存逻辑
+    // TODO: Implement actual save logic
     setInternalEditingBrand(null)
   }
 

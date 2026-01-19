@@ -263,19 +263,19 @@ const Dashboard = ({ selectedBrand, onPageChange, onEditBrandConfig }) => {
     {
       id: 1,
       title: 'Brand Promotion Campaign',
-      description: '建议增加预算至 $800/天',
+      description: 'Recommend increasing budget to $800/day',
       type: 'increase'
     },
     {
       id: 2,
       title: 'Retargeting Campaign',
-      description: '建议暂停低效广告组',
+      description: 'Recommend pausing inefficient ad sets',
       type: 'pause'
     },
     {
       id: 3,
       title: 'New Product Launch',
-      description: '建议立即启动新广告组',
+      description: 'Recommend launching new ad sets immediately',
       type: 'launch'
     }
   ]
@@ -641,13 +641,13 @@ const Dashboard = ({ selectedBrand, onPageChange, onEditBrandConfig }) => {
                     <div className="flex items-start gap-2">
                       <span className="text-blue-600 font-bold text-xs">→</span>
                       <p className="text-[11px] text-slate-600 font-medium leading-snug flex-1">
-                        品牌推广 Campaign ROI 达到 4.2，超出目标 40%，建议增加预算以获取更多转化。
+                        Brand promotion Campaign ROI reached 4.2, exceeding target by 40%, recommend increasing budget for more conversions.
                       </p>
                     </div>
                     <div className="flex items-start gap-2">
                       <span className="text-amber-600 font-bold text-xs">→</span>
                       <p className="text-[11px] text-slate-600 font-medium leading-snug flex-1">
-                        Search 广告 CTR 仍低于行业平均水平，建议优化关键词以提升点击率。
+                        Search ad CTR still below industry average, recommend optimizing keywords to improve click-through rate.
                       </p>
                     </div>
                   </div>
@@ -714,7 +714,7 @@ const Dashboard = ({ selectedBrand, onPageChange, onEditBrandConfig }) => {
                       <div className="bg-amber-50/50 border border-amber-100 rounded-lg px-2.5 py-1.5 flex items-start gap-2">
                         <div className="mt-0.5 shrink-0 w-0.5 h-0.5 rounded-full bg-amber-600" />
                         <p className="text-[10px] text-slate-700 font-semibold leading-snug flex-1">
-                          Facebook Ads cost is high, recommend reevaluating投放 strategy
+                          Facebook Ads cost is high, recommend reevaluating launch strategy
                         </p>
                       </div>
                       <div className="bg-amber-50/50 border border-amber-100 rounded-lg px-2.5 py-1.5 flex items-start gap-2">

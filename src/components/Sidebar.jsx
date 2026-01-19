@@ -24,7 +24,7 @@ const Sidebar = ({ isMobile, onClose, currentPage, onPageChange, selectedBrand, 
       {/* Logo */}
       <div className="p-6 border-b border-border">
         <h1 className="text-2xl font-bold text-primary">AdsGo</h1>
-        <p className="text-sm text-gray-500 mt-1">广告管理平台</p>
+        <p className="text-sm text-gray-500 mt-1">Ad Management Platform</p>
       </div>
 
       {/* Brand Switcher */}
@@ -63,7 +63,7 @@ const Sidebar = ({ isMobile, onClose, currentPage, onPageChange, selectedBrand, 
               <button
                 onClick={() => {
                   setIsBrandDropdownOpen(false)
-                  // TODO: 实现创建新 Business Suite 的逻辑
+                  // TODO: Implement logic to create new Business Suite
                 }}
                 className="w-full flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-primary/10 text-primary transition-colors"
               >
@@ -107,8 +107,8 @@ const Sidebar = ({ isMobile, onClose, currentPage, onPageChange, selectedBrand, 
           )
         })}
         
-        {/* 废弃页面 */}
-        <div className="mt-4">
+        {/* Deprecated Pages - Hidden */}
+        {/* <div className="mt-4">
           <button
             onClick={() => setIsDeprecatedOpen(!isDeprecatedOpen)}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
@@ -118,7 +118,7 @@ const Sidebar = ({ isMobile, onClose, currentPage, onPageChange, selectedBrand, 
             }`}
           >
             <Archive size={20} />
-            <span className="font-medium">废弃页面</span>
+            <span className="font-medium">Deprecated Pages</span>
             <ChevronRight size={16} className={`ml-auto transition-transform ${isDeprecatedOpen ? 'rotate-90' : ''}`} />
           </button>
           
@@ -140,7 +140,7 @@ const Sidebar = ({ isMobile, onClose, currentPage, onPageChange, selectedBrand, 
               ))}
             </div>
           )}
-        </div>
+        </div> */}
       </nav>
 
       {/* Business Suite Menu - Just above User Profile */}
@@ -166,7 +166,7 @@ const Sidebar = ({ isMobile, onClose, currentPage, onPageChange, selectedBrand, 
             className="w-full flex items-center gap-2 text-gray-600 hover:text-primary transition-colors mb-3"
           >
             <X size={20} />
-            <span className="text-sm">关闭菜单</span>
+            <span className="text-sm">Close Menu</span>
           </button>
         )}
         <div className="flex items-center gap-3">
@@ -174,7 +174,7 @@ const Sidebar = ({ isMobile, onClose, currentPage, onPageChange, selectedBrand, 
             U
           </div>
           <div className="flex-1">
-            <p className="font-medium text-gray-900">用户</p>
+            <p className="font-medium text-gray-900">User</p>
             <p className="text-sm text-gray-500">user@example.com</p>
           </div>
         </div>

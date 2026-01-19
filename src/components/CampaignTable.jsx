@@ -313,7 +313,7 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
             type: 'decrease',
             reasons: [
               'ROI is 1.8, below target (2.0)',
-              'CPC high (¥2.5), cost偏高',
+              'CPC high (¥2.5), cost is high',
               'Conversion rate low (1.5%), recommend reevaluating'
             ],
             detailedReason: 'The Adset ROI is 1.8, below target (2.0). CPC is high (¥2.5), conversion rate is low (1.5%).',
@@ -343,7 +343,7 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
             type: 'decrease',
             reasons: [
               'ROI is 1.8, below target (2.0)',
-              'CPC high (¥2.5), cost偏高',
+              'CPC high (¥2.5), cost is high',
               'Conversion rate low (1.5%), recommend reevaluating'
             ],
             detailedReason: 'The Adset ROI is 1.8, below target (2.0). CPC is high (¥2.5), conversion rate is low (1.5%).',

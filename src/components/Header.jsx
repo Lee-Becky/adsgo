@@ -6,32 +6,32 @@ const Header = ({ toggleSidebar, isMobile, currentPage }) => {
       case 'overview':
         return {
           title: 'Dashboard',
-          subtitle: '广告活动概览与实时优化'
+          subtitle: 'Ad campaign overview and real-time optimization'
         }
       case 'dashboard':
         return {
           title: 'ad manager',
-          subtitle: '管理和优化您的广告活动'
+          subtitle: 'Manage and optimize your ad campaigns'
         }
       case 'adManagerV2':
         return {
           title: 'ad manager',
-          subtitle: 'AI 驱动的全渠道广告管理平台'
+          subtitle: 'AI-driven cross-channel ad management platform'
         }
       case 'adManagerV3':
         return {
           title: 'ad manager',
-          subtitle: 'AI 驱动的全渠道广告管理平台'
+          subtitle: 'AI-driven cross-channel ad management platform'
         }
       case 'insights':
         return {
           title: 'Ad Insights',
-          subtitle: '洞察并提供建议发布的新campaigns'
+          subtitle: 'Insights and recommendations for new campaigns to publish'
         }
       case 'drafts':
         return {
           title: 'Drafts',
-          subtitle: '管理您的草稿广告活动'
+          subtitle: 'Manage your draft ad campaigns'
         }
       case 'settings':
         return {
@@ -41,7 +41,7 @@ const Header = ({ toggleSidebar, isMobile, currentPage }) => {
       default:
         return {
           title: 'Dashboard',
-          subtitle: '广告活动概览与实时优化'
+          subtitle: 'Ad campaign overview and real-time optimization'
         }
     }
   }
@@ -67,7 +67,7 @@ const Header = ({ toggleSidebar, isMobile, currentPage }) => {
         </div>
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2 text-sm text-gray-600 bg-gray-100 px-3 py-2 rounded-lg">
-            <span>时区:</span>
+            <span>Timezone:</span>
             <span className="font-medium">UTC+8</span>
           </div>
           <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
