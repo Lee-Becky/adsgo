@@ -23,7 +23,11 @@ const Sidebar = ({ isMobile, onClose, currentPage, onPageChange, selectedBrand, 
     <div className="w-64 h-full bg-white border-r border-border flex flex-col">
       {/* Logo */}
       <div className="p-6 border-b border-border">
-        <h1 className="text-2xl font-bold text-primary">AdsGo</h1>
+        <img 
+          src="https://www.adsgo.ai/_next/static/media/logo.ecc9c90c.svg"
+          alt="AdsGo"
+          className="h-19 w-auto"
+        />
         <p className="text-sm text-gray-500 mt-1">24H AI Advertising Expert</p>
       </div>
 
