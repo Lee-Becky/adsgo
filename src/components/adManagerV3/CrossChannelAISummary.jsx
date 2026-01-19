@@ -492,20 +492,20 @@ const CrossChannelAISummary = ({
             {/* Comparative Boxes */}
             <div className="flex items-center gap-3">
               <div className="flex-1 bg-white border border-slate-200 rounded-xl p-3 flex flex-col">
-                <span className="text-[9px] font-bold text-slate-400 mb-1">Current</span>
-                <span className="text-base font-black text-slate-800 tracking-tight">¥{budgetStats.totalCurrentBudget.toLocaleString()}</span>
+                <span className="text-[9px] font-bold text-slate-400 mb-1">Daily budget</span>
+                <span className="text-base font-black text-slate-800 tracking-tight">${budgetStats.totalCurrentBudget.toLocaleString()}</span>
               </div>
               
               <ArrowRight size={14} className="text-slate-300 shrink-0" />
               
               <div className="flex-[1.2] bg-white border-2 border-blue-600 rounded-xl p-3 flex flex-col shadow-lg shadow-blue-50">
-                <span className="text-[9px] font-bold text-blue-600 mb-1">Optimized</span>
-                <span className="text-base font-black text-slate-900 tracking-tight">¥{budgetStats.totalSuggestedBudget.toLocaleString()}</span>
+                <span className="text-[9px] font-bold text-blue-600 mb-1">AI Optimized</span>
+                <span className="text-base font-black text-slate-900 tracking-tight">${budgetStats.totalSuggestedBudget.toLocaleString()}</span>
               </div>
               
               <div className="flex-1 bg-slate-100/80 border border-slate-200 rounded-xl p-3 flex flex-col">
                 <span className="text-[9px] font-bold text-slate-500 mb-1">Reserved</span>
-                <span className="text-base font-black text-blue-600 tracking-tight">¥{remainingBudget.toLocaleString()}</span>
+                <span className="text-base font-black text-blue-600 tracking-tight">${remainingBudget.toLocaleString()}</span>
               </div>
             </div>
           </div>
