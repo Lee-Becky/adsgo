@@ -525,199 +525,127 @@ const AdInsights = ({ onPageChange }) => {
                   />
                 ))}
 
-                {/* More Recommendations Card - same height as other cards */}
+                {/* More Recommendations Card - optimized version */}
                 <div className="campaign-wrapper">
                   <div 
                     onClick={() => onPageChange('drafts')}
-                    className="ad-card more-recommendations-card cursor-pointer hover:shadow-lg transition-shadow overflow-hidden relative flex flex-col"
+                    className="ad-card more-recommendations-card cursor-pointer hover:shadow-lg transition-all overflow-hidden relative flex flex-col group"
                   >
-                    {/* 动效背景容器 - 扩大边界 */}
+                    {/* 优雅的渐变背景 */}
                     <div className="absolute inset-[8px] rounded-xl overflow-hidden" style={{ 
-                      background: 'radial-gradient(circle at center, #c3a2fe 0%, #7135f4 50%, #4f46e5 100%)',
+                      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)',
                       zIndex: 0 
                     }}>
-                      {/* 背景微粒 */}
-                      <div className="absolute w-[2px] h-[2px] bg-white rounded-full opacity-[0.1]" style={{ 
-                        left: '20%', 
-                        animation: 'drift 8s infinite linear' 
-                      }}></div>
-                      <div className="absolute w-[3px] h-[3px] bg-white rounded-full opacity-[0.1]" style={{ 
-                        left: '70%', 
-                        animation: 'drift 12s infinite linear' 
-                      }}></div>
-                      <div className="absolute w-[1px] h-[1px] bg-white rounded-full opacity-[0.1]" style={{ 
-                        left: '40%', 
-                        animation: 'drift 15s infinite linear' 
+                      {/* 柔和的光晕效果 */}
+                      <div className="absolute top-1/4 left-1/4 w-[200px] h-[200px] bg-white/10 rounded-full blur-[60px] animate-float-slow"></div>
+                      <div className="absolute bottom-1/4 right-1/4 w-[150px] h-[150px] bg-white/15 rounded-full blur-[50px] animate-float-slower"></div>
+                      
+                      {/* 网格背景 */}
+                      <div className="absolute inset-0 opacity-[0.08]" style={{
+                        backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)',
+                        backgroundSize: '30px 30px'
                       }}></div>
 
-                      {/* 中心引擎 */}
-                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[100px] h-[100px] z-[5] flex flex-col items-center justify-center text-center">
-                        <div className="absolute w-[120%] h-[120%] bg-[#8B5CF6] blur-[30px] opacity-[0.3]" style={{ 
-                          animation: 'core-pulse 3s infinite ease-in-out' 
-                        }}></div>
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5" className="relative z-[2]">
-                          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" strokeLinecap="round" strokeLinejoin="round"/>
-                        </svg>
-                        <div className="relative z-[2] text-white mt-2">
-                          <div className="text-[14px] font-extrabold opacity-[0.9] tracking-[1px]">More Recommendations</div>
-                          <div className="text-[9px] opacity-[0.5] mt-1">AdsGo has been generated</div>
+                      {/* 中心内容区域 - 螺旋运动系统 */}
+                      <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
+                        {/* 核心 AI Engine - 等比放大并确保文案不换行 */}
+                        <div className="relative z-[20] w-28 h-28 bg-white/20 backdrop-blur-md border-2 border-white/40 rounded-[24px] flex flex-col items-center justify-center shadow-2xl animate-pulse-slow -translate-y-[60px]">
+                          <svg className="w-12 h-12 text-white" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2L2 7l10 5 10-5M2 17l10 5 10-5M2 12l10 5 10-5"/>
+                          </svg>
+                          <div className="text-[11px] text-white font-black mt-2 whitespace-nowrap px-4 tracking-wider">AI Regeneration</div>
+                          {/* 核心发光效果 */}
+                          <div className="absolute inset-0 bg-white/20 blur-xl rounded-full -z-10 animate-pulse"></div>
+                        </div>
+
+                        {/* 螺旋环绕系统 - 同样向上偏移，保持与核心的相对位置 */}
+                        <div className="absolute inset-0 flex items-center justify-center animate-system-rotate-slow -translate-y-[60px]">
+                          {/* 1. Audience */}
+                          <div className="absolute animate-spiral-card" style={{ animationDelay: '0s', '--radius': '110px', '--start-scale': '0.4' }}>
+                            <div className="w-14 h-14 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl flex flex-col items-center justify-center">
+                              <svg className="w-5 h-5 text-cyan-300" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
+                              </svg>
+                              <div className="text-[10px] text-white/70 mt-1 font-medium">Age</div>
+                            </div>
+                          </div>
+
+                          {/* 2. Creative */}
+                          <div className="absolute animate-spiral-card" style={{ animationDelay: '-1s', '--radius': '100px', '--start-scale': '0.5' }}>
+                            <div className="w-14 h-14 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl flex flex-col items-center justify-center">
+                              <svg className="w-5 h-5 text-purple-300" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
+                              </svg>
+                              <div className="text-[10px] text-white/70 mt-1 font-medium">Creatives</div>
+                            </div>
+                          </div>
+
+                          {/* 3. Copy */}
+                          <div className="absolute animate-spiral-card" style={{ animationDelay: '-2s', '--radius': '90px', '--start-scale': '0.6' }}>
+                            <div className="w-14 h-14 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl flex flex-col items-center justify-center">
+                              <svg className="w-5 h-5 text-green-300" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+                              </svg>
+                              <div className="text-[10px] text-white/70 mt-1 font-medium">Ad Copys</div>
+                            </div>
+                          </div>
+
+                          {/* 4. Landing */}
+                          <div className="absolute animate-spiral-card" style={{ animationDelay: '-3s', '--radius': '105px', '--start-scale': '0.45' }}>
+                            <div className="w-14 h-14 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl flex flex-col items-center justify-center">
+                              <svg className="w-5 h-5 text-amber-300" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
+                              </svg>
+                              <div className="text-[10px] text-white/70 mt-1 font-medium">LandingPages</div>
+                            </div>
+                          </div>
+
+                          {/* 5. Metrics */}
+                          <div className="absolute animate-spiral-card" style={{ animationDelay: '-4s', '--radius': '95px', '--start-scale': '0.55' }}>
+                            <div className="w-14 h-14 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl flex flex-col items-center justify-center">
+                              <svg className="w-5 h-5 text-pink-300" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/>
+                              </svg>
+                              <div className="text-[10px] text-white/70 mt-1 font-medium">Gender</div>
+                            </div>
+                          </div>
+
+                          {/* 6. Schedule */}
+                          <div className="absolute animate-spiral-card" style={{ animationDelay: '-5s', '--radius': '115px', '--start-scale': '0.35' }}>
+                            <div className="w-14 h-14 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl flex flex-col items-center justify-center">
+                              <svg className="w-5 h-5 text-indigo-300" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
+                              </svg>
+                              <div className="text-[10px] text-white/70 mt-1 font-medium">Interests</div>
+                            </div>
+                          </div>
+
+                          {/* 7. Location */}
+                          <div className="absolute animate-spiral-card" style={{ animationDelay: '-6s', '--radius': '85px', '--start-scale': '0.65' }}>
+                            <div className="w-14 h-14 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl flex flex-col items-center justify-center">
+                              <svg className="w-5 h-5 text-teal-300" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                              </svg>
+                              <div className="text-[10px] text-white/70 mt-1 font-medium">Locations</div>
+                            </div>
+                          </div>
+
+                          {/* 8. Keyword */}
+                          <div className="absolute animate-spiral-card" style={{ animationDelay: '-7s', '--radius': '120px', '--start-scale': '0.3' }}>
+                            <div className="w-14 h-14 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl flex flex-col items-center justify-center">
+                              <svg className="w-5 h-5 text-orange-300" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/>
+                              </svg>
+                              <div className="text-[10px] text-white/70 mt-1 font-medium">Keywords</div>
+                            </div>
+                          </div>
                         </div>
                       </div>
 
-                      {/* 裂变幻影效果 - 从外层区域发射，避开中心文案 */}
-                      <div className="absolute w-[80px] h-[40px] bg-[rgba(255,255,255,0.15)] border border-[rgba(255,255,255,0.3)] rounded-[8px] top-[15%] left-[10%] scale-0 opacity-0 z-[1] pointer-events-none" style={{ 
-                        animation: 'emit-card 4s infinite 0s' 
-                      }}></div>
-                      <div className="absolute w-[80px] h-[40px] bg-[rgba(255,255,255,0.15)] border border-[rgba(255,255,255,0.3)] rounded-[8px] top-[15%] right-[10%] scale-0 opacity-0 z-[1] pointer-events-none" style={{ 
-                        animation: 'emit-card-alt 4s infinite 1s' 
-                      }}></div>
-                      <div className="absolute w-[80px] h-[40px] bg-[rgba(255,255,255,0.15)] border border-[rgba(255,255,255,0.3)] rounded-[8px] top-[15%] left-[50%] -translate-x-1/2 scale-0 opacity-0 z-[1] pointer-events-none" style={{ 
-                        animation: 'emit-card 4s infinite 2.5s' 
-                      }}></div>
-
-                      {/* 元素环绕系统 */}
-                      <div className="absolute w-full h-full" style={{ animation: 'system-rotate 30s linear infinite' }}>
-                        {/* 1. Interests (原 Audiences) */}
-                        <div className="absolute w-[80px] h-[80px] bg-[rgba(255,255,255,0.08)] backdrop-blur-[8px] border border-[rgba(255,255,255,0.2)] rounded-[20px] flex flex-col items-center justify-center" style={{ 
-                          top: '22%', 
-                          left: '50%', 
-                          marginLeft: '-40px', 
-                          borderBottom: '2px solid #0ea5e9',
-                          animation: 'counter-rotate 30s linear infinite, float-vibrate 4s infinite ease-in-out' 
-                        }}>
-                          <svg width="36" height="36" viewBox="0 0 64 64">
-                            <circle fill="#0ea5e9" cx="32" cy="24" r="8" />
-                            <path fill="#0ea5e9" d="M16 50c0-6 8-10 16-10s16 4 16 10" opacity="0.6" />
-                          </svg>
-                          <div className="text-[10px] text-white mt-[6px] font-medium opacity-[0.7]">Interests</div>
-                        </div>
-
-                        {/* 2. Creatives */}
-                        <div className="absolute w-[80px] h-[80px] bg-[rgba(255,255,255,0.08)] backdrop-blur-[8px] border border-[rgba(255,255,255,0.2)] rounded-[20px] flex flex-col items-center justify-center" style={{ 
-                          top: '22%', 
-                          right: '22%', 
-                          borderBottom: '2px solid #8B5CF6',
-                          animation: 'counter-rotate 30s linear infinite, float-vibrate 4s infinite ease-in-out' 
-                        }}>
-                          <svg width="36" height="36" viewBox="0 0 64 64">
-                            <rect x="18" y="18" width="28" height="28" rx="4" fill="#8B5CF6" />
-                            <circle cx="32" cy="32" r="6" fill="#000" opacity="0.2" />
-                          </svg>
-                          <div className="text-[10px] text-white mt-[6px] font-medium opacity-[0.7]">Creatives</div>
-                        </div>
-
-                        {/* 3. Ad copys */}
-                        <div className="absolute w-[80px] h-[80px] bg-[rgba(255,255,255,0.08)] backdrop-blur-[8px] border border-[rgba(255,255,255,0.2)] rounded-[20px] flex flex-col items-center justify-center" style={{ 
-                          left: '22%', 
-                          top: '50%', 
-                          marginTop: '-40px', 
-                          borderBottom: '2px solid #10b981',
-                          animation: 'counter-rotate 30s linear infinite, float-vibrate 4s infinite ease-in-out' 
-                        }}>
-                          <svg width="36" height="36" viewBox="0 0 64 64">
-                            <path d="M15 15h34v34H15z" stroke="#10b981" strokeWidth="3" fill="none" />
-                            <path d="M22 25h20M22 35h20M22 45h10" stroke="#fff" strokeWidth="2" />
-                          </svg>
-                          <div className="text-[10px] text-white mt-[6px] font-medium opacity-[0.7]">Ad copys</div>
-                        </div>
-
-                        {/* 4. Landingpages (原 Insights) */}
-                        <div className="absolute w-[80px] h-[80px] bg-[rgba(255,255,255,0.08)] backdrop-blur-[8px] border border-[rgba(255,255,255,0.2)] rounded-[20px] flex flex-col items-center justify-center" style={{ 
-                          right: '22%', 
-                          top: '50%', 
-                          marginTop: '-40px', 
-                          borderBottom: '2px solid #f59e0b',
-                          animation: 'counter-rotate 30s linear infinite, float-vibrate 4s infinite ease-in-out' 
-                        }}>
-                          <svg width="36" height="36" viewBox="0 0 64 64">
-                            <rect fill="#f59e0b" x="15" y="35" width="5" height="15" />
-                            <rect fill="#f59e0b" x="25" y="25" width="5" height="25" />
-                            <rect fill="#f59e0b" x="35" y="15" width="5" height="35" />
-                            <path d="M35 10l2 4 4 2-4 2-2 4-2-4-4-2 4-2z" fill="#fff" />
-                          </svg>
-                          <div className="text-[10px] text-white mt-[6px] font-medium opacity-[0.7]">Landingpages</div>
-                        </div>
-
-                        {/* 5. Performance */}
-                        <div className="absolute w-[80px] h-[80px] bg-[rgba(255,255,255,0.08)] backdrop-blur-[8px] border border-[rgba(255,255,255,0.2)] rounded-[20px] flex flex-col items-center justify-center" style={{ 
-                          bottom: '22%', 
-                          left: '22%', 
-                          borderBottom: '2px solid #ec4899',
-                          animation: 'counter-rotate 30s linear infinite, float-vibrate 4s infinite ease-in-out' 
-                        }}>
-                          <svg width="36" height="36" viewBox="0 0 64 64">
-                            <path fill="#ec4899" d="M32 8 L32 8 L32 8 L32 8" />
-                            <path fill="#ec4899" d="M12 32 L52 32" stroke="#ec4899" strokeWidth="4" />
-                            <path fill="#ec4899" d="M12 24 L12 40" stroke="#ec4899" strokeWidth="4" />
-                            <path fill="#ec4899" d="M52 24 L52 40" stroke="#ec4899" strokeWidth="4" />
-                            <path fill="#ec4899" d="M20 16 L44 48" stroke="#ec4899" strokeWidth="3" />
-                          </svg>
-                          <div className="text-[10px] text-white mt-[6px] font-medium opacity-[0.7]">Performance</div>
-                        </div>
-
-                        {/* 6. Age */}
-                        <div className="absolute w-[80px] h-[80px] bg-[rgba(255,255,255,0.08)] backdrop-blur-[8px] border border-[rgba(255,255,255,0.2)] rounded-[20px] flex flex-col items-center justify-center" style={{ 
-                          bottom: '22%', 
-                          left: '50%', 
-                          marginLeft: '-40px', 
-                          borderBottom: '2px solid #8b5cf6',
-                          animation: 'counter-rotate 30s linear infinite, float-vibrate 4s infinite ease-in-out' 
-                        }}>
-                          <svg width="36" height="36" viewBox="0 0 64 64">
-                            <circle fill="#8b5cf6" cx="32" cy="32" r="16" />
-                            <path fill="#fff" d="M32 20 L32 44" strokeWidth="4" />
-                            <path fill="#fff" d="M20 32 L44 32" strokeWidth="4" />
-                          </svg>
-                          <div className="text-[10px] text-white mt-[6px] font-medium opacity-[0.7]">Age</div>
-                        </div>
-
-                        {/* 7. Gender */}
-                        <div className="absolute w-[80px] h-[80px] bg-[rgba(255,255,255,0.08)] backdrop-blur-[8px] border border-[rgba(255,255,255,0.2)] rounded-[20px] flex flex-col items-center justify-center" style={{ 
-                          bottom: '22%', 
-                          right: '22%', 
-                          borderBottom: '2px solid #6366f1',
-                          animation: 'counter-rotate 30s linear infinite, float-vibrate 4s infinite ease-in-out' 
-                        }}>
-                          <svg width="36" height="36" viewBox="0 0 64 64">
-                            <circle fill="#6366f1" cx="24" cy="32" r="8" />
-                            <circle fill="#6366f1" cx="40" cy="32" r="8" />
-                            <path fill="#6366f1" d="M24 44 L24 52 M40 44 L40 52" stroke="#6366f1" strokeWidth="3" />
-                          </svg>
-                          <div className="text-[10px] text-white mt-[6px] font-medium opacity-[0.7]">Gender</div>
-                        </div>
-
-                        {/* 8. Locations */}
-                        <div className="absolute w-[80px] h-[80px] bg-[rgba(255,255,255,0.08)] backdrop-blur-[8px] border border-[rgba(255,255,255,0.2)] rounded-[20px] flex flex-col items-center justify-center" style={{ 
-                          top: '50%', 
-                          left: '50%', 
-                          marginLeft: '-40px', 
-                          marginTop: '-40px', 
-                          borderBottom: '2px solid #14b8a6',
-                          animation: 'counter-rotate 30s linear infinite, float-vibrate 4s infinite ease-in-out' 
-                        }}>
-                          <svg width="36" height="36" viewBox="0 0 64 64">
-                            <path fill="#14b8a6" d="M32 8 L40 16 L32 24 L24 16 Z" />
-                            <circle fill="#14b8a6" cx="32" cy="32" r="4" />
-                            <path fill="#14b8a6" d="M32 24 L32 52" stroke="#14b8a6" strokeWidth="3" />
-                          </svg>
-                          <div className="text-[10px] text-white mt-[6px] font-medium opacity-[0.7]">Locations</div>
-                        </div>
-
-                        {/* 9. Keywords */}
-                        <div className="absolute w-[80px] h-[80px] bg-[rgba(255,255,255,0.08)] backdrop-blur-[8px] border border-[rgba(255,255,255,0.2)] rounded-[20px] flex flex-col items-center justify-center" style={{ 
-                          top: '50%', 
-                          right: '22%', 
-                          marginTop: '-40px', 
-                          borderBottom: '2px solid #f97316',
-                          animation: 'counter-rotate 30s linear infinite, float-vibrate 4s infinite ease-in-out' 
-                        }}>
-                          <svg width="36" height="36" viewBox="0 0 64 64">
-                            <path fill="#f97316" d="M12 24 L20 24 M12 32 L20 32 M12 40 L20 32" stroke="#f97316" strokeWidth="3" />
-                            <rect fill="#f97316" x="24" y="20" width="28" height="24" rx="4" />
-                          </svg>
-                          <div className="text-[10px] text-white mt-[6px] font-medium opacity-[0.7]">Keywords</div>
-                        </div>
-                      </div>
+                      {/* 微妙的粒子效果 */}
+                      <div className="absolute w-1 h-1 bg-white/30 rounded-full animate-particle-1" style={{ top: '20%', left: '15%' }}></div>
+                      <div className="absolute w-1 h-1 bg-white/30 rounded-full animate-particle-2" style={{ top: '60%', right: '20%' }}></div>
+                      <div className="absolute w-1 h-1 bg-white/30 rounded-full animate-particle-3" style={{ bottom: '30%', left: '25%' }}></div>
                     </div>
 
                     {/* 内容层 - 放在底部，白色背景 */}
@@ -726,9 +654,9 @@ const AdInsights = ({ onPageChange }) => {
                       <p className="text-sm text-gray-600 text-center mb-4">
                         More AI regeneration campaigns in drafts
                       </p>
-                      <button className="flex items-center gap-2 text-sm font-semibold text-white bg-gradient-to-r from-[#8B5CF6] to-[#7033f5] px-6 py-2.5 rounded-full hover:shadow-lg transition-all hover:scale-105">
+                      <button className="flex items-center gap-2 text-sm font-semibold text-white bg-gradient-to-r from-[#667eea] to-[#764ba2] px-6 py-2.5 rounded-full hover:shadow-lg transition-all hover:scale-105 group-hover:scale-110">
                         Go to Drafts
-                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg className="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                         </svg>
                       </button>
@@ -1418,74 +1346,64 @@ const AdInsights = ({ onPageChange }) => {
           text-overflow: ellipsis;
         }
 
-        /* 动效关键帧 */
-        @keyframes core-pulse {
-          0%, 100% { transform: scale(1); opacity: 0.2; }
-          50% { transform: scale(1.2); opacity: 0.4; }
+        /* 优化后的动效关键帧 */
+        @keyframes float-slow {
+          0%, 100% { transform: translate3d(0, 0, 0); }
+          50% { transform: translate3d(20px, 20px, 0); }
+        }
+        @keyframes float-slower {
+          0%, 100% { transform: translate3d(0, 0, 0); }
+          50% { transform: translate3d(-15px, -15px, 0); }
+        }
+        @keyframes card-float {
+          0%, 100% { transform: translate3d(0, 0, 0); }
+          50% { transform: translate3d(0, -8px, 0); }
+        }
+        @keyframes pulse-slow {
+          0%, 100% { transform: scale(1); opacity: 1; }
+          50% { transform: scale(1.05); opacity: 0.8; }
+        }
+        @keyframes particle-1 {
+          0%, 100% { transform: translate3d(0, 0, 0); opacity: 0.3; }
+          50% { transform: translate3d(30px, -20px, 0); opacity: 0.6; }
+        }
+        @keyframes particle-2 {
+          0%, 100% { transform: translate3d(0, 0, 0); opacity: 0.3; }
+          50% { transform: translate3d(-40px, 15px, 0); opacity: 0.6; }
+        }
+        @keyframes particle-3 {
+          0%, 100% { transform: translate3d(0, 0, 0); opacity: 0.3; }
+          50% { transform: translate3d(20px, 40px, 0); opacity: 0.6; }
         }
 
-        @keyframes system-rotate {
-          to { transform: rotate(360deg); }
-        }
+        .animate-float-slow { animation: float-slow 8s ease-in-out infinite; }
+        .animate-float-slower { animation: float-slower 12s ease-in-out infinite; }
+        .animate-card-float { animation: card-float 4s ease-in-out infinite; }
+        .animate-pulse-slow { animation: pulse-slow 3s ease-in-out infinite; }
+        .animate-particle-1 { animation: particle-1 7s ease-in-out infinite; }
+        .animate-particle-2 { animation: particle-2 10s ease-in-out infinite; }
+        .animate-particle-3 { animation: particle-3 9s ease-in-out infinite; }
 
-        @keyframes counter-rotate {
-          to { transform: rotate(-360deg); }
-        }
-
-        @keyframes float-vibrate {
-          0%, 100% { margin-top: -30px; }
-          50% { margin-top: -40px; }
-        }
-
-        @keyframes emit-card {
-          0% { 
-            transform: translate(0, 0) scale(0.3) rotate(0deg); 
-            opacity: 0; 
+        @keyframes spiral-move {
+          0% {
+            transform: rotate(0deg) translateX(var(--radius)) rotate(0deg) scale(var(--start-scale));
+            opacity: 0;
           }
-          20% { 
-            transform: translate(20px, 40px) scale(0.6) rotate(-10deg); 
-            opacity: 0.6; 
+          15% {
+            opacity: 0.8;
           }
-          50% { 
-            transform: translate(60px, 100px) scale(1.0) rotate(-20deg); 
-            opacity: 0.9; 
+          85% {
+            opacity: 0.8;
           }
-          80% { 
-            transform: translate(100px, 160px) scale(1.3) rotate(-30deg); 
-            opacity: 0.5; 
-          }
-          100% { 
-            transform: translate(140px, 200px) scale(0.5) rotate(-45deg); 
-            opacity: 0; 
-          }
-        }
-
-        @keyframes emit-card-alt {
-          0% { 
-            transform: translate(0, 0) scale(0.3) rotate(0deg); 
-            opacity: 0; 
-          }
-          20% { 
-            transform: translate(-20px, 40px) scale(0.6) rotate(10deg); 
-            opacity: 0.6; 
-          }
-          50% { 
-            transform: translate(-60px, 100px) scale(1.0) rotate(20deg); 
-            opacity: 0.9; 
-          }
-          80% { 
-            transform: translate(-100px, 160px) scale(1.3) rotate(30deg); 
-            opacity: 0.5; 
-          }
-          100% { 
-            transform: translate(-140px, 200px) scale(0.5) rotate(45deg); 
-            opacity: 0; 
+          100% {
+            transform: rotate(360deg) translateX(var(--radius)) rotate(-360deg) scale(1.1);
+            opacity: 0;
           }
         }
 
-        @keyframes drift {
-          from { transform: translateY(500px); }
-          to { transform: translateY(-100px); }
+        .animate-spiral-card {
+          animation: spiral-move 12s linear infinite;
+          will-change: transform, opacity;
         }
       `}</style>
     </div>

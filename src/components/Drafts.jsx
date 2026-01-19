@@ -305,7 +305,7 @@ const Drafts = () => {
   }
 
   const formatCurrency = (value) => {
-    return `¥${value.toFixed(2)}`
+    return `$${value.toFixed(2)}`
   }
 
   const getPlatformLogo = (platform) => {
