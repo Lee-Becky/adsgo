@@ -35,8 +35,8 @@ const Header = ({ toggleSidebar, isMobile, currentPage }) => {
         }
       case 'settings':
         return {
-          title: 'Settings',
-          subtitle: '管理您的品牌和设置'
+          title: 'Business Suite',
+          subtitle: 'The business suite defines how the AI evaluates performance and optimizes your ads. All ads in the group share one optimization goal and one budget, and are optimized together by the AI.'
         }
       default:
         return {

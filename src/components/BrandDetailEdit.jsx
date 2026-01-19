@@ -53,7 +53,7 @@ const BrandDetailEdit = ({ brand, onSave, onCancel }) => {
             <div className="flex items-center gap-4">
               <button onClick={onCancel} className="p-1 hover:bg-slate-100 rounded-md transition-colors text-slate-400 hover:text-slate-900"><ArrowLeft size={18} /></button>
               <div className="flex items-center gap-2">
-                <span className="text-xs font-bold text-slate-400 tracking-tight">Brand Settings</span>
+                <span className="text-xs font-bold text-slate-400 tracking-tight">Business Suite</span>
                 <ChevronRight size={12} className="text-slate-300" />
                 <span className="text-xs font-bold text-slate-900 tracking-tight">{formData.base.name}</span>
               </div>

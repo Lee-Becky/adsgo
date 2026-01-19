@@ -76,7 +76,7 @@ const BrandManagement = ({ editingBrand: externalEditingBrand, onClearEditingBra
       <div className="flex items-center justify-between mb-6">
         <button className="flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors">
           <Plus size={20} />
-          <span className="font-medium">New brand</span>
+          <span className="font-medium">New Business Suite</span>
         </button>
       </div>
 

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Layout, Image, Sparkles, BarChart3, Settings, Users, DollarSign, Search, FileText, ChevronDown, X, Plus, Lightbulb, Layers, Archive, ChevronRight } from 'lucide-react'
+import { Layout, Image, Sparkles, BarChart3, Settings, Users, DollarSign, Search, FileText, ChevronDown, X, Plus, Lightbulb, Layers, Archive, ChevronRight, Target } from 'lucide-react'
 
 const Sidebar = ({ isMobile, onClose, currentPage, onPageChange, selectedBrand, onBrandChange }) => {
   const [isBrandDropdownOpen, setIsBrandDropdownOpen] = useState(false)
@@ -63,12 +63,12 @@ const Sidebar = ({ isMobile, onClose, currentPage, onPageChange, selectedBrand, 
               <button
                 onClick={() => {
                   setIsBrandDropdownOpen(false)
-                  // TODO: 实现创建新品牌的逻辑
+                  // TODO: 实现创建新 Business Suite 的逻辑
                 }}
                 className="w-full flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-primary/10 text-primary transition-colors"
               >
                 <Plus size={16} />
-                <span className="font-medium">New brand</span>
+                <span className="font-medium">New Business Suite</span>
               </button>
             </div>
           </div>
@@ -143,7 +143,7 @@ const Sidebar = ({ isMobile, onClose, currentPage, onPageChange, selectedBrand, 
         </div>
       </nav>
 
-      {/* Settings Menu - Just above User Profile */}
+      {/* Business Suite Menu - Just above User Profile */}
       <div className="px-4 py-2">
         <button
           onClick={() => onPageChange('settings')}
@@ -153,8 +153,8 @@ const Sidebar = ({ isMobile, onClose, currentPage, onPageChange, selectedBrand, 
               : 'text-gray-600 hover:bg-gray-100'
           }`}
         >
-          <Settings size={20} />
-          <span className="font-medium">Settings</span>
+          <Target size={20} />
+          <span className="font-medium">Business Suite</span>
         </button>
       </div>
 

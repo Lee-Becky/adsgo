@@ -101,12 +101,31 @@ const RecommendationCard = ({ card, isExpanded, onToggle, onEdit, onPublish, sta
   const showExpandArrow = !isLookalike && tagsArr.length > 4;
   const isPublished = !!status;
 
+  // 统一使用蓝色系
+  const colors = {
+    primary: '#3B82F6',
+    gradient: 'linear-gradient(135deg, #3B82F6 0%, #2563EB 100%)',
+    lightBg: '#EFF6FF',
+    lightBorder: '#DBEAFE',
+    icon: '#3B82F6',
+    shadow: 'rgba(59, 130, 246, 0.2)',
+    shadowHover: 'rgba(59, 130, 246, 0.35)',
+    shadowGlow: 'rgba(59, 130, 246, 0.15)'
+  };
+
   return (
     <div className="campaign-wrapper">
       {/* External Header with Index Badge and Actions */}
       <div className="campaign-external-header">
         <div className="campaign-index-group">
-          <div className={`campaign-index-badge ${isPublished ? 'is-published' : ''}`}>
+          <div 
+            className={`campaign-index-badge ${isPublished ? 'is-published' : ''}`}
+            style={{
+              background: isPublished ? '' : `linear-gradient(135deg, ${colors.lightBg} 0%, ${colors.lightBorder} 100%)`,
+              borderColor: isPublished ? '' : colors.lightBorder,
+              color: isPublished ? '' : colors.primary
+            }}
+          >
             {String(cardIndex + 1).padStart(2, '0')}
           </div>
           <span className="campaign-subtitle">CAMPAIGN</span>
@@ -120,14 +139,26 @@ const RecommendationCard = ({ card, isExpanded, onToggle, onEdit, onPublish, sta
             <button className="btn-edit-ghost" onClick={() => onEdit(card.id)}>
               <i className="fas fa-pen"></i>
             </button>
-            <button className="btn-publish-external" onClick={() => onPublish(card.id)}>
+            <button 
+              className="btn-publish-external"
+              style={{
+                background: colors.gradient,
+                boxShadow: `0 2px 12px ${colors.shadow}, 0 0 0 0 ${colors.primary}66`
+              }}
+              onClick={() => onPublish(card.id)}
+            >
               Publish
             </button>
           </div>
         )}
       </div>
 
-      <div className={`ad-card ${isPublished ? 'is-published' : ''}`}>
+      <div 
+        className={`ad-card ${isPublished ? 'is-published' : ''}`}
+        style={isPublished ? {
+          '--card-gradient': colors.gradient
+        } : {}}
+      >
         {/* Audience Info */}
         <div className="ad-audience-top">
           {isLookalike ? (
@@ -135,16 +166,31 @@ const RecommendationCard = ({ card, isExpanded, onToggle, onEdit, onPublish, sta
               <div className="flex items-center gap-2 mb-2 min-w-0">
                 <span className="aud-name flex-shrink-0">{card.audience}</span>
                 <div className="aud-group aud-group-hover min-w-0 overflow-hidden" title="类似受众 (US, 3% to 5%) - AdsGo已付费客户1222">
-                  <span className="aud-content-tag aud-content-tag-long">类似受众 (US, 3% to 5%) - AdsGo已付费客户1222</span>
+                  <span 
+                    className="aud-content-tag aud-content-tag-long"
+                    style={{
+                      background: colors.lightBg,
+                      borderColor: colors.lightBorder,
+                      color: colors.primary
+                    }}
+                  >
+                    类似受众 (US, 3% to 5%) - AdsGo已付费客户1222
+                  </span>
                 </div>
               </div>
               <div className="aud-row-2">
                 <div className={`aud-tags-wrapper ${isExpanded ? 'expanded' : 'collapsed'}`}>
                   <div className="aud-tags-container">
-                    <span className="aud-pill-text">Scaling up by using the highest potential lookalike audience</span>
+                    <span className="aud-pill-text" style={{ color: colors.primary }}>
+                      Scaling up by using the highest potential lookalike audience
+                    </span>
                   </div>
                 </div>
-                <div onClick={() => onToggle(card.id)} className={`aud-expand-btn ${isExpanded ? 'rotated' : ''}`}>
+                <div 
+                  onClick={() => onToggle(card.id)} 
+                  className={`aud-expand-btn ${isExpanded ? 'rotated' : ''}`}
+                  style={{ '--hover-color': colors.primary }}
+                >
                   <i className="fas fa-chevron-down"></i>
                 </div>
               </div>
@@ -154,12 +200,33 @@ const RecommendationCard = ({ card, isExpanded, onToggle, onEdit, onPublish, sta
               <div className="flex items-center gap-3 mb-2 flex-wrap">
                 <span className="aud-name">{card.audience}</span>
                 <div className="aud-group">
-                  <i className="fas fa-birthday-cake aud-icon-standalone"></i>
-                  <span className="aud-content-tag">{card.age}</span>
+                  <i className="fas fa-birthday-cake aud-icon-standalone" style={{ color: colors.icon }}></i>
+                  <span 
+                    className="aud-content-tag"
+                    style={{
+                      background: colors.lightBg,
+                      borderColor: colors.lightBorder,
+                      color: colors.primary
+                    }}
+                  >
+                    {card.age}
+                  </span>
                 </div>
                 <div className="aud-group">
-                  <i className={`fas fa-${card.gender === 'Male' ? 'mars' : card.gender === 'Female' ? 'venus' : 'venus-mars'} aud-icon-standalone`}></i>
-                  <span className="aud-content-tag">{card.gender}</span>
+                  <i 
+                    className={`fas fa-${card.gender === 'Male' ? 'mars' : card.gender === 'Female' ? 'venus' : 'venus-mars'} aud-icon-standalone`}
+                    style={{ color: colors.icon }}
+                  ></i>
+                  <span 
+                    className="aud-content-tag"
+                    style={{
+                      background: colors.lightBg,
+                      borderColor: colors.lightBorder,
+                      color: colors.primary
+                    }}
+                  >
+                    {card.gender}
+                  </span>
                 </div>
               </div>
               <div className="aud-row-2">
@@ -167,12 +234,26 @@ const RecommendationCard = ({ card, isExpanded, onToggle, onEdit, onPublish, sta
                 <div className={`aud-tags-wrapper ${isExpanded ? 'expanded' : 'collapsed'}`}>
                   <div className="aud-tags-container">
                     {tagsArr.map((tag, idx) => (
-                      <span key={idx} className="aud-pill-tag">{tag.trim()}</span>
+                      <span 
+                        key={idx} 
+                        className="aud-pill-tag"
+                        style={{
+                          background: colors.lightBg,
+                          borderColor: colors.lightBorder,
+                          color: colors.primary
+                        }}
+                      >
+                        {tag.trim()}
+                      </span>
                     ))}
                   </div>
                 </div>
                 {showExpandArrow && (
-                  <div onClick={() => onToggle(card.id)} className={`aud-expand-btn ${isExpanded ? 'rotated' : ''}`}>
+                  <div 
+                    onClick={() => onToggle(card.id)} 
+                    className={`aud-expand-btn ${isExpanded ? 'rotated' : ''}`}
+                    style={{ '--hover-color': colors.primary }}
+                  >
                     <i className="fas fa-chevron-down"></i>
                   </div>
                 )}
@@ -184,7 +265,15 @@ const RecommendationCard = ({ card, isExpanded, onToggle, onEdit, onPublish, sta
         {/* Header - Simplified */}
         <div className="ad-header">
           <div className="ad-user-info">
-            <div className="ad-avatar"><i className="fas fa-asterisk"></i></div>
+            <div 
+              className="ad-avatar"
+              style={{
+                background: colors.lightBg,
+                color: colors.primary
+              }}
+            >
+              <i className="fas fa-asterisk"></i>
+            </div>
             <div className="ad-text-box">
               <h4>AdsGo.ai</h4>
               <p>Sponsored · <i className="fas fa-globe-americas"></i></p>
@@ -442,8 +531,8 @@ const AdInsights = ({ onPageChange }) => {
                     onClick={() => onPageChange('drafts')}
                     className="ad-card more-recommendations-card cursor-pointer hover:shadow-lg transition-shadow overflow-hidden relative flex flex-col"
                   >
-                    {/* 动效背景容器 - 留边距 */}
-                    <div className="absolute inset-[16px] rounded-xl overflow-hidden" style={{ 
+                    {/* 动效背景容器 - 扩大边界 */}
+                    <div className="absolute inset-[8px] rounded-xl overflow-hidden" style={{ 
                       background: 'radial-gradient(circle at center, #c3a2fe 0%, #7135f4 50%, #4f46e5 100%)',
                       zIndex: 0 
                     }}>
@@ -488,66 +577,145 @@ const AdInsights = ({ onPageChange }) => {
 
                       {/* 元素环绕系统 */}
                       <div className="absolute w-full h-full" style={{ animation: 'system-rotate 30s linear infinite' }}>
-                        {/* 1. Audiences */}
-                        <div className="absolute w-[70px] h-[70px] bg-[rgba(255,255,255,0.08)] backdrop-blur-[8px] border border-[rgba(255,255,255,0.2)] rounded-[20px] flex flex-col items-center justify-center" style={{ 
-                          top: '15%', 
+                        {/* 1. Interests (原 Audiences) */}
+                        <div className="absolute w-[80px] h-[80px] bg-[rgba(255,255,255,0.08)] backdrop-blur-[8px] border border-[rgba(255,255,255,0.2)] rounded-[20px] flex flex-col items-center justify-center" style={{ 
+                          top: '22%', 
                           left: '50%', 
-                          marginLeft: '-35px', 
+                          marginLeft: '-40px', 
                           borderBottom: '2px solid #0ea5e9',
                           animation: 'counter-rotate 30s linear infinite, float-vibrate 4s infinite ease-in-out' 
                         }}>
-                          <svg width="30" height="30" viewBox="0 0 64 64">
+                          <svg width="36" height="36" viewBox="0 0 64 64">
                             <circle fill="#0ea5e9" cx="32" cy="24" r="8" />
                             <path fill="#0ea5e9" d="M16 50c0-6 8-10 16-10s16 4 16 10" opacity="0.6" />
                           </svg>
-                          <div className="text-[8px] text-white mt-[5px] font-medium opacity-[0.7]">Audiences</div>
+                          <div className="text-[10px] text-white mt-[6px] font-medium opacity-[0.7]">Interests</div>
                         </div>
 
                         {/* 2. Creatives */}
-                        <div className="absolute w-[70px] h-[70px] bg-[rgba(255,255,255,0.08)] backdrop-blur-[8px] border border-[rgba(255,255,255,0.2)] rounded-[20px] flex flex-col items-center justify-center" style={{ 
-                          bottom: '15%', 
-                          left: '50%', 
-                          marginLeft: '-35px', 
+                        <div className="absolute w-[80px] h-[80px] bg-[rgba(255,255,255,0.08)] backdrop-blur-[8px] border border-[rgba(255,255,255,0.2)] rounded-[20px] flex flex-col items-center justify-center" style={{ 
+                          top: '22%', 
+                          right: '22%', 
                           borderBottom: '2px solid #8B5CF6',
                           animation: 'counter-rotate 30s linear infinite, float-vibrate 4s infinite ease-in-out' 
                         }}>
-                          <svg width="30" height="30" viewBox="0 0 64 64">
+                          <svg width="36" height="36" viewBox="0 0 64 64">
                             <rect x="18" y="18" width="28" height="28" rx="4" fill="#8B5CF6" />
                             <circle cx="32" cy="32" r="6" fill="#000" opacity="0.2" />
                           </svg>
-                          <div className="text-[8px] text-white mt-[5px] font-medium opacity-[0.7]">Creatives</div>
+                          <div className="text-[10px] text-white mt-[6px] font-medium opacity-[0.7]">Creatives</div>
                         </div>
 
                         {/* 3. Ad copys */}
-                        <div className="absolute w-[70px] h-[70px] bg-[rgba(255,255,255,0.08)] backdrop-blur-[8px] border border-[rgba(255,255,255,0.2)] rounded-[20px] flex flex-col items-center justify-center" style={{ 
-                          left: '15%', 
+                        <div className="absolute w-[80px] h-[80px] bg-[rgba(255,255,255,0.08)] backdrop-blur-[8px] border border-[rgba(255,255,255,0.2)] rounded-[20px] flex flex-col items-center justify-center" style={{ 
+                          left: '22%', 
                           top: '50%', 
-                          marginTop: '-35px', 
+                          marginTop: '-40px', 
                           borderBottom: '2px solid #10b981',
                           animation: 'counter-rotate 30s linear infinite, float-vibrate 4s infinite ease-in-out' 
                         }}>
-                          <svg width="30" height="30" viewBox="0 0 64 64">
+                          <svg width="36" height="36" viewBox="0 0 64 64">
                             <path d="M15 15h34v34H15z" stroke="#10b981" strokeWidth="3" fill="none" />
                             <path d="M22 25h20M22 35h20M22 45h10" stroke="#fff" strokeWidth="2" />
                           </svg>
-                          <div className="text-[8px] text-white mt-[5px] font-medium opacity-[0.7]">Ad copys</div>
+                          <div className="text-[10px] text-white mt-[6px] font-medium opacity-[0.7]">Ad copys</div>
                         </div>
 
-                        {/* 4. AI Insights */}
-                        <div className="absolute w-[70px] h-[70px] bg-[rgba(255,255,255,0.08)] backdrop-blur-[8px] border border-[rgba(255,255,255,0.2)] rounded-[20px] flex flex-col items-center justify-center" style={{ 
-                          right: '15%', 
+                        {/* 4. Landingpages (原 Insights) */}
+                        <div className="absolute w-[80px] h-[80px] bg-[rgba(255,255,255,0.08)] backdrop-blur-[8px] border border-[rgba(255,255,255,0.2)] rounded-[20px] flex flex-col items-center justify-center" style={{ 
+                          right: '22%', 
                           top: '50%', 
-                          marginTop: '-35px', 
+                          marginTop: '-40px', 
                           borderBottom: '2px solid #f59e0b',
                           animation: 'counter-rotate 30s linear infinite, float-vibrate 4s infinite ease-in-out' 
                         }}>
-                          <svg width="30" height="30" viewBox="0 0 64 64">
+                          <svg width="36" height="36" viewBox="0 0 64 64">
                             <rect fill="#f59e0b" x="15" y="35" width="5" height="15" />
                             <rect fill="#f59e0b" x="25" y="25" width="5" height="25" />
                             <rect fill="#f59e0b" x="35" y="15" width="5" height="35" />
                             <path d="M35 10l2 4 4 2-4 2-2 4-2-4-4-2 4-2z" fill="#fff" />
                           </svg>
-                          <div className="text-[7px] text-white mt-[4px] font-medium opacity-[0.7]">Insights</div>
+                          <div className="text-[10px] text-white mt-[6px] font-medium opacity-[0.7]">Landingpages</div>
+                        </div>
+
+                        {/* 5. Performance */}
+                        <div className="absolute w-[80px] h-[80px] bg-[rgba(255,255,255,0.08)] backdrop-blur-[8px] border border-[rgba(255,255,255,0.2)] rounded-[20px] flex flex-col items-center justify-center" style={{ 
+                          bottom: '22%', 
+                          left: '22%', 
+                          borderBottom: '2px solid #ec4899',
+                          animation: 'counter-rotate 30s linear infinite, float-vibrate 4s infinite ease-in-out' 
+                        }}>
+                          <svg width="36" height="36" viewBox="0 0 64 64">
+                            <path fill="#ec4899" d="M32 8 L32 8 L32 8 L32 8" />
+                            <path fill="#ec4899" d="M12 32 L52 32" stroke="#ec4899" strokeWidth="4" />
+                            <path fill="#ec4899" d="M12 24 L12 40" stroke="#ec4899" strokeWidth="4" />
+                            <path fill="#ec4899" d="M52 24 L52 40" stroke="#ec4899" strokeWidth="4" />
+                            <path fill="#ec4899" d="M20 16 L44 48" stroke="#ec4899" strokeWidth="3" />
+                          </svg>
+                          <div className="text-[10px] text-white mt-[6px] font-medium opacity-[0.7]">Performance</div>
+                        </div>
+
+                        {/* 6. Age */}
+                        <div className="absolute w-[80px] h-[80px] bg-[rgba(255,255,255,0.08)] backdrop-blur-[8px] border border-[rgba(255,255,255,0.2)] rounded-[20px] flex flex-col items-center justify-center" style={{ 
+                          bottom: '22%', 
+                          left: '50%', 
+                          marginLeft: '-40px', 
+                          borderBottom: '2px solid #8b5cf6',
+                          animation: 'counter-rotate 30s linear infinite, float-vibrate 4s infinite ease-in-out' 
+                        }}>
+                          <svg width="36" height="36" viewBox="0 0 64 64">
+                            <circle fill="#8b5cf6" cx="32" cy="32" r="16" />
+                            <path fill="#fff" d="M32 20 L32 44" strokeWidth="4" />
+                            <path fill="#fff" d="M20 32 L44 32" strokeWidth="4" />
+                          </svg>
+                          <div className="text-[10px] text-white mt-[6px] font-medium opacity-[0.7]">Age</div>
+                        </div>
+
+                        {/* 7. Gender */}
+                        <div className="absolute w-[80px] h-[80px] bg-[rgba(255,255,255,0.08)] backdrop-blur-[8px] border border-[rgba(255,255,255,0.2)] rounded-[20px] flex flex-col items-center justify-center" style={{ 
+                          bottom: '22%', 
+                          right: '22%', 
+                          borderBottom: '2px solid #6366f1',
+                          animation: 'counter-rotate 30s linear infinite, float-vibrate 4s infinite ease-in-out' 
+                        }}>
+                          <svg width="36" height="36" viewBox="0 0 64 64">
+                            <circle fill="#6366f1" cx="24" cy="32" r="8" />
+                            <circle fill="#6366f1" cx="40" cy="32" r="8" />
+                            <path fill="#6366f1" d="M24 44 L24 52 M40 44 L40 52" stroke="#6366f1" strokeWidth="3" />
+                          </svg>
+                          <div className="text-[10px] text-white mt-[6px] font-medium opacity-[0.7]">Gender</div>
+                        </div>
+
+                        {/* 8. Locations */}
+                        <div className="absolute w-[80px] h-[80px] bg-[rgba(255,255,255,0.08)] backdrop-blur-[8px] border border-[rgba(255,255,255,0.2)] rounded-[20px] flex flex-col items-center justify-center" style={{ 
+                          top: '50%', 
+                          left: '50%', 
+                          marginLeft: '-40px', 
+                          marginTop: '-40px', 
+                          borderBottom: '2px solid #14b8a6',
+                          animation: 'counter-rotate 30s linear infinite, float-vibrate 4s infinite ease-in-out' 
+                        }}>
+                          <svg width="36" height="36" viewBox="0 0 64 64">
+                            <path fill="#14b8a6" d="M32 8 L40 16 L32 24 L24 16 Z" />
+                            <circle fill="#14b8a6" cx="32" cy="32" r="4" />
+                            <path fill="#14b8a6" d="M32 24 L32 52" stroke="#14b8a6" strokeWidth="3" />
+                          </svg>
+                          <div className="text-[10px] text-white mt-[6px] font-medium opacity-[0.7]">Locations</div>
+                        </div>
+
+                        {/* 9. Keywords */}
+                        <div className="absolute w-[80px] h-[80px] bg-[rgba(255,255,255,0.08)] backdrop-blur-[8px] border border-[rgba(255,255,255,0.2)] rounded-[20px] flex flex-col items-center justify-center" style={{ 
+                          top: '50%', 
+                          right: '22%', 
+                          marginTop: '-40px', 
+                          borderBottom: '2px solid #f97316',
+                          animation: 'counter-rotate 30s linear infinite, float-vibrate 4s infinite ease-in-out' 
+                        }}>
+                          <svg width="36" height="36" viewBox="0 0 64 64">
+                            <path fill="#f97316" d="M12 24 L20 24 M12 32 L20 32 M12 40 L20 32" stroke="#f97316" strokeWidth="3" />
+                            <rect fill="#f97316" x="24" y="20" width="28" height="24" rx="4" />
+                          </svg>
+                          <div className="text-[10px] text-white mt-[6px] font-medium opacity-[0.7]">Keywords</div>
                         </div>
                       </div>
                     </div>
@@ -745,7 +913,6 @@ const AdInsights = ({ onPageChange }) => {
         }
 
         .btn-publish-external {
-          background: linear-gradient(135deg, #8B5CF6 0%, #7033f5 100%);
           background-size: 200% 200%;
           border: none;
           padding: 7px 18px;
@@ -757,7 +924,6 @@ const AdInsights = ({ onPageChange }) => {
           display: flex;
           align-items: center;
           gap: 5px;
-          box-shadow: 0 2px 12px rgba(112, 51, 245, 0.2), 0 0 0 0 rgba(112, 51, 245, 0.4);
           transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
           animation: gradient-pulse 3s ease infinite, initial-glow 0.6s ease-out;
           position: relative;
@@ -780,7 +946,6 @@ const AdInsights = ({ onPageChange }) => {
         }
 
         .btn-publish-external:hover {
-          box-shadow: 0 6px 24px rgba(112, 51, 245, 0.35), 0 0 0 4px rgba(112, 51, 245, 0.15);
           transform: translateY(-2px) scale(1.02);
         }
 
@@ -841,7 +1006,7 @@ const AdInsights = ({ onPageChange }) => {
           top: 0;
           bottom: 0;
           width: 4px;
-          background: linear-gradient(180deg, #7033f5 0%, #8B5CF6 100%);
+          background: var(--card-gradient, linear-gradient(180deg, #7033f5 0%, #8B5CF6 100%));
           border-top-left-radius: 16px;
           border-bottom-left-radius: 16px;
         }
@@ -861,12 +1026,6 @@ const AdInsights = ({ onPageChange }) => {
           font-size: 11px;
           font-weight: 600;
           letter-spacing: 0.02em;
-        }
-
-        .status-badge-tag.status-manual {
-          background: #F5F1FF;
-          border: 1px solid #E0E7FF;
-          color: #7033f5;
         }
 
         .status-badge-tag.status-auto {
@@ -962,14 +1121,10 @@ const AdInsights = ({ onPageChange }) => {
         }
 
         .aud-icon-standalone {
-          color: #7033f5;
           font-size: 14px;
         }
 
         .aud-content-tag {
-          background: #F5F1FF;
-          border: 1px solid #E0E7FF;
-          color: #7033f5;
           font-weight: 700;
           font-size: 11px;
           padding: 3px 8px;
@@ -978,6 +1133,8 @@ const AdInsights = ({ onPageChange }) => {
           overflow: hidden;
           text-overflow: ellipsis;
           max-width: 100%;
+          border-style: solid;
+          border-width: 1px;
         }
 
         .aud-content-tag-long {
@@ -1009,7 +1166,6 @@ const AdInsights = ({ onPageChange }) => {
         }
 
         .aud-pill-text {
-          color: #7033f5;
           font-size: 10px;
           font-weight: 600;
           white-space: nowrap;
@@ -1045,13 +1201,12 @@ const AdInsights = ({ onPageChange }) => {
         }
 
         .aud-pill-tag {
-          background: #F5F1FF;
-          border: 1px solid #E0E7FF;
-          color: #7033f5;
           padding: 3px 8px;
           border-radius: 12px;
           font-size: 10px;
           font-weight: 600;
+          border-style: solid;
+          border-width: 1px;
         }
 
         .aud-expand-btn {
@@ -1066,7 +1221,7 @@ const AdInsights = ({ onPageChange }) => {
 
         .aud-expand-btn:hover {
           background: #F3F4F6;
-          color: #7033f5;
+          color: var(--hover-color, #7033f5);
         }
 
         .aud-expand-btn.rotated {
@@ -1089,11 +1244,9 @@ const AdInsights = ({ onPageChange }) => {
           width: 32px;
           height: 32px;
           border-radius: 50%;
-          background: #E0E7FF;
           display: flex;
           align-items: center;
           justify-content: center;
-          color: #7033f5;
           font-size: 16px;
         }
 
@@ -1139,12 +1292,6 @@ const AdInsights = ({ onPageChange }) => {
           border-radius: 12px;
           font-size: 10px;
           font-weight: 600;
-        }
-
-        .status-badge.status-manual {
-          background: #F5F1FF;
-          border: 1px solid #E0E7FF;
-          color: #7033f5;
         }
 
         .status-badge.status-auto {

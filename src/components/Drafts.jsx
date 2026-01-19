@@ -489,18 +489,6 @@ const Drafts = () => {
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 min-w-[180px]">
                   Campaign
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-bold text-primary min-w-[150px]">
-                  <div className="flex items-center gap-1">
-                    <Sparkles size={14} />
-                    <span>Auto-scaling</span>
-                    <div className="relative group inline-block">
-                      <Info size={12} className="text-gray-400 cursor-help" />
-                      <div className="absolute left-0 top-full mt-2 w-80 bg-gray-900 text-white text-xs rounded-lg p-3 opacity-0 group-hover:opacity-100 transition-opacity z-10">
-                        Control whether the campaign allows AI to automatically launch. When enabled, AI will automatically launch the campaign at an appropriate time based on performance and budget.
-                      </div>
-                    </div>
-                  </div>
-                </th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 min-w-[120px]">
                   Daily Budget
                 </th>
@@ -536,28 +524,6 @@ const Drafts = () => {
                         <Sparkles size={10} />
                         AI-Auto
                       </span>
-                    </div>
-                  </td>
-                  <td className="px-4 py-4">
-                    <div className="flex items-center gap-3">
-                      <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-medium ${
-                        campaign.autoScaling === 'Auto_Publish_Enable' 
-                          ? 'bg-green-100 text-green-700' 
-                          : 'bg-gray-100 text-gray-600'
-                      }`}>
-                        {campaign.autoScaling === 'Auto_Publish_Enable' ? 'Auto_Publish_Enable' : 'Auto_Publish_Disable'}
-                      </span>
-                      <button
-                        onClick={() => handleAutoScalingToggle(campaign.id)}
-                        className="p-1 hover:bg-gray-100 rounded transition-colors"
-                        title="Toggle Auto-scaling"
-                      >
-                        {campaign.autoScaling === 'Auto_Publish_Enable' ? (
-                          <ToggleRight size={28} className="text-green-500" />
-                        ) : (
-                          <ToggleLeft size={28} className="text-gray-400" />
-                        )}
-                      </button>
                     </div>
                   </td>
                   <td className="px-4 py-4">
@@ -647,27 +613,30 @@ const Drafts = () => {
                     </div>
                   </td>
                   <td className="px-4 py-4">
-                    <div className="flex flex-col gap-2">
+                    <div className="flex items-center gap-2">
                       <button
                         onClick={() => handleEdit(campaign.id)}
-                        className="flex items-center gap-1 px-3 py-1.5 bg-white border border-border rounded-lg text-sm text-gray-700 hover:bg-gray-50 hover:text-primary transition-colors"
+                        className="flex items-center gap-1.5 px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-300 hover:text-primary transition-all duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary/20"
+                        aria-label="Edit campaign"
                       >
                         <Edit size={14} />
-                        Edit
+                        <span>Edit</span>
                       </button>
                       <button
                         onClick={() => handlePublish(campaign.id)}
-                        className="flex items-center gap-1 px-3 py-1.5 bg-primary text-white rounded-lg text-sm hover:bg-primary-hover transition-colors"
+                        className="flex items-center gap-1.5 px-3 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary-hover hover:shadow-md hover:shadow-primary/20 transition-all duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary/50"
+                        aria-label="Publish campaign"
                       >
                         <Send size={14} />
-                        Publish
+                        <span>Publish</span>
                       </button>
                       <button
                         onClick={() => handleDelete(campaign.id)}
-                        className="flex items-center gap-1 px-3 py-1.5 bg-red-50 text-red-600 rounded-lg text-sm hover:bg-red-100 transition-colors"
+                        className="flex items-center justify-center p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 hover:text-red-700 transition-all duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-red-500/20"
+                        aria-label="Delete campaign"
+                        title="Delete campaign"
                       >
                         <Trash2 size={14} />
-                        Delete
                       </button>
                     </div>
                   </td>
