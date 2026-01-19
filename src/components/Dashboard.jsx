@@ -391,7 +391,7 @@ const Dashboard = ({ selectedBrand, onPageChange, onEditBrandConfig }) => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
         {/* AI Optimization Section - Left Column (2/3) */}
         <div className="lg:col-span-2">
-          <div className="bg-white rounded-xl border border-border shadow-sm p-6">
+          <div className="bg-white rounded-xl border border-border shadow-sm p-6 h-full flex flex-col">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-primary/10 rounded-lg">
@@ -529,7 +529,7 @@ const Dashboard = ({ selectedBrand, onPageChange, onEditBrandConfig }) => {
             </div>
 
             {/* Chart using Recharts */}
-            <div className="h-80 bg-white rounded-xl border border-gray-200 p-6">
+            <div className="flex-1 bg-white rounded-xl border border-gray-200 p-6 min-h-[320px]">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={performanceChartData}>
                   <defs>
@@ -616,62 +616,144 @@ const Dashboard = ({ selectedBrand, onPageChange, onEditBrandConfig }) => {
 
         {/* Optimization Overview - Right Column (1/3) */}
         <div className="lg:col-span-1">
-          <div className="bg-white rounded-xl border border-border shadow-sm p-6 h-full flex flex-col">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-primary/10 rounded-lg">
-                  <Sparkles className="text-primary" size={20} />
+          <div className="bg-slate-50/50 border border-blue-100 rounded-2xl p-4 shadow-sm h-full flex flex-col">
+            <div className="flex items-center justify-between border-b border-slate-200 pb-1.5 mb-4 shrink-0">
+              <div className="flex items-center gap-2">
+                <Sparkles size={16} className="text-blue-500" />
+                <div className="flex items-baseline gap-3">
+                  <h3 className="text-base font-black text-slate-800 tracking-wide">Optimization Overview</h3>
+                  <div className="flex items-center gap-1.5 px-2 py-0.5 bg-blue-100/50 rounded-full text-[11px] font-black text-blue-600 border border-blue-200">
+                    <Clock size={10} />
+                    <span>2026-01-15 13:29</span>
+                  </div>
                 </div>
-                <div>
-                  <h2 className="text-lg font-bold text-gray-900">Optimization Overview</h2>
-                  <p className="text-xs text-gray-500 mt-0.5">Based on last 14 days data</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-2 text-xs font-bold text-gray-600">
-                <Clock className="text-gray-500" size={12} />
-                <span>2026-01-15 13:29:35</span>
               </div>
             </div>
 
-            <div className="space-y-3 flex-1">
-              <p className="text-gray-700 leading-relaxed text-sm">
-                Overall performance improved by <span className="text-green-600 font-semibold">23%</span> compared to yesterday, ROI increased from 3.2 to 4.2, and conversion cost decreased by 15%.
-              </p>
-              
-              <div className="grid grid-cols-1 gap-3">
-                <div className="pl-3 border-l-4 border-green-500">
-                  <p className="text-xs font-semibold text-gray-900 mb-1">Key Highlights</p>
-                  <ul className="text-xs text-gray-600 space-y-0.5">
-                    <li>• Brand promotion Campaign ROI reached 4.2, exceeding target by 40%</li>
-                    <li>• Display ad CVR reached 3.5%, industry leading</li>
-                    <li>• TikTok Ads CTR increased to 3.2%, young audience response positive</li>
-                  </ul>
+            <div className="flex-1 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent">
+              {/* AI Summary Section - Direct rendering without title/logo */}
+              <div className="mb-4">
+                <div className="space-y-2">
+                  <p className="text-xs text-slate-700 font-medium leading-relaxed">
+                    Overall performance improved by <span className="text-green-600 font-bold">23%</span> compared to yesterday, ROI increased from 3.2 to 4.2, and conversion cost decreased by 15%.
+                  </p>
+                  <div className="space-y-1.5">
+                    <div className="flex items-start gap-2">
+                      <span className="text-blue-600 font-bold text-xs">→</span>
+                      <p className="text-[11px] text-slate-600 font-medium leading-snug flex-1">
+                        品牌推广 Campaign ROI 达到 4.2，超出目标 40%，建议增加预算以获取更多转化。
+                      </p>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <span className="text-amber-600 font-bold text-xs">→</span>
+                      <p className="text-[11px] text-slate-600 font-medium leading-snug flex-1">
+                        Search 广告 CTR 仍低于行业平均水平，建议优化关键词以提升点击率。
+                      </p>
+                    </div>
+                  </div>
                 </div>
+              </div>
 
-                <div className="pl-3 border-l-4 border-yellow-500">
-                  <p className="text-xs font-semibold text-gray-900 mb-1">Potential Risks</p>
-                  <ul className="text-xs text-gray-600 space-y-0.5">
-                    <li>• Search ad CTR still below industry average (1.2% vs 2.5%), keywords need optimization</li>
-                    <li>• Facebook Ads cost is high, recommend reevaluating投放 strategy</li>
-                    <li>• Overall traffic quality stable, invalid click rate decreased by 8%</li>
-                  </ul>
+              {/* Key Highlights Section */}
+              <div className="mb-4">
+                <div className="bg-white border border-green-200 rounded-xl p-3 shadow-sm">
+                  <div className="flex items-center gap-1.5 mb-3 pb-2 border-b border-green-100 shrink-0">
+                    <div className="w-4 h-4 bg-green-100 rounded-lg flex items-center justify-center">
+                      <Check size={12} className="text-green-600" />
+                    </div>
+                    <span className="text-xs font-black text-green-700 tracking-wide">Key Highlights</span>
+                  </div>
+                  <div className="max-h-[120px] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-transparent">
+                    <div className="space-y-2">
+                      <div className="bg-green-50/50 border border-green-100 rounded-lg px-2.5 py-1.5 flex items-start gap-2">
+                        <div className="mt-0.5 shrink-0 w-0.5 h-0.5 rounded-full bg-green-600" />
+                        <p className="text-[10px] text-slate-700 font-semibold leading-snug flex-1">
+                          Brand promotion Campaign ROI reached 4.2, exceeding target by 40%
+                        </p>
+                      </div>
+                      <div className="bg-green-50/50 border border-green-100 rounded-lg px-2.5 py-1.5 flex items-start gap-2">
+                        <div className="mt-0.5 shrink-0 w-0.5 h-0.5 rounded-full bg-green-600" />
+                        <p className="text-[10px] text-slate-700 font-semibold leading-snug flex-1">
+                          Display ad CVR reached 3.5%, industry leading
+                        </p>
+                      </div>
+                      <div className="bg-green-50/50 border border-green-100 rounded-lg px-2.5 py-1.5 flex items-start gap-2">
+                        <div className="mt-0.5 shrink-0 w-0.5 h-0.5 rounded-full bg-green-600" />
+                        <p className="text-[10px] text-slate-700 font-semibold leading-snug flex-1">
+                          TikTok Ads CTR increased to 3.2%, young audience response positive
+                        </p>
+                      </div>
+                      <div className="bg-green-50/50 border border-green-100 rounded-lg px-2.5 py-1.5 flex items-start gap-2">
+                        <div className="mt-0.5 shrink-0 w-0.5 h-0.5 rounded-full bg-green-600" />
+                        <p className="text-[10px] text-slate-700 font-semibold leading-snug flex-1">
+                          Overall traffic quality stable, invalid click rate decreased by 8%
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Potential Risks Section */}
+              <div>
+                <div className="bg-white border border-amber-200 rounded-xl p-3 shadow-sm">
+                  <div className="flex items-center gap-1.5 mb-3 pb-2 border-b border-amber-100 shrink-0">
+                    <div className="w-4 h-4 bg-amber-100 rounded-lg flex items-center justify-center">
+                      <AlertCircle size={12} className="text-amber-600" />
+                    </div>
+                    <span className="text-xs font-black text-amber-700 tracking-wide">Potential Risks</span>
+                  </div>
+                  <div className="max-h-[120px] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-transparent">
+                    <div className="space-y-2">
+                      <div className="bg-amber-50/50 border border-amber-100 rounded-lg px-2.5 py-1.5 flex items-start gap-2">
+                        <div className="mt-0.5 shrink-0 w-0.5 h-0.5 rounded-full bg-amber-600" />
+                        <p className="text-[10px] text-slate-700 font-semibold leading-snug flex-1">
+                          Search ad CTR still below industry average (1.2% vs 2.5%), keywords need optimization
+                        </p>
+                      </div>
+                      <div className="bg-amber-50/50 border border-amber-100 rounded-lg px-2.5 py-1.5 flex items-start gap-2">
+                        <div className="mt-0.5 shrink-0 w-0.5 h-0.5 rounded-full bg-amber-600" />
+                        <p className="text-[10px] text-slate-700 font-semibold leading-snug flex-1">
+                          Facebook Ads cost is high, recommend reevaluating投放 strategy
+                        </p>
+                      </div>
+                      <div className="bg-amber-50/50 border border-amber-100 rounded-lg px-2.5 py-1.5 flex items-start gap-2">
+                        <div className="mt-0.5 shrink-0 w-0.5 h-0.5 rounded-full bg-amber-600" />
+                        <p className="text-[10px] text-slate-700 font-semibold leading-snug flex-1">
+                          CPM increased by 35.6% from $1.80 to $2.44, market competition intensified
+                        </p>
+                      </div>
+                      <div className="bg-amber-50/50 border border-amber-100 rounded-lg px-2.5 py-1.5 flex items-start gap-2">
+                        <div className="mt-0.5 shrink-0 w-0.5 h-0.5 rounded-full bg-amber-600" />
+                        <p className="text-[10px] text-slate-700 font-semibold leading-snug flex-1">
+                          CPA target of $0.5031 too aggressive, historical best $0.65 still exceeds target by 29%
+                        </p>
+                      </div>
+                      <div className="bg-amber-50/50 border border-amber-100 rounded-lg px-2.5 py-1.5 flex items-start gap-2">
+                        <div className="mt-0.5 shrink-0 w-0.5 h-0.5 rounded-full bg-amber-600" />
+                        <p className="text-[10px] text-slate-700 font-semibold leading-snug flex-1">
+                          Campaign paused on 01-12, CPA=$0.70 was optimal before pause
+                        </p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
 
             {/* Action Buttons */}
-            <div className="space-y-3 mt-4">
+            <div className="space-y-2.5 mt-4 pt-3 border-t border-slate-200 shrink-0">
               <button 
                 onClick={() => onPageChange('adManagerV3')}
-                className="w-full py-3 bg-primary text-white rounded-lg font-medium hover:bg-primary-hover transition-colors"
+                className="w-full py-2.5 bg-gradient-to-r from-primary to-primary/80 text-white rounded-xl font-bold text-sm hover:shadow-lg hover:shadow-primary/20 transition-all"
               >
-              View budget adjustment suggestions
+                View budget adjustment suggestions
               </button>
               <button 
                 onClick={() => onPageChange('insights')}
-                className="w-full py-3 border-2 border-primary text-primary rounded-lg font-medium hover:bg-primary/5 transition-colors"
+                className="w-full py-2.5 border-2 border-primary text-primary rounded-xl font-bold text-sm hover:bg-primary/5 transition-colors"
               >
-              View new campaign suggestions
+                View new campaign suggestions
               </button>
             </div>
           </div>
