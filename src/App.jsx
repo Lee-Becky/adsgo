@@ -12,6 +12,7 @@ import Drafts from './components/Drafts'
 import DataFetchingModal from './components/DataFetchingModal'
 import Dashboard from './components/Dashboard'
 import AdInsights from './components/AdInsights'
+import { AutoRegeneration } from './components/autoRegeneration'
 import AdManagerV2 from './components/adManagerV2/AdManagerV2'
 import AdManagerV3 from './components/adManagerV3/AdManagerV3'
 
@@ -173,6 +174,8 @@ function App() {
         <Drafts />
       ) : currentPage === 'insights' ? (
         <AdInsights onPageChange={handlePageChange} />
+      ) : currentPage === 'autoRegeneration' ? (
+        <AutoRegeneration onPageChange={handlePageChange} />
       ) : currentPage === 'adManagerV2' ? (
         <AdManagerV2 />
       ) : currentPage === 'adManagerV3' ? (

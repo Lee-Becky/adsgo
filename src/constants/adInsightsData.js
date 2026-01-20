@@ -41,8 +41,8 @@ export const CAMPAIGN_CARDS = [
   },
   {
     id: '04',
-    hasImage: false,
-    currentImgIndex: 0,
+    hasImage: true,
+    currentImgIndex: 2,
     selected: true,
     cta: 'Shop Now',
     headline: 'Best Sellers',

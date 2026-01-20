@@ -1,52 +1,8 @@
 import { Bell, HelpCircle, Menu } from 'lucide-react'
+import { getPageInfo } from '../constants/menuConfig'
 
 const Header = ({ toggleSidebar, isMobile, currentPage }) => {
-  const getPageInfo = () => {
-    switch (currentPage) {
-      case 'overview':
-        return {
-          title: 'Dashboard',
-          subtitle: 'Ad campaign overview and real-time optimization'
-        }
-      case 'dashboard':
-        return {
-          title: 'ad manager',
-          subtitle: 'Manage and optimize your ad campaigns'
-        }
-      case 'adManagerV2':
-        return {
-          title: 'ad manager',
-          subtitle: 'AI-driven cross-channel ad management platform'
-        }
-      case 'adManagerV3':
-        return {
-          title: 'ad manager',
-          subtitle: 'AI-driven cross-channel ad management platform'
-        }
-      case 'insights':
-        return {
-          title: 'Ad Insights',
-          subtitle: 'Insights and recommendations for new campaigns to publish'
-        }
-      case 'drafts':
-        return {
-          title: 'Drafts',
-          subtitle: 'Manage your draft ad campaigns'
-        }
-      case 'settings':
-        return {
-          title: 'Business Suite',
-          subtitle: 'The business suite defines how the AI evaluates performance and optimizes your ads. All ads in the group share one optimization goal and one budget, and are optimized together by the AI.'
-        }
-      default:
-        return {
-          title: 'Dashboard',
-          subtitle: 'Ad campaign overview and real-time optimization'
-        }
-    }
-  }
-
-  const pageInfo = getPageInfo()
+  const pageInfo = getPageInfo(currentPage)
 
   return (
     <div className="bg-white border-b border-border px-6 py-4">

@@ -6,8 +6,8 @@ import FilterSection from './FilterSection'
 import CampaignTable from './CampaignTable'
 import BudgetEditModal from './BudgetEditModal'
 import BudgetReasonModal from './BudgetReasonModal'
-import BrandDataOverlay from '../BrandDataOverlay'
-import { MOCK_GOALS } from '../../services/adManager/mockData'
+import BrandDataOverlay from './BrandDataOverlay'
+import { MOCK_GOALS } from './mockData'
 
 const AdManagerV3 = ({ onEditBrandConfig, selectedBrand }) => {
   // Brand data status: 'no-accounts' | 'fetching' | 'no-data' | 'success'

@@ -1,5 +1,6 @@
-import { useState } from 'react'
-import { Layout, Image, Sparkles, BarChart3, Settings, Users, DollarSign, Search, FileText, ChevronDown, X, Plus, Lightbulb, Layers, Archive, ChevronRight, Target } from 'lucide-react'
+import React, { useState } from 'react'
+import { Layout, Image, Sparkles, BarChart3, Settings, Users, DollarSign, Search, FileText, ChevronDown, X, Plus, Lightbulb, Layers, Archive, ChevronRight, Target, RefreshCw } from 'lucide-react'
+import { MENU_ITEMS, SETTINGS_MENU } from '../constants/menuConfig'
 
 const Sidebar = ({ isMobile, onClose, currentPage, onPageChange, selectedBrand, onBrandChange }) => {
   const [isBrandDropdownOpen, setIsBrandDropdownOpen] = useState(false)
@@ -8,12 +9,15 @@ const Sidebar = ({ isMobile, onClose, currentPage, onPageChange, selectedBrand, 
   
   const [isDeprecatedOpen, setIsDeprecatedOpen] = useState(false)
   
-  const menuItems = [
-    { icon: Layout, label: 'Dashboard', active: currentPage === 'overview' },
-    { icon: Layers, label: 'Ad Manager', active: currentPage === 'adManagerV3' },
-    { icon: Lightbulb, label: 'Ad Insights', active: currentPage === 'insights' },
-    { icon: FileText, label: 'Drafts', active: currentPage === 'drafts' },
-  ]
+  // 图标映射
+  const iconMap = {
+    Layout,
+    Layers,
+    Lightbulb,
+    RefreshCw,
+    FileText,
+    Target
+  }
   
   const deprecatedItems = [
     { icon: Image, label: 'Ad Manager V1.0', pageKey: 'dashboard' },
@@ -81,31 +85,21 @@ const Sidebar = ({ isMobile, onClose, currentPage, onPageChange, selectedBrand, 
 
       {/* Navigation */}
       <nav className="flex-1 p-4 space-y-1">
-        {menuItems.map((item, index) => {
-          let pageKey
-          if (item.label === 'Dashboard') {
-            pageKey = 'overview'
-          } else if (item.label === 'Ad Manager') {
-            pageKey = 'adManagerV3'
-          } else if (item.label === 'Ad Insights') {
-            pageKey = 'insights'
-          } else if (item.label === 'Drafts') {
-            pageKey = 'drafts'
-          } else {
-            pageKey = 'settings'
-          }
+        {MENU_ITEMS.map((item) => {
+          const IconComponent = iconMap[item.icon]
+          const isActive = currentPage === item.key
           
           return (
             <button
-              key={index}
-              onClick={() => onPageChange(pageKey)}
+              key={item.key}
+              onClick={() => onPageChange(item.key)}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
-                item.active
+                isActive
                   ? 'bg-primary text-white'
                   : 'text-gray-600 hover:bg-gray-100'
               }`}
             >
-              <item.icon size={20} />
+              <IconComponent size={20} />
               <span className="font-medium">{item.label}</span>
             </button>
           )
@@ -150,15 +144,15 @@ const Sidebar = ({ isMobile, onClose, currentPage, onPageChange, selectedBrand, 
       {/* Business Suite Menu - Just above User Profile */}
       <div className="px-4 py-2">
         <button
-          onClick={() => onPageChange('settings')}
+          onClick={() => onPageChange(SETTINGS_MENU.key)}
           className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
-            currentPage === 'settings'
+            currentPage === SETTINGS_MENU.key
               ? 'bg-primary text-white'
               : 'text-gray-600 hover:bg-gray-100'
           }`}
         >
           <Target size={20} />
-          <span className="font-medium">Business Suite</span>
+          <span className="font-medium">{SETTINGS_MENU.label}</span>
         </button>
       </div>
 
