@@ -15,6 +15,8 @@ import AdInsights from './components/AdInsights'
 import { AutoRegeneration } from './components/autoRegeneration'
 import AdManagerV2 from './components/adManagerV2/AdManagerV2'
 import AdManagerV3 from './components/adManagerV3/AdManagerV3'
+import ComingSoon from './components/ComingSoon'
+import { getPageInfo } from './constants/menuConfig'
 
 function App() {
   const [selectedCampaign, setSelectedCampaign] = useState(null)
@@ -24,13 +26,13 @@ function App() {
   const [showBudgetEdit, setShowBudgetEdit] = useState(false)
   const [budgetStatus, setBudgetStatus] = useState({})
   const [autoExecuteRecommendations, setAutoExecuteRecommendations] = useState(false)
-  const [isOverviewConnected, setIsOverviewConnected] = useState(false) // Dashboard page connection state
-  const [isOverviewDataFetching, setIsOverviewDataFetching] = useState(false) // Dashboard page data fetching state
+  const [isOverviewConnected, setIsOverviewConnected] = useState(false) // Home page connection state
+  const [isOverviewDataFetching, setIsOverviewDataFetching] = useState(false) // Home page data fetching state
   const [isDashboardConnected, setIsDashboardConnected] = useState(false) // Ad Manager page connection state
   const [isDashboardDataFetching, setIsDashboardDataFetching] = useState(false) // Ad Manager page data fetching state
   const [isInsightsConnected, setIsInsightsConnected] = useState(false) // Ad Insights page connection state
   const [isInsightsDataFetching, setIsInsightsDataFetching] = useState(false) // Ad Insights page data fetching state
-  const [currentPage, setCurrentPage] = useState('overview') // 'overview', 'dashboard', 'drafts', 'insights', or 'settings'
+  const [currentPage, setCurrentPage] = useState('overview') // 'overview', 'adManagerV3', 'autoRegeneration', 'drafts', 'insights', or 'settings'
   const [selectedBrand, setSelectedBrand] = useState('neopets')
   const [editingBrand, setEditingBrand] = useState(null)
 
@@ -117,6 +119,71 @@ function App() {
     }
   }
 
+  const renderContent = () => {
+    const pageInfo = getPageInfo(currentPage)
+
+    switch (currentPage) {
+      case 'overview':
+        return (
+          <Dashboard 
+            selectedBrand={selectedBrand} 
+            onPageChange={handlePageChange} 
+            onEditBrandConfig={handleEditBrandConfig}
+          />
+        )
+      case 'adManagerV3':
+        return (
+          <AdManagerV3 
+            onEditBrandConfig={handleEditBrandConfig}
+            selectedBrand={selectedBrand}
+          />
+        )
+      case 'autoRegeneration':
+        return <AutoRegeneration onPageChange={handlePageChange} />
+      case 'insights':
+        return <AdInsights onPageChange={handlePageChange} />
+      case 'drafts':
+        return <Drafts />
+      case 'settings':
+        return <BrandManagement editingBrand={editingBrand} onClearEditingBrand={handleClearEditingBrand} />
+      case 'dashboard': // 保持兼容旧路由
+        return (
+          <div className="p-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+              <div className="lg:col-span-2 h-full">
+                <OverallAnalysis />
+              </div>
+              <div className="lg:col-span-1 h-full">
+                <OptimizePreferences />
+              </div>
+            </div>
+            <div className="bg-white rounded-xl border border-border shadow-sm overflow-hidden">
+              <div className="p-5 border-b border-border bg-gray-50">
+                <FilterSection />
+              </div>
+              <CampaignTable 
+                budgetStatus={budgetStatus}
+                onBudgetStatusChange={setBudgetStatus}
+                onCampaignClick={handleCampaignClick}
+                onBudgetReasonClick={handleBudgetReasonClick}
+                onBudgetEditClick={handleBudgetEditClick}
+                onMoreInsights={handleMoreInsights}
+                autoExecuteRecommendations={autoExecuteRecommendations}
+                onAutoExecuteToggle={setAutoExecuteRecommendations}
+              />
+            </div>
+          </div>
+        )
+      default:
+        return (
+          <ComingSoon 
+            title={pageInfo?.title} 
+            subtitle={pageInfo?.subtitle} 
+          />
+        )
+    }
+  }
+
   return (
     <>
       <MainLayout
@@ -128,91 +195,33 @@ function App() {
         selectedBrand={selectedBrand}
         onBrandChange={setSelectedBrand}
       >
-      {/* Main Content Area - Scrollable */}
-      {currentPage === 'overview' ? (
-        <Dashboard 
-          selectedBrand={selectedBrand} 
-          onPageChange={handlePageChange} 
-          onEditBrandConfig={handleEditBrandConfig}
+        {/* Main Content Area - Scrollable */}
+        {renderContent()}
+
+        {/* Campaign Analysis Modal */}
+        <CampaignAnalysisModal
+          isOpen={showCampaignAnalysis}
+          onClose={() => setShowCampaignAnalysis(false)}
+          campaign={selectedCampaign}
         />
-      ) : currentPage === 'dashboard' ? (
-        <div className="p-6">
-        {/* Overall Analysis and Optimize Preferences - Side by Side */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-          {/* Today's Overview - Takes 2/3 of the space */}
-          <div className="lg:col-span-2 h-full">
-            <OverallAnalysis />
-          </div>
 
-          {/* Optimize Preferences - Takes 1/3 of the space */}
-          <div className="lg:col-span-1 h-full">
-            <OptimizePreferences />
-          </div>
-        </div>
-
-        {/* Filter and Data Section - Connected visually */}
-        <div className="bg-white rounded-xl border border-border shadow-sm overflow-hidden">
-          {/* Filter Section - Light background for visual differentiation */}
-          <div className="p-5 border-b border-border bg-gray-50">
-            <FilterSection />
-          </div>
-
-          {/* Campaign Table - White background */}
-          <CampaignTable 
-            budgetStatus={budgetStatus}
-            onBudgetStatusChange={setBudgetStatus}
-            onCampaignClick={handleCampaignClick}
-            onBudgetReasonClick={handleBudgetReasonClick}
-            onBudgetEditClick={handleBudgetEditClick}
-            onMoreInsights={handleMoreInsights}
-            autoExecuteRecommendations={autoExecuteRecommendations}
-            onAutoExecuteToggle={setAutoExecuteRecommendations}
-          />
-        </div>
-      </div>
-      ) : currentPage === 'drafts' ? (
-        <Drafts />
-      ) : currentPage === 'insights' ? (
-        <AdInsights onPageChange={handlePageChange} />
-      ) : currentPage === 'autoRegeneration' ? (
-        <AutoRegeneration onPageChange={handlePageChange} />
-      ) : currentPage === 'adManagerV2' ? (
-        <AdManagerV2 />
-      ) : currentPage === 'adManagerV3' ? (
-        <AdManagerV3 
-          onEditBrandConfig={handleEditBrandConfig}
-          selectedBrand={selectedBrand}
+        {/* Budget Reason Modal */}
+        <BudgetReasonModal
+          isOpen={showBudgetReason}
+          onClose={() => setShowBudgetReason(false)}
+          campaign={selectedCampaign}
+          reason={budgetReasonData}
         />
-      ) : (
-        <BrandManagement editingBrand={editingBrand} onClearEditingBrand={handleClearEditingBrand} />
-      )}
 
-
-      {/* Campaign Analysis Modal */}
-      <CampaignAnalysisModal
-        isOpen={showCampaignAnalysis}
-        onClose={() => setShowCampaignAnalysis(false)}
-        campaign={selectedCampaign}
-      />
-
-      {/* Budget Reason Modal */}
-      <BudgetReasonModal
-        isOpen={showBudgetReason}
-        onClose={() => setShowBudgetReason(false)}
-        campaign={selectedCampaign}
-        reason={budgetReasonData}
-      />
-
-      {/* Budget Edit Modal */}
-      <BudgetEditModal
-        isOpen={showBudgetEdit}
-        onClose={() => setShowBudgetEdit(false)}
-        campaign={selectedCampaign}
-        onSave={handleBudgetSave}
-        onUpdateBudgetStatus={handleUpdateBudgetStatus}
-      />
+        {/* Budget Edit Modal */}
+        <BudgetEditModal
+          isOpen={showBudgetEdit}
+          onClose={() => setShowBudgetEdit(false)}
+          campaign={selectedCampaign}
+          onSave={handleBudgetSave}
+          onUpdateBudgetStatus={handleUpdateBudgetStatus}
+        />
       </MainLayout>
-
     </>
   )
 }
