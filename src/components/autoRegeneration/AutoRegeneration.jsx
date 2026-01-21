@@ -239,31 +239,127 @@ const AutoRegeneration = ({ onPageChange }) => {
     return [
       ...campaignCardsData,
       {
-        id: 'draft-1',
+        id: 'meta-extra-1',
+        platform: 'Meta',
+        campaignName: 'Fitness Apparel Launch',
+        dailyBudget: 250,
+        audience: 'Gym Enthusiasts (18-45)',
+        creatives: [{ id: 'mc1', name: 'Fitness Video', type: 'video' }],
+        product: { type: 'url', value: 'https://example.com/fitness' },
+        updateTime: '2026-01-21 10:15:00',
+        isRecommendation: true
+      },
+      {
+        id: 'meta-extra-2',
+        platform: 'Meta',
+        campaignName: 'Eco-Friendly Home Decor',
+        dailyBudget: 150,
+        audience: 'Sustainable Living Seekers',
+        creatives: [{ id: 'mc2', name: 'Product Carousel', type: 'carousel' }],
+        product: { type: 'url', value: 'https://example.com/eco-home' },
+        updateTime: '2026-01-21 09:45:00',
+        isRecommendation: true
+      },
+      {
+        id: 'meta-extra-3',
+        platform: 'Meta',
+        campaignName: 'Smart Watch Promotion',
+        dailyBudget: 300,
+        audience: 'Tech Early Adopters',
+        creatives: [{ id: 'mc3', name: 'Watch Image 1', type: 'image' }],
+        product: { type: 'url', value: 'https://example.com/smartwatch' },
+        updateTime: '2026-01-21 08:30:00',
+        isRecommendation: true
+      },
+      {
+        id: 'meta-extra-4',
+        platform: 'Meta',
+        campaignName: 'Winter Clearance Sale',
+        dailyBudget: 500,
+        audience: 'Bargain Hunters',
+        creatives: [{ id: 'mc4', name: 'Clearance Banner', type: 'image' }],
+        product: { type: 'url', value: 'https://example.com/clearance' },
+        updateTime: '2026-01-20 18:00:00',
+        isRecommendation: false
+      },
+      {
+        id: 'meta-extra-5',
+        platform: 'Meta',
+        campaignName: 'Organic Skincare Set',
+        dailyBudget: 120,
+        audience: 'Natural Beauty Fans',
+        creatives: [{ id: 'mc5', name: 'Skincare Video', type: 'video' }],
+        product: { type: 'url', value: 'https://example.com/skincare' },
+        updateTime: '2026-01-20 16:20:00',
+        isRecommendation: false
+      },
+      {
+        id: 'meta-extra-6',
+        platform: 'Meta',
+        campaignName: 'Pet Tech Accessories',
+        dailyBudget: 200,
+        audience: 'Pet Owners (US)',
+        creatives: [{ id: 'mc6', name: 'Pet Gadget Image', type: 'image' }],
+        product: { type: 'url', value: 'https://example.com/pet-tech' },
+        updateTime: '2026-01-20 14:10:00',
+        isRecommendation: false
+      },
+      {
+        id: 'meta-extra-7',
+        platform: 'Meta',
+        campaignName: 'Gaming Headset Launch',
+        dailyBudget: 400,
+        audience: 'Hardcore Gamers (15-30)',
+        creatives: [{ id: 'mc7', name: 'Gaming Carousel', type: 'carousel' }],
+        product: { type: 'url', value: 'https://example.com/gaming' },
+        updateTime: '2026-01-20 11:55:00',
+        isRecommendation: false
+      },
+      {
+        id: 'meta-extra-8',
+        platform: 'Meta',
+        campaignName: 'Kitchenware Essential Kit',
+        dailyBudget: 180,
+        audience: 'Home Cooks',
+        creatives: [{ id: 'mc8', name: 'Kitchen Video', type: 'video' }],
+        product: { type: 'url', value: 'https://example.com/kitchen' },
+        updateTime: '2026-01-20 09:30:00',
+        isRecommendation: false
+      },
+      {
+        id: 'google-extra-1',
         platform: 'Google',
         campaignName: 'Spring Sale 2026',
         dailyBudget: 500,
         audience: 'Young Professionals (25-35)',
         creatives: [
-          { id: 'c1', name: 'Banner A', type: 'image' },
-          { id: 'c2', name: 'Video B', type: 'video' }
+          { id: 'gc1', name: 'Banner A', type: 'image' },
+          { id: 'gc2', name: 'Video B', type: 'video' }
         ],
         product: { type: 'feed', name: 'Electronics' },
         updateTime: '2026-01-06 14:30:00',
         isRecommendation: false
       },
       {
-        id: 'draft-2',
-        platform: 'Meta',
-        campaignName: 'Summer Launch Campaign',
-        dailyBudget: 800,
-        audience: 'Fashion Enthusiasts',
-        creatives: [
-          { id: 'c4', name: 'Image Ad 1', type: 'image' },
-          { id: 'c5', name: 'Carousel Ad', type: 'carousel' }
-        ],
-        product: { type: 'url', value: 'https://example.com/fashion-products' },
-        updateTime: '2026-01-06 12:00:00',
+        id: 'google-extra-2',
+        platform: 'Google',
+        campaignName: 'Back to School Gear',
+        dailyBudget: 600,
+        audience: 'Students & Parents',
+        creatives: [{ id: 'gc3', name: 'Search Ad Text', type: 'text' }],
+        product: { type: 'url', value: 'https://example.com/school' },
+        updateTime: '2026-01-05 11:00:00',
+        isRecommendation: false
+      },
+      {
+        id: 'google-extra-3',
+        platform: 'Google',
+        campaignName: 'Luxury Travel Packages',
+        dailyBudget: 1200,
+        audience: 'High Net Worth Individuals',
+        creatives: [{ id: 'gc4', name: 'Luxury Video', type: 'video' }],
+        product: { type: 'url', value: 'https://example.com/travel' },
+        updateTime: '2026-01-04 15:45:00',
         isRecommendation: false
       }
     ];
@@ -441,13 +537,15 @@ const AutoRegeneration = ({ onPageChange }) => {
 
           {/* Launch Recommendation Header with Auto-launch Pill */}
           <div className="flex flex-wrap items-center justify-between gap-4 mb-8 px-2">
-            <div className="flex gap-2.5">
-              <div className="w-1 h-auto min-h-[36px] rounded" style={{ background: 'linear-gradient(180deg, #8B5CF6, #4F46E5)' }}></div>
-              <div>
-                <div className="flex items-center gap-2.5 mb-0.5">
-                  <h2 className="text-base md:text-lg font-bold text-gray-900 tracking-tight">Meta launch waitlist (AI Regeneration)</h2>
-                </div>
-                <p className="text-xs text-gray-500">
+            <div className="pl-4 relative">
+              {/* Logo Stripe */}
+              <div className="absolute left-0 top-0.5 bottom-0.5 w-1.5 rounded-full bg-gradient-to-b from-[#c3a2fe] via-[#7135f4] to-[#0d031f]"></div>
+              
+              <div className="flex flex-col">
+                <h2 className="text-xl font-bold text-gray-900 leading-none">
+                  Recommended publish waitlists
+                </h2>
+                <p className="text-sm text-gray-500 mt-2 leading-none">
                   Once an AI recommendation campaign is deleted, it will not be published.
                 </p>
               </div>
@@ -460,7 +558,7 @@ const AutoRegeneration = ({ onPageChange }) => {
                 <div className="flex items-center gap-1.5">
                   <Sparkles size={14} className="text-[#7033f5]" />
                   <span className="text-[13px] font-bold text-gray-600 tracking-tight">Recommendations</span>
-                  <span className="text-sm font-black text-[#141414]">4</span>
+                  <span className="text-sm font-black text-[#141414]">5</span>
                 </div>
                 
                 <div className="text-gray-400">
@@ -471,9 +569,9 @@ const AutoRegeneration = ({ onPageChange }) => {
                 
                 <div className="flex items-center gap-1.5">
                   <Send size={14} className="text-green-600" />
-                  <span className="text-[13px] font-bold text-gray-600 tracking-tight">Launched</span>
+                  <span className="text-[13px] font-bold text-gray-600 tracking-tight">Published</span>
                   <span className="text-sm font-black text-[#141414]">
-                    {Object.keys(campaignStatus).length}
+                    {Object.keys(campaignStatus).length+1}
                   </span>
                 </div>
               </div>
@@ -551,10 +649,20 @@ const AutoRegeneration = ({ onPageChange }) => {
 
       {/* Drafts Section */}
       </div>
-      <div className="mt-8">
-        <h2 className="text-xl font-bold text-gray-900 mb-4 pl-4 relative before:content-[''] before:block before:w-1.5 before:h-6 before:rounded-full before:bg-gradient-to-b before:from-[#c3a2fe] before:via-[#7135f4] before:to-[#0d031f] before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2">
-        More drafts awaiting launch 
-        </h2>
+      <div className="mt-8 px-4 md:px-6">
+        <div className="mb-6 pl-4 relative">
+          {/* Logo Stripe */}
+          <div className="absolute left-0 top-0.5 bottom-0.5 w-1.5 rounded-full bg-gradient-to-b from-[#c3a2fe] via-[#7135f4] to-[#0d031f]"></div>
+          
+          <div className="flex flex-col">
+            <h2 className="text-xl font-bold text-gray-900 leading-none">
+              More drafts awaiting publish
+            </h2>
+            <p className="text-sm text-gray-500 mt-2 leading-none">
+              Campaigns tagged with "AI regeneration" will be available in the Recommended publish waitlist.
+            </p>
+          </div>
+        </div>
         <div className="bg-white rounded-xl border border-border shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
