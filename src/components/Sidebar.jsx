@@ -17,6 +17,29 @@ const Sidebar = ({ isMobile, onClose, currentPage, onPageChange, selectedBrand, 
   
   const brands = ['neopets', 'gaming studio', 'tech brand']
 
+  // 根据当前页面自动展开父菜单
+  useEffect(() => {
+    // 查找当前页面所属的父菜单
+    const findParentKey = (items, targetKey) => {
+      for (const item of items) {
+        if (item.key === targetKey) return null
+        if (item.children && item.children.some(child => child.key === targetKey)) {
+          return item.key
+        }
+        if (item.children) {
+          const found = findParentKey(item.children, targetKey)
+          if (found) return found
+        }
+      }
+      return null
+    }
+
+    const parentKey = findParentKey(MENU_ITEMS, currentPage)
+    if (parentKey && !expandedKeys.includes(parentKey)) {
+      setExpandedKeys(prev => [...prev, parentKey])
+    }
+  }, [currentPage])
+
   // Handle click outside to close user menu
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -177,23 +200,8 @@ const Sidebar = ({ isMobile, onClose, currentPage, onPageChange, selectedBrand, 
 
       {/* Footer Actions */}
       <div className="mt-auto px-3 py-4 flex flex-col gap-1 border-t border-slate-50">
-        <button
-          onClick={() => onPageChange(SETTINGS_MENU.key)}
-          className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all duration-200 group ${
-            currentPage === SETTINGS_MENU.key
-              ? 'bg-primary text-white shadow-md'
-              : 'text-slate-600 hover:bg-slate-50'
-          }`}
-        >
-          <Cog 
-            size={19} 
-            className={`transition-colors duration-200 ${
-              currentPage === SETTINGS_MENU.key ? 'text-white' : 'text-slate-400 group-hover:text-slate-600'
-            }`} 
-          />
-          <span className="font-medium text-[14px]">{SETTINGS_MENU.label}</span>
-        </button>
-
+        {/* Brand Management button hidden */}
+        
         <div className="h-px bg-slate-100 my-2 mx-1" />
 
         <button className="w-full flex items-center gap-3 px-3.5 py-2 rounded-xl transition-all duration-200 text-slate-600 hover:bg-slate-50 group">

@@ -8,6 +8,7 @@ import CampaignAnalysisModal from './components/CampaignAnalysisModal'
 import BudgetReasonModal from './components/BudgetReasonModal'
 import BudgetEditModal from './components/BudgetEditModal'
 import BrandManagement from './components/BrandManagement'
+import BasicInfo from './components/BasicInfo'
 import Drafts from './components/Drafts'
 import DataFetchingModal from './components/DataFetchingModal'
 import Dashboard from './components/Dashboard'
@@ -70,6 +71,7 @@ function App() {
   }
 
   const handlePageChange = (page) => {
+    console.log('Page change requested:', page)
     setCurrentPage(page)
   }
 
@@ -136,6 +138,7 @@ function App() {
           <AdManagerV3 
             onEditBrandConfig={handleEditBrandConfig}
             selectedBrand={selectedBrand}
+            onPageChange={handlePageChange}
           />
         )
       case 'autoRegeneration':
@@ -146,6 +149,11 @@ function App() {
         return <Drafts />
       case 'settings':
         return <BrandManagement editingBrand={editingBrand} onClearEditingBrand={handleClearEditingBrand} />
+      case 'basicInfo':
+        console.log('Rendering BasicInfo component')
+        return <BasicInfo onSave={() => {}} onCancel={() => handlePageChange('overview')} />
+      case 'optimizeGoals':
+        return <ComingSoon title="Optimize Goals" subtitle="Set and manage optimization goals" />
       case 'dashboard': // 保持兼容旧路由
         return (
           <div className="p-6">

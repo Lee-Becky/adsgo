@@ -9,7 +9,7 @@ import BudgetReasonModal from './BudgetReasonModal'
 import BrandDataOverlay from './BrandDataOverlay'
 import { MOCK_GOALS } from './mockData'
 
-const AdManagerV3 = ({ onEditBrandConfig, selectedBrand }) => {
+const AdManagerV3 = ({ onEditBrandConfig, selectedBrand, onPageChange }) => {
   // Brand data status: 'no-accounts' | 'fetching' | 'no-data' | 'success'
   const [brandDataStatus, setBrandDataStatus] = useState('no-accounts')
   const [budgetStatus, setBudgetStatus] = useState({})
@@ -114,6 +114,7 @@ const AdManagerV3 = ({ onEditBrandConfig, selectedBrand }) => {
         isCollapsed={isSummaryCollapsed}
         onActiveTabChange={setActiveTab}
         activeTab={activeTab}
+        onPageChange={onPageChange}
       />
 
       {/* Cross-Channel AI Summary - with margin - Show when activeTab is 'all' or 'meta' */}

@@ -43,7 +43,8 @@ const DashboardInsightsHeader = ({
   onCollapseToggle,
   isCollapsed,
   onActiveTabChange,
-  activeTab: propActiveTab
+  activeTab: propActiveTab,
+  onPageChange
 }) => {
   const [hoveredPlatform, setHoveredPlatform] = useState(null);
   const [activeTab, setActiveTab] = useState(propActiveTab || 'meta');
@@ -293,7 +294,10 @@ const DashboardInsightsHeader = ({
               <button 
                 onClick={() => {
                   setShowBudgetModal(false);
-                  onEditBrandConfig();
+                  // 跳转到 brand center -> optimize goal 菜单
+                  if (onPageChange) {
+                    onPageChange('optimizeGoals');
+                  }
                 }}
                 className="w-full px-4 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl text-sm font-bold text-white hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg shadow-blue-500/25 flex items-center justify-center gap-2"
               >

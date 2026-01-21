@@ -4,7 +4,7 @@ import {
   IMAGE_POOL,
   PLATFORM_LOGOS
 } from './mockData';
-import { Edit, Send, X, Check, Sparkles, Trash2 } from 'lucide-react';
+import { Edit, Send, X, Check, Sparkles, Trash2, ChevronDown } from 'lucide-react';
 
 // --- Sub Components ---
 
@@ -205,6 +205,7 @@ const RecommendationCard = ({ card, isExpanded, onToggle, onEdit, onPublish, sta
 
 const AutoRegeneration = ({ onPageChange }) => {
   const [selectedPlatform, setSelectedPlatform] = useState('Meta');
+  const [draftPlatformFilter, setDraftPlatformFilter] = useState('');
   const [autoRegen, setAutoRegen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
@@ -662,17 +663,34 @@ const AutoRegeneration = ({ onPageChange }) => {
       {/* Drafts Section */}
       </div>
       <div className="mt-8 px-4 md:px-6">
-        <div className="mb-6 pl-4 relative">
+        <div className="mb-6 flex items-center justify-between relative">
           {/* Logo Stripe */}
           <div className="absolute left-0 top-0.5 bottom-0.5 w-1.5 rounded-full bg-gradient-to-b from-[#c3a2fe] via-[#7135f4] to-[#0d031f]"></div>
           
-          <div className="flex flex-col">
+          <div className="pl-4 flex flex-col">
             <h2 className="text-xl font-bold text-gray-900 leading-none">
               More drafts awaiting publish
             </h2>
             <p className="text-sm text-gray-500 mt-2 leading-none">
               Campaigns tagged with "AI regeneration" will be available in the Recommended publish waitlist.
             </p>
+          </div>
+
+          {/* Platform Filter - Modern UI */}
+          <div className="relative">
+            <select 
+              value={draftPlatformFilter} 
+              onChange={(e) => setDraftPlatformFilter(e.target.value)}
+              className="appearance-none bg-white border border-gray-200 rounded-xl px-4 py-2.5 pr-10 text-sm font-semibold text-gray-700 hover:border-gray-300 hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-[#7033f5] focus:border-transparent cursor-pointer transition-all duration-200 min-w-[160px]"
+            >
+              <option value="">All Platforms</option>
+              <option value="Meta">Meta</option>
+              <option value="Google">Google</option>
+            </select>
+            <ChevronDown 
+              size={16} 
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none transition-transform duration-200"
+            />
           </div>
         </div>
         <div className="bg-white rounded-xl border border-border shadow-sm overflow-hidden">
@@ -690,7 +708,9 @@ const AutoRegeneration = ({ onPageChange }) => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
-                {paginatedDrafts.map((campaign) => (
+                {paginatedDrafts
+                  .filter(campaign => draftPlatformFilter === '' || campaign.platform === draftPlatformFilter)
+                  .map((campaign) => (
                   <tr key={campaign.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-4 py-4">
                       <div>
