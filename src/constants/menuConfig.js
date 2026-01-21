@@ -14,7 +14,7 @@ export const MENU_ITEMS = [
     label: 'Campaign Generator',
     icon: 'Sparkles',
     title: 'Campaign Generator',
-    subtitle: 'Create and manage ad campaigns'
+    subtitle: 'Generate and publish campaigns'
   },
   {
     key: 'aiOptimize',

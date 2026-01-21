@@ -4,7 +4,7 @@ import {
   IMAGE_POOL,
   PLATFORM_LOGOS
 } from './mockData';
-import { Edit, Send, X, Check, Sparkles, Trash2, ChevronDown } from 'lucide-react';
+import { Edit, Send, X, Check, Sparkles, Trash2, ChevronDown, Infinity, Clock, RefreshCw, ShieldCheck, GripVertical } from 'lucide-react';
 
 // --- Sub Components ---
 
@@ -52,7 +52,7 @@ const RecommendationCard = ({ card, isExpanded, onToggle, onEdit, onPublish, sta
           >
             {String(cardIndex + 1).padStart(2, '0')}
           </div>
-          <span className="campaign-subtitle">CAMPAIGN</span>
+          <span className="campaign-subtitle">Campaign</span>
         </div>
         {isPublished ? (
           <div className={`status-badge-tag ${status === 'manual' ? 'status-manual' : 'status-auto'}`}>
@@ -214,6 +214,14 @@ const AutoRegeneration = ({ onPageChange }) => {
   const [selectedCardId, setSelectedCardId] = useState(null);
   const [campaignStatus, setCampaignStatus] = useState({});
   const [hiddenCards, setHiddenCards] = useState(new Set());
+  const [autoPublishCampaigns, setAutoPublishCampaigns] = useState(() => {
+    const initialStatus = {};
+    const firstSixIds = ['01', '03', '05', 'meta-extra-1', 'meta-extra-2', 'meta-extra-3'];
+    firstSixIds.forEach(id => {
+      initialStatus[id] = true;
+    });
+    return initialStatus;
+  });
   
   // Merge campaign cards with draft campaigns
   const [draftCampaigns, setDraftCampaigns] = useState(() => {
@@ -224,7 +232,7 @@ const AutoRegeneration = ({ onPageChange }) => {
     
     const nowStr = formatDate(new Date());
 
-    const campaignCardsData = CAMPAIGN_CARDS.filter(card => ['01', '03', '04', '05'].includes(card.id)).map(card => ({
+    const campaignCardsData = CAMPAIGN_CARDS.map(card => ({
       id: card.id,
       platform: 'Meta',
       campaignName: `${card.audience} Campaign ${card.id}`,
@@ -371,11 +379,34 @@ const AutoRegeneration = ({ onPageChange }) => {
   const [tempBudget, setTempBudget] = useState('');
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [campaignToDelete, setCampaignToDelete] = useState(null);
+  const [draggedIndex, setDraggedIndex] = useState(null);
+
+  const handleDragStart = (e, index) => {
+    setDraggedIndex(index);
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleDragOver = (e, index) => {
+    e.preventDefault();
+    if (draggedIndex === null || draggedIndex === index) return;
+
+    const newDrafts = [...draftCampaigns];
+    const draggedItem = newDrafts[draggedIndex];
+    newDrafts.splice(draggedIndex, 1);
+    newDrafts.splice(index, 0, draggedItem);
+    
+    setDraggedIndex(index);
+    setDraftCampaigns(newDrafts);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedIndex(null);
+  };
 
   useEffect(() => {
     if (autoRegen) {
       const autoStatus = {};
-      CAMPAIGN_CARDS.filter(card => ['01', '03', '04', '05'].includes(card.id)).forEach(card => {
+      CAMPAIGN_CARDS.forEach(card => {
         if (!campaignStatus[card.id]) {
           autoStatus[card.id] = 'auto';
         }
@@ -406,7 +437,7 @@ const AutoRegeneration = ({ onPageChange }) => {
     setDraftCampaigns(prev => prev.filter(campaign => campaign.id !== cardId));
   };
 
-  const displayedCards = CAMPAIGN_CARDS.filter(card => ['01', '03', '04', '05'].includes(card.id) && !hiddenCards.has(card.id));
+  const displayedCards = CAMPAIGN_CARDS.filter(card => !hiddenCards.has(card.id));
 
   // Pagination Logic
   const totalPages = Math.ceil(draftCampaigns.length / itemsPerPage);
@@ -429,7 +460,6 @@ const AutoRegeneration = ({ onPageChange }) => {
   const handleDeleteConfirm = () => {
     if (campaignToDelete !== null) {
       setDraftCampaigns(prev => prev.filter(campaign => campaign.id !== campaignToDelete));
-      // Also hide the card if it's one of the recommendations
       setHiddenCards(prev => new Set([...prev, campaignToDelete]));
       setCampaignToDelete(null);
       setDeleteConfirmOpen(false);
@@ -521,7 +551,6 @@ const AutoRegeneration = ({ onPageChange }) => {
       <div className="flex-1 flex flex-col gap-4">
         {/* Meta Launch Recommendation Section */}
         <div className="bg-white rounded-xl border border-border shadow-sm p-4 md:p-6">
-          {/* Platform Selector Integrated into Card Header */}
           <div className="mb-6 px-2">
             <div className="bg-gray-100 p-0.5 rounded-full flex gap-1 w-fit">
               {['Meta', 'Google', 'TikTok', 'Bing'].map(p => (
@@ -548,77 +577,30 @@ const AutoRegeneration = ({ onPageChange }) => {
             </div>
           </div>
 
-          {/* Launch Recommendation Header with Auto-launch Pill */}
           <div className="flex flex-wrap items-center justify-between gap-4 mb-8 px-2">
             <div className="pl-4 relative">
-              {/* Logo Stripe */}
               <div className="absolute left-0 top-0.5 bottom-0.5 w-1.5 rounded-full bg-gradient-to-b from-[#c3a2fe] via-[#7135f4] to-[#0d031f]"></div>
               
               <div className="flex flex-col">
-                <h2 className="text-xl font-bold text-gray-900 leading-none">
-                  Recommended publish waitlists
-                </h2>
+                <div className="flex items-center gap-3">
+                  <h2 className="text-xl font-bold text-gray-900 leading-none">
+                    Recommended publish waitlists
+                  </h2>
+                  <div className="flex items-center gap-2 px-2.5 py-1 bg-gray-100 rounded-lg border border-gray-200 shadow-sm transition-all hover:bg-gray-200 group/time cursor-default">
+                    <Clock size={12} className="text-blue-500" />
+                    <span className="text-[11px] font-black text-gray-600">2026-01-21 19:25</span>
+                    <div className="w-px h-3 bg-gray-300 mx-0.5"></div>
+                    <RefreshCw size={12} className="text-gray-400 group-hover/time:text-blue-500 group-hover/time:rotate-180 transition-all duration-500 cursor-pointer" />
+                  </div>
+                </div>
                 <p className="text-sm text-gray-500 mt-2 leading-none">
                   Once an AI recommendation campaign is deleted, it will not be published.
                 </p>
               </div>
             </div>
-
-            {/* Compact Auto-launch Card Moved Here */}
-            <div className="bg-white rounded-full border border-[#d1d5db] py-0 flex items-center gap-0 shadow-sm overflow-hidden h-[42px]">
-              {/* Metrics (Left Side - Constant Light Blue) */}
-              <div className="flex items-center gap-4 px-4 bg-[#f0f7ff] self-stretch">
-                <div className="flex items-center gap-1.5">
-                  <Sparkles size={14} className="text-[#7033f5]" />
-                  <span className="text-[13px] font-bold text-gray-600 tracking-tight">Recommendations</span>
-                  <span className="text-sm font-black text-[#141414]">5</span>
-                </div>
-                
-                <div className="text-gray-400">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-                    <path d="M5 12h14M12 5l7 7-7 7" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </div>
-                
-                <div className="flex items-center gap-1.5">
-                  <Send size={14} className="text-green-600" />
-                  <span className="text-[13px] font-bold text-gray-600 tracking-tight">Published</span>
-                  <span className="text-sm font-black text-[#141414]">
-                    {Object.keys(campaignStatus).length+1}
-                  </span>
-                </div>
-              </div>
-
-              {/* Divider */}
-              <div className="w-px h-full min-h-[32px] bg-gray-300"></div>
-              
-              {/* Switch (Right Side - Dynamic Background) */}
-              <div className={`flex items-center gap-3 px-4 py-1 self-stretch transition-colors duration-300 ${autoRegen ? 'bg-[#141414]' : 'bg-gray-100'}`}>
-                <div className={`flex items-center gap-1.5 text-xs font-bold tracking-tight ${autoRegen ? 'text-white' : 'text-gray-700'}`}>
-                  <img 
-                    src="https://www.adsgo.ai/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Frobot-active.7003b4d8.png&w=256&q=75" 
-                    alt="AI Robot" 
-                    className={`w-4 h-4 transition-all ${autoRegen ? 'brightness-200' : ''}`} 
-                  />
-                  <span>Auto-publish:</span>
-                </div>
-                <div 
-                  className={`w-9 h-[18px] rounded-full p-[2px] cursor-pointer transition-colors border ${autoRegen ? 'bg-white/20 border-white/30' : 'bg-gray-200 border-gray-400 shadow-inner'}`}
-                  onClick={() => setAutoRegen(!autoRegen)}
-                >
-                  <div className={`w-[14px] h-[14px] rounded-full shadow-sm transition-transform ${autoRegen ? 'translate-x-4 bg-white' : 'translate-x-0 bg-gray-500'}`} />
-                </div>
-                <span className={`text-[10px] font-black tracking-wide ${autoRegen ? 'text-green-400' : 'text-red-500'}`}>
-                  {autoRegen ? 'Automatic scaling publish' : 'Manual publish required'}
-                </span>
-              </div>
-            </div>
           </div>
 
-          {/* Campaign Grid Content */}
           <div className="py-2 px-2">
-
-            {/* Campaign Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
               {displayedCards.map((card, index) => (
                 <RecommendationCard
@@ -634,37 +616,131 @@ const AutoRegeneration = ({ onPageChange }) => {
                 />
               ))}
               
-              {/* Empty Placeholder Card - Appears when fewer than 4 cards */}
-              {displayedCards.length < 4 && (
-                <div className="campaign-wrapper">
-                  <div className="campaign-external-header h-[36px]"></div> {/* Match height of other headers */}
-                  <div className="ad-card flex flex-col items-center justify-center p-8 text-center bg-gray-50/50 border-dashed border-2 border-gray-200 min-h-[450px]">
-                    <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mb-6 animate-pulse-slow">
-                      <Sparkles size={32} className="text-primary opacity-60" />
+              <div key="empty-placeholder" className="campaign-wrapper">
+                <div className="campaign-external-header">
+                  <div className="bg-[#f0f7ff] border border-blue-100 rounded-xl px-3 py-1.5 flex items-center gap-2.5 shadow-sm">
+                    <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center border border-blue-50">
+                      <img src="https://www.adsgo.ai/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Frobot-active.7003b4d8.png&w=256&q=75" alt="AI Robot" className="w-5 h-5" />
                     </div>
-                    <h4 className="text-lg font-bold text-gray-900 mb-3 leading-tight">
-                      Generating More campaigns...
-                    </h4>
-                    <p className="text-sm text-gray-500 max-w-[200px] leading-relaxed">
-                      Don't worry, AdsGo will automatically generate new campaign recommendations.
-                    </p>
-                    <div className="mt-8 flex gap-1.5">
-                      <div className="w-1.5 h-1.5 bg-primary/20 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
-                      <div className="w-1.5 h-1.5 bg-primary/40 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
-                      <div className="w-1.5 h-1.5 bg-primary/60 rounded-full animate-bounce"></div>
-                    </div>
+                    <span className="text-[14px] font-black text-blue-600 tracking-tight">Ai-scaling control center</span>
                   </div>
                 </div>
-              )}
+                <div className="ad-card flex flex-col items-stretch p-0 bg-gray-50/30 border-dashed border-2 border-gray-200 min-h-[550px] relative group shadow-sm hover:shadow-md transition-shadow">
+                    <div className="h-[240px] relative bg-white border-b border-dashed border-gray-200">
+                      <div className="absolute inset-0 rounded-t-xl overflow-hidden" style={{ 
+                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)',
+                      }}>
+                        <div className="absolute top-1/4 left-1/4 w-[150px] h-[150px] bg-white/10 rounded-full blur-[40px] animate-float-slow"></div>
+                        <div className="absolute bottom-1/4 right-1/4 w-[100px] h-[100px] bg-white/15 rounded-full blur-[30px] animate-float-slower"></div>
+                        <div className="absolute inset-0 opacity-[0.08]" style={{
+                          backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)',
+                          backgroundSize: '20px 20px'
+                        }}></div>
+
+                        <div className="absolute inset-0 flex items-center justify-center scale-[0.7]">
+                          <div className="relative z-[20] w-32 h-32 bg-white/20 backdrop-blur-md border-2 border-white/40 rounded-[28px] flex flex-col items-center justify-center shadow-2xl animate-pulse-slow">
+                            <Sparkles className="w-14 h-14 text-white" />
+                            <div className="text-[13px] text-white font-black mt-2 whitespace-nowrap tracking-wider">Generating</div>
+                          </div>
+
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            {[
+                              { label: 'Ad copys', icon: 'fa-font', delay: '0s', r: '145px' },
+                              { label: 'Age', icon: 'fa-birthday-cake', delay: '-1.66s', r: '135px' },
+                              { label: 'Gender', icon: 'fa-venus-mars', delay: '-3.33s', r: '155px' },
+                              { label: 'Creatives', icon: 'fa-image', delay: '-5s', r: '125px' },
+                              { label: 'Locations', icon: 'fa-map-marker-alt', delay: '-6.66s', r: '150px' },
+                              { label: 'Products', icon: 'fa-shopping-bag', delay: '-8.33s', r: '140px' },
+                              { label: 'Cta', icon: 'fa-mouse-pointer', delay: '-10s', r: '160px' },
+                              { label: 'Interests', icon: 'fa-bullseye', delay: '-11.66s', r: '120px' },
+                              { label: 'Lookalike', icon: 'fa-user-friends', delay: '-13.33s', r: '165px' }
+                            ].map((item, idx) => (
+                              <div key={idx} className="absolute animate-spiral-card" style={{ animationDelay: item.delay, '--radius': item.r }}>
+                                <div className="w-16 h-16 bg-white/15 backdrop-blur-md border border-white/30 rounded-2xl flex flex-col items-center justify-center text-white shadow-xl">
+                                  <i className={`fas ${item.icon} text-xl mb-1.5`}></i>
+                                  <span className="text-[11px] font-black tracking-tight leading-none">{item.label}</span>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                        <div className="absolute w-1 h-1 bg-white/30 rounded-full animate-particle-1" style={{ top: '20%', left: '15%' }}></div>
+                        <div className="absolute w-1 h-1 bg-white/30 rounded-full animate-particle-2" style={{ top: '60%', right: '20%' }}></div>
+                      </div>
+                    </div>
+
+                    <div className="flex-1 bg-[#f8faff] p-3 flex flex-col gap-3">
+                      <div className="bg-white border border-gray-100 rounded-xl p-2 shadow-sm space-y-2">
+                        <div className="flex items-center gap-1.5 px-1">
+                          <i className="fas fa-chart-line text-primary text-[8px]"></i>
+                          <span className="text-[12px] font-black text-gray-700 tracking-tight">AI Regeneration Publishing</span>
+                        </div>
+                        <div className="flex gap-1.5 items-center px-0.5">
+                          <div className="flex-1 bg-gray-50 border border-gray-100 rounded-lg p-1.5 flex flex-col">
+                            <span className="text-[10px] font-bold text-gray-400 leading-none mb-1">Recommendations</span>
+                            <span className="text-sm font-black text-gray-900 leading-none">5</span>
+                          </div>
+                          <i className="fas fa-arrow-right text-[10px] text-gray-300"></i>
+                          <div className="flex-1 bg-white border-2 border-primary rounded-lg p-1.5 flex flex-col relative shadow-sm">
+                            <span className="text-[10px] font-bold text-primary leading-none mb-1">Published</span>
+                            <span className="text-sm font-black text-gray-900 leading-none text-center">{String(Object.keys(campaignStatus).length + 1)}</span>
+                          </div>
+                        </div>
+                        <div className="px-0.5">
+                          <div className="w-full bg-[#eff6ff] border border-primary/10 rounded-lg p-1.5 flex items-center justify-between">
+                            <span className="text-[10px] font-bold text-gray-500">Reserved</span>
+                            <span className="text-sm font-black text-primary leading-none">{String(5 - (Object.keys(campaignStatus).length + 1))}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex gap-3 mt-auto pt-1 relative">
+                        <div 
+                          onClick={() => setAutoRegen(false)}
+                          className={`flex-1 border-2 rounded-2xl p-2 flex flex-col items-center text-center transition-all duration-300 cursor-pointer relative ${!autoRegen ? 'bg-blue-50 border-blue-500 shadow-[0_8px_16px_rgba(59,130,246,0.12)] scale-[1.05] z-10' : 'bg-white border-slate-100 hover:border-blue-200 opacity-80 grayscale hover:grayscale-0'}`}
+                        >
+                          <div className="mb-1.5 relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 bg-white shadow-md">
+                            <svg viewBox="0 0 24 24" fill="none" className={`w-5 h-5 ${!autoRegen ? 'text-blue-600' : 'text-blue-400'}`}>
+                              <rect x="3" y="4" width="18" height="18" rx="2" strokeWidth="2" stroke="currentColor" fill="none"/><path d="M16 2V6M8 2V6M3 10H21" strokeWidth="2" stroke="currentColor" strokeLinecap="round"/><circle cx="12" cy="16" r="1.5" fill="currentColor" className={!autoRegen ? 'animate-pulse' : ''}/>
+                            </svg>
+                          </div>
+                          <p className={`text-[14px] font-black mb-1.5 tracking-tight ${!autoRegen ? 'text-blue-700' : 'text-slate-800'}`}>Recommendations</p>
+                          <div className={`flex items-center gap-1 px-2 py-0.5 rounded-full border transition-all duration-300 ${!autoRegen ? 'bg-blue-600 border-blue-600 text-white shadow-sm' : 'bg-slate-50 border-slate-100 text-slate-300'}`}>
+                            <div className={`w-1 h-1 rounded-full ${!autoRegen ? 'bg-white animate-pulse' : 'bg-slate-300'}`} /><span className="text-[7px] font-black tracking-wider">{!autoRegen ? 'Running' : 'Standby'}</span>
+                          </div>
+                        </div>
+
+                        <div 
+                          onClick={() => setAutoRegen(true)}
+                          className={`flex-1 border-2 rounded-2xl p-2 flex flex-col items-center text-center transition-all duration-300 cursor-pointer relative overflow-hidden ${autoRegen ? 'bg-slate-900 border-slate-800 shadow-[0_12px_24px_rgba(0,0,0,0.25)] scale-[1.05] z-10' : 'bg-white border-slate-100 hover:border-indigo-200 opacity-80 grayscale hover:grayscale-0'}`}
+                        >
+                          {autoRegen && (
+                            <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden opacity-30">
+                              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200%] h-[200%] bg-[conic-gradient(from_0deg,transparent_0deg,rgba(99,102,241,0.4)_20deg,transparent_40deg)] animate-[spin_3s_linear_infinite]" />
+                            </div>
+                          )}
+                          <div className={`mb-1.5 relative z-10 w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 ${autoRegen ? 'bg-slate-800 shadow-md border border-slate-700' : 'bg-white shadow-sm'}`}>
+                            <Infinity size={20} className={`${autoRegen ? 'text-indigo-400 animate-[spin_3s_linear_infinite]' : 'text-indigo-600'}`}/>
+                          </div>
+                          <p className={`text-[14px] font-black mb-1.5 tracking-tight relative z-10 ${autoRegen ? 'text-white' : 'text-slate-800'}`}>Auto Publish</p>
+                          <div className={`relative z-10 flex items-center gap-1 px-2 py-0.5 rounded-full border transition-all duration-300 ${autoRegen ? 'bg-indigo-600 border-indigo-500 text-white shadow-md' : 'bg-slate-50 border-slate-100 text-slate-300'}`}>
+                            <div className={`w-1 h-1 rounded-full ${autoRegen ? 'bg-green-400 animate-ping' : 'bg-slate-300'}`} /><span className="text-[7px] font-black tracking-wider">{autoRegen ? 'Active' : 'Standby'}</span>
+                          </div>
+                          <div className="absolute top-1.5 right-1.5 z-20">
+                            <div className={`bg-slate-900 text-white text-[9px] font-black px-1.5 py-0.5 rounded-md leading-tight shadow-sm flex items-center gap-0.5 animate-pulse`}><ShieldCheck size={14} className="text-[#7033f5]" /><span>7*24H</span></div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
-      {/* Drafts Section */}
       </div>
       <div className="mt-8 px-4 md:px-6">
         <div className="mb-6 flex items-center justify-between relative">
-          {/* Logo Stripe */}
           <div className="absolute left-0 top-0.5 bottom-0.5 w-1.5 rounded-full bg-gradient-to-b from-[#c3a2fe] via-[#7135f4] to-[#0d031f]"></div>
           
           <div className="pl-4 flex flex-col">
@@ -676,7 +752,6 @@ const AutoRegeneration = ({ onPageChange }) => {
             </p>
           </div>
 
-          {/* Platform Filter - Modern UI */}
           <div className="relative">
             <select 
               value={draftPlatformFilter} 
@@ -698,6 +773,7 @@ const AutoRegeneration = ({ onPageChange }) => {
             <table className="w-full">
               <thead className="bg-gray-50">
                 <tr>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 min-w-[140px]">Auto Publish</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 min-w-[180px]">Campaign</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 min-w-[120px]">Daily Budget</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 min-w-[200px]">Audience</th>
@@ -707,11 +783,45 @@ const AutoRegeneration = ({ onPageChange }) => {
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 min-w-[150px]">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border">
+              <tbody className="divide-y-0">
                 {paginatedDrafts
                   .filter(campaign => draftPlatformFilter === '' || campaign.platform === draftPlatformFilter)
-                  .map((campaign) => (
-                  <tr key={campaign.id} className="hover:bg-gray-50 transition-colors">
+                  .map((campaign, index) => {
+                    const actualIndex = (currentPage - 1) * itemsPerPage + index;
+                    return (
+                  <tr 
+                    key={campaign.id} 
+                    className={`hover:bg-gray-50 transition-all duration-200 ${draggedIndex === actualIndex ? 'opacity-40 bg-blue-50 border-2 border-dashed border-blue-200' : 'border-b border-border'}`}
+                    draggable
+                    onDragStart={(e) => handleDragStart(e, actualIndex)}
+                    onDragOver={(e) => handleDragOver(e, actualIndex)}
+                    onDragEnd={handleDragEnd}
+                  >
+                    <td className="px-4 py-4">
+                      <div className="flex items-start gap-3">
+                        <div className="mt-1 cursor-grab active:cursor-grabbing text-gray-300 hover:text-gray-600 transition-colors">
+                          <GripVertical size={16} />
+                        </div>
+                        <div className="flex flex-col gap-2 flex-1">
+                          {(actualIndex + 1) <= 6 && (
+                            <div className="w-fit px-2 py-0.5 bg-blue-50 text-blue-600 border border-blue-100 rounded-md text-[9px] font-black tracking-tight">
+                              Sequence {actualIndex + 1}
+                            </div>
+                          )}
+                          <div className="flex items-center gap-2">
+                            <div 
+                              className={`w-8 h-4 rounded-full p-0.5 cursor-pointer transition-colors ${autoPublishCampaigns[campaign.id] ? 'bg-green-500' : 'bg-gray-300'}`}
+                              onClick={() => setAutoPublishCampaigns(prev => ({ ...prev, [campaign.id]: !prev[campaign.id] }))}
+                            >
+                              <div className={`w-3 h-3 bg-white rounded-full transition-transform ${autoPublishCampaigns[campaign.id] ? 'translate-x-4' : 'translate-x-0'}`} />
+                            </div>
+                            <span className={`text-[10px] font-bold ${autoPublishCampaigns[campaign.id] ? 'text-green-600' : 'text-gray-500'}`}>
+                              {autoPublishCampaigns[campaign.id] ? 'Allowed' : 'Prohibited'}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </td>
                     <td className="px-4 py-4">
                       <div>
                         <div className="flex items-center gap-2 mb-1">
@@ -774,12 +884,11 @@ const AutoRegeneration = ({ onPageChange }) => {
                       </div>
                     </td>
                   </tr>
-                ))}
+                );})}
               </tbody>
             </table>
           </div>
 
-          {/* Pagination Footer */}
           {draftCampaigns.length > 0 && (
             <div className="px-4 py-3 bg-gray-50 border-t border-border flex items-center justify-between">
               <div className="flex-1 flex justify-between sm:hidden">
@@ -899,7 +1008,7 @@ const AutoRegeneration = ({ onPageChange }) => {
         .campaign-index-group { display: flex; align-items: center; gap: 10px; }
         .campaign-index-badge { width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg, #F5F1FF 0%, #E0E7FF 100%); border: 1px solid #D1D5DB; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: #7033f5; }
         .campaign-index-badge.is-published { background: linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 100%); border-color: #10B981; color: #059669; }
-        .campaign-subtitle { font-size: 11px; font-weight: 500; color: #9CA3AF; letter-spacing: 0.08em; text-transform: uppercase; }
+        .campaign-subtitle { font-size: 11px; font-weight: 500; color: #9CA3AF; letter-spacing: 0.08em; text-transform: none; }
         .external-actions { display: flex; align-items: center; gap: 6px; }
         .btn-edit-ghost { width: 32px; height: 32px; border: 1px solid #E5E7EB; background: transparent; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #6B7280; cursor: pointer; transition: all 0.2s; }
         .btn-edit-ghost:hover { background: #F3F4F6; color: #374151; }
@@ -953,7 +1062,20 @@ const AutoRegeneration = ({ onPageChange }) => {
         @keyframes particle-1 { 0%, 100% { transform: translate3d(0, 0, 0); opacity: 0.3; } 50% { transform: translate3d(30px, -20px, 0); opacity: 0.6; } }
         @keyframes particle-2 { 0%, 100% { transform: translate3d(0, 0, 0); opacity: 0.3; } 50% { transform: translate3d(-40px, 15px, 0); opacity: 0.6; } }
         @keyframes particle-3 { 0%, 100% { transform: translate3d(0, 0, 0); opacity: 0.3; } 50% { transform: translate3d(20px, 40px, 0); opacity: 0.6; } }
-        @keyframes spiral-move { 0% { transform: rotate(0deg) translateX(var(--radius)) rotate(0deg) scale(var(--start-scale)); opacity: 0; } 15% { opacity: 0.8; } 85% { opacity: 0.8; } 100% { transform: rotate(360deg) translateX(var(--radius)) rotate(-360deg) scale(1.1); opacity: 0; } }
+        
+        /* Corrected Orbit Animation: Dynamic depth scaling and absolute leveling */
+        @keyframes orbit-move {
+          0% { transform: rotate(0deg) translateX(var(--radius)) rotate(0deg) scale(0.6); opacity: 0.2; z-index: 5; }
+          25% { opacity: 0.8; }
+          50% { transform: rotate(180deg) translateX(var(--radius)) rotate(-180deg) scale(1.3); opacity: 1; z-index: 30; }
+          75% { opacity: 0.8; }
+          100% { transform: rotate(360deg) translateX(var(--radius)) rotate(-360deg) scale(0.6); opacity: 0.2; z-index: 5; }
+        }
+        .animate-spiral-card {
+          animation: orbit-move 15s linear infinite;
+          will-change: transform, opacity;
+        }
+
         @keyframes system-rotate-slow { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .animate-float-slow { animation: float-slow 8s ease-in-out infinite; }
         .animate-float-slower { animation: float-slower 12s ease-in-out infinite; }
@@ -961,7 +1083,6 @@ const AutoRegeneration = ({ onPageChange }) => {
         .animate-particle-1 { animation: particle-1 7s ease-in-out infinite; }
         .animate-particle-2 { animation: particle-2 10s ease-in-out infinite; }
         .animate-particle-3 { animation: particle-3 9s ease-in-out infinite; }
-        .animate-spiral-card { animation: spiral-move 12s linear infinite; will-change: transform, opacity; }
         .animate-system-rotate-slow { animation: system-rotate-slow 360s linear infinite; }
       `}</style>
     </div>

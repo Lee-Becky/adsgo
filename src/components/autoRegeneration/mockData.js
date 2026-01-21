@@ -28,19 +28,6 @@ export const CAMPAIGN_CARDS = [
     interests: 'Books, Study, Campus, University, Exams, Library, Coffee, Notes'
   },
   {
-    id: '04',
-    hasImage: true,
-    currentImgIndex: 2,
-    selected: true,
-    cta: 'Shop Now',
-    headline: 'Best Sellers',
-    text: 'Top rated products just for you...',
-    audience: 'Parents',
-    age: '30-60',
-    gender: 'All',
-    interests: 'Kids, Toys, Home, Family, Education, Baby, Parenting, Care'
-  },
-  {
     id: '05',
     hasImage: true,
     currentImgIndex: 2,
