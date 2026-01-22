@@ -214,14 +214,28 @@ const AutoRegeneration = ({ onPageChange }) => {
   const [selectedCardId, setSelectedCardId] = useState(null);
   const [campaignStatus, setCampaignStatus] = useState({});
   const [hiddenCards, setHiddenCards] = useState(new Set());
-  const [autoPublishCampaigns, setAutoPublishCampaigns] = useState(() => {
+  // 记忆每个 campaign 的人工操作状态：null(无操作), true(人工开启), false(人工关闭)
+  const [manualPublishOverrides, setManualPublishOverrides] = useState({});
+  const [autoPublishCampaigns, setAutoPublishCampaigns] = useState({});
+  
+  // 统一初始化逻辑
+  useEffect(() => {
+    const initialOverrides = {};
     const initialStatus = {};
-    const firstSixIds = ['01', '03', '05', 'meta-extra-1', 'meta-extra-2', 'meta-extra-3'];
-    firstSixIds.forEach(id => {
-      initialStatus[id] = true;
+    
+    draftCampaigns.forEach(campaign => {
+      if (campaign.isRecommendation) {
+        initialOverrides[campaign.id] = null; // AI 标签不带人工标签
+        initialStatus[campaign.id] = autoRegen; // 随系统状态
+      } else {
+        initialOverrides[campaign.id] = false; // 非 AI 标签视为人工操作的关闭态
+        initialStatus[campaign.id] = false;
+      }
     });
-    return initialStatus;
-  });
+    
+    setManualPublishOverrides(initialOverrides);
+    setAutoPublishCampaigns(initialStatus);
+  }, []);
   
   // Merge campaign cards with draft campaigns
   const [draftCampaigns, setDraftCampaigns] = useState(() => {
@@ -380,27 +394,119 @@ const AutoRegeneration = ({ onPageChange }) => {
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [campaignToDelete, setCampaignToDelete] = useState(null);
   const [draggedIndex, setDraggedIndex] = useState(null);
+  const [dragOverIndex, setDragOverIndex] = useState(null);
+  const [highlightedRowId, setHighlightedRowId] = useState(null);
+  const [animatingInfo, setAnimatingInfo] = useState({ id: null, phase: 'idle', targetIndex: null });
 
   const handleDragStart = (e, index) => {
     setDraggedIndex(index);
     e.dataTransfer.effectAllowed = 'move';
+    // 增加被拖拽元素的透明度
+    e.currentTarget.classList.add('row-dragging');
   };
 
   const handleDragOver = (e, index) => {
     e.preventDefault();
-    if (draggedIndex === null || draggedIndex === index) return;
-
-    const newDrafts = [...draftCampaigns];
-    const draggedItem = newDrafts[draggedIndex];
-    newDrafts.splice(draggedIndex, 1);
-    newDrafts.splice(index, 0, draggedItem);
-    
-    setDraggedIndex(index);
-    setDraftCampaigns(newDrafts);
+    if (draggedIndex === null || dragOverIndex === index) return;
+    setDragOverIndex(index);
   };
 
-  const handleDragEnd = () => {
+  const handleDragEnd = (e, campaignId) => {
+    const fromIndex = draggedIndex;
+    const toIndex = dragOverIndex;
+
+    // 清除状态
     setDraggedIndex(null);
+    setDragOverIndex(null);
+    e.currentTarget.classList.remove('row-dragging');
+    
+    if (fromIndex !== null && toIndex !== null && fromIndex !== toIndex) {
+      const newDrafts = [...draftCampaigns];
+      const [draggedItem] = newDrafts.splice(fromIndex, 1);
+      newDrafts.splice(toIndex, 0, draggedItem);
+      setDraftCampaigns(newDrafts);
+    }
+
+    // 拖拽结束后的视觉反馈
+    // 1. 先定位
+    setTimeout(() => {
+      const element = document.getElementById(`campaign-row-${campaignId}`);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      
+      // 2. 定位完成后开始闪烁（约600ms后）
+      setTimeout(() => {
+        setHighlightedRowId(campaignId);
+        setTimeout(() => {
+          setHighlightedRowId(null);
+        }, 3000);
+      }, 600);
+    }, 50);
+  };
+
+  const handleToggleAutoPublish = (campaignId) => {
+    const currentStatus = autoPublishCampaigns[campaignId];
+    const newStatus = !currentStatus;
+    
+    // 记录人工操作偏好
+    setManualPublishOverrides(prev => ({ ...prev, [campaignId]: newStatus }));
+
+    // 1. 准备阶段：计算目标位置
+    const currentDrafts = [...draftCampaigns];
+    const currentItem = currentDrafts.find(c => c.id === campaignId);
+    const otherDrafts = currentDrafts.filter(c => c.id !== campaignId);
+    
+    // 预估更新后的状态（用于计算位置）
+    const predictedAutoPublishStatus = { ...autoPublishCampaigns, [campaignId]: newStatus };
+    const enabledInOthers = otherDrafts.filter(c => predictedAutoPublishStatus[c.id]);
+    
+    let targetIdx = 0;
+    if (enabledInOthers.length > 0) {
+      const lastEnabledId = enabledInOthers[enabledInOthers.length - 1].id;
+      targetIdx = otherDrafts.findIndex(c => c.id === lastEnabledId) + 1;
+    }
+
+    // 2. 开始动画阶段：拿起 (Pick up)
+    setAnimatingInfo({ id: campaignId, phase: 'leaving', targetIndex: targetIdx });
+
+    // 300ms 后执行位置挪动逻辑
+    setTimeout(() => {
+      // 更新开关状态
+      setAutoPublishCampaigns(prev => ({ ...prev, [campaignId]: newStatus }));
+      
+      // 更新数组位置
+      const reorderedDrafts = [...otherDrafts];
+      reorderedDrafts.splice(targetIdx, 0, currentItem);
+      setDraftCampaigns(reorderedDrafts);
+
+      // 跨页处理：计算目标行所在的页码并自动跳转
+      const targetPage = Math.floor(targetIdx / itemsPerPage) + 1;
+      if (currentPage !== targetPage) {
+        setCurrentPage(targetPage);
+      }
+
+      // 进入第二阶段
+      setAnimatingInfo({ id: campaignId, phase: 'arriving', targetIndex: targetIdx });
+
+      // 定位（给 React 一个渲染页面的缓冲时间）
+      setTimeout(() => {
+        const element = document.getElementById(`campaign-row-${campaignId}`);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        
+        // 关键逻辑：等待定位完成后才开始闪烁
+        setTimeout(() => {
+          setHighlightedRowId(campaignId);
+          // 结束动画和闪烁状态
+          setTimeout(() => {
+            setAnimatingInfo({ id: null, phase: 'idle', targetIndex: null });
+            setHighlightedRowId(null);
+          }, 3000);
+        }, 600); // 滚动定位约需600ms
+      }, 100);
+    }, 400);
   };
 
   useEffect(() => {
@@ -417,31 +523,33 @@ const AutoRegeneration = ({ onPageChange }) => {
     }
   }, [autoRegen]);
 
-  // When recommendations is active (autoRegen is false), disable auto publish for all campaigns
+  // 当主卡片状态 (autoRegen) 变更时，根据记忆恢复或关闭开关
   useEffect(() => {
     if (!autoRegen) {
+      // 当 recommendations 激活时，所有开关自动关闭
       setAutoPublishCampaigns(prev => {
         const newStatus = {};
-        Object.keys(prev).forEach(id => {
-          newStatus[id] = false;
-        });
+        Object.keys(prev).forEach(id => newStatus[id] = false);
         return newStatus;
       });
     } else {
-      // When auto publish is activated, automatically enable auto publish for campaigns with AI regeneration tag
-      setAutoPublishCampaigns(prev => {
+      // 当 auto publish 重新激活时，根据记忆恢复状态
+      setAutoPublishCampaigns(() => {
         const newStatus = {};
         draftCampaigns.forEach(campaign => {
-          if (campaign.isRecommendation) {
-            newStatus[campaign.id] = true;
+          const override = manualPublishOverrides[campaign.id];
+          if (override !== null && override !== undefined) {
+            // 如果有人工操作记忆，优先应用
+            newStatus[campaign.id] = override;
           } else {
-            newStatus[campaign.id] = prev[campaign.id] || false;
+            // 如果没有记忆且带 AI 标签，自动打开
+            newStatus[campaign.id] = !!campaign.isRecommendation;
           }
         });
         return newStatus;
       });
     }
-  }, [autoRegen]);
+  }, [autoRegen, manualPublishOverrides, draftCampaigns]);
 
   const toggleTags = (cardId) => {
     setExpandedTags(prev => ({ ...prev, [cardId]: !prev[cardId] }));
@@ -814,20 +922,68 @@ const AutoRegeneration = ({ onPageChange }) => {
                   .filter(campaign => draftPlatformFilter === '' || campaign.platform === draftPlatformFilter)
                   .map((campaign, index) => {
                     const actualIndex = (currentPage - 1) * itemsPerPage + index;
+                    
+                    // 动态计算样式类
+                    let rowClass = 'border-b border-border transition-all duration-500 ';
+                    
+                    if (draggedIndex === actualIndex) {
+                      rowClass += 'opacity-40 bg-blue-50 border-2 border-dashed border-blue-200';
+                    } else if (animatingInfo.id === campaign.id) {
+                      if (animatingInfo.phase === 'leaving') {
+                        rowClass += 'row-pickup-fade';
+                      } else if (animatingInfo.phase === 'arriving') {
+                        rowClass += 'row-highlight-flash';
+                      }
+                    } else if (highlightedRowId === campaign.id) {
+                      rowClass += 'row-highlight-flash';
+                    }
+
+                    // 为腾位准备的偏移逻辑
+                    let gapStyle = {};
+                    
+                    // 情况A：自动化换位中的腾位 (始终向下移)
+                    if (animatingInfo.phase === 'leaving' && 
+                        animatingInfo.targetIndex !== null && 
+                        actualIndex >= animatingInfo.targetIndex &&
+                        campaign.id !== animatingInfo.id) {
+                      gapStyle = { transform: 'translateY(72px)', borderTop: '2px dashed rgba(59, 130, 246, 0.3)' };
+                    }
+                    
+                    // 情况B：手动拖拽中的腾位
+                    if (dragOverIndex !== null && draggedIndex !== null && campaign.id !== animatingInfo.id) {
+                      if (dragOverIndex < draggedIndex) {
+                        // 从后往前拖 (向上挪): 目标位置到原位置之间的行向下移动
+                        if (actualIndex >= dragOverIndex && actualIndex < draggedIndex) {
+                          gapStyle = { transform: 'translateY(72px)', borderTop: actualIndex === dragOverIndex ? '2px dashed rgba(59, 130, 246, 0.3)' : '' };
+                        }
+                      } else if (dragOverIndex > draggedIndex) {
+                        // 从前往后拖 (向下挪): 原位置到目标位置之间的行向上移动
+                        if (actualIndex > draggedIndex && actualIndex <= dragOverIndex) {
+                          gapStyle = { transform: 'translateY(-72px)', borderBottom: actualIndex === dragOverIndex ? '2px dashed rgba(59, 130, 246, 0.3)' : '' };
+                        }
+                      }
+                    }
+
                     return (
                   <tr 
                     key={campaign.id} 
-                    className={`hover:bg-gray-50 transition-all duration-200 ${draggedIndex === actualIndex ? 'opacity-40 bg-blue-50 border-2 border-dashed border-blue-200' : 'border-b border-border'}`}
-                    draggable={!autoRegen ? false : true}
-                    onDragStart={(e) => !autoRegen || handleDragStart(e, actualIndex)}
-                    onDragOver={(e) => !autoRegen || handleDragOver(e, actualIndex)}
-                    onDragEnd={handleDragEnd}
+                    id={`campaign-row-${campaign.id}`}
+                    className={`hover:bg-gray-50 ${rowClass}`}
+                    style={gapStyle}
+                    draggable={(!autoRegen || !autoPublishCampaigns[campaign.id]) ? false : true}
+                    onDragStart={(e) => (!autoRegen || !autoPublishCampaigns[campaign.id]) || handleDragStart(e, actualIndex)}
+                    onDragOver={(e) => (!autoRegen || !autoPublishCampaigns[campaign.id]) || handleDragOver(e, actualIndex)}
+                    onDragEnd={(e) => handleDragEnd(e, campaign.id)}
                   >
                     <td className={`px-4 py-4 ${!autoRegen ? 'bg-gray-100' : ''}`}>
                       <div className="flex items-start gap-3">
-                        <div className={`mt-1 ${!autoRegen ? 'cursor-not-allowed text-gray-300' : 'cursor-grab active:cursor-grabbing text-gray-300 hover:text-gray-600'} transition-colors`}>
-                          <GripVertical size={16} />
-                        </div>
+                        {autoRegen && autoPublishCampaigns[campaign.id] ? (
+                          <div className="mt-1 cursor-grab active:cursor-grabbing text-gray-300 hover:text-gray-600 transition-colors">
+                            <GripVertical size={16} />
+                          </div>
+                        ) : (
+                          <div className="w-4" /> /* 占位符，保持对齐 */
+                        )}
                         <div className="flex flex-col gap-2 flex-1">
                           {(actualIndex + 1) <= 6 && autoPublishCampaigns[campaign.id] && (
                             <div className="w-fit px-2 py-0.5 bg-blue-50 text-blue-600 border border-blue-100 rounded-md text-[9px] font-black tracking-tight">
@@ -837,7 +993,7 @@ const AutoRegeneration = ({ onPageChange }) => {
                           <div className="flex items-center gap-2">
                             <div 
                               className={`w-8 h-4 rounded-full p-0.5 transition-colors ${autoPublishCampaigns[campaign.id] ? 'bg-green-500' : 'bg-gray-300'} ${!autoRegen ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
-                              onClick={() => !autoRegen || setAutoPublishCampaigns(prev => ({ ...prev, [campaign.id]: !prev[campaign.id] }))}
+                              onClick={() => !autoRegen || handleToggleAutoPublish(campaign.id)}
                             >
                               <div className={`w-3 h-3 bg-white rounded-full transition-transform ${autoPublishCampaigns[campaign.id] ? 'translate-x-4' : 'translate-x-0'}`} />
                             </div>
@@ -1110,6 +1266,35 @@ const AutoRegeneration = ({ onPageChange }) => {
         .animate-particle-2 { animation: particle-2 10s ease-in-out infinite; }
         .animate-particle-3 { animation: particle-3 9s ease-in-out infinite; }
         .animate-system-rotate-slow { animation: system-rotate-slow 360s linear infinite; }
+
+        @keyframes row-flash {
+          0%, 100% { background-color: transparent; }
+          50% { background-color: rgba(59, 130, 246, 0.15); }
+        }
+        .row-highlight-flash {
+          animation: row-flash 1s ease-in-out 3;
+          position: relative;
+          z-index: 10;
+        }
+
+        .row-pickup-fade {
+          opacity: 0;
+          transform: scale(0.95);
+          filter: blur(4px);
+          pointer-events: none;
+        }
+
+        /* 已移除 row-gap-opening 类，改用内联 style 动态计算方向 */
+
+        .row-dragging {
+          opacity: 0.5;
+          background-color: #f8faff;
+        }
+
+        /* 确保表格行平滑过渡 */
+        tr {
+          transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease, filter 0.4s ease;
+        }
       `}</style>
     </div>
   );
