@@ -1084,6 +1084,12 @@ const AutoRegeneration = ({ onPageChange }) => {
                     // 动态计算样式类
                     let rowClass = 'border-b border-border transition-all duration-500 ';
                     
+                    const isPublishing = !!campaignStatus[campaign.id];
+
+                    if (isPublishing) {
+                      rowClass += 'opacity-50 pointer-events-none grayscale-[0.5] bg-gray-50/50 ';
+                    }
+
                     if (draggedIndex === actualIndex) {
                       rowClass += 'opacity-40 bg-blue-50 border-2 border-dashed border-blue-200';
                     } else if (animatingInfo.id === campaign.id) {
@@ -1222,17 +1228,24 @@ const AutoRegeneration = ({ onPageChange }) => {
                     </td>
                     <td className="px-4 py-4"><div className="text-sm text-gray-600">{campaign.updateTime}</div></td>
                     <td className="px-4 py-4">
-                      <div className="flex items-center gap-2">
-                        <button onClick={() => handleEditDraft(campaign.id)} className="flex items-center gap-1.5 px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-300 hover:text-primary transition-all duration-200 cursor-pointer">
-                          <Edit size={14} /> <span>Edit</span>
-                        </button>
-                        <button onClick={() => handlePublishDraft(campaign.id)} className="flex items-center gap-1.5 px-3 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary-hover hover:shadow-md transition-all duration-200 cursor-pointer">
-                          <Send size={14} /> <span>Publish</span>
-                        </button>
-                        <button onClick={() => handleDelete(campaign.id)} className="flex items-center justify-center p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 hover:text-red-700 transition-all duration-200 cursor-pointer">
-                          <Trash2 size={14} />
-                        </button>
-                      </div>
+                      {campaignStatus[campaign.id] ? (
+                        <div className="flex items-center gap-1.5 px-3 py-2 bg-blue-50 text-blue-600 border border-blue-100 rounded-lg text-sm font-bold animate-pulse">
+                          <RefreshCw size={14} className="animate-spin" />
+                          <span>Publishing...</span>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          <button onClick={() => handleEditDraft(campaign.id)} className="flex items-center gap-1.5 px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-300 hover:text-primary transition-all duration-200 cursor-pointer">
+                            <Edit size={14} /> <span>Edit</span>
+                          </button>
+                          <button onClick={() => handlePublishDraft(campaign.id)} className="flex items-center gap-1.5 px-3 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary-hover hover:shadow-md transition-all duration-200 cursor-pointer">
+                            <Send size={14} /> <span>Publish</span>
+                          </button>
+                          <button onClick={() => handleDelete(campaign.id)} className="flex items-center justify-center p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 hover:text-red-700 transition-all duration-200 cursor-pointer">
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
+                      )}
                     </td>
                   </tr>
                 );})}
