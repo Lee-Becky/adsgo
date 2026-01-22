@@ -417,6 +417,32 @@ const AutoRegeneration = ({ onPageChange }) => {
     }
   }, [autoRegen]);
 
+  // When recommendations is active (autoRegen is false), disable auto publish for all campaigns
+  useEffect(() => {
+    if (!autoRegen) {
+      setAutoPublishCampaigns(prev => {
+        const newStatus = {};
+        Object.keys(prev).forEach(id => {
+          newStatus[id] = false;
+        });
+        return newStatus;
+      });
+    } else {
+      // When auto publish is activated, automatically enable auto publish for campaigns with AI regeneration tag
+      setAutoPublishCampaigns(prev => {
+        const newStatus = {};
+        draftCampaigns.forEach(campaign => {
+          if (campaign.isRecommendation) {
+            newStatus[campaign.id] = true;
+          } else {
+            newStatus[campaign.id] = prev[campaign.id] || false;
+          }
+        });
+        return newStatus;
+      });
+    }
+  }, [autoRegen]);
+
   const toggleTags = (cardId) => {
     setExpandedTags(prev => ({ ...prev, [cardId]: !prev[cardId] }));
   };
@@ -594,7 +620,7 @@ const AutoRegeneration = ({ onPageChange }) => {
                   </div>
                 </div>
                 <p className="text-sm text-gray-500 mt-2 leading-none">
-                  Once an AI recommendation campaign is deleted, it will not be published.
+                Showcasing the top 3 campaigns for auto-publish order.
                 </p>
               </div>
             </div>
@@ -622,7 +648,7 @@ const AutoRegeneration = ({ onPageChange }) => {
                     <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center border border-blue-50">
                       <img src="https://www.adsgo.ai/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Frobot-active.7003b4d8.png&w=256&q=75" alt="AI Robot" className="w-5 h-5" />
                     </div>
-                    <span className="text-[14px] font-black text-blue-600 tracking-tight">Ai-scaling control center</span>
+                    <span className="text-[14px] font-black text-blue-600 tracking-tight">AI-Scaling Control Center</span>
                   </div>
                 </div>
                 <div className="ad-card flex flex-col items-stretch p-0 bg-gray-50/30 border-dashed border-2 border-gray-200 min-h-[550px] relative group shadow-sm hover:shadow-md transition-shadow">
@@ -640,7 +666,7 @@ const AutoRegeneration = ({ onPageChange }) => {
                         <div className="absolute inset-0 flex items-center justify-center scale-[0.7]">
                           <div className="relative z-[20] w-32 h-32 bg-white/20 backdrop-blur-md border-2 border-white/40 rounded-[28px] flex flex-col items-center justify-center shadow-2xl animate-pulse-slow">
                             <Sparkles className="w-14 h-14 text-white" />
-                            <div className="text-[13px] text-white font-black mt-2 whitespace-nowrap tracking-wider">Generating</div>
+                            <div className="text-[15px] text-white font-black mt-2 whitespace-nowrap tracking-wider">Regenerating</div>
                           </div>
 
                           <div className="absolute inset-0 flex items-center justify-center">
@@ -706,7 +732,7 @@ const AutoRegeneration = ({ onPageChange }) => {
                           </div>
                           <p className={`text-[14px] font-black mb-1.5 tracking-tight ${!autoRegen ? 'text-blue-700' : 'text-slate-800'}`}>Recommendations</p>
                           <div className={`flex items-center gap-1 px-2 py-0.5 rounded-full border transition-all duration-300 ${!autoRegen ? 'bg-blue-600 border-blue-600 text-white shadow-sm' : 'bg-slate-50 border-slate-100 text-slate-300'}`}>
-                            <div className={`w-1 h-1 rounded-full ${!autoRegen ? 'bg-white animate-pulse' : 'bg-slate-300'}`} /><span className="text-[7px] font-black tracking-wider">{!autoRegen ? 'Running' : 'Standby'}</span>
+                            <div className={`w-1 h-1 rounded-full ${!autoRegen ? 'bg-white animate-pulse' : 'bg-slate-300'}`} /><span className="text-[9px] font-black tracking-wider">{!autoRegen ? 'Running' : 'Standby'}</span>
                           </div>
                         </div>
 
@@ -724,7 +750,7 @@ const AutoRegeneration = ({ onPageChange }) => {
                           </div>
                           <p className={`text-[14px] font-black mb-1.5 tracking-tight relative z-10 ${autoRegen ? 'text-white' : 'text-slate-800'}`}>Auto Publish</p>
                           <div className={`relative z-10 flex items-center gap-1 px-2 py-0.5 rounded-full border transition-all duration-300 ${autoRegen ? 'bg-indigo-600 border-indigo-500 text-white shadow-md' : 'bg-slate-50 border-slate-100 text-slate-300'}`}>
-                            <div className={`w-1 h-1 rounded-full ${autoRegen ? 'bg-green-400 animate-ping' : 'bg-slate-300'}`} /><span className="text-[7px] font-black tracking-wider">{autoRegen ? 'Active' : 'Standby'}</span>
+                            <div className={`w-1 h-1 rounded-full ${autoRegen ? 'bg-green-400 animate-ping' : 'bg-slate-300'}`} /><span className="text-[9px] font-black tracking-wider">{autoRegen ? 'Running' : 'Standby'}</span>
                           </div>
                           <div className="absolute top-1.5 right-1.5 z-20">
                             <div className={`bg-slate-900 text-white text-[9px] font-black px-1.5 py-0.5 rounded-md leading-tight shadow-sm flex items-center gap-0.5 animate-pulse`}><ShieldCheck size={14} className="text-[#7033f5]" /><span>7*24H</span></div>
@@ -748,7 +774,7 @@ const AutoRegeneration = ({ onPageChange }) => {
               More drafts awaiting publish
             </h2>
             <p className="text-sm text-gray-500 mt-2 leading-none">
-              Campaigns tagged with "AI regeneration" will be available in the Recommended publish waitlist.
+            When Auto Publish is running, you can choose whether a campaign participates and set its publish order.
             </p>
           </div>
 
@@ -773,7 +799,7 @@ const AutoRegeneration = ({ onPageChange }) => {
             <table className="w-full">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 min-w-[140px]">Auto Publish</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 min-w-[140px]">Auto Publish Order</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 min-w-[180px]">Campaign</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 min-w-[120px]">Daily Budget</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 min-w-[200px]">Audience</th>
@@ -792,31 +818,31 @@ const AutoRegeneration = ({ onPageChange }) => {
                   <tr 
                     key={campaign.id} 
                     className={`hover:bg-gray-50 transition-all duration-200 ${draggedIndex === actualIndex ? 'opacity-40 bg-blue-50 border-2 border-dashed border-blue-200' : 'border-b border-border'}`}
-                    draggable
-                    onDragStart={(e) => handleDragStart(e, actualIndex)}
-                    onDragOver={(e) => handleDragOver(e, actualIndex)}
+                    draggable={!autoRegen ? false : true}
+                    onDragStart={(e) => !autoRegen || handleDragStart(e, actualIndex)}
+                    onDragOver={(e) => !autoRegen || handleDragOver(e, actualIndex)}
                     onDragEnd={handleDragEnd}
                   >
-                    <td className="px-4 py-4">
+                    <td className={`px-4 py-4 ${!autoRegen ? 'bg-gray-100' : ''}`}>
                       <div className="flex items-start gap-3">
-                        <div className="mt-1 cursor-grab active:cursor-grabbing text-gray-300 hover:text-gray-600 transition-colors">
+                        <div className={`mt-1 ${!autoRegen ? 'cursor-not-allowed text-gray-300' : 'cursor-grab active:cursor-grabbing text-gray-300 hover:text-gray-600'} transition-colors`}>
                           <GripVertical size={16} />
                         </div>
                         <div className="flex flex-col gap-2 flex-1">
-                          {(actualIndex + 1) <= 6 && (
+                          {(actualIndex + 1) <= 6 && autoPublishCampaigns[campaign.id] && (
                             <div className="w-fit px-2 py-0.5 bg-blue-50 text-blue-600 border border-blue-100 rounded-md text-[9px] font-black tracking-tight">
                               Sequence {actualIndex + 1}
                             </div>
                           )}
                           <div className="flex items-center gap-2">
                             <div 
-                              className={`w-8 h-4 rounded-full p-0.5 cursor-pointer transition-colors ${autoPublishCampaigns[campaign.id] ? 'bg-green-500' : 'bg-gray-300'}`}
-                              onClick={() => setAutoPublishCampaigns(prev => ({ ...prev, [campaign.id]: !prev[campaign.id] }))}
+                              className={`w-8 h-4 rounded-full p-0.5 transition-colors ${autoPublishCampaigns[campaign.id] ? 'bg-green-500' : 'bg-gray-300'} ${!autoRegen ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
+                              onClick={() => !autoRegen || setAutoPublishCampaigns(prev => ({ ...prev, [campaign.id]: !prev[campaign.id] }))}
                             >
                               <div className={`w-3 h-3 bg-white rounded-full transition-transform ${autoPublishCampaigns[campaign.id] ? 'translate-x-4' : 'translate-x-0'}`} />
                             </div>
-                            <span className={`text-[10px] font-bold ${autoPublishCampaigns[campaign.id] ? 'text-green-600' : 'text-gray-500'}`}>
-                              {autoPublishCampaigns[campaign.id] ? 'Allowed' : 'Prohibited'}
+                            <span className={`text-[10px] font-bold ${autoPublishCampaigns[campaign.id] ? 'text-green-600' : 'text-red-600'} ${!autoRegen ? 'opacity-50' : ''}`}>
+                              {autoPublishCampaigns[campaign.id] ? 'Waiting' : 'Forbidden'}
                             </span>
                           </div>
                         </div>
