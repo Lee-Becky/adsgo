@@ -571,7 +571,63 @@ const AutoRegeneration = ({ onPageChange }) => {
     setDraftCampaigns(prev => prev.filter(campaign => campaign.id !== cardId));
   };
 
-  const displayedCards = CAMPAIGN_CARDS.filter(card => !hiddenCards.has(card.id));
+  // 获取未被手动关闭campaign开关的前3个campaign
+  const getRecommendedCards = () => {
+    // 根据当前激活的功能卡片决定使用哪个状态
+    // 当recommendations功能卡片激活时（!autoRegen）：使用manualPublishOverrides（记忆的人工操作状态）
+    // 当auto publish功能卡片激活时（autoRegen）：使用autoPublishCampaigns（真实的开关状态）
+    const statusToUse = autoRegen ? autoPublishCampaigns : manualPublishOverrides;
+    
+    // 过滤出未被手动关闭的campaign
+    // 对于recommendations模式：记忆状态为true或null（无操作）且带AI标签的campaign
+    // 对于auto publish模式：开关状态为true的campaign
+    const enabledCampaigns = draftCampaigns.filter(campaign => {
+      const status = statusToUse[campaign.id];
+      
+      if (autoRegen) {
+        // auto publish模式：只展示开关开启的campaign
+        return status === true && !hiddenCards.has(campaign.id);
+      } else {
+        // recommendations模式：展示AI标签的campaign（记忆状态为true或null）
+        // 如果有人工关闭记录（false），则不展示
+        return campaign.isRecommendation && 
+               status !== false && 
+               !hiddenCards.has(campaign.id);
+      }
+    });
+    
+    // 取前3个，并转换为RecommendationCard需要的格式
+    const top3 = enabledCampaigns.slice(0, 3);
+    
+    return top3.map((campaign, index) => {
+      // 如果campaign有originalCard（来自CAMPAIGN_CARDS），使用它
+      if (campaign.originalCard) {
+        return campaign.originalCard;
+      }
+      
+      // 否则，根据campaign数据创建一个card对象
+      const hasImage = campaign.creatives.some(c => c.type === 'image' || c.type === 'carousel');
+      const interests = campaign.audience.includes('(') 
+        ? campaign.audience.substring(campaign.audience.indexOf('(') + 1, campaign.audience.indexOf(')'))
+        : campaign.audience;
+      
+      return {
+        id: campaign.id,
+        hasImage: hasImage,
+        currentImgIndex: 0,
+        selected: true,
+        cta: 'Shop Now',
+        headline: `${campaign.campaignName} - Special Offer`,
+        text: `Targeting ${campaign.audience} with optimized creatives.`,
+        audience: campaign.audience,
+        age: '18-45',
+        gender: 'All',
+        interests: interests
+      };
+    });
+  };
+
+  const displayedCards = getRecommendedCards();
 
   // Pagination Logic
   const totalPages = Math.ceil(draftCampaigns.length / itemsPerPage);
