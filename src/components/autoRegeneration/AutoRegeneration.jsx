@@ -509,21 +509,7 @@ const AutoRegeneration = ({ onPageChange }) => {
     }, 400);
   };
 
-  useEffect(() => {
-    if (autoRegen) {
-      const autoStatus = {};
-      CAMPAIGN_CARDS.forEach(card => {
-        if (!campaignStatus[card.id]) {
-          autoStatus[card.id] = 'auto';
-        }
-      });
-      if (Object.keys(autoStatus).length > 0) {
-        setCampaignStatus(prev => ({ ...prev, ...autoStatus }));
-      }
-    }
-  }, [autoRegen]);
-
-  // 当主卡片状态 (autoRegen) 变更时，根据记忆恢复或关闭开关
+  // 当主卡片状态 (autoRegen) 变更时，根据记忆恢复或关闭开关，并触发激活时的发布动作
   useEffect(() => {
     if (!autoRegen) {
       // 当 recommendations 激活时，所有开关自动关闭
@@ -534,22 +520,38 @@ const AutoRegeneration = ({ onPageChange }) => {
       });
     } else {
       // 当 auto publish 重新激活时，根据记忆恢复状态
-      setAutoPublishCampaigns(() => {
-        const newStatus = {};
-        draftCampaigns.forEach(campaign => {
-          const override = manualPublishOverrides[campaign.id];
-          if (override !== null && override !== undefined) {
-            // 如果有人工操作记忆，优先应用
-            newStatus[campaign.id] = override;
-          } else {
-            // 如果没有记忆且带 AI 标签，自动打开
-            newStatus[campaign.id] = !!campaign.isRecommendation;
-          }
-        });
-        return newStatus;
+      const newAutoPublishStatus = {};
+      draftCampaigns.forEach(campaign => {
+        const override = manualPublishOverrides[campaign.id];
+        if (override !== null && override !== undefined) {
+          // 如果有人工操作记忆，优先应用
+          newAutoPublishStatus[campaign.id] = override;
+        } else {
+          // 如果没有记忆且带 AI 标签，自动打开
+          newAutoPublishStatus[campaign.id] = !!campaign.isRecommendation;
+        }
       });
+      
+      setAutoPublishCampaigns(newAutoPublishStatus);
+
+      // 激活时的发布逻辑：从当前开启的项中选取前3个
+      const autoStatus = {};
+      const cardsToPublish = draftCampaigns
+        .filter(campaign => newAutoPublishStatus[campaign.id] === true && !hiddenCards.has(campaign.id))
+        .slice(0, 3);
+
+      cardsToPublish.forEach(card => {
+        if (!campaignStatus[card.id]) {
+          autoStatus[card.id] = 'auto';
+        }
+      });
+
+      if (Object.keys(autoStatus).length > 0) {
+        setCampaignStatus(prev => ({ ...prev, ...autoStatus }));
+      }
     }
-  }, [autoRegen, manualPublishOverrides, draftCampaigns]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoRegen]);
 
   const toggleTags = (cardId) => {
     setExpandedTags(prev => ({ ...prev, [cardId]: !prev[cardId] }));
@@ -957,18 +959,18 @@ const AutoRegeneration = ({ onPageChange }) => {
                         <div className="flex gap-1.5 items-center px-0.5">
                           <div className="flex-1 bg-gray-50 border border-gray-100 rounded-lg p-1.5 flex flex-col">
                             <span className="text-[10px] font-bold text-gray-400 leading-none mb-1">Recommendations</span>
-                            <span className="text-sm font-black text-gray-900 leading-none">5</span>
+                            <span className="text-sm font-black text-gray-900 leading-none">{aiRegenerationCount}</span>
                           </div>
                           <i className="fas fa-arrow-right text-[10px] text-gray-300"></i>
                           <div className="flex-1 bg-white border-2 border-primary rounded-lg p-1.5 flex flex-col relative shadow-sm">
                             <span className="text-[10px] font-bold text-primary leading-none mb-1">Published</span>
-                            <span className="text-sm font-black text-gray-900 leading-none text-center">{String(Object.keys(campaignStatus).length + 1)}</span>
+                            <span className="text-sm font-black text-gray-900 leading-none text-center">{Object.keys(campaignStatus).length}</span>
                           </div>
                         </div>
                         <div className="px-0.5">
                           <div className="w-full bg-[#eff6ff] border border-primary/10 rounded-lg p-1.5 flex items-center justify-between">
                             <span className="text-[10px] font-bold text-gray-500">Reserved</span>
-                            <span className="text-sm font-black text-primary leading-none">{String(5 - (Object.keys(campaignStatus).length + 1))}</span>
+                            <span className="text-sm font-black text-primary leading-none">{Math.max(0, aiRegenerationCount - Object.keys(campaignStatus).length)}</span>
                           </div>
                         </div>
                       </div>
