@@ -682,11 +682,17 @@ const AutoRegeneration = ({ onPageChange }) => {
   const aiRegenerationCount = getAIRegenerationCount();
   const isRefreshDisabled = aiRegenerationCount > 10;
 
-  // 刷新按钮点击处理：生成2-4条带有AI Regeneration标签的新campaign
+  // 刷新按钮点击处理：生成1-4条带有AI Regeneration标签的新campaign
   const handleRefresh = () => {
     if (isRefreshDisabled) return;
 
-    const numNewCampaigns = Math.floor(Math.random() * 3) + 2; // 2-4条
+    // 计算最多还能添加几个，不超过10个，且单次添加1-4个
+    const remainingQuota = 10 - aiRegenerationCount;
+    if (remainingQuota <= 0) return;
+    
+    const maxToAdd = Math.min(4, remainingQuota);
+    const numNewCampaigns = Math.floor(Math.random() * maxToAdd) + 1; // 1 to maxToAdd
+    
     const formatDate = (date) => {
       const pad = (n) => n.toString().padStart(2, '0');
       return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
@@ -859,10 +865,10 @@ const AutoRegeneration = ({ onPageChange }) => {
                     <div className="relative group/tooltip">
                       <RefreshCw 
                         size={12} 
-                        className={`${isRefreshDisabled ? 'text-gray-300 cursor-not-allowed' : 'text-gray-400 group-hover/tooltip:text-blue-500 group-hover/tooltip:rotate-180 transition-all duration-500 cursor-pointer'}`} 
+                        className={`${aiRegenerationCount >= 10 ? 'text-gray-300 cursor-not-allowed' : 'text-gray-400 group-hover/tooltip:text-blue-500 group-hover/tooltip:rotate-180 transition-all duration-500 cursor-pointer'}`} 
                         onClick={handleRefresh}
                       />
-                      {isRefreshDisabled && (
+                      {aiRegenerationCount >= 10 && (
                         <div className="absolute top-full right-0 mt-2 w-72 bg-gray-900 text-white text-xs font-medium rounded-lg p-3 opacity-0 group-hover/tooltip:opacity-100 transition-opacity duration-200 pointer-events-none z-20">
                           <div className="flex items-start gap-2">
                             <AlertCircle size={14} className="text-yellow-400 flex-shrink-0 mt-0.5" />
@@ -1070,6 +1076,11 @@ const AutoRegeneration = ({ onPageChange }) => {
                   .map((campaign, index) => {
                     const actualIndex = (currentPage - 1) * itemsPerPage + index;
                     
+                    // 实时计算 Sequence 编号：在所有开启项中的全局索引 + 1
+                    const sequenceNumber = draftCampaigns
+                      .filter(c => autoPublishCampaigns[c.id])
+                      .findIndex(c => c.id === campaign.id) + 1;
+
                     // 动态计算样式类
                     let rowClass = 'border-b border-border transition-all duration-500 ';
                     
@@ -1122,7 +1133,13 @@ const AutoRegeneration = ({ onPageChange }) => {
                     onDragOver={(e) => (!autoRegen || !autoPublishCampaigns[campaign.id]) || handleDragOver(e, actualIndex)}
                     onDragEnd={(e) => handleDragEnd(e, campaign.id)}
                   >
-                    <td className={`px-4 py-4 ${!autoRegen ? 'bg-gray-100' : ''}`}>
+                    <td className={`px-4 py-4 relative group/column-tooltip ${!autoRegen ? 'bg-gray-100 cursor-help' : ''}`}>
+                      {!autoRegen && (
+                        <div className="absolute left-full top-1/2 -translate-y-1/2 ml-2 w-64 bg-gray-900 text-white text-[11px] font-medium rounded-lg p-3 opacity-0 group-hover/column-tooltip:opacity-100 transition-opacity duration-200 pointer-events-none z-50 shadow-xl leading-relaxed">
+                          Currently, recommendations are in running state. AdsGo does not automatically publish campaigns, so this column cannot be operated.
+                          <div className="absolute right-full top-1/2 -translate-y-1/2 w-2 h-2 bg-gray-900 rotate-45 -mr-1"></div>
+                        </div>
+                      )}
                       <div className="flex items-start gap-3">
                         {autoRegen && autoPublishCampaigns[campaign.id] ? (
                           <div className="mt-1 cursor-grab active:cursor-grabbing text-gray-300 hover:text-gray-600 transition-colors">
@@ -1132,9 +1149,9 @@ const AutoRegeneration = ({ onPageChange }) => {
                           <div className="w-4" /> /* 占位符，保持对齐 */
                         )}
                         <div className="flex flex-col gap-2 flex-1">
-                          {(actualIndex + 1) <= 6 && autoPublishCampaigns[campaign.id] && (
+                          {autoPublishCampaigns[campaign.id] && sequenceNumber > 0 && (
                             <div className="w-fit px-2 py-0.5 bg-blue-50 text-blue-600 border border-blue-100 rounded-md text-[9px] font-black tracking-tight">
-                              Sequence {actualIndex + 1}
+                              Sequence {sequenceNumber}
                             </div>
                           )}
                           <div className="flex items-center gap-2">
@@ -1161,7 +1178,12 @@ const AutoRegeneration = ({ onPageChange }) => {
                             </span>
                           )}
                         </div>
-                        <div className="font-medium text-gray-900 text-sm mb-1">{campaign.campaignName}</div>
+                        <div 
+                          className="font-medium text-gray-900 text-sm mb-1 truncate max-w-[180px]" 
+                          title={campaign.campaignName}
+                        >
+                          {campaign.campaignName}
+                        </div>
                       </div>
                     </td>
                     <td className="px-4 py-4">
@@ -1301,7 +1323,7 @@ const AutoRegeneration = ({ onPageChange }) => {
       {deleteConfirmOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="absolute inset-0 bg-black/50" onClick={handleDeleteCancel}></div>
-          <div className="relative bg-white rounded-xl shadow-lg p-6 w-full max-w-md mx-4">
+          <div className="relative bg-white rounded-xl shadow-lg p-6 w-full max-md mx-4">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Delete campaign draft</h3>
             <p className="text-gray-600 mb-6">Once deleted, it cannot be recovered. Confirm deletion?</p>
             <div className="flex justify-end gap-3">
