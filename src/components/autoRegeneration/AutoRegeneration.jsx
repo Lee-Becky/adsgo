@@ -4,7 +4,7 @@ import {
   IMAGE_POOL,
   PLATFORM_LOGOS
 } from './mockData';
-import { Edit, Send, X, Check, Sparkles, Trash2, ChevronDown, Infinity, Clock, RefreshCw, ShieldCheck, GripVertical } from 'lucide-react';
+import { Edit, Send, X, Check, Sparkles, Trash2, ChevronDown, Infinity, Clock, RefreshCw, ShieldCheck, GripVertical, AlertCircle } from 'lucide-react';
 
 // --- Sub Components ---
 
@@ -578,26 +578,29 @@ const AutoRegeneration = ({ onPageChange }) => {
     // 当auto publish功能卡片激活时（autoRegen）：使用autoPublishCampaigns（真实的开关状态）
     const statusToUse = autoRegen ? autoPublishCampaigns : manualPublishOverrides;
     
-    // 过滤出未被手动关闭的campaign
-    // 对于recommendations模式：记忆状态为true或null（无操作）且带AI标签的campaign
-    // 对于auto publish模式：开关状态为true的campaign
-    const enabledCampaigns = draftCampaigns.filter(campaign => {
-      const status = statusToUse[campaign.id];
-      
-      if (autoRegen) {
-        // auto publish模式：只展示开关开启的campaign
-        return status === true && !hiddenCards.has(campaign.id);
-      } else {
-        // recommendations模式：展示AI标签的campaign（记忆状态为true或null）
-        // 如果有人工关闭记录（false），则不展示
-        return campaign.isRecommendation && 
-               status !== false && 
-               !hiddenCards.has(campaign.id);
-      }
-    });
+    let enabledCampaigns = [];
     
-    // 取前3个，并转换为RecommendationCard需要的格式
-    const top3 = enabledCampaigns.slice(0, 3);
+    if (autoRegen) {
+      // auto publish模式：按照表格第一列的顺序，选择开关开启的前3个campaign
+      // 表格中的顺序就是draftCampaigns数组的顺序
+      enabledCampaigns = draftCampaigns
+        .filter(campaign => autoPublishCampaigns[campaign.id] === true && !hiddenCards.has(campaign.id))
+        .slice(0, 3); // 按表格顺序取前3个
+    } else {
+      // recommendations模式：展示AI标签的campaign（记忆状态为true或null）
+      // 如果有人工关闭记录（false），则不展示
+      enabledCampaigns = draftCampaigns
+        .filter(campaign => {
+          const status = statusToUse[campaign.id];
+          return campaign.isRecommendation && 
+                 status !== false && 
+                 !hiddenCards.has(campaign.id);
+        })
+        .slice(0, 3); // 取前3个
+    }
+    
+    // 转换为RecommendationCard需要的格式
+    const top3 = enabledCampaigns;
     
     return top3.map((campaign, index) => {
       // 如果campaign有originalCard（来自CAMPAIGN_CARDS），使用它
@@ -668,6 +671,77 @@ const AutoRegeneration = ({ onPageChange }) => {
   const handleBudgetCancel = () => { setEditingBudget(null); setTempBudget(''); };
 
   const formatCurrency = (value) => `$${value.toFixed(2)}`;
+
+  // 计算带有AI regeneration标签的campaign数量
+  const getAIRegenerationCount = () => {
+    return draftCampaigns.filter(campaign => campaign.isRecommendation).length;
+  };
+
+  const aiRegenerationCount = getAIRegenerationCount();
+  const isRefreshDisabled = aiRegenerationCount > 10;
+
+  // 刷新按钮点击处理：生成2-4条带有AI Regeneration标签的新campaign
+  const handleRefresh = () => {
+    if (isRefreshDisabled) return;
+
+    const numNewCampaigns = Math.floor(Math.random() * 3) + 2; // 2-4条
+    const formatDate = (date) => {
+      const pad = (n) => n.toString().padStart(2, '0');
+      return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+    };
+
+    const audiences = [
+      'Tech Enthusiasts (25-40)',
+      'Fashion Forward (18-35)',
+      'Home Decor Lovers (30-50)',
+      'Fitness Buffs (20-45)',
+      'Pet Owners (25-55)',
+      'Travel Seekers (25-45)',
+      'Foodies (20-50)',
+      'Gamers (18-35)'
+    ];
+
+    const newCampaigns = Array.from({ length: numNewCampaigns }, (_, i) => {
+      const audience = audiences[Math.floor(Math.random() * audiences.length)];
+      const hasImage = Math.random() > 0.3;
+      const creativeType = hasImage ? (Math.random() > 0.5 ? 'image' : 'carousel') : 'video';
+      
+      return {
+        id: `ai-regen-${Date.now()}-${i}`,
+        platform: 'Meta',
+        campaignName: `${audience.split('(')[0].trim()} Campaign - AI Generated`,
+        dailyBudget: Math.floor(Math.random() * 300) + 100,
+        audience: audience,
+        creatives: [
+          { id: `ac${i}-1`, name: `Creative ${i + 1}`, type: creativeType }
+        ],
+        product: { type: 'url', value: 'https://example.com/ai-campaign' },
+        updateTime: formatDate(new Date()),
+        isRecommendation: true
+      };
+    });
+
+    // 添加新campaign到draftCampaigns数组开头
+    setDraftCampaigns(prev => [...newCampaigns, ...prev]);
+
+    // 更新manualPublishOverrides状态：新添加的AI regeneration campaign初始状态为null（无人工操作）
+    setManualPublishOverrides(prev => {
+      const newOverrides = { ...prev };
+      newCampaigns.forEach(campaign => {
+        newOverrides[campaign.id] = null;
+      });
+      return newOverrides;
+    });
+
+    // 更新autoPublishCampaigns状态：新添加的AI regeneration campaign根据当前autoRegen状态设置
+    setAutoPublishCampaigns(prev => {
+      const newStatus = { ...prev };
+      newCampaigns.forEach(campaign => {
+        newStatus[campaign.id] = autoRegen; // 随当前系统状态
+      });
+      return newStatus;
+    });
+  };
 
   const getPlatformLogo = (platform) => {
     switch (platform) {
@@ -776,11 +850,26 @@ const AutoRegeneration = ({ onPageChange }) => {
                   <h2 className="text-xl font-bold text-gray-900 leading-none">
                     Recommended publish waitlists
                   </h2>
-                  <div className="flex items-center gap-2 px-2.5 py-1 bg-gray-100 rounded-lg border border-gray-200 shadow-sm transition-all hover:bg-gray-200 group/time cursor-default">
+                  <div className={`flex items-center gap-2 px-2.5 py-1 rounded-lg border shadow-sm transition-all ${isRefreshDisabled ? 'bg-gray-50 border-gray-200 cursor-not-allowed' : 'bg-gray-100 border-gray-200 hover:bg-gray-200 group/time cursor-default'}`}>
                     <Clock size={12} className="text-blue-500" />
                     <span className="text-[11px] font-black text-gray-600">2026-01-21 19:25</span>
                     <div className="w-px h-3 bg-gray-300 mx-0.5"></div>
-                    <RefreshCw size={12} className="text-gray-400 group-hover/time:text-blue-500 group-hover/time:rotate-180 transition-all duration-500 cursor-pointer" />
+                    <div className="relative group/tooltip">
+                      <RefreshCw 
+                        size={12} 
+                        className={`${isRefreshDisabled ? 'text-gray-300 cursor-not-allowed' : 'text-gray-400 group-hover/tooltip:text-blue-500 group-hover/tooltip:rotate-180 transition-all duration-500 cursor-pointer'}`} 
+                        onClick={handleRefresh}
+                      />
+                      {isRefreshDisabled && (
+                        <div className="absolute top-full right-0 mt-2 w-72 bg-gray-900 text-white text-xs font-medium rounded-lg p-3 opacity-0 group-hover/tooltip:opacity-100 transition-opacity duration-200 pointer-events-none z-20">
+                          <div className="flex items-start gap-2">
+                            <AlertCircle size={14} className="text-yellow-400 flex-shrink-0 mt-0.5" />
+                            <span>AI has recommended 10 campaigns. You can delete some and then refresh to get new recommendations.</span>
+                          </div>
+                          <div className="absolute top-0 right-4 -mt-1 w-2 h-2 bg-gray-900 rotate-45"></div>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
                 <p className="text-sm text-gray-500 mt-2 leading-none">
