@@ -218,25 +218,6 @@ const AutoRegeneration = ({ onPageChange }) => {
   const [manualPublishOverrides, setManualPublishOverrides] = useState({});
   const [autoPublishCampaigns, setAutoPublishCampaigns] = useState({});
   
-  // 统一初始化逻辑
-  useEffect(() => {
-    const initialOverrides = {};
-    const initialStatus = {};
-    
-    draftCampaigns.forEach(campaign => {
-      if (campaign.isRecommendation) {
-        initialOverrides[campaign.id] = null; // AI 标签不带人工标签
-        initialStatus[campaign.id] = autoRegen; // 随系统状态
-      } else {
-        initialOverrides[campaign.id] = false; // 非 AI 标签视为人工操作的关闭态
-        initialStatus[campaign.id] = false;
-      }
-    });
-    
-    setManualPublishOverrides(initialOverrides);
-    setAutoPublishCampaigns(initialStatus);
-  }, []);
-  
   // Merge campaign cards with draft campaigns
   const [draftCampaigns, setDraftCampaigns] = useState(() => {
     const formatDate = (date) => {
@@ -389,6 +370,26 @@ const AutoRegeneration = ({ onPageChange }) => {
       }
     ];
   });
+
+  // 统一初始化逻辑
+  useEffect(() => {
+    const initialOverrides = {};
+    const initialStatus = {};
+    
+    draftCampaigns.forEach(campaign => {
+      if (campaign.isRecommendation) {
+        initialOverrides[campaign.id] = null; // AI 标签不带人工标签
+        initialStatus[campaign.id] = autoRegen; // 随系统状态
+      } else {
+        initialOverrides[campaign.id] = false; // 非 AI 标签视为人工操作的关闭态
+        initialStatus[campaign.id] = false;
+      }
+    });
+    
+    setManualPublishOverrides(initialOverrides);
+    setAutoPublishCampaigns(initialStatus);
+  }, []);
+  
   const [editingBudget, setEditingBudget] = useState(null);
   const [tempBudget, setTempBudget] = useState('');
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
@@ -634,9 +635,17 @@ const AutoRegeneration = ({ onPageChange }) => {
 
   const displayedCards = getRecommendedCards();
 
-  // Pagination Logic
-  const totalPages = Math.ceil(draftCampaigns.length / itemsPerPage);
-  const paginatedDrafts = draftCampaigns.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  // Filter campaigns by platform BEFORE pagination
+  const filteredDrafts = draftCampaigns.filter(campaign => campaign.platform === selectedPlatform);
+
+  // Pagination Logic based on filtered results
+  const totalPages = Math.ceil(filteredDrafts.length / itemsPerPage);
+  const paginatedDrafts = filteredDrafts.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+  // Reset to first page when platform changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedPlatform]);
 
   const goToPage = (page) => {
     if (page >= 1 && page <= totalPages) {
@@ -821,514 +830,516 @@ const AutoRegeneration = ({ onPageChange }) => {
   return (
     <div className="min-h-screen bg-background p-4 md:p-6 font-sans">
       <div className="flex-1 flex flex-col gap-4">
-        {/* Meta Launch Recommendation Section */}
-        <div className="bg-white rounded-xl border border-border shadow-sm p-4 md:p-6">
-          <div className="mb-6 px-2">
-            <div className="bg-gray-100 p-0.5 rounded-full flex gap-1 w-fit">
-              {['Meta', 'Google', 'TikTok', 'Bing'].map(p => (
-                <div key={p} className="relative group">
-                  <button
-                    onClick={() => p === 'Meta' && setSelectedPlatform(p)}
-                    className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all flex items-center gap-2 ${
-                      selectedPlatform === p 
-                        ? 'bg-white shadow-sm text-[#141414]' 
-                        : 'text-[#8c8c8c] opacity-40 grayscale'
-                    }`}
-                  >
-                    <img src={PLATFORM_LOGOS[p]} alt={p} className="w-6 h-6" />
-                    {p}
-                  </button>
-                  {p !== 'Meta' && (
-                    <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1.5 bg-gray-900 text-white text-xs font-medium rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
-                      Coming soon
-                      <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1 w-2 h-2 bg-gray-900 rotate-45"></div>
-                    </div>
+        {/* Platform Selector Card */}
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-4 transition-all">
+          <div className="bg-gray-50 p-1 rounded-[20px] flex gap-1 w-fit border border-gray-100/50">
+            {['Meta', 'Google', 'TikTok', 'Bing'].map(p => (
+              <div key={p} className="relative group">
+                <button
+                  onClick={() => (p === 'Meta' || p === 'Google') && setSelectedPlatform(p)}
+                  className={`
+                    relative px-7 py-2 rounded-[16px] text-sm font-black transition-all duration-300 flex items-center gap-3
+                    ${selectedPlatform === p 
+                      ? 'bg-white shadow-[0_4px_12px_rgba(0,0,0,0.08)] text-gray-900 scale-[1.02] translate-y-[-1px]' 
+                      : 'text-gray-400 opacity-60 grayscale hover:grayscale-0 hover:opacity-100 hover:bg-white/60 hover:translate-y-[-1px]'
+                    }
+                    ${(p !== 'Meta' && p !== 'Google') ? 'cursor-not-allowed' : 'cursor-pointer active:scale-95'}
+                  `}
+                >
+                  <img 
+                    src={PLATFORM_LOGOS[p]} 
+                    alt={p} 
+                    className={`w-6 h-6 transition-transform duration-300 ${selectedPlatform === p ? 'scale-110' : 'group-hover:scale-110'}`} 
+                  />
+                  <span className="tracking-tight">{p}</span>
+                  {selectedPlatform === p && (
+                    <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-primary rounded-full animate-pulse"></div>
                   )}
-                </div>
-              ))}
-            </div>
+                </button>
+                
+                {(p !== 'Meta' && p !== 'Google') && (
+                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-3 px-3 py-2 bg-gray-900 text-white text-[10px] font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0 whitespace-nowrap z-10 shadow-xl pointer-events-none">
+                    Coming soon
+                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1.5 w-3 h-3 bg-gray-900 rotate-45 rounded-sm"></div>
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
+        </div>
 
-          <div className="flex flex-wrap items-center justify-between gap-4 mb-8 px-2">
-            <div className="pl-4 relative">
-              <div className="absolute left-0 top-0.5 bottom-0.5 w-1.5 rounded-full bg-gradient-to-b from-[#c3a2fe] via-[#7135f4] to-[#0d031f]"></div>
-              
-              <div className="flex flex-col">
-                <div className="flex items-center gap-3">
-                  <h2 className="text-xl font-bold text-gray-900 leading-none">
-                    Recommended publish waitlists
-                  </h2>
-                  <div className={`flex items-center gap-2 px-2.5 py-1 rounded-lg border shadow-sm transition-all ${isRefreshDisabled ? 'bg-gray-50 border-gray-200 cursor-not-allowed' : 'bg-gray-100 border-gray-200 hover:bg-gray-200 group/time cursor-default'}`}>
-                    <Clock size={12} className="text-blue-500" />
-                    <span className="text-[11px] font-black text-gray-600">2026-01-21 19:25</span>
-                    <div className="w-px h-3 bg-gray-300 mx-0.5"></div>
+        {/* Meta Launch Recommendation Section */}
+        {selectedPlatform === 'Meta' && (
+          <div className="bg-white rounded-xl border border-border shadow-sm p-4 md:p-6">
+            <div className="flex flex-wrap items-center justify-between gap-4 mb-8 px-2">
+              <div className="pl-4 relative">
+                <div className="absolute left-0 top-0.5 bottom-0.5 w-1.5 rounded-full bg-gradient-to-b from-[#c3a2fe] via-[#7135f4] to-[#0d031f]"></div>
+                
+                <div className="flex flex-col">
+                  <div className="flex items-center gap-3">
+                    <h2 className="text-xl font-bold text-gray-900 leading-none">
+                      Recommended publish waitlists
+                    </h2>
+                    <div className={`flex items-center gap-2 px-2.5 py-1 rounded-lg border shadow-sm transition-all ${isRefreshDisabled ? 'bg-gray-50 border-gray-200 cursor-not-allowed' : 'bg-gray-100 border-gray-200 hover:bg-gray-200 group/time cursor-default'}`}>
+                      <Clock size={12} className="text-blue-500" />
+                      <span className="text-[11px] font-black text-gray-600">2026-01-21 19:25</span>
+                      <div className="w-px h-3 bg-gray-300 mx-0.5"></div>
                     <div className="relative group/tooltip">
                       <RefreshCw 
                         size={12} 
                         className={`${aiRegenerationCount >= 10 ? 'text-gray-300 cursor-not-allowed' : 'text-gray-400 group-hover/tooltip:text-blue-500 group-hover/tooltip:rotate-180 transition-all duration-500 cursor-pointer'}`} 
                         onClick={handleRefresh}
                       />
-                      {aiRegenerationCount >= 10 && (
-                        <div className="absolute top-full right-0 mt-2 w-72 bg-gray-900 text-white text-xs font-medium rounded-lg p-3 opacity-0 group-hover/tooltip:opacity-100 transition-opacity duration-200 pointer-events-none z-20">
+                      {aiRegenerationCount >= 10 ? (
+                        <div className="absolute top-full right-0 mt-2 w-72 bg-gray-900 text-white text-xs font-medium rounded-lg p-3 opacity-0 group-hover/tooltip:opacity-100 transition-opacity duration-200 pointer-events-none z-20 shadow-xl">
                           <div className="flex items-start gap-2">
                             <AlertCircle size={14} className="text-yellow-400 flex-shrink-0 mt-0.5" />
                             <span>AI has recommended 10 campaigns. You can delete some and then refresh to get new recommendations.</span>
                           </div>
                           <div className="absolute top-0 right-4 -mt-1 w-2 h-2 bg-gray-900 rotate-45"></div>
                         </div>
+                      ) : (
+                        <div className="absolute top-full right-0 mt-2 bg-gray-900 text-white text-[10px] font-black px-2 py-1 rounded opacity-0 group-hover/tooltip:opacity-100 transition-opacity duration-200 pointer-events-none z-20 shadow-lg whitespace-nowrap">
+                          Get more AI recommendations
+                          <div className="absolute top-0 right-4 -mt-1 w-1.5 h-1.5 bg-gray-900 rotate-45"></div>
+                        </div>
                       )}
                     </div>
+                    </div>
                   </div>
+                  <p className="text-sm text-gray-500 mt-2 leading-none">
+                    Showcasing the top 3 campaigns for auto-publish order.
+                  </p>
                 </div>
-                <p className="text-sm text-gray-500 mt-2 leading-none">
-                Showcasing the top 3 campaigns for auto-publish order.
-                </p>
               </div>
             </div>
-          </div>
 
-          <div className="py-2 px-2">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
-              {displayedCards.map((card, index) => (
-                <RecommendationCard
-                  key={card.id}
-                  card={card}
-                  isExpanded={expandedTags[card.id]}
-                  onToggle={toggleTags}
-                  onEdit={handleEditCard}
-                  onPublish={handlePublishCard}
-                  onHide={handleHideCard}
-                  status={campaignStatus[card.id]}
-                  cardIndex={index}
-                />
-              ))}
-              
-              <div key="empty-placeholder" className="campaign-wrapper">
-                <div className="campaign-external-header">
-                  <div className="bg-[#f0f7ff] border border-blue-100 rounded-xl px-3 py-1.5 flex items-center gap-2.5 shadow-sm">
-                    <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center border border-blue-50">
-                      <img src="https://www.adsgo.ai/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Frobot-active.7003b4d8.png&w=256&q=75" alt="AI Robot" className="w-5 h-5" />
+            <div className="py-2 px-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+                {displayedCards.map((card, index) => (
+                  <RecommendationCard
+                    key={card.id}
+                    card={card}
+                    isExpanded={expandedTags[card.id]}
+                    onToggle={toggleTags}
+                    onEdit={handleEditCard}
+                    onPublish={handlePublishCard}
+                    onHide={handleHideCard}
+                    status={campaignStatus[card.id]}
+                    cardIndex={index}
+                  />
+                ))}
+                
+                <div key="empty-placeholder" className="campaign-wrapper">
+                  <div className="campaign-external-header">
+                    <div className="bg-[#f0f7ff] border border-blue-100 rounded-xl px-3 py-1.5 flex items-center gap-2.5 shadow-sm">
+                      <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center border border-blue-50">
+                        <img src="https://www.adsgo.ai/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Frobot-active.7003b4d8.png&w=256&q=75" alt="AI Robot" className="w-5 h-5" />
+                      </div>
+                      <span className="text-[14px] font-black text-blue-600 tracking-tight">AI-Scaling Control Center</span>
                     </div>
-                    <span className="text-[14px] font-black text-blue-600 tracking-tight">AI-Scaling Control Center</span>
                   </div>
-                </div>
-                <div className="ad-card flex flex-col items-stretch p-0 bg-gray-50/30 border-dashed border-2 border-gray-200 min-h-[550px] relative group shadow-sm hover:shadow-md transition-shadow">
-                    <div className="h-[240px] relative bg-white border-b border-dashed border-gray-200">
-                      <div className="absolute inset-0 rounded-t-xl overflow-hidden" style={{ 
-                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)',
-                      }}>
-                        <div className="absolute top-1/4 left-1/4 w-[150px] h-[150px] bg-white/10 rounded-full blur-[40px] animate-float-slow"></div>
-                        <div className="absolute bottom-1/4 right-1/4 w-[100px] h-[100px] bg-white/15 rounded-full blur-[30px] animate-float-slower"></div>
-                        <div className="absolute inset-0 opacity-[0.08]" style={{
-                          backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)',
-                          backgroundSize: '20px 20px'
-                        }}></div>
+                  <div className="ad-card flex flex-col items-stretch p-0 bg-gray-50/30 border-dashed border-2 border-gray-200 min-h-[550px] relative group shadow-sm hover:shadow-md transition-shadow">
+                      <div className="h-[240px] relative bg-white border-b border-dashed border-gray-200">
+                        <div className="absolute inset-0 rounded-t-xl overflow-hidden" style={{ 
+                          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)',
+                        }}>
+                          <div className="absolute top-1/4 left-1/4 w-[150px] h-[150px] bg-white/10 rounded-full blur-[40px] animate-float-slow"></div>
+                          <div className="absolute bottom-1/4 right-1/4 w-[100px] h-[100px] bg-white/15 rounded-full blur-[30px] animate-float-slower"></div>
+                          <div className="absolute inset-0 opacity-[0.08]" style={{
+                            backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)',
+                            backgroundSize: '20px 20px'
+                          }}></div>
 
-                        <div className="absolute inset-0 flex items-center justify-center scale-[0.7]">
-                          <div className="relative z-[20] w-32 h-32 bg-white/20 backdrop-blur-md border-2 border-white/40 rounded-[28px] flex flex-col items-center justify-center shadow-2xl animate-pulse-slow">
-                            <Sparkles className="w-14 h-14 text-white" />
-                            <div className="text-[15px] text-white font-black mt-2 whitespace-nowrap tracking-wider">Regenerating</div>
-                          </div>
-
-                          <div className="absolute inset-0 flex items-center justify-center">
-                            {[
-                              { label: 'Ad copys', icon: 'fa-font', delay: '0s', r: '145px' },
-                              { label: 'Age', icon: 'fa-birthday-cake', delay: '-1.66s', r: '135px' },
-                              { label: 'Gender', icon: 'fa-venus-mars', delay: '-3.33s', r: '155px' },
-                              { label: 'Creatives', icon: 'fa-image', delay: '-5s', r: '125px' },
-                              { label: 'Locations', icon: 'fa-map-marker-alt', delay: '-6.66s', r: '150px' },
-                              { label: 'Products', icon: 'fa-shopping-bag', delay: '-8.33s', r: '140px' },
-                              { label: 'Cta', icon: 'fa-mouse-pointer', delay: '-10s', r: '160px' },
-                              { label: 'Interests', icon: 'fa-bullseye', delay: '-11.66s', r: '120px' },
-                              { label: 'Lookalike', icon: 'fa-user-friends', delay: '-13.33s', r: '165px' }
-                            ].map((item, idx) => (
-                              <div key={idx} className="absolute animate-spiral-card" style={{ animationDelay: item.delay, '--radius': item.r }}>
-                                <div className="w-16 h-16 bg-white/15 backdrop-blur-md border border-white/30 rounded-2xl flex flex-col items-center justify-center text-white shadow-xl">
-                                  <i className={`fas ${item.icon} text-xl mb-1.5`}></i>
-                                  <span className="text-[11px] font-black tracking-tight leading-none">{item.label}</span>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                        <div className="absolute w-1 h-1 bg-white/30 rounded-full animate-particle-1" style={{ top: '20%', left: '15%' }}></div>
-                        <div className="absolute w-1 h-1 bg-white/30 rounded-full animate-particle-2" style={{ top: '60%', right: '20%' }}></div>
-                      </div>
-                    </div>
-
-                    <div className="flex-1 bg-[#f8faff] p-3 flex flex-col gap-3">
-                      <div className="bg-white border border-gray-100 rounded-xl p-2 shadow-sm space-y-2">
-                        <div className="flex items-center gap-1.5 px-1">
-                          <i className="fas fa-chart-line text-primary text-[8px]"></i>
-                          <span className="text-[12px] font-black text-gray-700 tracking-tight">AI Regeneration Publishing</span>
-                        </div>
-                        <div className="flex gap-1.5 items-center px-0.5">
-                          <div className="flex-1 bg-gray-50 border border-gray-100 rounded-lg p-1.5 flex flex-col">
-                            <span className="text-[10px] font-bold text-gray-400 leading-none mb-1">Recommendations</span>
-                            <span className="text-sm font-black text-gray-900 leading-none">{aiRegenerationCount}</span>
-                          </div>
-                          <i className="fas fa-arrow-right text-[10px] text-gray-300"></i>
-                          <div className="flex-1 bg-white border-2 border-primary rounded-lg p-1.5 flex flex-col relative shadow-sm">
-                            <span className="text-[10px] font-bold text-primary leading-none mb-1">Published</span>
-                            <span className="text-sm font-black text-gray-900 leading-none text-center">{Object.keys(campaignStatus).length}</span>
-                          </div>
-                        </div>
-                        <div className="px-0.5">
-                          <div className="w-full bg-[#eff6ff] border border-primary/10 rounded-lg p-1.5 flex items-center justify-between">
-                            <span className="text-[10px] font-bold text-gray-500">Reserved</span>
-                            <span className="text-sm font-black text-primary leading-none">{Math.max(0, aiRegenerationCount - Object.keys(campaignStatus).length)}</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="flex gap-3 mt-auto pt-1 relative">
-                        <div 
-                          onClick={() => setAutoRegen(false)}
-                          className={`flex-1 border-2 rounded-2xl p-2 flex flex-col items-center text-center transition-all duration-300 cursor-pointer relative ${!autoRegen ? 'bg-blue-50 border-blue-500 shadow-[0_8px_16px_rgba(59,130,246,0.12)] scale-[1.05] z-10' : 'bg-white border-slate-100 hover:border-blue-200 opacity-80 grayscale hover:grayscale-0'}`}
-                        >
-                          <div className="mb-1.5 relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 bg-white shadow-md">
-                            <svg viewBox="0 0 24 24" fill="none" className={`w-5 h-5 ${!autoRegen ? 'text-blue-600' : 'text-blue-400'}`}>
-                              <rect x="3" y="4" width="18" height="18" rx="2" strokeWidth="2" stroke="currentColor" fill="none"/><path d="M16 2V6M8 2V6M3 10H21" strokeWidth="2" stroke="currentColor" strokeLinecap="round"/><circle cx="12" cy="16" r="1.5" fill="currentColor" className={!autoRegen ? 'animate-pulse' : ''}/>
-                            </svg>
-                          </div>
-                          <p className={`text-[14px] font-black mb-1.5 tracking-tight ${!autoRegen ? 'text-blue-700' : 'text-slate-800'}`}>Recommendations</p>
-                          <div className={`flex items-center gap-1 px-2 py-0.5 rounded-full border transition-all duration-300 ${!autoRegen ? 'bg-blue-600 border-blue-600 text-white shadow-sm' : 'bg-slate-50 border-slate-100 text-slate-300'}`}>
-                            <div className={`w-1 h-1 rounded-full ${!autoRegen ? 'bg-white animate-pulse' : 'bg-slate-300'}`} /><span className="text-[9px] font-black tracking-wider">{!autoRegen ? 'Running' : 'Standby'}</span>
-                          </div>
-                        </div>
-
-                        <div 
-                          onClick={() => setAutoRegen(true)}
-                          className={`flex-1 border-2 rounded-2xl p-2 flex flex-col items-center text-center transition-all duration-300 cursor-pointer relative overflow-hidden ${autoRegen ? 'bg-slate-900 border-slate-800 shadow-[0_12px_24px_rgba(0,0,0,0.25)] scale-[1.05] z-10' : 'bg-white border-slate-100 hover:border-indigo-200 opacity-80 grayscale hover:grayscale-0'}`}
-                        >
-                          {autoRegen && (
-                            <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden opacity-30">
-                              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200%] h-[200%] bg-[conic-gradient(from_0deg,transparent_0deg,rgba(99,102,241,0.4)_20deg,transparent_40deg)] animate-[spin_3s_linear_infinite]" />
+                          <div className="absolute inset-0 flex items-center justify-center scale-[0.7]">
+                            <div className="relative z-[20] w-32 h-32 bg-white/20 backdrop-blur-md border-2 border-white/40 rounded-[28px] flex flex-col items-center justify-center shadow-2xl animate-pulse-slow">
+                              <Sparkles className="w-14 h-14 text-white" />
+                              <div className="text-[15px] text-white font-black mt-2 whitespace-nowrap tracking-wider">Regenerating</div>
                             </div>
-                          )}
-                          <div className={`mb-1.5 relative z-10 w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 ${autoRegen ? 'bg-slate-800 shadow-md border border-slate-700' : 'bg-white shadow-sm'}`}>
-                            <Infinity size={20} className={`${autoRegen ? 'text-indigo-400 animate-[spin_3s_linear_infinite]' : 'text-indigo-600'}`}/>
+
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              {[
+                                { label: 'Ad copys', icon: 'fa-font', delay: '0s', r: '145px' },
+                                { label: 'Age', icon: 'fa-birthday-cake', delay: '-1.66s', r: '135px' },
+                                { label: 'Gender', icon: 'fa-venus-mars', delay: '-3.33s', r: '155px' },
+                                { label: 'Creatives', icon: 'fa-image', delay: '-5s', r: '125px' },
+                                { label: 'Locations', icon: 'fa-map-marker-alt', delay: '-6.66s', r: '150px' },
+                                { label: 'Products', icon: 'fa-shopping-bag', delay: '-8.33s', r: '140px' },
+                                { label: 'Cta', icon: 'fa-mouse-pointer', delay: '-10s', r: '160px' },
+                                { label: 'Interests', icon: 'fa-bullseye', delay: '-11.66s', r: '120px' },
+                                { label: 'Lookalike', icon: 'fa-user-friends', delay: '-13.33s', r: '165px' }
+                              ].map((item, idx) => (
+                                <div key={idx} className="absolute animate-spiral-card" style={{ animationDelay: item.delay, '--radius': item.r }}>
+                                  <div className="w-16 h-16 bg-white/15 backdrop-blur-md border border-white/30 rounded-2xl flex flex-col items-center justify-center text-white shadow-xl">
+                                    <i className={`fas ${item.icon} text-xl mb-1.5`}></i>
+                                    <span className="text-[11px] font-black tracking-tight leading-none">{item.label}</span>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
                           </div>
-                          <p className={`text-[14px] font-black mb-1.5 tracking-tight relative z-10 ${autoRegen ? 'text-white' : 'text-slate-800'}`}>Auto Publish</p>
-                          <div className={`relative z-10 flex items-center gap-1 px-2 py-0.5 rounded-full border transition-all duration-300 ${autoRegen ? 'bg-indigo-600 border-indigo-500 text-white shadow-md' : 'bg-slate-50 border-slate-100 text-slate-300'}`}>
-                            <div className={`w-1 h-1 rounded-full ${autoRegen ? 'bg-green-400 animate-ping' : 'bg-slate-300'}`} /><span className="text-[9px] font-black tracking-wider">{autoRegen ? 'Running' : 'Standby'}</span>
+                          <div className="absolute w-1 h-1 bg-white/30 rounded-full animate-particle-1" style={{ top: '20%', left: '15%' }}></div>
+                          <div className="absolute w-1 h-1 bg-white/30 rounded-full animate-particle-2" style={{ top: '60%', right: '20%' }}></div>
+                        </div>
+                      </div>
+
+                      <div className="flex-1 bg-[#f8faff] p-3 flex flex-col gap-3">
+                        <div className="bg-white border border-gray-100 rounded-xl p-2 shadow-sm space-y-2">
+                          <div className="flex items-center gap-1.5 px-1">
+                            <i className="fas fa-chart-line text-primary text-[8px]"></i>
+                            <span className="text-[12px] font-black text-gray-700 tracking-tight">AI Regeneration Publishing</span>
                           </div>
-                          <div className="absolute top-1.5 right-1.5 z-20">
-                            <div className={`bg-slate-900 text-white text-[9px] font-black px-1.5 py-0.5 rounded-md leading-tight shadow-sm flex items-center gap-0.5 animate-pulse`}><ShieldCheck size={14} className="text-[#7033f5]" /><span>7*24H</span></div>
+                          <div className="flex gap-1.5 items-center px-0.5">
+                            <div className="flex-1 bg-gray-50 border border-gray-100 rounded-lg p-1.5 flex flex-col">
+                              <span className="text-[10px] font-bold text-gray-400 leading-none mb-1">Recommendations</span>
+                              <span className="text-sm font-black text-gray-900 leading-none">{aiRegenerationCount}</span>
+                            </div>
+                            <i className="fas fa-arrow-right text-[10px] text-gray-300"></i>
+                            <div className="flex-1 bg-white border-2 border-primary rounded-lg p-1.5 flex flex-col relative shadow-sm">
+                              <span className="text-[10px] font-bold text-primary leading-none mb-1">Published</span>
+                              <span className="text-sm font-black text-gray-900 leading-none text-center">{Object.keys(campaignStatus).length}</span>
+                            </div>
+                          </div>
+                          <div className="px-0.5">
+                            <div className="w-full bg-[#eff6ff] border border-primary/10 rounded-lg p-1.5 flex items-center justify-between">
+                              <span className="text-[10px] font-bold text-gray-500">Reserved</span>
+                              <span className="text-sm font-black text-primary leading-none">{Math.max(0, aiRegenerationCount - Object.keys(campaignStatus).length)}</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="flex gap-3 mt-auto pt-1 relative">
+                          <div 
+                            onClick={() => setAutoRegen(false)}
+                            className={`flex-1 border-2 rounded-2xl p-2 flex flex-col items-center text-center transition-all duration-300 cursor-pointer relative ${!autoRegen ? 'bg-blue-50 border-blue-500 shadow-[0_8px_16px_rgba(59,130,246,0.12)] scale-[1.05] z-10' : 'bg-white border-slate-100 hover:border-blue-200 opacity-80 grayscale hover:grayscale-0'}`}
+                          >
+                            <div className="mb-1.5 relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 bg-white shadow-md">
+                              <svg viewBox="0 0 24 24" fill="none" className={`w-5 h-5 ${!autoRegen ? 'text-blue-600' : 'text-blue-400'}`}>
+                                <rect x="3" y="4" width="18" height="18" rx="2" strokeWidth="2" stroke="currentColor" fill="none"/><path d="M16 2V6M8 2V6M3 10H21" strokeWidth="2" stroke="currentColor" strokeLinecap="round"/><circle cx="12" cy="16" r="1.5" fill="currentColor" className={!autoRegen ? 'animate-pulse' : ''}/>
+                              </svg>
+                            </div>
+                            <p className={`text-[14px] font-black mb-1.5 tracking-tight ${!autoRegen ? 'text-blue-700' : 'text-slate-800'}`}>Recommendations</p>
+                            <div className={`flex items-center gap-1 px-2 py-0.5 rounded-full border transition-all duration-300 ${!autoRegen ? 'bg-blue-600 border-blue-600 text-white shadow-sm' : 'bg-slate-50 border-slate-100 text-slate-300'}`}>
+                              <div className={`w-1 h-1 rounded-full ${!autoRegen ? 'bg-white animate-pulse' : 'bg-slate-300'}`} /><span className="text-[9px] font-black tracking-wider">{!autoRegen ? 'Running' : 'Standby'}</span>
+                            </div>
+                          </div>
+
+                          <div 
+                            onClick={() => setAutoRegen(true)}
+                            className={`flex-1 border-2 rounded-2xl p-2 flex flex-col items-center text-center transition-all duration-300 cursor-pointer relative overflow-hidden ${autoRegen ? 'bg-slate-900 border-slate-800 shadow-[0_12px_24px_rgba(0,0,0,0.25)] scale-[1.05] z-10' : 'bg-white border-slate-100 hover:border-indigo-200 opacity-80 grayscale hover:grayscale-0'}`}
+                          >
+                            {autoRegen && (
+                              <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden opacity-30">
+                                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200%] h-[200%] bg-[conic-gradient(from_0deg,transparent_0deg,rgba(99,102,241,0.4)_20deg,transparent_40deg)] animate-[spin_3s_linear_infinite]" />
+                              </div>
+                            )}
+                            <div className={`mb-1.5 relative z-10 w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 ${autoRegen ? 'bg-slate-800 shadow-md border border-slate-700' : 'bg-white shadow-sm'}`}>
+                              <Infinity size={20} className={`${autoRegen ? 'text-indigo-400 animate-[spin_3s_linear_infinite]' : 'text-indigo-600'}`}/>
+                            </div>
+                            <p className={`text-[14px] font-black mb-1.5 tracking-tight relative z-10 ${autoRegen ? 'text-white' : 'text-slate-800'}`}>Auto Publish</p>
+                            <div className={`relative z-10 flex items-center gap-1 px-2 py-0.5 rounded-full border transition-all duration-300 ${autoRegen ? 'bg-indigo-600 border-indigo-500 text-white shadow-md' : 'bg-slate-50 border-slate-100 text-slate-300'}`}>
+                              <div className={`w-1 h-1 rounded-full ${autoRegen ? 'bg-green-400 animate-ping' : 'bg-slate-300'}`} /><span className="text-[9px] font-black tracking-wider">{autoRegen ? 'Running' : 'Standby'}</span>
+                            </div>
+                            <div className="absolute top-1.5 right-1.5 z-20">
+                              <div className={`bg-slate-900 text-white text-[9px] font-black px-1.5 py-0.5 rounded-md leading-tight shadow-sm flex items-center gap-0.5 animate-pulse`}><ShieldCheck size={14} className="text-[#7033f5]" /><span>7*24H</span></div>
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
+        )}
 
-      </div>
-      <div className="mt-8 px-4 md:px-6">
-        <div className="mb-6 flex items-center justify-between relative">
-          <div className="absolute left-0 top-0.5 bottom-0.5 w-1.5 rounded-full bg-gradient-to-b from-[#c3a2fe] via-[#7135f4] to-[#0d031f]"></div>
-          
-          <div className="pl-4 flex flex-col">
-            <h2 className="text-xl font-bold text-gray-900 leading-none">
-              More drafts awaiting publish
-            </h2>
-            <p className="text-sm text-gray-500 mt-2 leading-none">
-            When Auto Publish is running, you can choose whether a campaign participates and set its publish order.
-            </p>
+        <div className="mt-8 px-4 md:px-6">
+          <div className="mb-6 flex items-center justify-between relative">
+            <div className="absolute left-0 top-0.5 bottom-0.5 w-1.5 rounded-full bg-gradient-to-b from-[#c3a2fe] via-[#7135f4] to-[#0d031f]"></div>
+            
+            <div className="pl-4 flex flex-col">
+              <h2 className="text-xl font-bold text-gray-900 leading-none">
+                More drafts awaiting publish
+              </h2>
+            </div>
           </div>
-
-          <div className="relative">
-            <select 
-              value={draftPlatformFilter} 
-              onChange={(e) => setDraftPlatformFilter(e.target.value)}
-              className="appearance-none bg-white border border-gray-200 rounded-xl px-4 py-2.5 pr-10 text-sm font-semibold text-gray-700 hover:border-gray-300 hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-[#7033f5] focus:border-transparent cursor-pointer transition-all duration-200 min-w-[160px]"
-            >
-              <option value="">All Platforms</option>
-              <option value="Meta">Meta</option>
-              <option value="Google">Google</option>
-            </select>
-            <ChevronDown 
-              size={16} 
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none transition-transform duration-200"
-            />
-          </div>
-        </div>
-        <div className="bg-white rounded-xl border border-border shadow-sm overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full">
+          <div className="bg-white rounded-xl border border-border shadow-sm overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 min-w-[140px]">Auto Publish Order</th>
+                  {selectedPlatform === 'Meta' && <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 min-w-[140px]">Auto Publish Order</th>}
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 min-w-[180px]">Campaign</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 min-w-[120px]">Daily Budget</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 min-w-[200px]">Audience</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 min-w-[150px]">Creatives</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 min-w-[100px]">Product</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 min-w-[180px]">Update Time</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 min-w-[150px]">Actions</th>
-                </tr>
-              </thead>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 min-w-[120px]">Daily Budget</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 min-w-[200px]">Audience</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 min-w-[150px]">Creatives</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 min-w-[100px]">Product</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 min-w-[180px]">Update Time</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 min-w-[150px]">Actions</th>
+                  </tr>
+                </thead>
               <tbody className="divide-y-0">
                 {paginatedDrafts
-                  .filter(campaign => draftPlatformFilter === '' || campaign.platform === draftPlatformFilter)
                   .map((campaign, index) => {
                     const actualIndex = (currentPage - 1) * itemsPerPage + index;
-                    
-                    // 实时计算 Sequence 编号：在所有开启项中的全局索引 + 1
-                    const sequenceNumber = draftCampaigns
-                      .filter(c => autoPublishCampaigns[c.id])
-                      .findIndex(c => c.id === campaign.id) + 1;
+                      
+                      // 实时计算 Sequence 编号：在所有开启项中的全局索引 + 1
+                      const sequenceNumber = draftCampaigns
+                        .filter(c => autoPublishCampaigns[c.id])
+                        .findIndex(c => c.id === campaign.id) + 1;
 
-                    // 动态计算样式类
-                    let rowClass = 'border-b border-border transition-all duration-500 ';
-                    
-                    const isPublishing = !!campaignStatus[campaign.id];
+                      // 动态计算样式类
+                      let rowClass = 'border-b border-border transition-all duration-500 ';
+                      
+                      const isPublishing = !!campaignStatus[campaign.id];
 
-                    if (isPublishing) {
-                      rowClass += 'opacity-50 pointer-events-none grayscale-[0.5] bg-gray-50/50 ';
-                    }
+                      if (isPublishing) {
+                        rowClass += 'opacity-50 pointer-events-none grayscale-[0.5] bg-gray-50/50 ';
+                      }
 
-                    if (draggedIndex === actualIndex) {
-                      rowClass += 'opacity-40 bg-blue-50 border-2 border-dashed border-blue-200';
-                    } else if (animatingInfo.id === campaign.id) {
-                      if (animatingInfo.phase === 'leaving') {
-                        rowClass += 'row-pickup-fade';
-                      } else if (animatingInfo.phase === 'arriving') {
+                      if (draggedIndex === actualIndex) {
+                        rowClass += 'opacity-40 bg-blue-50 border-2 border-dashed border-blue-200';
+                      } else if (animatingInfo.id === campaign.id) {
+                        if (animatingInfo.phase === 'leaving') {
+                          rowClass += 'row-pickup-fade';
+                        } else if (animatingInfo.phase === 'arriving') {
+                          rowClass += 'row-highlight-flash';
+                        }
+                      } else if (highlightedRowId === campaign.id) {
                         rowClass += 'row-highlight-flash';
                       }
-                    } else if (highlightedRowId === campaign.id) {
-                      rowClass += 'row-highlight-flash';
-                    }
 
-                    // 为腾位准备的偏移逻辑
-                    let gapStyle = {};
-                    
-                    // 情况A：自动化换位中的腾位 (始终向下移)
-                    if (animatingInfo.phase === 'leaving' && 
-                        animatingInfo.targetIndex !== null && 
-                        actualIndex >= animatingInfo.targetIndex &&
-                        campaign.id !== animatingInfo.id) {
-                      gapStyle = { transform: 'translateY(72px)', borderTop: '2px dashed rgba(59, 130, 246, 0.3)' };
-                    }
-                    
-                    // 情况B：手动拖拽中的腾位
-                    if (dragOverIndex !== null && draggedIndex !== null && campaign.id !== animatingInfo.id) {
-                      if (dragOverIndex < draggedIndex) {
-                        // 从后往前拖 (向上挪): 目标位置到原位置之间的行向下移动
-                        if (actualIndex >= dragOverIndex && actualIndex < draggedIndex) {
-                          gapStyle = { transform: 'translateY(72px)', borderTop: actualIndex === dragOverIndex ? '2px dashed rgba(59, 130, 246, 0.3)' : '' };
-                        }
-                      } else if (dragOverIndex > draggedIndex) {
-                        // 从前往后拖 (向下挪): 原位置到目标位置之间的行向上移动
-                        if (actualIndex > draggedIndex && actualIndex <= dragOverIndex) {
-                          gapStyle = { transform: 'translateY(-72px)', borderBottom: actualIndex === dragOverIndex ? '2px dashed rgba(59, 130, 246, 0.3)' : '' };
+                      // 为腾位准备的偏移逻辑
+                      let gapStyle = {};
+                      
+                      // 情况A：自动化换位中的腾位 (始终向下移)
+                      if (animatingInfo.phase === 'leaving' && 
+                          animatingInfo.targetIndex !== null && 
+                          actualIndex >= animatingInfo.targetIndex &&
+                          campaign.id !== animatingInfo.id) {
+                        gapStyle = { transform: 'translateY(72px)', borderTop: '2px dashed rgba(59, 130, 246, 0.3)' };
+                      }
+                      
+                      // 情况B：手动拖拽中的腾位
+                      if (dragOverIndex !== null && draggedIndex !== null && campaign.id !== animatingInfo.id) {
+                        if (dragOverIndex < draggedIndex) {
+                          // 从后往前拖 (向上挪): 目标位置到原位置之间的行向下移动
+                          if (actualIndex >= dragOverIndex && actualIndex < draggedIndex) {
+                            gapStyle = { transform: 'translateY(72px)', borderTop: actualIndex === dragOverIndex ? '2px dashed rgba(59, 130, 246, 0.3)' : '' };
+                          }
+                        } else if (dragOverIndex > draggedIndex) {
+                          // 从前往后拖 (向下挪): 原位置到目标位置之间的行向上移动
+                          if (actualIndex > draggedIndex && actualIndex <= dragOverIndex) {
+                            gapStyle = { transform: 'translateY(-72px)', borderBottom: actualIndex === dragOverIndex ? '2px dashed rgba(59, 130, 246, 0.3)' : '' };
+                          }
                         }
                       }
-                    }
 
-                    return (
-                  <tr 
-                    key={campaign.id} 
-                    id={`campaign-row-${campaign.id}`}
-                    className={`hover:bg-gray-50 ${rowClass}`}
-                    style={gapStyle}
-                    draggable={(!autoRegen || !autoPublishCampaigns[campaign.id]) ? false : true}
-                    onDragStart={(e) => (!autoRegen || !autoPublishCampaigns[campaign.id]) || handleDragStart(e, actualIndex)}
-                    onDragOver={(e) => (!autoRegen || !autoPublishCampaigns[campaign.id]) || handleDragOver(e, actualIndex)}
-                    onDragEnd={(e) => handleDragEnd(e, campaign.id)}
-                  >
-                    <td className={`px-4 py-4 relative group/column-tooltip ${!autoRegen ? 'bg-gray-100 cursor-help' : ''}`}>
-                      {!autoRegen && (
-                        <div className="absolute left-full top-1/2 -translate-y-1/2 ml-2 w-64 bg-gray-900 text-white text-[11px] font-medium rounded-lg p-3 opacity-0 group-hover/column-tooltip:opacity-100 transition-opacity duration-200 pointer-events-none z-50 shadow-xl leading-relaxed">
-                          Currently, recommendations are in running state. AdsGo does not automatically publish campaigns, so this column cannot be operated.
-                          <div className="absolute right-full top-1/2 -translate-y-1/2 w-2 h-2 bg-gray-900 rotate-45 -mr-1"></div>
-                        </div>
-                      )}
-                      <div className="flex items-start gap-3">
-                        {autoRegen && autoPublishCampaigns[campaign.id] ? (
-                          <div className="mt-1 cursor-grab active:cursor-grabbing text-gray-300 hover:text-gray-600 transition-colors">
-                            <GripVertical size={16} />
-                          </div>
-                        ) : (
-                          <div className="w-4" /> /* 占位符，保持对齐 */
-                        )}
-                        <div className="flex flex-col gap-2 flex-1">
-                          {autoPublishCampaigns[campaign.id] && sequenceNumber > 0 && (
-                            <div className="w-fit px-2 py-0.5 bg-blue-50 text-blue-600 border border-blue-100 rounded-md text-[9px] font-black tracking-tight">
-                              Sequence {sequenceNumber}
-                            </div>
-                          )}
-                          <div className="flex items-center gap-2">
-                            <div 
-                              className={`w-8 h-4 rounded-full p-0.5 transition-colors ${autoPublishCampaigns[campaign.id] ? 'bg-green-500' : 'bg-gray-300'} ${!autoRegen ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
-                              onClick={() => !autoRegen || handleToggleAutoPublish(campaign.id)}
-                            >
-                              <div className={`w-3 h-3 bg-white rounded-full transition-transform ${autoPublishCampaigns[campaign.id] ? 'translate-x-4' : 'translate-x-0'}`} />
-                            </div>
-                            <span className={`text-[10px] font-bold ${autoPublishCampaigns[campaign.id] ? 'text-green-600' : 'text-red-600'} ${!autoRegen ? 'opacity-50' : ''}`}>
-                              {autoPublishCampaigns[campaign.id] ? 'Waiting' : 'Forbidden'}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-4 py-4">
-                      <div>
-                        <div className="flex items-center gap-2 mb-1">
-                          {getPlatformLogo(campaign.platform)}
-                          {campaign.isRecommendation && (
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-green-50 text-green-600 border border-green-100 text-[10px] font-bold rounded-full">
-                              <Sparkles size={10} /> AI Regeneration
-                            </span>
-                          )}
-                        </div>
-                        <div 
-                          className="font-medium text-gray-900 text-sm mb-1 truncate max-w-[180px]" 
-                          title={campaign.campaignName}
+                      return (
+                        <tr 
+                          key={campaign.id} 
+                          id={`campaign-row-${campaign.id}`}
+                          className={`hover:bg-gray-50 ${rowClass}`}
+                          style={gapStyle}
+                          draggable={((selectedPlatform !== 'Meta') || !autoRegen || !autoPublishCampaigns[campaign.id]) ? false : true}
+                          onDragStart={(e) => ((selectedPlatform !== 'Meta') || !autoRegen || !autoPublishCampaigns[campaign.id]) || handleDragStart(e, actualIndex)}
+                          onDragOver={(e) => ((selectedPlatform !== 'Meta') || !autoRegen || !autoPublishCampaigns[campaign.id]) || handleDragOver(e, actualIndex)}
+                          onDragEnd={(e) => handleDragEnd(e, campaign.id)}
                         >
-                          {campaign.campaignName}
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-4 py-4">
-                      {editingBudget === campaign.id ? (
-                        <div className="flex items-center gap-2">
-                          <input type="number" value={tempBudget} onChange={(e) => setTempBudget(e.target.value)} className="w-24 px-2 py-1 border border-border rounded text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" autoFocus />
-                          <button onClick={() => handleBudgetSave(campaign.id)} className="text-green-600 hover:text-green-700 transition-colors"><Check size={16} /></button>
-                          <button onClick={handleBudgetCancel} className="text-gray-400 hover:text-gray-600 transition-colors"><X size={16} /></button>
-                        </div>
-                      ) : (
-                        <div className="flex items-center gap-2">
-                          <span className="font-medium text-gray-900 text-sm">{formatCurrency(campaign.dailyBudget)}</span>
-                          <button onClick={() => handleBudgetEditStart(campaign.id, campaign.dailyBudget)} className="text-gray-400 hover:text-primary transition-colors"><Edit size={14} /></button>
-                        </div>
-                      )}
-                    </td>
-                    <td className="px-4 py-4"><div className="text-sm text-gray-600">{campaign.audience}</div></td>
-                    <td className="px-4 py-4">
-                      <div className="flex items-center gap-2">
-                        {campaign.creatives.slice(0, 3).map((creative) => (
-                          <div key={creative.id} className="relative group">{getCreativeIcon(creative.type)}</div>
-                        ))}
-                        {campaign.creatives.length > 3 && <div className="text-xs text-gray-500">+{campaign.creatives.length - 3} more</div>}
-                      </div>
-                    </td>
-                    <td className="px-4 py-4">
-                      {typeof campaign.product === 'object' ? (
-                        campaign.product.type === 'url' ? (
-                          <a href={campaign.product.value} target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:text-primary-hover hover:underline">{campaign.product.value}</a>
-                        ) : (
-                          <span className="text-sm text-gray-600">Feeds: {campaign.product.name}</span>
-                        )
-                      ) : (
-                        <span className="text-sm text-gray-600">{campaign.product}</span>
-                      )}
-                    </td>
-                    <td className="px-4 py-4"><div className="text-sm text-gray-600">{campaign.updateTime}</div></td>
-                    <td className="px-4 py-4">
-                      {campaignStatus[campaign.id] ? (
-                        <div className="flex items-center gap-1.5 px-3 py-2 bg-blue-50 text-blue-600 border border-blue-100 rounded-lg text-sm font-bold animate-pulse">
-                          <RefreshCw size={14} className="animate-spin" />
-                          <span>Publishing...</span>
-                        </div>
-                      ) : (
-                        <div className="flex items-center gap-2">
-                          <button onClick={() => handleEditDraft(campaign.id)} className="flex items-center gap-1.5 px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-300 hover:text-primary transition-all duration-200 cursor-pointer">
-                            <Edit size={14} /> <span>Edit</span>
-                          </button>
-                          <button onClick={() => handlePublishDraft(campaign.id)} className="flex items-center gap-1.5 px-3 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary-hover hover:shadow-md transition-all duration-200 cursor-pointer">
-                            <Send size={14} /> <span>Publish</span>
-                          </button>
-                          <button onClick={() => handleDelete(campaign.id)} className="flex items-center justify-center p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 hover:text-red-700 transition-all duration-200 cursor-pointer">
-                            <Trash2 size={14} />
-                          </button>
-                        </div>
-                      )}
-                    </td>
-                  </tr>
-                );})}
-              </tbody>
-            </table>
-          </div>
+                          {selectedPlatform === 'Meta' && (
+                            <td className={`px-4 py-4 relative group/column-tooltip ${!autoRegen ? 'bg-gray-100 cursor-help' : ''}`}>
+                              {!autoRegen && (
+                                <div className="absolute left-full top-1/2 -translate-y-1/2 ml-2 w-64 bg-gray-900 text-white text-[11px] font-medium rounded-lg p-3 opacity-0 group-hover/column-tooltip:opacity-100 transition-opacity duration-200 pointer-events-none z-50 shadow-xl leading-relaxed">
+                                  Currently, recommendations are in running state. AdsGo does not automatically publish campaigns, so this column cannot be operated.
+                                  <div className="absolute right-full top-1/2 -translate-y-1/2 w-2 h-2 bg-gray-900 rotate-45 -mr-1"></div>
+                                </div>
+                              )}
+                              <div className="flex items-start gap-3">
+                                {autoRegen && autoPublishCampaigns[campaign.id] ? (
+                                  <div className="mt-1 cursor-grab active:cursor-grabbing text-gray-300 hover:text-gray-600 transition-colors">
+                                    <GripVertical size={16} />
+                                  </div>
+                                ) : (
+                                  <div className="w-4" /> /* 占位符，保持对齐 */
+                                )}
+                                <div className="flex flex-col gap-2 flex-1">
+                                  {autoPublishCampaigns[campaign.id] && sequenceNumber > 0 && (
+                                    <div className="w-fit px-2 py-0.5 bg-blue-50 text-blue-600 border border-blue-100 rounded-md text-[9px] font-black tracking-tight">
+                                      Sequence {sequenceNumber}
+                                    </div>
+                                  )}
+                                  <div className="flex items-center gap-2">
+                                    <div 
+                                      className={`w-8 h-4 rounded-full p-0.5 transition-colors ${autoPublishCampaigns[campaign.id] ? 'bg-green-500' : 'bg-gray-300'} ${!autoRegen ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
+                                      onClick={() => !autoRegen || handleToggleAutoPublish(campaign.id)}
+                                    >
+                                      <div className={`w-3 h-3 bg-white rounded-full transition-transform ${autoPublishCampaigns[campaign.id] ? 'translate-x-4' : 'translate-x-0'}`} />
+                                    </div>
+                                    <span className={`text-[10px] font-bold ${autoPublishCampaigns[campaign.id] ? 'text-green-600' : 'text-red-600'} ${!autoRegen ? 'opacity-50' : ''}`}>
+                                      {autoPublishCampaigns[campaign.id] ? 'Waiting' : 'Forbidden'}
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                            </td>
+                          )}
+                          <td className="px-4 py-4">
+                            <div>
+                              <div className="flex items-center gap-2 mb-1">
+                                {getPlatformLogo(campaign.platform)}
+                                {campaign.isRecommendation && (
+                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-green-50 text-green-600 border border-green-100 text-[10px] font-bold rounded-full">
+                                    <Sparkles size={10} /> AI Regeneration
+                                  </span>
+                                )}
+                              </div>
+                              <div 
+                                className="font-medium text-gray-900 text-sm mb-1 truncate max-w-[180px]" 
+                                title={campaign.campaignName}
+                              >
+                                {campaign.campaignName}
+                              </div>
+                            </div>
+                          </td>
+                          <td className="px-4 py-4">
+                            {editingBudget === campaign.id ? (
+                              <div className="flex items-center gap-2">
+                                <input type="number" value={tempBudget} onChange={(e) => setTempBudget(e.target.value)} className="w-24 px-2 py-1 border border-border rounded text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" autoFocus />
+                                <button onClick={() => handleBudgetSave(campaign.id)} className="text-green-600 hover:text-green-700 transition-colors"><Check size={16} /></button>
+                                <button onClick={handleBudgetCancel} className="text-gray-400 hover:text-gray-600 transition-colors"><X size={16} /></button>
+                              </div>
+                            ) : (
+                              <div className="flex items-center gap-2">
+                                <span className="font-medium text-gray-900 text-sm">{formatCurrency(campaign.dailyBudget)}</span>
+                                <button onClick={() => handleBudgetEditStart(campaign.id, campaign.dailyBudget)} className="text-gray-400 hover:text-primary transition-colors"><Edit size={14} /></button>
+                              </div>
+                            )}
+                          </td>
+                          <td className="px-4 py-4"><div className="text-sm text-gray-600">{campaign.audience}</div></td>
+                          <td className="px-4 py-4">
+                            <div className="flex items-center gap-2">
+                              {campaign.creatives.slice(0, 3).map((creative) => (
+                                <div key={creative.id} className="relative group">{getCreativeIcon(creative.type)}</div>
+                              ))}
+                              {campaign.creatives.length > 3 && <div className="text-xs text-gray-500">+{campaign.creatives.length - 3} more</div>}
+                            </div>
+                          </td>
+                          <td className="px-4 py-4">
+                            {typeof campaign.product === 'object' ? (
+                              campaign.product.type === 'url' ? (
+                                <a href={campaign.product.value} target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:text-primary-hover hover:underline">{campaign.product.value}</a>
+                              ) : (
+                                <span className="text-sm text-gray-600">Feeds: {campaign.product.name}</span>
+                              )
+                            ) : (
+                              <span className="text-sm text-gray-600">{campaign.product}</span>
+                            )}
+                          </td>
+                          <td className="px-4 py-4"><div className="text-sm text-gray-600">{campaign.updateTime}</div></td>
+                          <td className="px-4 py-4">
+                            {campaignStatus[campaign.id] ? (
+                              <div className="flex items-center gap-1.5 px-3 py-2 bg-blue-50 text-blue-600 border border-blue-100 rounded-lg text-sm font-bold animate-pulse">
+                                <RefreshCw size={14} className="animate-spin" />
+                                <span>Publishing...</span>
+                              </div>
+                            ) : (
+                              <div className="flex items-center gap-2">
+                                <button onClick={() => handleEditDraft(campaign.id)} className="flex items-center gap-1.5 px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-300 hover:text-primary transition-all duration-200 cursor-pointer">
+                                  <Edit size={14} /> <span>Edit</span>
+                                </button>
+                                <button onClick={() => handlePublishDraft(campaign.id)} className="flex items-center gap-1.5 px-3 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary-hover hover:shadow-md transition-all duration-200 cursor-pointer">
+                                  <Send size={14} /> <span>Publish</span>
+                                </button>
+                                <button onClick={() => handleDelete(campaign.id)} className="flex items-center justify-center p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 hover:text-red-700 transition-all duration-200 cursor-pointer">
+                                  <Trash2 size={14} />
+                                </button>
+                              </div>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                </tbody>
+              </table>
+            </div>
 
-          {draftCampaigns.length > 0 && (
+          {filteredDrafts.length > 0 && (
             <div className="px-4 py-3 bg-gray-50 border-t border-border flex items-center justify-between">
               <div className="flex-1 flex justify-between sm:hidden">
-                <button
-                  onClick={() => goToPage(currentPage - 1)}
-                  disabled={currentPage === 1}
-                  className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
-                >
-                  Previous
-                </button>
-                <button
-                  onClick={() => goToPage(currentPage + 1)}
-                  disabled={currentPage === totalPages}
-                  className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
-                >
-                  Next
-                </button>
-              </div>
+                  <button
+                    onClick={() => goToPage(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+                  >
+                    Previous
+                  </button>
+                  <button
+                    onClick={() => goToPage(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+                  >
+                    Next
+                  </button>
+                </div>
               <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
                 <div>
                   <p className="text-sm text-gray-700">
-                    Showing <span className="font-medium">{(currentPage - 1) * itemsPerPage + 1}</span> to <span className="font-medium">{Math.min(currentPage * itemsPerPage, draftCampaigns.length)}</span> of{' '}
-                    <span className="font-medium">{draftCampaigns.length}</span> results
+                    Showing <span className="font-medium">{(currentPage - 1) * itemsPerPage + 1}</span> to <span className="font-medium">{Math.min(currentPage * itemsPerPage, filteredDrafts.length)}</span> of{' '}
+                    <span className="font-medium">{filteredDrafts.length}</span> results
                   </p>
                 </div>
-                <div>
-                  <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-                    <button
-                      onClick={() => goToPage(currentPage - 1)}
-                      disabled={currentPage === 1}
-                      className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
-                    >
-                      <span className="sr-only">Previous</span>
-                      <i className="fas fa-chevron-left"></i>
-                    </button>
-                    {[...Array(totalPages)].map((_, i) => (
+                  <div>
+                    <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
                       <button
-                        key={i + 1}
-                        onClick={() => goToPage(i + 1)}
-                        className={`relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium ${
-                          currentPage === i + 1
-                            ? 'z-10 bg-primary border-primary text-white'
-                            : 'bg-white text-gray-700 hover:bg-gray-50'
-                        }`}
+                        onClick={() => goToPage(currentPage - 1)}
+                        disabled={currentPage === 1}
+                        className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
                       >
-                        {i + 1}
+                        <span className="sr-only">Previous</span>
+                        <i className="fas fa-chevron-left"></i>
                       </button>
-                    ))}
-                    <button
-                      onClick={() => goToPage(currentPage + 1)}
-                      disabled={currentPage === totalPages}
-                      className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
-                    >
-                      <span className="sr-only">Next</span>
-                      <i className="fas fa-chevron-right"></i>
-                    </button>
-                  </nav>
+                      {[...Array(totalPages)].map((_, i) => (
+                        <button
+                          key={i + 1}
+                          onClick={() => goToPage(i + 1)}
+                          className={`relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium ${
+                            currentPage === i + 1
+                              ? 'z-10 bg-primary border-primary text-white'
+                              : 'bg-white text-gray-700 hover:bg-gray-50'
+                          }`}
+                        >
+                          {i + 1}
+                        </button>
+                      ))}
+                      <button
+                        onClick={() => goToPage(currentPage + 1)}
+                        disabled={currentPage === totalPages}
+                        className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+                      >
+                        <span className="sr-only">Next</span>
+                        <i className="fas fa-chevron-right"></i>
+                      </button>
+                    </nav>
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {draftCampaigns.length === 0 && (
-            <div className="p-12 text-center">
-              <div className="text-gray-400 mb-4">
-                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                  <polyline points="14 2 14 9 20 9"/>
-                  <line x1="12" y1="18" x2="12" y2="12"/>
-                  <line x1="9" y1="15" x2="15" y2="15"/>
-                </svg>
+          {filteredDrafts.length === 0 && (
+              <div className="p-12 text-center">
+                <div className="text-gray-400 mb-4">
+                  <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                    <polyline points="14 2 14 9 20 9"/>
+                    <line x1="12" y1="18" x2="12" y2="12"/>
+                    <line x1="9" y1="15" x2="15" y2="15"/>
+                  </svg>
+                </div>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">No drafts found</h3>
+                <p className="text-sm text-gray-500">You haven't created any draft campaigns yet.</p>
               </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No drafts found</h3>
-              <p className="text-sm text-gray-500">You haven't created any draft campaigns yet.</p>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
 
@@ -1465,8 +1476,6 @@ const AutoRegeneration = ({ onPageChange }) => {
           filter: blur(4px);
           pointer-events: none;
         }
-
-        /* 已移除 row-gap-opening 类，改用内联 style 动态计算方向 */
 
         .row-dragging {
           opacity: 0.5;
