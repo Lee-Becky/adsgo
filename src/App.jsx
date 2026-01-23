@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
+import { Routes, Route, useNavigate, useLocation } from 'react-router-dom'
 import MainLayout from './components/MainLayout'
 import FilterSection from './components/FilterSection'
 import OverallAnalysis from './components/OverallAnalysis'
@@ -20,6 +21,15 @@ import ComingSoon from './components/ComingSoon'
 import { getPageInfo } from './constants/menuConfig'
 
 function App() {
+  const navigate = useNavigate()
+  const location = useLocation()
+  const currentPage = useMemo(() => {
+    const path = location.pathname.slice(1) || 'overview'
+    // 获取路径的最后一部分作为页面 key
+    const parts = path.split('/')
+    return parts[parts.length - 1] || 'overview'
+  }, [location.pathname])
+
   const [selectedCampaign, setSelectedCampaign] = useState(null)
   const [showCampaignAnalysis, setShowCampaignAnalysis] = useState(false)
   const [showBudgetReason, setShowBudgetReason] = useState(false)
@@ -33,7 +43,6 @@ function App() {
   const [isDashboardDataFetching, setIsDashboardDataFetching] = useState(false) // Ad Manager page data fetching state
   const [isInsightsConnected, setIsInsightsConnected] = useState(false) // Ad Insights page connection state
   const [isInsightsDataFetching, setIsInsightsDataFetching] = useState(false) // Ad Insights page data fetching state
-  const [currentPage, setCurrentPage] = useState('overview') // 'overview', 'adManagerV3', 'autoRegeneration', 'drafts', 'insights', or 'settings'
   const [selectedBrand, setSelectedBrand] = useState('neopets')
   const [editingBrand, setEditingBrand] = useState(null)
 
@@ -72,7 +81,7 @@ function App() {
 
   const handlePageChange = (page) => {
     console.log('Page change requested:', page)
-    setCurrentPage(page)
+    navigate(`/${page}`)
   }
 
   const handleClearEditingBrand = () => {
@@ -113,11 +122,11 @@ function App() {
         color: 'bg-green-500'
       }
     ]
-    
+
     const brand = brands.find(b => b.name === selectedBrand)
     if (brand) {
       setEditingBrand(brand)
-      setCurrentPage('settings')
+      navigate('/settings')
     }
   }
 
@@ -127,15 +136,15 @@ function App() {
     switch (currentPage) {
       case 'overview':
         return (
-          <Dashboard 
-            selectedBrand={selectedBrand} 
-            onPageChange={handlePageChange} 
+          <Dashboard
+            selectedBrand={selectedBrand}
+            onPageChange={handlePageChange}
             onEditBrandConfig={handleEditBrandConfig}
           />
         )
       case 'adManagerV3':
         return (
-          <AdManagerV3 
+          <AdManagerV3
             onEditBrandConfig={handleEditBrandConfig}
             selectedBrand={selectedBrand}
             onPageChange={handlePageChange}
@@ -169,7 +178,7 @@ function App() {
               <div className="p-5 border-b border-border bg-gray-50">
                 <FilterSection />
               </div>
-              <CampaignTable 
+              <CampaignTable
                 budgetStatus={budgetStatus}
                 onBudgetStatusChange={setBudgetStatus}
                 onCampaignClick={handleCampaignClick}
@@ -184,53 +193,53 @@ function App() {
         )
       default:
         return (
-          <ComingSoon 
-            title={pageInfo?.title} 
-            subtitle={pageInfo?.subtitle} 
+          <ComingSoon
+            title={pageInfo?.title}
+            subtitle={pageInfo?.subtitle}
           />
         )
     }
   }
 
   return (
-    <>
-      <MainLayout
-        showDemoOverlay={false}
-        onDemoConnect={() => {}}
-        onDemoCreate={() => {}}
-        currentPage={currentPage}
-        onPageChange={handlePageChange}
-        selectedBrand={selectedBrand}
-        onBrandChange={setSelectedBrand}
-      >
-        {/* Main Content Area - Scrollable */}
-        {renderContent()}
+    <Routes>
+      <Route path="/*" element={
+        <MainLayout
+          showDemoOverlay={false}
+          onDemoConnect={() => {}}
+          onDemoCreate={() => {}}
+          selectedBrand={selectedBrand}
+          onBrandChange={setSelectedBrand}
+        >
+          {/* Main Content Area - Scrollable */}
+          {renderContent()}
 
-        {/* Campaign Analysis Modal */}
-        <CampaignAnalysisModal
-          isOpen={showCampaignAnalysis}
-          onClose={() => setShowCampaignAnalysis(false)}
-          campaign={selectedCampaign}
-        />
+          {/* Campaign Analysis Modal */}
+          <CampaignAnalysisModal
+            isOpen={showCampaignAnalysis}
+            onClose={() => setShowCampaignAnalysis(false)}
+            campaign={selectedCampaign}
+          />
 
-        {/* Budget Reason Modal */}
-        <BudgetReasonModal
-          isOpen={showBudgetReason}
-          onClose={() => setShowBudgetReason(false)}
-          campaign={selectedCampaign}
-          reason={budgetReasonData}
-        />
+          {/* Budget Reason Modal */}
+          <BudgetReasonModal
+            isOpen={showBudgetReason}
+            onClose={() => setShowBudgetReason(false)}
+            campaign={selectedCampaign}
+            reason={budgetReasonData}
+          />
 
-        {/* Budget Edit Modal */}
-        <BudgetEditModal
-          isOpen={showBudgetEdit}
-          onClose={() => setShowBudgetEdit(false)}
-          campaign={selectedCampaign}
-          onSave={handleBudgetSave}
-          onUpdateBudgetStatus={handleUpdateBudgetStatus}
-        />
-      </MainLayout>
-    </>
+          {/* Budget Edit Modal */}
+          <BudgetEditModal
+            isOpen={showBudgetEdit}
+            onClose={() => setShowBudgetEdit(false)}
+            campaign={selectedCampaign}
+            onSave={handleBudgetSave}
+            onUpdateBudgetStatus={handleUpdateBudgetStatus}
+          />
+        </MainLayout>
+      } />
+    </Routes>
   )
 }
 

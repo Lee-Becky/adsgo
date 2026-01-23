@@ -1,8 +1,14 @@
 import { Bell, HelpCircle, Menu, Globe, Clock, ChevronDown } from 'lucide-react'
 import { getPageInfo } from '../constants/menuConfig'
 import { useState } from 'react'
+import { useLocation } from 'react-router-dom'
 
-const Header = ({ toggleSidebar, isMobile, currentPage }) => {
+const Header = ({ toggleSidebar, isMobile }) => {
+  const location = useLocation()
+  // 获取路径的最后一部分作为页面 key
+  const path = location.pathname.slice(1) || 'overview'
+  const parts = path.split('/')
+  const currentPage = parts[parts.length - 1] || 'overview'
   const pageInfo = getPageInfo(currentPage)
   const [languageDropdownOpen, setLanguageDropdownOpen] = useState(false)
   const [selectedLanguage, setSelectedLanguage] = useState('English')

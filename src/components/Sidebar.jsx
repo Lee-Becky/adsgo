@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { 
   Layout, Image, Sparkles, BarChart3, Settings, Users, 
   DollarSign, Search, FileText, ChevronDown, X, Plus, 
@@ -9,7 +10,13 @@ import {
 } from 'lucide-react'
 import { MENU_ITEMS, SETTINGS_MENU } from '../constants/menuConfig'
 
-const Sidebar = ({ isMobile, onClose, currentPage, onPageChange, selectedBrand, onBrandChange }) => {
+const Sidebar = ({ isMobile, onClose, selectedBrand, onBrandChange }) => {
+  const navigate = useNavigate()
+  const location = useLocation()
+  // 获取路径的最后一部分作为页面 key
+  const path = location.pathname.slice(1) || 'overview'
+  const parts = path.split('/')
+  const currentPage = parts[parts.length - 1] || 'overview'
   const [isBrandDropdownOpen, setIsBrandDropdownOpen] = useState(false)
   const [expandedKeys, setExpandedKeys] = useState(['aiOptimize'])
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
@@ -57,12 +64,17 @@ const Sidebar = ({ isMobile, onClose, currentPage, onPageChange, selectedBrand, 
   }, [isUserMenuOpen])
   
   const iconMap = {
-    Layout, Layers, Lightbulb, RefreshCw, FileText, Target, 
-    Sparkles, Zap, Trash2, BarChart3, Palette, FolderOpen, 
+    Layout, Layers, Lightbulb, RefreshCw, FileText, Target,
+    Sparkles, Zap, Trash2, BarChart3, Palette, FolderOpen,
     Eye, Brain, Building2, Info, Package, Box, Users
   }
 
-  const renderMenuItem = (menuItem, depth = 0, isWithinAbandon = false) => {
+  // 构建完整路径
+  const buildPath = (menuItem, parentKey = null) => {
+    return parentKey ? `/${parentKey}/${menuItem.key}` : `/${menuItem.key}`
+  }
+
+  const renderMenuItem = (menuItem, depth = 0, isWithinAbandon = false, parentKey = null) => {
     const ItemIcon = iconMap[menuItem.icon]
     const isItemActive = currentPage === menuItem.key
     const itemHasChildren = menuItem.children && menuItem.children.length > 0
@@ -74,13 +86,13 @@ const Sidebar = ({ isMobile, onClose, currentPage, onPageChange, selectedBrand, 
         <button
           onClick={() => {
             if (itemHasChildren) {
-              setExpandedKeys(prev => 
-                prev.includes(menuItem.key) 
-                  ? prev.filter(k => k !== menuItem.key) 
+              setExpandedKeys(prev =>
+                prev.includes(menuItem.key)
+                  ? prev.filter(k => k !== menuItem.key)
                   : [...prev, menuItem.key]
               )
             } else {
-              onPageChange(menuItem.key)
+              navigate(buildPath(menuItem, parentKey))
             }
           }}
           className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all duration-200 group relative ${
@@ -123,7 +135,7 @@ const Sidebar = ({ isMobile, onClose, currentPage, onPageChange, selectedBrand, 
         
         {itemHasChildren && itemIsExpanded && (
           <div className="mt-1 flex flex-col gap-0.5 border-l border-slate-100 ml-5 pl-1">
-            {menuItem.children.map(child => renderMenuItem(child, depth + 1, isAbandon))}
+            {menuItem.children.map(child => renderMenuItem(child, depth + 1, isAbandon, menuItem.key))}
           </div>
         )}
       </div>
