@@ -15,6 +15,7 @@ import DataFetchingModal from './components/DataFetchingModal'
 import Dashboard from './components/Dashboard'
 import AdInsights from './components/AdInsights'
 import { AutoRegeneration } from './components/autoRegeneration'
+import { Analysis360 } from './components/analysis'
 import AdManagerV2 from './components/adManagerV2/AdManagerV2'
 import AdManagerV3 from './components/adManagerV3/AdManagerV3'
 import ComingSoon from './components/ComingSoon'
@@ -154,6 +155,8 @@ function App() {
         return <AutoRegeneration onPageChange={handlePageChange} />
       case 'insights':
         return <AdInsights onPageChange={handlePageChange} />
+      case 'insights360':
+        return <Analysis360 onPageChange={handlePageChange} />
       case 'drafts':
         return <Drafts />
       case 'settings':
