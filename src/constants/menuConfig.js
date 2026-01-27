@@ -93,16 +93,16 @@ export const MENU_ITEMS = [
       },
       {
         key: 'basicInfo',
-        label: 'Basic Info',
+        label: 'Brand Info',
         icon: 'Info',
-        title: 'Basic Info',
+        title: 'Brand Info',
         subtitle: 'Manage basic brand information'
       },
       {
         key: 'marketingKits',
-        label: 'Marketing Kits',
+        label: 'Brand Kits',
         icon: 'Package',
-        title: 'Marketing Kits',
+        title: 'Brand Kits',
         subtitle: 'Manage marketing materials and kits'
       },
       {

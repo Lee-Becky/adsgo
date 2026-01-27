@@ -10,6 +10,7 @@ import BudgetReasonModal from './components/BudgetReasonModal'
 import BudgetEditModal from './components/BudgetEditModal'
 import BrandManagement from './components/BrandManagement'
 import BasicInfo from './components/BasicInfo'
+import OptimizeGoals from './components/brand/OptimizeGoals'
 import Drafts from './components/Drafts'
 import DataFetchingModal from './components/DataFetchingModal'
 import Dashboard from './components/Dashboard'
@@ -164,7 +165,7 @@ function App() {
         console.log('Rendering BasicInfo component')
         return <BasicInfo onSave={() => {}} onCancel={() => handlePageChange('overview')} />
       case 'optimizeGoals':
-        return <ComingSoon title="Optimize Goals" subtitle="Set and manage optimization goals" />
+        return <OptimizeGoals />
       case 'dashboard': // 保持兼容旧路由
         return (
           <div className="p-6">
