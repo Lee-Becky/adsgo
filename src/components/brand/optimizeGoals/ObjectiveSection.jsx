@@ -76,7 +76,6 @@ const ObjectiveSection = ({ formData, updateFormData, validation, setValidation 
 
       <div className="p-10 space-y-12">
         <div className="space-y-6">
-          <span className="text-sm font-bold text-slate-500 px-1">Campaign目标</span>
           <div className="grid grid-cols-3 gap-3">
             {campaignObjectives.map((obj) => {
               const Icon = obj.icon
@@ -109,7 +108,7 @@ const ObjectiveSection = ({ formData, updateFormData, validation, setValidation 
 
         {formData.campaignObjective && (
           <div className="space-y-6 animate-in slide-in-from-top-4 duration-500 pt-4 border-t border-slate-50">
-            <span className="text-sm font-bold text-slate-500 px-1">adset成效目标</span>
+            <span className="text-sm font-bold text-slate-500 px-1">Performance Goal</span>
             <div className="grid grid-cols-2 gap-3">
               {adsetGoals.map((goal) => {
                 const isActive = formData.adsetGoal === goal.value

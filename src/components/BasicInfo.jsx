@@ -13,16 +13,15 @@ const BasicInfo = ({ onSave, onCancel }) => {
     domain: 'neopets.com',
     businessType: 'online_shopping',
     subIndustry: 'Virtual Pets & Gaming',
-    businessScale: '51-200 employees',
-    websiteLanguage: [],
+    businessScale: 'Annual Revenue: $10M - $50M',
     slogan: 'Care, Play, and Discover!',
     description: 'Neopets is an immersive virtual world where users create and care for virtual pets.',
     businessModel: ['Freemium', 'Virtual Goods'],
-    nicheMarket: 'Millennial Nostalgia & Kids',
+    nicheMarket: ['Millennial Nostalgia', 'Kids'],
     brandFeatures: ['Family-friendly', 'Collectible-driven', 'Community-centric'],
     audienceTags: ['Gamers', 'Collectors', 'Nostalgia Seekers'],
-    mediaPlatforms: ['Meta', 'TikTok', 'Instagram'],
-    brandLocation: 'cn'
+    brandLocation: 'cn',
+    mediaPlatforms: ['meta', 'tiktok'], // meta, google, tiktok, bing
   })
 
   const handleBaseChange = (field, value) => {
@@ -37,22 +36,25 @@ const BasicInfo = ({ onSave, onCancel }) => {
   }
 
   return (
-    <div className="min-h-screen bg-[#FDFDFD] flex flex-col font-sans text-slate-900 selection:bg-indigo-100 selection:text-indigo-900">
+    <div className="min-h-screen bg-[#FDFDFD] flex flex-col font-sans text-slate-900 selection:bg-indigo-100 selection:text-indigo-900 relative">
+      {/* Top Floating Save Area */}
+      <div className="sticky top-0 z-50 bg-white/60 backdrop-blur-md border-b border-slate-100/50 py-3 px-10">
+        <div className="max-w-[1400px] mx-auto flex justify-end">
+          <button 
+            onClick={handleSave} 
+            className="bg-slate-900 text-white px-8 py-2.5 rounded-xl font-bold text-sm hover:bg-black transition-all active:scale-95 shadow-lg shadow-slate-200"
+          >
+            Save Info
+          </button>
+        </div>
+      </div>
+
       {/* Main Content Area */}
-      <main className="flex-1 overflow-y-auto">
+      <main className="flex-1">
         <div className="max-w-[1400px] mx-auto px-10 py-12">
           <FoundationTab data={formData} onChange={handleBaseChange} />
         </div>
       </main>
-
-      {/* Bottom Save Button */}
-      <div className="sticky bottom-0 bg-white border-t border-slate-100 py-4 px-10 shrink-0">
-        <div className="max-w-[1400px] mx-auto flex justify-center">
-          <button onClick={handleSave} className="bg-slate-900 text-white px-8 py-3 rounded-xl font-bold text-sm hover:bg-black transition-all active:scale-95 shadow-lg">
-            Save Assets
-          </button>
-        </div>
-      </div>
     </div>
   )
 }

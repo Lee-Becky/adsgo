@@ -55,7 +55,7 @@ const OptimizeGoals = () => {
           className="bg-slate-900 text-white px-8 py-3 rounded-2xl font-black text-xs tracking-wider hover:bg-black transition-all active:scale-95 shadow-2xl shadow-slate-900/20 flex items-center gap-2 border border-white/10"
         >
           <Save size={16} />
-          Save Configuration
+          Save Goal
         </button>
       </div>
 
