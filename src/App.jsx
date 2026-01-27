@@ -19,6 +19,7 @@ import AdInsights from './components/AdInsights'
 import { AutoRegeneration } from './components/autoRegeneration'
 import { Analysis360 } from './components/analysis'
 import AdManagerV3 from './components/adManagerV3/AdManagerV3'
+import { ProductList, ProductDetails } from './components/brand/products'
 import ComingSoon from './components/ComingSoon'
 import { getPageInfo } from './constants/menuConfig'
 
@@ -47,6 +48,7 @@ function App() {
   const [isInsightsDataFetching, setIsInsightsDataFetching] = useState(false) // Ad Insights page data fetching state
   const [selectedBrand, setSelectedBrand] = useState('neopets')
   const [editingBrand, setEditingBrand] = useState(null)
+  const [selectedProduct, setSelectedProduct] = useState(null)
 
   const handleCampaignClick = (campaign) => {
     setSelectedCampaign(campaign)
@@ -169,6 +171,22 @@ function App() {
         return <BrandKits />
       case 'optimizeGoals':
         return <OptimizeGoals />
+      case 'products':
+        return (
+          <ProductList 
+            onProductClick={(product) => {
+              setSelectedProduct(product)
+              handlePageChange('productDetails')
+            }} 
+          />
+        )
+      case 'productDetails':
+        return (
+          <ProductDetails 
+            product={selectedProduct} 
+            onBack={() => handlePageChange('products')} 
+          />
+        )
       case 'dashboard': // 保持兼容旧路由
         return (
           <div className="p-6">
