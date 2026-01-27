@@ -99,11 +99,11 @@ export const MENU_ITEMS = [
         subtitle: 'Manage basic brand information'
       },
       {
-        key: 'marketingKits',
+        key: 'brandKits',
         label: 'Brand Kits',
-        icon: 'Package',
+        icon: 'Sparkles',
         title: 'Brand Kits',
-        subtitle: 'Manage marketing materials and kits'
+        subtitle: 'Manage your brand\'s visual identity and communication guidelines'
       },
       {
         key: 'products',
