@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import { 
   Upload, X, Plus, Globe, Briefcase, MapPin, Layers, Sparkles, 
   MessageSquare, UserSquare2, Megaphone, Check, ChevronDown, Fingerprint,
-  Building2, Target, Quote, Search, BarChart3
+  Building2, Target, Quote, Search, BarChart3, Phone, Mail
 } from 'lucide-react'
 
 // --- Custom Searchable Select Component ---
@@ -82,6 +82,8 @@ const FoundationTab = ({ data = {}, onChange }) => {
     name: '',
     logos: ['🚀'],
     domain: '',
+    phone: '',
+    email: '',
     businessType: 'online_shopping',
     subIndustry: '',
     businessScale: '',
@@ -211,6 +213,26 @@ const FoundationTab = ({ data = {}, onChange }) => {
                       onChange={(e) => onChange('domain', e.target.value)} 
                       placeholder="Official domain (e.g. domain.com)" 
                     />
+                  </div>
+                  <div className="flex items-center gap-6">
+                    <div className="flex items-center gap-2 group/phone">
+                      <Phone size={14} className="text-slate-400" />
+                      <input 
+                        className="text-sm font-bold text-slate-400 bg-transparent border-none outline-none focus:ring-0 p-0 w-32 placeholder:text-slate-200" 
+                        value={brandData.phone} 
+                        onChange={(e) => onChange('phone', e.target.value)} 
+                        placeholder="Phone number" 
+                      />
+                    </div>
+                    <div className="flex items-center gap-2 group/email">
+                      <Mail size={14} className="text-slate-400" />
+                      <input 
+                        className="text-sm font-bold text-slate-400 bg-transparent border-none outline-none focus:ring-0 p-0 w-48 placeholder:text-slate-200" 
+                        value={brandData.email} 
+                        onChange={(e) => onChange('email', e.target.value)} 
+                        placeholder="Email address" 
+                      />
+                    </div>
                   </div>
                 </div>
                 
