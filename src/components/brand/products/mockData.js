@@ -2,6 +2,7 @@ export const MOCK_PRODUCTS = [
   {
     id: 1,
     name: 'AdsGo AI – Your 24/7 AI Ad Expert',
+    url: 'https://adsgo.ai/expert-tool',
     category: 'Business Services > Marketing & Advertising',
     type: 'Physical Goods',
     source: 'Shopify',
@@ -21,8 +22,9 @@ export const MOCK_PRODUCTS = [
   {
     id: 2,
     name: 'AI Marketing Analytics Suite - Premium Edition',
+    url: 'https://adsgo.ai/analytics-suite',
     category: 'Business Services > Marketing & Advertising',
-    type: 'Unrecognized',
+    type: 'Non-type',
     source: 'Manual',
     updatedOn: 'Jan 26, 2026 07:15 PM',
     image: 'https://picsum.photos/seed/analytics/150/150',
@@ -33,6 +35,7 @@ export const MOCK_PRODUCTS = [
   {
     id: 3,
     name: 'SIVEIS Cargo Liner for Dogs, Universal Nonslip Waterproof Pet Dog Back Seat Cover, Washable Car Boot Protector Mat ...',
+    url: 'https://www.amazon.com/dp/B08GP8XYLX',
     category: 'Pet Supplies > Pet Travel Accessories',
     type: 'Service',
     source: 'URL',
@@ -45,6 +48,7 @@ export const MOCK_PRODUCTS = [
   {
     id: 4,
     name: '「STAY TRUE」刺繍ワッペン コーデュロイ切替裏フリースストライプシャツ',
+    url: 'https://shop.staytrue.jp/items/12345',
     category: 'Apparel > Men\'s Clothing',
     type: 'Physical Goods',
     source: 'Shopify',
@@ -57,6 +61,7 @@ export const MOCK_PRODUCTS = [
   {
     id: 5,
     name: 'ComfyBrace Posture Corrector-Back Brace for Men and Women- Fully Adjustable Straightener for Mid, Upper Spine Sup...',
+    url: 'https://comfybrace.com/collections/frontpage/products/posture-corrector',
     category: 'Health > Medical Services',
     type: 'Physical Goods',
     source: 'Manual',
@@ -69,6 +74,7 @@ export const MOCK_PRODUCTS = [
   {
     id: 6,
     name: 'PRISTINE Himalayan Tea/Inspired by Westin Hotel Reed Diffuser for Home | Fresh Bergamot/White Tea Room Fragrance...',
+    url: 'https://pristinearoma.com/products/himalayan-tea-diffuser',
     category: 'Home > Cleaning Supplies',
     type: 'Physical Goods',
     source: 'Shopify',
@@ -81,6 +87,7 @@ export const MOCK_PRODUCTS = [
   {
     id: 7,
     name: 'Smart Home Security Camera 4K Ultra HD with Night Vision',
+    url: 'https://smarthome.io/products/cam-4k',
     category: 'Electronics > Security',
     type: 'Physical Goods',
     source: 'Manual',
@@ -93,6 +100,7 @@ export const MOCK_PRODUCTS = [
   {
     id: 8,
     name: 'Ergonomic Standing Desk with Memory Presets',
+    url: 'https://office-pro.com/products/standing-desk',
     category: 'Furniture > Office',
     type: 'Physical Goods',
     source: 'Shopify',
@@ -105,6 +113,7 @@ export const MOCK_PRODUCTS = [
   {
     id: 9,
     name: 'Digital Marketing Course - Zero to Hero 2026',
+    url: 'https://academy.digital.com/zero-to-hero',
     category: 'Education > Online Courses',
     type: 'Service',
     source: 'URL',
@@ -117,6 +126,7 @@ export const MOCK_PRODUCTS = [
   {
     id: 10,
     name: 'Wireless Noise Cancelling Headphones - Pro Series',
+    url: 'https://audio-master.com/headphones-pro',
     category: 'Electronics > Audio',
     type: 'Physical Goods',
     source: 'Shopify',
@@ -129,6 +139,7 @@ export const MOCK_PRODUCTS = [
   {
     id: 11,
     name: 'Organic Bamboo Bed Sheet Set - Queen Size',
+    url: 'https://naturehome.com/bed-sheet-queen',
     category: 'Home > Bedding',
     type: 'Physical Goods',
     source: 'Manual',
@@ -141,6 +152,7 @@ export const MOCK_PRODUCTS = [
   {
     id: 12,
     name: 'Portable Power Bank 20000mAh with Quick Charge',
+    url: 'https://tech-essentials.com/power-bank-20k',
     category: 'Electronics > Accessories',
     type: 'Physical Goods',
     source: 'Shopify',
@@ -153,6 +165,7 @@ export const MOCK_PRODUCTS = [
   {
     id: 13,
     name: 'Yoga Mat with Alignment Lines - Non-Slip Eco-Friendly',
+    url: 'https://fitness-gear.com/yoga-mat',
     category: 'Sports > Fitness',
     type: 'Physical Goods',
     source: 'Manual',
@@ -165,6 +178,7 @@ export const MOCK_PRODUCTS = [
   {
     id: 14,
     name: 'Gourmet Coffee Bean Selection - Arabica Blend',
+    url: 'https://coffee-roasters.com/arabica-blend',
     category: 'Food > Beverage',
     type: 'Physical Goods',
     source: 'Shopify',
@@ -177,6 +191,7 @@ export const MOCK_PRODUCTS = [
   {
     id: 15,
     name: 'Skin Care Radiance Serum with Vitamin C',
+    url: 'https://glow-beauty.com/radiance-serum',
     category: 'Beauty > Skin Care',
     type: 'Physical Goods',
     source: 'URL',
@@ -189,6 +204,7 @@ export const MOCK_PRODUCTS = [
   {
     id: 16,
     name: 'Subscription Box: Monthly Surprise Gadgets',
+    url: 'https://gadget-box.com/monthly-subscription',
     category: 'Services > Subscriptions',
     type: 'Service',
     source: 'Shopify',
@@ -201,6 +217,7 @@ export const MOCK_PRODUCTS = [
   {
     id: 17,
     name: 'Mechanical Gaming Keyboard with RGB Backlight',
+    url: 'https://gamer-pro.io/kb-rgb',
     category: 'Electronics > Computing',
     type: 'Physical Goods',
     source: 'Manual',
@@ -213,6 +230,7 @@ export const MOCK_PRODUCTS = [
   {
     id: 18,
     name: 'UV Toothbrush Sanitizer and Holder',
+    url: 'https://hygiene-tech.com/uv-sanitizer',
     category: 'Home > Personal Care',
     type: 'Physical Goods',
     source: 'Shopify',

@@ -3,26 +3,105 @@ import {
   Search, Plus, Edit2, Trash2, 
   Image as ImageIcon, ChevronLeft, ChevronRight, 
   X, ExternalLink, ShoppingBag, ArrowLeft,
-  ChevronDown, AlertTriangle, Link2Off, Loader2
+  ChevronDown, AlertTriangle, Link2Off, Loader2,
+  Play
 } from 'lucide-react';
 import { MOCK_PRODUCTS } from './mockData';
+import SetupProductModal from './SetupProductModal';
 
 const ProductList = ({ onProductClick }) => {
   const [inputValue, setInputValue] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const [products, setProducts] = useState(MOCK_PRODUCTS);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [productToDelete, setProductToDelete] = useState(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [addStep, setAddStep] = useState('options'); // 'options', 'url', 'manual', 'shopify'
+  const [addStep, setAddStep] = useState('options'); // 'options', 'url', 'manual', 'shopify', 'setup'
   const [isShopifyConnected, setIsShopifyConnected] = useState(false);
   const [isDisconnectModalOpen, setIsDisconnectModalOpen] = useState(false);
   const [shopifyStoreName, setShopifyStoreName] = useState('My Awesome Store');
   const [isSearching, setIsSearching] = useState(false);
+  const [highlightedProductId, setHighlightedProductId] = useState(null);
   
+  // URL Import logic
+  const [productUrl, setProductUrl] = useState('');
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [urlError, setUrlError] = useState('');
+
+  // Form State
+  const [productForm, setProductForm] = useState({
+    name: 'AdsGo AI – Your 24/7 AI Ad Expert',
+    url: '',
+    category: 'Marketing & Advertising',
+    description: 'Start your campaign today to achieve these results with AdsGo AI. *Results are estimates based on AdsGo AI historical campaign data. Actual performance may vary.',
+    priceRange: '',
+    type: 'Physical Goods',
+    usps: [''],
+    positioning: {
+      valueProposition: [],
+      features: [],
+      usageScenarios: [],
+      painPoints: [],
+      buyingMotivations: []
+    },
+    audience: [
+      { id: Date.now(), name: 'Audience Name', age: '', gender: 'All', traits: [] }
+    ],
+    assets: []
+  });
+
+  const updateForm = (field, value) => {
+    setProductForm(prev => ({ ...prev, [field]: value }));
+  };
+
+  const updatePositioning = (field, value) => {
+    setProductForm(prev => ({
+      ...prev,
+      positioning: { ...prev.positioning, [field]: value }
+    }));
+  };
+
+  const addUsp = () => {
+    if (productForm.usps.length < 20) {
+      updateForm('usps', [...productForm.usps, '']);
+    }
+  };
+
+  const removeUsp = (index) => {
+    const newUsps = productForm.usps.filter((_, i) => i !== index);
+    updateForm('usps', newUsps.length > 0 ? newUsps : ['']);
+  };
+
+  const updateUsp = (index, value) => {
+    const newUsps = [...productForm.usps];
+    newUsps[index] = value;
+    updateForm('usps', newUsps);
+  };
+
+  const addAudience = () => {
+    updateForm('audience', [
+      ...productForm.audience,
+      { id: Date.now(), name: 'Audience Name', age: '', gender: 'All', traits: [] }
+    ]);
+  };
+
+  const removeAudience = (id) => {
+    const newAudience = productForm.audience.filter(a => a.id !== id);
+    updateForm('audience', newAudience.length > 0 ? newAudience : [{ id: Date.now(), name: '', age: '', gender: 'All', traits: '' }]);
+  };
+
+  const updateAudience = (id, field, value) => {
+    const newAudience = productForm.audience.map(a => 
+      a.id === id ? { ...a, [field]: value } : a
+    );
+    updateForm('audience', newAudience);
+  };
+
+
   const itemsPerPage = 10;
 
-  const filteredProducts = MOCK_PRODUCTS.filter(product =>
+  const filteredProducts = products.filter(product =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -38,7 +117,7 @@ const ProductList = ({ onProductClick }) => {
       setSearchTerm(val);
       setCurrentPage(1);
       setIsSearching(false);
-    }, 600); // 模拟 600ms 加载延迟
+    }, 600);
   };
 
   const handleSearchBlur = () => {
@@ -51,6 +130,56 @@ const ProductList = ({ onProductClick }) => {
     if (e.key === 'Enter') {
       performSearch(inputValue);
     }
+  };
+
+  const handleAnalyzeUrl = () => {
+    if (!productUrl) {
+      setUrlError('Please provide a valid product url');
+      return;
+    }
+    setUrlError('');
+    setIsAnalyzing(true);
+    
+    // 模拟 5 秒后自动进入下一步
+    setTimeout(() => {
+      setIsAnalyzing(false);
+      setAddStep('setup');
+    }, 5000);
+  };
+
+  const handleCreateProduct = (formData) => {
+    const newProduct = {
+      id: Date.now(),
+      name: formData.name,
+      url: formData.url,
+      category: formData.category,
+      type: formData.type,
+      source: addStep === 'url' ? 'URL' : 'Manual',
+      updatedOn: new Date().toLocaleString('en-US', { month: 'short', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true }),
+      image: 'https://picsum.photos/seed/new/150/150',
+      description: formData.description,
+      usps: formData.usps.filter(u => u.trim()),
+      positioning: formData.positioning,
+      audience: formData.audience,
+      assets: { others: [] }
+    };
+
+    setProducts([newProduct, ...products]);
+    setHighlightedProductId(newProduct.id);
+    closeAddModal();
+
+    // 3秒后移除高亮
+    setTimeout(() => {
+      setHighlightedProductId(null);
+    }, 3000);
+  };
+
+  const closeAddModal = () => {
+    setIsAddModalOpen(false);
+    setIsAnalyzing(false);
+    setProductUrl('');
+    setUrlError('');
+    setAddStep('options');
   };
 
   // 获取末级类目
@@ -116,8 +245,19 @@ const ProductList = ({ onProductClick }) => {
     }
   ];
 
+  const platformIcons = [
+    { id: 'amazon', logo: 'https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg' },
+    { id: 'shopify', logo: 'https://cdn.worldvectorlogo.com/logos/shopify.svg' },
+    { id: 'etsy', logo: 'https://upload.wikimedia.org/wikipedia/commons/8/89/Etsy_logo.svg' },
+    { id: 'ebay', logo: 'https://upload.wikimedia.org/wikipedia/commons/1/1b/Ebay_logo.svg' },
+    { id: 'apple', logo: 'https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg' },
+    { id: 'playstore', logo: 'https://upload.wikimedia.org/wikipedia/commons/d/d0/Google_Play_Arrow_logo.svg' },
+    { id: 'wordpress', logo: 'https://upload.wikimedia.org/wikipedia/commons/0/09/Wordpress-Logo.svg' },
+    { id: 'wix', logo: 'https://upload.wikimedia.org/wikipedia/commons/7/76/Wix.com_website_logo.svg' }
+  ];
+
   return (
-    <div className="min-h-screen bg-[#FDFDFD] p-8 flex flex-col font-sans">
+    <div className="min-h-screen bg-[#FDFDFD] p-8 flex flex-col font-sans text-slate-900">
       <div className="w-full mx-auto space-y-6 flex-1">
         {/* Header Section */}
         <div className="flex items-center justify-end mb-8">
@@ -180,7 +320,11 @@ const ProductList = ({ onProductClick }) => {
                 {currentItems.map((product) => (
                   <tr 
                     key={product.id} 
-                    className="hover:bg-slate-50/50 transition-colors cursor-pointer group"
+                    className={`transition-all cursor-pointer group ${
+                      highlightedProductId === product.id 
+                        ? 'bg-indigo-50/80 animate-[pulse_1s_ease-in-out_3]' 
+                        : 'hover:bg-slate-50/50'
+                    }`}
                     onClick={() => onProductClick(product)}
                   >
                     <td className="px-8 py-5">
@@ -192,11 +336,16 @@ const ProductList = ({ onProductClick }) => {
                             <ImageIcon className="text-slate-300" size={20} />
                           )}
                         </div>
-                        <span className="text-sm font-bold text-slate-700 truncate">
+                      <div className="flex flex-col min-w-0 overflow-hidden">
+                        <span className="text-sm font-bold text-slate-700 truncate mb-0.5">
                           {product.name}
                         </span>
+                        <span className="text-[10px] font-medium text-slate-400 truncate opacity-70">
+                          {product.url || 'No link provided'}
+                        </span>
                       </div>
-                    </td>
+                    </div>
+                  </td>
                     <td className="px-8 py-5 text-sm font-medium text-slate-500">
                       <span className="truncate block">
                         {getLastCategory(product.category)}
@@ -206,9 +355,10 @@ const ProductList = ({ onProductClick }) => {
                     <span className={`inline-block px-2 py-1 rounded-md text-[10px] font-bold whitespace-nowrap ${
                       product.type === 'Physical Goods' ? 'bg-blue-50 text-blue-600' :
                       product.type === 'Service' ? 'bg-purple-50 text-purple-600' :
+                      product.type === 'Non-type' ? 'bg-slate-100 text-slate-500' :
                       'bg-slate-100 text-slate-500'
                     }`}>
-                      {product.type}
+                      {product.type || 'Non-type'}
                     </span>
                   </td>
                     <td className="px-8 py-5 text-sm font-medium text-slate-500 whitespace-nowrap">
@@ -298,7 +448,7 @@ const ProductList = ({ onProductClick }) => {
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="bg-white rounded-[32px] w-full max-w-md overflow-hidden shadow-2xl border border-slate-100 animate-in zoom-in-95 duration-200">
             <div className="px-8 pt-8 pb-4 flex justify-between items-start">
-              <h3 className="text-xl font-bold text-slate-900">Delete product?</h3>
+              <h3 className="text-xl font-bold text-slate-900 font-sans">Delete product?</h3>
               <button 
                 onClick={closeDeleteModal}
                 className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-full transition-all"
@@ -308,8 +458,8 @@ const ProductList = ({ onProductClick }) => {
             </div>
             
             <div className="px-8 py-2">
-              <p className="text-sm font-medium text-slate-500 leading-relaxed">
-                Are you sure you want to delete this product? This action is irreversible.
+              <p className="text-sm font-medium text-slate-500 leading-relaxed font-sans">
+                解除连接后，商品信息将不再更新，确认吗？
               </p>
             </div>
 
@@ -339,11 +489,11 @@ const ProductList = ({ onProductClick }) => {
               <div className="w-10 h-10 rounded-full bg-rose-50 flex items-center justify-center text-rose-500">
                 <AlertTriangle size={20} />
               </div>
-              <h3 className="text-xl font-bold text-slate-900">Disconnect Shopify?</h3>
+              <h3 className="text-xl font-bold text-slate-900 font-sans">Disconnect Shopify?</h3>
             </div>
             
             <div className="px-8 py-2">
-              <p className="text-sm font-medium text-slate-500 leading-relaxed">
+              <p className="text-sm font-medium text-slate-500 leading-relaxed font-sans">
                 解除连接后，商品信息将不再更新，确认吗？
               </p>
             </div>
@@ -369,89 +519,160 @@ const ProductList = ({ onProductClick }) => {
       {/* Add Product Flow Modal */}
       {isAddModalOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-white rounded-[32px] w-full max-w-lg overflow-hidden shadow-2xl border border-slate-100 animate-in zoom-in-95 duration-200 min-h-[400px] flex flex-col">
+          <div className={`bg-white rounded-[40px] w-full shadow-2xl border border-slate-100 animate-in zoom-in-95 duration-200 flex flex-col relative transition-all duration-500 ${
+            addStep === 'setup' ? 'max-w-4xl h-[90vh]' : 'max-w-2xl min-h-[400px]'
+          }`}>
             
+            {/* Loading Overlay for URL Analysis */}
+            {isAnalyzing && (
+              <div className="absolute inset-0 z-[120] bg-white rounded-[40px] flex flex-col items-center justify-center p-10 text-center animate-in fade-in duration-300">
+                <div className="w-20 h-20 rounded-[32px] bg-indigo-50 flex items-center justify-center mb-6 shadow-inner relative">
+                  <div className="absolute inset-0 rounded-[32px] border-4 border-indigo-100 border-t-indigo-500 animate-spin" />
+                  <Loader2 className="text-indigo-500 animate-spin" size={32} />
+                </div>
+                <h3 className="text-xl font-bold text-slate-900 mb-2 font-sans">Analyzing product info...</h3>
+                <p className="text-xs text-slate-400 font-medium mb-10 max-w-[320px] font-sans">
+                  We're fetching details from the URL. This might take a few moments.
+                </p>
+                <button 
+                  onClick={closeAddModal}
+                  className="px-10 py-3.5 bg-slate-900 text-white rounded-2xl font-bold text-sm hover:bg-black transition-all active:scale-95 shadow-lg shadow-slate-200 font-sans"
+                >
+                  Close and analyze in background
+                </button>
+              </div>
+            )}
+
             {/* Modal Header */}
-            <div className="p-8 pb-4 flex justify-between items-center">
-              <div className="flex items-center gap-3">
+            <div className="p-8 pb-4 flex justify-between items-center shrink-0">
+              <div className="flex items-center gap-4">
                 {addStep !== 'options' && (
                   <button 
                     onClick={() => setAddStep('options')}
-                    className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-full transition-all"
+                    className="p-2.5 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-full transition-all"
                   >
                     <ArrowLeft size={20} />
                   </button>
                 )}
-                <h3 className="text-xl font-bold text-slate-900">
+                <h3 className="text-xl font-bold text-slate-900 font-sans">
                   {addStep === 'options' ? 'How do you want to add product?' :
                    addStep === 'url' ? 'Import from URL' :
-                   addStep === 'manual' ? 'Enter Manually' : 'Sync from Shopify'}
+                   addStep === 'manual' ? 'Enter Manually' : 
+                   addStep === 'setup' ? 'Setup your product' : 'Sync from Shopify'}
                 </h3>
               </div>
               <button 
-                onClick={() => setIsAddModalOpen(false)}
-                className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-full transition-all"
+                onClick={closeAddModal}
+                className="p-2.5 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-full transition-all"
               >
                 <X size={20} />
               </button>
             </div>
             
-            <div className="px-8 pb-8 flex-1 flex flex-col">
+            <div className="px-8 pb-8 flex-1 flex flex-col overflow-hidden">
               {/* Step 1: Options */}
               {addStep === 'options' && (
-                <div className="space-y-3">
+                <div className="space-y-4 pt-4">
                   {addOptions.map((option) => (
                     <button
                       key={option.id}
                       onClick={() => setAddStep(option.id)}
-                      className="w-full group flex items-center gap-4 p-5 bg-slate-50 border border-slate-100 rounded-[24px] hover:bg-white hover:shadow-md hover:border-indigo-100 transition-all text-left"
+                      className="w-full group flex items-center gap-6 p-6 bg-slate-50 border border-slate-100 rounded-[28px] hover:bg-white hover:shadow-xl hover:border-indigo-100 transition-all text-left"
                     >
-                      <div className="w-12 h-12 rounded-2xl bg-white border border-slate-100 flex items-center justify-center text-slate-400 group-hover:text-indigo-50 group-hover:border-indigo-50 group-hover:shadow-inner transition-all overflow-hidden p-2.5 shrink-0">
+                      <div className="w-14 h-14 rounded-2xl bg-white border border-slate-100 flex items-center justify-center text-slate-400 group-hover:text-indigo-50 group-hover:border-indigo-50 group-hover:shadow-inner transition-all overflow-hidden p-3 shrink-0">
                         {option.logo ? (
                           <img src={option.logo} alt="" className="w-full h-full object-contain" />
                         ) : (
-                          <option.icon size={22} />
+                          <option.icon size={26} />
                         )}
                       </div>
                       <div className="flex-1">
-                        <h4 className="text-sm font-bold text-slate-700 mb-0.5">{option.title}</h4>
-                        <p className="text-[11px] font-medium text-slate-400">{option.subtitle}</p>
+                        <h4 className="text-base font-bold text-slate-700 mb-1 font-sans">{option.title}</h4>
+                        <p className="text-xs font-medium text-slate-400 leading-relaxed font-sans">{option.subtitle}</p>
                       </div>
-                      <ChevronRight size={18} className="text-slate-300 group-hover:text-indigo-400 group-hover:translate-x-1 transition-all" />
+                      <ChevronRight size={20} className="text-slate-300 group-hover:text-indigo-400 group-hover:translate-x-1 transition-all" />
                     </button>
                   ))}
                 </div>
               )}
 
-              {/* Step 2: URL Import */}
+              {/* Step 2: URL Import (Enhanced with Design Polish) */}
               {addStep === 'url' && (
-                <div className="space-y-6 py-4">
-                  <div className="space-y-2">
-                    <label className="text-[11px] font-bold text-slate-400 tracking-wider">Product URL</label>
-                    <input 
-                      type="text" 
-                      placeholder="https://example.com/product/..." 
-                      className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 text-sm focus:outline-none focus:ring-4 focus:ring-indigo-500/5 focus:bg-white focus:border-indigo-300 transition-all"
-                    />
+                <div className="flex-1 flex flex-col pt-6 px-10 text-center">
+                  <div className="space-y-8 mb-12">
+                    <h2 className="text-3xl font-bold text-slate-900 leading-tight font-sans">
+                      Paste your <span className="text-indigo-500">product link</span> to get product info
+                    </h2>
+                    
+                    <div className="space-y-4">
+                      <p className="text-[10px] font-bold text-slate-400 tracking-[0.2em] font-sans">AdsGo Supports</p>
+                      <div className="flex items-center justify-center gap-4">
+                        {platformIcons.map(icon => (
+                          <div key={icon.id} className="w-10 h-10 rounded-full bg-white border border-slate-100 flex items-center justify-center p-2 shadow-sm hover:shadow-md hover:scale-110 transition-all cursor-default">
+                            <img src={icon.logo} alt={icon.id} className="w-full h-full object-contain" />
+                          </div>
+                        ))}
+                        <div className="w-10 h-10 rounded-full bg-white border border-slate-100 flex items-center justify-center text-slate-300 font-bold text-sm">...</div>
+                      </div>
+                    </div>
                   </div>
-                  <button className="w-full bg-slate-900 text-white py-4 rounded-2xl font-bold text-sm hover:bg-black shadow-lg shadow-slate-200 transition-all active:scale-95">
-                    Import Product
-                  </button>
+
+                  <div className="space-y-8 max-w-[520px] mx-auto w-full flex-1 flex flex-col">
+                    <div className="space-y-3">
+                      <div className="relative group">
+                        <input 
+                          type="text" 
+                          value={productUrl}
+                          onChange={(e) => setProductUrl(e.target.value)}
+                          placeholder="e.g. amazon product link, shopify product link, app store link, etc." 
+                          className={`w-full bg-slate-50 border-[1.5px] rounded-[24px] px-8 py-6 text-sm font-medium text-slate-700 placeholder:text-slate-300 focus:outline-none transition-all duration-300 ${
+                            urlError 
+                              ? 'border-rose-400 bg-rose-50/20' 
+                              : 'border-slate-100 focus:bg-white focus:border-indigo-300 focus:ring-[8px] focus:ring-indigo-500/5 shadow-inner'
+                          }`}
+                        />
+                        {urlError && (
+                          <div className="absolute -bottom-7 left-4 flex items-center gap-1.5 text-rose-500 font-bold text-[10px] animate-in slide-in-from-top-1">
+                            <AlertTriangle size={12} />
+                            {urlError}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    
+                    <div className="mt-auto">
+                      <button 
+                        onClick={handleAnalyzeUrl}
+                        className="w-full bg-indigo-600 text-white py-5 rounded-[22px] font-bold text-base hover:bg-indigo-700 shadow-xl shadow-indigo-100 transition-all active:scale-[0.97] font-sans"
+                      >
+                        Analyze URL
+                      </button>
+                    </div>
+                  </div>
                 </div>
               )}
 
-              {/* Step 2: Manual Entry */}
+              {/* Step 3: Setup Product */}
+              {addStep === 'setup' && (
+                <SetupProductModal 
+                  isOpen={true}
+                  onClose={closeAddModal}
+                  onCreate={handleCreateProduct}
+                />
+              )}
+
+              {/* Step 2: Manual Entry (Restored) */}
               {addStep === 'manual' && (
                 <div className="space-y-6 py-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <label className="text-[11px] font-bold text-slate-400 tracking-wider">Product Name</label>
-                      <input type="text" className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-indigo-300" />
+                      <label className="text-[11px] font-bold text-slate-400 tracking-widest font-sans">Product Name</label>
+                      <input type="text" className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-indigo-300 font-sans" />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-[11px] font-bold text-slate-400 tracking-wider">Category</label>
+                      <label className="text-[11px] font-bold text-slate-400 tracking-widest font-sans">Category</label>
                       <div className="relative">
-                        <select className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm appearance-none focus:outline-none focus:border-indigo-300">
+                        <select className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm appearance-none focus:outline-none focus:border-indigo-300 font-sans">
                           <option>Select Category</option>
                         </select>
                         <ChevronDown size={14} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400" />
@@ -459,22 +680,22 @@ const ProductList = ({ onProductClick }) => {
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[11px] font-bold text-slate-400 tracking-wider">Description</label>
-                    <textarea className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm min-h-[100px] resize-none focus:outline-none focus:border-indigo-300" />
+                    <label className="text-[11px] font-bold text-slate-400 tracking-widest font-sans">Description</label>
+                    <textarea className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm min-h-[100px] resize-none focus:outline-none focus:border-indigo-300 font-sans" />
                   </div>
                   <button 
                     onClick={() => {
                       setIsAddModalOpen(false);
                       onProductClick(null);
                     }}
-                    className="w-full bg-slate-900 text-white py-4 rounded-2xl font-bold text-sm hover:bg-black shadow-lg shadow-slate-200 transition-all active:scale-95"
+                    className="w-full bg-slate-900 text-white py-4 rounded-2xl font-bold text-sm hover:bg-black shadow-lg shadow-slate-200 transition-all active:scale-95 font-sans"
                   >
                     Create Product
                   </button>
                 </div>
               )}
 
-              {/* Step 2: Shopify Sync */}
+              {/* Step 2: Shopify Sync (Restored) */}
               {addStep === 'shopify' && (
                 <div className="flex-1 flex flex-col justify-center items-center text-center space-y-8 py-6">
                   {!isShopifyConnected ? (
@@ -483,14 +704,14 @@ const ProductList = ({ onProductClick }) => {
                         <img src="https://cdn.worldvectorlogo.com/logos/shopify.svg" alt="" className="w-full h-full object-contain" />
                       </div>
                       <div className="max-w-[320px] space-y-2">
-                        <h4 className="text-lg font-bold text-slate-900">Connect to Shopify</h4>
-                        <p className="text-xs text-slate-400 leading-relaxed font-medium">
+                        <h4 className="text-lg font-bold text-slate-900 font-sans">Connect to Shopify</h4>
+                        <p className="text-xs text-slate-400 leading-relaxed font-medium font-sans">
                           Link your Shopify store to automatically import products and keep your assets in sync with your ads.
                         </p>
                       </div>
                       <button 
                         onClick={handleShopifyConnect}
-                        className="w-full max-w-[280px] bg-slate-900 text-white py-4 rounded-2xl font-bold text-sm hover:bg-black shadow-lg shadow-slate-200 transition-all active:scale-95"
+                        className="w-full max-w-[280px] bg-slate-900 text-white py-4 rounded-2xl font-bold text-sm hover:bg-black shadow-lg shadow-slate-200 transition-all active:scale-95 font-sans"
                       >
                         Connect Shopify Store
                       </button>
@@ -501,21 +722,21 @@ const ProductList = ({ onProductClick }) => {
                         <div className="w-20 h-20 rounded-[24px] bg-green-50 border border-green-100 flex items-center justify-center p-4 shadow-inner">
                           <img src="https://cdn.worldvectorlogo.com/logos/shopify.svg" alt="" className="w-full h-full object-contain" />
                         </div>
-                        <div className="absolute -top-1 -right-1 w-6 h-6 bg-green-500 border-4 border-white rounded-full flex items-center justify-center">
+                        <div className="absolute -top-1.5 -right-1.5 w-6 h-6 bg-green-500 border-4 border-white rounded-full flex items-center justify-center shadow-sm">
                           <div className="w-1.5 h-1.5 bg-white rounded-full" />
                         </div>
                       </div>
                       <div className="space-y-2">
-                        <h4 className="text-lg font-bold text-slate-900">{shopifyStoreName}</h4>
+                        <h4 className="text-lg font-bold text-slate-900 font-sans">{shopifyStoreName}</h4>
                         <div className="flex items-center justify-center gap-2">
                           <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                          <p className="text-xs text-green-600 font-bold tracking-wide">Connected</p>
+                          <p className="text-xs text-green-600 font-bold tracking-wide font-sans">Connected</p>
                         </div>
                       </div>
                       <div className="w-full pt-6">
                         <button 
                           onClick={() => setIsDisconnectModalOpen(true)}
-                          className="px-8 py-3 bg-slate-50 border border-slate-100 rounded-2xl text-slate-400 hover:text-rose-500 hover:bg-rose-50 hover:border-rose-100 font-bold text-[13px] transition-all flex items-center gap-2 mx-auto shadow-sm"
+                          className="px-8 py-3 bg-slate-50 border border-slate-100 rounded-2xl text-slate-400 hover:text-rose-500 hover:bg-rose-50 hover:border-rose-100 font-bold text-[13px] transition-all flex items-center gap-2 mx-auto shadow-sm font-sans"
                         >
                           <Link2Off size={18} />
                           Disconnect Store
