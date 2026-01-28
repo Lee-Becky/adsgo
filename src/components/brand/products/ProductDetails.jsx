@@ -3,7 +3,7 @@ import {
   X, ArrowLeft, Loader2, Info, ChevronDown, 
   Sparkles, Target, User, Layers, Edit2, Trash2,
   Search, ChevronRight, Image as ImageIcon, Plus,
-  HelpCircle, AlertCircle
+  HelpCircle, AlertCircle, History, Download, FileText
 } from 'lucide-react';
 
 // --- Shared Internal Components (Synced with SetupProductModal) ---
@@ -91,8 +91,8 @@ const AssetGrid = ({ title, subtitle, assets = [], onAssetsChange, maxCount = 99
       <div className="flex items-center justify-between">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
+            <div className="w-1 h-3 bg-blue-400 rounded-full" />
             <h5 className="text-[13px] font-black text-slate-900">{title}</h5>
-            {showExamples && <span className="text-[10px] font-bold text-indigo-500 cursor-pointer hover:underline"></span>}
           </div>
           <p className="text-[10px] text-slate-400 font-medium leading-tight">{subtitle}</p>
         </div>
@@ -397,6 +397,11 @@ const ProductDetails = ({ product, onBack }) => {
       action: product?.assets?.action || [],
       environment: product?.assets?.environment || [],
       team: product?.assets?.team || []
+    },
+    historicalRecords: {
+      audienceTags: product?.historicalRecords?.audienceTags || ['Tech Enthusiasts', '25-35 Years Old', 'Mobile First'],
+      creativeTags: product?.historicalRecords?.creativeTags || ['Cinematic', 'Minimalist Style', 'UGC Content'],
+      report: product?.historicalRecords?.report || 'product analysis report.md'
     }
   });
 
@@ -412,7 +417,8 @@ const ProductDetails = ({ product, onBack }) => {
     usps: useRef(null),
     positioning: useRef(null),
     audience: useRef(null),
-    assets: useRef(null)
+    assets: useRef(null),
+    historical: useRef(null)
   };
 
   const toggleSection = (section) => {
@@ -498,7 +504,8 @@ const ProductDetails = ({ product, onBack }) => {
                 { id: 'usps', label: 'Selling Points', icon: Sparkles, color: 'amber' },
                 { id: 'positioning', label: 'Product Positioning', icon: Target, color: 'purple' },
                 { id: 'audience', label: 'Audience Profile', icon: User, color: 'emerald' },
-                { id: 'assets', label: 'Product Assets', icon: Layers, color: 'blue' }
+                { id: 'assets', label: 'Product Assets', icon: Layers, color: 'blue' },
+                { id: 'historical', label: 'Historical Records', icon: History, color: 'rose' }
               ].map((tab) => (
                 <button 
                   key={tab.id}
@@ -735,6 +742,86 @@ const ProductDetails = ({ product, onBack }) => {
             ) : (
               <AssetGrid title="Assets" subtitle="Upload product images or video assets." assets={productForm.assets?.others} onAssetsChange={(a) => updateForm('assets', { ...productForm.assets, others: a })} isExpandable isExpanded={expandedSections.others} onToggle={() => toggleSection('others')} />
             )}
+          </section>
+
+          {/* 6. Historical Records Section */}
+          <section ref={sectionRefs.historical} className="bg-white border border-slate-100 rounded-[40px] p-10 shadow-sm space-y-10 scroll-mt-32 animate-in fade-in duration-500">
+            <div className="flex items-center gap-4 border-b border-slate-50 pb-6">
+              <div className="w-12 h-12 rounded-2xl bg-rose-50 flex items-center justify-center text-rose-600 shadow-sm">
+                <History size={24} />
+              </div>
+              <div>
+                <h4 className="text-xl font-black text-slate-900">Historical Records</h4>
+                <p className="text-xs text-slate-400 font-bold">Data-driven insights from previous high-performing campaigns.</p>
+              </div>
+            </div>
+
+            <div className="space-y-10">
+              <div className="space-y-3">
+                <label className="text-[11px] font-black text-slate-400 flex items-center gap-2">
+                  <div className="w-1 h-3 bg-rose-400 rounded-full" />
+                  High-conversion Audience Tags
+                </label>
+                <TagEditor 
+                  tags={productForm.historicalRecords.audienceTags} 
+                  onTagsChange={(tags) => setProductForm(prev => ({
+                    ...prev, 
+                    historicalRecords: { ...prev.historicalRecords, audienceTags: tags }
+                  }))}
+                  placeholder="+ Audience Tag"
+                  label="Tag"
+                />
+              </div>
+
+              <div className="space-y-3">
+                <label className="text-[11px] font-black text-slate-400 flex items-center gap-2">
+                  <div className="w-1 h-3 bg-rose-400 rounded-full" />
+                  High-conversion Creative Tags
+                </label>
+                <TagEditor 
+                  tags={productForm.historicalRecords.creativeTags} 
+                  onTagsChange={(tags) => setProductForm(prev => ({
+                    ...prev, 
+                    historicalRecords: { ...prev.historicalRecords, creativeTags: tags }
+                  }))}
+                  placeholder="+ Creative Tag"
+                  label="Tag"
+                />
+              </div>
+
+              <div className="space-y-3">
+                <label className="text-[11px] font-black text-slate-400 flex items-center gap-2">
+                  <div className="w-1 h-3 bg-rose-400 rounded-full" />
+                  Report
+                </label>
+                <div className="max-w-md group">
+                  <div className="bg-slate-50 border border-slate-100 rounded-3xl p-5 flex items-center justify-between transition-all hover:bg-white hover:shadow-xl hover:border-rose-100">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 rounded-2xl bg-white flex items-center justify-center text-rose-500 shadow-sm border border-slate-100 group-hover:scale-110 transition-transform">
+                        <FileText size={24} />
+                      </div>
+                      <div>
+                        <p className="text-sm font-black text-slate-700">{productForm.historicalRecords.report}</p>
+                        <p className="text-[10px] text-slate-400 font-bold mt-0.5">
+                          {new Date().toLocaleString('zh-CN', { 
+                            year: 'numeric', 
+                            month: '2-digit', 
+                            day: '2-digit', 
+                            hour: '2-digit', 
+                            minute: '2-digit', 
+                            second: '2-digit',
+                            hour12: false 
+                          }).replace(/\//g, '-')}
+                        </p>
+                      </div>
+                    </div>
+                    <button className="p-3 bg-white text-slate-400 hover:text-indigo-600 rounded-xl shadow-sm border border-slate-50 hover:scale-110 transition-all active:scale-95">
+                      <Download size={20} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
           </section>
         </main>
       </div>

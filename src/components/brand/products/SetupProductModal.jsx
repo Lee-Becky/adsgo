@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   X, ArrowLeft, Loader2, Info, ChevronDown, 
   Sparkles, Target, User, Layers, Edit2, Trash2,
@@ -54,7 +54,7 @@ const AssetGrid = ({ title, subtitle, assets = [], onAssetsChange, maxCount = 99
   const needsMoreCard = isExpandable && !isExpanded && assets.length > 4;
   const displayAssets = needsMoreCard ? assets.slice(0, 3) : assets;
   const moreCount = assets.length - 3;
-  const fileInputRef = React.useRef(null);
+  const fileInputRef = useRef(null);
 
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
@@ -92,8 +92,8 @@ const AssetGrid = ({ title, subtitle, assets = [], onAssetsChange, maxCount = 99
       <div className="flex items-center justify-between">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
+            <div className="w-1 h-3 bg-blue-400 rounded-full" />
             <h5 className="text-[13px] font-black text-slate-900">{title}</h5>
-            {showExamples && <span className="text-[10px] font-bold text-indigo-500 cursor-pointer hover:underline">View examples</span>}
           </div>
           <p className="text-[10px] text-slate-400 font-medium leading-tight">{subtitle}</p>
         </div>
@@ -664,7 +664,7 @@ const SetupProductModal = ({ isOpen, onClose, onCreate, initialData = {} }) => {
                 {productForm.usps.map((usp, i) => (
                   <div key={i} className="flex items-center gap-3 group animate-in fade-in slide-in-from-left-2 duration-300">
                     <div className="flex-1 relative group/input">
-                      <div className="absolute left-4 top-1/2 -translate-y-1/2 w-6 h-6 rounded-md bg-slate-100 border border-slate-200 flex items-center justify-center text-[10px] font-black text-slate-400 group-focus-within/input:bg-amber-100 group-focus-within/input:border-amber-200 group-focus-within/input:text-amber-600 transition-all">
+                      <div className="absolute left-4 top-1/2 -translate-y-1/2 w-6 h-6 rounded-md bg-slate-100 border border-slate-200 flex items-center justify-center text-[10px] font-black text-slate-400 group-focus-within/input:bg-amber-100 group-focus-within/input:text-amber-600 transition-all">
                         {i + 1}
                       </div>
                       <input 
@@ -951,6 +951,9 @@ const SetupProductModal = ({ isOpen, onClose, onCreate, initialData = {} }) => {
                     subtitle="Demonstrate how the product works — from setup steps to someone actively using it in real situations."
                     assets={productForm.assets.demo}
                     onAssetsChange={(assets) => updateForm('assets', { ...productForm.assets, demo: assets })}
+                    isExpandable
+                    isExpanded={expandedSections.demo}
+                    onToggle={() => toggleSection('demo')}
                   />
 
                   {/* Testimonial */}
@@ -959,6 +962,9 @@ const SetupProductModal = ({ isOpen, onClose, onCreate, initialData = {} }) => {
                     subtitle="Customer feedback, quotes, social proof, or user experiences."
                     assets={productForm.assets.testimonial}
                     onAssetsChange={(assets) => updateForm('assets', { ...productForm.assets, testimonial: assets })}
+                    isExpandable
+                    isExpanded={expandedSections.testimonial}
+                    onToggle={() => toggleSection('testimonial')}
                   />
 
                   {/* Lifestyle */}
@@ -967,6 +973,9 @@ const SetupProductModal = ({ isOpen, onClose, onCreate, initialData = {} }) => {
                     subtitle="The product in a natural environment or everyday scene."
                     assets={productForm.assets.lifestyle}
                     onAssetsChange={(assets) => updateForm('assets', { ...productForm.assets, lifestyle: assets })}
+                    isExpandable
+                    isExpanded={expandedSections.lifestyle}
+                    onToggle={() => toggleSection('lifestyle')}
                   />
 
                   {/* Painpoints */}
@@ -975,6 +984,9 @@ const SetupProductModal = ({ isOpen, onClose, onCreate, initialData = {} }) => {
                     subtitle="Highlight the frustrations or difficult situations before using the product."
                     assets={productForm.assets.painpoints}
                     onAssetsChange={(assets) => updateForm('assets', { ...productForm.assets, painpoints: assets })}
+                    isExpandable
+                    isExpanded={expandedSections.painpoints}
+                    onToggle={() => toggleSection('painpoints')}
                   />
 
                   {/* Comparison */}
@@ -983,6 +995,9 @@ const SetupProductModal = ({ isOpen, onClose, onCreate, initialData = {} }) => {
                     subtitle="Shows clear before-and-after differences or comparisons."
                     assets={productForm.assets.comparison}
                     onAssetsChange={(assets) => updateForm('assets', { ...productForm.assets, comparison: assets })}
+                    isExpandable
+                    isExpanded={expandedSections.comparison}
+                    onToggle={() => toggleSection('comparison')}
                   />
 
                   {/* Result */}
@@ -991,6 +1006,9 @@ const SetupProductModal = ({ isOpen, onClose, onCreate, initialData = {} }) => {
                     subtitle="Shows the positive results or improvements achieved after using the product."
                     assets={productForm.assets.result}
                     onAssetsChange={(assets) => updateForm('assets', { ...productForm.assets, result: assets })}
+                    isExpandable
+                    isExpanded={expandedSections.result}
+                    onToggle={() => toggleSection('result')}
                   />
 
                   {/* Others */}
