@@ -117,7 +117,7 @@ export const MENU_ITEMS = [
         label: 'Competitors',
         icon: 'Users',
         title: 'Competitors',
-        subtitle: 'Track and analyze competitors'
+        subtitle: 'Campaign generation will take competitor information into account.'
       }
     ]
   },

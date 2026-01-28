@@ -20,6 +20,7 @@ import { AutoRegeneration } from './components/autoRegeneration'
 import { Analysis360 } from './components/analysis'
 import AdManagerV3 from './components/adManagerV3/AdManagerV3'
 import { ProductList, ProductDetails } from './components/brand/products'
+import { Competitors } from './components/brand/competitors'
 import ComingSoon from './components/ComingSoon'
 import { getPageInfo } from './constants/menuConfig'
 
@@ -180,6 +181,8 @@ function App() {
             }} 
           />
         )
+      case 'competitors':
+        return <Competitors />
       case 'productDetails':
         return (
           <ProductDetails 

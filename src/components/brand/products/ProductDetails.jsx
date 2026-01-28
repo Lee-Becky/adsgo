@@ -505,7 +505,7 @@ const ProductDetails = ({ product, onBack }) => {
                 { id: 'positioning', label: 'Product Positioning', icon: Target, color: 'purple' },
                 { id: 'audience', label: 'Audience Profile', icon: User, color: 'emerald' },
                 { id: 'assets', label: 'Product Assets', icon: Layers, color: 'blue' },
-                { id: 'historical', label: 'Historical Records', icon: History, color: 'rose' }
+                { id: 'historical', label: 'High-Performance', icon: History, color: 'rose' }
               ].map((tab) => (
                 <button 
                   key={tab.id}
@@ -744,14 +744,14 @@ const ProductDetails = ({ product, onBack }) => {
             )}
           </section>
 
-          {/* 6. Historical Records Section */}
+          {/* 6. Conversion Performance Section */}
           <section ref={sectionRefs.historical} className="bg-white border border-slate-100 rounded-[40px] p-10 shadow-sm space-y-10 scroll-mt-32 animate-in fade-in duration-500">
             <div className="flex items-center gap-4 border-b border-slate-50 pb-6">
               <div className="w-12 h-12 rounded-2xl bg-rose-50 flex items-center justify-center text-rose-600 shadow-sm">
                 <History size={24} />
               </div>
               <div>
-                <h4 className="text-xl font-black text-slate-900">Historical Records</h4>
+                <h4 className="text-xl font-black text-slate-900">High-Performance</h4>
                 <p className="text-xs text-slate-400 font-bold">Data-driven insights from previous high-performing campaigns.</p>
               </div>
             </div>
