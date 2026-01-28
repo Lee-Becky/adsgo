@@ -26,14 +26,14 @@ export const MENU_ITEMS = [
         label: 'Ad Manager',
         icon: 'Layers',
         title: 'Ad Manager',
-        subtitle: 'AI-driven cross-channel ad management platform'
+        subtitle: 'Unified management of cross-channel campaigns and AI-driven budget optimization'
       },
       {
         key: 'autoRegeneration',
-        label: 'Ad Regeneration',
+        label: 'Draft & Recom.',
         icon: 'RefreshCw',
-        title: 'Ad Regeneration',
-        subtitle: 'AI-driven campaign recommendations based on performance'
+        title: 'Draft & Recom.',
+        subtitle: 'Management of unpublished drafts and AI-driven campaign recommendations based on performance'
       }
     ]
   },

@@ -691,7 +691,7 @@ const AutoRegeneration = ({ onPageChange }) => {
   const aiRegenerationCount = getAIRegenerationCount();
   const isRefreshDisabled = aiRegenerationCount > 10;
 
-  // 刷新按钮点击处理：生成1-4条带有AI Regeneration标签的新campaign
+  // 刷新按钮点击处理：生成1-4条带有AI Recommended标签的新campaign
   const handleRefresh = () => {
     if (isRefreshDisabled) return;
 
@@ -987,7 +987,7 @@ const AutoRegeneration = ({ onPageChange }) => {
                         <div className="bg-white border border-gray-100 rounded-xl p-2 shadow-sm space-y-2">
                           <div className="flex items-center gap-1.5 px-1">
                             <i className="fas fa-chart-line text-primary text-[8px]"></i>
-                            <span className="text-[12px] font-black text-gray-700 tracking-tight">AI Regeneration Publishing</span>
+                            <span className="text-[12px] font-black text-gray-700 tracking-tight">AI Recommended Publishing</span>
                           </div>
                           <div className="flex gap-1.5 items-center px-0.5">
                             <div className="flex-1 bg-gray-50 border border-gray-100 rounded-lg p-1.5 flex flex-col">
@@ -1059,23 +1059,23 @@ const AutoRegeneration = ({ onPageChange }) => {
             
             <div className="pl-4 flex flex-col">
               <h2 className="text-xl font-bold text-gray-900 leading-none">
-                More drafts awaiting publish
+                More drafts awaiting publish               
               </h2>
             </div>
           </div>
-          <div className="bg-white rounded-xl border border-border shadow-sm overflow-hidden">
-            <div className="overflow-x-auto">
+          <div className="bg-white rounded-xl border border-border shadow-sm">
+            <div>
               <table className="w-full">
               <thead className="bg-gray-50">
                 <tr>
-                  {selectedPlatform === 'Meta' && <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 min-w-[140px]">Auto Publish Order</th>}
+                  {selectedPlatform === 'Meta' && autoRegen && <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 min-w-[80px]">Order</th>}
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 min-w-[180px]">Campaign</th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 min-w-[120px]">Daily Budget</th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 min-w-[200px]">Audience</th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 min-w-[150px]">Creatives</th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 min-w-[100px]">Product</th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 min-w-[180px]">Update Time</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 min-w-[150px]">Actions</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 min-w-[200px]">{selectedPlatform === 'Google' ? 'Actions' : 'Auto publish & Actions'}</th>
                   </tr>
                 </thead>
               <tbody className="divide-y-0">
@@ -1146,14 +1146,8 @@ const AutoRegeneration = ({ onPageChange }) => {
                           onDragOver={(e) => ((selectedPlatform !== 'Meta') || !autoRegen || !autoPublishCampaigns[campaign.id]) || handleDragOver(e, actualIndex)}
                           onDragEnd={(e) => handleDragEnd(e, campaign.id)}
                         >
-                          {selectedPlatform === 'Meta' && (
-                            <td className={`px-4 py-4 relative group/column-tooltip ${!autoRegen ? 'bg-gray-100 cursor-help' : ''}`}>
-                              {!autoRegen && (
-                                <div className="absolute left-full top-1/2 -translate-y-1/2 ml-2 w-64 bg-gray-900 text-white text-[11px] font-medium rounded-lg p-3 opacity-0 group-hover/column-tooltip:opacity-100 transition-opacity duration-200 pointer-events-none z-50 shadow-xl leading-relaxed">
-                                  Currently, recommendations are in running state. AdsGo does not automatically publish campaigns, so this column cannot be operated.
-                                  <div className="absolute right-full top-1/2 -translate-y-1/2 w-2 h-2 bg-gray-900 rotate-45 -mr-1"></div>
-                                </div>
-                              )}
+                          {selectedPlatform === 'Meta' && autoRegen && (
+                            <td className="px-4 py-4">
                               <div className="flex items-start gap-3">
                                 {autoRegen && autoPublishCampaigns[campaign.id] ? (
                                   <div className="mt-1 cursor-grab active:cursor-grabbing text-gray-300 hover:text-gray-600 transition-colors">
@@ -1164,21 +1158,10 @@ const AutoRegeneration = ({ onPageChange }) => {
                                 )}
                                 <div className="flex flex-col gap-2 flex-1">
                                   {autoPublishCampaigns[campaign.id] && sequenceNumber > 0 && (
-                                    <div className="w-fit px-2 py-0.5 bg-blue-50 text-blue-600 border border-blue-100 rounded-md text-[9px] font-black tracking-tight">
-                                      Sequence {sequenceNumber}
+                                    <div className="w-8 h-8 flex items-center justify-center bg-blue-50 text-blue-600 border-2 border-blue-100 rounded-lg text-sm font-black shadow-sm">
+                                      {sequenceNumber}
                                     </div>
                                   )}
-                                  <div className="flex items-center gap-2">
-                                    <div 
-                                      className={`w-8 h-4 rounded-full p-0.5 transition-colors ${autoPublishCampaigns[campaign.id] ? 'bg-green-500' : 'bg-gray-300'} ${!autoRegen ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
-                                      onClick={() => !autoRegen || handleToggleAutoPublish(campaign.id)}
-                                    >
-                                      <div className={`w-3 h-3 bg-white rounded-full transition-transform ${autoPublishCampaigns[campaign.id] ? 'translate-x-4' : 'translate-x-0'}`} />
-                                    </div>
-                                    <span className={`text-[10px] font-bold ${autoPublishCampaigns[campaign.id] ? 'text-green-600' : 'text-red-600'} ${!autoRegen ? 'opacity-50' : ''}`}>
-                                      {autoPublishCampaigns[campaign.id] ? 'Waiting' : 'Forbidden'}
-                                    </span>
-                                  </div>
                                 </div>
                               </div>
                             </td>
@@ -1189,7 +1172,7 @@ const AutoRegeneration = ({ onPageChange }) => {
                                 {getPlatformLogo(campaign.platform)}
                                 {campaign.isRecommendation && (
                                   <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-green-50 text-green-600 border border-green-100 text-[10px] font-bold rounded-full">
-                                    <Sparkles size={10} /> AI Regeneration
+                                    <Sparkles size={10} /> AI Recommended
                                   </span>
                                 )}
                               </div>
@@ -1243,16 +1226,37 @@ const AutoRegeneration = ({ onPageChange }) => {
                                 <span>Publishing...</span>
                               </div>
                             ) : (
-                              <div className="flex items-center gap-2">
-                                <button onClick={() => handleEditDraft(campaign.id)} className="flex items-center gap-1.5 px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-300 hover:text-primary transition-all duration-200 cursor-pointer">
-                                  <Edit size={14} /> <span>Edit</span>
-                                </button>
-                                <button onClick={() => handlePublishDraft(campaign.id)} className="flex items-center gap-1.5 px-3 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary-hover hover:shadow-md transition-all duration-200 cursor-pointer">
-                                  <Send size={14} /> <span>Publish</span>
-                                </button>
-                                <button onClick={() => handleDelete(campaign.id)} className="flex items-center justify-center p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 hover:text-red-700 transition-all duration-200 cursor-pointer">
-                                  <Trash2 size={14} />
-                                </button>
+                              <div className="flex items-center gap-3">
+                                {selectedPlatform === 'Meta' && (
+                                  <div className="flex items-center gap-2 border-r border-gray-100 pr-3 mr-1 relative group/column-tooltip">
+                                    {!autoRegen && (
+                                      <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-64 bg-gray-900 text-white text-[11px] font-medium rounded-lg p-3 opacity-0 group-hover/column-tooltip:opacity-100 transition-opacity duration-200 pointer-events-none z-50 shadow-xl leading-relaxed">
+                                        <div className="absolute bottom-full left-1/2 -translate-x-1/2 w-2 h-2 bg-gray-900 rotate-45 -mb-1"></div>
+                                        Currently, recommendations are in running state. AdsGo does not automatically publish campaigns, so this switch cannot be operated.
+                                      </div>
+                                    )}
+                                    <div 
+                                      className={`w-8 h-4 rounded-full p-0.5 transition-colors ${autoPublishCampaigns[campaign.id] ? 'bg-green-500' : 'bg-gray-300'} ${!autoRegen ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
+                                      onClick={() => !autoRegen || handleToggleAutoPublish(campaign.id)}
+                                    >
+                                      <div className={`w-3 h-3 bg-white rounded-full transition-transform ${autoPublishCampaigns[campaign.id] ? 'translate-x-4' : 'translate-x-0'}`} />
+                                    </div>
+                                    <span className={`text-[10px] font-bold w-12 ${autoPublishCampaigns[campaign.id] ? 'text-green-600' : 'text-red-600'} ${!autoRegen ? 'opacity-50' : ''}`}>
+                                      {autoPublishCampaigns[campaign.id] ? 'Waiting' : 'Forbidden'}
+                                    </span>
+                                  </div>
+                                )}
+                                <div className="flex items-center gap-2">
+                                  <button onClick={() => handleEditDraft(campaign.id)} className="flex items-center justify-center p-2 bg-white border border-gray-200 rounded-lg text-gray-400 hover:bg-gray-50 hover:border-gray-300 hover:text-primary transition-all duration-200 cursor-pointer" title="Edit">
+                                    <Edit size={14} />
+                                  </button>
+                                  <button onClick={() => handlePublishDraft(campaign.id)} className="flex items-center gap-1.5 px-3 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary-hover hover:shadow-md transition-all duration-200 cursor-pointer">
+                                    <Send size={14} /> <span>Publish</span>
+                                  </button>
+                                  <button onClick={() => handleDelete(campaign.id)} className="flex items-center justify-center p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 hover:text-red-700 transition-all duration-200 cursor-pointer">
+                                    <Trash2 size={14} />
+                                  </button>
+                                </div>
                               </div>
                             )}
                           </td>
@@ -1345,14 +1349,31 @@ const AutoRegeneration = ({ onPageChange }) => {
 
       {/* Delete Confirmation Modal */}
       {deleteConfirmOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="absolute inset-0 bg-black/50" onClick={handleDeleteCancel}></div>
-          <div className="relative bg-white rounded-xl shadow-lg p-6 w-full max-md mx-4">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Delete campaign draft</h3>
-            <p className="text-gray-600 mb-6">Once deleted, it cannot be recovered. Confirm deletion?</p>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={handleDeleteCancel}></div>
+          <div className="relative bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md transform transition-all animate-in fade-in zoom-in duration-200">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center text-red-600">
+                <AlertCircle size={20} />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900">Delete campaign draft</h3>
+            </div>
+            <p className="text-gray-600 mb-8 leading-relaxed">
+              Are you sure you want to delete this campaign draft? This action <span className="font-semibold text-gray-900">cannot be undone</span> and all associated data will be lost.
+            </p>
             <div className="flex justify-end gap-3">
-              <button onClick={handleDeleteCancel} className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-border rounded-lg hover:bg-gray-50 transition-colors">No</button>
-              <button onClick={handleDeleteConfirm} className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors">Yes</button>
+              <button 
+                onClick={handleDeleteCancel} 
+                className="flex-1 sm:flex-none px-6 py-2.5 text-sm font-bold text-gray-700 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-all active:scale-95"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={handleDeleteConfirm} 
+                className="flex-1 sm:flex-none px-6 py-2.5 text-sm font-bold text-white bg-red-600 rounded-xl hover:bg-red-700 shadow-lg shadow-red-200 transition-all active:scale-95"
+              >
+                Delete
+              </button>
             </div>
           </div>
         </div>
