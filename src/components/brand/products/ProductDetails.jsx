@@ -92,7 +92,7 @@ const AssetGrid = ({ title, subtitle, assets = [], onAssetsChange, maxCount = 99
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <h5 className="text-[13px] font-black text-slate-900">{title}</h5>
-            {showExamples && <span className="text-[10px] font-bold text-indigo-500 cursor-pointer hover:underline">View examples</span>}
+            {showExamples && <span className="text-[10px] font-bold text-indigo-500 cursor-pointer hover:underline"></span>}
           </div>
           <p className="text-[10px] text-slate-400 font-medium leading-tight">{subtitle}</p>
         </div>
