@@ -430,7 +430,43 @@ const SetupProductModal = ({ isOpen, onClose, onCreate, initialData = {} }) => {
   const [formErrors, setFormErrors] = useState({});
 
   const updateForm = (field, value) => {
-    setProductForm(prev => ({ ...prev, [field]: value }));
+    setProductForm(prev => {
+      // Logic for type switching and asset migration
+      if (field === 'type' && value !== prev.type) {
+        let newAssets = { ...prev.assets };
+        
+        if (value === 'Non-type') {
+          // Migrating from Physical/Service to Non-type
+          // Collect ALL existing assets from all categories into 'others'
+          const allAssets = Object.keys(prev.assets).reduce((acc, key) => {
+            return [...acc, ...prev.assets[key]];
+          }, []);
+          
+          // Simple URL-based deduplication
+          const uniqueAssets = Array.from(new Map(allAssets.map(item => [item.url, item])).values());
+          
+          // Clear everything and put all into others
+          Object.keys(newAssets).forEach(key => newAssets[key] = []);
+          newAssets.others = uniqueAssets;
+        } else if (prev.type === 'Non-type' && (value === 'Physical Goods' || value === 'Service')) {
+          // Migrating from Non-type to structured types
+          // Keep assets in 'others', clear others (redundant but safe)
+          const existingOthers = [...prev.assets.others];
+          Object.keys(newAssets).forEach(key => {
+            if (key !== 'others') newAssets[key] = [];
+          });
+          newAssets.others = existingOthers;
+        } else {
+          // Migrating between Physical Goods and Service
+          // Ensure 'others' is preserved, maybe merge some common categories in future if needed
+          // For now, per user request, we focus on Non-type flow
+        }
+        
+        return { ...prev, [field]: value, assets: newAssets };
+      }
+      
+      return { ...prev, [field]: value };
+    });
   };
 
   const updatePositioning = (field, value) => {

@@ -174,6 +174,15 @@ export const getPageInfo = (pageKey) => {
       subtitle: page.subtitle
     }
   }
+
+  // 特殊处理详情页映射
+  if (pageKey === 'productDetails') {
+    const productsPage = findPage(allItems.filter(i => i.key === 'brandCenter'))?.children?.find(c => c.key === 'products');
+    return {
+      title: productsPage?.title || 'Products',
+      subtitle: productsPage?.subtitle || 'Manage product information'
+    }
+  }
   
   // 默认返回 Home 信息
   return {
