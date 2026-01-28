@@ -48,6 +48,153 @@ const TagEditor = ({ tags = [], onTagsChange, placeholder, label = "" }) => {
   );
 };
 
+const AssetGrid = ({ title, subtitle, assets = [], onAssetsChange, maxCount = 99, showExamples = false, isExpandable = false, isExpanded = false, onToggle }) => {
+  const displayAssets = isExpandable && !isExpanded ? assets.slice(0, 4) : assets;
+  const moreCount = assets.length - 4;
+  const fileInputRef = React.useRef(null);
+
+  const handleFileChange = (e) => {
+    const files = Array.from(e.target.files);
+    if (files.length === 0) return;
+
+    const newAssets = files.map(file => ({
+      url: URL.createObjectURL(file),
+      file: file
+    }));
+
+    if (onAssetsChange) {
+      onAssetsChange([...assets, ...newAssets].slice(0, maxCount));
+    }
+    
+    // Reset input so the same file can be uploaded again if deleted
+    e.target.value = '';
+  };
+
+  const removeAsset = (index) => {
+    if (onAssetsChange) {
+      onAssetsChange(assets.filter((_, i) => i !== index));
+    }
+  };
+
+  return (
+    <div className="space-y-4">
+      <input 
+        type="file" 
+        ref={fileInputRef} 
+        className="hidden" 
+        multiple={maxCount > 1}
+        accept="image/*,video/*"
+        onChange={handleFileChange}
+      />
+      <div className="flex items-center justify-between">
+        <div className="space-y-1">
+          <h5 className="text-[13px] font-black text-slate-900">{title}</h5>
+          <p className="text-[10px] text-slate-400 font-medium leading-tight">{subtitle}</p>
+        </div>
+      </div>
+
+      <div className="flex flex-wrap gap-4 items-start">
+        {/* Upload Button */}
+        {assets.length < maxCount && (
+          <div 
+            onClick={() => fileInputRef.current?.click()}
+            className="w-[140px] aspect-square bg-slate-50 border-2 border-dashed border-slate-200 rounded-[24px] flex items-center justify-center cursor-pointer hover:bg-indigo-50 hover:border-indigo-300 transition-all group active:scale-[0.97]"
+          >
+            <Plus size={32} className="text-slate-300 group-hover:text-indigo-500 transition-colors" />
+          </div>
+        )}
+
+        {/* Assets List */}
+        {displayAssets.map((asset, i) => (
+          <div key={i} className="w-[140px] aspect-square bg-white border border-slate-100 rounded-[24px] relative overflow-hidden group shadow-sm hover:shadow-md transition-all">
+            <img src={asset.url || `https://picsum.photos/seed/${title}${i}/300/300`} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+            <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+              <button 
+                onClick={() => removeAsset(i)}
+                className="p-2 bg-white rounded-xl text-rose-500 shadow-lg hover:scale-110 active:scale-90 transition-all"
+              >
+                <Trash2 size={14} />
+              </button>
+            </div>
+          </div>
+        ))}
+
+        {/* Expand Card */}
+        {isExpandable && !isExpanded && moreCount > 0 && (
+          <div 
+            onClick={onToggle}
+            className="w-[140px] aspect-square bg-slate-900 rounded-[24px] flex flex-col items-center justify-center cursor-pointer hover:bg-black transition-all shadow-xl group"
+          >
+            <span className="text-lg font-black text-white">{moreCount} more</span>
+            <span className="text-[10px] font-bold text-white/60 uppercase tracking-widest mt-1">assets</span>
+          </div>
+        )}
+
+        {/* Collapse Card */}
+        {isExpandable && isExpanded && (
+          <div 
+            onClick={onToggle}
+            className="w-[140px] aspect-square bg-slate-100 border border-slate-200 rounded-[24px] flex flex-col items-center justify-center cursor-pointer hover:bg-slate-200 transition-all group"
+          >
+            <ChevronRight size={24} className="text-slate-400 rotate-180 mb-1" />
+            <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Collapse</span>
+          </div>
+        )}
+
+        {/* Examples logic for Main Photo */}
+        {showExamples && (
+          <div className="flex-1 min-w-[300px] bg-slate-50/80 border border-slate-100 rounded-[24px] p-5 flex gap-6">
+            <div className="flex-1 space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-xl bg-white border border-slate-100 flex items-center justify-center relative shadow-sm">
+                  <img src="/Transparent image.webp" alt="" className="w-full h-full object-cover rounded-xl" />
+                  <div className="absolute -bottom-1.5 -right-1.5 w-6 h-6 bg-[#22C55E] rounded-full flex items-center justify-center shadow-lg border-2 border-white">
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M2.5 6L5 8.5L9.5 3.5" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </div>
+                </div>
+                <span className="text-[11px] font-bold text-slate-500">Transparent image</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-xl bg-white border border-slate-100 flex items-center justify-center relative shadow-sm">
+                  <img src="/Blurry image.webp" alt="" className="w-full h-full object-cover rounded-xl" />
+                  <div className="absolute -bottom-1.5 -right-1.5 w-6 h-6 bg-[#EF4444] rounded-full flex items-center justify-center shadow-lg border-2 border-white">
+                    <X size={12} strokeWidth={3} className="text-white" />
+                  </div>
+                </div>
+                <span className="text-[11px] font-bold text-slate-500">Blurry image</span>
+              </div>
+            </div>
+            <div className="flex-1 space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-xl bg-white border border-slate-100 flex items-center justify-center relative shadow-sm">
+                  <img src="/Solid Clean background.webp" alt="" className="w-full h-full object-cover rounded-xl" />
+                  <div className="absolute -bottom-1.5 -right-1.5 w-6 h-6 bg-[#22C55E] rounded-full flex items-center justify-center shadow-lg border-2 border-white">
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M2.5 6L5 8.5L9.5 3.5" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </div>
+                </div>
+                <span className="text-[11px] font-bold text-slate-500">Solid / Clean background</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-xl bg-white border border-slate-100 flex items-center justify-center relative shadow-sm">
+                  <img src="/Messy background.webp" alt="" className="w-full h-full object-cover rounded-xl" />
+                  <div className="absolute -bottom-1.5 -right-1.5 w-6 h-6 bg-[#EF4444] rounded-full flex items-center justify-center shadow-lg border-2 border-white">
+                    <X size={12} strokeWidth={3} className="text-white" />
+                  </div>
+                </div>
+                <span className="text-[11px] font-bold text-slate-500">Messy background</span>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
 const SearchableSelect = ({ options, value, onChange, placeholder, isSearchable = true, error }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -224,7 +371,7 @@ const SetupProductModal = ({ isOpen, onClose, onCreate, initialData = {} }) => {
     category: '',
     description: 'Start your campaign today to achieve these results with AdsGo AI. *Results are estimates based on AdsGo AI historical campaign data. Actual performance may vary.',
     priceRange: '',
-    type: 'Physical Goods',
+    type: 'Non-type',
     usps: [''],
     positioning: {
       valueProposition: [],
@@ -236,9 +383,28 @@ const SetupProductModal = ({ isOpen, onClose, onCreate, initialData = {} }) => {
     audience: [
       { id: Date.now(), name: 'Audience Name', age: '', gender: 'All', traits: [] }
     ],
-    assets: [],
+    assets: {
+      main: [],
+      detailed: [],
+      demo: [],
+      testimonial: [],
+      lifestyle: [],
+      painpoints: [],
+      comparison: [],
+      result: [],
+      others: []
+    },
     ...initialData
   });
+
+  const [expandedSections, setExpandedSections] = useState({
+    detailed: false,
+    others: false
+  });
+
+  const toggleSection = (section) => {
+    setExpandedSections(prev => ({ ...prev, [section]: !prev[section] }));
+  };
 
   const [formErrors, setFormErrors] = useState({});
 
@@ -259,11 +425,6 @@ const SetupProductModal = ({ isOpen, onClose, onCreate, initialData = {} }) => {
     if (!productForm.url?.trim()) errors.url = 'Product URL is required';
     if (!productForm.category) errors.category = 'Category is required';
     if (!productForm.type) errors.type = 'Product Type is required';
-    
-    const hasAssets = true; 
-    if (!hasAssets) {
-      errors.assets = 'At least one asset is required';
-    }
     
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
@@ -691,46 +852,129 @@ const SetupProductModal = ({ isOpen, onClose, onCreate, initialData = {} }) => {
             </section>
 
             {/* 5. Assets Section */}
-            <section className="space-y-6">
+            <section className="space-y-10">
               <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 shadow-sm">
                     <Layers size={20} />
                   </div>
                   <div>
-                    <h4 className="text-lg font-bold text-slate-900 font-sans">Assets <span className="text-rose-500 font-black">*</span></h4>
+                    <h4 className="text-lg font-bold text-slate-900 font-sans">Assets</h4>
                     <p className="text-[10px] text-slate-400 font-medium font-sans">Upload product images or video assets.</p>
                   </div>
                 </div>
-                {formErrors.assets && <p className="text-[10px] text-rose-500 font-black animate-pulse">{formErrors.assets}</p>}
               </div>
-              
-              <div className="grid grid-cols-5 gap-5">
-                <div className="aspect-square bg-slate-50 border-2 border-dashed border-slate-200 rounded-[32px] flex items-center justify-center cursor-pointer hover:bg-indigo-50 hover:border-indigo-300 transition-all group shadow-sm hover:shadow-md active:scale-[0.98]">
-                  <div className="flex flex-col items-center gap-2">
-                    <div className="w-12 h-12 rounded-2xl bg-white border border-slate-100 flex items-center justify-center text-slate-400 group-hover:text-indigo-600 group-hover:shadow-inner transition-all">
-                      <Plus size={24} strokeWidth={2.5} />
-                    </div>
-                    <span className="text-[11px] font-black text-slate-400 group-hover:text-indigo-600 uppercase tracking-wider">Upload</span>
-                  </div>
+
+              {productForm.type === 'Physical Goods' ? (
+                <div className="space-y-12">
+                  {/* Product Main Photo */}
+                  <AssetGrid 
+                    title="Product main photo" 
+                    subtitle="A clear view of the product by itself."
+                    maxCount={1}
+                    assets={productForm.assets.main}
+                    onAssetsChange={(assets) => updateForm('assets', { ...productForm.assets, main: assets })}
+                    showExamples={productForm.assets.main.length === 0}
+                  />
+
+                  {/* Detailed Shots */}
+                  <AssetGrid 
+                    title="Product detailed shots" 
+                    subtitle="Extra visuals of the product that give a fuller look or highlight specific parts."
+                    assets={productForm.assets.detailed}
+                    onAssetsChange={(assets) => updateForm('assets', { ...productForm.assets, detailed: assets })}
+                    isExpandable
+                    isExpanded={expandedSections.detailed}
+                    onToggle={() => toggleSection('detailed')}
+                  />
+
+                  {/* Product Demo */}
+                  <AssetGrid 
+                    title="Product demo" 
+                    subtitle="Demonstrate how the product works — from setup steps to someone actively using it in real situations."
+                    assets={productForm.assets.demo}
+                    onAssetsChange={(assets) => updateForm('assets', { ...productForm.assets, demo: assets })}
+                  />
+
+                  {/* Testimonial */}
+                  <AssetGrid 
+                    title="Customer review / testimonial" 
+                    subtitle="Customer feedback, quotes, social proof, or user experiences."
+                    assets={productForm.assets.testimonial}
+                    onAssetsChange={(assets) => updateForm('assets', { ...productForm.assets, testimonial: assets })}
+                  />
+
+                  {/* Lifestyle */}
+                  <AssetGrid 
+                    title="Lifestyle" 
+                    subtitle="The product in a natural environment or everyday scene."
+                    assets={productForm.assets.lifestyle}
+                    onAssetsChange={(assets) => updateForm('assets', { ...productForm.assets, lifestyle: assets })}
+                  />
+
+                  {/* Painpoints */}
+                  <AssetGrid 
+                    title="Painpoints" 
+                    subtitle="Highlight the frustrations or difficult situations before using the product."
+                    assets={productForm.assets.painpoints}
+                    onAssetsChange={(assets) => updateForm('assets', { ...productForm.assets, painpoints: assets })}
+                  />
+
+                  {/* Comparison */}
+                  <AssetGrid 
+                    title="Comparison" 
+                    subtitle="Shows clear before-and-after differences or comparisons."
+                    assets={productForm.assets.comparison}
+                    onAssetsChange={(assets) => updateForm('assets', { ...productForm.assets, comparison: assets })}
+                  />
+
+                  {/* Result */}
+                  <AssetGrid 
+                    title="Result / Outcome" 
+                    subtitle="Shows the positive results or improvements achieved after using the product."
+                    assets={productForm.assets.result}
+                    onAssetsChange={(assets) => updateForm('assets', { ...productForm.assets, result: assets })}
+                  />
+
+                  {/* Others */}
+                  <AssetGrid 
+                    title="Others" 
+                    subtitle="Assets without specific labels"
+                    assets={productForm.assets.others}
+                    onAssetsChange={(assets) => updateForm('assets', { ...productForm.assets, others: assets })}
+                    isExpandable
+                    isExpanded={expandedSections.others}
+                    onToggle={() => toggleSection('others')}
+                  />
                 </div>
-                {[...Array(9)].map((_, i) => (
-                  <div key={i} className="aspect-square bg-white border border-slate-100 rounded-[32px] relative overflow-hidden group shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-                    <img src={`https://picsum.photos/seed/setup${i}/400/400`} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                    <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3 backdrop-blur-[2px]">
-                      <button className="w-10 h-10 bg-white rounded-xl text-slate-900 hover:bg-indigo-50 flex items-center justify-center shadow-lg transition-all hover:scale-110 active:scale-90">
-                        <Edit2 size={16} strokeWidth={2.5} />
-                      </button>
-                      <button className="w-10 h-10 bg-white rounded-xl text-rose-500 hover:bg-rose-50 flex items-center justify-center shadow-lg transition-all hover:scale-110 active:scale-90">
-                        <Trash2 size={16} strokeWidth={2.5} />
-                      </button>
-                    </div>
-                    <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-md px-2 py-1 rounded-lg border border-black/5 shadow-sm">
-                       <ImageIcon size={12} className="text-slate-600" />
+              ) : (
+                <div className="grid grid-cols-5 gap-5">
+                  <div className="aspect-square bg-slate-50 border-2 border-dashed border-slate-200 rounded-[32px] flex items-center justify-center cursor-pointer hover:bg-indigo-50 hover:border-indigo-300 transition-all group shadow-sm hover:shadow-md active:scale-[0.98]">
+                    <div className="flex flex-col items-center gap-2">
+                      <div className="w-12 h-12 rounded-2xl bg-white border border-slate-100 flex items-center justify-center text-slate-400 group-hover:text-indigo-600 group-hover:shadow-inner transition-all">
+                        <Plus size={24} strokeWidth={2.5} />
+                      </div>
+                      <span className="text-[11px] font-black text-slate-400 group-hover:text-indigo-600 uppercase tracking-wider">Upload</span>
                     </div>
                   </div>
-                ))}
-              </div>
+                  {[...Array(9)].map((_, i) => (
+                    <div key={i} className="aspect-square bg-white border border-slate-100 rounded-[32px] relative overflow-hidden group shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                      <img src={`https://picsum.photos/seed/setup${i}/400/400`} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                      <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3 backdrop-blur-[2px]">
+                        <button className="w-10 h-10 bg-white rounded-xl text-slate-900 hover:bg-indigo-50 flex items-center justify-center shadow-lg transition-all hover:scale-110 active:scale-90">
+                          <Edit2 size={16} strokeWidth={2.5} />
+                        </button>
+                        <button className="w-10 h-10 bg-white rounded-xl text-rose-500 hover:bg-rose-50 flex items-center justify-center shadow-lg transition-all hover:scale-110 active:scale-90">
+                          <Trash2 size={16} strokeWidth={2.5} />
+                        </button>
+                      </div>
+                      <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-md px-2 py-1 rounded-lg border border-black/5 shadow-sm">
+                         <ImageIcon size={12} className="text-slate-600" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </section>
           </div>
 
