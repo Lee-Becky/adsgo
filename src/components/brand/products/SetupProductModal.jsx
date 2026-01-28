@@ -49,8 +49,11 @@ const TagEditor = ({ tags = [], onTagsChange, placeholder, label = "" }) => {
 };
 
 const AssetGrid = ({ title, subtitle, assets = [], onAssetsChange, maxCount = 99, showExamples = false, isExpandable = false, isExpanded = false, onToggle }) => {
-  const displayAssets = isExpandable && !isExpanded ? assets.slice(0, 4) : assets;
-  const moreCount = assets.length - 4;
+  // If expandable and NOT expanded, we show at most 4 items. 
+  // If we have more than 4 items, the 4th item position (index 3) becomes the "more" card.
+  const needsMoreCard = isExpandable && !isExpanded && assets.length > 4;
+  const displayAssets = needsMoreCard ? assets.slice(0, 3) : assets;
+  const moreCount = assets.length - 3;
   const fileInputRef = React.useRef(null);
 
   const handleFileChange = (e) => {
@@ -88,17 +91,20 @@ const AssetGrid = ({ title, subtitle, assets = [], onAssetsChange, maxCount = 99
       />
       <div className="flex items-center justify-between">
         <div className="space-y-1">
-          <h5 className="text-[13px] font-black text-slate-900">{title}</h5>
+          <div className="flex items-center gap-2">
+            <h5 className="text-[13px] font-black text-slate-900">{title}</h5>
+            {showExamples && <span className="text-[10px] font-bold text-indigo-500 cursor-pointer hover:underline">View examples</span>}
+          </div>
           <p className="text-[10px] text-slate-400 font-medium leading-tight">{subtitle}</p>
         </div>
       </div>
 
-      <div className="flex flex-wrap gap-4 items-start">
-        {/* Upload Button */}
+      <div className={`flex flex-wrap gap-4 items-start ${isExpandable && !isExpanded ? 'overflow-hidden max-h-[140px]' : ''}`}>
+        {/* Upload Button - Always visible if under maxCount */}
         {assets.length < maxCount && (
           <div 
             onClick={() => fileInputRef.current?.click()}
-            className="w-[140px] aspect-square bg-slate-50 border-2 border-dashed border-slate-200 rounded-[24px] flex items-center justify-center cursor-pointer hover:bg-indigo-50 hover:border-indigo-300 transition-all group active:scale-[0.97]"
+            className="w-[140px] aspect-square bg-slate-50 border-2 border-dashed border-slate-200 rounded-[24px] flex items-center justify-center cursor-pointer hover:bg-indigo-50 hover:border-indigo-300 transition-all group active:scale-[0.97] shrink-0"
           >
             <Plus size={32} className="text-slate-300 group-hover:text-indigo-500 transition-colors" />
           </div>
@@ -106,7 +112,7 @@ const AssetGrid = ({ title, subtitle, assets = [], onAssetsChange, maxCount = 99
 
         {/* Assets List */}
         {displayAssets.map((asset, i) => (
-          <div key={i} className="w-[140px] aspect-square bg-white border border-slate-100 rounded-[24px] relative overflow-hidden group shadow-sm hover:shadow-md transition-all">
+          <div key={i} className="w-[140px] aspect-square bg-white border border-slate-100 rounded-[24px] relative overflow-hidden group shadow-sm hover:shadow-md transition-all shrink-0">
             <img src={asset.url || `https://picsum.photos/seed/${title}${i}/300/300`} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
             <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
               <button 
@@ -119,11 +125,11 @@ const AssetGrid = ({ title, subtitle, assets = [], onAssetsChange, maxCount = 99
           </div>
         ))}
 
-        {/* Expand Card */}
-        {isExpandable && !isExpanded && moreCount > 0 && (
+        {/* Expand Card - Show at 4th position if collapsed and assets > 4 (1 upload + 3 images + 1 more) */}
+        {needsMoreCard && (
           <div 
             onClick={onToggle}
-            className="w-[140px] aspect-square bg-slate-900 rounded-[24px] flex flex-col items-center justify-center cursor-pointer hover:bg-black transition-all shadow-xl group"
+            className="w-[140px] aspect-square bg-slate-900 rounded-[24px] flex flex-col items-center justify-center cursor-pointer hover:bg-black transition-all shadow-xl group shrink-0"
           >
             <span className="text-lg font-black text-white">{moreCount} more</span>
             <span className="text-[10px] font-bold text-white/60 uppercase tracking-widest mt-1">assets</span>
@@ -134,7 +140,7 @@ const AssetGrid = ({ title, subtitle, assets = [], onAssetsChange, maxCount = 99
         {isExpandable && isExpanded && (
           <div 
             onClick={onToggle}
-            className="w-[140px] aspect-square bg-slate-100 border border-slate-200 rounded-[24px] flex flex-col items-center justify-center cursor-pointer hover:bg-slate-200 transition-all group"
+            className="w-[140px] aspect-square bg-slate-100 border border-slate-200 rounded-[24px] flex flex-col items-center justify-center cursor-pointer hover:bg-slate-200 transition-all group shrink-0"
           >
             <ChevronRight size={24} className="text-slate-400 rotate-180 mb-1" />
             <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Collapse</span>
@@ -392,14 +398,29 @@ const SetupProductModal = ({ isOpen, onClose, onCreate, initialData = {} }) => {
       painpoints: [],
       comparison: [],
       result: [],
-      others: []
+      others: [],
+      // Service specific
+      problem: [],
+      intro: [],
+      action: [],
+      environment: [],
+      team: []
     },
     ...initialData
   });
 
   const [expandedSections, setExpandedSections] = useState({
     detailed: false,
-    others: false
+    others: false,
+    // Service specific
+    problem: false,
+    intro: false,
+    action: false,
+    result: false,
+    testimonial: false,
+    environment: false,
+    team: false,
+    comparison: false
   });
 
   const toggleSection = (section) => {
@@ -947,33 +968,117 @@ const SetupProductModal = ({ isOpen, onClose, onCreate, initialData = {} }) => {
                     onToggle={() => toggleSection('others')}
                   />
                 </div>
-              ) : (
-                <div className="grid grid-cols-5 gap-5">
-                  <div className="aspect-square bg-slate-50 border-2 border-dashed border-slate-200 rounded-[32px] flex items-center justify-center cursor-pointer hover:bg-indigo-50 hover:border-indigo-300 transition-all group shadow-sm hover:shadow-md active:scale-[0.98]">
-                    <div className="flex flex-col items-center gap-2">
-                      <div className="w-12 h-12 rounded-2xl bg-white border border-slate-100 flex items-center justify-center text-slate-400 group-hover:text-indigo-600 group-hover:shadow-inner transition-all">
-                        <Plus size={24} strokeWidth={2.5} />
-                      </div>
-                      <span className="text-[11px] font-black text-slate-400 group-hover:text-indigo-600 uppercase tracking-wider">Upload</span>
-                    </div>
-                  </div>
-                  {[...Array(9)].map((_, i) => (
-                    <div key={i} className="aspect-square bg-white border border-slate-100 rounded-[32px] relative overflow-hidden group shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-                      <img src={`https://picsum.photos/seed/setup${i}/400/400`} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                      <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3 backdrop-blur-[2px]">
-                        <button className="w-10 h-10 bg-white rounded-xl text-slate-900 hover:bg-indigo-50 flex items-center justify-center shadow-lg transition-all hover:scale-110 active:scale-90">
-                          <Edit2 size={16} strokeWidth={2.5} />
-                        </button>
-                        <button className="w-10 h-10 bg-white rounded-xl text-rose-500 hover:bg-rose-50 flex items-center justify-center shadow-lg transition-all hover:scale-110 active:scale-90">
-                          <Trash2 size={16} strokeWidth={2.5} />
-                        </button>
-                      </div>
-                      <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-md px-2 py-1 rounded-lg border border-black/5 shadow-sm">
-                         <ImageIcon size={12} className="text-slate-600" />
-                      </div>
-                    </div>
-                  ))}
+              ) : productForm.type === 'Service' ? (
+                <div className="space-y-12">
+                  {/* Problem / Pain points */}
+                  <AssetGrid 
+                    title="Problem / Pain points" 
+                    subtitle="The issue customers face before using your service."
+                    assets={productForm.assets.problem}
+                    onAssetsChange={(assets) => updateForm('assets', { ...productForm.assets, problem: assets })}
+                    isExpandable
+                    isExpanded={expandedSections.problem}
+                    onToggle={() => toggleSection('problem')}
+                  />
+
+                  {/* Business intro */}
+                  <AssetGrid 
+                    title="Business intro" 
+                    subtitle="Visuals that introduce your company, team, or brand identity."
+                    assets={productForm.assets.intro}
+                    onAssetsChange={(assets) => updateForm('assets', { ...productForm.assets, intro: assets })}
+                    isExpandable
+                    isExpanded={expandedSections.intro}
+                    onToggle={() => toggleSection('intro')}
+                  />
+
+                  {/* Service in action */}
+                  <AssetGrid 
+                    title="Service in action" 
+                    subtitle="Your staff, tools, or process while delivering the service."
+                    assets={productForm.assets.action}
+                    onAssetsChange={(assets) => updateForm('assets', { ...productForm.assets, action: assets })}
+                    isExpandable
+                    isExpanded={expandedSections.action}
+                    onToggle={() => toggleSection('action')}
+                  />
+
+                  {/* Result / Outcome */}
+                  <AssetGrid 
+                    title="Result / Outcome" 
+                    subtitle="The positive result after your service is completed."
+                    assets={productForm.assets.result}
+                    onAssetsChange={(assets) => updateForm('assets', { ...productForm.assets, result: assets })}
+                    isExpandable
+                    isExpanded={expandedSections.result}
+                    onToggle={() => toggleSection('result')}
+                  />
+
+                  {/* Customer review / testimonial */}
+                  <AssetGrid 
+                    title="Customer review / testimonial" 
+                    subtitle="Customer feedback, quotes, social proof, or user experiences."
+                    assets={productForm.assets.testimonial}
+                    onAssetsChange={(assets) => updateForm('assets', { ...productForm.assets, testimonial: assets })}
+                    isExpandable
+                    isExpanded={expandedSections.testimonial}
+                    onToggle={() => toggleSection('testimonial')}
+                  />
+
+                  {/* Service Environment */}
+                  <AssetGrid 
+                    title="Service Environment" 
+                    subtitle="Shows the real service setting and workspace layout where the service is provided."
+                    assets={productForm.assets.environment}
+                    onAssetsChange={(assets) => updateForm('assets', { ...productForm.assets, environment: assets })}
+                    isExpandable
+                    isExpanded={expandedSections.environment}
+                    onToggle={() => toggleSection('environment')}
+                  />
+
+                  {/* Team / Staff portrait */}
+                  <AssetGrid 
+                    title="Team / Staff portrait" 
+                    subtitle="Features your service team or professional staff."
+                    assets={productForm.assets.team}
+                    onAssetsChange={(assets) => updateForm('assets', { ...productForm.assets, team: assets })}
+                    isExpandable
+                    isExpanded={expandedSections.team}
+                    onToggle={() => toggleSection('team')}
+                  />
+
+                  {/* Comparison */}
+                  <AssetGrid 
+                    title="Comparison" 
+                    subtitle="Shows clear before-and-after differences or comparisons."
+                    assets={productForm.assets.comparison}
+                    onAssetsChange={(assets) => updateForm('assets', { ...productForm.assets, comparison: assets })}
+                    isExpandable
+                    isExpanded={expandedSections.comparison}
+                    onToggle={() => toggleSection('comparison')}
+                  />
+
+                  {/* Others */}
+                  <AssetGrid 
+                    title="Others" 
+                    subtitle="Assets without specific labels"
+                    assets={productForm.assets.others}
+                    onAssetsChange={(assets) => updateForm('assets', { ...productForm.assets, others: assets })}
+                    isExpandable
+                    isExpanded={expandedSections.others}
+                    onToggle={() => toggleSection('others')}
+                  />
                 </div>
+              ) : (
+                <AssetGrid 
+                  title="Assets" 
+                  subtitle="Upload product images or video assets."
+                  assets={productForm.assets.others}
+                  onAssetsChange={(assets) => updateForm('assets', { ...productForm.assets, others: assets })}
+                  isExpandable
+                  isExpanded={expandedSections.others}
+                  onToggle={() => toggleSection('others')}
+                />
               )}
             </section>
           </div>
