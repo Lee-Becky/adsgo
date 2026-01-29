@@ -1,9 +1,7 @@
 import { useState } from 'react'
 import { Save } from 'lucide-react'
 import ObjectiveSection from './optimizeGoals/ObjectiveSection'
-import LocationSection from './optimizeGoals/LocationSection'
-import DailyBudgetSection from './optimizeGoals/DailyBudgetSection'
-import PerformanceKPISection from './optimizeGoals/PerformanceKPISection'
+import BudgetKPISection from './optimizeGoals/BudgetKPISection'
 import AssetSection from './optimizeGoals/AssetSection'
 import RulesLibrarySection from './optimizeGoals/RulesLibrarySection'
 
@@ -12,14 +10,19 @@ const OptimizeGoals = () => {
     campaignObjective: '',
     adsetGoal: '',
     event: '',
-    targetLocations: [],
-    budgetMode: 'unified',
-    unifiedBudget: '',
-    splitBudgets: {},
-    kpiType: 'ROAS',
-    kpiMode: 'unified',
-    unifiedKPI: '',
-    splitKPIs: {},
+    marketGroups: [
+      {
+        id: crypto.randomUUID(),
+        targetLocations: [],
+        budgetMode: 'unified',
+        unifiedBudget: '',
+        splitBudgets: {},
+        kpiType: 'ROAS',
+        kpiMode: 'unified',
+        unifiedKPI: '',
+        splitKPIs: {}
+      }
+    ],
     adScopeAccounts: [],
     assetLoading: false,
     optimizePreferences: []
@@ -27,9 +30,7 @@ const OptimizeGoals = () => {
 
   const [validation, setValidation] = useState({
     objective: false,
-    locations: false,
-    budget: false,
-    kpi: false,
+    marketGroups: false,
     assets: false
   })
 
@@ -59,7 +60,7 @@ const OptimizeGoals = () => {
         </button>
       </div>
 
-      <main className="flex-1 max-w-4xl mx-auto w-full px-10 py-12">
+      <main className="flex-1 max-w-6xl mx-auto w-full px-10 py-12">
         <div className="space-y-10">
           
           {/* Section 1: Objective */}
@@ -72,37 +73,14 @@ const OptimizeGoals = () => {
             />
           </div>
 
-          {/* Section 2: Location */}
-          <div className="bg-white rounded-[32px] border border-slate-200 shadow-[0_4px_24px_rgba(0,0,0,0.04)] relative z-10">
-            <LocationSection 
-              formData={formData}
-              updateFormData={updateFormData}
-              validation={validation}
-              setValidation={setValidation}
-            />
-          </div>
-
-          {/* Section 3: Daily Budget */}
-          <div className="bg-white rounded-[32px] border border-slate-200 shadow-[0_4px_24px_rgba(0,0,0,0.04)] relative">
-            <DailyBudgetSection 
-              formData={formData}
-              updateFormData={updateFormData}
-              updateFormDataDeep={updateFormDataDeep}
-              validation={validation}
-              setValidation={setValidation}
-            />
-          </div>
-
-          {/* Section 4: Performance KPI */}
-          <div className="bg-white rounded-[32px] border border-slate-200 shadow-[0_4px_24px_rgba(0,0,0,0.04)] relative">
-            <PerformanceKPISection 
-              formData={formData}
-              updateFormData={updateFormData}
-              updateFormDataDeep={updateFormDataDeep}
-              validation={validation}
-              setValidation={setValidation}
-            />
-          </div>
+          {/* Section 2: Market Strategy Groups (Directly listed without heavy container) */}
+          <BudgetKPISection 
+            formData={formData}
+            updateFormData={updateFormData}
+            updateFormDataDeep={updateFormDataDeep}
+            validation={validation}
+            setValidation={setValidation}
+          />
 
           {/* Section 5: Asset Scope */}
           <div className="bg-white rounded-[32px] border border-slate-200 shadow-[0_4px_24px_rgba(0,0,0,0.04)] relative">
