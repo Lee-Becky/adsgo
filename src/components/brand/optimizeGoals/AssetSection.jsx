@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { ShieldCheck, Info, RefreshCw, Plus, GripVertical, CheckCircle2, X, Link2, Loader2, Search, Trash2 } from 'lucide-react'
+import { ShieldCheck, Info, RefreshCw, Plus, GripVertical, CheckCircle2, X, Link2, Loader2, Search, Trash2, Link2Off, AlertTriangle } from 'lucide-react'
 
 const AssetSection = ({ formData, updateFormData, validation, setValidation }) => {
   const [activePlatform, setActivePlatform] = useState('meta')
@@ -7,12 +7,13 @@ const AssetSection = ({ formData, updateFormData, validation, setValidation }) =
   const [countdown, setCountdown] = useState(60)
   const [isAuthorized, setIsAuthorized] = useState(false)
   const [showAddModal, setShowAddModal] = useState(false)
+  const [showDisconnectConfirm, setShowDisconnectConfirm] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [draggedItemIndex, setDraggedItemIndex] = useState(null)
   
   const platforms = [
     { id: 'meta', label: 'Meta', icon: 'https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://meta.com&size=256', enabled: true },
-    { id: 'google', label: 'Google', icon: 'https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://google.com&size=256', enabled: false },
+    { id: 'google', label: 'Google', icon: 'https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://google.com&size=256', enabled: true },
     { id: 'tiktok', label: 'TikTok', icon: 'https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://tiktok.com&size=256', enabled: false },
     { id: 'bing', label: 'Bing', icon: 'https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://bing.com&size=256', enabled: false }
   ]
@@ -37,6 +38,13 @@ const AssetSection = ({ formData, updateFormData, validation, setValidation }) =
   const handleConnect = () => {
     setIsFetching(true)
     setCountdown(10)
+  }
+
+  const handleDisconnect = () => {
+    setIsAuthorized(false)
+    setShowDisconnectConfirm(false)
+    // Optional: clear accounts
+    // setAccounts([])
   }
 
   const handleAddAccount = (acc) => {
@@ -67,7 +75,6 @@ const AssetSection = ({ formData, updateFormData, validation, setValidation }) =
     const itemToMove = newAccounts.splice(draggedItemIndex, 1)[0]
     newAccounts.splice(index, 0, itemToMove)
     
-    // Re-assign priority based on new order
     const reordered = newAccounts.map((acc, i) => ({ ...acc, priority: i + 1 }))
     
     setAccounts(reordered)
@@ -100,7 +107,9 @@ const AssetSection = ({ formData, updateFormData, validation, setValidation }) =
     <div className="animate-in fade-in duration-700">
       <header className="px-10 py-6 bg-slate-100 border-b border-slate-200 flex items-center justify-between rounded-t-[32px]">
         <div className="flex items-center gap-3">
-          <ShieldCheck size={20} className="text-slate-900" />
+          <div className="w-8 h-8 rounded-xl bg-slate-900 flex items-center justify-center text-white shadow-sm">
+            <ShieldCheck size={16} />
+          </div>
           <h2 className="text-sm font-black text-slate-900">Ad Scope (Assigned account)</h2>
         </div>
         {validation.assets && (
@@ -111,30 +120,42 @@ const AssetSection = ({ formData, updateFormData, validation, setValidation }) =
       </header>
 
       <div className="p-10 space-y-8">
-        {/* Platform Tabs */}
-        <div className="bg-slate-50 p-1.5 rounded-[24px] flex gap-2">
-          {platforms.map((p) => (
-            <div key={p.id} className="flex-1 relative group/tab">
-              <button
-                disabled={!p.enabled}
-                onClick={() => p.enabled && setActivePlatform(p.id)}
-                className={`w-full flex items-center justify-center gap-3 py-3 rounded-2xl transition-all ${
-                  activePlatform === p.id 
-                    ? 'bg-white text-slate-900 shadow-md border border-slate-100' 
-                    : 'text-slate-400'
-                } ${!p.enabled ? 'opacity-40 cursor-not-allowed' : 'hover:text-slate-600'}`}
-              >
-                <img src={p.icon} alt={p.label} className="w-5 h-5 grayscale-[0.5]" />
-                <span className="text-sm font-bold">{p.label}</span>
-              </button>
-              {!p.enabled && (
-                <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[10px] font-black px-3 py-1.5 rounded-lg opacity-0 group-hover/tab:opacity-100 pointer-events-none transition-opacity shadow-xl z-50 whitespace-nowrap">
-                  Coming Soon
-                  <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-slate-900 rotate-45" />
-                </div>
-              )}
-            </div>
-          ))}
+        {/* Platform Tabs - Improved States */}
+        <div className="bg-slate-50 p-1.5 rounded-[24px] flex gap-3">
+          {platforms.map((p) => {
+            const isActive = activePlatform === p.id
+            const isEnabled = p.enabled
+            return (
+              <div key={p.id} className="flex-1 relative group/tab">
+                <button
+                  disabled={!isEnabled}
+                  onClick={() => isEnabled && setActivePlatform(p.id)}
+                  className={`w-full flex items-center justify-center gap-3 py-3.5 rounded-2xl transition-all duration-300 border-2 ${
+                    isActive 
+                      ? 'bg-white border-indigo-600 text-slate-900 shadow-xl shadow-indigo-100 scale-[1.02] z-10' 
+                      : isEnabled 
+                        ? 'bg-white/50 border-transparent text-slate-400 hover:bg-white hover:text-slate-600 hover:border-slate-200' 
+                        : 'bg-transparent border-transparent text-slate-300 cursor-not-allowed opacity-40'
+                  }`}
+                >
+                  <img 
+                    src={p.icon} 
+                    alt={p.label} 
+                    className={`w-5 h-5 transition-all duration-300 ${
+                      isActive ? 'grayscale-0 scale-110' : isEnabled ? 'grayscale-[0.4] hover:grayscale-0' : 'grayscale'
+                    }`} 
+                  />
+                  <span className={`text-sm font-black transition-colors ${isActive ? 'text-slate-900' : 'text-inherit'}`}>{p.label}</span>
+                </button>
+                {!isEnabled && (
+                  <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[10px] font-black px-3 py-1.5 rounded-lg opacity-0 group-hover/tab:opacity-100 pointer-events-none transition-opacity shadow-xl z-50 whitespace-nowrap">
+                    Coming Soon
+                    <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-slate-900 rotate-45" />
+                  </div>
+                )}
+              </div>
+            )
+          })}
         </div>
 
         {isFetching ? (
@@ -172,9 +193,12 @@ const AssetSection = ({ formData, updateFormData, validation, setValidation }) =
                   <p className="text-xs font-medium text-slate-400">439596235886019</p>
                 </div>
               </div>
-              <button className="flex items-center gap-2 px-6 py-2.5 bg-white border border-slate-200 text-slate-900 rounded-2xl font-bold text-xs hover:bg-slate-50 transition-all">
-                <RefreshCw size={14} />
-                Switch Account
+              <button 
+                onClick={() => setShowDisconnectConfirm(true)}
+                className="flex items-center gap-2 px-6 py-2.5 bg-white border border-slate-200 text-rose-500 rounded-2xl font-bold text-xs hover:bg-rose-50 hover:border-rose-100 transition-all"
+              >
+                <Link2Off size={14} />
+                Disconnect
               </button>
             </div>
 
@@ -195,7 +219,7 @@ const AssetSection = ({ formData, updateFormData, validation, setValidation }) =
             <div className="flex items-center justify-between px-1">
               <button 
                 onClick={() => setShowAddModal(true)}
-                className="flex items-center gap-2 px-6 py-2.5 bg-white border border-indigo-600 text-indigo-600 rounded-full font-bold text-xs hover:bg-indigo-50 transition-all shadow-sm"
+                className="flex items-center gap-2 px-6 py-2.5 bg-white border-2 border-indigo-600 text-indigo-600 rounded-full font-bold text-xs hover:bg-indigo-50 transition-all shadow-sm"
               >
                 <Plus size={14} strokeWidth={3} />
                 Add Ad Account
@@ -249,6 +273,7 @@ const AssetSection = ({ formData, updateFormData, validation, setValidation }) =
           </div>
         )}
 
+        {/* Add Account Modal */}
         {showAddModal && (
           <div className="fixed inset-0 z-[1000] flex items-center justify-center p-6">
             <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowAddModal(false)} />
@@ -285,6 +310,40 @@ const AssetSection = ({ formData, updateFormData, validation, setValidation }) =
                       <Plus size={18} className="text-slate-200 group-hover:text-indigo-600" />
                     </button>
                   ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Disconnect Confirm Modal */}
+        {showDisconnectConfirm && (
+          <div className="fixed inset-0 z-[1000] flex items-center justify-center p-6">
+            <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowDisconnectConfirm(false)} />
+            <div className="relative bg-white rounded-[40px] shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-300">
+              <div className="p-10 flex flex-col items-center text-center space-y-6">
+                <div className="w-20 h-20 rounded-full bg-rose-50 flex items-center justify-center text-rose-500">
+                  <AlertTriangle size={40} strokeWidth={2.5} />
+                </div>
+                <div className="space-y-2">
+                  <h3 className="text-xl font-black text-slate-900 tracking-tight">Confirm Disconnection</h3>
+                  <p className="text-sm font-bold text-slate-400 leading-relaxed">
+                    AdsGo will no longer be able to provide ads management and optimization services for these accounts. Are you sure you want to disconnect?
+                  </p>
+                </div>
+                <div className="w-full grid grid-cols-2 gap-4 pt-4">
+                  <button 
+                    onClick={() => setShowDisconnectConfirm(false)}
+                    className="py-4 bg-slate-100 text-slate-900 rounded-2xl font-black text-sm hover:bg-slate-200 transition-all"
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    onClick={handleDisconnect}
+                    className="py-4 bg-rose-500 text-white rounded-2xl font-black text-sm hover:bg-rose-600 transition-all shadow-lg shadow-rose-200"
+                  >
+                    Confirm
+                  </button>
                 </div>
               </div>
             </div>
