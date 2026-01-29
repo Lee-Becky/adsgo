@@ -84,12 +84,12 @@ const ObjectiveSection = ({ formData, updateFormData, validation, setValidation 
   return (
     <div className="bg-white rounded-[32px] border border-slate-200 shadow-[0_4px_24px_rgba(0,0,0,0.04)] relative z-[60] animate-in fade-in duration-700">
       <header className="px-10 py-6 bg-slate-100 border-b border-slate-200 flex items-center justify-between rounded-t-[32px]">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-xl bg-slate-900 flex items-center justify-center text-white shadow-sm">
-            <Target size={16} />
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-xl bg-slate-900 flex items-center justify-center text-white shadow-sm">
+              <Target size={16} />
+            </div>
+            <h2 className="text-sm font-black text-slate-900">Promote Objective <span className="text-rose-500 ml-1">*</span></h2>
           </div>
-          <h2 className="text-sm font-black text-slate-900">Promote Objective</h2>
-        </div>
         {validation.objective && (
           <div className="text-emerald-500 animate-in zoom-in duration-500">
             <CheckCircle2 size={24} />

@@ -21,6 +21,7 @@ import { Analysis360 } from './components/analysis'
 import AdManagerV3 from './components/adManagerV3/AdManagerV3'
 import { ProductList, ProductDetails } from './components/brand/products'
 import { Competitors } from './components/brand/competitors'
+import CreateBrandModal from './components/brand/CreateBrandModal'
 import ComingSoon from './components/ComingSoon'
 import { getPageInfo } from './constants/menuConfig'
 
@@ -47,7 +48,9 @@ function App() {
   const [isDashboardDataFetching, setIsDashboardDataFetching] = useState(false) // Ad Manager page data fetching state
   const [isInsightsConnected, setIsInsightsConnected] = useState(false) // Ad Insights page connection state
   const [isInsightsDataFetching, setIsInsightsDataFetching] = useState(false) // Ad Insights page data fetching state
+  const [brands, setBrands] = useState(['neopets', 'gaming studio', 'tech brand'])
   const [selectedBrand, setSelectedBrand] = useState('neopets')
+  const [isCreateBrandModalOpen, setIsCreateBrandModalOpen] = useState(false)
   const [editingBrand, setEditingBrand] = useState(null)
   const [selectedProduct, setSelectedProduct] = useState(null)
 
@@ -237,6 +240,8 @@ function App() {
           onDemoCreate={() => {}}
           selectedBrand={selectedBrand}
           onBrandChange={setSelectedBrand}
+          onCreateBrand={() => setIsCreateBrandModalOpen(true)}
+          brands={brands}
         >
           {/* Main Content Area - Scrollable */}
           {renderContent()}
@@ -263,6 +268,18 @@ function App() {
             campaign={selectedCampaign}
             onSave={handleBudgetSave}
             onUpdateBudgetStatus={handleUpdateBudgetStatus}
+          />
+
+          {/* Create Brand Modal */}
+          <CreateBrandModal 
+            isOpen={isCreateBrandModalOpen}
+            onClose={() => setIsCreateBrandModalOpen(false)}
+            onCreate={(newBrand) => {
+              console.log('New Brand Created:', newBrand);
+              const brandName = newBrand.name;
+              setBrands(prev => [...prev, brandName]);
+              setSelectedBrand(brandName);
+            }}
           />
         </MainLayout>
       } />

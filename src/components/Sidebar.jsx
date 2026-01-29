@@ -9,8 +9,7 @@ import {
   ChevronsUpDown, Check, LogOut, CreditCard, Link, HelpCircle
 } from 'lucide-react'
 import { MENU_ITEMS, SETTINGS_MENU } from '../constants/menuConfig'
-
-const Sidebar = ({ isMobile, onClose, selectedBrand, onBrandChange }) => {
+const Sidebar = ({ isMobile, onClose, selectedBrand, onBrandChange, onCreateBrand, brands = [] }) => {
   const navigate = useNavigate()
   const location = useLocation()
   // 获取路径的最后一部分作为页面 key
@@ -21,8 +20,6 @@ const Sidebar = ({ isMobile, onClose, selectedBrand, onBrandChange }) => {
   const [expandedKeys, setExpandedKeys] = useState(['aiOptimize'])
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
   const userMenuRef = useRef(null)
-  
-  const brands = ['neopets', 'gaming studio', 'tech brand']
 
   // 根据当前页面自动展开父菜单
   useEffect(() => {
@@ -193,7 +190,10 @@ const Sidebar = ({ isMobile, onClose, selectedBrand, onBrandChange }) => {
               <div className="h-px bg-slate-100 my-1.5 mx-2" />
               <div className="px-2 pb-1">
                 <button
-                  onClick={() => setIsBrandDropdownOpen(false)}
+                  onClick={() => {
+                    setIsBrandDropdownOpen(false)
+                    onCreateBrand()
+                  }}
                   className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-white border border-primary text-primary rounded-xl hover:bg-primary/5 transition-all group"
                 >
                   <Plus size={16} className="group-hover:rotate-90 transition-transform duration-300" />

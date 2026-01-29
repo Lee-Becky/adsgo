@@ -205,7 +205,7 @@ const BudgetKPISection = ({ formData, updateFormData, updateFormDataDeep, valida
       <header className="px-10 py-6 bg-slate-100 border-b border-slate-200 flex items-center justify-between rounded-t-[32px]">
         <div className="flex items-center gap-3">
           <Layers size={20} className="text-slate-900" />
-          <h2 className="text-sm font-black text-slate-900">Budget & Performance KPI</h2>
+          <h2 className="text-sm font-black text-slate-900">Budget & Performance KPI <span className="text-rose-500 ml-1">*</span></h2>
         </div>
         {validation.marketGroups && (
           <div className="text-emerald-500 animate-in zoom-in duration-500">
