@@ -104,7 +104,7 @@ const AssetSection = ({ formData, updateFormData, validation, setValidation }) =
   }, [isAuthorized, accounts, setValidation])
 
   return (
-    <div className="animate-in fade-in duration-700">
+    <div className="bg-white rounded-[32px] border border-slate-200 shadow-[0_4px_24px_rgba(0,0,0,0.04)] overflow-hidden animate-in fade-in duration-700">
       <header className="px-10 py-6 bg-slate-100 border-b border-slate-200 flex items-center justify-between rounded-t-[32px]">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-xl bg-slate-900 flex items-center justify-center text-white shadow-sm">
