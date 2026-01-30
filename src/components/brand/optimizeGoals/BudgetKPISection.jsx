@@ -189,8 +189,8 @@ const BudgetKPISection = ({ formData, updateFormData, updateFormDataDeep, valida
     const allGroupsValid = formData.marketGroups.length > 0 && formData.marketGroups.every(group => {
       const locValid = group.targetLocations.length > 0
       let budgetValid = group.budgetMode === 'unified' ? !!group.unifiedBudget : (locValid && group.targetLocations.every(loc => group.splitBudgets[loc.value]))
-      let kpiValid = group.kpiMode === 'unified' ? !!group.unifiedKPI : (locValid && group.targetLocations.every(loc => group.splitKPIs[loc.value]))
-      return locValid && budgetValid && kpiValid
+      // KPI is optional now
+      return locValid && budgetValid
     })
     setValidation(prev => ({ ...prev, marketGroups: allGroupsValid }))
   }, [formData.marketGroups, setValidation])
@@ -267,7 +267,7 @@ const BudgetKPISection = ({ formData, updateFormData, updateFormDataDeep, valida
                           setActiveSearchGroupId(group.id)
                           setShowLocationDropdown(true)
                         }}
-                        placeholder="Add regions..."
+                        placeholder="Add locations..."
                         className="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-indigo-500/5 focus:border-indigo-500 transition-all shadow-sm"
                       />
                       
@@ -309,7 +309,7 @@ const BudgetKPISection = ({ formData, updateFormData, updateFormDataDeep, valida
                       {!locValid && (
                         <div className="w-full py-10 flex flex-col items-center justify-center border border-dashed border-slate-200 rounded-2xl bg-white/50 space-y-2">
                           <Globe size={24} className="text-slate-200" />
-                          <p className="text-[11px] font-bold text-slate-300">No regions added</p>
+                          <p className="text-[11px] font-bold text-slate-300">No locations added</p>
                         </div>
                       )}
                     </div>

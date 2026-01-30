@@ -1,7 +1,65 @@
-import React from 'react';
-import { CheckCircle2, Users, Activity, ChevronDown, Sparkles, Search, DollarSign } from 'lucide-react';
+import React, { useState } from 'react';
+import { CheckCircle2, Users, Activity, ChevronDown, Sparkles, Search, DollarSign, Megaphone, MousePointer2, ShoppingBag, Smartphone, Check, ChevronLeft, ArrowRight, ChevronRight } from 'lucide-react';
 
-export const AnalysisResultsStep = ({ onBack, onGenerate, LOGO_LINKS }) => {
+export const AnalysisResultsStep = ({ onBack, onGenerate, LOGO_LINKS, initialUrl }) => {
+  const [isObjectiveOpen, setIsObjectiveOpen] = useState(false);
+  const [selectedObjective, setSelectedObjective] = useState('sales_conversions');
+  
+  const [isEventSelectOpen, setIsEventSelectOpen] = useState(false);
+  const [selectorStage, setSelectorStage] = useState('goal'); // 'goal' or 'event'
+  const [selectedAdsetGoal, setSelectedAdsetGoal] = useState('in_web_actions');
+  const [selectedEvent, setSelectedEvent] = useState('Purchase');
+  const [eventSearch, setEventSearch] = useState('');
+
+  const campaignObjectives = [
+    { value: 'awareness_engagement', label: 'Awareness & Engagement', icon: Megaphone },
+    { value: 'traffic', label: 'Traffic', icon: MousePointer2 },
+    { value: 'leads', label: 'Leads', icon: Users },
+    { value: 'sales_conversions', label: 'Sales & Conversions', icon: ShoppingBag },
+    { value: 'app_promotion', label: 'App Promotion', icon: Smartphone }
+  ];
+
+  const getAdsetGoals = (objective) => {
+    const mapping = {
+      awareness_engagement: [
+        { value: 'impressions', label: 'Impressions' },
+        { value: 'post_engagement', label: 'Post engagement' },
+        { value: 'conversations', label: 'Conversations' }
+      ],
+      traffic: [
+        { value: 'impressions', label: 'Impressions' },
+        { value: 'link_clicks', label: 'Link clicks' },
+        { value: 'page_views', label: 'Page views' }
+      ],
+      leads: [
+        { value: 'leads_landing_page', label: 'Leads within landing-page', needsEvent: true },
+        { value: 'instant_form_leads', label: 'Instant form leads' },
+        { value: 'whatsapp', label: 'WhatsApp' },
+        { value: 'calls', label: 'Calls' }
+      ],
+      sales_conversions: [
+        { value: 'in_web_actions', label: 'In-web actions', needsEvent: true }
+      ],
+      app_promotion: [
+        { value: 'installs', label: 'Installs' },
+        { value: 'in_app_actions', label: 'In-app actions', needsEvent: true }
+      ]
+    };
+    return mapping[objective] || [];
+  };
+
+  const allEvents = [
+    'Purchase', 'AddToCart', 'InitiateCheckout', 'Lead', 
+    'CompleteRegistration', 'SubmitApplication', 'Contact', 
+    'Search', 'ViewContent', 'Subscribe', 'CustomizeProduct',
+    'Donate', 'FindLocation', 'Schedule', 'StartTrial'
+  ];
+
+  const filteredEvents = allEvents.filter(ev => ev.toLowerCase().includes(eventSearch.toLowerCase()));
+  const currentObjective = campaignObjectives.find(o => o.value === selectedObjective);
+  const adsetGoals = getAdsetGoals(selectedObjective);
+  const currentGoal = adsetGoals.find(g => g.value === selectedAdsetGoal);
+
   const personas = [
     { title: 'Beach fashion enthusiasts', age: '18-35', gender: '15% male, 85% female', details: 'Style-conscious women who actively...', interests: 'Swimsuit (apparel), Bikini (apparel), Summer (time), Beaches (places), Resort...', img: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Felix' },
     { title: 'Luxury travelers', age: '25-50', gender: '40% male, 60% female', details: 'High-income individuals seeking premium...', interests: 'First class, luxury resort, boutique hotel, private jet, fine dining...', img: 'https://api.dicebear.com/7.x/avataaars/svg?seed=James' },
@@ -48,24 +106,241 @@ export const AnalysisResultsStep = ({ onBack, onGenerate, LOGO_LINKS }) => {
             <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-indigo-600 shadow-sm border border-slate-100 text-left"><Activity className="w-6 h-6" /></div>
             <div className="text-left"><h3 className="text-xl font-bold text-slate-900 text-left">Promotion objective</h3><p className="text-sm text-slate-400 text-left">Configure your final campaign settings</p></div>
           </div>
-          <div className="p-10 space-y-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-left">
-              <div className="space-y-3 text-left"><label className="text-sm font-bold text-slate-900 ml-1 text-left">Business type</label><div className="relative group text-left"><select className="w-full bg-slate-50 border-none rounded-2xl px-6 py-4 appearance-none focus:ring-2 focus:ring-indigo-100 transition-all font-medium text-slate-700 text-left"><option>Online shopping</option><option>SaaS platform</option><option>Lead generation</option></select><ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 pointer-events-none group-focus-within:rotate-180 transition-transform" /></div></div>
-              <div className="grid grid-cols-2 gap-4 text-left">
-                <div className="space-y-3 text-left"><label className="text-sm font-bold text-slate-900 ml-1 text-left">Your Business goal</label><div className="relative text-left"><select className="w-full bg-slate-50 border-none rounded-2xl px-6 py-4 appearance-none focus:ring-2 focus:ring-indigo-100 transition-all font-medium text-slate-700 text-sm text-left"><option>Sales</option><option>Leads</option><option>Traffic</option></select><ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 pointer-events-none" /></div></div>
-                <div className="space-y-3 text-left"><label className="text-sm font-bold text-slate-900 ml-1 text-left">Performance goal</label><div className="relative text-left"><select className="w-full bg-slate-50 border-none rounded-2xl px-6 py-4 appearance-none focus:ring-2 focus:ring-indigo-100 transition-all font-medium text-slate-700 text-sm text-left"><option>In-web actions</option><option>Maximize reach</option><option>Lower CPA</option></select><ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 pointer-events-none" /></div></div>
+          <div className="p-10 space-y-10">
+            {/* Top Row: Business Type, Objective, Conversion Event */}
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-8 text-left border-b border-slate-50 pb-10">
+              {/* Business Type - Smaller width (3 columns) */}
+              <div className="md:col-span-3 space-y-3 text-left">
+                <label className="text-sm font-bold text-slate-900 ml-1">Business type</label>
+                <div className="relative group">
+                  <select className="w-full bg-slate-50 border-none rounded-2xl px-6 py-4 appearance-none focus:ring-2 focus:ring-indigo-100 transition-all font-bold text-slate-700 text-sm">
+                    <option>Online shopping</option>
+                    <option>SaaS platform</option>
+                    <option>Lead generation</option>
+                  </select>
+                  <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 pointer-events-none group-focus-within:rotate-180 transition-transform" />
+                </div>
               </div>
-              <div className="space-y-3 text-left"><label className="text-sm font-bold text-slate-900 ml-1 text-left text-left">Ad platform</label><div className="relative flex items-center bg-slate-50 rounded-2xl px-6 py-4 text-left"><div className="flex items-center gap-2 flex-1 text-left"><img src={LOGO_LINKS.meta} className="w-6 h-6 rounded-md object-contain" alt="Meta" /><span className="font-semibold text-slate-700 text-left">Meta</span></div><div className="flex items-center gap-2 bg-indigo-50 px-3 py-1 rounded-full border border-indigo-100 text-left"><Sparkles className="w-3 h-3 text-indigo-600" /><span className="text-[10px] font-bold text-indigo-600 tracking-wider text-left">Recommended</span></div><ChevronDown className="ml-4 w-5 h-5 text-slate-300" /></div></div>
-              <div className="space-y-3 text-left"><label className="text-sm font-bold text-slate-900 ml-1 text-left text-left">Target locations</label><div className="relative flex items-center bg-slate-50 rounded-2xl px-6 py-4 text-left"><div className="flex flex-wrap gap-2 flex-1 text-left"><span className="bg-white px-3 py-1 rounded-lg border border-slate-100 text-sm font-medium text-slate-700 flex items-center gap-2 text-left">United States<button className="text-slate-300 hover:text-rose-500 text-left">×</button></span></div><Search className="ml-4 w-5 h-5 text-slate-300" /></div></div>
-              <div className="space-y-3 text-left"><label className="text-sm font-bold text-slate-900 ml-1 text-left text-left">Suggested daily limit</label><div className="relative flex items-center bg-slate-50 rounded-2xl px-6 text-left"><input type="number" defaultValue="45" className="bg-transparent border-none py-4 px-0 w-full focus:ring-0 font-bold text-slate-900 text-xl text-left" /><div className="h-6 w-[1px] bg-slate-200 mx-4 text-left"></div><span className="font-bold text-slate-400 tracking-wider text-left">USD</span></div></div>
-              <div className="space-y-3 text-left"><label className="text-sm font-bold text-slate-900 ml-1 text-left text-left">Promotion type</label><div className="relative text-left"><select className="w-full bg-slate-50 border-none rounded-2xl px-6 py-4 appearance-none focus:ring-2 focus:ring-indigo-100 transition-all font-medium text-slate-700 text-left"><option>Long-term</option><option>Fixed term</option><option>Dynamic</option></select><ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 pointer-events-none" /></div></div>
+
+              {/* Objective & Conversion Event Grid - Larger width (9 columns) */}
+              <div className="md:col-span-9 grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
+                {/* Objective Selector */}
+                <div className="space-y-3 text-left">
+                  <label className="text-sm font-bold text-slate-900 ml-1">Objective</label>
+                  <div className="relative">
+                    <div 
+                      onClick={() => setIsObjectiveOpen(!isObjectiveOpen)}
+                      className={`w-full flex items-center justify-between px-6 py-4 bg-slate-50 border-2 rounded-2xl cursor-pointer transition-all ${
+                        isObjectiveOpen ? 'border-indigo-500 bg-white shadow-lg' : 'border-transparent hover:border-indigo-100 hover:bg-white'
+                      }`}
+                    >
+                      <span className="text-base font-bold text-slate-700 truncate">{currentObjective?.label}</span>
+                      <ChevronDown className={`w-5 h-5 text-slate-300 transition-transform duration-300 ${isObjectiveOpen ? 'rotate-180 text-indigo-500' : ''}`} />
+                    </div>
+
+                    {isObjectiveOpen && (
+                      <div className="absolute z-[110] mt-2 w-full left-0 bg-white border border-slate-100 rounded-2xl shadow-2xl p-2 animate-in fade-in zoom-in-95 duration-200">
+                        {campaignObjectives.map((obj) => (
+                          <button
+                            key={obj.value}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedObjective(obj.value);
+                              setSelectedAdsetGoal('');
+                              setSelectedEvent('');
+                              setIsObjectiveOpen(false);
+                            }}
+                            className={`w-full text-left px-4 py-3.5 rounded-xl text-sm font-bold transition-all flex items-center justify-between group ${
+                              selectedObjective === obj.value ? 'bg-slate-900 text-white' : 'hover:bg-slate-50 text-slate-600'
+                            }`}
+                          >
+                            <span>{obj.label}</span>
+                            {selectedObjective === obj.value && <Check size={14} />}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Conversion Event Selector */}
+                <div className="space-y-3 text-left">
+                  <label className="text-sm font-bold text-slate-900 ml-1">Conversion Event</label>
+                  <div className="relative">
+                    <div 
+                      onClick={() => {
+                        setIsEventSelectOpen(!isEventSelectOpen);
+                        setSelectorStage('goal');
+                      }}
+                      className={`w-full flex items-center justify-between px-6 py-4 bg-slate-50 border-2 rounded-2xl cursor-pointer transition-all h-16 ${
+                        (selectedAdsetGoal && (!currentGoal?.needsEvent || selectedEvent)) ? 'border-indigo-500 bg-white shadow-lg' : 'border-transparent hover:border-indigo-100 hover:bg-white'
+                      }`}
+                    >
+                      <div className="flex-1 min-w-0">
+                        {selectedAdsetGoal && (!currentGoal?.needsEvent || selectedEvent) ? (
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-bold text-slate-400 truncate leading-none">{currentGoal?.label}</span>
+                            {selectedEvent && (
+                              <>
+                                <ChevronRight size={14} className="text-slate-300 shrink-0" />
+                                <span className="text-base font-bold text-indigo-600 truncate leading-none">{selectedEvent}</span>
+                              </>
+                            )}
+                          </div>
+                        ) : (
+                          <span className="text-sm font-bold text-slate-300">Select event...</span>
+                        )}
+                      </div>
+                      <ChevronDown className={`w-5 h-5 text-slate-300 transition-transform duration-300 ${isEventSelectOpen ? 'rotate-180 text-indigo-500' : ''}`} />
+                    </div>
+
+                    {isEventSelectOpen && (
+                      <div className="absolute z-[110] mt-2 w-72 right-0 bg-white border border-slate-100 rounded-2xl shadow-2xl p-3 animate-in fade-in zoom-in-95 duration-200">
+                        {selectorStage === 'goal' ? (
+                          <div className="space-y-2">
+                            <p className="text-[9px] font-bold text-slate-400 tracking-wider mb-1 px-1">Select Goal</p>
+                            <div className="grid grid-cols-1 gap-1">
+                              {adsetGoals.map(goal => (
+                                <button
+                                  key={goal.value}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setSelectedAdsetGoal(goal.value);
+                                    setSelectedEvent('');
+                                    if (goal.needsEvent) {
+                                      setSelectorStage('event');
+                                    } else {
+                                      setIsEventSelectOpen(false);
+                                    }
+                                  }}
+                                  className={`w-full text-left px-3 py-2.5 rounded-lg text-xs font-bold transition-all flex items-center justify-between group ${
+                                    selectedAdsetGoal === goal.value ? 'bg-slate-900 text-white' : 'hover:bg-slate-50 text-slate-600'
+                                  }`}
+                                >
+                                  <span>{goal.label}</span>
+                                  {goal.needsEvent ? <ArrowRight size={12} className="opacity-30 group-hover:opacity-100" /> : (selectedAdsetGoal === goal.value && <Check size={12} />)}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="space-y-3">
+                            <div className="flex items-center gap-2 px-1">
+                              <button 
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectorStage('goal');
+                                }} 
+                                className="p-1 hover:bg-slate-100 rounded-md transition-colors text-slate-400 hover:text-slate-900"
+                              >
+                                <ChevronLeft size={14} />
+                              </button>
+                              <p className="text-[9px] font-bold text-slate-400 tracking-wider">Back</p>
+                            </div>
+                            <div className="relative">
+                              <Search size={12} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-300" />
+                              <input 
+                                className="w-full pl-8 pr-3 py-2 bg-slate-50 border-none rounded-lg text-xs font-bold text-slate-900 focus:ring-2 focus:ring-indigo-500/20"
+                                placeholder="Search events..."
+                                value={eventSearch}
+                                onChange={(e) => setEventSearch(e.target.value)}
+                                autoFocus
+                              />
+                            </div>
+                            <div className="max-h-48 overflow-y-auto custom-scrollbar space-y-1 pr-1">
+                              {filteredEvents.map(ev => (
+                                <button
+                                  key={ev}
+                                  onClick={() => {
+                                    setSelectedEvent(ev);
+                                    setIsEventSelectOpen(false);
+                                  }}
+                                  className={`w-full text-left px-3 py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-between group ${
+                                    selectedEvent === ev ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200' : 'hover:bg-slate-50 text-slate-600'
+                                  }`}
+                                >
+                                  {ev}
+                                  {selectedEvent === ev && <Check size={12} />}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Bottom Row: Ad platform, Target locations, Daily limit, Promotion type */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-10 text-left">
+              <div className="space-y-3 text-left">
+                <label className="text-sm font-bold text-slate-900 ml-1">Ad platform</label>
+                <div className="relative flex items-center bg-slate-50 rounded-2xl px-6 py-4 border border-transparent">
+                  <div className="flex items-center gap-2 flex-1">
+                    <img src={LOGO_LINKS.meta} className="w-6 h-6 rounded-md object-contain" alt="Meta" />
+                    <span className="font-bold text-slate-700">Meta</span>
+                  </div>
+                  <div className="flex items-center gap-2 bg-indigo-50 px-3 py-1 rounded-full border border-indigo-100">
+                    <Sparkles className="w-3 h-3 text-indigo-600" />
+                    <span className="text-[10px] font-bold text-indigo-600 tracking-wider">Recommended</span>
+                  </div>
+                  <ChevronDown className="ml-4 w-5 h-5 text-slate-300" />
+                </div>
+              </div>
+
+              <div className="space-y-3 text-left">
+                <label className="text-sm font-bold text-slate-900 ml-1">Target locations</label>
+                <div className="relative flex items-center bg-slate-50 rounded-2xl px-6 py-4 border border-transparent">
+                  <div className="flex flex-wrap gap-2 flex-1">
+                    <span className="bg-white px-3 py-1 rounded-lg border border-slate-100 text-sm font-bold text-slate-700 flex items-center gap-2">
+                      United States
+                      <button className="text-slate-300 hover:text-rose-500">×</button>
+                    </span>
+                  </div>
+                  <Search className="ml-4 w-5 h-5 text-slate-300" />
+                </div>
+              </div>
+
+              <div className="space-y-3 text-left">
+                <label className="text-sm font-bold text-slate-900 ml-1">Suggested daily limit</label>
+                <div className="relative flex items-center bg-slate-50 rounded-2xl px-6 border border-transparent">
+                  <input type="number" defaultValue="45" className="bg-transparent border-none py-4 px-0 w-full focus:ring-0 font-bold text-slate-900 text-xl" />
+                  <div className="h-6 w-[1px] bg-slate-200 mx-4"></div>
+                  <span className="font-bold text-slate-400 tracking-wider">USD</span>
+                </div>
+              </div>
+
+              <div className="space-y-3 text-left">
+                <label className="text-sm font-bold text-slate-900 ml-1">Promotion type</label>
+                <div className="relative">
+                  <select className="w-full bg-slate-50 border-none rounded-2xl px-6 py-4 appearance-none focus:ring-2 focus:ring-indigo-100 transition-all font-bold text-slate-700 text-sm">
+                    <option>Long-term</option>
+                    <option>Fixed term</option>
+                    <option>Dynamic</option>
+                  </select>
+                  <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 pointer-events-none" />
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
       <div className="fixed bottom-0 left-[260px] right-0 h-24 bg-white/80 backdrop-blur-md border-t border-slate-100 flex items-center justify-between px-12 z-40 shadow-[0_-10px_40px_rgba(0,0,0,0.03)] text-left">
         <button onClick={onBack} className="px-10 py-3 bg-slate-100 text-slate-600 rounded-full text-xs font-bold tracking-wider hover:bg-slate-200 transition-all border border-slate-100 text-left">Previous</button>
-        <button onClick={onGenerate} className="absolute left-1/2 -translate-x-1/2 px-20 py-4 bg-gradient-to-r from-indigo-600 to-purple-800 text-white rounded-full text-sm font-bold tracking-wide shadow-2xl shadow-indigo-200 hover:-translate-y-1 active:translate-y-0.5 transition-all text-left">Generate campaign</button>
+        <button 
+          onClick={() => onGenerate({
+            objective: selectedObjective,
+            adsetGoal: selectedAdsetGoal,
+            event: selectedEvent,
+            locations: ['United States'], // Dynamic based on UI in real logic
+            dailyLimit: '45' // Dynamic based on UI in real logic
+          })} 
+          className="absolute left-1/2 -translate-x-1/2 px-20 py-4 bg-gradient-to-r from-indigo-600 to-purple-800 text-white rounded-full text-sm font-bold tracking-wide shadow-2xl shadow-indigo-200 hover:-translate-y-1 active:translate-y-0.5 transition-all text-left"
+        >
+          Generate campaign
+        </button>
         <div className="w-[120px] text-left"></div>
       </div>
     </div>

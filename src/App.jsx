@@ -50,12 +50,21 @@ function App() {
   const [isDashboardDataFetching, setIsDashboardDataFetching] = useState(false) // Ad Manager page data fetching state
   const [isInsightsConnected, setIsInsightsConnected] = useState(false) // Ad Insights page connection state
   const [isInsightsDataFetching, setIsInsightsDataFetching] = useState(false) // Ad Insights page data fetching state
-  const [brands, setBrands] = useState(['neopets', 'gaming studio', 'tech brand'])
-  const [selectedBrand, setSelectedBrand] = useState('neopets')
+  const [brands, setBrands] = useState(['Default Brand'])
+  const [selectedBrand, setSelectedBrand] = useState('Default Brand')
   const [isBrandSwitching, setIsBrandSwitching] = useState(false)
   const [isCreateBrandModalOpen, setIsCreateBrandModalOpen] = useState(false)
   const [editingBrand, setEditingBrand] = useState(null)
   const [selectedProduct, setSelectedProduct] = useState(null)
+  const [hasGeneratedCampaign, setHasGeneratedCampaign] = useState(false)
+  const [firstGeneratedUrl, setFirstGeneratedUrl] = useState('')
+  const [savedConfig, setSavedConfig] = useState({
+    objective: '',
+    adsetGoal: '',
+    event: '',
+    locations: [],
+    dailyLimit: ''
+  })
 
   const handleCampaignClick = (campaign) => {
     setSelectedCampaign(campaign)
@@ -175,7 +184,16 @@ function App() {
       case 'autoRegeneration':
         return <AutoRegeneration onPageChange={handlePageChange} />
       case 'campaignGenerator':
-        return <CampaignGenerator />
+        return (
+          <CampaignGenerator 
+            hasGenerated={hasGeneratedCampaign} 
+            setHasGenerated={setHasGeneratedCampaign} 
+            firstGeneratedUrl={firstGeneratedUrl}
+            setFirstGeneratedUrl={setFirstGeneratedUrl}
+            savedConfig={savedConfig}
+            setSavedConfig={setSavedConfig}
+          />
+        )
       case 'insights':
         return <AdInsights onPageChange={handlePageChange} />
       case 'insights360':

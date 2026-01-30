@@ -111,7 +111,7 @@ const ANALYSIS_SEQUENCE = [
   }
 ];
 
-const TypewriterText = ({ text, duration = 5000, onUpdate }) => {
+const TypewriterText = ({ text, duration = 5000, onUpdate, isFirstGeneration }) => {
   const [displayedText, setDisplayedText] = useState('');
   
   useEffect(() => {
@@ -139,8 +139,8 @@ const TypewriterText = ({ text, duration = 5000, onUpdate }) => {
   return <span>{displayedText}</span>;
 };
 
-export const CampaignGenerator = () => {
-  const [url, setUrl] = useState('');
+export const CampaignGenerator = ({ hasGenerated, setHasGenerated, firstGeneratedUrl, setFirstGeneratedUrl, savedConfig, setSavedConfig }) => {
+  const [url, setUrl] = useState(firstGeneratedUrl || '');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [visibleItems, setVisibleItems] = useState([]);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
@@ -160,6 +160,10 @@ export const CampaignGenerator = () => {
 
   const handleStartAnalysis = () => {
     if (!url) return;
+    if (!hasGenerated) {
+      setFirstGeneratedUrl(url);
+    }
+    setHasGenerated(true);
     setIsAnalyzing(true);
     setVisibleItems([]);
     setCurrentStepIndex(0);
@@ -214,8 +218,16 @@ export const CampaignGenerator = () => {
           setIsAnalyzing(false);
           setVisibleItems([]);
         }} 
-        onGenerate={() => setShowEditor(true)}
+        onGenerate={(config) => {
+          if (!hasGenerated) {
+            setFirstGeneratedUrl(url);
+            setHasGenerated(true);
+          }
+          setSavedConfig(config);
+          setShowEditor(true);
+        }}
         LOGO_LINKS={LOGO_LINKS}
+        initialUrl={url}
       />
     );
   }
@@ -293,7 +305,10 @@ export const CampaignGenerator = () => {
       url={url} 
       setUrl={setUrl} 
       handleStartAnalysis={handleStartAnalysis} 
-      avatars={avatars} 
+      avatars={avatars}
+      isFirstGeneration={!hasGenerated}
+      firstGeneratedUrl={firstGeneratedUrl}
+      savedConfig={savedConfig}
     />
   );
 };

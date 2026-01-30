@@ -3,6 +3,7 @@ import { X, Upload, Trash2, Check, Scissors, Fingerprint } from 'lucide-react';
 import ObjectiveSection from './optimizeGoals/ObjectiveSection';
 import BudgetKPISection from './optimizeGoals/BudgetKPISection';
 import AssetSection from './optimizeGoals/AssetSection';
+import SaveConfirmationModal from '../campaignGenerator/SaveConfirmationModal';
 
 const ImageCropper = ({ imageSrc, onCrop, onCancel }) => {
   const [zoom, setZoom] = useState(1);
@@ -97,8 +98,9 @@ const ImageCropper = ({ imageSrc, onCrop, onCancel }) => {
   );
 };
 
-const CreateBrandModal = ({ isOpen, onClose, onCreate }) => {
+const CreateBrandModal = ({ isOpen, onClose, onCreate, initialData }) => {
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [errors, setErrors] = useState({});
   const [brandForm, setBrandForm] = useState({
     name: '',
@@ -134,6 +136,47 @@ const CreateBrandModal = ({ isOpen, onClose, onCreate }) => {
   });
   
   const fileInputRef = useRef(null);
+
+  // Initialize with initialData if provided
+  useEffect(() => {
+    if (initialData && isOpen) {
+      setBrandForm(prev => ({
+        ...prev,
+        ...initialData,
+        // Ensure nested structures like logo and marketGroups are preserved or merged correctly
+        logo: initialData.logo || prev.logo,
+        marketGroups: initialData.marketGroups || prev.marketGroups
+      }));
+    } else if (!isOpen) {
+      // Reset form when modal closes to keep it "clean" for next time if no initialData
+      setBrandForm({
+        name: '',
+        url: '',
+        logo: null,
+        campaignObjective: '',
+        adsetGoal: '',
+        event: '',
+        marketGroups: [
+          {
+            id: crypto.randomUUID(),
+            targetLocations: [],
+            budgetMode: 'unified',
+            unifiedBudget: '',
+            splitBudgets: {},
+            kpiType: 'ROAS',
+            kpiMode: 'unified',
+            unifiedKPI: '',
+            splitKPIs: {}
+          }
+        ],
+        adScopeAccounts: [],
+        assetLoading: false,
+        optimizePreferences: []
+      });
+      setIsSubmitted(false);
+      setErrors({});
+    }
+  }, [initialData, isOpen]);
 
   const getValidationErrors = () => {
     const newErrors = {};
@@ -178,9 +221,14 @@ const CreateBrandModal = ({ isOpen, onClose, onCreate }) => {
     const newErrors = getValidationErrors();
     setErrors(newErrors);
     if (Object.keys(newErrors).length === 0) {
-      onCreate(brandForm);
-      onClose();
+      setIsConfirmOpen(true);
     }
+  };
+
+  const handleFinalConfirm = () => {
+    onCreate(brandForm);
+    setIsConfirmOpen(false);
+    onClose();
   };
 
   const handleFileChange = (e) => {
@@ -220,7 +268,7 @@ const CreateBrandModal = ({ isOpen, onClose, onCreate }) => {
         >
           {/* Header */}
           <div className="px-10 pt-10 pb-6 flex items-center justify-between shrink-0">
-            <h3 className="text-2xl font-bold text-slate-900">Create New Brand</h3>
+            <h3 className="text-2xl font-bold text-slate-900">{initialData ? 'Edit Brand' : 'Create New Brand'}</h3>
             <button 
               onClick={onClose}
               className="p-2.5 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-full transition-all"
@@ -380,7 +428,7 @@ const CreateBrandModal = ({ isOpen, onClose, onCreate }) => {
               form="create-brand-form"
               className="px-10 py-4 bg-indigo-600 text-white rounded-2xl font-bold text-sm hover:bg-indigo-700 shadow-xl shadow-indigo-100 transition-all active:scale-95"
             >
-              Create Brand
+              {initialData ? 'Save Changes' : 'Create Brand'}
             </button>
           </div>
         </div>
@@ -394,6 +442,14 @@ const CreateBrandModal = ({ isOpen, onClose, onCreate }) => {
           onCancel={() => setTempImage(null)}
         />
       )}
+
+      {/* Save Confirmation Modal */}
+      <SaveConfirmationModal 
+        isOpen={isConfirmOpen}
+        onClose={() => setIsConfirmOpen(false)}
+        onConfirm={handleFinalConfirm}
+        brandUrl={brandForm.url}
+      />
 
       <style dangerouslySetInnerHTML={{ __html: `
         .custom-scrollbar::-webkit-scrollbar {
