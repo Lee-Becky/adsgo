@@ -3,6 +3,7 @@ import { Loader2, Command, Zap } from 'lucide-react';
 import { UrlInputStep } from './UrlInputStep';
 import { AnalysisResultsStep } from './AnalysisResultsStep';
 import { CampaignEditorStep } from './CampaignEditorStep';
+import { ConfigurePublishStep } from './ConfigurePublishStep';
 
 const LOGO_LINKS = {
   meta: 'https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://meta.com&size=256',
@@ -146,6 +147,8 @@ export const CampaignGenerator = ({ hasGenerated, setHasGenerated, firstGenerate
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [showFinalResults, setShowFinalResults] = useState(false);
   const [showEditor, setShowEditor] = useState(false);
+  const [showConfigurePublish, setShowConfigurePublish] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
   const scrollRef = useRef(null);
   const endOfListRef = useRef(null);
 
@@ -199,6 +202,17 @@ export const CampaignGenerator = ({ hasGenerated, setHasGenerated, firstGenerate
   useEffect(() => {
     handleScroll();
   }, [visibleItems, currentStepIndex, isAnalyzing]);
+
+  if (showConfigurePublish) {
+    return (
+      <ConfigurePublishStep 
+        product={selectedProduct}
+        savedConfig={savedConfig}
+        LOGO_LINKS={LOGO_LINKS}
+        onBack={() => setShowConfigurePublish(false)}
+      />
+    );
+  }
 
   if (showEditor) {
     return (
@@ -309,6 +323,10 @@ export const CampaignGenerator = ({ hasGenerated, setHasGenerated, firstGenerate
       isFirstGeneration={!hasGenerated}
       firstGeneratedUrl={firstGeneratedUrl}
       savedConfig={savedConfig}
+      onSelectProduct={(product) => {
+        setSelectedProduct(product);
+        setShowConfigurePublish(true);
+      }}
     />
   );
 };

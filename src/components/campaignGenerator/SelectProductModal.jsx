@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { X, Search, Plus, Package, Check, Globe } from 'lucide-react';
 import { MOCK_PRODUCTS } from '../brand/products/mockData';
 
 const SelectProductModal = ({ isOpen, onClose, onSelect }) => {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedId, setSelectedId] = useState(null);
 
@@ -34,7 +36,10 @@ const SelectProductModal = ({ isOpen, onClose, onSelect }) => {
             </div>
           </div>
           <div className="flex items-center gap-4 ml-8">
-            <button className="flex items-center gap-2 px-5 py-2.5 bg-indigo-600 text-white rounded-2xl text-sm font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 active:scale-95">
+            <button 
+              onClick={() => navigate('/brandCenter/products?action=new')}
+              className="flex items-center gap-2 px-5 py-2.5 bg-indigo-600 text-white rounded-2xl text-sm font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 active:scale-95"
+            >
               <Plus size={18} />
               New products
             </button>

@@ -8,8 +8,10 @@ import {
 } from 'lucide-react';
 import { MOCK_PRODUCTS } from './mockData';
 import SetupProductModal from './SetupProductModal';
+import { useLocation } from 'react-router-dom';
 
 const ProductList = ({ onProductClick }) => {
+  const location = useLocation();
   const [inputValue, setInputValue] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -18,6 +20,15 @@ const ProductList = ({ onProductClick }) => {
   const [productToDelete, setProductToDelete] = useState(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [addStep, setAddStep] = useState('options'); // 'options', 'url', 'manual', 'shopify', 'setup'
+
+  // Handle auto-opening the "New product" modal via URL action parameter
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    if (params.get('action') === 'new') {
+      setAddStep('options');
+      setIsAddModalOpen(true);
+    }
+  }, [location.search]);
   const [isShopifyConnected, setIsShopifyConnected] = useState(false);
   const [isDisconnectModalOpen, setIsDisconnectModalOpen] = useState(false);
   const [shopifyStoreName, setShopifyStoreName] = useState('My Awesome Store');

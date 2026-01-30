@@ -5,7 +5,7 @@ import CreateBrandModal from '../brand/CreateBrandModal';
 import SaveConfirmationModal from './SaveConfirmationModal';
 import SelectProductModal from './SelectProductModal';
 
-export const UrlInputStep = ({ url, setUrl, handleStartAnalysis, avatars, isFirstGeneration, firstGeneratedUrl, savedConfig }) => {
+export const UrlInputStep = ({ url, setUrl, handleStartAnalysis, avatars, isFirstGeneration, firstGeneratedUrl, savedConfig, onSelectProduct }) => {
   const navigate = useNavigate();
   const [isSaved, setIsSaved] = useState(false); // Reset to false to ensure user goes through confirm flow each time
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -164,9 +164,11 @@ export const UrlInputStep = ({ url, setUrl, handleStartAnalysis, avatars, isFirs
       <SelectProductModal 
         isOpen={isProductModalOpen}
         onClose={() => setIsProductModalOpen(false)}
-        onSelect={(id) => {
-          console.log('Product selected:', id);
+        onSelect={(product) => {
           setIsProductModalOpen(false);
+          if (onSelectProduct) {
+            onSelectProduct(product);
+          }
         }}
       />
 
