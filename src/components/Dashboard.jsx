@@ -750,7 +750,7 @@ const Dashboard = ({ selectedBrand, onPageChange, onEditBrandConfig }) => {
                 View budget adjustment suggestions
               </button>
               <button 
-                onClick={() => onPageChange('insights')}
+                onClick={() => onPageChange('autoRegeneration')}
                 className="w-full py-2.5 border-2 border-primary text-primary rounded-xl font-bold text-sm hover:bg-primary/5 transition-colors"
               >
                 View new campaign suggestions
