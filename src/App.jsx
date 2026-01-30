@@ -22,6 +22,7 @@ import AdManagerV3 from './components/adManagerV3/AdManagerV3'
 import { ProductList, ProductDetails } from './components/brand/products'
 import { Competitors } from './components/brand/competitors'
 import CreateBrandModal from './components/brand/CreateBrandModal'
+import BrandSwitchLoading from './components/brand/BrandSwitchLoading'
 import ComingSoon from './components/ComingSoon'
 import { getPageInfo } from './constants/menuConfig'
 
@@ -50,6 +51,7 @@ function App() {
   const [isInsightsDataFetching, setIsInsightsDataFetching] = useState(false) // Ad Insights page data fetching state
   const [brands, setBrands] = useState(['neopets', 'gaming studio', 'tech brand'])
   const [selectedBrand, setSelectedBrand] = useState('neopets')
+  const [isBrandSwitching, setIsBrandSwitching] = useState(false)
   const [isCreateBrandModalOpen, setIsCreateBrandModalOpen] = useState(false)
   const [editingBrand, setEditingBrand] = useState(null)
   const [selectedProduct, setSelectedProduct] = useState(null)
@@ -90,6 +92,17 @@ function App() {
   const handlePageChange = (page) => {
     console.log('Page change requested:', page)
     navigate(`/${page}`)
+  }
+
+  const handleBrandChange = (brand) => {
+    setIsBrandSwitching(true)
+    setSelectedBrand(brand)
+    navigate('/overview')
+    
+    // Simulate loading/syncing time before reload
+    setTimeout(() => {
+      window.location.reload()
+    }, 1500)
   }
 
   const handleClearEditingBrand = () => {
@@ -232,58 +245,64 @@ function App() {
   }
 
   return (
-    <Routes>
-      <Route path="/*" element={
-        <MainLayout
-          showDemoOverlay={false}
-          onDemoConnect={() => {}}
-          onDemoCreate={() => {}}
-          selectedBrand={selectedBrand}
-          onBrandChange={setSelectedBrand}
-          onCreateBrand={() => setIsCreateBrandModalOpen(true)}
-          brands={brands}
-        >
-          {/* Main Content Area - Scrollable */}
-          {renderContent()}
+    <>
+      <Routes>
+        <Route path="/*" element={
+          <MainLayout
+            showDemoOverlay={false}
+            onDemoConnect={() => {}}
+            onDemoCreate={() => {}}
+            selectedBrand={selectedBrand}
+            onBrandChange={handleBrandChange}
+            onCreateBrand={() => setIsCreateBrandModalOpen(true)}
+            brands={brands}
+          >
+            {/* Main Content Area - Scrollable */}
+            {renderContent()}
 
-          {/* Campaign Analysis Modal */}
-          <CampaignAnalysisModal
-            isOpen={showCampaignAnalysis}
-            onClose={() => setShowCampaignAnalysis(false)}
-            campaign={selectedCampaign}
-          />
+            {/* Campaign Analysis Modal */}
+            <CampaignAnalysisModal
+              isOpen={showCampaignAnalysis}
+              onClose={() => setShowCampaignAnalysis(false)}
+              campaign={selectedCampaign}
+            />
 
-          {/* Budget Reason Modal */}
-          <BudgetReasonModal
-            isOpen={showBudgetReason}
-            onClose={() => setShowBudgetReason(false)}
-            campaign={selectedCampaign}
-            reason={budgetReasonData}
-          />
+            {/* Budget Reason Modal */}
+            <BudgetReasonModal
+              isOpen={showBudgetReason}
+              onClose={() => setShowBudgetReason(false)}
+              campaign={selectedCampaign}
+              reason={budgetReasonData}
+            />
 
-          {/* Budget Edit Modal */}
-          <BudgetEditModal
-            isOpen={showBudgetEdit}
-            onClose={() => setShowBudgetEdit(false)}
-            campaign={selectedCampaign}
-            onSave={handleBudgetSave}
-            onUpdateBudgetStatus={handleUpdateBudgetStatus}
-          />
+            {/* Budget Edit Modal */}
+            <BudgetEditModal
+              isOpen={showBudgetEdit}
+              onClose={() => setShowBudgetEdit(false)}
+              campaign={selectedCampaign}
+              onSave={handleBudgetSave}
+              onUpdateBudgetStatus={handleUpdateBudgetStatus}
+            />
 
-          {/* Create Brand Modal */}
-          <CreateBrandModal 
-            isOpen={isCreateBrandModalOpen}
-            onClose={() => setIsCreateBrandModalOpen(false)}
-            onCreate={(newBrand) => {
-              console.log('New Brand Created:', newBrand);
-              const brandName = newBrand.name;
-              setBrands(prev => [...prev, brandName]);
-              setSelectedBrand(brandName);
-            }}
-          />
-        </MainLayout>
-      } />
-    </Routes>
+            {/* Create Brand Modal */}
+            <CreateBrandModal 
+              isOpen={isCreateBrandModalOpen}
+              onClose={() => setIsCreateBrandModalOpen(false)}
+              onCreate={(newBrand) => {
+                console.log('New Brand Created:', newBrand);
+                const brandName = newBrand.name;
+                setBrands(prev => [...prev, brandName]);
+                handleBrandChange(brandName);
+              }}
+            />
+          </MainLayout>
+        } />
+      </Routes>
+
+      {isBrandSwitching && (
+        <BrandSwitchLoading brandName={selectedBrand} />
+      )}
+    </>
   )
 }
 
