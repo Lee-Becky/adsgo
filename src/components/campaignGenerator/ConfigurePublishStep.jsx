@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { 
   ChevronDown, Globe, MapPin, Target, Sparkles, ChevronRight, 
   ShoppingCart, Layout, Users, MousePointer2, Plus, Info, 
-  ArrowRight, Zap, Image as ImageIcon, Link as LinkIcon
+  ArrowRight, Zap, Image as ImageIcon, Link as LinkIcon, Trash2
 } from 'lucide-react';
 
 export const ConfigurePublishStep = ({ product, savedConfig, LOGO_LINKS, onBack }) => {
@@ -12,28 +12,65 @@ export const ConfigurePublishStep = ({ product, savedConfig, LOGO_LINKS, onBack 
   const [event] = useState('Purchase');
   
   // Dynamic Structure Logic
-  // Assuming we have 8 assets as default for the mock
-  const totalAssets = 8;
-  const [adsetsCount, setAdsetsCount] = useState(2);
-  const [adsPerSet, setAdsPerSet] = useState(4);
+  const [creatives, setCreatives] = useState([
+    { id: 1, url: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&q=80&w=400", isMain: true },
+    { id: 2, url: "https://picsum.photos/seed/asset-1/300/400" },
+    { id: 3, url: "https://picsum.photos/seed/asset-2/300/400" },
+    { id: 4, url: "https://picsum.photos/seed/asset-3/300/400" },
+    { id: 5, url: "https://picsum.photos/seed/asset-4/300/400" },
+    { id: 6, url: "https://picsum.photos/seed/asset-5/300/400" },
+    { id: 7, url: "https://picsum.photos/seed/asset-6/300/400" },
+    { id: 8, url: "https://picsum.photos/seed/asset-7/300/400" },
+  ]);
+
+  const totalCreatives = creatives.length;
+  const [adsetsCount, setAdsetsCount] = useState(3);
+  const [adsPerSet, setAdsPerSet] = useState('6'); // Can be string 'dynamic' or number
   
   const [budget, setBudget] = useState(50);
   const [budgetType, setBudgetType] = useState('CBO'); // CBO or ABO
 
-  // Campaign count logic: Assets / (Adsets * AdsPerSet), use ceil to ensure all assets are covered
+  // Campaign count logic: use ceil to ensure all creatives are covered
   const campaignCount = useMemo(() => {
-    return Math.ceil(totalAssets / (adsetsCount * adsPerSet));
-  }, [adsetsCount, adsPerSet, totalAssets]);
+    if (adsPerSet === 'dynamic') {
+      return 1; // In dynamic mode, we use 1 campaign where each adset contains all creatives
+    }
+    const adsCountNum = Number(adsPerSet);
+    return Math.ceil(totalCreatives / (adsetsCount * adsCountNum));
+  }, [adsetsCount, adsPerSet, totalCreatives]);
+
+  // Dynamic Estimated Budget Logic
+  const estimatedDailyBudget = useMemo(() => {
+    if (budgetType === 'CBO') {
+      return campaignCount * budget;
+    } else {
+      return (campaignCount * adsetsCount) * budget;
+    }
+  }, [budgetType, campaignCount, adsetsCount, budget]);
 
   // Dynamic Scale Logic to keep the tree inside the card
   const treeScale = useMemo(() => {
-    // Basic heuristics for scaling based on structure complexity
     const horizontalComplexity = campaignCount * adsetsCount;
     if (horizontalComplexity > 12) return 0.5;
     if (horizontalComplexity > 8) return 0.65;
     if (horizontalComplexity > 4) return 0.8;
     return 1;
   }, [campaignCount, adsetsCount]);
+
+  const handleFileUpload = (e) => {
+    const files = Array.from(e.target.files);
+    const newCreatives = files.map(file => ({
+      id: Date.now() + Math.random(),
+      url: URL.createObjectURL(file),
+      isMain: false
+    }));
+    setCreatives(prev => [...prev, ...newCreatives]);
+  };
+
+  const removeCreative = (id) => {
+    if (creatives.length <= 1) return; // Keep at least one
+    setCreatives(prev => prev.filter(c => c.id !== id));
+  };
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] pb-32 animate-in fade-in duration-700 overflow-y-auto custom-scrollbar">
@@ -45,7 +82,7 @@ export const ConfigurePublishStep = ({ product, savedConfig, LOGO_LINKS, onBack 
             { label: 'Location', value: locations[0], icon: MapPin },
             { label: 'Platform', value: 'Meta', icon: Globe, img: LOGO_LINKS?.meta },
             { label: 'Objective', value: objective, icon: Target },
-            { label: 'Optimization Event', value: event, icon: Zap }
+            { label: 'Optimization event', value: event, icon: Zap }
           ].map((item, i) => (
             <div key={i} className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm flex flex-col gap-2 group cursor-pointer hover:border-indigo-200 transition-all">
               <span className="text-[10px] font-bold text-slate-400 tracking-wider">{item.label}</span>
@@ -64,7 +101,7 @@ export const ConfigurePublishStep = ({ product, savedConfig, LOGO_LINKS, onBack 
           ))}
         </div>
 
-        {/* Landing Page & Assets Section */}
+        {/* Landing Page & Creatives Section */}
         <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/20 overflow-hidden">
           <div className="p-8 space-y-8">
             <div className="flex items-start justify-between">
@@ -73,7 +110,7 @@ export const ConfigurePublishStep = ({ product, savedConfig, LOGO_LINKS, onBack 
                   <ShoppingCart size={24} />
                 </div>
                 <div className="space-y-1">
-                  <h3 className="text-lg font-bold text-slate-900 leading-none">{product?.name || 'AIGC Recommended Assets #1'}</h3>
+                  <h3 className="text-lg font-bold text-slate-900 leading-none">{product?.name || 'AIGC Recommended Creatives'}</h3>
                   <div className="flex items-center gap-1.5 text-indigo-600 hover:underline cursor-pointer">
                     <LinkIcon size={14} />
                     <span className="text-xs font-medium">{product?.url || '/products/item-1'}</span>
@@ -82,26 +119,30 @@ export const ConfigurePublishStep = ({ product, savedConfig, LOGO_LINKS, onBack 
               </div>
             </div>
 
-            {/* Assets Grid */}
+            {/* Creatives Grid */}
             <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4">
-              {/* Main Asset */}
-              <div className="aspect-[3/4] rounded-2xl bg-slate-100 border border-slate-200 overflow-hidden relative group shadow-sm">
-                <img src={product?.image || "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&q=80&w=400"} className="w-full h-full object-cover" alt="" />
-                <div className="absolute top-2 left-2 bg-indigo-600 text-[8px] font-black text-white px-1.5 py-0.5 rounded shadow-lg tracking-tighter">MAIN</div>
-              </div>
-              
-              {/* Other Assets */}
-              {[1, 2, 3, 4, 5, 6].map((i) => (
-                <div key={i} className="aspect-[3/4] rounded-2xl bg-slate-100 border border-slate-200 overflow-hidden relative hover:shadow-lg transition-shadow">
-                  <img src={`https://picsum.photos/seed/asset-${i}/300/400`} className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity" alt="" />
+              {creatives.map((creative) => (
+                <div key={creative.id} className="aspect-[3/4] rounded-2xl bg-slate-100 border border-slate-200 overflow-hidden relative group shadow-sm hover:shadow-lg transition-all">
+                  <img src={creative.url} className="w-full h-full object-cover" alt="" />
+                  {creative.isMain && (
+                    <div className="absolute top-2 left-2 bg-indigo-600 text-[8px] font-bold text-white px-1.5 py-0.5 rounded shadow-lg tracking-tighter">Main</div>
+                  )}
+                  {/* Delete Button on Hover */}
+                  <button 
+                    onClick={() => removeCreative(creative.id)}
+                    className="absolute top-2 right-2 p-1.5 bg-white/90 backdrop-blur-sm text-rose-500 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white hover:scale-110 shadow-sm"
+                  >
+                    <Trash2 size={12} strokeWidth={2.5} />
+                  </button>
                 </div>
               ))}
 
               {/* Add Button */}
-              <button className="aspect-[3/4] rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center gap-2 text-slate-300 hover:border-indigo-300 hover:text-indigo-500 hover:bg-indigo-50/30 transition-all group">
+              <label className="aspect-[3/4] rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center gap-2 text-slate-300 hover:border-indigo-300 hover:text-indigo-500 hover:bg-indigo-50/30 transition-all group cursor-pointer">
+                <input type="file" multiple accept="image/*" className="hidden" onChange={handleFileUpload} />
                 <Plus size={24} className="group-hover:scale-110 transition-transform" />
-                <span className="text-[10px] font-bold text-center leading-tight">Add<br/>assets</span>
-              </button>
+                <span className="text-[10px] font-bold text-center leading-tight">Add creatives</span>
+              </label>
             </div>
           </div>
         </div>
@@ -111,7 +152,7 @@ export const ConfigurePublishStep = ({ product, savedConfig, LOGO_LINKS, onBack 
           
           {/* Left: Structure & Tree */}
           <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/20 p-8 space-y-8 flex flex-col min-h-[500px]">
-            <h3 className="text-sm font-bold text-slate-400 tracking-wider">Campaign Structure</h3>
+            <h3 className="text-sm font-bold text-slate-400 tracking-wider">Campaign structure</h3>
             
             <div className="grid grid-cols-2 gap-6">
               <div className="space-y-2">
@@ -132,10 +173,11 @@ export const ConfigurePublishStep = ({ product, savedConfig, LOGO_LINKS, onBack 
                 <div className="relative">
                   <select 
                     value={adsPerSet} 
-                    onChange={(e) => setAdsPerSet(Number(e.target.value))}
+                    onChange={(e) => setAdsPerSet(e.target.value)}
                     className="w-full bg-slate-50 border-none rounded-xl px-4 py-3 text-sm font-bold text-slate-700 appearance-none focus:ring-2 focus:ring-indigo-100 transition-all"
                   >
                     {[1, 2, 3, 4, 5, 6, 7, 8].map(n => <option key={n} value={n}>{n}</option>)}
+                    <option value="dynamic">Dynamic</option>
                   </select>
                   <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none" size={14} />
                 </div>
@@ -146,7 +188,15 @@ export const ConfigurePublishStep = ({ product, savedConfig, LOGO_LINKS, onBack 
             <div className="bg-indigo-50/50 rounded-2xl p-4 flex gap-3 border border-indigo-100/50">
               <Info size={18} className="text-indigo-500 shrink-0" />
               <p className="text-xs font-medium text-slate-600 leading-relaxed">
-                AI will generate <span className="text-indigo-600 font-bold">{campaignCount} Campaign</span> with a <span className="text-indigo-600 font-bold">1:{adsetsCount}:{adsPerSet}</span> structure based on the <span className="text-indigo-600 font-bold">{totalAssets} assets</span> provided.
+                {adsPerSet === 'dynamic' ? (
+                  <>
+                    AI will generate <span className="text-indigo-600 font-bold">1 Campaign</span> where each of the <span className="text-indigo-600 font-bold">{adsetsCount} Adsets</span> will use <span className="text-indigo-600 font-bold">all {totalCreatives} creatives</span> (Dynamic mode).
+                  </>
+                ) : (
+                  <>
+                    AI will generate <span className="text-indigo-600 font-bold">{campaignCount} Campaign</span> with a <span className="text-indigo-600 font-bold">1:{adsetsCount}:{adsPerSet}</span> structure based on the <span className="text-indigo-600 font-bold">{totalCreatives} creatives</span> provided.
+                  </>
+                )}
               </p>
             </div>
 
@@ -163,7 +213,7 @@ export const ConfigurePublishStep = ({ product, savedConfig, LOGO_LINKS, onBack 
                       <div className="w-12 h-12 bg-slate-900 rounded-xl flex items-center justify-center text-white shadow-xl relative z-20 transition-transform group-hover:scale-110">
                         <Layout size={20} />
                       </div>
-                      <span className="text-[9px] font-bold mt-2 text-slate-400">CAMP {ci + 1}</span>
+                      <span className="text-[9px] font-bold mt-2 text-slate-400">Camp {ci + 1}</span>
                       
                       {/* Connector down to Adsets */}
                       <div className="w-px h-8 bg-slate-200 relative">
@@ -185,8 +235,13 @@ export const ConfigurePublishStep = ({ product, savedConfig, LOGO_LINKS, onBack 
                             </div>
                             
                             {/* Level 3: Ads dots grid */}
-                            <div className="mt-8 grid gap-1 px-1" style={{ gridTemplateColumns: `repeat(${Math.ceil(adsPerSet/2)}, minmax(0, 1fr))` }}>
-                              {[...Array(adsPerSet)].map((_, di) => (
+                            <div 
+                              className="mt-8 grid gap-1 px-1" 
+                              style={{ 
+                                gridTemplateColumns: `repeat(${adsPerSet === 'dynamic' ? Math.ceil(totalCreatives/3) : Math.ceil(Number(adsPerSet)/2)}, minmax(0, 1fr))` 
+                              }}
+                            >
+                              {[...Array(adsPerSet === 'dynamic' ? totalCreatives : Number(adsPerSet))].map((_, di) => (
                                 <div key={di} className="w-2 h-2 bg-indigo-500 rounded-[2px] shadow-sm animate-in zoom-in" style={{ animationDelay: `${di * 50}ms` }} />
                               ))}
                             </div>
@@ -203,7 +258,7 @@ export const ConfigurePublishStep = ({ product, savedConfig, LOGO_LINKS, onBack 
           {/* Right: Budget & Estimated Spend */}
           <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/20 p-10 space-y-10 flex flex-col min-h-[500px]">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-bold text-slate-900 leading-none">Campaign Budget (Daily)</h3>
+              <h3 className="text-sm font-bold text-slate-900 leading-none">Campaign budget (Daily)</h3>
               <div className="inline-flex p-1 bg-slate-50 rounded-xl border border-slate-100">
                 {['CBO', 'ABO'].map(type => (
                   <button
@@ -232,11 +287,11 @@ export const ConfigurePublishStep = ({ product, savedConfig, LOGO_LINKS, onBack 
 
             <div className="grid grid-cols-2 gap-6">
               <div className="bg-indigo-600 rounded-[2rem] p-6 text-white shadow-xl shadow-indigo-200 transition-transform hover:scale-[1.02]">
-                <p className="text-[10px] font-bold text-indigo-100 tracking-wider mb-2">DAILY SPEND (EST.)</p>
-                <div className="text-3xl font-bold">${budget}</div>
+                <p className="text-[10px] font-bold text-indigo-100 tracking-wider mb-2">Daily spend (est.)</p>
+                <div className="text-3xl font-bold">${estimatedDailyBudget}</div>
               </div>
               <div className="bg-slate-900 rounded-[2rem] p-6 text-white shadow-xl transition-transform hover:scale-[1.02]">
-                <p className="text-[10px] font-bold text-slate-500 tracking-wider mb-2">TOTAL CAMPAIGNS</p>
+                <p className="text-[10px] font-bold text-slate-500 tracking-wider mb-2">Total campaigns</p>
                 <div className="text-3xl font-bold">{campaignCount}</div>
               </div>
             </div>
@@ -247,9 +302,9 @@ export const ConfigurePublishStep = ({ product, savedConfig, LOGO_LINKS, onBack 
                 <Sparkles size={20} />
               </div>
               <div className="space-y-1">
-                <h4 className="text-xs font-bold text-slate-900">AI Testing Advice</h4>
+                <h4 className="text-xs font-bold text-slate-900">AI testing advice</h4>
                 <p className="text-[11px] text-slate-500 leading-relaxed">
-                  Based on <span className="font-bold text-indigo-600">{totalAssets} assets</span>, AI suggests using cross-testing mode. First round test duration is estimated to be <span className="font-bold text-indigo-600">72 hours</span>.
+                  Based on <span className="font-bold text-indigo-600">{totalCreatives} creatives</span>, AI suggests using cross-testing mode. First round test duration is estimated to be <span className="font-bold text-indigo-600">72 hours</span>.
                 </p>
               </div>
             </div>
@@ -266,7 +321,7 @@ export const ConfigurePublishStep = ({ product, savedConfig, LOGO_LINKS, onBack 
           Back
         </button>
         <button className="px-24 py-4 bg-slate-900 text-white rounded-full text-sm font-bold flex items-center gap-3 hover:bg-black transition-all shadow-xl active:scale-95 group">
-          Confirm Configuration & Start AI Building
+          Confirm configuration & start AI building
           <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
         </button>
       </div>
