@@ -20,6 +20,8 @@ import { AutoRegeneration } from './components/autoRegeneration'
 import { CampaignGenerator } from './components/campaignGenerator'
 import { Analysis360 } from './components/analysis'
 import AdManagerV3 from './components/adManagerV3/AdManagerV3'
+import AIGenerate from './components/creativeHub/AIGenerate'
+import CreativeLibrary from './components/creativeHub/CreativeLibrary'
 import { ProductList, ProductDetails } from './components/brand/products'
 import { Competitors } from './components/brand/competitors'
 import CreateBrandModal from './components/brand/CreateBrandModal'
@@ -195,6 +197,10 @@ function App() {
             onPageChange={handlePageChange}
           />
         )
+      case 'aiGenerate':
+        return <AIGenerate />
+      case 'creativeLibrary':
+        return <CreativeLibrary />
       case 'insights':
         return <AdInsights onPageChange={handlePageChange} />
       case 'insights360':
