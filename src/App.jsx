@@ -109,9 +109,9 @@ function App() {
     setSelectedBrand(brand)
     navigate('/overview')
     
-    // Simulate loading/syncing time before reload
+    // Simulate loading/syncing time
     setTimeout(() => {
-      window.location.reload()
+      setIsBrandSwitching(false)
     }, 1500)
   }
 
