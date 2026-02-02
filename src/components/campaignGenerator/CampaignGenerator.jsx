@@ -168,10 +168,7 @@ export const CampaignGenerator = ({ hasGenerated, setHasGenerated, firstGenerate
 
   const handleStartAnalysis = () => {
     if (!url) return;
-    if (!hasGenerated) {
-      setFirstGeneratedUrl(url);
-    }
-    setHasGenerated(true);
+    // Removed setHasGenerated(true) from here
     setIsAnalyzing(true);
     setVisibleItems([]);
     setCurrentStepIndex(0);
@@ -298,9 +295,10 @@ export const CampaignGenerator = ({ hasGenerated, setHasGenerated, firstGenerate
           setVisibleItems([]);
         }} 
         onGenerate={(config) => {
+          // This is the correct moment to mark the user as non-first-generation
           if (!hasGenerated) {
             setFirstGeneratedUrl(url);
-            setHasGenerated(true);
+            setHasGenerated(true); 
           }
           setSavedConfig(config);
           setShowEditor(true);

@@ -1,17 +1,85 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { 
   ChevronDown, Globe, MapPin, Target, Sparkles, ChevronRight, 
   ShoppingCart, Layout, Users, MousePointer2, Plus, Info, 
-  ArrowRight, Zap, Image as ImageIcon, Link as LinkIcon, Trash2
+  ArrowRight, Zap, Image as ImageIcon, Link as LinkIcon, Trash2,
+  Search, X, Check, Megaphone, Smartphone, ShoppingBag, ChevronLeft,
+  CheckCircle2
 } from 'lucide-react';
 
+const PLATFORMS = [
+  { id: 'meta', name: 'Meta', logo: 'https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://meta.com&size=256' },
+  { id: 'google', name: 'Google', logo: 'https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://google.com&size=256' },
+  { id: 'tiktok', name: 'TikTok', logo: 'https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://tiktok.com&size=256', disabled: true },
+  { id: 'bing', name: 'Bing', logo: 'https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://bing.com&size=256', disabled: true }
+];
+
+const CAMPAIGN_OBJECTIVES = [
+  { value: 'awareness_engagement', label: 'Awareness & Engagement', icon: Megaphone, color: 'text-rose-500', bg: 'bg-rose-50', description: 'Reach more people' },
+  { value: 'traffic', label: 'Traffic', icon: MousePointer2, color: 'text-blue-500', bg: 'bg-blue-50', description: 'Drive site visits' },
+  { value: 'leads', label: 'Leads', icon: Users, color: 'text-amber-500', bg: 'bg-amber-50', description: 'Find prospects' },
+  { value: 'sales_conversions', label: 'Sales & Conversions', icon: ShoppingBag, color: 'text-emerald-500', bg: 'bg-emerald-50', description: 'Drive transactions' },
+  { value: 'app_promotion', label: 'App Promotion', icon: Smartphone, color: 'text-indigo-500', bg: 'bg-indigo-50', description: 'Install & usage' }
+];
+
+const ADSET_GOALS_MAPPING = {
+  awareness_engagement: [
+    { value: 'impressions', label: 'Impressions' },
+    { value: 'post_engagement', label: 'Post engagement' },
+    { value: 'conversations', label: 'Conversations' }
+  ],
+  traffic: [
+    { value: 'impressions', label: 'Impressions' },
+    { value: 'link_clicks', label: 'Link clicks' },
+    { value: 'page_views', label: 'Page views' }
+  ],
+  leads: [
+    { value: 'leads_landing_page', label: 'Leads within landing-page', needsEvent: true },
+    { value: 'instant_form_leads', label: 'Instant form leads' },
+    { value: 'whatsapp', label: 'WhatsApp' },
+    { value: 'calls', label: 'Calls' }
+  ],
+  sales_conversions: [
+    { value: 'in_web_actions', label: 'In-web actions', needsEvent: true }
+  ],
+  app_promotion: [
+    { value: 'installs', label: 'Installs' },
+    { value: 'in_app_actions', label: 'In-app actions', needsEvent: true }
+  ]
+};
+
+const STANDARD_EVENTS = [
+  'Purchase', 'AddToCart', 'InitiateCheckout', 'Lead', 
+  'CompleteRegistration', 'SubmitApplication', 'Contact', 
+  'Search', 'ViewContent', 'Subscribe', 'CustomizeProduct',
+  'Donate', 'FindLocation', 'Schedule', 'StartTrial'
+];
+
+const ALL_COUNTRIES = [
+  { code: 'US', name: 'United States' },
+  { code: 'GB', name: 'United Kingdom' },
+  { code: 'CA', name: 'Canada' },
+  { code: 'AU', name: 'Australia' },
+  { code: 'DE', name: 'Germany' },
+  { code: 'FR', name: 'France' },
+  { code: 'JP', name: 'Japan' },
+  { code: 'SG', name: 'Singapore' },
+  { code: 'BR', name: 'Brazil' },
+  { code: 'IN', name: 'India' }
+];
+
 export const ConfigurePublishStep = ({ product, savedConfig, LOGO_LINKS, onBack, onConfirm }) => {
-  // Use data from Brand config as defaults
-  const [locations] = useState(savedConfig?.locations || ['United States (US)']);
-  const [objective] = useState('Sales & Conversions');
-  const [event] = useState('Purchase');
+  // --- States ---
+  const [selectedLocations, setSelectedLocations] = useState(savedConfig?.locations?.map(name => {
+    const found = ALL_COUNTRIES.find(c => c.name === name);
+    return found || { code: name.slice(0, 2).toUpperCase(), name };
+  }) || [{ code: 'US', name: 'United States' }]);
   
-  // Dynamic Structure Logic
+  const [platform, setPlatform] = useState(PLATFORMS[0]);
+  const [objective, setObjective] = useState(savedConfig?.objective || 'sales_conversions');
+  const [adsetGoal, setAdsetGoal] = useState(savedConfig?.adsetGoal || 'in_web_actions');
+  const [event, setEvent] = useState(savedConfig?.event || 'Purchase');
+
   const [creatives, setCreatives] = useState([
     { id: 1, url: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&q=80&w=400", isMain: true },
     { id: 2, url: "https://picsum.photos/seed/asset-1/300/400" },
@@ -23,32 +91,43 @@ export const ConfigurePublishStep = ({ product, savedConfig, LOGO_LINKS, onBack,
     { id: 8, url: "https://picsum.photos/seed/asset-7/300/400" },
   ]);
 
-  const totalCreatives = creatives.length;
   const [adsetsCount, setAdsetsCount] = useState(3);
-  const [adsPerSet, setAdsPerSet] = useState('6'); // Can be string 'dynamic' or number
-  
+  const [adsPerSet, setAdsPerSet] = useState('6');
   const [budget, setBudget] = useState(50);
-  const [budgetType, setBudgetType] = useState('CBO'); // CBO or ABO
+  const [budgetType, setBudgetType] = useState('CBO');
 
-  // Campaign count logic: use ceil to ensure all creatives are covered
+  // --- Dropdown States ---
+  const [openDropdown, setOpenDropdown] = useState(null); // 'location', 'platform', 'objective', 'event'
+  const [locationSearch, setLocationSearch] = useState('');
+  const [eventSearch, setEventSearch] = useState('');
+  const [objectiveStage, setObjectiveStage] = useState('goal'); // 'goal' or 'event'
+
+  // --- Refs for Click Outside ---
+  const dropdownRef = useRef(null);
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setOpenDropdown(null);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // --- Memos ---
+  const totalCreatives = creatives.length;
+  
   const campaignCount = useMemo(() => {
-    if (adsPerSet === 'dynamic') {
-      return 1; // In dynamic mode, we use 1 campaign where each adset contains all creatives
-    }
+    if (adsPerSet === 'dynamic') return 1;
     const adsCountNum = Number(adsPerSet);
     return Math.ceil(totalCreatives / (adsetsCount * adsCountNum));
   }, [adsetsCount, adsPerSet, totalCreatives]);
 
-  // Dynamic Estimated Budget Logic
   const estimatedDailyBudget = useMemo(() => {
-    if (budgetType === 'CBO') {
-      return campaignCount * budget;
-    } else {
-      return (campaignCount * adsetsCount) * budget;
-    }
+    if (budgetType === 'CBO') return campaignCount * budget;
+    return (campaignCount * adsetsCount) * budget;
   }, [budgetType, campaignCount, adsetsCount, budget]);
 
-  // Dynamic Scale Logic to keep the tree inside the card
   const treeScale = useMemo(() => {
     const horizontalComplexity = campaignCount * adsetsCount;
     if (horizontalComplexity > 12) return 0.5;
@@ -56,6 +135,31 @@ export const ConfigurePublishStep = ({ product, savedConfig, LOGO_LINKS, onBack,
     if (horizontalComplexity > 4) return 0.8;
     return 1;
   }, [campaignCount, adsetsCount]);
+
+  const filteredCountries = ALL_COUNTRIES.filter(c => 
+    c.name.toLowerCase().includes(locationSearch.toLowerCase()) || 
+    c.code.toLowerCase().includes(locationSearch.toLowerCase())
+  );
+
+  const filteredEvents = STANDARD_EVENTS.filter(ev => 
+    ev.toLowerCase().includes(eventSearch.toLowerCase())
+  );
+
+  const currentObjectiveObj = CAMPAIGN_OBJECTIVES.find(o => o.value === objective);
+  const availableGoals = ADSET_GOALS_MAPPING[objective] || [];
+  const currentGoalObj = availableGoals.find(g => g.value === adsetGoal);
+
+  // --- Handlers ---
+  const toggleLocation = (country) => {
+    const isSelected = selectedLocations.some(l => l.code === country.code);
+    if (isSelected) {
+      if (selectedLocations.length > 1) {
+        setSelectedLocations(selectedLocations.filter(l => l.code !== country.code));
+      }
+    } else {
+      setSelectedLocations([...selectedLocations, country]);
+    }
+  };
 
   const handleFileUpload = (e) => {
     const files = Array.from(e.target.files);
@@ -68,7 +172,7 @@ export const ConfigurePublishStep = ({ product, savedConfig, LOGO_LINKS, onBack,
   };
 
   const removeCreative = (id) => {
-    if (creatives.length <= 1) return; // Keep at least one
+    if (creatives.length <= 1) return;
     setCreatives(prev => prev.filter(c => c.id !== id));
   };
 
@@ -77,32 +181,265 @@ export const ConfigurePublishStep = ({ product, savedConfig, LOGO_LINKS, onBack,
       <div className="max-w-6xl mx-auto p-8 space-y-8">
         
         {/* Top Configuration Bar */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          {[
-            { label: 'Location', value: locations[0], icon: MapPin },
-            { label: 'Platform', value: 'Meta', icon: Globe, img: LOGO_LINKS?.meta },
-            { label: 'Objective', value: objective, icon: Target },
-            { label: 'Optimization event', value: event, icon: Zap }
-          ].map((item, i) => (
-            <div key={i} className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm flex flex-col gap-2 group cursor-pointer hover:border-indigo-200 transition-all">
-              <span className="text-[10px] font-bold text-slate-400 tracking-wider">{item.label}</span>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 relative z-[200]">
+          
+          {/* Location Selector */}
+          <div className="relative" ref={openDropdown === 'location' ? dropdownRef : null}>
+            <div 
+              onClick={() => setOpenDropdown(openDropdown === 'location' ? null : 'location')}
+              className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm flex flex-col gap-2 group cursor-pointer hover:border-indigo-200 transition-all h-full"
+            >
+              <span className="text-[10px] font-bold text-slate-400 tracking-wider">Location</span>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2.5 min-w-0">
-                  {item.img ? (
-                    <img src={item.img} className="w-5 h-5 rounded object-contain shrink-0" alt="" />
-                  ) : (
-                    <item.icon size={16} className="text-indigo-500 shrink-0" />
-                  )}
-                  <span className="text-sm font-bold text-slate-700 truncate">{item.value}</span>
+                  <MapPin size={16} className="text-indigo-500 shrink-0" />
+                  <span className="text-sm font-bold text-slate-700 truncate">
+                    {selectedLocations[0]?.name}
+                    {selectedLocations.length > 1 && '...'}
+                  </span>
                 </div>
-                <ChevronDown size={14} className="text-slate-300 group-hover:text-indigo-400 transition-colors" />
+                <ChevronDown size={14} className={`text-slate-300 transition-transform ${openDropdown === 'location' ? 'rotate-180' : ''}`} />
               </div>
             </div>
-          ))}
+            {openDropdown === 'location' && (
+              <div className="absolute top-full left-0 mt-2 w-[500px] bg-white rounded-3xl shadow-2xl border border-slate-100 overflow-hidden flex animate-in fade-in zoom-in-95 duration-200">
+                {/* Left: Search & List */}
+                <div className="w-1/2 border-r border-slate-50 flex flex-col">
+                  <div className="p-4 border-b border-slate-50">
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-300 w-3.5 h-3.5" />
+                      <input 
+                        className="w-full pl-9 pr-3 py-2 bg-slate-50 border-none rounded-xl text-xs font-bold text-slate-900 focus:ring-2 focus:ring-indigo-500/10"
+                        placeholder="Search locations..."
+                        value={locationSearch}
+                        onChange={(e) => setLocationSearch(e.target.value)}
+                        autoFocus
+                      />
+                    </div>
+                  </div>
+                  <div className="flex-1 max-h-[300px] overflow-y-auto custom-scrollbar p-2 space-y-1">
+                    {filteredCountries.map(c => (
+                      <button 
+                        key={c.code}
+                        onClick={() => toggleLocation(c)}
+                        className={`w-full text-left px-3 py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-between ${
+                          selectedLocations.some(l => l.code === c.code) ? 'bg-indigo-50 text-indigo-600' : 'text-slate-600 hover:bg-slate-50'
+                        }`}
+                      >
+                        {c.name}
+                        {selectedLocations.some(l => l.code === c.code) && <Check size={12} />}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                {/* Right: Selected */}
+                <div className="w-1/2 bg-slate-50/30 flex flex-col">
+                  <div className="p-4 border-b border-slate-50 flex items-center justify-between">
+                    <span className="text-[10px] font-black text-slate-400 tracking-widest">SELECTED ({selectedLocations.length})</span>
+                  </div>
+                  <div className="flex-1 max-h-[300px] overflow-y-auto custom-scrollbar p-4 flex flex-wrap gap-2 content-start">
+                    {selectedLocations.map(l => (
+                      <div key={l.code} className="flex items-center gap-1.5 px-2.5 py-1.5 bg-white border border-slate-100 rounded-lg shadow-sm animate-in zoom-in">
+                        <span className="text-[10px] font-black text-slate-700">{l.code}</span>
+                        <button onClick={() => toggleLocation(l)} className="text-slate-300 hover:text-rose-500 transition-colors">
+                          <X size={10} strokeWidth={3} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Platform Selector */}
+          <div className="relative" ref={openDropdown === 'platform' ? dropdownRef : null}>
+            <div 
+              onClick={() => setOpenDropdown(openDropdown === 'platform' ? null : 'platform')}
+              className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm flex flex-col gap-2 group cursor-pointer hover:border-indigo-200 transition-all h-full"
+            >
+              <span className="text-[10px] font-bold text-slate-400 tracking-wider">Platform</span>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <img src={platform.logo} className="w-5 h-5 rounded object-contain shrink-0" alt="" />
+                  <span className="text-sm font-bold text-slate-700 truncate">{platform.name}</span>
+                </div>
+                <ChevronDown size={14} className={`text-slate-300 transition-transform ${openDropdown === 'platform' ? 'rotate-180' : ''}`} />
+              </div>
+            </div>
+            {openDropdown === 'platform' && (
+              <div className="absolute top-full left-0 mt-2 w-full min-w-[200px] bg-white rounded-2xl shadow-2xl border border-slate-100 p-2 space-y-1 animate-in fade-in zoom-in-95 duration-200">
+                {PLATFORMS.map(p => (
+                  <button 
+                    key={p.id}
+                    disabled={p.disabled}
+                    onClick={() => {
+                      setPlatform(p);
+                      setOpenDropdown(null);
+                    }}
+                    className={`w-full group flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all relative ${
+                      p.disabled ? 'opacity-40 cursor-not-allowed' : 
+                      platform.id === p.id ? 'bg-indigo-50 text-indigo-600' : 'hover:bg-slate-50 text-slate-600'
+                    }`}
+                  >
+                    <img src={p.logo} className="w-5 h-5 rounded object-contain shrink-0" alt="" />
+                    <span className="text-xs font-bold">{p.name}</span>
+                    {p.disabled && (
+                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="bg-slate-900 text-white text-[8px] font-black px-2 py-1 rounded shadow-lg">COMING SOON</div>
+                      </div>
+                    )}
+                    {!p.disabled && platform.id === p.id && <Check size={12} className="ml-auto" />}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Objective Selector */}
+          <div className="relative" ref={openDropdown === 'objective' ? dropdownRef : null}>
+            <div 
+              onClick={() => {
+                setOpenDropdown(openDropdown === 'objective' ? null : 'objective');
+                setObjectiveStage('goal');
+              }}
+              className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm flex flex-col gap-2 group cursor-pointer hover:border-indigo-200 transition-all h-full"
+            >
+              <span className="text-[10px] font-bold text-slate-400 tracking-wider">Objective</span>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <Target size={16} className="text-indigo-500 shrink-0" />
+                  <span className="text-sm font-bold text-slate-700 truncate">{currentObjectiveObj?.label}</span>
+                </div>
+                <ChevronDown size={14} className={`text-slate-300 transition-transform ${openDropdown === 'objective' ? 'rotate-180' : ''}`} />
+              </div>
+            </div>
+            {openDropdown === 'objective' && (
+              <div className="absolute top-full left-0 mt-2 w-[320px] bg-white rounded-3xl shadow-2xl border border-slate-100 p-4 space-y-3 animate-in fade-in zoom-in-95 duration-200">
+                <p className="text-[10px] font-black text-slate-400 tracking-widest px-2">Select objective</p>
+                <div className="space-y-1.5">
+                  {CAMPAIGN_OBJECTIVES.map(obj => {
+                    const Icon = obj.icon;
+                    return (
+                      <button 
+                        key={obj.value}
+                        onClick={() => {
+                          setObjective(obj.value);
+                          setAdsetGoal(ADSET_GOALS_MAPPING[obj.value][0].value);
+                          setOpenDropdown(null);
+                        }}
+                        className={`w-full text-left p-3 rounded-xl transition-all flex items-center gap-3 ${
+                          objective === obj.value ? 'bg-indigo-50 text-indigo-600 ring-1 ring-indigo-100 shadow-sm' : 'hover:bg-slate-50 text-slate-600'
+                        }`}
+                      >
+                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${objective === obj.value ? 'bg-indigo-500 text-white' : obj.bg + ' ' + obj.color}`}>
+                          <Icon size={18} />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-xs font-bold leading-none mb-1">{obj.label}</p>
+                          <p className="text-[9px] font-medium opacity-60 truncate">{obj.description}</p>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Event Selector (Cascading) */}
+          <div className="relative" ref={openDropdown === 'event' ? dropdownRef : null}>
+            <div 
+              onClick={() => {
+                setOpenDropdown(openDropdown === 'event' ? null : 'event');
+                setObjectiveStage('goal');
+              }}
+              className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm flex flex-col gap-2 group cursor-pointer hover:border-indigo-200 transition-all h-full"
+            >
+              <span className="text-[10px] font-bold text-slate-400 tracking-wider">Conversion event</span>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <Zap size={16} className="text-indigo-500 shrink-0" />
+                  <div className="flex items-center gap-1 min-w-0">
+                    <span className="text-sm font-bold text-slate-700 truncate">{currentGoalObj?.label}</span>
+                    {event && <><ChevronRight size={10} className="text-slate-300 shrink-0" /><span className="text-sm font-bold text-indigo-600 truncate">{event}</span></>}
+                  </div>
+                </div>
+                <ChevronDown size={14} className={`text-slate-300 transition-transform ${openDropdown === 'event' ? 'rotate-180' : ''}`} />
+              </div>
+            </div>
+            {openDropdown === 'event' && (
+              <div className="absolute top-full right-0 mt-2 w-[340px] bg-white rounded-3xl shadow-2xl border border-slate-100 p-4 animate-in fade-in zoom-in-95 duration-200">
+                {objectiveStage === 'goal' ? (
+                  <div className="space-y-3">
+                    <p className="text-[10px] font-black text-slate-400 tracking-widest px-2">Select conversion event</p>
+                    <div className="space-y-1">
+                      {availableGoals.map(goal => (
+                        <button
+                          key={goal.value}
+                          onClick={() => {
+                            setAdsetGoal(goal.value);
+                            if (goal.needsEvent) {
+                              setObjectiveStage('event');
+                            } else {
+                              setEvent('');
+                              setOpenDropdown(null);
+                            }
+                          }}
+                          className={`w-full text-left px-4 py-3 rounded-xl text-xs font-bold transition-all flex items-center justify-between group ${
+                            adsetGoal === goal.value ? 'bg-slate-900 text-white shadow-lg' : 'hover:bg-slate-50 text-slate-600'
+                          }`}
+                        >
+                          {goal.label}
+                          {goal.needsEvent ? <ArrowRight size={12} className="opacity-40 group-hover:translate-x-1 transition-all" /> : (adsetGoal === goal.value && <CheckCircle2 size={12} />)}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2">
+                      <button onClick={() => setObjectiveStage('goal')} className="p-1.5 hover:bg-slate-50 rounded-lg transition-colors text-slate-400">
+                        <ChevronLeft size={16} />
+                      </button>
+                      <p className="text-[10px] font-black text-slate-400 tracking-widest">BACK</p>
+                    </div>
+                    <div className="relative px-1">
+                      <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 w-3.5 h-3.5" />
+                      <input 
+                        className="w-full pl-9 pr-3 py-2.5 bg-slate-50 border-none rounded-xl text-xs font-bold text-slate-900 focus:ring-2 focus:ring-indigo-500/10"
+                        placeholder="Search events..."
+                        value={eventSearch}
+                        onChange={(e) => setEventSearch(e.target.value)}
+                        autoFocus
+                      />
+                    </div>
+                    <div className="max-h-[240px] overflow-y-auto custom-scrollbar px-1 space-y-1">
+                      {filteredEvents.map(ev => (
+                        <button
+                          key={ev}
+                          onClick={() => {
+                            setEvent(ev);
+                            setOpenDropdown(null);
+                          }}
+                          className={`w-full text-left px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-between ${
+                            event === ev ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200' : 'hover:bg-slate-50 text-slate-600'
+                          }`}
+                        >
+                          {ev}
+                          {event === ev && <Check size={12} />}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Landing Page & Creatives Section */}
-        <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/20 overflow-hidden">
+        <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/20 overflow-hidden relative z-10">
           <div className="p-8 space-y-8">
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-4">
@@ -148,7 +485,7 @@ export const ConfigurePublishStep = ({ product, savedConfig, LOGO_LINKS, onBack,
         </div>
 
         {/* Campaign Structure & Budget Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 relative z-0">
           
           {/* Left: Structure & Tree */}
           <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/20 p-8 space-y-8 flex flex-col min-h-[500px]">
@@ -331,8 +668,7 @@ export const ConfigurePublishStep = ({ product, savedConfig, LOGO_LINKS, onBack,
             estimatedDailyBudget,
             creatives
           })}
-          className="px-24 py-4 bg-slate-900 text-white rounded-full text-sm font-bold flex items-center gap-3 hover:bg-black transition-all shadow-xl active:scale-95 group"
-        >
+          className="px-24 py-4 bg-slate-900 text-white rounded-full text-sm font-bold flex items-center gap-3 hover:bg-black transition-all shadow-xl active:scale-95 group">
           Confirm configuration & start AI building
           <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
         </button>

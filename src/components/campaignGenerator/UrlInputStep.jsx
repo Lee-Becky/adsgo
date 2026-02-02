@@ -235,23 +235,30 @@ export const UrlInputStep = ({ url, setUrl, handleStartAnalysis, avatars, isFirs
                   className="w-full py-4 bg-transparent text-xl font-medium text-slate-900 placeholder:text-slate-300 focus:outline-none text-left"
                 />
               </div>
-              <button onClick={handleStartAnalysis} className="px-10 py-4 bg-indigo-600 text-white rounded-[1.4rem] font-bold text-lg flex items-center justify-center gap-3 hover:bg-indigo-700 transition-all duration-300 shadow-lg shadow-indigo-100 active:scale-95 group/btn overflow-hidden">
+            </div>
+          </div>
+          
+          <div className="mt-10 flex flex-col items-center gap-8">
+            <div className="flex items-center gap-4">
+              {!isFirstGeneration && (
+                <button 
+                  onClick={() => setIsProductModalOpen(true)}
+                  className="flex items-center gap-2.5 px-8 py-4 bg-white border border-slate-200 rounded-[1.2rem] text-sm font-bold text-slate-500 hover:text-indigo-600 hover:border-indigo-100 hover:bg-indigo-50/30 transition-all shadow-sm active:scale-95 group"
+                >
+                  <Grid className="w-4 h-4 text-slate-400 group-hover:text-indigo-500 transition-colors" />
+                  Choose Existing Product
+                </button>
+              )}
+              
+              <button 
+                onClick={handleStartAnalysis} 
+                className="px-12 py-4 bg-indigo-600 text-white rounded-[1.2rem] font-bold text-lg flex items-center justify-center gap-3 hover:bg-indigo-700 transition-all duration-300 shadow-xl shadow-indigo-100 active:scale-95 group/btn overflow-hidden"
+              >
                 <Sparkles className="w-5 h-5 transition-transform group-hover/btn:rotate-12" />
-                <span>Deep Research</span>
+                <span>Deep Research URL</span>
                 <ArrowRight className="w-5 h-5 group-hover/btn:translate-x-1 transition-transform" />
               </button>
             </div>
-          </div>
-          <div className="mt-8 flex flex-col items-center gap-6">
-            {!isFirstGeneration && (
-              <button 
-                onClick={() => setIsProductModalOpen(true)}
-                className="flex items-center gap-2 px-6 py-2.5 bg-white/80 backdrop-blur-md border border-slate-200 rounded-2xl text-xs font-bold text-slate-500 hover:text-indigo-600 hover:border-indigo-100 hover:bg-indigo-50/30 transition-all shadow-sm active:scale-95 group"
-              >
-                <Grid className="w-3.5 h-3.5 text-slate-400 group-hover:text-indigo-500 transition-colors" />
-                Choose Existing Product
-              </button>
-            )}
 
             <div className="flex justify-center items-center gap-4 text-[11px] font-bold tracking-wider text-slate-400 text-center">
               <span className="w-6 h-[1px] bg-slate-200"></span>
