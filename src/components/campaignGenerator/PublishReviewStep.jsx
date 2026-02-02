@@ -7,7 +7,7 @@ import {
 import EditAdModal from './EditAdModal';
 import EditAdsetDrawer from './EditAdsetDrawer';
 
-export const PublishReviewStep = ({ config, LOGO_LINKS, onBack }) => {
+export const PublishReviewStep = ({ config, LOGO_LINKS, onBack, onPublish }) => {
   const [editingAd, setEditingAd] = useState(null); // { campaignIdx, adsetIdx, adIdx, data }
   const [isAdsetDrawerOpen, setIsAdsetDrawerOpen] = useState(false);
   const { 
@@ -183,7 +183,10 @@ export const PublishReviewStep = ({ config, LOGO_LINKS, onBack }) => {
             </div>
           </div>
           
-          <button className="px-20 py-4 bg-slate-900 text-white rounded-full text-sm font-black flex items-center gap-3 hover:bg-black transition-all shadow-xl active:scale-[0.98] group overflow-hidden relative">
+          <button 
+            onClick={onPublish}
+            className="px-20 py-4 bg-slate-900 text-white rounded-full text-sm font-black flex items-center gap-3 hover:bg-black transition-all shadow-xl active:scale-[0.98] group overflow-hidden relative"
+          >
             <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
             Publish
             <CheckCircle2 size={20} className="group-hover:scale-110 transition-transform" />

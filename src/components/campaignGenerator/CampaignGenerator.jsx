@@ -5,6 +5,7 @@ import { AnalysisResultsStep } from './AnalysisResultsStep';
 import { CampaignEditorStep } from './CampaignEditorStep';
 import { ConfigurePublishStep } from './ConfigurePublishStep';
 import { PublishReviewStep } from './PublishReviewStep';
+import PublishCampaignModal from './PublishCampaignModal';
 
 const LOGO_LINKS = {
   meta: 'https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://meta.com&size=256',
@@ -141,7 +142,7 @@ const TypewriterText = ({ text, duration = 5000, onUpdate, isFirstGeneration }) 
   return <span>{displayedText}</span>;
 };
 
-export const CampaignGenerator = ({ hasGenerated, setHasGenerated, firstGeneratedUrl, setFirstGeneratedUrl, savedConfig, setSavedConfig }) => {
+export const CampaignGenerator = ({ hasGenerated, setHasGenerated, firstGeneratedUrl, setFirstGeneratedUrl, savedConfig, setSavedConfig, onPageChange }) => {
   const [url, setUrl] = useState(firstGeneratedUrl || '');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [visibleItems, setVisibleItems] = useState([]);
@@ -154,6 +155,7 @@ export const CampaignGenerator = ({ hasGenerated, setHasGenerated, firstGenerate
   const [showPublishReview, setShowPublishReview] = useState(false);
   const [publishConfig, setPublishReviewConfig] = useState(null);
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [showPublishModal, setShowPublishModal] = useState(false);
   const scrollRef = useRef(null);
   const endOfListRef = useRef(null);
 
@@ -165,6 +167,20 @@ export const CampaignGenerator = ({ hasGenerated, setHasGenerated, firstGenerate
     { id: 4, img: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Lilith' },
     { id: 5, img: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Jasper' },
   ];
+
+  const handlePublishClick = () => {
+    setShowPublishModal(true);
+  };
+
+  const handlePublishComplete = () => {
+    setShowPublishModal(false);
+    console.log('Publish complete, redirecting to Ad Manager');
+    if (onPageChange) {
+      onPageChange('adManagerV3');
+    } else {
+      window.location.hash = '#/ad-manager-v3';
+    }
+  };
 
   const handleStartAnalysis = () => {
     if (!url) return;
@@ -248,14 +264,29 @@ export const CampaignGenerator = ({ hasGenerated, setHasGenerated, firstGenerate
 
   if (showPublishReview) {
     return (
-      <PublishReviewStep 
-        config={publishConfig}
-        LOGO_LINKS={LOGO_LINKS}
-        onBack={() => {
-          setShowPublishReview(false);
-          setShowConfigurePublish(true);
-        }}
-      />
+      <>
+        <PublishReviewStep 
+          config={publishConfig}
+          LOGO_LINKS={LOGO_LINKS}
+          onBack={() => {
+            setShowPublishReview(false);
+            setShowConfigurePublish(true);
+          }}
+          onPublish={handlePublishClick}
+        />
+        <PublishCampaignModal 
+          isOpen={showPublishModal}
+          onClose={() => setShowPublishModal(false)}
+          LOGO_LINKS={LOGO_LINKS}
+          onComplete={handlePublishComplete}
+          publishConfig={{
+            ...savedConfig,
+            ...publishConfig,
+            locations: publishConfig?.locations || savedConfig?.locations,
+            budget: publishConfig?.estimatedDailyBudget || savedConfig?.dailyLimit
+          }}
+        />
+      </>
     );
   }
 
@@ -278,11 +309,26 @@ export const CampaignGenerator = ({ hasGenerated, setHasGenerated, firstGenerate
 
   if (showEditor) {
     return (
-      <CampaignEditorStep 
-        onBack={() => setShowEditor(false)} 
-        finalUrl={url} 
-        LOGO_LINKS={LOGO_LINKS}
-      />
+      <>
+        <CampaignEditorStep 
+          onBack={() => setShowEditor(false)} 
+          finalUrl={url} 
+          LOGO_LINKS={LOGO_LINKS}
+          onPublish={handlePublishClick}
+        />
+        <PublishCampaignModal 
+          isOpen={showPublishModal}
+          onClose={() => setShowPublishModal(false)}
+          LOGO_LINKS={LOGO_LINKS}
+          onComplete={handlePublishComplete}
+          publishConfig={{
+            ...savedConfig,
+            ...publishConfig,
+            locations: publishConfig?.locations || savedConfig?.locations,
+            budget: publishConfig?.estimatedDailyBudget || savedConfig?.dailyLimit
+          }}
+        />
+      </>
     );
   }
 
@@ -295,7 +341,7 @@ export const CampaignGenerator = ({ hasGenerated, setHasGenerated, firstGenerate
           setVisibleItems([]);
         }} 
         onGenerate={(config) => {
-          // This is the correct moment to mark the user as non-first-generation
+         ConfigurePublishStep // This is the correct moment to mark the user as non-first-generation
           if (!hasGenerated) {
             setFirstGeneratedUrl(url);
             setHasGenerated(true); 
@@ -378,18 +424,33 @@ export const CampaignGenerator = ({ hasGenerated, setHasGenerated, firstGenerate
   }
 
   return (
-    <UrlInputStep 
-      url={url} 
-      setUrl={setUrl} 
-      handleStartAnalysis={handleStartAnalysis} 
-      avatars={avatars}
-      isFirstGeneration={!hasGenerated}
-      firstGeneratedUrl={firstGeneratedUrl}
-      savedConfig={savedConfig}
-      onSelectProduct={(product) => {
-        setSelectedProduct(product);
-        setShowConfigurePublish(true);
-      }}
-    />
+    <>
+      <UrlInputStep 
+        url={url} 
+        setUrl={setUrl} 
+        handleStartAnalysis={handleStartAnalysis} 
+        avatars={avatars}
+        isFirstGeneration={!hasGenerated}
+        firstGeneratedUrl={firstGeneratedUrl}
+        savedConfig={savedConfig}
+        onSelectProduct={(product) => {
+          setSelectedProduct(product);
+          setShowConfigurePublish(true);
+        }}
+      />
+
+      <PublishCampaignModal 
+        isOpen={showPublishModal}
+        onClose={() => setShowPublishModal(false)}
+        LOGO_LINKS={LOGO_LINKS}
+        onComplete={handlePublishComplete}
+        publishConfig={{
+          ...savedConfig,
+          ...publishConfig,
+          locations: publishConfig?.locations || savedConfig?.locations,
+          budget: publishConfig?.estimatedDailyBudget || savedConfig?.dailyLimit
+        }}
+      />
+    </>
   );
 };

@@ -217,6 +217,8 @@ const AutoRegeneration = ({ onPageChange }) => {
   // 记忆每个 campaign 的人工操作状态：null(无操作), true(人工开启), false(人工关闭)
   const [manualPublishOverrides, setManualPublishOverrides] = useState({});
   const [autoPublishCampaigns, setAutoPublishCampaigns] = useState({});
+  // 专门跟踪 recommendations 指标的总数，只有删除时才做减法
+  const [totalRecommendationsCount, setTotalRecommendationsCount] = useState(0);
   
   // Merge campaign cards with draft campaigns
   const [draftCampaigns, setDraftCampaigns] = useState(() => {
@@ -375,9 +377,11 @@ const AutoRegeneration = ({ onPageChange }) => {
   useEffect(() => {
     const initialOverrides = {};
     const initialStatus = {};
+    let initialAiCount = 0;
     
     draftCampaigns.forEach(campaign => {
       if (campaign.isRecommendation) {
+        initialAiCount++;
         initialOverrides[campaign.id] = null; // AI 标签不带人工标签
         initialStatus[campaign.id] = autoRegen; // 随系统状态
       } else {
@@ -388,6 +392,7 @@ const AutoRegeneration = ({ onPageChange }) => {
     
     setManualPublishOverrides(initialOverrides);
     setAutoPublishCampaigns(initialStatus);
+    setTotalRecommendationsCount(initialAiCount);
   }, []);
   
   const [editingBudget, setEditingBudget] = useState(null);
@@ -663,6 +668,10 @@ const AutoRegeneration = ({ onPageChange }) => {
   const handleDelete = (id) => { setCampaignToDelete(id); setDeleteConfirmOpen(true); };
   const handleDeleteConfirm = () => {
     if (campaignToDelete !== null) {
+      const campaign = draftCampaigns.find(c => c.id === campaignToDelete);
+      if (campaign && campaign.isRecommendation) {
+        setTotalRecommendationsCount(prev => Math.max(0, prev - 1));
+      }
       setDraftCampaigns(prev => prev.filter(campaign => campaign.id !== campaignToDelete));
       setHiddenCards(prev => new Set([...prev, campaignToDelete]));
       setCampaignToDelete(null);
@@ -740,6 +749,8 @@ const AutoRegeneration = ({ onPageChange }) => {
 
     // 添加新campaign到draftCampaigns数组开头
     setDraftCampaigns(prev => [...newCampaigns, ...prev]);
+    // 更新 recommendations 总数
+    setTotalRecommendationsCount(prev => prev + newCampaigns.length);
 
     // 更新manualPublishOverrides状态：新添加的AI regeneration campaign初始状态为null（无人工操作）
     setManualPublishOverrides(prev => {
@@ -992,7 +1003,7 @@ const AutoRegeneration = ({ onPageChange }) => {
                           <div className="flex gap-1.5 items-center px-0.5">
                             <div className="flex-1 bg-gray-50 border border-gray-100 rounded-lg p-1.5 flex flex-col">
                               <span className="text-[10px] font-bold text-gray-400 leading-none mb-1">Recommendations</span>
-                              <span className="text-sm font-black text-gray-900 leading-none">{aiRegenerationCount}</span>
+                              <span className="text-sm font-black text-gray-900 leading-none">{totalRecommendationsCount}</span>
                             </div>
                             <i className="fas fa-arrow-right text-[10px] text-gray-300"></i>
                             <div className="flex-1 bg-white border-2 border-primary rounded-lg p-1.5 flex flex-col relative shadow-sm">
@@ -1003,7 +1014,7 @@ const AutoRegeneration = ({ onPageChange }) => {
                           <div className="px-0.5">
                             <div className="w-full bg-[#eff6ff] border border-primary/10 rounded-lg p-1.5 flex items-center justify-between">
                               <span className="text-[10px] font-bold text-gray-500">Reserved</span>
-                              <span className="text-sm font-black text-primary leading-none">{Math.max(0, aiRegenerationCount - Object.keys(campaignStatus).length)}</span>
+                              <span className="text-sm font-black text-primary leading-none">{aiRegenerationCount}</span>
                             </div>
                           </div>
                         </div>

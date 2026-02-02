@@ -192,6 +192,7 @@ function App() {
             setFirstGeneratedUrl={setFirstGeneratedUrl}
             savedConfig={savedConfig}
             setSavedConfig={setSavedConfig}
+            onPageChange={handlePageChange}
           />
         )
       case 'insights':

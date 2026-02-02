@@ -1,7 +1,7 @@
 import React from 'react';
 import { MessageSquare } from 'lucide-react';
 
-export const CampaignEditorStep = ({ onBack }) => {
+export const CampaignEditorStep = ({ onBack, onPublish }) => {
   return (
     <div className="fixed inset-0 top-[64px] left-[260px] bg-[#F8FAFC] flex flex-col font-sans overflow-hidden z-10 animate-in fade-in duration-500">
       {/* Main Content Area - Image covers the full width */}
@@ -23,7 +23,10 @@ export const CampaignEditorStep = ({ onBack }) => {
         </button>
         
         <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-4">
-          <button className="px-24 py-3.5 bg-gradient-to-r from-indigo-600 to-purple-800 text-white rounded-full text-sm font-bold tracking-wider shadow-2xl shadow-indigo-200 hover:-translate-y-1 active:translate-y-0.5 transition-all">
+          <button 
+            onClick={onPublish}
+            className="px-24 py-3.5 bg-gradient-to-r from-indigo-600 to-purple-800 text-white rounded-full text-sm font-bold tracking-wider shadow-2xl shadow-indigo-200 hover:-translate-y-1 active:translate-y-0.5 transition-all"
+          >
             Publish
           </button>
           <button className="px-10 py-3 bg-slate-50 text-slate-500 rounded-full text-[11px] font-bold hover:bg-slate-100 transition-all border border-slate-100">
