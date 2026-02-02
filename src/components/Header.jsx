@@ -1,6 +1,6 @@
 import { Bell, HelpCircle, Menu, Globe, Clock, ChevronDown } from 'lucide-react'
 import { getPageInfo } from '../constants/menuConfig'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 
 const Header = ({ toggleSidebar, isMobile }) => {
@@ -13,7 +13,45 @@ const Header = ({ toggleSidebar, isMobile }) => {
   const [languageDropdownOpen, setLanguageDropdownOpen] = useState(false)
   const [selectedLanguage, setSelectedLanguage] = useState('English')
 
-  const languages = ['English', '中文', 'Español', 'Français', 'Deutsch', '日本語']
+  const languages = [
+    { name: 'English', code: 'en' },
+    { name: '中文', code: 'zh-CN' },
+    { name: 'Español', code: 'es' },
+    { name: 'Français', code: 'fr' },
+    { name: 'Deutsch', code: 'de' },
+    { name: '日本語', code: 'ja' }
+  ]
+
+  // 初始化语言状态，从 Cookie 读取
+  useEffect(() => {
+    const getCookie = (name) => {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) return parts.pop().split(';').shift();
+    };
+    const googtrans = getCookie('googtrans');
+    if (googtrans) {
+      const langCode = googtrans.split('/').pop();
+      const matchedLang = languages.find(l => l.code === langCode);
+      if (matchedLang) setSelectedLanguage(matchedLang.name);
+    }
+  }, []);
+
+  const handleLanguageChange = (lang) => {
+    setSelectedLanguage(lang.name)
+    setLanguageDropdownOpen(false)
+    
+    // Google 翻译 Cookie 切换逻辑
+    // 格式为 /源语言/目标语言
+    const cookieValue = lang.code === 'en' ? '' : `/en/${lang.code}`;
+    
+    // 设置 Cookie
+    document.cookie = `googtrans=${cookieValue}; path=/`;
+    document.cookie = `googtrans=${cookieValue}; path=/; domain=${window.location.hostname}`;
+    
+    // 刷新页面以应用翻译
+    window.location.reload();
+  }
 
   return (
     <header className="sticky top-0 z-30 w-full bg-white/80 backdrop-blur-xl border-b border-slate-100 transition-all duration-300">
@@ -65,18 +103,15 @@ const Header = ({ toggleSidebar, isMobile }) => {
                 <div className="absolute right-0 top-full mt-2 min-w-[160px] origin-top-right overflow-hidden rounded-xl border border-slate-200 bg-white p-1.5 shadow-xl animate-in fade-in slide-in-from-top-2 duration-200 z-50">
                   {languages.map((lang) => (
                     <button
-                      key={lang}
-                      onClick={() => {
-                        setSelectedLanguage(lang);
-                        setLanguageDropdownOpen(false);
-                      }}
+                      key={lang.code}
+                      onClick={() => handleLanguageChange(lang)}
                       className={`flex w-full items-center gap-2 rounded-lg px-3 py-2 text-[13px] font-bold transition-all ${
-                        selectedLanguage === lang
+                        selectedLanguage === lang.name
                           ? "bg-primary/10 text-primary"
                           : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                       }`}
                     >
-                      {lang}
+                      {lang.name}
                     </button>
                   ))}
                 </div>
