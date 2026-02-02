@@ -18,7 +18,7 @@ const Competitors = () => {
   return (
     <div className="min-h-screen bg-[#FDFDFD] flex flex-col font-sans text-slate-900 selection:bg-indigo-100 selection:text-indigo-900">
       {/* Top Header Section - Re-added for Add button */}
-      <div className="sticky top-0 z-50 bg-white/60 backdrop-blur-md border-b border-slate-100/50 py-3 px-10">
+      <div className="sticky top-0 z-10 bg-white/60 backdrop-blur-md border-b border-slate-100/50 py-3 px-10">
         <div className="max-w-[1400px] mx-auto flex justify-end">
           <button 
             onClick={() => setIsModalOpen(true)}

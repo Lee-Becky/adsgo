@@ -478,7 +478,7 @@ const ProductDetails = ({ product, onBack }) => {
   return (
     <div className="min-h-screen bg-slate-50/50 flex flex-col font-sans text-slate-900">
       {/* Header */}
-      <header className="sticky top-0 z-[100] bg-white/80 backdrop-blur-md border-b border-slate-100 px-8 py-5 flex items-center justify-between">
+      <header className="sticky top-0 z-10 bg-white/80 backdrop-blur-md border-b border-slate-100 px-8 py-5 flex items-center justify-between">
         <div className="flex items-center gap-6">
           <button 
             onClick={onBack}

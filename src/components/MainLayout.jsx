@@ -61,7 +61,7 @@ const MainLayout = ({ children, showDemoOverlay, onDemoConnect, onDemoCreate, se
       </aside>
 
       {/* Main Content Wrapper */}
-      <div className="flex-1 flex flex-col h-full overflow-hidden relative">
+      <div className="flex-1 flex flex-col h-full relative">
         {/* Header */}
         <Header toggleSidebar={toggleSidebar} isMobile={isMobile} />
 
