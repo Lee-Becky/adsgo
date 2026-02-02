@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Sparkles, Search, Zap, ArrowRight, Edit3, Save, MapPin, Globe, Target, ChevronRight, Settings2, Grid } from 'lucide-react';
+import { Sparkles, Search, Zap, ArrowRight, Edit3, Save, MapPin, Globe, Target, ChevronRight, Settings2, Grid, Link as LinkIcon } from 'lucide-react';
 import CreateBrandModal from '../brand/CreateBrandModal';
 import SaveConfirmationModal from './SaveConfirmationModal';
 import SelectProductModal from './SelectProductModal';
 
 export const UrlInputStep = ({ url, setUrl, handleStartAnalysis, avatars, isFirstGeneration, firstGeneratedUrl, savedConfig, onSelectProduct }) => {
   const navigate = useNavigate();
+  const [showError, setShowError] = useState(false);
   const [isSaved, setIsSaved] = useState(false); // Reset to false to ensure user goes through confirm flow each time
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
@@ -226,16 +227,25 @@ export const UrlInputStep = ({ url, setUrl, handleStartAnalysis, avatars, isFirs
             <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-[2rem] blur opacity-10 group-focus-within:opacity-25 transition duration-1000 group-within:duration-200"></div>
             <div className="relative flex items-center bg-white rounded-[1.8rem] shadow-[0_15px_45px_-10px_rgba(0,0,0,0.05)] border border-slate-100 p-2.5 transition-all duration-500 group-focus-within:shadow-[0_20px_60px_-15px_rgba(79,70,229,0.15)] group-focus-within:-translate-y-1">
               <div className="flex-1 flex items-center px-5 text-left">
-                <Search className="w-6 h-6 text-slate-300 mr-4 group-focus-within:text-indigo-500 transition-colors" />
+                <LinkIcon className="w-6 h-6 text-slate-300 mr-4 group-focus-within:text-indigo-500 transition-colors" />
                 <input
                   type="text"
                   placeholder="https://your-page.com/product-link"
                   value={url}
-                  onChange={(e) => setUrl(e.target.value)}
+                  onChange={(e) => {
+                    setUrl(e.target.value);
+                    if (e.target.value.trim()) setShowError(false);
+                  }}
                   className="w-full py-4 bg-transparent text-xl font-medium text-slate-900 placeholder:text-slate-300 focus:outline-none text-left"
                 />
               </div>
             </div>
+            {showError && (
+              <div className="absolute left-6 -bottom-8 flex items-center gap-1.5 text-red-500 animate-in fade-in slide-in-from-top-1">
+                <div className="w-1.5 h-1.5 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]"></div>
+                <span className="text-sm font-bold tracking-tight">URL is required.</span>
+              </div>
+            )}
           </div>
           
           <div className="mt-10 flex flex-col items-center gap-8">
@@ -251,12 +261,22 @@ export const UrlInputStep = ({ url, setUrl, handleStartAnalysis, avatars, isFirs
               )}
               
               <button 
-                onClick={handleStartAnalysis} 
-                className="px-12 py-4 bg-indigo-600 text-white rounded-[1.2rem] font-bold text-lg flex items-center justify-center gap-3 hover:bg-indigo-700 transition-all duration-300 shadow-xl shadow-indigo-100 active:scale-95 group/btn overflow-hidden"
+                onClick={() => {
+                  if (!url?.trim()) {
+                    setShowError(true);
+                    return;
+                  }
+                  handleStartAnalysis();
+                }} 
+                className={`px-12 py-4 rounded-[1.2rem] font-bold text-lg flex items-center justify-center gap-3 transition-all duration-300 shadow-xl overflow-hidden active:scale-95 group/btn ${
+                  !url?.trim() 
+                    ? 'bg-slate-100 text-slate-400 shadow-none' 
+                    : 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-indigo-100'
+                }`}
               >
-                <Sparkles className="w-5 h-5 transition-transform group-hover/btn:rotate-12" />
+                <Sparkles className={`w-5 h-5 transition-transform ${url?.trim() ? 'group-hover/btn:rotate-12' : ''}`} />
                 <span>Deep Research URL</span>
-                <ArrowRight className="w-5 h-5 group-hover/btn:translate-x-1 transition-transform" />
+                <ArrowRight className={`w-5 h-5 transition-transform ${url?.trim() ? 'group-hover/btn:translate-x-1' : ''}`} />
               </button>
             </div>
 

@@ -386,7 +386,7 @@ const Dashboard = ({ selectedBrand, onPageChange, onEditBrandConfig }) => {
   }
 
   return (
-    <div className="min-h-screen bg-background p-6">
+    <div className="space-y-6">
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
         {/* AI Optimization Section - Left Column (2/3) */}
