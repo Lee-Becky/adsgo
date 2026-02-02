@@ -40,7 +40,7 @@ export const UrlInputStep = ({ url, setUrl, handleStartAnalysis, avatars, isFirs
   };
 
   return (
-    <div className="relative min-h-[calc(100vh-64px)] w-full overflow-y-auto bg-[#FAFAFA] flex flex-col items-center p-8 font-sans selection:bg-indigo-100 custom-scrollbar">
+    <div className="relative min-h-full w-full bg-[#FAFAFA] flex flex-col items-center p-8 font-sans selection:bg-indigo-100 overflow-hidden">
       {/* Brand Info Card - Inline instead of absolute to prevent overlap */}
       {!isFirstGeneration && (
         <div className="w-full max-w-5xl z-50 animate-in slide-in-from-top-4 duration-500 mb-12">
@@ -172,9 +172,9 @@ export const UrlInputStep = ({ url, setUrl, handleStartAnalysis, avatars, isFirs
         }}
       />
 
-      <div className="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] bg-indigo-100/40 rounded-full blur-[120px] animate-pulse pointer-events-none"></div>
-      <div className="absolute bottom-[-10%] right-[-10%] w-[40vw] h-[40vw] bg-purple-100/30 rounded-full blur-[100px] animate-pulse pointer-events-none" style={{ animationDelay: '2s' }}></div>
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:44px_44px] pointer-events-none"></div>
+      <div className="absolute top-0 left-0 w-[50vw] h-[50vw] -translate-x-1/4 -translate-y-1/4 bg-indigo-100/40 rounded-full blur-[120px] animate-pulse pointer-events-none"></div>
+      <div className="absolute bottom-0 right-0 w-[40vw] h-[40vw] translate-x-1/4 translate-y-1/4 bg-purple-100/30 rounded-full blur-[100px] animate-pulse pointer-events-none" style={{ animationDelay: '2s' }}></div>
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:44px_44px] pointer-events-none overflow-hidden"></div>
       
       {/* Centered Content Container */}
       <div className={`relative z-10 w-full max-w-7xl flex flex-col items-center text-center ${!isFirstGeneration ? 'mt-4' : 'mt-24'}`}>
