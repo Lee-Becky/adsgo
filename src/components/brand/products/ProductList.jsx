@@ -40,6 +40,12 @@ const ProductList = ({ onProductClick }) => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [urlError, setUrlError] = useState('');
 
+  // Sync state for Meta and GMC
+  const [syncStates, setSyncStates] = useState({
+    gmc: { isConnected: false, isConnecting: false, email: '' },
+    meta: { isConnected: false, isConnecting: false, email: '' }
+  });
+
   // Form State
   const [productForm, setProductForm] = useState({
     name: '',
@@ -128,7 +134,9 @@ const ProductList = ({ onProductClick }) => {
       url: formData.url,
       category: formData.category,
       type: formData.type,
-      source: addStep === 'url' ? 'URL' : 'Manual',
+      source: addStep === 'url' ? 'URL' : 
+              addStep === 'gmc' ? 'Google GMC' :
+              addStep === 'meta' ? 'Meta feeds' : 'Manual',
       updatedOn: new Date().toLocaleString('en-US', { month: 'short', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true }),
       image: 'https://picsum.photos/seed/new/150/150',
       description: formData.description,
@@ -195,7 +203,50 @@ const ProductList = ({ onProductClick }) => {
     setIsShopifyConnected(false);
   };
 
+  const handleSyncConnect = (platform) => {
+    setSyncStates(prev => ({
+      ...prev,
+      [platform]: { ...prev[platform], isConnecting: true }
+    }));
+
+    setTimeout(() => {
+      setSyncStates(prev => ({
+        ...prev,
+        [platform]: { 
+          isConnected: true, 
+          isConnecting: false, 
+          email: 'user@example.com' 
+        }
+      }));
+    }, 3000);
+  };
+
+  const handleSyncDisconnect = (platform) => {
+    setSyncStates(prev => ({
+      ...prev,
+      [platform]: { isConnected: false, isConnecting: false, email: '' }
+    }));
+  };
+
   const addOptions = [
+    {
+      id: 'shopify',
+      title: 'Sync from Shopify',
+      subtitle: 'Automatically import and update all your products from Shopify',
+      logo: 'https://cdn.worldvectorlogo.com/logos/shopify.svg'
+    },
+    {
+      id: 'meta',
+      title: 'Sync From Meta Feeds',
+      subtitle: 'Import products directly from your Meta Commerce Manager',
+      logo: 'https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://meta.com&size=256'
+    },
+    {
+      id: 'gmc',
+      title: 'Sync From Google GMC',
+      subtitle: 'Import products directly from your Google Merchant Center',
+      logo: 'https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://google.com&size=256'
+    },
     {
       id: 'url',
       title: 'Import from URL',
@@ -208,12 +259,6 @@ const ProductList = ({ onProductClick }) => {
       subtitle: 'Manually enter all the product details',
       icon: Edit2,
       isManual: true
-    },
-    {
-      id: 'shopify',
-      title: 'Sync from Shopify',
-      subtitle: 'Automatically import and update all your products from Shopify',
-      logo: 'https://cdn.worldvectorlogo.com/logos/shopify.svg'
     }
   ];
 
@@ -231,7 +276,6 @@ const ProductList = ({ onProductClick }) => {
   return (
     <div className="min-h-screen bg-[#FDFDFD] p-8 flex flex-col font-sans text-slate-900">
       <div className="w-full mx-auto space-y-6 flex-1">
-        {/* Header Section */}
         <div className="flex items-center justify-end mb-8">
           <div className="flex items-center gap-4">
             <div className="relative">
@@ -264,7 +308,6 @@ const ProductList = ({ onProductClick }) => {
           </div>
         </div>
 
-        {/* Table Section */}
         <div className="bg-white rounded-[32px] border border-slate-100 shadow-sm overflow-hidden flex flex-col relative min-h-[400px]">
           {isSearching && (
             <div className="absolute inset-0 z-10 bg-white/60 backdrop-blur-[1px] flex flex-col items-center justify-center gap-3 animate-in fade-in duration-200">
@@ -403,7 +446,6 @@ const ProductList = ({ onProductClick }) => {
           <div className={`bg-white rounded-[40px] w-full shadow-2xl border border-slate-100 animate-in zoom-in-95 duration-200 flex flex-col relative transition-all duration-500 ${
             addStep === 'setup' ? 'max-w-4xl h-[90vh]' : 'max-w-2xl min-h-[400px]'
           }`}>
-            
             {isAnalyzing && (
               <div className="absolute inset-0 z-[120] bg-white rounded-[40px] flex flex-col items-center justify-center p-10 text-center animate-in fade-in duration-300">
                 <div className="w-20 h-20 rounded-[32px] bg-indigo-50 flex items-center justify-center mb-6 shadow-inner relative">
@@ -424,7 +466,9 @@ const ProductList = ({ onProductClick }) => {
                 <h3 className="text-xl font-bold text-slate-900 font-sans">
                   {addStep === 'options' ? 'How do you want to add product?' :
                    addStep === 'url' ? 'Import from URL' :
-                   addStep === 'setup' ? 'Setup your product' : 'Sync from Shopify'}
+                   addStep === 'setup' ? 'Setup your product' : 
+                   addStep === 'shopify' ? 'Sync from Shopify' :
+                   addStep === 'gmc' ? 'Sync from Google GMC' : 'Sync from Meta Feeds'}
                 </h3>
               </div>
               <button onClick={closeAddModal} className="p-2.5 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-full transition-all"><X size={20} /></button>
@@ -522,6 +566,82 @@ const ProductList = ({ onProductClick }) => {
                         <div className="flex items-center justify-center gap-2"><span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" /><p className="text-xs text-green-600 font-bold tracking-wide font-sans">Connected</p></div>
                       </div>
                       <div className="w-full pt-6"><button onClick={() => setIsDisconnectModalOpen(true)} className="px-8 py-3 bg-slate-50 border border-slate-100 rounded-2xl text-slate-400 hover:text-rose-500 hover:bg-rose-50 hover:border-rose-100 font-bold text-[13px] transition-all flex items-center gap-2 mx-auto shadow-sm font-sans"><Link2Off size={18} />Disconnect Store</button></div>
+                    </>
+                  )}
+                </div>
+              )}
+
+              {(addStep === 'gmc' || addStep === 'meta') && (
+                <div className="flex-1 flex flex-col justify-center items-center text-center space-y-8 py-6">
+                  {syncStates[addStep].isConnecting ? (
+                    <div className="flex flex-col items-center gap-4">
+                      <div className="w-20 h-20 rounded-[24px] bg-indigo-50 flex items-center justify-center shadow-inner">
+                        <Loader2 className="text-indigo-500 animate-spin" size={32} />
+                      </div>
+                      <p className="text-sm font-bold text-slate-900">Fetching Your Assets...</p>
+                    </div>
+                  ) : !syncStates[addStep].isConnected ? (
+                    <>
+                      <div className="w-20 h-20 rounded-[24px] bg-slate-50 border border-slate-100 flex items-center justify-center p-4 shadow-inner">
+                        <img 
+                          src={addStep === 'gmc' ? 
+                            'https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://google.com&size=256' : 
+                            'https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://meta.com&size=256'
+                          } 
+                          alt="" 
+                          className="w-full h-full object-contain" 
+                        />
+                      </div>
+                      <div className="max-w-[320px] space-y-2">
+                        <h4 className="text-lg font-bold text-slate-900 font-sans">
+                          {addStep === 'gmc' ? 'Google GMC' : 'Meta Feeds'}
+                        </h4>
+                        <p className="text-xs text-slate-400 leading-relaxed font-medium font-sans">
+                          {addStep === 'gmc' ? 
+                            'Connect to Google Merchant Center to sync your products.' : 
+                            'Connect to Meta Commerce Manager to sync your product feeds.'}
+                        </p>
+                      </div>
+                      <button 
+                        onClick={() => handleSyncConnect(addStep)} 
+                        className="w-full max-w-[280px] bg-slate-900 text-white py-4 rounded-2xl font-bold text-sm hover:bg-black shadow-lg shadow-slate-200 transition-all active:scale-95 font-sans"
+                      >
+                        Connect
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <div className="relative">
+                        <div className="w-20 h-20 rounded-[24px] bg-green-50 border border-green-100 flex items-center justify-center p-4 shadow-inner">
+                          <img 
+                            src={addStep === 'gmc' ? 
+                              'https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://google.com&size=256' : 
+                              'https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://meta.com&size=256'
+                            } 
+                            alt="" 
+                            className="w-full h-full object-contain" 
+                          />
+                        </div>
+                        <div className="absolute -top-1.5 -right-1.5 w-6 h-6 bg-green-500 border-4 border-white rounded-full flex items-center justify-center shadow-sm">
+                          <div className="w-1.5 h-1.5 bg-white rounded-full" />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <h4 className="text-lg font-bold text-slate-900 font-sans">{syncStates[addStep].email}</h4>
+                        <div className="flex items-center justify-center gap-2">
+                          <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                          <p className="text-xs text-green-600 font-bold tracking-wide font-sans">Connected</p>
+                        </div>
+                      </div>
+                      <div className="w-full pt-6">
+                        <button 
+                          onClick={() => handleSyncDisconnect(addStep)} 
+                          className="px-8 py-3 bg-rose-50 text-rose-500 border border-rose-100 rounded-2xl font-bold text-[13px] transition-all flex items-center gap-2 mx-auto shadow-sm font-sans"
+                        >
+                          <Link2Off size={18} />
+                          Disconnect
+                        </button>
+                      </div>
                     </>
                   )}
                 </div>
