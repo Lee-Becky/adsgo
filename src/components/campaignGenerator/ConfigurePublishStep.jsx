@@ -68,6 +68,47 @@ const ALL_COUNTRIES = [
   { code: 'IN', name: 'India' }
 ];
 
+const CustomSelect = ({ label, options, value, onChange }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const selectedOption = options.find(opt => opt.value === value);
+
+  return (
+    <div className="space-y-2 relative text-left">
+      {label && <label className="text-[10px] font-bold text-slate-400 tracking-wider">{label}</label>}
+      <div 
+        onClick={() => setIsOpen(!isOpen)}
+        className={`w-full h-11 px-4 bg-slate-50 border rounded-xl flex items-center justify-between cursor-pointer transition-all ${
+          isOpen ? 'border-indigo-500 ring-2 ring-indigo-500/10 bg-white shadow-sm' : 'border-transparent hover:bg-slate-100'
+        }`}
+      >
+        <span className="text-sm font-bold text-slate-700">
+          {selectedOption ? selectedOption.label : value}
+        </span>
+        <ChevronDown size={14} className={`text-slate-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+      </div>
+
+      {isOpen && (
+        <div className="absolute z-[150] top-full left-0 right-0 mt-2 bg-white border border-slate-100 rounded-xl shadow-2xl py-2 animate-in fade-in zoom-in-95 duration-200">
+          {options.map((opt) => (
+            <div 
+              key={opt.value}
+              onClick={() => {
+                onChange(opt.value);
+                setIsOpen(false);
+              }}
+              className={`px-4 py-2.5 text-sm font-bold cursor-pointer transition-colors ${
+                value === opt.value ? 'bg-indigo-50 text-indigo-600' : 'hover:bg-slate-50 text-slate-600'
+              }`}
+            >
+              {opt.label}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
 export const ConfigurePublishStep = ({ product, savedConfig, LOGO_LINKS, onBack, onConfirm }) => {
   // --- States ---
   const [selectedLocations, setSelectedLocations] = useState(savedConfig?.locations?.map(name => {
@@ -487,38 +528,26 @@ export const ConfigurePublishStep = ({ product, savedConfig, LOGO_LINKS, onBack,
         {/* Campaign Structure & Budget Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 relative z-0">
           
-          {/* Left: Structure & Tree */}
-          <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/20 p-8 space-y-8 flex flex-col min-h-[500px]">
+          {/* Left: Structure & Tree - Removed overflow-hidden implicitly via no class, added high z-index for dropdowns */}
+          <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/20 p-8 space-y-8 flex flex-col min-h-[500px] relative z-20">
             <h3 className="text-sm font-bold text-slate-400 tracking-wider">Campaign structure</h3>
             
             <div className="grid grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <label className="text-[10px] font-bold text-slate-400 tracking-wider">Adsets</label>
-                <div className="relative">
-                  <select 
-                    value={adsetsCount} 
-                    onChange={(e) => setAdsetsCount(Number(e.target.value))}
-                    className="w-full bg-slate-50 border-none rounded-xl px-4 py-3 text-sm font-bold text-slate-700 appearance-none focus:ring-2 focus:ring-indigo-100 transition-all"
-                  >
-                    {[1, 2, 3, 4, 5].map(n => <option key={n} value={n}>{n}</option>)}
-                  </select>
-                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none" size={14} />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <label className="text-[10px] font-bold text-slate-400 tracking-wider">Ads per set</label>
-                <div className="relative">
-                  <select 
-                    value={adsPerSet} 
-                    onChange={(e) => setAdsPerSet(e.target.value)}
-                    className="w-full bg-slate-50 border-none rounded-xl px-4 py-3 text-sm font-bold text-slate-700 appearance-none focus:ring-2 focus:ring-indigo-100 transition-all"
-                  >
-                    {[1, 2, 3, 4, 5, 6, 7, 8].map(n => <option key={n} value={n}>{n}</option>)}
-                    <option value="dynamic">Dynamic</option>
-                  </select>
-                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none" size={14} />
-                </div>
-              </div>
+              <CustomSelect 
+                label="Adsets"
+                value={adsetsCount}
+                onChange={(val) => setAdsetsCount(Number(val))}
+                options={[1, 2, 3, 4, 5].map(n => ({ value: n, label: n.toString() }))}
+              />
+              <CustomSelect 
+                label="Ads per set"
+                value={adsPerSet}
+                onChange={(val) => setAdsPerSet(val)}
+                options={[
+                  ...[1, 2, 3, 4, 5, 6, 7, 8].map(n => ({ value: n.toString(), label: n.toString() })),
+                  { value: 'dynamic', label: 'Dynamic' }
+                ]}
+              />
             </div>
 
             {/* Info Box */}

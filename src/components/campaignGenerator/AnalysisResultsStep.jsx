@@ -1,5 +1,70 @@
 import React, { useState } from 'react';
-import { CheckCircle2, Users, Activity, ChevronDown, Sparkles, Search, DollarSign, Megaphone, MousePointer2, ShoppingBag, Smartphone, Check, ChevronLeft, ArrowRight, ChevronRight } from 'lucide-react';
+import { CheckCircle2, Users, Activity, ChevronDown, Sparkles, Search, DollarSign, Megaphone, MousePointer2, ShoppingBag, Smartphone, Check, ChevronLeft, ArrowRight, ChevronRight, X } from 'lucide-react';
+
+const CustomDropdown = ({ label, options, value, onChange, placeholder, isSearchable }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [search, setSearch] = useState('');
+  const selectedOption = options.find(opt => opt.value === value || opt.label === value);
+
+  const filteredOptions = isSearchable 
+    ? options.filter(opt => opt.label.toLowerCase().includes(search.toLowerCase()))
+    : options;
+
+  return (
+    <div className="space-y-3 relative text-left">
+      {label && <label className="text-sm font-bold text-slate-900 ml-1">{label}</label>}
+      <div 
+        onClick={() => setIsOpen(!isOpen)}
+        className={`w-full flex items-center justify-between px-6 py-4 bg-slate-50 border-2 rounded-2xl cursor-pointer transition-all ${
+          isOpen ? 'border-indigo-500 bg-white shadow-lg' : 'border-transparent hover:border-indigo-100 hover:bg-white'
+        }`}
+      >
+        <span className={`text-base font-bold truncate ${selectedOption ? 'text-slate-700' : 'text-slate-300'}`}>
+          {selectedOption ? selectedOption.label : placeholder}
+        </span>
+        <ChevronDown size={20} className={`text-slate-300 transition-transform duration-300 ${isOpen ? 'rotate-180 text-indigo-500' : ''}`} />
+      </div>
+
+      {isOpen && (
+        <div className="absolute z-[120] mt-2 w-full left-0 bg-white border border-slate-100 rounded-2xl shadow-2xl p-2 animate-in fade-in zoom-in-95 duration-200">
+          {isSearchable && (
+            <div className="p-2 mb-2 sticky top-0 bg-white z-10">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300" />
+                <input 
+                  autoFocus
+                  className="w-full pl-9 pr-4 py-2 bg-slate-50 border-none rounded-xl text-sm font-bold focus:ring-2 focus:ring-indigo-500/20"
+                  placeholder="Search..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  onClick={(e) => e.stopPropagation()}
+                />
+              </div>
+            </div>
+          )}
+          <div className="max-h-60 overflow-y-auto custom-scrollbar">
+            {filteredOptions.map((opt) => (
+              <button
+                key={opt.value}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onChange(opt.value);
+                  setIsOpen(false);
+                }}
+                className={`w-full text-left px-4 py-3.5 rounded-xl text-sm font-bold transition-all flex items-center justify-between group ${
+                  (value === opt.value || value === opt.label) ? 'bg-slate-900 text-white' : 'hover:bg-slate-50 text-slate-600'
+                }`}
+              >
+                <span>{opt.label}</span>
+                {(value === opt.value || value === opt.label) && <Check size={14} />}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
 
 export const AnalysisResultsStep = ({ onBack, onGenerate, LOGO_LINKS, initialUrl }) => {
   const [isObjectiveOpen, setIsObjectiveOpen] = useState(false);
@@ -110,17 +175,18 @@ export const AnalysisResultsStep = ({ onBack, onGenerate, LOGO_LINKS, initialUrl
             {/* Top Row: Business Type, Objective, Conversion Event */}
             <div className="grid grid-cols-1 md:grid-cols-12 gap-8 text-left border-b border-slate-50 pb-10">
               {/* Business Type - Smaller width (3 columns) */}
-              <div className="md:col-span-3 space-y-3 text-left">
-                <label className="text-sm font-bold text-slate-900 ml-1">Business type</label>
-                <div className="relative group">
-                  <select className="w-full bg-slate-50 border-none rounded-2xl px-6 py-4 appearance-none focus:ring-2 focus:ring-indigo-100 transition-all font-bold text-slate-700 text-sm">
-                    <option>Online shopping</option>
-                    <option>Local Store & Service</option>
-                    <option>Solution & Online Service</option>
-                    <option>App</option>
-                  </select>
-                  <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 pointer-events-none group-focus-within:rotate-180 transition-transform" />
-                </div>
+              <div className="md:col-span-3">
+                <CustomDropdown 
+                  label="Business type"
+                  value="Online shopping"
+                  onChange={() => {}}
+                  options={[
+                    { value: 'Online shopping', label: 'Online shopping' },
+                    { value: 'Local Store & Service', label: 'Local Store & Service' },
+                    { value: 'Solution & Online Service', label: 'Solution & Online Service' },
+                    { value: 'App', label: 'App' }
+                  ]}
+                />
               </div>
 
               {/* Objective & Conversion Event Grid - Larger width (9 columns) */}
@@ -313,16 +379,17 @@ export const AnalysisResultsStep = ({ onBack, onGenerate, LOGO_LINKS, initialUrl
                 </div>
               </div>
 
-              <div className="space-y-3 text-left">
-                <label className="text-sm font-bold text-slate-900 ml-1">Promotion type</label>
-                <div className="relative">
-                  <select className="w-full bg-slate-50 border-none rounded-2xl px-6 py-4 appearance-none focus:ring-2 focus:ring-indigo-100 transition-all font-bold text-slate-700 text-sm">
-                    <option>Long-term</option>
-                    <option>Fixed term</option>
-                    <option>Dynamic</option>
-                  </select>
-                  <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 pointer-events-none" />
-                </div>
+              <div>
+                <CustomDropdown 
+                  label="Promotion type"
+                  value="Long-term"
+                  onChange={() => {}}
+                  options={[
+                    { value: 'Long-term', label: 'Long-term' },
+                    { value: 'Fixed term', label: 'Fixed term' },
+                    { value: 'Dynamic', label: 'Dynamic' }
+                  ]}
+                />
               </div>
             </div>
           </div>
