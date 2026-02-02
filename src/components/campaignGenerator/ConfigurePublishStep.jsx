@@ -5,7 +5,7 @@ import {
   ArrowRight, Zap, Image as ImageIcon, Link as LinkIcon, Trash2
 } from 'lucide-react';
 
-export const ConfigurePublishStep = ({ product, savedConfig, LOGO_LINKS, onBack }) => {
+export const ConfigurePublishStep = ({ product, savedConfig, LOGO_LINKS, onBack, onConfirm }) => {
   // Use data from Brand config as defaults
   const [locations] = useState(savedConfig?.locations || ['United States (US)']);
   const [objective] = useState('Sales & Conversions');
@@ -320,7 +320,19 @@ export const ConfigurePublishStep = ({ product, savedConfig, LOGO_LINKS, onBack 
         >
           Back
         </button>
-        <button className="px-24 py-4 bg-slate-900 text-white rounded-full text-sm font-bold flex items-center gap-3 hover:bg-black transition-all shadow-xl active:scale-95 group">
+        <button 
+          onClick={() => onConfirm?.({
+            campaignCount,
+            adsetsCount,
+            adsPerSet,
+            budget,
+            budgetType,
+            totalCreatives,
+            estimatedDailyBudget,
+            creatives
+          })}
+          className="px-24 py-4 bg-slate-900 text-white rounded-full text-sm font-bold flex items-center gap-3 hover:bg-black transition-all shadow-xl active:scale-95 group"
+        >
           Confirm configuration & start AI building
           <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
         </button>

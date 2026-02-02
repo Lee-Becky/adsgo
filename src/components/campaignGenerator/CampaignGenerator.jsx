@@ -4,6 +4,7 @@ import { UrlInputStep } from './UrlInputStep';
 import { AnalysisResultsStep } from './AnalysisResultsStep';
 import { CampaignEditorStep } from './CampaignEditorStep';
 import { ConfigurePublishStep } from './ConfigurePublishStep';
+import { PublishReviewStep } from './PublishReviewStep';
 
 const LOGO_LINKS = {
   meta: 'https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://meta.com&size=256',
@@ -148,6 +149,10 @@ export const CampaignGenerator = ({ hasGenerated, setHasGenerated, firstGenerate
   const [showFinalResults, setShowFinalResults] = useState(false);
   const [showEditor, setShowEditor] = useState(false);
   const [showConfigurePublish, setShowConfigurePublish] = useState(false);
+  const [isBuilding, setIsBuilding] = useState(false);
+  const [countdown, setCountdown] = useState(10);
+  const [showPublishReview, setShowPublishReview] = useState(false);
+  const [publishConfig, setPublishReviewConfig] = useState(null);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const scrollRef = useRef(null);
   const endOfListRef = useRef(null);
@@ -203,6 +208,60 @@ export const CampaignGenerator = ({ hasGenerated, setHasGenerated, firstGenerate
     handleScroll();
   }, [visibleItems, currentStepIndex, isAnalyzing]);
 
+  // Loading timer for building process
+  useEffect(() => {
+    if (isBuilding && countdown > 0) {
+      const timer = setTimeout(() => setCountdown(c => c - 1), 1000);
+      return () => clearTimeout(timer);
+    } else if (isBuilding && countdown === 0) {
+      setIsBuilding(false);
+      setShowPublishReview(true);
+    }
+  }, [isBuilding, countdown]);
+
+  if (isBuilding) {
+    return (
+      <div className="min-h-[calc(100vh-64px)] w-full bg-[#FAFAFA] flex flex-col items-center justify-center p-8 animate-in fade-in duration-500">
+        <div className="max-w-md w-full text-center space-y-8">
+          <div className="relative w-32 h-32 mx-auto">
+            <div className="absolute inset-0 rounded-full border-4 border-indigo-50" />
+            <div 
+              className="absolute inset-0 rounded-full border-4 border-indigo-600 border-t-transparent animate-spin" 
+              style={{ animationDuration: '2s' }}
+            />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <span className="text-3xl font-bold text-indigo-600">{countdown}s</span>
+            </div>
+          </div>
+          <div className="space-y-3">
+            <h2 className="text-2xl font-bold text-slate-900">Building your strategy...</h2>
+            <p className="text-slate-500 leading-relaxed">
+              AdsGo is constructing the best-practice ad strategy structure based on your configuration.
+            </p>
+          </div>
+          <div className="flex justify-center gap-2">
+            {[1, 2, 3].map(i => (
+              <div key={i} className="w-2 h-2 bg-indigo-600 rounded-full animate-bounce" style={{ animationDelay: `${i * 0.2}s` }} />
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (showPublishReview) {
+    return (
+      <PublishReviewStep 
+        config={publishConfig}
+        LOGO_LINKS={LOGO_LINKS}
+        onBack={() => {
+          setShowPublishReview(false);
+          setShowConfigurePublish(true);
+        }}
+      />
+    );
+  }
+
   if (showConfigurePublish) {
     return (
       <ConfigurePublishStep 
@@ -210,6 +269,12 @@ export const CampaignGenerator = ({ hasGenerated, setHasGenerated, firstGenerate
         savedConfig={savedConfig}
         LOGO_LINKS={LOGO_LINKS}
         onBack={() => setShowConfigurePublish(false)}
+        onConfirm={(config) => {
+          setPublishReviewConfig(config);
+          setIsBuilding(true);
+          setCountdown(10);
+          setShowConfigurePublish(false);
+        }}
       />
     );
   }
