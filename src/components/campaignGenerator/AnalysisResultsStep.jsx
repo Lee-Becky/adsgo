@@ -115,8 +115,9 @@ export const AnalysisResultsStep = ({ onBack, onGenerate, LOGO_LINKS, initialUrl
                 <div className="relative group">
                   <select className="w-full bg-slate-50 border-none rounded-2xl px-6 py-4 appearance-none focus:ring-2 focus:ring-indigo-100 transition-all font-bold text-slate-700 text-sm">
                     <option>Online shopping</option>
-                    <option>SaaS platform</option>
-                    <option>Lead generation</option>
+                    <option>Local Store & Service</option>
+                    <option>Solution & Online Service</option>
+                    <option>App</option>
                   </select>
                   <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 pointer-events-none group-focus-within:rotate-180 transition-transform" />
                 </div>

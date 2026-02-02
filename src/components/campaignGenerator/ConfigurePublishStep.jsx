@@ -235,7 +235,7 @@ export const ConfigurePublishStep = ({ product, savedConfig, LOGO_LINKS, onBack,
                 {/* Right: Selected */}
                 <div className="w-1/2 bg-slate-50/30 flex flex-col">
                   <div className="p-4 border-b border-slate-50 flex items-center justify-between">
-                    <span className="text-[10px] font-black text-slate-400 tracking-widest">SELECTED ({selectedLocations.length})</span>
+                    <span className="text-[10px] font-black text-slate-400 tracking-widest">Selected ({selectedLocations.length})</span>
                   </div>
                   <div className="flex-1 max-h-[300px] overflow-y-auto custom-scrollbar p-4 flex flex-wrap gap-2 content-start">
                     {selectedLocations.map(l => (

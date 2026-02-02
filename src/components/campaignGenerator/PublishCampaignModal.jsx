@@ -1,13 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { 
   X, Check, ChevronRight, Loader2, 
   Layout, Target, Rocket, Sparkles,
-  ArrowRight, AlertCircle, RefreshCw
+  ArrowRight, AlertCircle, RefreshCw,
+  ChevronDown, Search
 } from 'lucide-react';
 import ObjectiveSection from '../brand/optimizeGoals/ObjectiveSection';
 import BudgetKPISection from '../brand/optimizeGoals/BudgetKPISection';
 
 const PublishCampaignModal = ({ isOpen, onClose, LOGO_LINKS, onComplete, publishConfig }) => {
+  console.log('PublishCampaignModal Root - publishConfig:', publishConfig);
   const [step, setStep] = useState(1);
   const [connectedPlatform, setConnectedPlatform] = useState(null); // 'meta' or 'google'
   const [isConnecting, setIsConnecting] = useState(false);
@@ -25,6 +27,8 @@ const PublishCampaignModal = ({ isOpen, onClose, LOGO_LINKS, onComplete, publish
     conversionDataset: ''
   });
 
+  const [activeDropdown, setActiveDropdown] = useState(null); // 'adAccount', 'fbPage', etc.
+
   // Step 3 progress
   const [publishProgress, setPublishProgress] = useState([
     { id: 1, name: 'Campaign #1 - US Market', status: 'Publishing' },
@@ -34,49 +38,56 @@ const PublishCampaignModal = ({ isOpen, onClose, LOGO_LINKS, onComplete, publish
     { id: 5, name: 'Campaign #5 - Brand Awareness', status: 'Waiting' },
   ]);
 
-  // Step 4 data (mocking the brand optimize goal data structure)
-  const [brandGoalData, setBrandGoalData] = useState({
-    campaignObjective: 'sales_conversions',
-    adsetGoal: 'in_web_actions',
-    event: 'Purchase',
-    marketGroups: [
-      {
-        id: '1',
-        targetLocations: ['United States'],
-        budgetMode: 'unified',
-        unifiedBudget: '500',
-        kpiType: 'ROAS',
-        kpiMode: 'unified',
-        unifiedKPI: ''
-      }
-    ]
-  });
+  // Step 4 data initialization
+  const initialBrandGoalData = useMemo(() => {
+    console.log('PublishCampaignModal - Syncing brandGoalData. Raw publishConfig:', publishConfig);
+    
+    // Determine locations with multiple fallbacks
+    let rawLocations = publishConfig?.locations || publishConfig?.targetLocations || ['United States'];
+    if (!Array.isArray(rawLocations) || rawLocations.length === 0) rawLocations = ['United States'];
 
-  // Sync data from publishConfig when step 4 is reached or modal opens
-  useEffect(() => {
-    if (isOpen && publishConfig) {
-      setBrandGoalData(prev => ({
-        ...prev,
-        // Map common objectives if possible, otherwise default to sales_conversions
-        campaignObjective: 'sales_conversions',
-        adsetGoal: 'in_web_actions',
-        event: publishConfig.event || 'Purchase',
-        marketGroups: [
-          {
-            ...prev.marketGroups[0],
-            targetLocations: publishConfig.locations || ['United States'],
-            unifiedBudget: publishConfig.budget?.toString() || '500',
-            unifiedKPI: '' // Keep empty for user selection
-          }
-        ]
-      }));
-    }
+    const finalLocations = rawLocations.map(loc => {
+      if (typeof loc === 'string') return { value: loc.toLowerCase(), label: loc };
+      return loc; // Already an object
+    });
+
+    console.log('PublishCampaignModal - Normalized finalLocations:', finalLocations);
+
+    return {
+      campaignObjective: 'sales_conversions',
+      adsetGoal: 'in_web_actions',
+      event: publishConfig?.event || 'Purchase',
+      marketGroups: [
+        {
+          id: '1',
+          targetLocations: finalLocations,
+          budgetMode: 'unified',
+          unifiedBudget: publishConfig?.budget?.toString() || '500',
+          kpiType: 'ROAS',
+          kpiMode: 'unified',
+          unifiedKPI: ''
+        }
+      ]
+    };
   }, [isOpen, publishConfig]);
+
+  const [brandGoalData, setBrandGoalData] = useState(initialBrandGoalData);
+
+  // Update state if initial data changes (e.g. when modal re-opens)
+  useEffect(() => {
+    if (isOpen) {
+      setBrandGoalData(initialBrandGoalData);
+    }
+  }, [isOpen, initialBrandGoalData]);
 
   const [validation, setValidation] = useState({
     objective: true,
     marketGroups: true
   });
+
+  useEffect(() => {
+    console.log('Publish Campaign Modal - publishConfig received:', publishConfig);
+  }, [publishConfig]);
 
   useEffect(() => {
     if (step === 3) {
@@ -211,102 +222,164 @@ const PublishCampaignModal = ({ isOpen, onClose, LOGO_LINKS, onComplete, publish
     </div>
   );
 
+  const CustomDropdown = ({ label, options, value, onChange, placeholder, isOpen, onToggle }) => {
+    const selectedOption = options.find(opt => opt.value === value);
+    
+    return (
+      <div className="space-y-2 relative">
+        <label className="text-[10px] font-bold text-slate-400 tracking-widest">{label}</label>
+        <div 
+          onClick={onToggle}
+          className={`w-full h-12 px-4 bg-white border rounded-xl flex items-center justify-between cursor-pointer transition-all ${
+            isOpen ? 'border-indigo-500 ring-2 ring-indigo-500/10' : 'border-slate-200 hover:border-slate-300'
+          }`}
+        >
+          <span className={`text-sm font-bold ${selectedOption ? 'text-slate-900' : 'text-slate-400'}`}>
+            {selectedOption ? selectedOption.label : placeholder}
+          </span>
+          <ChevronDown size={16} className={`text-slate-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+        </div>
+
+        {isOpen && (
+          <div className="absolute z-[150] top-full left-0 right-0 mt-2 bg-white border border-slate-100 rounded-xl shadow-2xl py-2 animate-in fade-in zoom-in-95 duration-200">
+            {options.map((opt) => (
+              <div 
+                key={opt.value}
+                onClick={() => {
+                  onChange(opt.value);
+                  onToggle();
+                }}
+                className={`px-4 py-2.5 text-sm font-bold cursor-pointer transition-colors ${
+                  value === opt.value ? 'bg-indigo-50 text-indigo-600' : 'hover:bg-slate-50 text-slate-600'
+                }`}
+              >
+                {opt.label}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
   const renderStep2 = () => {
     const isMeta = connectedPlatform === 'meta';
     const canPublish = isMeta 
       ? (selections.adAccount && selections.fbPage && selections.pixel && selections.event)
       : (selections.adAccount && selections.conversionDataset && selections.event);
 
+    const options = {
+      adAccount: [
+        { value: '1', label: 'Main Business Account (129-382-991)' },
+        { value: '2', label: 'Backup Marketing (442-110-872)' }
+      ],
+      fbPage: [
+        { value: '1', label: 'Eco-Friendly Brand' },
+        { value: '2', label: 'Daily Lifestyle Store' }
+      ],
+      pixel: [
+        { value: '1', label: 'Primary Web Pixel (Active)' }
+      ],
+      metaEvent: [
+        { value: 'purchase', label: 'Purchase' },
+        { value: 'add_to_cart', label: 'Add to Cart' },
+        { value: 'lead', label: 'Lead' }
+      ],
+      conversionDataset: [
+        { value: '1', label: 'Primary Conversions' },
+        { value: '2', label: 'Secondary Goals' }
+      ],
+      googleEvent: [
+        { value: 'sales', label: 'Sales' },
+        { value: 'signup', label: 'Signup' }
+      ]
+    };
+
+    const handleToggle = (key) => {
+      setActiveDropdown(activeDropdown === key ? null : key);
+    };
+
     return (
       <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
         <div className="bg-slate-50 rounded-2xl p-6 space-y-6">
-          {/* Ad Account Selection */}
-          <div className="space-y-2">
-            <label className="text-[10px] font-bold text-slate-400 tracking-widest">Select ad account</label>
-            <select 
-              value={selections.adAccount}
-              onChange={(e) => setSelections({...selections, adAccount: e.target.value})}
-              className="w-full h-12 px-4 bg-white border border-slate-200 rounded-xl text-sm font-bold focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
-            >
-              <option value="">Select an account...</option>
-              <option value="1">Main Business Account (129-382-991)</option>
-              <option value="2">Backup Marketing (442-110-872)</option>
-            </select>
-          </div>
+          <CustomDropdown 
+            label="Select ad account"
+            options={options.adAccount}
+            value={selections.adAccount}
+            onChange={(val) => setSelections({...selections, adAccount: val})}
+            placeholder="Select an account..."
+            isOpen={activeDropdown === 'adAccount'}
+            onToggle={() => handleToggle('adAccount')}
+          />
 
           {isMeta ? (
             <>
               {selections.adAccount && (
-                <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
-                  <label className="text-[10px] font-bold text-slate-400 tracking-widest">Facebook page</label>
-                  <select 
+                <div className="animate-in fade-in slide-in-from-top-2 duration-300">
+                  <CustomDropdown 
+                    label="Facebook page"
+                    options={options.fbPage}
                     value={selections.fbPage}
-                    onChange={(e) => setSelections({...selections, fbPage: e.target.value})}
-                    className="w-full h-12 px-4 bg-white border border-slate-200 rounded-xl text-sm font-bold focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
-                  >
-                    <option value="">Select a page...</option>
-                    <option value="1">Eco-Friendly Brand</option>
-                    <option value="2">Daily Lifestyle Store</option>
-                  </select>
+                    onChange={(val) => setSelections({...selections, fbPage: val})}
+                    placeholder="Select a page..."
+                    isOpen={activeDropdown === 'fbPage'}
+                    onToggle={() => handleToggle('fbPage')}
+                  />
                 </div>
               )}
               {selections.fbPage && (
-                <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
-                  <label className="text-[10px] font-bold text-slate-400 tracking-widest">Tracking pixel</label>
-                  <select 
+                <div className="animate-in fade-in slide-in-from-top-2 duration-300">
+                  <CustomDropdown 
+                    label="Tracking pixel"
+                    options={options.pixel}
                     value={selections.pixel}
-                    onChange={(e) => setSelections({...selections, pixel: e.target.value})}
-                    className="w-full h-12 px-4 bg-white border border-slate-200 rounded-xl text-sm font-bold focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
-                  >
-                    <option value="">Select a pixel...</option>
-                    <option value="1">Primary Web Pixel (Active)</option>
-                  </select>
+                    onChange={(val) => setSelections({...selections, pixel: val})}
+                    placeholder="Select a pixel..."
+                    isOpen={activeDropdown === 'pixel'}
+                    onToggle={() => handleToggle('pixel')}
+                  />
                 </div>
               )}
               {selections.pixel && (
-                <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
-                  <label className="text-[10px] font-bold text-slate-400 tracking-widest">Optimization event</label>
-                  <select 
+                <div className="animate-in fade-in slide-in-from-top-2 duration-300">
+                  <CustomDropdown 
+                    label="Event"
+                    options={options.metaEvent}
                     value={selections.event}
-                    onChange={(e) => setSelections({...selections, event: e.target.value})}
-                    className="w-full h-12 px-4 bg-white border border-slate-200 rounded-xl text-sm font-bold focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
-                  >
-                    <option value="">Select an event...</option>
-                    <option value="purchase">Purchase</option>
-                    <option value="add_to_cart">Add to Cart</option>
-                    <option value="lead">Lead</option>
-                  </select>
+                    onChange={(val) => setSelections({...selections, event: val})}
+                    placeholder="Select an event..."
+                    isOpen={activeDropdown === 'metaEvent'}
+                    onToggle={() => handleToggle('metaEvent')}
+                  />
                 </div>
               )}
             </>
           ) : (
             <>
               {selections.adAccount && (
-                <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
-                  <label className="text-[10px] font-bold text-slate-400 tracking-widest">Conversion dataset</label>
-                  <select 
+                <div className="animate-in fade-in slide-in-from-top-2 duration-300">
+                  <CustomDropdown 
+                    label="Conversion dataset"
+                    options={options.conversionDataset}
                     value={selections.conversionDataset}
-                    onChange={(e) => setSelections({...selections, conversionDataset: e.target.value})}
-                    className="w-full h-12 px-4 bg-white border border-slate-200 rounded-xl text-sm font-bold focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
-                  >
-                    <option value="">Select a dataset...</option>
-                    <option value="1">Primary Conversions</option>
-                    <option value="2">Secondary Goals</option>
-                  </select>
+                    onChange={(val) => setSelections({...selections, conversionDataset: val})}
+                    placeholder="Select a dataset..."
+                    isOpen={activeDropdown === 'conversionDataset'}
+                    onToggle={() => handleToggle('conversionDataset')}
+                  />
                 </div>
               )}
               {selections.conversionDataset && (
-                <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
-                  <label className="text-[10px] font-bold text-slate-400 tracking-widest">Optimization event</label>
-                  <select 
+                <div className="animate-in fade-in slide-in-from-top-2 duration-300">
+                  <CustomDropdown 
+                    label="Optimization event"
+                    options={options.googleEvent}
                     value={selections.event}
-                    onChange={(e) => setSelections({...selections, event: e.target.value})}
-                    className="w-full h-12 px-4 bg-white border border-slate-200 rounded-xl text-sm font-bold focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
-                  >
-                    <option value="">Select an event...</option>
-                    <option value="sales">Sales</option>
-                    <option value="signup">Signup</option>
-                  </select>
+                    onChange={(val) => setSelections({...selections, event: val})}
+                    placeholder="Select an event..."
+                    isOpen={activeDropdown === 'googleEvent'}
+                    onToggle={() => handleToggle('googleEvent')}
+                  />
                 </div>
               )}
             </>
@@ -321,7 +394,10 @@ const PublishCampaignModal = ({ isOpen, onClose, LOGO_LINKS, onComplete, publish
         </div>
 
         <button 
-          onClick={() => setStep(3)}
+          onClick={() => {
+            setActiveDropdown(null);
+            setStep(3);
+          }}
           disabled={!canPublish}
           className="w-full py-4 bg-slate-900 text-white rounded-2xl text-sm font-black flex items-center justify-center gap-2 hover:bg-black transition-all disabled:opacity-30 disabled:grayscale"
         >
@@ -388,13 +464,13 @@ const PublishCampaignModal = ({ isOpen, onClose, LOGO_LINKS, onComplete, publish
         <div className="w-16 h-16 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center mb-2 animate-bounce">
           <Check size={32} />
         </div>
-        <h3 className="text-2xl font-black text-slate-900 tracking-tight">Deployment successful!</h3>
+        <h3 className="text-2xl font-black text-slate-900 tracking-tight">Publish successful!</h3>
         <p className="text-sm font-medium text-slate-500">Confirm your brand's optimize goal to activate AI optimization</p>
       </div>
 
-      <div className="space-y-8 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
-        {/* Objective Card */}
-        <div className="bg-white rounded-[2rem] border border-slate-200 shadow-sm overflow-hidden transform transition-all hover:shadow-md">
+      <div className="space-y-8 pr-2 pb-32">
+        {/* Objective Card - Removed overflow-hidden to allow dropdown to show */}
+        <div className="bg-white rounded-[2rem] border border-slate-200 shadow-sm transform transition-all hover:shadow-md relative z-[100]">
           <ObjectiveSection 
             formData={brandGoalData}
             updateFormData={(key, val) => setBrandGoalData(p => ({...p, [key]: val}))}
@@ -404,7 +480,7 @@ const PublishCampaignModal = ({ isOpen, onClose, LOGO_LINKS, onComplete, publish
         </div>
 
         {/* Budget & KPI Card */}
-        <div className="transform transition-all hover:shadow-md">
+        <div className="transform transition-all hover:shadow-md relative z-[50]">
           <BudgetKPISection 
             formData={brandGoalData}
             updateFormData={(key, val) => setBrandGoalData(p => ({...p, [key]: val}))}
@@ -413,16 +489,6 @@ const PublishCampaignModal = ({ isOpen, onClose, LOGO_LINKS, onComplete, publish
             setValidation={setValidation}
           />
         </div>
-      </div>
-
-      <div className="pt-4">
-        <button 
-          onClick={onComplete}
-          className="w-full py-5 bg-gradient-to-r from-emerald-600 to-teal-700 text-white rounded-2xl text-base font-black flex items-center justify-center gap-3 hover:scale-[1.02] active:scale-98 transition-all shadow-xl shadow-emerald-200/50"
-        >
-          Confirm strategy & finish
-          <ArrowRight size={20} />
-        </button>
       </div>
     </div>
   );
@@ -476,7 +542,7 @@ const PublishCampaignModal = ({ isOpen, onClose, LOGO_LINKS, onComplete, publish
 
         {/* Step 1 Footer */}
         {step === 1 && (
-          <div className="px-10 py-6 border-t border-slate-50 flex items-center justify-between bg-slate-50/50">
+          <div className="px-10 py-6 border-t border-slate-50 flex items-center justify-between bg-slate-50/50 shrink-0">
             <button onClick={onClose} className="text-xs font-bold text-slate-400 hover:text-slate-600 px-6 py-2 transition-colors">
               Cancel
             </button>
@@ -487,6 +553,19 @@ const PublishCampaignModal = ({ isOpen, onClose, LOGO_LINKS, onComplete, publish
             >
               Select account
               <ChevronRight size={16} />
+            </button>
+          </div>
+        )}
+
+        {/* Step 4 Sticky Footer */}
+        {step === 4 && (
+          <div className="absolute bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-white via-white to-white/0 pt-16 z-[200]">
+            <button 
+              onClick={onComplete}
+              className="w-full py-5 bg-gradient-to-r from-emerald-600 to-teal-700 text-white rounded-2xl text-base font-black flex items-center justify-center gap-3 hover:scale-[1.02] active:scale-98 transition-all shadow-2xl shadow-emerald-200/50"
+            >
+              Confirm strategy & finish
+              <ArrowRight size={20} />
             </button>
           </div>
         )}

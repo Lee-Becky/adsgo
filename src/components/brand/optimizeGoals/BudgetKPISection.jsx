@@ -300,10 +300,10 @@ const BudgetKPISection = ({ formData, updateFormData, updateFormDataDeep, valida
                     </div>
 
                     <div className="flex flex-wrap gap-2">
-                      {group.targetLocations.map((location) => (
-                        <span key={location.value} className="px-3 py-2 bg-white border border-slate-200 rounded-full text-xs font-bold text-slate-700 flex items-center gap-2 shadow-sm animate-in zoom-in">
-                          {location.label}
-                          <X size={12} className="cursor-pointer hover:text-rose-500" onClick={() => removeLocation(group.id, location.value)} />
+                      {group.targetLocations.map((location, locIdx) => (
+                        <span key={location.value || `${location}-${locIdx}`} className="px-3 py-2 bg-white border border-slate-200 rounded-full text-xs font-bold text-slate-700 flex items-center gap-2 shadow-sm animate-in zoom-in">
+                          {location.label || location}
+                          <X size={12} className="cursor-pointer hover:text-rose-500" onClick={() => removeLocation(group.id, location.value || location)} />
                         </span>
                       ))}
                       {!locValid && (
