@@ -18,7 +18,7 @@ import Dashboard from './components/Dashboard'
 import AdInsights from './components/AdInsights'
 import { AutoRegeneration } from './components/autoRegeneration'
 import { CampaignGenerator } from './components/campaignGenerator'
-import { Analysis360 } from './components/analysis'
+import { Analysis360, AIAnalysis } from './components/analysis'
 import AdManagerV3 from './components/adManagerV3/AdManagerV3'
 import AIGenerate from './components/creativeHub/AIGenerate'
 import CreativeLibrary from './components/creativeHub/CreativeLibrary'
@@ -205,6 +205,8 @@ function App() {
         return <AdInsights onPageChange={handlePageChange} />
       case 'insights360':
         return <Analysis360 onPageChange={handlePageChange} />
+      case 'aiAnalysis':
+        return <AIAnalysis />
       case 'drafts':
         return <Drafts />
       case 'settings':
