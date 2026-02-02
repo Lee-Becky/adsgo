@@ -22,7 +22,7 @@ const Header = ({ toggleSidebar, isMobile }) => {
     { name: '日本語', code: 'ja' }
   ]
 
-  // 初始化语言状态，从 Cookie 读取
+  // 初始化语言状态，从 Cookie 读取 Google 翻译状态
   useEffect(() => {
     const getCookie = (name) => {
       const value = `; ${document.cookie}`;
@@ -41,21 +41,20 @@ const Header = ({ toggleSidebar, isMobile }) => {
     setSelectedLanguage(lang.name)
     setLanguageDropdownOpen(false)
     
-    // Google 翻译 Cookie 切换逻辑
-    // 格式为 /源语言/目标语言
+    // Google 翻译 Cookie 切换逻辑 (格式: /源语言/目标语言)
     const cookieValue = lang.code === 'en' ? '' : `/en/${lang.code}`;
     
-    // 设置 Cookie
+    // 写入 Cookie，确保全路径生效
     document.cookie = `googtrans=${cookieValue}; path=/`;
     document.cookie = `googtrans=${cookieValue}; path=/; domain=${window.location.hostname}`;
     
-    // 刷新页面以应用翻译
+    // 刷新页面触发 Google 脚本重翻译
     window.location.reload();
   }
 
   return (
     <header className="sticky top-0 z-30 w-full bg-white/80 backdrop-blur-xl border-b border-slate-100 transition-all duration-300">
-      <div className="mx-auto max-w-[1600px] px-6">
+      <div className="px-6">
         <div className="flex h-[72px] items-center justify-between">
           <div className="flex items-center gap-4">
             {isMobile && (
