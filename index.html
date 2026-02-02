@@ -5,43 +5,59 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AdsGo - 广告管理</title>
+    
+    <style>
+      /* 极致隐藏 Google 翻译所有潜在 UI 元素，防止加载瞬间的闪烁 */
+      .goog-te-banner-frame, 
+      .goog-te-banner-frame.skiptranslate,
+      .goog-te-gadget-icon,
+      .goog-te-menu-value,
+      .goog-te-menu-frame,
+      .goog-gt-tt,
+      #goog-gt-tt,
+      .goog-te-balloon-frame,
+      #google_translate_element,
+      iframe.goog-te-banner-frame,
+      iframe.goog-te-menu-frame {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        height: 0 !important;
+        width: 0 !important;
+      }
+      
+      body {
+        top: 0 !important;
+        position: static !important;
+      }
+
+      /* 针对 Chrome 自动注入的翻译条进行拦截 */
+      .skiptranslate {
+        display: none !important;
+      }
+      
+      /* 防止翻译导致的页面偏移 */
+      body > .skiptranslate {
+        display: none !important;
+      }
+    </style>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <style>
-      /* 强制隐藏 Google 翻译原生 UI */
-      .goog-te-banner-frame.skiptranslate,
-      #goog-gt-tt,
-      .goog-te-balloon-frame,
-      .goog-te-menu-value span:nth-child(2),
-      .goog-te-menu-value img,
-      .goog-te-gadget .goog-te-menu-value:after {
-        display: none !important;
-      }
-      .goog-te-gadget {
-        color: transparent !important;
-        font-size: 0 !important;
-      }
-      body {
-        top: 0 !important;
-      }
-      #google_translate_element {
-        display: none;
-      }
-      .skiptranslate {
-        display: none !important;
-      }
-    </style>
   </head>
   <body>
     <div id="root"></div>
-    <div id="google_translate_element"></div>
+    <!-- 这个节点必须存在但必须隐藏 -->
+    <div id="google_translate_element" style="display:none"></div>
+    
     <script type="module" src="/src/main.jsx"></script>
     <script>
       function googleTranslateElementInit() {
         new google.translate.TranslateElement({
           pageLanguage: 'en',
+          includedLanguages: 'zh-CN,en,es,fr,de,ja',
           layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
           autoDisplay: false
         }, 'google_translate_element');
