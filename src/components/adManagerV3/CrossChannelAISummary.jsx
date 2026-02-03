@@ -273,15 +273,15 @@ const CrossChannelAISummary = ({
     : 0;
 
   return (
-    <div className="mb-8">
+    <div className="mb-8 w-full overflow-hidden">
       {/* Collapsible Content */}
       <div 
-        className={`grid grid-cols-1 lg:grid-cols-3 gap-4 items-stretch transition-all duration-500 ease-in-out ${
+        className={`grid grid-cols-1 xl:grid-cols-3 gap-4 items-stretch transition-all duration-500 ease-in-out ${
           isCollapsed ? 'opacity-0 max-h-0 overflow-hidden -translate-y-2' : 'opacity-100 max-h-[2000px]'
         }`}
       >
         {/* Left Column: AI Summary (2/3 Width) */}
-      <div className="lg:col-span-2 bg-slate-50/50 border border-blue-100 rounded-2xl p-4 shadow-sm flex flex-col h-full">
+      <div className="xl:col-span-2 bg-slate-50/50 border border-blue-100 rounded-2xl p-4 shadow-sm flex flex-col h-full min-w-0">
         <div className="flex items-center justify-between border-b border-slate-200 pb-1.5 mb-5 shrink-0">
           <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
@@ -303,7 +303,7 @@ const CrossChannelAISummary = ({
           </div>
         </div>
 
-        <div className="grid grid-cols-[60%_40%] gap-4 mb-4 shrink-0 relative">
+        <div className="grid grid-cols-[minmax(0,60%)_minmax(0,40%)] gap-4 mb-4 shrink-0 relative">
           {/* Divider Line */}
           <div className="absolute left-[60%] top-0 bottom-0 w-px bg-slate-200 -translate-x-1/2"></div>
 
@@ -403,7 +403,7 @@ const CrossChannelAISummary = ({
       </div>
 
       {/* Right Column: Optimize Goal & Auto-apply (1/3 Width) */}
-      <div className="lg:col-span-1 h-full">
+      <div className="xl:col-span-1 h-full">
         <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm h-full flex flex-col">
           {/* Header Section */}
           <div className="flex items-center justify-between mb-5 shrink-0">

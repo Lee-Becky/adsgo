@@ -61,12 +61,12 @@ const MainLayout = ({ children, showDemoOverlay, onDemoConnect, onDemoCreate, se
       </aside>
 
       {/* Main Content Wrapper */}
-      <div className="flex-1 flex flex-col h-full relative">
+      <div className="flex-1 flex flex-col h-full relative min-w-0">
         {/* Header */}
         <Header toggleSidebar={toggleSidebar} isMobile={isMobile} />
 
         {/* Content Area with Overlay Scope */}
-        <div className="flex-1 relative overflow-hidden flex flex-col">
+        <div className="flex-1 relative flex flex-col min-w-0 overflow-hidden">
           {/* Scrollable Page Content */}
           <main className="flex-1 overflow-y-auto scroll-smooth p-6">
             {children}

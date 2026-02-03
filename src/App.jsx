@@ -28,10 +28,17 @@ import CreateBrandModal from './components/brand/CreateBrandModal'
 import BrandSwitchLoading from './components/brand/BrandSwitchLoading'
 import ComingSoon from './components/ComingSoon'
 import { getPageInfo } from './constants/menuConfig'
+import { resetModalCounter } from './constants/zIndex'
+import { useEffect } from 'react'
 
 function App() {
   const navigate = useNavigate()
   const location = useLocation()
+
+  // 路由变化时重置弹窗层级计数器
+  useEffect(() => {
+    resetModalCounter()
+  }, [location.pathname])
   const currentPage = useMemo(() => {
     const path = location.pathname.slice(1) || 'overview'
     // 获取路径的最后一部分作为页面 key

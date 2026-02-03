@@ -765,7 +765,7 @@ const AutoRegeneration = ({ onPageChange }) => {
     setAutoPublishCampaigns(prev => {
       const newStatus = { ...prev };
       newCampaigns.forEach(campaign => {
-        newStatus[campaign.id] = autoRegen; // 随当前系统状态
+        newStatus[campaign.id] = autoRegen; // 随系统状态
       });
       return newStatus;
     });
@@ -839,7 +839,7 @@ const AutoRegeneration = ({ onPageChange }) => {
   };
 
   return (
-    <div className="min-h-screen bg-background p-4 md:p-6 font-sans">
+    <div className="min-h-screen bg-background font-sans p-6">
       <div className="flex-1 flex flex-col gap-4">
         {/* Platform Selector Card */}
         <div className="bg-white rounded-2xl border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-4 transition-all">
@@ -1064,7 +1064,7 @@ const AutoRegeneration = ({ onPageChange }) => {
           </div>
         )}
 
-        <div className="mt-8 px-4 md:px-6">
+        <div className="mt-8">
           <div className="mb-6 flex items-center justify-between relative">
             <div className="absolute left-0 top-0.5 bottom-0.5 w-1.5 rounded-full bg-gradient-to-b from-[#c3a2fe] via-[#7135f4] to-[#0d031f]"></div>
             

@@ -4,6 +4,7 @@ import ObjectiveSection from './optimizeGoals/ObjectiveSection';
 import BudgetKPISection from './optimizeGoals/BudgetKPISection';
 import AssetSection from './optimizeGoals/AssetSection';
 import SaveConfirmationModal from '../campaignGenerator/SaveConfirmationModal';
+import BaseModal from './Common';
 
 const ImageCropper = ({ imageSrc, onCrop, onCancel }) => {
   const [zoom, setZoom] = useState(1);
@@ -30,7 +31,7 @@ const ImageCropper = ({ imageSrc, onCrop, onCancel }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-slate-900/90 backdrop-blur-md p-6">
+    <BaseModal isOpen={true} onClose={onCancel} className="bg-slate-900/90 backdrop-blur-md p-6">
       <div className="bg-white rounded-[32px] overflow-hidden shadow-2xl w-full max-w-[500px] flex flex-col">
         <div className="p-6 border-b border-slate-100 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -94,7 +95,7 @@ const ImageCropper = ({ imageSrc, onCrop, onCancel }) => {
           </div>
         </div>
       </div>
-    </div>
+    </BaseModal>
   );
 };
 
@@ -261,10 +262,9 @@ const CreateBrandModal = ({ isOpen, onClose, onCreate, initialData }) => {
 
   return (
     <>
-      <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300">
+      <BaseModal isOpen={isOpen} onClose={onClose}>
         <div 
           className="w-full max-w-[960px] max-h-[90vh] bg-white rounded-[32px] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 flex flex-col"
-          onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
           <div className="px-10 pt-10 pb-6 flex items-center justify-between shrink-0">
@@ -432,7 +432,7 @@ const CreateBrandModal = ({ isOpen, onClose, onCreate, initialData }) => {
             </button>
           </div>
         </div>
-      </div>
+      </BaseModal>
 
       {/* Image Cropper Modal */}
       {tempImage && (

@@ -11,18 +11,24 @@ const Tooltip = ({ accounts, title, platform, buttonRef }) => {
   const [position, setPosition] = useState({ top: 0, left: 0 });
 
   useEffect(() => {
-    if (buttonRef.current) {
-      const rect = buttonRef.current.getBoundingClientRect();
-      setPosition({
-        top: rect.bottom + 8,
-        left: rect.left
-      });
-    }
+    const updatePosition = () => {
+      if (buttonRef.current) {
+        const rect = buttonRef.current.getBoundingClientRect();
+        setPosition({
+          top: rect.bottom + window.scrollY + 8,
+          left: rect.left + window.scrollX
+        });
+      }
+    };
+
+    updatePosition();
+    window.addEventListener('resize', updatePosition);
+    return () => window.removeEventListener('resize', updatePosition);
   }, [buttonRef]);
 
   return createPortal(
     <div 
-      className="fixed bg-white border border-slate-200 rounded-lg shadow-lg p-3 z-[999999] min-w-[200px]"
+      className="absolute bg-white border border-slate-200 rounded-lg shadow-lg p-3 z-[999999] min-w-[200px]"
       style={{ top: position.top, left: position.left }}
     >
       <div className="text-xs font-bold text-slate-800 mb-2 pb-1 border-b border-slate-100">{title}</div>

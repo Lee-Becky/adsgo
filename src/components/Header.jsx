@@ -53,7 +53,7 @@ const Header = ({ toggleSidebar, isMobile }) => {
   }
 
   return (
-    <header className="sticky top-0 z-[200] w-full bg-white/80 backdrop-blur-xl border-b border-slate-100 transition-all duration-300">
+    <header className="sticky top-0 z-[50] w-full bg-white/80 backdrop-blur-xl border-b border-slate-100 transition-all duration-300">
       <div className="px-6">
         <div className="flex h-[72px] items-center justify-between">
           <div className="flex items-center gap-4">
@@ -99,7 +99,7 @@ const Header = ({ toggleSidebar, isMobile }) => {
               </button>
 
               {languageDropdownOpen && (
-                <div className="absolute right-0 top-full mt-2 min-w-[160px] origin-top-right rounded-xl border border-slate-200 bg-white p-1.5 shadow-2xl animate-in fade-in slide-in-from-top-2 duration-200 z-[210]">
+                <div className="absolute right-0 top-full mt-2 min-w-[160px] origin-top-right rounded-xl border border-slate-200 bg-white p-1.5 shadow-2xl animate-in fade-in slide-in-from-top-2 duration-200 z-[60]">
                   {languages.map((lang) => (
                     <button
                       key={lang.code}
