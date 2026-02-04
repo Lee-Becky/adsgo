@@ -141,7 +141,7 @@ const AIAnalysis = () => {
           <Sparkles className="text-amber-400" size={32} />
         </div>
         <h1 className="text-4xl font-bold text-gray-900 mb-4">开始营销分析</h1>
-        <p className="text-gray-500 text-lg">选择功能快速开始，或直接输入问题</p>
+        <p className="text-gray-500 text-lg">选择功能快速开始，或直接输入问题，可先访问 http://172.30.134.140:8000/ 使用</p>
       </div>
 
       {/* Main Content Sections */}
