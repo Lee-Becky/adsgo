@@ -120,27 +120,6 @@ export const MENU_ITEMS = [
         subtitle: 'Campaign generation will take competitor information into account.'
       }
     ]
-  },
-  {
-    key: 'abandon',
-    label: 'Abandon',
-    icon: 'Trash2',
-    children: [
-      {
-        key: 'insights',
-        label: 'Ad Insights',
-        icon: 'Lightbulb',
-        title: 'Ad Insights',
-        subtitle: 'Insights and recommendations for new campaigns to publish'
-      },
-      {
-        key: 'drafts',
-        label: 'Drafts',
-        icon: 'FileText',
-        title: 'Drafts',
-        subtitle: 'Manage your draft ad campaigns'
-      }
-    ]
   }
 ]
 
