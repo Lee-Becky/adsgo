@@ -17,6 +17,13 @@ export const MENU_ITEMS = [
     subtitle: 'Generate and publish campaigns'
   },
   {
+    key: 'batchGenerateAds',
+    label: 'Batch Generate Ads',
+    icon: 'Layers',
+    title: 'Batch Generate Ads',
+    subtitle: 'High-performance multi-product campaign architecture orchestration'
+  },
+  {
     key: 'aiOptimize',
     label: 'AI Optimize',
     icon: 'Zap',

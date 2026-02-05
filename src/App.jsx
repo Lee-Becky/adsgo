@@ -18,6 +18,7 @@ import Dashboard from './components/Dashboard'
 import AdInsights from './components/AdInsights'
 import { AutoRegeneration } from './components/autoRegeneration'
 import { CampaignGenerator } from './components/campaignGenerator'
+import BatchGenerateAds from './components/batch_generate_campaign/BatchGenerateAds'
 import { Analysis360, AIAnalysis } from './components/analysis'
 import AdManagerV3 from './components/adManagerV3/AdManagerV3'
 import AIGenerate from './components/creativeHub/AIGenerate'
@@ -204,6 +205,8 @@ function App() {
             onPageChange={handlePageChange}
           />
         )
+      case 'batchGenerateAds':
+        return <BatchGenerateAds />
       case 'aiGenerate':
         return <AIGenerate />
       case 'creativeLibrary':
