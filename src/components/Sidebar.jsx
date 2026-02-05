@@ -177,18 +177,6 @@ const Sidebar = ({ isMobile, onClose, selectedBrand, onBrandChange, onCreateBran
         {MENU_ITEMS.map((item) => renderNavSection(item))}
       </nav>
 
-      {/* Footer Actions */}
-      <div className="mt-auto px-3 py-2 flex flex-col gap-0.5 border-t border-slate-50">
-        <button className="w-full flex items-center gap-3 px-3.5 py-1.5 rounded-xl transition-all duration-200 text-slate-600 hover:bg-slate-50 group">
-          <Star size={16} className="text-amber-400 group-hover:scale-110 transition-transform duration-200" />
-          <span className="font-medium text-[12.5px]">What's New</span>
-        </button>
-        <button className="w-full flex items-center gap-3 px-3.5 py-1.5 rounded-xl transition-all duration-200 text-slate-600 hover:bg-slate-50 group">
-          <BookOpen size={16} className="text-sky-500 group-hover:scale-110 transition-transform duration-200" />
-          <span className="font-medium text-[12.5px]">Getting Started</span>
-        </button>
-      </div>
-
       {/* User Profile Section */}
       <div className="p-2 border-t border-slate-100 relative" ref={userMenuRef}>
         {/* User Floating Menu */}
