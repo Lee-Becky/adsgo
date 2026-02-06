@@ -6,13 +6,20 @@ import {
   Lightbulb, Layers, Archive, ChevronRight, Target, 
   RefreshCw, Zap, Trash2, Palette, FolderOpen, Eye, 
   Brain, Building2, Info, Package, Box, Cog, Star, BookOpen,
-  ChevronsUpDown, Check, LogOut, CreditCard, Link, HelpCircle
+  ChevronsUpDown, Check, LogOut, CreditCard, Link, HelpCircle,
+  ChevronLeft, Wand2, Monitor, PieChart, BrainCircuit, ShieldCheck,
+  Fingerprint, Swords
 } from 'lucide-react'
 import { MENU_ITEMS, SETTINGS_MENU } from '../constants/menuConfig'
 
-const Sidebar = ({ isMobile, onClose, selectedBrand, onBrandChange, onCreateBrand, brands = [] }) => {
+const MINI_LOGO = "data:image/png;base64,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"
+
+const Sidebar = ({ isMobile, isPinned, onTogglePinned, onClose, selectedBrand, onBrandChange, onCreateBrand, brands = [] }) => {
   const navigate = useNavigate()
   const location = useLocation()
+  const [isHovered, setIsHovered] = useState(false)
+  const isCollapsed = !isMobile && !isPinned && !isHovered
+
   // 获取路径的最后一部分作为页面 key
   const path = location.pathname.slice(1) || 'overview'
   const parts = path.split('/')
@@ -40,7 +47,9 @@ const Sidebar = ({ isMobile, onClose, selectedBrand, onBrandChange, onCreateBran
   const iconMap = {
     Layout, Layers, Lightbulb, RefreshCw, FileText, Target,
     Sparkles, Zap, Trash2, BarChart3, Palette, FolderOpen,
-    Eye, Brain, Building2, Info, Package, Box, Users
+    Eye, Brain, Building2, Info, Package, Box, Users,
+    Wand2, Monitor, PieChart, BrainCircuit, ShieldCheck,
+    Fingerprint, Swords, Image
   }
 
   // 构建完整路径
@@ -60,30 +69,41 @@ const Sidebar = ({ isMobile, onClose, selectedBrand, onBrandChange, onCreateBran
           navigate(buildPath(menuItem, parentKey))
           if (isMobile) onClose()
         }}
-        className={`w-full flex items-center gap-3 px-4 py-2 rounded-xl transition-all duration-200 group relative text-left ${
+        className={`w-full flex items-center rounded-xl transition-all duration-200 group relative text-left ${
           isItemActive
             ? 'bg-slate-900 text-white shadow-md shadow-slate-200'
             : 'text-slate-600 hover:bg-slate-50'
-        } ${isSubItem ? 'ml-1' : ''}`}
+        } ${isCollapsed ? 'justify-center px-0 py-2' : 'gap-3 px-4 py-2'} ${isSubItem && !isCollapsed ? 'ml-1' : ''}`}
       >
         {isSubItem && isItemActive && (
-          <div className="absolute -left-[10px] w-[2px] h-4 bg-slate-900 rounded-full" />
+          <div className={`absolute w-[2px] bg-slate-900 rounded-full ${isCollapsed ? '-left-px h-6' : '-left-[10px] h-4'}`} />
         )}
         
-        {ItemIcon && (
-          <ItemIcon 
-            size={isSubItem ? 16 : 18} 
-            className={`shrink-0 transition-colors duration-200 ${
-              isItemActive ? 'text-white' : 'text-slate-400 group-hover:text-slate-600'
-            }`} 
-          />
-        )}
+        <div className={`flex flex-col items-center justify-center shrink-0 transition-all duration-300 ${isCollapsed ? 'w-full' : 'w-5'}`}>
+          {ItemIcon && (
+            <ItemIcon 
+              size={isSubItem ? 16 : 18} 
+              className={`transition-colors duration-200 ${
+                isItemActive ? 'text-white' : 'text-slate-400 group-hover:text-slate-600'
+              }`} 
+            />
+          )}
+          {isCollapsed && menuItem.shortLabel && (
+            <span className={`text-[9px] font-bold mt-1 leading-none transition-all duration-300 scale-90 ${
+              isItemActive ? 'text-white/90' : 'text-slate-400 group-hover:text-slate-600'
+            }`}>
+              {menuItem.shortLabel}
+            </span>
+          )}
+        </div>
         
-        <span className={`font-bold whitespace-nowrap overflow-hidden text-ellipsis ${
-          isSubItem ? 'text-[12.5px]' : 'text-[13.5px]'
-        }`}>
-          {menuItem.label}
-        </span>
+        {!isCollapsed && (
+          <span className={`font-bold whitespace-nowrap overflow-hidden text-ellipsis transition-all duration-300 opacity-100 w-auto ${
+            isSubItem ? 'text-[12.5px]' : 'text-[13.5px]'
+          }`}>
+            {menuItem.label}
+          </span>
+        )}
       </button>
     )
   }
@@ -91,9 +111,13 @@ const Sidebar = ({ isMobile, onClose, selectedBrand, onBrandChange, onCreateBran
   const renderNavSection = (item) => {
     if (item.children) {
       return (
-        <div key={item.key} className="space-y-0.5 mb-2">
-          <p className="px-4 py-1 text-[11px] font-bold text-slate-400 tracking-wider">{item.label}</p>
-          <div className="border-l-2 border-slate-100 ml-4 space-y-0.5">
+        <div key={item.key} className={`space-y-0.5 transition-all duration-300 ${isCollapsed ? 'mb-0.5' : 'mb-2'}`}>
+          {!isCollapsed && (
+            <p className="px-4 py-1 text-[11px] font-bold text-slate-400 tracking-wider transition-all duration-300 opacity-100">
+              {item.label}
+            </p>
+          )}
+          <div className={`border-slate-100 space-y-0.5 transition-all duration-300 ${isCollapsed ? 'border-l-0 ml-0' : 'border-l-2 ml-4'}`}>
             {item.children.map(child => renderMenuItem(child, item.key))}
           </div>
         </div>
@@ -107,33 +131,65 @@ const Sidebar = ({ isMobile, onClose, selectedBrand, onBrandChange, onCreateBran
   }
 
   return (
-    <div className="w-64 h-full bg-white border-r border-slate-200 flex flex-col font-sans select-none">
+    <div 
+      className={`h-full bg-white border-r border-slate-200 flex flex-col font-sans select-none relative transition-all duration-300 ${isCollapsed ? 'w-[72px]' : 'w-64'}`}
+      onMouseEnter={() => !isMobile && setIsHovered(true)}
+      onMouseLeave={() => !isMobile && setIsHovered(false)}
+    >
+      {/* Pin/Toggle Button (Ear) */}
+      {!isMobile && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation()
+            onTogglePinned()
+          }}
+          className={`
+            absolute -right-3 top-1/2 -translate-y-1/2 
+            w-6 h-6 bg-slate-900 border border-slate-800 
+            text-white rounded-full flex items-center justify-center 
+            shadow-lg hover:bg-slate-800 hover:scale-110
+            transition-all z-[60] group/ear opacity-100
+          `}
+          title={isPinned ? "折叠侧边栏" : "固定侧边栏"}
+        >
+          {isPinned ? (
+            <ChevronLeft size={14} className="group-hover/ear:-translate-x-0.5 transition-transform" />
+          ) : (
+            <ChevronRight size={14} className="group-hover/ear:translate-x-0.5 transition-transform" />
+          )}
+        </button>
+      )}
+
       {/* Logo Section */}
-      <div className="h-[72px] px-6 flex items-center justify-center border-b border-slate-100 shrink-0">
+      <div className="h-[72px] px-4 flex items-center justify-center border-b border-slate-100 shrink-0 overflow-hidden transition-all duration-300">
         <img 
-          src="https://www.adsgo.ai/_next/static/media/logo.ecc9c90c.svg"
+          src={isCollapsed ? MINI_LOGO : "https://www.adsgo.ai/_next/static/media/logo.ecc9c90c.svg"}
           alt="AdsGo"
-          className="h-12 w-auto object-contain"
+          className={`h-12 w-auto object-contain transition-all duration-300 ${isCollapsed ? 'scale-75' : 'scale-100'}`}
         />
       </div>
 
       {/* Brand Switcher */}
-      <div className="px-4 py-3 shrink-0">
+      <div className="px-4 py-3 shrink-0 overflow-hidden">
         <div className="relative">
           <button 
             onClick={() => setIsBrandDropdownOpen(!isBrandDropdownOpen)}
             className="w-full flex items-center justify-between gap-3 px-3 py-2 bg-slate-50 border border-slate-100 rounded-xl hover:bg-slate-100 transition-all duration-200 group"
           >
             <div className="flex items-center gap-2.5 min-w-0">
-              <div className="w-7 h-7 bg-white rounded-lg flex items-center justify-center shadow-sm border border-slate-100 group-hover:border-slate-200 transition-colors">
+              <div className="w-7 h-7 bg-white rounded-lg flex items-center justify-center shadow-sm border border-slate-100 group-hover:border-slate-200 transition-colors shrink-0">
                 <span className="text-lg">🐾</span>
               </div>
-              <span className="font-bold text-slate-800 text-[14px] truncate">{selectedBrand}</span>
+              <span className={`font-bold text-slate-800 text-[14px] truncate transition-all duration-300 ${isCollapsed ? 'opacity-0 w-0' : 'opacity-100 w-auto'}`}>
+                {selectedBrand}
+              </span>
             </div>
-            <ChevronsUpDown 
-              size={14} 
-              className="text-slate-400 shrink-0" 
-            />
+            {!isCollapsed && (
+              <ChevronsUpDown 
+                size={14} 
+                className="text-slate-400 shrink-0" 
+              />
+            )}
           </button>
           
           {isBrandDropdownOpen && (
@@ -252,11 +308,11 @@ const Sidebar = ({ isMobile, onClose, selectedBrand, onBrandChange, onCreateBran
               </div>
               <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-green-500 border-2 border-white rounded-full shadow-sm" />
             </div>
-            <div className="flex-1 text-left min-w-0">
+            <div className={`flex-1 text-left min-w-0 transition-all duration-300 ${isCollapsed ? 'opacity-0 w-0' : 'opacity-100 w-auto ml-3'}`}>
               <p className="font-bold text-slate-900 text-[13px] truncate leading-tight">User</p>
               <p className="text-[10px] text-slate-500 truncate mt-0.5 font-medium">Professional Plan</p>
             </div>
-            <ChevronsUpDown size={14} className="text-slate-400 shrink-0" />
+            {!isCollapsed && <ChevronsUpDown size={14} className="text-slate-400 shrink-0" />}
           </button>
         </div>
       </div>

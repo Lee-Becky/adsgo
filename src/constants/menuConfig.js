@@ -5,6 +5,7 @@ export const MENU_ITEMS = [
   {
     key: 'overview',
     label: 'Home',
+    shortLabel: 'Home',
     icon: 'Layout',
     title: 'Home',
     subtitle: 'Ad campaign overview and real-time optimization'
@@ -12,13 +13,15 @@ export const MENU_ITEMS = [
   {
     key: 'campaignGenerator',
     label: 'Campaign Generator',
-    icon: 'Sparkles',
+    shortLabel: 'Gen',
+    icon: 'Wand2',
     title: 'Campaign Generator',
     subtitle: 'Generate and publish campaigns'
   },
   {
     key: 'batchGenerateAds',
     label: 'Batch Generate Ads',
+    shortLabel: 'Batch',
     icon: 'Layers',
     title: 'Batch Generate Ads',
     subtitle: 'High-performance multi-product campaign architecture orchestration'
@@ -26,19 +29,22 @@ export const MENU_ITEMS = [
   {
     key: 'aiOptimize',
     label: 'AI Optimize',
+    shortLabel: 'Opt',
     icon: 'Zap',
     children: [
       {
         key: 'adManagerV3',
         label: 'Ad Manager',
-        icon: 'Layers',
+        shortLabel: 'Ads',
+        icon: 'Monitor',
         title: 'Ad Manager',
         subtitle: 'Unified management of cross-channel campaigns and AI-driven budget optimization'
       },
       {
         key: 'autoRegeneration',
         label: 'Draft & Recom.',
-        icon: 'RefreshCw',
+        shortLabel: 'Draft',
+        icon: 'FileText',
         title: 'Draft & Recom.',
         subtitle: 'Management of unpublished drafts and AI-driven campaign recommendations based on performance'
       }
@@ -47,11 +53,13 @@ export const MENU_ITEMS = [
   {
     key: 'creativeHub',
     label: 'Creative Hub',
+    shortLabel: 'Hub',
     icon: 'Palette',
     children: [
       {
         key: 'aiGenerate',
         label: 'AI Generate',
+        shortLabel: 'AIGC',
         icon: 'Sparkles',
         title: 'AI Generate',
         subtitle: 'Generate ad creatives using AI'
@@ -59,7 +67,8 @@ export const MENU_ITEMS = [
       {
         key: 'creativeLibrary',
         label: 'Creative Library',
-        icon: 'FolderOpen',
+        shortLabel: 'Lib',
+        icon: 'Image',
         title: 'Creative Library',
         subtitle: 'Browse and manage your creative assets'
       }
@@ -68,19 +77,22 @@ export const MENU_ITEMS = [
   {
     key: 'analysis',
     label: 'Analysis',
+    shortLabel: 'Anls',
     icon: 'BarChart3',
     children: [
       {
         key: 'insights360',
         label: '360° Insights',
-        icon: 'Eye',
+        shortLabel: '360',
+        icon: 'PieChart',
         title: '360° Insights',
         subtitle: 'Comprehensive 360-degree view of campaign insights'
       },
       {
         key: 'aiAnalysis',
         label: 'AI Analysis',
-        icon: 'Brain',
+        shortLabel: 'Anal',
+        icon: 'BrainCircuit',
         title: 'AI Analysis',
         subtitle: 'AI-powered campaign analysis and recommendations'
       }
@@ -89,11 +101,13 @@ export const MENU_ITEMS = [
   {
     key: 'brandCenter',
     label: 'Brand Center',
-    icon: 'Building2',
+    shortLabel: 'Brand',
+    icon: 'ShieldCheck',
     children: [
       {
         key: 'optimizeGoals',
         label: 'Optimize Goals',
+        shortLabel: 'Goal',
         icon: 'Target',
         title: 'Optimize Goals',
         subtitle: 'Set and manage optimization goals'
@@ -101,6 +115,7 @@ export const MENU_ITEMS = [
       {
         key: 'basicInfo',
         label: 'Brand Info',
+        shortLabel: 'Info',
         icon: 'Info',
         title: 'Brand Info',
         subtitle: 'Manage basic brand information'
@@ -108,21 +123,24 @@ export const MENU_ITEMS = [
       {
         key: 'brandKits',
         label: 'Brand Kits',
-        icon: 'Sparkles',
+        shortLabel: 'Kits',
+        icon: 'Fingerprint',
         title: 'Brand Kits',
         subtitle: 'Manage your brand\'s visual identity and communication guidelines'
       },
       {
         key: 'products',
         label: 'Products',
-        icon: 'Box',
+        shortLabel: 'Prod',
+        icon: 'Package',
         title: 'Products',
         subtitle: 'Manage product information'
       },
       {
         key: 'competitors',
         label: 'Competitors',
-        icon: 'Users',
+        shortLabel: 'Comp',
+        icon: 'Swords',
         title: 'Competitors',
         subtitle: 'Campaign generation will take competitor information into account.'
       }

@@ -6,7 +6,15 @@ import GlobalDemoOverlay from './GlobalDemoOverlay'
 
 const MainLayout = ({ children, showDemoOverlay, onDemoConnect, onDemoCreate, selectedBrand, onBrandChange, onCreateBrand, brands = [] }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+  const [isPinned, setIsPinned] = useState(() => {
+    const saved = localStorage.getItem('sidebarPinned')
+    return saved !== null ? JSON.parse(saved) : true
+  })
   const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    localStorage.setItem('sidebarPinned', JSON.stringify(isPinned))
+  }, [isPinned])
 
   // Detect screen size
   useEffect(() => {
@@ -44,14 +52,17 @@ const MainLayout = ({ children, showDemoOverlay, onDemoConnect, onDemoCreate, se
       {/* Sidebar */}
       <aside
         className={`
-          fixed lg:static inset-y-0 left-0 z-50
-          w-64 bg-white border-r border-border flex flex-col
-          transform transition-transform duration-300 ease-in-out
+          fixed inset-y-0 left-0 z-[600]
+          bg-white border-r border-border flex flex-col
+          transition-all duration-300 ease-in-out
           ${isMobile ? (isSidebarOpen ? 'translate-x-0' : '-translate-x-full') : 'translate-x-0'}
+          ${!isMobile ? (isPinned ? 'w-64' : 'w-[72px] hover:w-64 group/sidebar shadow-xl hover:shadow-2xl') : 'w-64'}
         `}
       >
         <Sidebar 
           isMobile={isMobile} 
+          isPinned={isPinned}
+          onTogglePinned={() => setIsPinned(!isPinned)}
           onClose={toggleSidebar} 
           selectedBrand={selectedBrand} 
           onBrandChange={onBrandChange} 
@@ -61,7 +72,12 @@ const MainLayout = ({ children, showDemoOverlay, onDemoConnect, onDemoCreate, se
       </aside>
 
       {/* Main Content Wrapper */}
-      <div className="flex-1 flex flex-col h-full relative min-w-0">
+      <div 
+        className={`
+          flex-1 flex flex-col h-full relative min-w-0 transition-all duration-300
+          ${!isMobile ? (isPinned ? 'ml-64' : 'ml-[72px]') : ''}
+        `}
+      >
         {/* Header */}
         <Header toggleSidebar={toggleSidebar} isMobile={isMobile} />
 
