@@ -161,7 +161,7 @@ const Sidebar = ({ isMobile, isPinned, onTogglePinned, onClose, selectedBrand, o
       )}
 
       {/* Logo Section */}
-      <div className="h-[72px] px-4 flex items-center justify-center border-b border-slate-100 shrink-0 overflow-hidden transition-all duration-300">
+      <div className={`h-[72px] px-4 flex items-center justify-center border-b border-slate-100 shrink-0 transition-all duration-300 ${isCollapsed ? 'overflow-hidden' : ''}`}>
         <img 
           src={isCollapsed ? MINI_LOGO : "https://www.adsgo.ai/_next/static/media/logo.ecc9c90c.svg"}
           alt="AdsGo"
@@ -170,7 +170,7 @@ const Sidebar = ({ isMobile, isPinned, onTogglePinned, onClose, selectedBrand, o
       </div>
 
       {/* Brand Switcher */}
-      <div className="px-4 py-3 shrink-0 overflow-hidden">
+      <div className="px-4 py-3 shrink-0">
         <div className="relative">
           <button 
             onClick={() => setIsBrandDropdownOpen(!isBrandDropdownOpen)}
