@@ -18,11 +18,11 @@ const Competitors = () => {
   return (
     <div className="min-h-screen bg-[#FDFDFD] flex flex-col font-sans text-slate-900 selection:bg-indigo-100 selection:text-indigo-900">
       {/* Top Header Section - Re-added for Add button */}
-      <div className="sticky top-0 z-10 bg-white/60 backdrop-blur-md border-b border-slate-100/50 py-3 px-10">
+      <div className="sticky top-0 z-10 py-3 px-10 pointer-events-none">
         <div className="max-w-[1400px] mx-auto flex justify-end">
           <button 
             onClick={() => setIsModalOpen(true)}
-            className="bg-slate-900 text-white px-6 py-2.5 rounded-xl font-bold text-sm hover:bg-black transition-all active:scale-95 shadow-lg shadow-slate-200 flex items-center gap-2"
+            className="pointer-events-auto bg-slate-900 text-white px-6 py-2.5 rounded-xl font-bold text-sm hover:bg-black transition-all active:scale-95 shadow-lg shadow-slate-200 flex items-center gap-2"
           >
             <Plus size={16} />
             Add Competitor

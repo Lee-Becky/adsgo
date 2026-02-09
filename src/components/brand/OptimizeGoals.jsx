@@ -50,10 +50,10 @@ const OptimizeGoals = () => {
     <div className="min-h-full bg-slate-50 flex flex-col font-sans text-slate-900 selection:bg-indigo-100 relative">
       
       {/* Action Bar Container - Sticky with blur to prevent content overlap */}
-      <div className="sticky top-0 z-10 w-full flex justify-end px-10 py-4 bg-slate-50/60 backdrop-blur-md">
+      <div className="sticky top-0 z-10 w-full flex justify-end px-10 py-4 pointer-events-none">
         <button 
           onClick={handleSave}
-          className="bg-slate-900 text-white px-8 py-3 rounded-2xl font-black text-xs tracking-wider hover:bg-black transition-all active:scale-95 shadow-2xl shadow-slate-900/20 flex items-center gap-2 border border-white/10"
+          className="pointer-events-auto bg-slate-900 text-white px-8 py-3 rounded-2xl font-black text-xs tracking-wider hover:bg-black transition-all active:scale-95 shadow-2xl shadow-slate-900/20 flex items-center gap-2 border border-white/10"
         >
           <Save size={16} />
           Save Goal

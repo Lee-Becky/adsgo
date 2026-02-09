@@ -10,7 +10,6 @@ import BudgetReasonModal from './components/BudgetReasonModal'
 import BudgetEditModal from './components/BudgetEditModal'
 import BrandManagement from './components/BrandManagement'
 import BasicInfo from './components/BasicInfo'
-import BrandKits from './components/brand/BrandKits'
 import OptimizeGoals from './components/brand/OptimizeGoals'
 import Drafts from './components/Drafts'
 import DataFetchingModal from './components/DataFetchingModal'
@@ -225,8 +224,6 @@ function App() {
       case 'basicInfo':
         console.log('Rendering BasicInfo component')
         return <BasicInfo onSave={() => {}} onCancel={() => handlePageChange('overview')} />
-      case 'brandKits':
-        return <BrandKits />
       case 'optimizeGoals':
         return <OptimizeGoals />
       case 'products':

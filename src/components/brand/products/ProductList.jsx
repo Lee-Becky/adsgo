@@ -276,7 +276,7 @@ const ProductList = ({ onProductClick }) => {
   return (
     <div className="min-h-screen bg-[#FDFDFD] p-8 flex flex-col font-sans text-slate-900">
       <div className="w-full mx-auto space-y-6 flex-1">
-        <div className="flex items-center justify-end mb-8">
+        <div className="flex items-center justify-end py-4 mb-4">
           <div className="flex items-center gap-4">
             <div className="relative">
               <Search className={`absolute left-3 top-1/2 -translate-y-1/2 transition-colors ${isSearching ? 'text-indigo-500' : 'text-slate-400'}`} size={18} />
@@ -300,7 +300,7 @@ const ProductList = ({ onProductClick }) => {
                 setAddStep('options');
                 setIsAddModalOpen(true);
               }}
-              className="bg-slate-900 hover:bg-black text-white px-6 py-2 rounded-xl text-sm font-bold flex items-center gap-2 transition-all active:scale-95 shadow-lg shadow-slate-200"
+              className="pointer-events-auto bg-slate-900 hover:bg-black text-white px-6 py-2 rounded-xl text-sm font-bold flex items-center gap-2 transition-all active:scale-95 shadow-lg shadow-slate-200"
             >
               <Plus size={18} />
               New product

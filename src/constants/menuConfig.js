@@ -121,14 +121,6 @@ export const MENU_ITEMS = [
         subtitle: 'Manage basic brand information'
       },
       {
-        key: 'brandKits',
-        label: 'Brand Kits',
-        shortLabel: 'Kits',
-        icon: 'Fingerprint',
-        title: 'Brand Kits',
-        subtitle: 'Manage your brand\'s visual identity and communication guidelines'
-      },
-      {
         key: 'products',
         label: 'Products',
         shortLabel: 'Prod',

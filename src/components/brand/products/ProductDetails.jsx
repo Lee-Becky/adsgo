@@ -478,18 +478,18 @@ const ProductDetails = ({ product, onBack }) => {
   return (
     <div className="min-h-screen bg-slate-50/50 flex flex-col font-sans text-slate-900">
       {/* Header */}
-      <header className="sticky top-0 z-10 bg-white/80 backdrop-blur-md border-b border-slate-100 px-8 py-5 flex items-center justify-between">
+      <header className="sticky top-0 z-10 px-8 py-5 flex items-center justify-between pointer-events-none">
         <div className="flex items-center gap-6">
           <button 
             onClick={onBack}
-            className="p-2.5 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-full transition-all"
+            className="pointer-events-auto p-2.5 text-slate-400 hover:text-slate-600 hover:bg-white rounded-full transition-all shadow-sm border border-slate-100 bg-white/50"
           >
             <ArrowLeft size={20} />
           </button>
           <div>
           </div>
         </div>
-        <button className="px-10 py-3 bg-indigo-600 text-white rounded-2xl font-bold text-sm hover:bg-indigo-700 shadow-xl shadow-indigo-100 transition-all active:scale-95">
+        <button className="pointer-events-auto px-10 py-3 bg-indigo-600 text-white rounded-2xl font-bold text-sm hover:bg-indigo-700 shadow-xl shadow-indigo-100 transition-all active:scale-95">
           Save changes
         </button>
       </header>

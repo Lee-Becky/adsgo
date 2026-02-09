@@ -2,7 +2,8 @@ import { useState, useRef, useEffect } from 'react'
 import { 
   Upload, X, Plus, Globe, Briefcase, MapPin, Layers, Sparkles, 
   MessageSquare, UserSquare2, Megaphone, Check, ChevronDown, Fingerprint,
-  Building2, Target, Quote, Search, BarChart3, Phone, Mail
+  Building2, Target, Quote, Search, BarChart3, Phone, Mail, Palette, Type,
+  Ban, Heart, Languages, Edit3
 } from 'lucide-react'
 
 // --- Custom Searchable Select Component ---
@@ -94,7 +95,19 @@ const FoundationTab = ({ data = {}, onChange }) => {
     brandFeatures: [],
     audienceTags: [],
     brandLocation: 'cn',
-    mediaPlatforms: []
+    mediaPlatforms: [],
+    // Brand Kits default fields
+    colors: [
+      { id: 1, hex: '#5C3A21', label: 'Primary' },
+      { id: 2, hex: '#A08E7E', label: 'Secondary 1' },
+      { id: 3, hex: '#E5B27F', label: 'Secondary 2' }
+    ],
+    fonts: ['Noto Sans Display', 'Noto Serif Japanese', 'Jost', 'Arial'],
+    visualStyle: 'Heritage-inspired designs with modern comfort',
+    tone: 'Direct and informative, focusing on practical details',
+    forbiddenWords: ['cheap', 'low quality'],
+    preferredPhrases: ['Heritage', 'Timeless aesthetics', 'Functional clothing'],
+    languagePreference: ['English (US)']
   }
   
   const brandData = { ...defaultData, ...data }
@@ -146,6 +159,22 @@ const FoundationTab = ({ data = {}, onChange }) => {
     const current = brandData.mediaPlatforms || []
     onChange('mediaPlatforms', current.includes(id) ? current.filter(p => p !== id) : [...current, id])
   }
+
+  // Brand Kits Handlers
+  const handleColorChange = (id, hex) => {
+    onChange('colors', brandData.colors.map(c => c.id === id ? { ...c, hex } : c));
+  };
+
+  const addColor = () => {
+    if (brandData.colors.length >= 3) return;
+    const newId = Date.now();
+    onChange('colors', [...brandData.colors, { id: newId, hex: '#4F46E5', label: `Secondary ${brandData.colors.length}` }]);
+  };
+
+  const removeColor = (id) => {
+    if (brandData.colors.length <= 1) return;
+    onChange('colors', brandData.colors.filter(c => c.id !== id));
+  };
 
   return (
     <div className="max-w-5xl mx-auto py-4 px-8 space-y-10 animate-in fade-in duration-1000 text-slate-900 selection:bg-indigo-100">
@@ -221,7 +250,6 @@ const FoundationTab = ({ data = {}, onChange }) => {
                         className="text-sm font-bold text-slate-400 bg-transparent border-none outline-none focus:ring-0 p-0 w-32 placeholder:text-slate-200" 
                         value={brandData.phone} 
                         onChange={(e) => onChange('phone', e.target.value)} 
-                        placeholder="Phone number" 
                       />
                     </div>
                     <div className="flex items-center gap-2 group/email">
@@ -356,6 +384,141 @@ const FoundationTab = ({ data = {}, onChange }) => {
         </div>
       </div>
 
+      {/* 4. Brand Kits Content - MIGRATED FROM BrandKits.jsx */}
+      <div className="space-y-10">
+        {/* 4.1 Visual Identity & Standards Unified Card */}
+        <div className="grid grid-cols-1 relative z-10">
+          <div className="p-8 bg-white border border-slate-100 rounded-[32px] shadow-sm flex flex-col gap-10">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+              {/* Brand Colors Section */}
+              <Field label="Brand colors" icon={Palette}>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {brandData.colors.map((color) => (
+                    <div key={color.id} className="group relative flex items-center gap-3 p-3 bg-slate-50 border border-slate-100 rounded-2xl transition-all hover:bg-white hover:shadow-md">
+                      <div className="relative w-12 h-12 shrink-0 overflow-hidden rounded-xl shadow-inner border border-black/5">
+                        <div className="w-full h-full" style={{ backgroundColor: color.hex }} />
+                        <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer">
+                          <Edit3 size={16} className="text-white drop-shadow-sm" />
+                          <input 
+                            type="color" 
+                            value={color.hex} 
+                            onChange={(e) => handleColorChange(color.id, e.target.value)}
+                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                          />
+                        </div>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-[10px] font-bold text-slate-400 truncate">{color.label}</div>
+                        <div className="text-sm font-mono font-bold text-slate-700 uppercase select-none">
+                          {color.hex}
+                        </div>
+                      </div>
+                      {brandData.colors.length > 1 && (
+                        <button 
+                          onClick={() => removeColor(color.id)}
+                          className="opacity-0 group-hover:opacity-100 p-1.5 text-slate-300 hover:text-rose-500 transition-all"
+                        >
+                          <X size={14} />
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                  {brandData.colors.length < 3 && (
+                    <button 
+                      onClick={addColor}
+                      className="flex items-center justify-center gap-2 h-[74px] border-2 border-dashed border-slate-100 rounded-2xl text-slate-300 hover:text-indigo-400 hover:border-indigo-200 hover:bg-indigo-50 transition-all"
+                    >
+                      <Plus size={18} />
+                      <span className="text-xs font-bold">Add Color</span>
+                    </button>
+                  )}
+                </div>
+              </Field>
+
+              {/* Typography & Language Section */}
+              <div className="flex flex-col gap-10">
+                <Field label="Typography" icon={Type}>
+                  <TagCloud 
+                    tags={brandData.fonts} 
+                    onTagsChange={(t) => onChange('fonts', t)} 
+                    color="indigo" 
+                    placeholder="+ Font" 
+                  />
+                </Field>
+
+                <Field label="Marketing language preference" icon={Languages}>
+                  <TagCloud 
+                    tags={brandData.languagePreference} 
+                    onTagsChange={(t) => onChange('languagePreference', t)} 
+                    color="indigo" 
+                    placeholder="+ Language" 
+                  />
+                </Field>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* 4.2 Style & Tone Group */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10">
+          {/* Visual Style Card */}
+          <div className="p-8 bg-white border border-slate-100 rounded-[32px] shadow-sm flex flex-col gap-8">
+            <Field label="Brand visual style" icon={Sparkles}>
+              <textarea 
+                className="w-full h-full min-h-[100px] bg-slate-50 border-none rounded-[24px] p-5 text-sm font-medium leading-relaxed text-slate-600 focus:ring-4 focus:ring-indigo-500/5 transition-all resize-none shadow-inner"
+                value={brandData.visualStyle}
+                onChange={(e) => onChange('visualStyle', e.target.value)}
+                placeholder="Describe your brand's visual style type..."
+              />
+            </Field>
+          </div>
+          
+          {/* Brand Tone Card */}
+          <div className="p-8 bg-white border border-slate-100 rounded-[32px] shadow-sm flex flex-col gap-8">
+            <Field label="Brand voice & tone" icon={MessageSquare}>
+              <textarea 
+                className="w-full h-full min-h-[100px] bg-slate-50 border-none rounded-[24px] p-5 text-sm font-medium leading-relaxed text-slate-600 focus:ring-4 focus:ring-indigo-500/5 transition-all resize-none shadow-inner"
+                value={brandData.tone}
+                onChange={(e) => onChange('tone', e.target.value)}
+                placeholder="How does your brand communicate?"
+              />
+            </Field>
+          </div>
+        </div>
+
+        {/* 4.3 Preference & Taboos Group */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10">
+          {/* Brand Preference Card */}
+          <div className="p-8 bg-white border border-slate-100 rounded-[32px] shadow-sm space-y-8 flex flex-col">
+            <Field label="Brand preference" icon={Heart}>
+              <TagCloud 
+                tags={brandData.preferredPhrases} 
+                onTagsChange={(t) => onChange('preferredPhrases', t)} 
+                color="indigo" 
+                placeholder="+ Content" 
+              />
+            </Field>
+          </div>
+
+          {/* Brand Taboos Card */}
+          <div className="p-8 bg-rose-50 border border-rose-100/50 rounded-[32px] space-y-8 flex flex-col">
+            <Field label="Brand taboos" icon={Ban}>
+              <div className="space-y-4">
+                <TagCloud 
+                  tags={brandData.forbiddenWords} 
+                  onTagsChange={(t) => onChange('forbiddenWords', t)} 
+                  color="rose" 
+                  placeholder="+ Content" 
+                />
+                <p className="text-[10px] text-rose-400 font-bold leading-relaxed">
+                  Content and concepts that must not appear in any brand marketing materials.
+                </p>
+              </div>
+            </Field>
+          </div>
+        </div>
+      </div>
+
       <footer className="pt-8 pb-4 flex flex-col items-center gap-2 opacity-10">
         <Fingerprint size={24} />
         <p className="text-[10px] font-bold">Digital identity signature v6.3 pro</p>
@@ -380,7 +543,8 @@ const TagCloud = ({ tags = [], onTagsChange, color = "indigo", placeholder }) =>
   const [val, setVal] = useState('')
   const colors = {
     indigo: "bg-indigo-50 border-indigo-100 text-indigo-700 hover:bg-indigo-100",
-    purple: "bg-purple-50 border-purple-100 text-purple-700 hover:bg-purple-100"
+    purple: "bg-purple-50 border-purple-100 text-purple-700 hover:bg-purple-100",
+    rose: "bg-white border-rose-100 text-rose-700 hover:bg-rose-50"
   }
   
   return (
