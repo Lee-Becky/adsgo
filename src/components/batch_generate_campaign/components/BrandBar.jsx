@@ -1,8 +1,7 @@
-
 import React from 'react';
 import { ShieldCheck, X } from 'lucide-react';
 
-export const BrandBar = ({ brand, onSave, onIgnore, isSaved }) => {
+const BrandBar = ({ brand, onSave, onIgnore, isSaved }) => {
   if (isSaved) {
     return (
       <div className="bg-indigo-50 border-b border-indigo-100 px-6 py-2 flex items-center justify-between sticky top-0 z-50">
@@ -53,3 +52,5 @@ export const BrandBar = ({ brand, onSave, onIgnore, isSaved }) => {
     </div>
   );
 };
+
+export default BrandBar;

@@ -1,64 +1,58 @@
+// Mock AI Service for generating creative assets
+// This is a simplified version that doesn't depend on Gemini API
 
 /**
- * Mock AI Service for Batch Campaign Generation
- * Replaces Gemini AI calls with equivalent simulated logic.
- */
-
-export async function generateCampaignPlan(
-  product,
-  creatives,
-  audiences,
-  adSetCount,
-  adsPerSet
-) {
-  // Simulate network delay
-  await new Promise(resolve => setTimeout(resolve, 1500));
-
-  const adSets = audiences.slice(0, adSetCount).map((audienceType, index) => {
-    const ads = Array.from({ length: adsPerSet }).map((_, adIndex) => {
-      const creative = creatives[adIndex % creatives.length];
-      return {
-        headline: `${product.name} - ${index === 0 ? 'Best Seller' : 'New Arrival'}`,
-        body: `Experience the excellence of ${product.name}. Perfect for your lifestyle. Shop now and save!`,
-        creativeId: creative?.id || `mock-creative-${adIndex}`
-      };
-    });
-
-    return {
-      name: `AdSet - ${audienceType} - ${index + 1}`,
-      audience: `Targeting ${audienceType} based on product affinity for ${product.name}.`,
-      ads: ads
-    };
-  });
-
-  return {
-    campaignName: `AI-Batch-${product.name.replace(/\s+/g, '-')}-${new Date().toISOString().slice(0, 10)}`,
-    adSets: adSets
-  };
-}
-
-/**
- * Mock AIGC Creative generation
- * Uses picsum.photos for random professional-looking placeholders
+ * Generate an AI creative image URL
+ * @param {string} prompt - The prompt for AI generation
+ * @returns {Promise<string>} URL of the generated image
  */
 export async function generateAIGCCreative(prompt) {
-  // Simulate generation time
-  await new Promise(resolve => setTimeout(resolve, 2000));
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 1500));
   
-  // Return a random picsum image based on the prompt hash or random seed
-  const seed = Math.random().toString(36).substring(7);
+  // Return a placeholder image URL based on the prompt
+  // Using picsum.photos for placeholder images
+  const seed = encodeURIComponent(prompt.substring(0, 20));
   return `https://picsum.photos/seed/${seed}/800/1200`;
 }
 
 /**
- * Mock product analysis report
+ * Mock service for analyzing product pages
+ * @param {string} productUrl - The URL of the product page
+ * @returns {Promise<Object>} Analysis report
  */
-export async function analyzeProduct(productUrl) {
+export async function analyzeProductPage(productUrl) {
+  // Simulate API delay
   await new Promise(resolve => setTimeout(resolve, 1000));
   
   return {
-    summary: "High-potential product with strong visual appeal. Landing page is well-optimized for conversion.",
-    recommendedAudience: "Primary: 25-45 Women interested in fashion and lifestyle. Secondary: Gift seekers.",
-    competitors: ["Competitor A", "Competitor B", "Competitor C"]
+    summary: 'Product analysis completed successfully',
+    recommendedAudience: '25-45 year olds interested in quality products',
+    competitors: ['Competitor A', 'Competitor B', 'Competitor C']
   };
+}
+
+/**
+ * Mock service for batch generating creatives
+ * @param {Array} products - Array of products to generate creatives for
+ * @param {number} countPerProduct - Number of creatives per product
+ * @returns {Promise<Object>} Mapping of product IDs to creative arrays
+ */
+export async function batchGenerateCreatives(products, countPerProduct = 3) {
+  const results = {};
+  
+  for (const product of products) {
+    const creatives = [];
+    for (let i = 0; i < countPerProduct; i++) {
+      const url = await generateAIGCCreative(`${product.name} creative ${i}`);
+      creatives.push({
+        id: `ai-${product.id}-${Date.now()}-${i}`,
+        url: url,
+        productId: product.id
+      });
+    }
+    results[product.id] = creatives;
+  }
+  
+  return results;
 }

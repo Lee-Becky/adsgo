@@ -1,15 +1,13 @@
-
 import React, { useState } from 'react';
-import { BudgetType, AudienceType, StructureStrategy, LalOption } from '../types';
 import { Users, Info, Sparkles, DollarSign, ChevronDown, Briefcase, Target, Layers, Lock, Edit3, Check } from 'lucide-react';
 
 const AUDIENCE_SHORT_LABELS = {
-  [AudienceType.LAL]: 'LAL',
-  [AudienceType.INT]: 'INT',
-  [AudienceType.ADVANTAGE]: 'Adv+'
+  LAL: 'LAL',
+  INT: 'INT',
+  ADV: 'Adv+'
 };
 
-export const CampaignPlanView = ({ 
+const CampaignPlanView = ({ 
   structure, 
   onStructureChange,
   budgetType, 
@@ -31,22 +29,21 @@ export const CampaignPlanView = ({
   const getAdSetGroups = () => {
     let groups = [];
     
-    if (structure.strategy === StructureStrategy.PER_PRODUCT) {
+    if (structure.strategy === 'PER_PRODUCT') {
       selectedProducts.forEach(p => {
         const ads = productCreativesMap[p.id] || [];
         if (ads.length > 0) groups.push({ name: p.name, ads });
       });
-    } else if (structure.strategy === StructureStrategy.PER_CATEGORY) {
-      const categoryMap = {};
-      selectedProducts.forEach(p => {
-        const cat = p.category || '未分类';
-        if (!categoryMap[cat]) categoryMap[cat] = [];
-        categoryMap[cat].push(...(productCreativesMap[p.id] || []));
-      });
-      Object.entries(categoryMap).forEach(([cat, ads]) => {
-        groups.push({ name: cat, ads });
-      });
-    } else if (structure.strategy === StructureStrategy.BY_AD_COUNT) {
+    } else if (structure.strategy === 'ALL_PRODUCTS_PER_SET') {
+      const allAds = selectedProducts.flatMap(p => productCreativesMap[p.id] || []);
+      const numAdsets = structure.numAdsets || 1;
+      for (let i = 0; i < numAdsets; i++) {
+        groups.push({ 
+          name: `混合组 ${i + 1}`, 
+          ads: allAds 
+        });
+      }
+    } else if (structure.strategy === 'BY_AD_COUNT') {
       const allAds = selectedProducts.flatMap(p => productCreativesMap[p.id] || []);
       const adsPerSet = structure.adsPerSet || 1;
       for (let i = 0; i < allAds.length; i += adsPerSet) {
@@ -60,11 +57,11 @@ export const CampaignPlanView = ({
   };
 
   const adSetGroups = getAdSetGroups();
-  const estimatedTotalDaily = budgetType === BudgetType.ABO 
+  const estimatedTotalDaily = budgetType === 'ABO' 
     ? dailyBudget * adSetGroups.length 
     : dailyBudget;
 
-  const hasLalAudience = adsetAudiences.slice(0, adSetGroups.length).some(a => a === AudienceType.LAL);
+  const hasLalAudience = adsetAudiences.slice(0, adSetGroups.length).some(a => a === 'LAL');
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -81,9 +78,9 @@ export const CampaignPlanView = ({
             <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">选择发布逻辑</label>
             <div className="grid grid-cols-3 gap-3">
               {[
-                { id: StructureStrategy.PER_PRODUCT, label: '每款商品1组', desc: '1 Adset per SKU' },
-                { id: StructureStrategy.PER_CATEGORY, label: '每种类目1组', desc: '1 Adset per Category' },
-                { id: StructureStrategy.BY_AD_COUNT, label: '按素材量拆组', desc: 'Fixed Ads per Adset' },
+                { id: 'PER_PRODUCT', label: '每款商品1组', desc: '1 Adset per SKU' },
+                { id: 'ALL_PRODUCTS_PER_SET', label: '每组内包含全部商品', desc: 'All SKU in every Adset' },
+                { id: 'BY_AD_COUNT', label: '按素材量拆组', desc: 'Fixed Ads per Adset' },
               ].map(opt => (
                 <button
                   key={opt.id}
@@ -101,7 +98,7 @@ export const CampaignPlanView = ({
             </div>
           </div>
 
-          {structure.strategy === StructureStrategy.BY_AD_COUNT && (
+          {structure.strategy === 'BY_AD_COUNT' && (
             <div className="animate-in slide-in-from-top-2 duration-200">
                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1 mb-2 block">每个 Adset 包含素材数</label>
                <div className="relative max-w-[200px]">
@@ -111,6 +108,22 @@ export const CampaignPlanView = ({
                   className="w-full h-11 bg-slate-50 border border-slate-100 rounded-xl px-4 text-xs font-black text-slate-700 appearance-none outline-none focus:border-indigo-500 transition-all"
                 >
                   {[1, 2, 3, 4, 5, 6].map(n => <option key={n} value={n}>{n} Ads</option>)}
+                </select>
+                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none" size={14} />
+              </div>
+            </div>
+          )}
+
+          {structure.strategy === 'ALL_PRODUCTS_PER_SET' && (
+            <div className="animate-in slide-in-from-top-2 duration-200">
+               <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1 mb-2 block">Adset 组数 (1-10)</label>
+               <div className="relative max-w-[200px]">
+                <select 
+                  value={structure.numAdsets}
+                  onChange={(e) => onStructureChange({ ...structure, numAdsets: Number(e.target.value) })}
+                  className="w-full h-11 bg-slate-50 border border-slate-100 rounded-xl px-4 text-xs font-black text-slate-700 appearance-none outline-none focus:border-indigo-500 transition-all"
+                >
+                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => <option key={n} value={n}>{n} Adsets</option>)}
                 </select>
                 <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none" size={14} />
               </div>
@@ -131,14 +144,15 @@ export const CampaignPlanView = ({
 
               <div className="w-full flex justify-center gap-10 overflow-x-auto pb-4 no-scrollbar">
                 {adSetGroups.map((group, idx) => {
-                  const audienceType = adsetAudiences[idx % adsetAudiences.length] || AudienceType.ADVANTAGE;
+                  const audienceType = adsetAudiences[idx % adsetAudiences.length] || 'ADV';
                   return (
                     <div key={idx} className="flex flex-col items-center shrink-0">
+                      {/* Clickable Audience Icon */}
                       <button 
                         onClick={() => onToggleAudience(idx)}
                         className={`w-10 h-10 rounded-xl border shadow-sm flex flex-col items-center justify-center transition-all hover:scale-110 active:scale-95 mb-2 relative group ${
-                          audienceType === AudienceType.LAL ? 'bg-purple-50 text-purple-600 border-purple-100' :
-                          audienceType === AudienceType.INT ? 'bg-amber-50 text-amber-600 border-amber-100' :
+                          audienceType === 'LAL' ? 'bg-purple-50 text-purple-600 border-purple-100' :
+                          audienceType === 'INT' ? 'bg-amber-50 text-amber-600 border-amber-100' :
                           'bg-indigo-50 text-indigo-600 border-indigo-100'
                         }`}
                         title="点击切换受众策略 (Adv+ / LAL / INT)"
@@ -153,17 +167,23 @@ export const CampaignPlanView = ({
                       <p className="text-[8px] font-black text-slate-400 uppercase truncate max-w-[80px] text-center mb-3">{group.name}</p>
                       
                       <div className="flex flex-wrap gap-1 justify-center max-w-[120px]">
-                        {group.ads.map((ad, adIdx) => (
+                        {group.ads.slice(0, 4).map((ad, adIdx) => (
                           <div key={adIdx} className="w-8 h-10 rounded-md border border-white shadow-sm overflow-hidden bg-white ring-1 ring-slate-100">
                             <img src={ad.url} className="w-full h-full object-cover" />
                           </div>
                         ))}
+                        {group.ads.length > 4 && (
+                          <div className="w-8 h-10 rounded-md border border-white shadow-sm flex items-center justify-center bg-slate-50 text-[8px] font-black text-slate-400">
+                            +{group.ads.length - 4}
+                          </div>
+                        )}
                       </div>
                     </div>
                   );
                 })}
               </div>
               
+              {/* LAL Options Multi-select Dropdown */}
               {hasLalAudience && (
                 <div className="w-full mt-8 pt-6 border-t border-slate-200/50 animate-in fade-in slide-in-from-top-2">
                   <div className="relative">
@@ -191,7 +211,7 @@ export const CampaignPlanView = ({
 
                     {showLalDropdown && (
                       <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-purple-100 rounded-2xl shadow-2xl z-50 overflow-hidden animate-in zoom-in-95 duration-150">
-                        {Object.values(LalOption).map((opt) => {
+                        {['US Purchase 1%', 'US add to cart 5%', 'US register last30days 1%~3%'].map((opt) => {
                           const isSel = lalOptions.includes(opt);
                           return (
                             <div 
@@ -249,13 +269,13 @@ export const CampaignPlanView = ({
             </div>
             <div className={`flex p-1 bg-slate-100/80 rounded-xl border border-slate-100 ${isExistingCampaign ? 'opacity-60 grayscale pointer-events-none' : ''}`}>
               <button 
-                onClick={() => onBudgetTypeChange(BudgetType.CBO)}
-                className={`px-4 py-1.5 rounded-lg text-[10px] font-black transition-all ${budgetType === BudgetType.CBO ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-400'}`}>
+                onClick={() => onBudgetTypeChange('CBO')}
+                className={`px-4 py-1.5 rounded-lg text-[10px] font-black transition-all ${budgetType === 'CBO' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-400'}`}>
                 CBO (均衡)
               </button>
               <button 
-                onClick={() => onBudgetTypeChange(BudgetType.ABO)}
-                className={`px-4 py-1.5 rounded-lg text-[10px] font-black transition-all ${budgetType === BudgetType.ABO ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-400'}`}>
+                onClick={() => onBudgetTypeChange('ABO')}
+                className={`px-4 py-1.5 rounded-lg text-[10px] font-black transition-all ${budgetType === 'ABO' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-400'}`}>
                 ABO (单组)
               </button>
             </div>
@@ -271,7 +291,7 @@ export const CampaignPlanView = ({
                 className="w-full bg-transparent border-none outline-none pl-16 pr-4 text-4xl font-black text-slate-800"
               />
               <span className="text-[10px] font-black text-slate-400 uppercase mr-4">
-                {budgetType === BudgetType.ABO ? 'Per AdSet' : 'Total Campaign'}
+                {budgetType === 'ABO' ? 'Per AdSet' : 'Total Campaign'}
               </span>
             </div>
           </div>
@@ -285,7 +305,7 @@ export const CampaignPlanView = ({
                 <div>
                   <p className="text-4xl font-black text-white">${estimatedTotalDaily}</p>
                   <p className="text-[10px] text-indigo-400 font-bold mt-1 uppercase tracking-widest">
-                    {budgetType === BudgetType.ABO ? `${dailyBudget} * ${adSetGroups.length} Adsets` : '系列全局消耗'}
+                    {budgetType === 'ABO' ? `${dailyBudget} * ${adSetGroups.length} Adsets` : '系列全局消耗'}
                   </p>
                 </div>
                 <div className="text-right">
@@ -302,3 +322,5 @@ export const CampaignPlanView = ({
     </div>
   );
 };
+
+export default CampaignPlanView;

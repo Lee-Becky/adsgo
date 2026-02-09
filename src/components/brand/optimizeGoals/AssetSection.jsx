@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { ShieldCheck, Info, RefreshCw, Plus, GripVertical, CheckCircle2, X, Link2, Loader2, Search, Trash2, Link2Off, AlertTriangle } from 'lucide-react'
+import { useZIndex } from '../../../hooks/useZIndex'
 
 const AssetSection = ({ formData, updateFormData, validation, setValidation }) => {
   const [activePlatform, setActivePlatform] = useState('meta')
@@ -10,6 +11,9 @@ const AssetSection = ({ formData, updateFormData, validation, setValidation }) =
   const [showDisconnectConfirm, setShowDisconnectConfirm] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [draggedItemIndex, setDraggedItemIndex] = useState(null)
+
+  const zIndexAddModal = useZIndex(showAddModal);
+  const zIndexDisconnectModal = useZIndex(showDisconnectConfirm);
   
   const platforms = [
     { id: 'meta', label: 'Meta', icon: 'https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://meta.com&size=256', enabled: true },
@@ -275,7 +279,10 @@ const AssetSection = ({ formData, updateFormData, validation, setValidation }) =
 
         {/* Add Account Modal */}
         {showAddModal && (
-          <div className="fixed inset-0 z-[1000] flex items-center justify-center p-6">
+          <div 
+            className="fixed inset-0 flex items-center justify-center p-6"
+            style={{ zIndex: zIndexAddModal }}
+          >
             <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowAddModal(false)} />
             <div className="relative bg-white rounded-[40px] shadow-2xl w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-300">
               <div className="p-8 border-b border-slate-50 flex items-center justify-between bg-slate-100">
@@ -318,7 +325,10 @@ const AssetSection = ({ formData, updateFormData, validation, setValidation }) =
 
         {/* Disconnect Confirm Modal */}
         {showDisconnectConfirm && (
-          <div className="fixed inset-0 z-[1000] flex items-center justify-center p-6">
+          <div 
+            className="fixed inset-0 flex items-center justify-center p-6"
+            style={{ zIndex: zIndexDisconnectModal }}
+          >
             <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowDisconnectConfirm(false)} />
             <div className="relative bg-white rounded-[40px] shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-300">
               <div className="p-10 flex flex-col items-center text-center space-y-6">

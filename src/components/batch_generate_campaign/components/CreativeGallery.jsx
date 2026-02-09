@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Plus, Sparkles, Upload, Image as ImageIcon, X, Check, Filter } from 'lucide-react';
 import { generateAIGCCreative } from '../services/mockAiService';
@@ -12,7 +11,7 @@ const MOCK_LIBRARY = [
   { id: 'lib-6', url: 'https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&q=80&w=400', relatedProduct: '意式复古灯芯绒外套' },
 ];
 
-export const CreativeGallery = ({ creatives, onAdd, onRemove, selectedProductName }) => {
+const CreativeGallery = ({ creatives, onAdd, onRemove, selectedProductName }) => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [showLibraryModal, setShowLibraryModal] = useState(false);
   const [showOnlyRelated, setShowOnlyRelated] = useState(true);
@@ -189,3 +188,5 @@ export const CreativeGallery = ({ creatives, onAdd, onRemove, selectedProductNam
     </div>
   );
 };
+
+export default CreativeGallery;

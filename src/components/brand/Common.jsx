@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { getNextModalZIndex } from '../../constants/zIndex';
+import { useZIndex } from '../../hooks/useZIndex';
 
 const BaseModal = ({ children, isOpen, onClose, className = "" }) => {
-  const [zIndex, setZIndex] = useState(0);
+  const zIndex = useZIndex(isOpen);
 
   useEffect(() => {
     if (isOpen) {
-      setZIndex(getNextModalZIndex());
       // 禁止背景滚动
       document.body.style.overflow = 'hidden';
     } else {

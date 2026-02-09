@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, ImagePlus, ChevronDown, Check, Plus, Trash2 } from 'lucide-react';
 import ChangeCreativesModal from './ChangeCreativesModal';
+import { useZIndex } from '../../hooks/useZIndex';
 
 const CTA_OPTIONS = [
   'Shop Now',
@@ -19,6 +20,8 @@ const EditAdModal = ({ isOpen, onClose, adData, onSave, allCreatives }) => {
   const [isCtaOpen, setIsCtaOpen] = useState(false);
   const [imageUrl, setImageUrl] = useState('');
   const [isChangeModalOpen, setIsChangeModalOpen] = useState(false);
+
+  const zIndex = useZIndex(isOpen);
 
   // Synchronize internal state with adData when modal opens
   useEffect(() => {
@@ -53,7 +56,10 @@ const EditAdModal = ({ isOpen, onClose, adData, onSave, allCreatives }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-[500] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300 p-4">
+    <div 
+      className="fixed inset-0 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300 p-4"
+      style={{ zIndex }}
+    >
       <div 
         className="w-full max-w-[560px] bg-white rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 flex flex-col max-h-[90vh]"
         onClick={(e) => e.stopPropagation()}
@@ -170,8 +176,11 @@ const EditAdModal = ({ isOpen, onClose, adData, onSave, allCreatives }) => {
               
               {isCtaOpen && (
                 <>
-                  <div className="fixed inset-0 z-[600]" onClick={() => setIsCtaOpen(false)} />
-                  <div className="absolute bottom-full left-0 right-0 mb-2 p-2 bg-white rounded-2xl shadow-2xl border border-slate-100 z-[610] animate-in fade-in slide-in-from-bottom-2">
+                  <div className="fixed inset-0" style={{ zIndex: zIndex + 1 }} onClick={() => setIsCtaOpen(false)} />
+                  <div 
+                    className="absolute bottom-full left-0 right-0 mb-2 p-2 bg-white rounded-2xl shadow-2xl border border-slate-100 animate-in fade-in slide-in-from-bottom-2"
+                    style={{ zIndex: zIndex + 2 }}
+                  >
                     {CTA_OPTIONS.map((opt) => (
                       <button
                         key={opt}

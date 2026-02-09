@@ -28,6 +28,7 @@ import { Competitors } from './components/brand/competitors'
 import CreateBrandModal from './components/brand/CreateBrandModal'
 import BrandSwitchLoading from './components/brand/BrandSwitchLoading'
 import ComingSoon from './components/ComingSoon'
+import ZIndexObserver from './components/ZIndexObserver'
 import { getPageInfo } from './constants/menuConfig'
 import { resetModalCounter } from './constants/zIndex'
 import { useEffect } from 'react'
@@ -286,6 +287,7 @@ function App() {
 
   return (
     <>
+      <ZIndexObserver />
       <Routes>
         <Route path="/*" element={
           <MainLayout

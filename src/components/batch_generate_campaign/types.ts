@@ -1,3 +1,18 @@
+export enum CampaignType {
+  PRODUCT = 'PRODUCT',
+  CATALOG = 'CATALOG'
+}
+
+export interface Catalog {
+  id: string;
+  name: string;
+}
+
+export enum ProductSet {
+  ALL = 'All Products',
+  BEST_SELLERS = 'Best Sellers',
+  NEW_ARRIVALS = 'New Arrivals'
+}
 
 export interface BrandInfo {
   name: string;
@@ -56,8 +71,14 @@ export enum BudgetType {
 
 export enum StructureStrategy {
   PER_PRODUCT = 'PER_PRODUCT',
-  PER_CATEGORY = 'PER_CATEGORY',
+  ALL_PRODUCTS_PER_SET = 'ALL_PRODUCTS_PER_SET',
   BY_AD_COUNT = 'BY_AD_COUNT'
+}
+
+export interface CampaignStructure {
+  strategy: StructureStrategy;
+  adsPerSet?: number;
+  numAdsets?: number;
 }
 
 export enum LandingPageType {
@@ -68,6 +89,11 @@ export enum LandingPageType {
 export enum AdCopyStrategy {
   AI_CUSTOM = 'AI_CUSTOM',
   UNIFIED = 'UNIFIED'
+}
+
+export enum ScheduleType {
+  CONTINUOUS = 'CONTINUOUS',
+  SCHEDULED = 'SCHEDULED'
 }
 
 export enum CampaignCountry {
@@ -92,23 +118,19 @@ export enum OptimizationEvent {
   REGISTER = '完成注册 (Register)'
 }
 
-export interface CampaignStructure {
-  strategy: StructureStrategy;
-  adsPerSet?: number;
-}
-
 export interface AdSetSettings {
   name: string;
-  country: string;
+  audienceType: AudienceType;
   ageMin: number;
   ageMax: number;
   gender: 'All' | 'Men' | 'Women';
   interests: string[];
+  placements: string[];
   optimizationEvent: string;
-  audienceType: AudienceType;
 }
 
 export interface AdSettings {
+  id: string;
   name: string;
   headline: string;
   primaryText: string;
@@ -117,4 +139,6 @@ export interface AdSettings {
   destinationUrl: string;
   utmParams: string;
   productId: string;
+  offerType?: 'AUTO' | 'MANUAL';
+  promoCode?: string;
 }
