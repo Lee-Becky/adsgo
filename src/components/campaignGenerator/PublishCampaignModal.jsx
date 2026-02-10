@@ -560,22 +560,22 @@ const PublishCampaignModal = ({ isOpen, onClose, LOGO_LINKS, onComplete, publish
       </div>
 
       <div className="space-y-8 pr-2 pb-32">
-        {/* Objective Card - Removed overflow-hidden to allow dropdown to show */}
-        <div className="bg-white rounded-[2rem] border border-slate-200 shadow-sm transform transition-all hover:shadow-md relative z-[100]">
-          <ObjectiveSection 
+        {/* Budget & KPI Card */}
+        <div className="transform transition-all hover:shadow-md relative z-[100]">
+          <BudgetKPISection 
             formData={brandGoalData}
             updateFormData={(key, val) => setBrandGoalData(p => ({...p, [key]: val}))}
+            updateFormDataDeep={(updates) => setBrandGoalData(p => ({...p, ...updates}))}
             validation={validation}
             setValidation={setValidation}
           />
         </div>
 
-        {/* Budget & KPI Card */}
-        <div className="transform transition-all hover:shadow-md relative z-[50]">
-          <BudgetKPISection 
+        {/* Objective Card - Removed overflow-hidden to allow dropdown to show */}
+        <div className="bg-white rounded-[2rem] border border-slate-200 shadow-sm transform transition-all hover:shadow-md relative z-[50]">
+          <ObjectiveSection 
             formData={brandGoalData}
             updateFormData={(key, val) => setBrandGoalData(p => ({...p, [key]: val}))}
-            updateFormDataDeep={(updates) => setBrandGoalData(p => ({...p, ...updates}))}
             validation={validation}
             setValidation={setValidation}
           />

@@ -339,24 +339,6 @@ const BudgetKPISection = ({ formData, updateFormData, updateFormDataDeep, valida
                         </div>
                         <h4 className="text-sm font-black text-slate-900">Daily Budget</h4>
                       </div>
-                      <div className="inline-flex p-0.5 bg-slate-50 rounded-lg border border-slate-200">
-                        <button
-                          onClick={() => updateGroup(group.id, { budgetMode: 'unified' })}
-                          className={`px-4 py-2 rounded-md text-[11px] font-black transition-all ${
-                            group.budgetMode === 'unified' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200' : 'text-slate-400'
-                          }`}
-                        >
-                          Same for all locations
-                        </button>
-                        <button
-                          onClick={() => updateGroup(group.id, { budgetMode: 'split' })}
-                          className={`px-4 py-2 rounded-md text-[11px] font-black transition-all ${
-                            group.budgetMode === 'split' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200' : 'text-slate-400'
-                          }`}
-                        >
-                          Split by location
-                        </button>
-                      </div>
                     </div>
 
                     {group.budgetMode === 'unified' ? (
@@ -409,24 +391,6 @@ const BudgetKPISection = ({ formData, updateFormData, updateFormDataDeep, valida
                           <Target size={18} />
                         </div>
                         <h4 className="text-sm font-black text-slate-900">KPI</h4>
-                      </div>
-                      <div className="inline-flex p-0.5 bg-slate-50 rounded-lg border border-slate-200">
-                        <button
-                          onClick={() => updateGroup(group.id, { kpiMode: 'unified' })}
-                          className={`px-4 py-2 rounded-md text-[11px] font-black transition-all ${
-                            group.kpiMode === 'unified' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200' : 'text-slate-400'
-                          }`}
-                        >
-                          Same for all locations
-                        </button>
-                        <button
-                          onClick={() => updateGroup(group.id, { kpiMode: 'split' })}
-                          className={`px-4 py-2 rounded-md text-[11px] font-black transition-all ${
-                            group.kpiMode === 'split' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200' : 'text-slate-400'
-                          }`}
-                        >
-                          Split by location
-                        </button>
                       </div>
                     </div>
 
