@@ -53,10 +53,14 @@ const GOOGLE_PRODUCTS = [
 ];
 
 const CREATIVE_LIBRARY = [
-  { id: 'lib1', url: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&q=80&w=400' },
-  { id: 'lib2', url: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&q=80&w=400' },
-  { id: 'lib3', url: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&q=80&w=400' },
-  { id: 'lib4', url: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&q=80&w=400' },
+  { id: 'lib1', name: '夏日清爽饮品海报', url: 'https://picsum.photos/seed/creative1/400/600' },
+  { id: 'lib2', name: '极简风格家居展示', url: 'https://picsum.photos/seed/creative2/400/600' },
+  { id: 'lib3', name: '户外运动装备特写', url: 'https://picsum.photos/seed/creative3/400/600' },
+  { id: 'lib4', name: '都市职场女性穿搭', url: 'https://picsum.photos/seed/creative4/400/600' },
+  { id: 'lib5', name: '科技感电子产品渲染', url: 'https://picsum.photos/seed/creative5/400/600' },
+  { id: 'lib6', name: '复古黑胶唱片包装', url: 'https://picsum.photos/seed/creative6/400/600' },
+  { id: 'lib7', name: '高端护肤品宣传照', url: 'https://picsum.photos/seed/creative7/400/600' },
+  { id: 'lib8', name: '自然有机食品摄影', url: 'https://picsum.photos/seed/creative8/400/600' },
 ];
 
 const ADD_OPTIONS = [
@@ -103,6 +107,16 @@ const PLATFORM_ICONS = [
   { id: 'wordpress', logo: 'https://upload.wikimedia.org/wikipedia/commons/0/09/Wordpress-Logo.svg' },
   { id: 'wix', logo: 'https://upload.wikimedia.org/wikipedia/commons/7/76/Wix.com_website_logo.svg' }
 ];
+
+const NanoBananaSkeleton = () => (
+  <div className="relative w-14 h-20 rounded-lg overflow-hidden shrink-0 border border-indigo-100 bg-indigo-50/30 animate-pulse flex flex-col items-center justify-center gap-1">
+    <div className="w-6 h-6 bg-indigo-100 rounded-full flex items-center justify-center">
+      <Loader2 size={12} className="text-indigo-400 animate-spin" />
+    </div>
+    <span className="text-[6px] font-black text-indigo-300 uppercase tracking-tighter text-center px-1">Nano Banana</span>
+    <span className="text-[5px] font-bold text-indigo-200 uppercase text-center">Generating...</span>
+  </div>
+);
 
 // --- Helper components ---
 
@@ -308,10 +322,20 @@ const SelectionModal = ({
                 return (
                   <div key={item.id} onClick={() => toggleItem(item.id)} className={`relative p-3 bg-white border-2 rounded-2xl transition-all cursor-pointer group ${isSel ? 'border-indigo-600 shadow-lg shadow-indigo-50' : 'border-slate-100 hover:border-slate-300'}`}>
                     <div className="aspect-square rounded-xl overflow-hidden mb-3 relative bg-slate-50">
-                      {item.imageUrl ? (<img src={item.imageUrl} className="w-full h-full object-cover transition-transform group-hover:scale-110" />) : (<div className="w-full h-full flex flex-col items-center justify-center gap-2 text-slate-300 bg-slate-50"><PackageCheck size={32} /><span className="text-[8px] font-black">暂无预览图</span></div>)}
+                      {(item.imageUrl || item.url) ? (<img src={item.imageUrl || item.url} className="w-full h-full object-cover transition-transform group-hover:scale-110" />) : (<div className="w-full h-full flex flex-col items-center justify-center gap-2 text-slate-300 bg-slate-50"><PackageCheck size={32} /><span className="text-[8px] font-black">暂无预览图</span></div>)}
                       <div className={`absolute top-2 right-2 w-6 h-6 rounded-full border-2 flex items-center justify-center shadow-lg ${isSel ? 'bg-indigo-600 border-indigo-600' : 'bg-black/20 border-white/40'}`}>{isSel && <Check size={14} className="text-white" />}</div>
                     </div>
-                    <div className="space-y-1"><p className="text-[10px] font-black text-slate-800 truncate px-1">{item.name || '未命名产品'}</p><div className="flex items-center gap-1.5 px-1 opacity-40 group-hover:opacity-100 transition-opacity"><Link2 size={10} /><p className="text-[8px] font-bold text-slate-400 truncate">{item.url}</p></div></div>
+                    <div className="space-y-1">
+                      <p className="text-[10px] font-black text-slate-800 truncate px-1">
+                        {item.name || (type === 'creative_lib' ? '未命名创意' : '未命名产品')}
+                      </p>
+                      {type !== 'creative_lib' && (
+                        <div className="flex items-center gap-1.5 px-1 opacity-40 group-hover:opacity-100 transition-opacity">
+                          <Link2 size={10} />
+                          <p className="text-[8px] font-bold text-slate-400 truncate">{item.url}</p>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 );
               })}
@@ -319,11 +343,21 @@ const SelectionModal = ({
           )}
         </div>
         <div className="p-8 bg-slate-50 border-t border-slate-100 flex items-center justify-between shrink-0 sticky bottom-0 z-20">
-          <div className="text-sm font-bold text-slate-400">已选中 <span className="text-indigo-600 font-black">{localSelected.size}</span> 个项目</div>
+          <div className="text-sm font-bold text-slate-400">
+            {type === 'creative_lib' ? '已选 ' : '已选中 '}
+            <span className="text-indigo-600 font-black">{localSelected.size}</span> 
+            {type === 'creative_lib' ? ' 个创意' : ' 个项目'}
+          </div>
           <button disabled={localSelected.size === 0} onClick={() => {
+            const randomSuffix = () => Math.random().toString(36).substring(2, 9);
             if (type === 'creative_lib') {
               const selectedCreatives = CREATIVE_LIBRARY.filter(i => localSelected.has(i.id));
-              onUpdateCreatives(modalContext, [...(productCreatives[modalContext] || []), ...selectedCreatives.map(c => ({ ...c, id: `${c.id}-${Date.now()}`, productId: modalContext }))]);
+              const newCreatives = selectedCreatives.map(c => ({ 
+                ...c, 
+                id: `${c.id}-${Date.now()}-${randomSuffix()}`, 
+                productId: modalContext 
+              }));
+              onUpdateCreatives(modalContext, prev => [...prev, ...newCreatives]);
             } else {
               const pool = getItems();
               const toAdd = pool.filter(i => localSelected.has(i.id) && !selectedProducts.some(p => p.id === i.id))
@@ -331,7 +365,9 @@ const SelectionModal = ({
               onSelectProducts([...selectedProducts, ...toAdd]);
             }
             onClose();
-          }} className={`px-10 py-4 rounded-2xl font-black tracking-widest shadow-xl transition-all ${localSelected.size === 0 ? 'bg-slate-200 text-white cursor-not-allowed shadow-none' : 'bg-slate-900 text-white hover:bg-black'}`}>确认选择产品</button>
+          }} className={`px-10 py-4 rounded-2xl font-black tracking-widest shadow-xl transition-all ${localSelected.size === 0 ? 'bg-slate-200 text-white cursor-not-allowed shadow-none' : 'bg-slate-900 text-white hover:bg-black'}`}>
+            {type === 'creative_lib' ? '确认' : '确认选择产品'}
+          </button>
         </div>
       </div>
     </div>
@@ -365,6 +401,9 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
   const [urlError, setUrlError] = useState('');
   const [syncStates, setSyncStates] = useState({ gmc: { isConnected: false, isConnecting: false, email: '' }, meta: { isConnected: false, isConnecting: false, email: '' } });
   const [productForm, setProductForm] = useState({ name: '', url: '', category: '', description: '', priceRange: '', type: 'Non-type', usps: [''], positioning: { valueProposition: [], features: [], usageScenarios: [], painPoints: [], buyingMotivations: [] }, audience: [{ id: Date.now(), name: 'Audience name', age: '', gender: 'All', traits: [] }], assets: { main: [], detailed: [], demo: [], testimonial: [], lifestyle: [], painpoints: [], comparison: [], result: [], others: [], problem: [], intro: [], action: [], environment: [], team: [] } });
+
+  const [generatingCounts, setGeneratingCounts] = useState({});
+  const [selectedMatchOptions, setSelectedMatchOptions] = useState(new Set(['24h']));
 
   const anyConnected = Object.values(authStatus).some(v => v);
 
@@ -449,14 +488,68 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
     setIsAuthLoading(false);
   };
 
-  const handleBatchAIGC = () => { setActiveModal(null); };
+  const handleBatchAIGC = async () => {
+    setActiveModal(null);
+    const productsToGenerate = selectedProducts.filter(p => !batchAIGCExclusions.has(p.id));
+    
+    setGeneratingCounts(prev => {
+      const next = { ...prev };
+      productsToGenerate.forEach(p => { next[p.id] = (next[p.id] || 0) + batchAIGCCount; });
+      return next;
+    });
 
-  const handleAIGCForProduct = (id) => {
-    // Placeholder
+    // 并行处理每个产品，但产品内部的创意逐个生成并即时显示
+    await Promise.all(productsToGenerate.map(async (p) => {
+      for (let i = 0; i < batchAIGCCount; i++) {
+        try {
+          const url = await generateAIGCCreative(`Batch generation ${i} for ${p.name}`);
+          const newCreative = { id: `aigc-batch-${Date.now()}-${i}-${p.id}-${Math.random()}`, url, productId: p.id };
+          // 逐个更新，使用函数式更新确保不丢失前一个创意
+          onUpdateCreatives(p.id, prev => [...prev, newCreative]);
+        } finally {
+          // 生成完成后减少骨架屏数量
+          setGeneratingCounts(prev => ({ ...prev, [p.id]: Math.max(0, (prev[p.id] || 1) - 1) }));
+        }
+      }
+    }));
+  };
+
+  const handleBatchMatch = () => {
+    setActiveModal(null);
+    selectedProducts.forEach(p => {
+      const matched = CREATIVE_LIBRARY.slice(0, 2).map(c => ({
+        ...c,
+        id: `matched-${c.id}-${p.id}-${Date.now()}-${Math.random()}`,
+        productId: p.id
+      }));
+      onUpdateCreatives(p.id, prev => [...prev, ...matched]);
+    });
+  };
+
+  const handleAIGCForProduct = async (id) => {
+    setGeneratingCounts(prev => ({ ...prev, [id]: (prev[id] || 0) + 1 }));
+    try {
+      const url = await generateAIGCCreative("Advertising product photography");
+      const newCreative = { id: `aigc-${Date.now()}-${Math.random()}`, url, productId: id };
+      onUpdateCreatives(id, prev => [...prev, newCreative]);
+    } finally {
+      setGeneratingCounts(prev => ({ ...prev, [id]: Math.max(0, (prev[id] || 1) - 1) }));
+    }
   };
 
   const handleUploadForProduct = (id) => {
-    // Placeholder
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = (e) => {
+      const file = e.target.files?.[0];
+      if (file) {
+        const url = URL.createObjectURL(file);
+        const newCreative = { id: `upload-${Date.now()}-${Math.random()}`, url, productId: id };
+        onUpdateCreatives(id, [...(productCreatives[id] || []), newCreative]);
+      }
+    };
+    input.click();
   };
 
   return (
@@ -656,15 +749,16 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
                 const creatives = productCreatives[p.id] || [];
                 const isExpanded = expandedAnalysisId === p.id;
                 const showAnalysisResult = analysisFinished || (isAnalyzing && p.isFromHistory);
+                const generatingCount = generatingCounts[p.id] || 0;
                 
                 return (
                   <div key={p.id} className="space-y-3">
-                    <div className={`bg-white border rounded-[2rem] p-4 md:p-6 transition-all hover:shadow-xl hover:shadow-slate-200/50 group ${creatives.length === 0 && showAnalysisResult ? 'border-amber-100 ring-2 ring-amber-500/5' : 'border-slate-100'}`}>
+                    <div className={`bg-white border rounded-[2rem] p-4 md:p-6 transition-all hover:shadow-xl hover:shadow-slate-200/50 group ${creatives.length === 0 && generatingCount === 0 && showAnalysisResult ? 'border-amber-100 ring-2 ring-amber-500/5' : 'border-slate-100'}`}>
                       <div className="flex flex-col lg:flex-row gap-6">
                         <div className="flex items-center gap-4 lg:w-72 shrink-0">
-                          <div className="w-12 h-12 rounded-xl overflow-hidden border border-slate-100 shrink-0 shadow-sm relative">
+                          <div className="w-12 h-12 rounded-xl overflow-hidden border border-slate-100 shrink-0 shadow-sm relative bg-slate-50">
                             <img src={p.imageUrl} className="w-full h-full object-cover" />
-                            {creatives.length === 0 && showAnalysisResult && (
+                            {creatives.length === 0 && generatingCount === 0 && showAnalysisResult && (
                               <div className="absolute inset-0 bg-amber-500/80 flex items-center justify-center">
                                 <Flame size={14} className="text-white animate-bounce" />
                               </div>
@@ -680,7 +774,7 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
                             )}
                           </div>
                         </div>
-                        <div className="flex-1 flex flex-col justify-center">
+                        <div className="flex-1 flex flex-col justify-center min-w-0">
                           {(!showAnalysisResult && isAnalyzing) ? (
                             <div className="w-full flex justify-end">
                               <button onClick={() => setExpandedAnalysisId(isExpanded ? null : p.id)} className="flex items-center gap-2 px-3 py-1.5 bg-indigo-50 text-indigo-600 rounded-lg text-[10px] font-black tracking-widest hover:bg-indigo-100 transition-colors">
@@ -688,8 +782,8 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
                               </button>
                             </div>
                           ) : (
-                            <div className="flex flex-col md:flex-row items-center gap-6 overflow-hidden">
-                              <div className="w-full flex items-center gap-3 overflow-x-auto no-scrollbar py-1">
+                            <div className="flex flex-col md:flex-row items-center gap-6 overflow-hidden min-w-0">
+                              <div className="flex-1 flex items-center gap-3 overflow-x-auto no-scrollbar py-1 pr-4">
                                 {creatives.map(c => (
                                   <div key={c.id} className="relative w-14 h-20 rounded-lg overflow-hidden shrink-0 border border-slate-100 group/item shadow-sm">
                                     <img src={c.url} className="w-full h-full object-cover" />
@@ -698,20 +792,27 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
                                     </button>
                                   </div>
                                 ))}
-                                <div className="flex gap-2 shrink-0 ml-2">
-                                  <button onClick={() => { setModalContext(p.id); setActiveModal('creative_lib'); }} className="w-14 h-20 rounded-lg border-2 border-dashed border-slate-100 flex flex-col items-center justify-center text-slate-300 hover:border-indigo-400 hover:text-indigo-400 hover:bg-indigo-50 transition-all gap-1" title="从素材库选择">
-                                    <Database size={16} />
-                                    <span className="text-[7px] font-black">库</span>
-                                  </button>
-                                  <button onClick={() => handleAIGCForProduct(p.id)} className="w-14 h-20 rounded-lg border-2 border-dashed border-purple-100 flex flex-col items-center justify-center text-purple-400 hover:border-purple-400 hover:bg-purple-50 transition-all gap-1" title="AI 生成">
-                                    <Sparkles size={16} />
-                                    <span className="text-[7px] font-black">AI</span>
-                                  </button>
-                                  <button onClick={() => handleUploadForProduct(p.id)} className="w-14 h-20 rounded-lg border-2 border-dashed border-slate-100 flex flex-col items-center justify-center text-slate-300 hover:border-slate-400 hover:bg-slate-50 transition-all gap-1" title="本地上传">
-                                    <Upload size={16} />
-                                    <span className="text-[7px] font-black">传</span>
-                                  </button>
-                                </div>
+                                
+                                {[...Array(generatingCount)].map((_, i) => (
+                                  <NanoBananaSkeleton key={`gen-${i}`} />
+                                ))}
+
+                                {creatives.length < 10 && (
+                                  <div className="flex gap-2 shrink-0 ml-2">
+                                    <button onClick={() => { setModalContext(p.id); setActiveModal('creative_lib'); }} className="w-14 h-20 rounded-lg border-2 border-dashed border-slate-100 flex flex-col items-center justify-center text-slate-300 hover:border-indigo-400 hover:text-indigo-400 hover:bg-indigo-50 transition-all gap-1" title="从素材库选择">
+                                      <Database size={16} />
+                                      <span className="text-[7px] font-black">库</span>
+                                    </button>
+                                    <button onClick={() => handleAIGCForProduct(p.id)} className="w-14 h-20 rounded-lg border-2 border-dashed border-purple-100 flex flex-col items-center justify-center text-purple-400 hover:border-purple-400 hover:bg-purple-50 transition-all gap-1" title="AI 生成">
+                                      <Sparkles size={16} />
+                                      <span className="text-[7px] font-black">AI</span>
+                                    </button>
+                                    <button onClick={() => handleUploadForProduct(p.id)} className="w-14 h-20 rounded-lg border-2 border-dashed border-slate-100 flex flex-col items-center justify-center text-slate-300 hover:border-slate-400 hover:bg-slate-50 transition-all gap-1" title="本地上传">
+                                      <Upload size={16} />
+                                      <span className="text-[7px] font-black">传</span>
+                                    </button>
+                                  </div>
+                                )}
                               </div>
                             </div>
                           )}
@@ -769,17 +870,24 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
               <button onClick={() => setActiveModal(null)} className="p-2 hover:bg-slate-50 rounded-full text-slate-300"><X size={24} /></button>
             </div>
             <div className="space-y-4">
-              {[{ id: '24h', label: '智能匹配 24h 内上传素材', icon: <Sparkles size={16} /> }, { id: 'unused', label: '智能匹配历史从未投放过素材', icon: <FileText size={16} /> }, { id: 'top7d', label: '智能匹配近 7 天 TOP 素材', icon: <Flame size={16} /> }].map(opt => (
-                <button key={opt.id} onClick={() => setActiveModal(null)} className="w-full p-6 rounded-2xl border-2 flex items-center justify-between border-slate-100 bg-white hover:border-indigo-600 transition-all group">
-                  <div className="flex items-center gap-4">
-                    <div className="p-2 rounded-lg bg-slate-50 text-slate-400">{opt.icon}</div>
-                    <span className="text-sm font-black text-slate-600">{opt.label}</span>
-                  </div>
-                  <Check size={20} className="text-indigo-600 opacity-0 group-hover:opacity-100" />
-                </button>
-              ))}
+              {[{ id: '24h', label: '智能匹配 24h 内上传素材', icon: <Sparkles size={16} /> }, { id: 'unused', label: '智能匹配历史从未投放过素材', icon: <FileText size={16} /> }, { id: 'top7d', label: '智能匹配近 7 天 TOP 素材', icon: <Flame size={16} /> }].map(opt => {
+                const isSel = selectedMatchOptions.has(opt.id);
+                return (
+                  <button key={opt.id} onClick={() => {
+                    const next = new Set(selectedMatchOptions);
+                    if (next.has(opt.id)) next.delete(opt.id); else next.add(opt.id);
+                    setSelectedMatchOptions(next);
+                  }} className={`w-full p-6 rounded-2xl border-2 flex items-center justify-between transition-all group ${isSel ? 'border-indigo-600 bg-indigo-50 shadow-sm' : 'border-slate-100 bg-white hover:border-slate-200'}`}>
+                    <div className="flex items-center gap-4">
+                      <div className={`p-2 rounded-lg ${isSel ? 'bg-indigo-600 text-white' : 'bg-slate-50 text-slate-400'}`}>{opt.icon}</div>
+                      <span className={`text-sm font-black ${isSel ? 'text-indigo-900' : 'text-slate-600'}`}>{opt.label}</span>
+                    </div>
+                    {isSel && <Check size={20} className="text-indigo-600" />}
+                  </button>
+                );
+              })}
             </div>
-            <button onClick={() => setActiveModal(null)} className="w-full py-5 rounded-2xl font-black tracking-widest shadow-xl bg-slate-900 text-white hover:bg-black transition-all">确认并开始批量匹配</button>
+            <button onClick={handleBatchMatch} className="w-full py-5 rounded-2xl font-black tracking-widest shadow-xl bg-slate-900 text-white hover:bg-black transition-all">确认并开始批量匹配</button>
           </div>
         </ModalWrapper>
       )}
@@ -878,7 +986,7 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
             <div className="p-8 pb-4 flex justify-between items-center shrink-0">
               <div className="flex items-center gap-4">
                 {addStep !== 'options' && (<button onClick={() => setAddStep('options')} className="p-2.5 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-full transition-all"><ArrowLeft size={20} /></button>)}
-                <h3 className="text-xl font-bold text-slate-900 font-sans">{addStep === 'options' ? '请选择同步产品数据的方式' : addStep === 'url' ? 'Import from URL' : addStep === 'setup' ? 'Setup your product' : addStep === 'shopify' ? 'Sync from Shopify' : addStep === 'gmc' ? 'Sync from Google GMC' : 'Sync from Meta feeds'}</h3>
+                <h3 className="text-xl font-bold text-slate-900 font-sans">{addStep === 'options' ? '请选择同步产品 data 方式' : addStep === 'url' ? 'Import from URL' : addStep === 'setup' ? 'Setup your product' : addStep === 'shopify' ? 'Sync from Shopify' : addStep === 'gmc' ? 'Sync from Google GMC' : 'Sync from Meta feeds'}</h3>
               </div>
               <button onClick={closeAddModal} className="p-2.5 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-full transition-all"><X size={20} /></button>
             </div>
@@ -956,10 +1064,7 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
                       </div>
                       <div className="space-y-2">
                         <h4 className="text-lg font-bold text-slate-900 font-sans">{shopifyStoreName}</h4>
-                        <div className="flex items-center justify-center gap-2">
-                          <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                          <p className="text-xs text-green-600 font-bold tracking-wide font-sans">Connected</p>
-                        </div>
+                        <div className="flex items-center justify-center gap-2"><span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" /><p className="text-xs text-green-600 font-bold tracking-wide font-sans">Connected</p></div>
                       </div>
                       <div className="w-full pt-6">
                         <button onClick={() => { setIsShopifyConnected(false); setAuthStatus(p => ({ ...p, shopify: false })); }} className="px-8 py-3 bg-slate-50 border border-slate-100 rounded-2xl text-slate-400 hover:text-rose-500 hover:bg-rose-50 hover:border-rose-100 font-bold text-[13px] transition-all flex items-center gap-2 mx-auto shadow-sm font-sans"><Link2Off size={18} />Disconnect store</button>

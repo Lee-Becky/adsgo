@@ -146,10 +146,12 @@ const BatchGenerateAds = () => {
   const [structure, setStructure] = useState({ 
     strategy: 'PER_PRODUCT',
     adsPerSet: 3,
-    numAdsets: 3
+    numAdsets: 3,
+    numAdsetsPerProduct: 1
   });
-  const [adsetAudiences, setAdsetAudiences] = useState(Array(10).fill('ADV'));
+  const [adsetAudiences, setAdsetAudiences] = useState(Array(50).fill('ADV'));
   const [lalOptions, setLalOptions] = useState(['US Purchase 1%']);
+  const [intOptions, setIntOptions] = useState([]);
   const [budgetType, setBudgetType] = useState('CBO');
   const [dailyBudget, setDailyBudget] = useState(50);
   const [view, setView] = useState('config');
@@ -165,6 +167,11 @@ const BatchGenerateAds = () => {
   const selectedCampaign = useMemo(() => 
     MOCK_EXISTING_CAMPAIGNS.find(c => c.id === selectedCampaignId), 
   [selectedCampaignId]);
+
+  const isAnyProductMissingCreatives = useMemo(() => {
+    if (selectedProducts.length === 0) return true;
+    return selectedProducts.some(p => (productCreativesMap[p.id] || []).length === 0);
+  }, [selectedProducts, productCreativesMap]);
 
   useEffect(() => {
     if (selectedCampaign) {
@@ -188,9 +195,17 @@ const BatchGenerateAds = () => {
     country: selectedLocations[0]?.name || ''
   };
 
-  const handleUpdateProductCreatives = (productId, creatives) => {
-    const creativesWithId = creatives.map(c => ({ ...c, productId }));
-    setProductCreativesMap(prev => ({ ...prev, [productId]: creativesWithId }));
+  const handleUpdateProductCreatives = (productId, creativesOrUpdater) => {
+    setProductCreativesMap(prev => {
+      const currentCreatives = prev[productId] || [];
+      const nextCreatives = typeof creativesOrUpdater === 'function' 
+        ? creativesOrUpdater(currentCreatives) 
+        : creativesOrUpdater;
+      
+      // 限制每个产品最多 10 个素材
+      const creativesWithId = nextCreatives.slice(0, 10).map(c => ({ ...c, productId }));
+      return { ...prev, [productId]: creativesWithId };
+    });
   };
 
   const handleToggleAudienceType = (index) => {
@@ -206,6 +221,12 @@ const BatchGenerateAds = () => {
 
   const handleToggleLalOption = (option) => {
     setLalOptions(prev => 
+      prev.includes(option) ? prev.filter(o => o !== option) : [...prev, option]
+    );
+  };
+
+  const handleToggleIntOption = (option) => {
+    setIntOptions(prev => 
       prev.includes(option) ? prev.filter(o => o !== option) : [...prev, option]
     );
   };
@@ -795,8 +816,21 @@ const BatchGenerateAds = () => {
                 />
               </div>
 
+              {/* Reminder Component when creatives are missing */}
+              {analysisFinished && isAnyProductMissingCreatives && (
+                <div className="bg-white rounded-[2.5rem] p-16 shadow-sm border border-slate-100 flex flex-col items-center justify-center text-center animate-in fade-in slide-in-from-top-4">
+                  <div className="w-20 h-20 bg-slate-50 border-2 border-dashed border-slate-200 rounded-3xl flex items-center justify-center text-slate-200 mb-8">
+                    <Plus size={40} />
+                  </div>
+                  <h3 className="text-xl font-black text-slate-900 mb-4">请先添加至少一个素材</h3>
+                  <p className="text-sm text-slate-400 font-bold leading-relaxed max-w-md">
+                    点击上方产品的 “AI” 或 “上传” 按钮填充创意资产。完成后系统将自动开启 Campaign 架构生成模块。
+                  </p>
+                </div>
+              )}
+
               {/* Card 3: Strategy & Budget */}
-              {analysisFinished && (
+              {analysisFinished && !isAnyProductMissingCreatives && (
                  <div className="bg-white rounded-[2.5rem] p-10 shadow-sm border border-slate-100 animate-in fade-in slide-in-from-top-8">
                     <div className="flex items-center gap-3 mb-8">
                        <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center text-white"><Layers size={20} /></div>
@@ -808,6 +842,7 @@ const BatchGenerateAds = () => {
                       dailyBudget={dailyBudget} onBudgetChange={setDailyBudget}
                       adsetAudiences={adsetAudiences} onToggleAudience={handleToggleAudienceType}
                       lalOptions={lalOptions} onToggleLalOption={handleToggleLalOption}
+                      intOptions={intOptions} onToggleIntOption={handleToggleIntOption}
                       selectedProducts={selectedProducts}
                       productCreativesMap={productCreativesMap}
                       isExistingCampaign={!!selectedCampaignId}
@@ -818,7 +853,7 @@ const BatchGenerateAds = () => {
               )}
 
               {/* Card 4: Advanced Settings */}
-              {analysisFinished && (
+              {analysisFinished && !isAnyProductMissingCreatives && (
                  <div className="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden animate-in fade-in slide-in-from-top-8">
                     <button onClick={() => setAdvancedOpen(!advancedOpen)} className="w-full p-10 flex items-center justify-between hover:bg-slate-50 transition-colors">
                         <div className="flex items-center gap-3">
@@ -1090,7 +1125,7 @@ const BatchGenerateAds = () => {
               )}
 
               {/* Preview Button */}
-              {analysisFinished && (
+              {analysisFinished && !isAnyProductMissingCreatives && (
                 <div className="flex flex-col items-center">
                   <button
                     onClick={() => setView('preview')}
