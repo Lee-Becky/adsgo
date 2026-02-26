@@ -817,7 +817,7 @@ const BatchGenerateAds = () => {
               </div>
 
               {/* Reminder Component when creatives are missing */}
-              {analysisFinished && isAnyProductMissingCreatives && (
+              {analysisFinished && isAnyProductMissingCreatives && campaignType !== 'CATALOG' && (
                 <div className="bg-white rounded-[2.5rem] p-16 shadow-sm border border-slate-100 flex flex-col items-center justify-center text-center animate-in fade-in slide-in-from-top-4">
                   <div className="w-20 h-20 bg-slate-50 border-2 border-dashed border-slate-200 rounded-3xl flex items-center justify-center text-slate-200 mb-8">
                     <Plus size={40} />
@@ -830,7 +830,7 @@ const BatchGenerateAds = () => {
               )}
 
               {/* Card 3: Strategy & Budget */}
-              {analysisFinished && !isAnyProductMissingCreatives && (
+              {analysisFinished && (!isAnyProductMissingCreatives || campaignType === 'CATALOG') && (
                  <div className="bg-white rounded-[2.5rem] p-10 shadow-sm border border-slate-100 animate-in fade-in slide-in-from-top-8">
                     <div className="flex items-center gap-3 mb-8">
                        <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center text-white"><Layers size={20} /></div>
@@ -838,6 +838,7 @@ const BatchGenerateAds = () => {
                     </div>
                     <CampaignPlanView 
                       structure={structure} onStructureChange={setStructure}
+                      campaignType={campaignType}
                       budgetType={budgetType} onBudgetTypeChange={setBudgetType}
                       dailyBudget={dailyBudget} onBudgetChange={setDailyBudget}
                       adsetAudiences={adsetAudiences} onToggleAudience={handleToggleAudienceType}
@@ -853,7 +854,7 @@ const BatchGenerateAds = () => {
               )}
 
               {/* Card 4: Advanced Settings */}
-              {analysisFinished && !isAnyProductMissingCreatives && (
+              {analysisFinished && (!isAnyProductMissingCreatives || campaignType === 'CATALOG') && (
                  <div className="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden animate-in fade-in slide-in-from-top-8">
                     <button onClick={() => setAdvancedOpen(!advancedOpen)} className="w-full p-10 flex items-center justify-between hover:bg-slate-50 transition-colors">
                         <div className="flex items-center gap-3">
@@ -1125,7 +1126,7 @@ const BatchGenerateAds = () => {
               )}
 
               {/* Preview Button */}
-              {analysisFinished && !isAnyProductMissingCreatives && (
+              {analysisFinished && (!isAnyProductMissingCreatives || campaignType === 'CATALOG') && (
                 <div className="flex flex-col items-center">
                   <button
                     onClick={() => setView('preview')}

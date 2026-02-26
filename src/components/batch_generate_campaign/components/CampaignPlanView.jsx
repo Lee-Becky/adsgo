@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Users, Info, Sparkles, DollarSign, ChevronDown, Briefcase, Target, Layers, Lock, Edit3, Check } from 'lucide-react';
+import { Users, Info, Sparkles, DollarSign, ChevronDown, Briefcase, Target, Layers, Lock, Edit3, Check, LayoutGrid } from 'lucide-react';
 import { Z_INDEX } from '../../../constants/zIndex';
 
 const AUDIENCE_SHORT_LABELS = {
@@ -11,6 +11,7 @@ const AUDIENCE_SHORT_LABELS = {
 const CampaignPlanView = ({ 
   structure, 
   onStructureChange,
+  campaignType,
   budgetType, 
   onBudgetTypeChange,
   dailyBudget, 
@@ -52,7 +53,7 @@ const CampaignPlanView = ({
       const numAdsets = structure.numAdsets || 1;
       for (let i = 0; i < numAdsets; i++) {
         groups.push({ 
-          name: `混合组 ${i + 1}`, 
+          name: campaignType === 'CATALOG' ? `DPA-${i + 1}` : `混合组 ${i + 1}`, 
           ads: allAds 
         });
       }
@@ -103,22 +104,25 @@ const CampaignPlanView = ({
         <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm space-y-6">
           <div className="space-y-3">
             <label className="text-[10px] font-bold text-slate-400 tracking-widest px-1">选择发布逻辑</label>
-            <div className="grid grid-cols-3 gap-3">
-              {[
-                { id: 'PER_PRODUCT', label: '每款产品多组', desc: 'Multiple Adsets per SKU' },
-                { id: 'ALL_PRODUCTS_PER_SET', label: '混合组包含全品', desc: 'All SKU in every Adset' },
-                { id: 'BY_AD_COUNT', label: '总素材智能拆组', desc: 'Intelligently split all ads' },
-              ].map(opt => (
+            <div className={`grid ${campaignType === 'CATALOG' ? 'grid-cols-1' : 'grid-cols-3'} gap-3`}>
+              {(campaignType === 'CATALOG' 
+                ? [{ id: 'ALL_PRODUCTS_PER_SET', label: '每组均投放已选目录', desc: 'Each group uses selected catalog' }]
+                : [
+                    { id: 'PER_PRODUCT', label: '每款产品多组', desc: 'Multiple Adsets per SKU' },
+                    { id: 'ALL_PRODUCTS_PER_SET', label: '混合组包含全品', desc: 'All SKU in every Adset' },
+                    { id: 'BY_AD_COUNT', label: '总素材智能拆组', desc: 'Intelligently split all ads' },
+                  ]
+              ).map(opt => (
                 <button
                   key={opt.id}
                   onClick={() => onStructureChange({ ...structure, strategy: opt.id })}
                   className={`p-4 rounded-2xl border text-left transition-all ${
-                    structure.strategy === opt.id 
+                    (structure.strategy === opt.id || campaignType === 'CATALOG')
                       ? 'border-indigo-600 bg-indigo-50 ring-2 ring-indigo-500/10' 
                       : 'border-slate-100 hover:border-slate-200 bg-white'
                   }`}
                 >
-                  <p className={`text-[11px] font-black ${structure.strategy === opt.id ? 'text-indigo-600' : 'text-slate-800'}`}>{opt.label}</p>
+                  <p className={`text-[11px] font-black ${(structure.strategy === opt.id || campaignType === 'CATALOG') ? 'text-indigo-600' : 'text-slate-800'}`}>{opt.label}</p>
                   <p className="text-[9px] text-slate-400 font-bold mt-1">{opt.desc}</p>
                 </button>
               ))}
@@ -219,15 +223,33 @@ const CampaignPlanView = ({
                       <p className="text-[8px] font-black text-slate-400 truncate max-w-[80px] text-center mb-3">{group.name}</p>
                       
                       <div className="flex flex-wrap gap-1 justify-center max-w-[120px]">
-                        {group.ads.slice(0, 4).map((ad, adIdx) => (
-                          <div key={adIdx} className="w-8 h-10 rounded-md border border-white shadow-sm overflow-hidden bg-white ring-1 ring-slate-100">
-                            <img src={ad.url} className="w-full h-full object-cover" />
+                        {campaignType === 'CATALOG' ? (
+                          <div className="w-16 h-20 rounded-lg border-2 border-dashed border-indigo-200 bg-indigo-50/30 flex flex-col items-center justify-center p-2 relative overflow-hidden group/catalog">
+                            <div className="grid grid-cols-2 gap-1 opacity-40 group-hover/catalog:opacity-60 transition-opacity">
+                              {[1, 2, 3, 4].map(i => (
+                                <div key={i} className="w-4 h-4 rounded-sm bg-indigo-200" />
+                              ))}
+                            </div>
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <LayoutGrid size={24} className="text-indigo-400" />
+                            </div>
+                            <div className="absolute bottom-1 w-full flex justify-center">
+                              <span className="text-[6px] font-black text-indigo-400 uppercase tracking-tighter">Dynamic Feed</span>
+                            </div>
                           </div>
-                        ))}
-                        {group.ads.length > 4 && (
-                          <div className="w-8 h-10 rounded-md border border-white shadow-sm flex items-center justify-center bg-slate-50 text-[8px] font-black text-slate-400">
-                            +{group.ads.length - 4}
-                          </div>
+                        ) : (
+                          <>
+                            {group.ads.slice(0, 4).map((ad, adIdx) => (
+                              <div key={adIdx} className="w-8 h-10 rounded-md border border-white shadow-sm overflow-hidden bg-white ring-1 ring-slate-100">
+                                <img src={ad.url} className="w-full h-full object-cover" />
+                              </div>
+                            ))}
+                            {group.ads.length > 4 && (
+                              <div className="w-8 h-10 rounded-md border border-white shadow-sm flex items-center justify-center bg-slate-50 text-[8px] font-black text-slate-400">
+                                +{group.ads.length - 4}
+                              </div>
+                            )}
+                          </>
                         )}
                       </div>
                     </div>
