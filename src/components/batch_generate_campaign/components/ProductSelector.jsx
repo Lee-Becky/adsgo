@@ -432,26 +432,17 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
     setAddStep('options');
   };
 
-  const handleShopifyConnect = () => {
-    window.open('https://www.shopify.com/admin/oauth/authorize', '_blank');
-    setTimeout(() => { 
-      setIsShopifyConnected(true); 
-      setAuthStatus(prev => ({ ...prev, shopify: true }));
-      setAddStep('shopify'); 
-    }, 1000);
-  };
-
-  const handleSyncConnect = (platform) => {
-    setSyncStates(prev => ({ ...prev, [platform]: { ...prev[platform], isConnecting: true } }));
-    setTimeout(() => { 
-      setSyncStates(prev => ({ ...prev, [platform]: { isConnected: true, isConnecting: false, email: 'user@example.com' } })); 
-      setAuthStatus(prev => ({ ...prev, [platform]: true }));
-    }, 3000);
-  };
-
-  const handleSyncDisconnect = (platform) => {
-    setSyncStates(prev => ({ ...prev, [platform]: { isConnected: false, isConnecting: false, email: '' } }));
-    setAuthStatus(prev => ({ ...prev, [platform]: false }));
+  const handleAuthorize = async (platform) => {
+    setIsAuthLoading(true);
+    const success = await authorizePlatform(platform);
+    if (success) { 
+      setAuthStatus(prev => ({ ...prev, [platform]: true })); 
+      if (platform === 'shopify') setIsShopifyConnected(true);
+      if (platform === 'meta' || platform === 'google') {
+        setSyncStates(prev => ({ ...prev, [platform]: { isConnected: true, isConnecting: false, email: 'user@example.com' } }));
+      }
+    }
+    setIsAuthLoading(false);
   };
 
   const removeProduct = (id) => { onSelectProducts(selectedProducts.filter(p => p.id !== id)); };
@@ -477,19 +468,6 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
       return () => clearInterval(interval);
     } else { setCurrentStep(0); }
   }, [isAnalyzing, onAnalysisComplete, selectedProducts]);
-
-  const handleAuthorize = async (platform) => {
-    setIsAuthLoading(true);
-    const success = await authorizePlatform(platform);
-    if (success) { 
-      setAuthStatus(prev => ({ ...prev, [platform]: true })); 
-      if (platform === 'shopify') setIsShopifyConnected(true);
-      if (platform === 'meta' || platform === 'google') {
-        setSyncStates(prev => ({ ...prev, [platform]: { isConnected: true, isConnecting: false, email: 'user@example.com' } }));
-      }
-    }
-    setIsAuthLoading(false);
-  };
 
   const handleBatchAIGC = async () => {
     setActiveModal(null);
@@ -553,6 +531,19 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
       }
     };
     input.click();
+  };
+
+  const handleSyncConnect = (platform) => {
+    setSyncStates(prev => ({ ...prev, [platform]: { ...prev[platform], isConnecting: true } }));
+    setTimeout(() => { 
+      setSyncStates(prev => ({ ...prev, [platform]: { isConnected: true, isConnecting: false, email: 'user@example.com' } })); 
+      setAuthStatus(prev => ({ ...prev, [platform]: true }));
+    }, 3000);
+  };
+
+  const handleSyncDisconnect = (platform) => {
+    setSyncStates(prev => ({ ...prev, [platform]: { isConnected: false, isConnecting: false, email: '' } }));
+    setAuthStatus(prev => ({ ...prev, [platform]: false }));
   };
 
   return (
@@ -860,7 +851,7 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
         />
       )}
       {activeModal === 'batch_match' && (
-        <ModalWrapper zIndex={Z_INDEX.MODAL_BASE + 40}>
+        <ModalWrapper>
           <div className="bg-white w-full max-w-xl rounded-[3rem] shadow-2xl p-10 space-y-8 animate-in slide-in-from-bottom-8">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
@@ -895,7 +886,7 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
         </ModalWrapper>
       )}
       {activeModal === 'batch_aigc' && (
-        <ModalWrapper zIndex={Z_INDEX.MODAL_BASE + 50}>
+        <ModalWrapper>
           <div className="bg-white w-full max-w-2xl rounded-[3rem] shadow-2xl p-10 space-y-8 animate-in slide-in-from-bottom-8">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
@@ -940,7 +931,7 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
         </ModalWrapper>
       )}
       {activeModal === 'select_account' && (
-        <ModalWrapper zIndex={Z_INDEX.MODAL_BASE + 60}>
+        <ModalWrapper>
           <div className="bg-white w-full max-w-xl rounded-[3rem] shadow-2xl p-10 space-y-8 animate-in slide-in-from-bottom-8">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
@@ -969,173 +960,181 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
           </div>
         </ModalWrapper>
       )}
-      {isAddModalOpen && (
-        <div 
-          className="fixed inset-0 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200"
-          style={{ zIndex: Z_INDEX.MODAL_BASE + 70 }}
-        >
-          <div className={`bg-white rounded-[40px] w-full shadow-2xl border border-slate-100 animate-in zoom-in-95 duration-200 flex flex-col relative transition-all duration-500 ${addStep === 'setup' ? 'max-w-4xl h-[90vh]' : 'max-w-2xl min-h-[400px]'}`}>
-            {isImportAnalyzing && (
-              <div className="absolute inset-0 z-[120] bg-white rounded-[40px] flex flex-col items-center justify-center p-10 text-center animate-in fade-in duration-300">
-                <div className="w-20 h-20 rounded-[32px] bg-indigo-50 flex items-center justify-center mb-6 shadow-inner relative">
-                  <div className="absolute inset-0 rounded-[32px] border-4 border-indigo-100 border-t-indigo-500 animate-spin" />
-                  <Loader2 className="text-indigo-500 animate-spin" size={32} />
-                </div>
-                <h3 className="text-xl font-bold text-slate-900 mb-2 font-sans">Analyzing product info...</h3>
-                <p className="text-xs text-slate-400 font-medium mb-10 max-w-[320px] font-sans">We're fetching details from the URL. This might take a few moments.</p>
-                <button onClick={closeAddModal} className="px-10 py-3.5 bg-slate-900 text-white rounded-2xl font-bold text-sm hover:bg-black transition-all active:scale-95 shadow-lg shadow-slate-200 font-sans">Close and analyze in background</button>
-              </div>
-            )}
-            <div className="p-8 pb-4 flex justify-between items-center shrink-0">
-              <div className="flex items-center gap-4">
-                {addStep !== 'options' && (<button onClick={() => setAddStep('options')} className="p-2.5 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-full transition-all"><ArrowLeft size={20} /></button>)}
-                <h3 className="text-xl font-bold text-slate-900 font-sans">{addStep === 'options' ? '请选择同步产品 data 方式' : addStep === 'url' ? 'Import from URL' : addStep === 'setup' ? 'Setup your product' : addStep === 'shopify' ? 'Sync from Shopify' : addStep === 'gmc' ? 'Sync from Google GMC' : 'Sync from Meta feeds'}</h3>
-              </div>
-              <button onClick={closeAddModal} className="p-2.5 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-full transition-all"><X size={20} /></button>
-            </div>
-            <div className="px-8 pb-8 flex-1 flex flex-col overflow-hidden">
-              {addStep === 'options' && (
-                <div className="space-y-4 pt-4">
-                  {ADD_OPTIONS.filter(opt => ['shopify', 'meta', 'gmc'].includes(opt.id)).map((option) => {
-                    const isConnected = option.id === 'shopify' ? authStatus.shopify : option.id === 'meta' ? authStatus.meta : authStatus.google;
-                    return (
-                      <button key={option.id} onClick={() => setAddStep(option.id)} className="w-full group flex items-center gap-6 p-6 bg-slate-50 border border-slate-100 rounded-[28px] hover:bg-white hover:shadow-xl hover:border-indigo-100 transition-all text-left">
-                        <div className="w-14 h-14 rounded-2xl bg-white border border-slate-100 flex items-center justify-center text-slate-400 group-hover:text-indigo-50 group-hover:border-indigo-50 group-hover:shadow-inner transition-all overflow-hidden p-3 shrink-0">
-                          {option.logo ? <img src={option.logo} alt="" className="w-full h-full object-contain" /> : <option.icon size={26} />}
-                        </div>
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-1">
-                            <h4 className="text-base font-bold text-slate-700 font-sans">{option.title}</h4>
-                            {isConnected && (
-                              <span className="px-2 py-0.5 bg-emerald-50 text-emerald-600 text-[10px] font-black rounded-full border border-emerald-100">Connected</span>
-                            )}
-                          </div>
-                          <p className="text-xs font-medium text-slate-400 leading-relaxed font-sans">{option.subtitle}</p>
-                        </div>
-                        <ChevronRight size={20} className="text-slate-300 group-hover:text-indigo-400 group-hover:translate-x-1 transition-all" />
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
-              {addStep === 'url' && (
-                <div className="flex-1 flex flex-col pt-6 px-10 text-center">
-                  <div className="space-y-8 mb-12">
-                    <h2 className="text-3xl font-bold text-slate-900 leading-tight font-sans">Paste your <span className="text-indigo-500">product link</span> to get product info</h2>
-                    <div className="space-y-4">
-                      <p className="text-[10px] font-bold text-slate-400 tracking-[0.2em] font-sans">AdsGo supports</p>
-                      <div className="flex items-center justify-center gap-4">
-                        {PLATFORM_ICONS.map(icon => (<div key={icon.id} className="w-10 h-10 rounded-full bg-white border border-slate-100 flex items-center justify-center p-2 shadow-sm hover:shadow-md hover:scale-110 transition-all cursor-default"><img src={icon.logo} alt={icon.id} className="w-full h-full object-contain" /></div>))}
-                        <div className="w-10 h-10 rounded-full bg-white border border-slate-100 flex items-center justify-center text-slate-300 font-bold text-sm">...</div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="space-y-8 max-w-[520px] mx-auto w-full flex-1 flex flex-col">
-                    <div className="space-y-3">
-                      <div className="relative group">
-                        <input type="text" value={productUrl} onChange={(e) => setProductUrl(e.target.value)} placeholder="e.g. amazon product link, shopify product link, etc." className={`w-full bg-slate-50 border-[1.5px] rounded-[24px] px-8 py-6 text-sm font-medium text-slate-700 placeholder:text-slate-300 focus:outline-none transition-all duration-300 ${urlError ? 'border-rose-400 bg-rose-50/20' : 'border-slate-100 focus:bg-white focus:border-indigo-300 focus:ring-[8px] focus:ring-indigo-500/5 shadow-inner'}`} />
-                        {urlError && <div className="absolute -bottom-7 left-4 flex items-center gap-1.5 text-rose-500 font-bold text-[10px] animate-in slide-in-from-top-1"><AlertTriangle size={12} />{urlError}</div>}
-                      </div>
-                    </div>
-                    <div className="mt-auto">
-                      <button onClick={handleImportAnalyzeUrl} className="w-full bg-indigo-600 text-white py-5 rounded-[22px] font-bold text-base hover:bg-indigo-700 shadow-xl shadow-indigo-100 transition-all active:scale-[0.97] font-sans">Analyze URL</button>
-                    </div>
-                  </div>
-                </div>
-              )}
-              {addStep === 'setup' && (<ProductSetupForm isOpen={true} initialData={productForm} onClose={() => setAddStep('options')} onCreate={handleCreateProduct} />)}
-              {addStep === 'shopify' && (
-                <div className="flex-1 flex flex-col justify-center items-center text-center space-y-8 py-6">
-                  {!isShopifyConnected ? (
-                    <>
-                      <div className="w-20 h-20 rounded-[24px] bg-slate-50 border border-slate-100 flex items-center justify-center p-4 shadow-inner">
-                        <img src="https://cdn.worldvectorlogo.com/logos/shopify.svg" alt="" className="w-full h-full object-contain" />
-                      </div>
-                      <div className="max-w-[320px] space-y-2">
-                        <h4 className="text-lg font-bold text-slate-900 font-sans">Connect to Shopify</h4>
-                        <p className="text-xs text-slate-400 leading-relaxed font-medium font-sans">Link your Shopify store to automatically import products and keep assets in sync.</p>
-                      </div>
-                      <button onClick={handleShopifyConnect} className="w-full max-w-[280px] bg-slate-900 text-white py-4 rounded-2xl font-bold text-sm hover:bg-black shadow-lg shadow-slate-200 transition-all active:scale-95 font-sans">Connect Shopify store</button>
-                    </>
-                  ) : (
-                    <>
-                      <div className="relative">
-                        <div className="w-20 h-20 rounded-[24px] bg-green-50 border border-green-100 flex items-center justify-center p-4 shadow-inner">
-                          <img src="https://cdn.worldvectorlogo.com/logos/shopify.svg" alt="" className="w-full h-full object-contain" />
-                        </div>
-                        <div className="absolute -top-1.5 -right-1.5 w-6 h-6 bg-green-500 border-4 border-white rounded-full flex items-center justify-center shadow-sm"><div className="w-1.5 h-1.5 bg-white rounded-full" /></div>
-                      </div>
-                      <div className="space-y-2">
-                        <h4 className="text-lg font-bold text-slate-900 font-sans">{shopifyStoreName}</h4>
-                        <div className="flex items-center justify-center gap-2"><span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" /><p className="text-xs text-green-600 font-bold tracking-wide font-sans">Connected</p></div>
-                      </div>
-                      <div className="w-full pt-6">
-                        <button onClick={() => { setIsShopifyConnected(false); setAuthStatus(p => ({ ...p, shopify: false })); }} className="px-8 py-3 bg-slate-50 border border-slate-100 rounded-2xl text-slate-400 hover:text-rose-500 hover:bg-rose-50 hover:border-rose-100 font-bold text-[13px] transition-all flex items-center gap-2 mx-auto shadow-sm font-sans"><Link2Off size={18} />Disconnect store</button>
-                      </div>
-                    </>
-                  )}
-                </div>
-              )}
-              {(addStep === 'gmc' || addStep === 'meta') && (
-                <div className="flex-1 flex flex-col justify-center items-center text-center space-y-8 py-6">
-                  {syncStates[addStep].isConnecting ? (
-                    <div className="flex flex-col items-center gap-4">
-                      <div className="w-20 h-20 rounded-[32px] bg-indigo-50 flex items-center justify-center shadow-inner">
-                        <Loader2 className="text-indigo-500 animate-spin" size={32} />
-                      </div>
-                      <p className="text-sm font-bold text-slate-900">Fetching your assets...</p>
-                    </div>
-                  ) : !syncStates[addStep].isConnected ? (
-                    <>
-                      <div className="w-20 h-20 rounded-[24px] bg-slate-50 border border-slate-100 flex items-center justify-center p-4 shadow-inner">
-                        <img src={addStep === 'gmc' ? 'https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://google.com&size=256' : 'https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://meta.com&size=256'} alt="" className="w-full h-full object-contain" />
-                      </div>
-                      <div className="max-w-[320px] space-y-2">
-                        <h4 className="text-lg font-bold text-slate-900 font-sans">{addStep === 'gmc' ? 'Google GMC' : 'Meta feeds'}</h4>
-                        <p className="text-xs text-slate-400 leading-relaxed font-medium font-sans">{addStep === 'gmc' ? 'Connect to Google Merchant Center to sync your products.' : 'Connect to Meta Commerce Manager to sync your product feeds.'}</p>
-                      </div>
-                      <button onClick={() => handleSyncConnect(addStep)} className="w-full max-w-[280px] bg-slate-900 text-white py-4 rounded-2xl font-bold text-sm hover:bg-black shadow-lg shadow-slate-200 transition-all active:scale-95 font-sans">Connect</button>
-                    </>
-                  ) : (
-                    <>
-                      <div className="relative">
-                        <div className="w-20 h-20 rounded-[24px] bg-green-50 border border-green-100 flex items-center justify-center p-4 shadow-inner">
-                          <img src={addStep === 'gmc' ? 'https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://google.com&size=256' : 'https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://meta.com&size=256'} alt="" className="w-full h-full object-contain" />
-                        </div>
-                        <div className="absolute -top-1.5 -right-1.5 w-6 h-6 bg-green-500 border-4 border-white rounded-full flex items-center justify-center shadow-sm">
-                          <div className="w-1.5 h-1.5 bg-white rounded-full" />
-                        </div>
-                      </div>
-                      <div className="space-y-2">
-                        <h4 className="text-lg font-bold text-slate-900 font-sans">{syncStates[addStep].email}</h4>
-                        <div className="flex items-center justify-center gap-2">
-                          <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                          <p className="text-xs text-green-600 font-bold tracking-wide font-sans">Connected</p>
-                        </div>
-                      </div>
-                      <div className="w-full pt-6">
-                        <button onClick={() => handleSyncDisconnect(addStep)} className="px-8 py-3 bg-rose-50 text-rose-500 border border-rose-100 rounded-2xl font-bold text-[13px] transition-all flex items-center gap-2 mx-auto shadow-sm font-sans"><Link2Off size={18} />Disconnect</button>
-                      </div>
-                    </>
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
+      {isAddModalOpen && <AddProductModal onClose={closeAddModal} authStatus={authStatus} handleAuthorize={handleAuthorize} isAuthLoading={isAuthLoading} shopifyStoreName={shopifyStoreName} setAuthStatus={setAuthStatus} setIsShopifyConnected={setIsShopifyConnected} isShopifyConnected={isShopifyConnected} syncStates={syncStates} handleSyncConnect={handleSyncConnect} handleSyncDisconnect={handleSyncDisconnect} addStep={addStep} setAddStep={setAddStep} productUrl={productUrl} setProductUrl={setProductUrl} urlError={urlError} handleImportAnalyzeUrl={handleImportAnalyzeUrl} isImportAnalyzing={isImportAnalyzing} productForm={productForm} handleCreateProduct={handleCreateProduct} />}
     </div>
   );
 };
 
-const ModalWrapper = ({ children, zIndex }) => (
-  <div 
-    className="fixed inset-0 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in"
-    style={{ zIndex }}
-  >
-    {children}
-  </div>
-);
+const ModalWrapper = ({ children }) => {
+  const zIndex = useZIndex(true);
+  return (
+    <div 
+      className="fixed inset-0 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in"
+      style={{ zIndex }}
+    >
+      {children}
+    </div>
+  );
+};
+
+const AddProductModal = ({ onClose, authStatus, handleAuthorize, isAuthLoading, shopifyStoreName, setAuthStatus, setIsShopifyConnected, isShopifyConnected, syncStates, handleSyncConnect, handleSyncDisconnect, addStep, setAddStep, productUrl, setProductUrl, urlError, handleImportAnalyzeUrl, isImportAnalyzing, productForm, handleCreateProduct }) => {
+  const zIndex = useZIndex(true);
+  return (
+    <div 
+      className="fixed inset-0 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200"
+      style={{ zIndex }}
+    >
+      <div className={`bg-white rounded-[40px] w-full shadow-2xl border border-slate-100 animate-in zoom-in-95 duration-200 flex flex-col relative transition-all duration-500 ${addStep === 'setup' ? 'max-w-4xl h-[90vh]' : 'max-w-2xl min-h-[400px]'}`}>
+        {isImportAnalyzing && (
+          <div className="absolute inset-0 z-[120] bg-white rounded-[40px] flex flex-col items-center justify-center p-10 text-center animate-in fade-in duration-300">
+            <div className="w-20 h-20 rounded-[32px] bg-indigo-50 flex items-center justify-center mb-6 shadow-inner relative">
+              <div className="absolute inset-0 rounded-[32px] border-4 border-indigo-100 border-t-indigo-500 animate-spin" />
+              <Loader2 className="text-indigo-500 animate-spin" size={32} />
+            </div>
+            <h3 className="text-xl font-bold text-slate-900 mb-2 font-sans">Analyzing product info...</h3>
+            <p className="text-xs text-slate-400 font-medium mb-10 max-w-[320px] font-sans">We're fetching details from the URL. This might take a few moments.</p>
+            <button onClick={onClose} className="px-10 py-3.5 bg-slate-900 text-white rounded-2xl font-bold text-sm hover:bg-black transition-all active:scale-95 shadow-lg shadow-slate-200 font-sans">Close and analyze in background</button>
+          </div>
+        )}
+        <div className="p-8 pb-4 flex justify-between items-center shrink-0">
+          <div className="flex items-center gap-4">
+            {addStep !== 'options' && (<button onClick={() => setAddStep('options')} className="p-2.5 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-full transition-all"><ArrowLeft size={20} /></button>)}
+            <h3 className="text-xl font-bold text-slate-900 font-sans">{addStep === 'options' ? '请选择同步产品 data 方式' : addStep === 'url' ? 'Import from URL' : addStep === 'setup' ? 'Setup your product' : addStep === 'shopify' ? 'Sync from Shopify' : addStep === 'gmc' ? 'Sync from Google GMC' : 'Sync from Meta feeds'}</h3>
+          </div>
+          <button onClick={onClose} className="p-2.5 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-full transition-all"><X size={20} /></button>
+        </div>
+        <div className="px-8 pb-8 flex-1 flex flex-col overflow-hidden">
+          {addStep === 'options' && (
+            <div className="space-y-4 pt-4">
+              {ADD_OPTIONS.filter(opt => ['shopify', 'meta', 'gmc'].includes(opt.id)).map((option) => {
+                const isConnected = option.id === 'shopify' ? authStatus.shopify : option.id === 'meta' ? authStatus.meta : authStatus.google;
+                return (
+                  <button key={option.id} onClick={() => setAddStep(option.id)} className="w-full group flex items-center gap-6 p-6 bg-slate-50 border border-slate-100 rounded-[28px] hover:bg-white hover:shadow-xl hover:border-indigo-100 transition-all text-left">
+                    <div className="w-14 h-14 rounded-2xl bg-white border border-slate-100 flex items-center justify-center text-slate-400 group-hover:text-indigo-50 group-hover:border-indigo-50 group-hover:shadow-inner transition-all overflow-hidden p-3 shrink-0">
+                      {option.logo ? <img src={option.logo} alt="" className="w-full h-full object-contain" /> : <option.icon size={26} />}
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-1">
+                        <h4 className="text-base font-bold text-slate-700 font-sans">{option.title}</h4>
+                        {isConnected && (
+                          <span className="px-2 py-0.5 bg-emerald-50 text-emerald-600 text-[10px] font-black rounded-full border border-emerald-100">Connected</span>
+                        )}
+                      </div>
+                      <p className="text-xs font-medium text-slate-400 leading-relaxed font-sans">{option.subtitle}</p>
+                    </div>
+                    <ChevronRight size={20} className="text-slate-300 group-hover:text-indigo-400 group-hover:translate-x-1 transition-all" />
+                  </button>
+                );
+              })}
+            </div>
+          )}
+          {addStep === 'url' && (
+            <div className="flex-1 flex flex-col pt-6 px-10 text-center">
+              <div className="space-y-8 mb-12">
+                <h2 className="text-3xl font-bold text-slate-900 leading-tight font-sans">Paste your <span className="text-indigo-500">product link</span> to get product info</h2>
+                <div className="space-y-4">
+                  <p className="text-[10px] font-bold text-slate-400 tracking-[0.2em] font-sans">AdsGo supports</p>
+                  <div className="flex items-center justify-center gap-4">
+                    {PLATFORM_ICONS.map(icon => (<div key={icon.id} className="w-10 h-10 rounded-full bg-white border border-slate-100 flex items-center justify-center p-2 shadow-sm hover:shadow-md hover:scale-110 transition-all cursor-default"><img src={icon.logo} alt={icon.id} className="w-full h-full object-contain" /></div>))}
+                    <div className="w-10 h-10 rounded-full bg-white border border-slate-100 flex items-center justify-center text-slate-300 font-bold text-sm">...</div>
+                  </div>
+                </div>
+              </div>
+              <div className="space-y-8 max-w-[520px] mx-auto w-full flex-1 flex flex-col">
+                <div className="space-y-3">
+                  <div className="relative group">
+                    <input type="text" value={productUrl} onChange={(e) => setProductUrl(e.target.value)} placeholder="e.g. amazon product link, shopify product link, etc." className={`w-full bg-slate-50 border-[1.5px] rounded-[24px] px-8 py-6 text-sm font-medium text-slate-700 placeholder:text-slate-300 focus:outline-none transition-all duration-300 ${urlError ? 'border-rose-400 bg-rose-50/20' : 'border-slate-100 focus:bg-white focus:border-indigo-300 focus:ring-[8px] focus:ring-indigo-500/5 shadow-inner'}`} />
+                    {urlError && <div className="absolute -bottom-7 left-4 flex items-center gap-1.5 text-rose-500 font-bold text-[10px] animate-in slide-in-from-top-1"><AlertTriangle size={12} />{urlError}</div>}
+                  </div>
+                </div>
+                <div className="mt-auto">
+                  <button onClick={handleImportAnalyzeUrl} className="w-full bg-indigo-600 text-white py-5 rounded-[22px] font-bold text-base hover:bg-indigo-700 shadow-xl shadow-indigo-100 transition-all active:scale-[0.97] font-sans">Analyze URL</button>
+                </div>
+              </div>
+            </div>
+          )}
+          {addStep === 'setup' && (<ProductSetupForm isOpen={true} initialData={productForm} onClose={() => setAddStep('options')} onCreate={handleCreateProduct} />)}
+          {addStep === 'shopify' && (
+            <div className="flex-1 flex flex-col justify-center items-center text-center space-y-8 py-6">
+              {!isShopifyConnected ? (
+                <>
+                  <div className="w-20 h-20 rounded-[24px] bg-slate-50 border border-slate-100 flex items-center justify-center p-4 shadow-inner">
+                    <img src="https://cdn.worldvectorlogo.com/logos/shopify.svg" alt="" className="w-full h-full object-contain" />
+                  </div>
+                  <div className="max-w-[320px] space-y-2">
+                    <h4 className="text-lg font-bold text-slate-900 font-sans">Connect to Shopify</h4>
+                    <p className="text-xs text-slate-400 leading-relaxed font-medium font-sans">Link your Shopify store to automatically import products and keep assets in sync.</p>
+                  </div>
+                  <button onClick={() => handleAuthorize('shopify')} disabled={isAuthLoading} className="w-full max-w-[280px] bg-slate-900 text-white py-4 rounded-2xl font-bold text-sm hover:bg-black shadow-lg shadow-slate-200 transition-all active:scale-95 font-sans">Connect Shopify store</button>
+                </>
+              ) : (
+                <>
+                  <div className="relative">
+                    <div className="w-20 h-20 rounded-[24px] bg-green-50 border border-green-100 flex items-center justify-center p-4 shadow-inner">
+                      <img src="https://cdn.worldvectorlogo.com/logos/shopify.svg" alt="" className="w-full h-full object-contain" />
+                    </div>
+                    <div className="absolute -top-1.5 -right-1.5 w-6 h-6 bg-green-500 border-4 border-white rounded-full flex items-center justify-center shadow-sm"><div className="w-1.5 h-1.5 bg-white rounded-full" /></div>
+                  </div>
+                  <div className="space-y-2">
+                    <h4 className="text-lg font-bold text-slate-900 font-sans">{shopifyStoreName}</h4>
+                    <div className="flex items-center justify-center gap-2"><span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" /><p className="text-xs text-green-600 font-bold tracking-wide font-sans">Connected</p></div>
+                  </div>
+                  <div className="w-full pt-6">
+                    <button onClick={() => { setIsShopifyConnected(false); setAuthStatus(p => ({ ...p, shopify: false })); }} className="px-8 py-3 bg-slate-50 border border-slate-100 rounded-2xl text-slate-400 hover:text-rose-500 hover:bg-rose-50 hover:border-rose-100 font-bold text-[13px] transition-all flex items-center gap-2 mx-auto shadow-sm font-sans"><Link2Off size={18} />Disconnect store</button>
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+          {(addStep === 'gmc' || addStep === 'meta') && (
+            <div className="flex-1 flex flex-col justify-center items-center text-center space-y-8 py-6">
+              {syncStates[addStep].isConnecting ? (
+                <div className="flex flex-col items-center gap-4">
+                  <div className="w-20 h-20 rounded-[32px] bg-indigo-50 flex items-center justify-center shadow-inner">
+                    <Loader2 className="text-indigo-500 animate-spin" size={32} />
+                  </div>
+                  <p className="text-sm font-bold text-slate-900">Fetching your assets...</p>
+                </div>
+              ) : !syncStates[addStep].isConnected ? (
+                <>
+                  <div className="w-20 h-20 rounded-[24px] bg-slate-50 border border-slate-100 flex items-center justify-center p-4 shadow-inner">
+                    <img src={addStep === 'gmc' ? 'https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://google.com&size=256' : 'https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://meta.com&size=256'} alt="" className="w-full h-full object-contain" />
+                  </div>
+                  <div className="max-w-[320px] space-y-2">
+                    <h4 className="text-lg font-bold text-slate-900 font-sans">{addStep === 'gmc' ? 'Google GMC' : 'Meta feeds'}</h4>
+                    <p className="text-xs text-slate-400 leading-relaxed font-medium font-sans">{addStep === 'gmc' ? 'Connect to Google Merchant Center to sync your products.' : 'Connect to Meta Commerce Manager to sync your product feeds.'}</p>
+                  </div>
+                  <button onClick={() => handleSyncConnect(addStep)} className="w-full max-w-[280px] bg-slate-900 text-white py-4 rounded-2xl font-bold text-sm hover:bg-black shadow-lg shadow-slate-200 transition-all active:scale-95 font-sans">Connect</button>
+                </>
+              ) : (
+                <>
+                  <div className="relative">
+                    <div className="w-20 h-20 rounded-[24px] bg-green-50 border border-green-100 flex items-center justify-center p-4 shadow-inner">
+                      <img src={addStep === 'gmc' ? 'https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://google.com&size=256' : 'https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://meta.com&size=256'} alt="" className="w-full h-full object-contain" />
+                    </div>
+                    <div className="absolute -top-1.5 -right-1.5 w-6 h-6 bg-green-500 border-4 border-white rounded-full flex items-center justify-center shadow-sm">
+                      <div className="w-1.5 h-1.5 bg-white rounded-full" />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <h4 className="text-lg font-bold text-slate-900 font-sans">{syncStates[addStep].email}</h4>
+                    <div className="flex items-center justify-center gap-2">
+                      <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                      <p className="text-xs text-green-600 font-bold tracking-wide font-sans">Connected</p>
+                    </div>
+                  </div>
+                  <div className="w-full pt-6">
+                    <button onClick={() => handleSyncDisconnect(addStep)} className="px-8 py-3 bg-rose-50 text-rose-500 border border-rose-100 rounded-2xl font-bold text-[13px] transition-all flex items-center gap-2 mx-auto shadow-sm font-sans"><Link2Off size={18} />Disconnect</button>
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const ProductSetupForm = ({ isOpen, initialData, onClose, onCreate }) => {
   return null; // Placeholder

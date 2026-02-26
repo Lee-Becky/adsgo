@@ -7,13 +7,13 @@ import { getNextModalZIndex } from '../constants/zIndex';
  * @returns {number} 应该使用的 zIndex
  */
 export const useZIndex = (isOpen) => {
-  const [zIndex, setZIndex] = useState(0);
+  const [zIndex, setZIndex] = useState(() => isOpen ? getNextModalZIndex() : 0);
 
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && zIndex === 0) {
       setZIndex(getNextModalZIndex());
     }
-  }, [isOpen]);
+  }, [isOpen, zIndex]);
 
   return zIndex;
 };
