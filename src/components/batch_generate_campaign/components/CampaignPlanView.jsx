@@ -67,7 +67,7 @@ const CampaignPlanView = ({
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
       <div className="space-y-4">
         <div className="flex items-center gap-2 px-2">
-          <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-widest">CAMPAIGN 架构策略</h4>
+          <h4 className="text-[11px] font-black text-slate-400 tracking-widest">Campaign 架构策略</h4>
           <div className="w-5 h-5 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center cursor-help shadow-sm">
             <Info size={12} />
           </div>
@@ -75,11 +75,11 @@ const CampaignPlanView = ({
 
         <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm space-y-6">
           <div className="space-y-3">
-            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">选择发布逻辑</label>
+            <label className="text-[10px] font-bold text-slate-400 tracking-widest px-1">选择发布逻辑</label>
             <div className="grid grid-cols-3 gap-3">
               {[
-                { id: 'PER_PRODUCT', label: '每款商品1组', desc: '1 Adset per SKU' },
-                { id: 'ALL_PRODUCTS_PER_SET', label: '每组内包含全部商品', desc: 'All SKU in every Adset' },
+                { id: 'PER_PRODUCT', label: '每款产品1组', desc: '1 Adset per SKU' },
+                { id: 'ALL_PRODUCTS_PER_SET', label: '每组内包含全部产品', desc: 'All SKU in every Adset' },
                 { id: 'BY_AD_COUNT', label: '按素材量拆组', desc: 'Fixed Ads per Adset' },
               ].map(opt => (
                 <button
@@ -91,7 +91,7 @@ const CampaignPlanView = ({
                       : 'border-slate-100 hover:border-slate-200 bg-white'
                   }`}
                 >
-                  <p className={`text-[11px] font-black uppercase ${structure.strategy === opt.id ? 'text-indigo-600' : 'text-slate-800'}`}>{opt.label}</p>
+                  <p className={`text-[11px] font-black ${structure.strategy === opt.id ? 'text-indigo-600' : 'text-slate-800'}`}>{opt.label}</p>
                   <p className="text-[9px] text-slate-400 font-bold mt-1">{opt.desc}</p>
                 </button>
               ))}
@@ -100,7 +100,7 @@ const CampaignPlanView = ({
 
           {structure.strategy === 'BY_AD_COUNT' && (
             <div className="animate-in slide-in-from-top-2 duration-200">
-               <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1 mb-2 block">每个 Adset 包含素材数</label>
+               <label className="text-[10px] font-bold text-slate-400 tracking-widest px-1 mb-2 block">每个 Adset 包含素材数</label>
                <div className="relative max-w-[200px]">
                 <select 
                   value={structure.adsPerSet}
@@ -116,7 +116,7 @@ const CampaignPlanView = ({
 
           {structure.strategy === 'ALL_PRODUCTS_PER_SET' && (
             <div className="animate-in slide-in-from-top-2 duration-200">
-               <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1 mb-2 block">Adset 组数 (1-10)</label>
+               <label className="text-[10px] font-bold text-slate-400 tracking-widest px-1 mb-2 block">Adset 组数 (1-10)</label>
                <div className="relative max-w-[200px]">
                 <select 
                   value={structure.numAdsets}
@@ -137,7 +137,7 @@ const CampaignPlanView = ({
                   <Briefcase size={28} />
                 </div>
                 <div className="absolute -bottom-6 flex flex-col items-center">
-                  <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Target Campaign</span>
+                  <span className="text-[9px] font-black text-slate-400 tracking-widest">Target Campaign</span>
                   <div className="w-[1px] h-6 bg-slate-200 mt-1"></div>
                 </div>
               </div>
@@ -164,7 +164,7 @@ const CampaignPlanView = ({
                         </div>
                       </button>
                       
-                      <p className="text-[8px] font-black text-slate-400 uppercase truncate max-w-[80px] text-center mb-3">{group.name}</p>
+                      <p className="text-[8px] font-black text-slate-400 truncate max-w-[80px] text-center mb-3">{group.name}</p>
                       
                       <div className="flex flex-wrap gap-1 justify-center max-w-[120px]">
                         {group.ads.slice(0, 4).map((ad, adIdx) => (
@@ -187,7 +187,7 @@ const CampaignPlanView = ({
               {hasLalAudience && (
                 <div className="w-full mt-8 pt-6 border-t border-slate-200/50 animate-in fade-in slide-in-from-top-2">
                   <div className="relative">
-                    <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest px-1 mb-2 block flex items-center gap-1.5">
+                    <label className="text-[9px] font-black text-slate-400 tracking-widest px-1 mb-2 block flex items-center gap-1.5">
                       <Sparkles size={10} className="text-purple-500" />
                       LAL 包含受众选项 (多选)
                     </label>
@@ -200,7 +200,7 @@ const CampaignPlanView = ({
                           <span className="text-xs font-bold text-slate-300">请选择 LAL 受众源...</span>
                         ) : (
                           lalOptions.map(opt => (
-                            <span key={opt} className="px-2 py-0.5 bg-purple-50 text-purple-600 rounded-lg text-[9px] font-black uppercase tracking-tighter border border-purple-100">
+                            <span key={opt} className="px-2 py-0.5 bg-purple-50 text-purple-600 rounded-lg text-[9px] font-black tracking-tighter border border-purple-100">
                               {opt.split(' ')[1] || opt}
                             </span>
                           ))
@@ -235,17 +235,17 @@ const CampaignPlanView = ({
       </div>
 
       <div className="space-y-4">
-        <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-widest px-2">预算配置与预估消耗</h4>
+        <h4 className="text-[11px] font-black text-slate-400 tracking-widest px-2">预算配置与预估消耗</h4>
         <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm flex flex-col gap-6 h-full">
           <div className="space-y-3">
             <div className="flex items-center justify-between px-1">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">目标投放系列 (Campaign)</label>
+              <label className="text-[10px] font-black text-slate-400 tracking-widest px-1">目标投放系列 (Campaign)</label>
               <button 
                 onClick={onSelectCampaign}
                 className="flex items-center gap-1.5 text-indigo-600 hover:text-indigo-700 transition-colors"
               >
                 <Edit3 size={12} />
-                <span className="text-[10px] font-black uppercase">选择已有</span>
+                <span className="text-[10px] font-black">选择已有</span>
               </button>
             </div>
             <div className={`flex items-center gap-4 p-5 rounded-[1.5rem] border-2 transition-all ${isExistingCampaign ? 'bg-indigo-50 border-indigo-200' : 'bg-slate-50 border-slate-100'}`}>
@@ -256,7 +256,7 @@ const CampaignPlanView = ({
                 <p className="text-xs font-black text-slate-900 truncate">
                   {selectedCampaign?.name || '创建全新系列 (Create New)'}
                 </p>
-                {isExistingCampaign && <p className="text-[9px] text-indigo-400 font-bold uppercase mt-0.5">ID: {selectedCampaign.id}</p>}
+                {isExistingCampaign && <p className="text-[9px] text-indigo-400 font-bold mt-0.5">ID: {selectedCampaign.id}</p>}
               </div>
               {isExistingCampaign && <Lock size={14} className="text-indigo-300 shrink-0" />}
             </div>
@@ -290,7 +290,7 @@ const CampaignPlanView = ({
                 onChange={(e) => onBudgetChange(Number(e.target.value))}
                 className="w-full bg-transparent border-none outline-none pl-16 pr-4 text-4xl font-black text-slate-800"
               />
-              <span className="text-[10px] font-black text-slate-400 uppercase mr-4">
+              <span className="text-[10px] font-black text-slate-400 mr-4">
                 {budgetType === 'ABO' ? 'Per AdSet' : 'Total Campaign'}
               </span>
             </div>
@@ -299,12 +299,12 @@ const CampaignPlanView = ({
           <div className="bg-slate-900 p-8 rounded-[2rem] text-white shadow-xl relative overflow-hidden">
              <div className="flex items-center gap-2 mb-2">
                 <Sparkles size={14} className="text-indigo-400" />
-                <p className="text-[10px] font-black uppercase opacity-60 tracking-widest">预估日均消耗</p>
+                <p className="text-[10px] font-black opacity-60 tracking-widest">预估日均消耗</p>
               </div>
               <div className="flex items-end justify-between">
                 <div>
                   <p className="text-4xl font-black text-white">${estimatedTotalDaily}</p>
-                  <p className="text-[10px] text-indigo-400 font-bold mt-1 uppercase tracking-widest">
+                  <p className="text-[10px] text-indigo-400 font-bold mt-1 tracking-widest">
                     {budgetType === 'ABO' ? `${dailyBudget} * ${adSetGroups.length} Adsets` : '系列全局消耗'}
                   </p>
                 </div>
@@ -313,7 +313,7 @@ const CampaignPlanView = ({
                     <Layers size={14} className="text-indigo-400" />
                     <p className="text-xl font-black text-white">{adSetGroups.length}</p>
                   </div>
-                  <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">AdSets 数量</p>
+                  <p className="text-[9px] text-slate-400 font-bold tracking-widest">AdSets 数量</p>
                 </div>
               </div>
           </div>

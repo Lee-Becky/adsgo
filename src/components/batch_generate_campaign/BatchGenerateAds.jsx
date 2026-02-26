@@ -1,6 +1,11 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { X, Globe, Monitor, Target, ShoppingBag, ChevronDown, Sparkles, Search, Briefcase, Check, Layout, Tag, Link2, Info, Settings, Plus, FileText, Type, Calendar, Clock, Rocket, Facebook, Instagram, Hash, Loader2, CheckCircle2 } from 'lucide-react';
-import BrandBar from './components/BrandBar';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { 
+  X, Globe, Monitor, Target, ShoppingBag, ChevronDown, Sparkles, Search, 
+  Briefcase, Check, Layout, Tag, Link2, Info, Settings, Plus, FileText, 
+  Type, Calendar, Clock, Rocket, Facebook, Instagram, Hash, Loader2, 
+  CheckCircle2, Layers, RefreshCw, MapPin, Zap, ArrowRight, ChevronLeft, 
+  Megaphone, MousePointer2, Users, Smartphone, ChevronRight 
+} from 'lucide-react';
 import ProductSelector from './components/ProductSelector';
 import CampaignPlanView from './components/CampaignPlanView';
 import CampaignPreviewView from './components/CampaignPreviewView';
@@ -22,9 +27,68 @@ const MOCK_PAGES = [
   { id: 'page_456', name: 'Retro Fashion Daily' },
 ];
 
+const PLATFORMS = [
+  { id: 'meta', name: 'Meta', logo: 'https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://meta.com&size=256' },
+  { id: 'google', name: 'Google', logo: 'https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://google.com&size=256' },
+  { id: 'tiktok', name: 'TikTok', logo: 'https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://tiktok.com&size=256', disabled: true },
+  { id: 'bing', name: 'Bing', logo: 'https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://bing.com&size=256', disabled: true }
+];
+
+const CAMPAIGN_OBJECTIVES = [
+  { value: 'awareness_engagement', label: 'Awareness & Engagement', icon: Megaphone, color: 'text-rose-500', bg: 'bg-rose-50', description: 'Reach more people' },
+  { value: 'traffic', label: 'Traffic', icon: MousePointer2, color: 'text-blue-500', bg: 'bg-blue-50', description: 'Drive site visits' },
+  { value: 'leads', label: 'Leads', icon: Users, color: 'text-amber-500', bg: 'bg-amber-50', description: 'Find prospects' },
+  { value: 'sales_conversions', label: 'Sales & Conversions', icon: ShoppingBag, color: 'text-emerald-500', bg: 'bg-emerald-50', description: 'Drive transactions' },
+  { value: 'app_promotion', label: 'App Promotion', icon: Smartphone, color: 'text-indigo-500', bg: 'bg-indigo-50', description: 'Install & usage' }
+];
+
+const ADSET_GOALS_MAPPING = {
+  awareness_engagement: [
+    { value: 'impressions', label: 'Impressions' },
+    { value: 'post_engagement', label: 'Post engagement' },
+    { value: 'conversations', label: 'Conversations' }
+  ],
+  traffic: [
+    { value: 'impressions', label: 'Impressions' },
+    { value: 'link_clicks', label: 'Link clicks' },
+    { value: 'page_views', label: 'Page views' }
+  ],
+  leads: [
+    { value: 'leads_landing_page', label: 'Leads within landing-page', needsEvent: true },
+    { value: 'instant_form_leads', label: 'Instant form leads' },
+    { value: 'whatsapp', label: 'WhatsApp' },
+    { value: 'calls', label: 'Calls' }
+  ],
+  sales_conversions: [
+    { value: 'in_web_actions', label: 'In-web actions', needsEvent: true }
+  ],
+  app_promotion: [
+    { value: 'installs', label: 'Installs' },
+    { value: 'in_app_actions', label: 'In-app actions', needsEvent: true }
+  ]
+};
+
+const STANDARD_EVENTS = [
+  'Purchase', 'AddToCart', 'InitiateCheckout', 'Lead', 
+  'CompleteRegistration', 'SubmitApplication', 'Contact', 
+  'Search', 'ViewContent', 'Subscribe', 'CustomizeProduct',
+  'Donate', 'FindLocation', 'Schedule', 'StartTrial'
+];
+
+const ALL_COUNTRIES = [
+  { code: 'US', name: 'United States' },
+  { code: 'GB', name: 'United Kingdom' },
+  { code: 'CA', name: 'Canada' },
+  { code: 'AU', name: 'Australia' },
+  { code: 'DE', name: 'Germany' },
+  { code: 'FR', name: 'France' },
+  { code: 'JP', name: 'Japan' },
+  { code: 'SG', name: 'Singapore' },
+  { code: 'BR', name: 'Brazil' },
+  { code: 'IN', name: 'India' }
+];
+
 const BatchGenerateAds = () => {
-  const [isBrandSaved, setIsBrandSaved] = useState(false);
-  const [showBrandSuggestion, setShowBrandSuggestion] = useState(false);
   const [selectedProducts, setSelectedProducts] = useState([]);
   const [productCreativesMap, setProductCreativesMap] = useState({});
   const [productReportsMap, setProductReportsMap] = useState({});
@@ -43,18 +107,36 @@ const BatchGenerateAds = () => {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
 
-  const [country, setCountry] = useState('United States (US)');
-  const [media, setMedia] = useState('Meta (FB/IG)');
-  const [goal, setGoal] = useState('销量');
-  const [optEvent, setOptEvent] = useState('成功购买');
+  const [selectedLocations, setSelectedLocations] = useState([{ code: 'US', name: 'United States' }]);
+  const [platform, setPlatform] = useState(PLATFORMS[0]);
+  const [objective, setObjective] = useState('sales_conversions');
+  const [adsetGoal, setAdsetGoal] = useState('in_web_actions');
+  const [event, setEvent] = useState('Purchase');
 
-  const [activeDropdown, setActiveDropdown] = useState(null);
+  const [openDropdown, setOpenDropdown] = useState(null); // 'location', 'platform', 'objective', 'event'
+  const [locationSearch, setLocationSearch] = useState('');
+  const [eventSearch, setEventSearch] = useState('');
+  const [objectiveStage, setObjectiveStage] = useState('goal'); // 'goal' or 'event'
+
+  const dropdownRef = useRef(null);
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setOpenDropdown(null);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const [selectedCampaignId, setSelectedCampaignId] = useState(null);
   const [showCampaignModal, setShowCampaignModal] = useState(false);
+  const [showAccountSelector, setShowAccountSelector] = useState(false);
 
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisFinished, setAnalysisFinished] = useState(false);
+  
+  const [advancedOpen, setAdvancedOpen] = useState(false);
   
   const [hasGeneratedOnce, setHasGeneratedOnce] = useState(() => {
     return localStorage.getItem('has_generated_once') === 'true';
@@ -93,19 +175,17 @@ const BatchGenerateAds = () => {
     }
   }, [selectedCampaign]);
 
+  const currentObjectiveObj = CAMPAIGN_OBJECTIVES.find(o => o.value === objective);
+  const availableGoals = ADSET_GOALS_MAPPING[objective] || [];
+  const currentGoalObj = availableGoals.find(g => g.value === adsetGoal);
+
   const detectedBrand = {
     name: 'Luminaire Vintage',
     logo: 'https://picsum.photos/seed/logo1/100/100',
     url: 'luminaire-style.com',
-    goal: goal.split(' ')[0],
-    country: country
+    goal: currentObjectiveObj?.label || '',
+    country: selectedLocations[0]?.name || ''
   };
-
-  useEffect(() => {
-    const savedBrand = localStorage.getItem('saved_brand');
-    if (savedBrand) setIsBrandSaved(true);
-    else setShowBrandSuggestion(true);
-  }, []);
 
   const handleUpdateProductCreatives = (productId, creatives) => {
     const creativesWithId = creatives.map(c => ({ ...c, productId }));
@@ -137,6 +217,26 @@ const BatchGenerateAds = () => {
     setEndDate(end.toISOString().split('T')[0]);
   };
 
+  const toggleLocation = (country) => {
+    const isSelected = selectedLocations.some(l => l.code === country.code);
+    if (isSelected) {
+      if (selectedLocations.length > 1) {
+        setSelectedLocations(selectedLocations.filter(l => l.code !== country.code));
+      }
+    } else {
+      setSelectedLocations([...selectedLocations, country]);
+    }
+  };
+
+  const filteredCountries = ALL_COUNTRIES.filter(c => 
+    c.name.toLowerCase().includes(locationSearch.toLowerCase()) || 
+    c.code.toLowerCase().includes(locationSearch.toLowerCase())
+  );
+
+  const filteredEvents = STANDARD_EVENTS.filter(ev => 
+    ev.toLowerCase().includes(eventSearch.toLowerCase())
+  );
+
   const startPublishing = () => {
     setPublishStep('PROGRESS');
     setPublishProgress(0);
@@ -152,43 +252,6 @@ const BatchGenerateAds = () => {
     }, 400);
   };
 
-  const SelectionField = ({ label, value, icon, options, onSelect, id }) => {
-    const isOpen = activeDropdown === id;
-    return (
-      <div className="space-y-3 relative">
-        <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] px-1">{label}</label>
-        <div 
-          onClick={() => setActiveDropdown(isOpen ? null : id)}
-          className={`flex items-center justify-between p-5 bg-white border-2 rounded-[1.5rem] cursor-pointer transition-all ${isOpen ? 'border-indigo-600 shadow-lg' : 'border-slate-100 hover:border-slate-200 shadow-sm'}`}
-        >
-          <div className="flex items-center min-w-0">
-            <span className={`mr-4 p-2 rounded-xl shadow-sm border transition-colors ${isOpen ? 'bg-indigo-600 text-white border-indigo-500' : 'bg-slate-50 text-indigo-600 border-slate-100'}`}>
-              {icon}
-            </span>
-            <span className="text-xs font-black text-slate-800 tracking-tight truncate">{value}</span>
-          </div>
-          <ChevronDown size={14} className={`text-slate-300 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
-        </div>
-        {isOpen && (
-          <>
-            <div className="fixed inset-0 z-40" onClick={() => setActiveDropdown(null)}></div>
-            <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2">
-              {options.map(opt => (
-                <div 
-                  key={opt}
-                  onClick={() => { onSelect(opt); setActiveDropdown(null); }}
-                  className="flex items-center justify-between px-5 py-4 hover:bg-slate-50 cursor-pointer transition-colors group"
-                >
-                  <span className={`text-xs font-bold ${value === opt ? 'text-indigo-600' : 'text-slate-600'}`}>{opt}</span>
-                  {value === opt && <Check size={14} className="text-indigo-600" />}
-                </div>
-              ))}
-            </div>
-          </>
-        )}
-      </div>
-    );
-  };
 
   const CampaignSearchModal = () => {
     const [search, setSearch] = useState('');
@@ -220,7 +283,7 @@ const BatchGenerateAds = () => {
             >
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-indigo-50 text-indigo-400 rounded-lg flex items-center justify-center"><Plus size={20}/></div>
-                <span className="text-sm font-black text-slate-400 uppercase">创建全新系列 (Default)</span>
+                <span className="text-sm font-black text-slate-400">创建全新系列 (Default)</span>
               </div>
             </div>
             {filtered.map(c => (
@@ -252,7 +315,7 @@ const BatchGenerateAds = () => {
               <div className="p-10 border-b border-slate-100 flex items-center justify-between">
                 <div>
                   <h3 className="text-2xl font-black text-slate-900">发布方案配置</h3>
-                  <p className="text-xs text-slate-400 font-bold uppercase tracking-widest mt-1">Final Sync to Meta Ecosystem</p>
+                  <p className="text-xs text-slate-400 font-bold tracking-widest mt-1">Final Sync to Meta Ecosystem</p>
                 </div>
                 <button onClick={() => setShowPublishModal(false)} className="p-2 hover:bg-slate-50 rounded-full text-slate-300 transition-colors">
                   <X size={24} />
@@ -262,9 +325,9 @@ const BatchGenerateAds = () => {
               <div className="p-12 space-y-8">
                 <div className="grid grid-cols-1 gap-6">
                   <div className="space-y-3">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">广告账户</label>
+                    <label className="text-[10px] font-black text-slate-400 tracking-widest px-1">广告账户</label>
                     <select 
-                      value={selectedAccount.id}
+                      value={selectedAccount?.id}
                       onChange={(e) => setSelectedAccount(MOCK_ACCOUNTS.find(a => a.id === e.target.value))}
                       className="w-full h-14 px-5 bg-slate-50 border-2 border-slate-100 rounded-2xl text-sm font-bold text-slate-800 focus:border-indigo-600 outline-none transition-all appearance-none"
                     >
@@ -274,9 +337,9 @@ const BatchGenerateAds = () => {
 
                   <div className="grid grid-cols-2 gap-6">
                     <div className="space-y-3">
-                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1 flex items-center gap-1.5"><Facebook size={12} className="text-blue-600" /> Facebook 粉丝页</label>
+                      <label className="text-[10px] font-black text-slate-400 tracking-widest px-1 flex items-center gap-1.5"><Facebook size={12} className="text-blue-600" /> Facebook 粉丝页</label>
                       <select 
-                        value={selectedFBPage.id}
+                        value={selectedFBPage?.id}
                         onChange={(e) => setSelectedFBPage(MOCK_PAGES.find(p => p.id === e.target.value))}
                         className="w-full h-14 px-5 bg-slate-50 border-2 border-slate-100 rounded-2xl text-sm font-bold text-slate-800 focus:border-indigo-600 outline-none transition-all appearance-none"
                       >
@@ -284,9 +347,9 @@ const BatchGenerateAds = () => {
                       </select>
                     </div>
                     <div className="space-y-3">
-                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1 flex items-center gap-1.5"><Instagram size={12} className="text-pink-600" /> Instagram 账户</label>
+                      <label className="text-[10px] font-black text-slate-400 tracking-widest px-1 flex items-center gap-1.5"><Instagram size={12} className="text-pink-600" /> Instagram 账户</label>
                       <select 
-                        value={selectedIGPage.id}
+                        value={selectedIGPage?.id}
                         onChange={(e) => setSelectedIGPage(MOCK_PAGES.find(p => p.id === e.target.value))}
                         className="w-full h-14 px-5 bg-slate-50 border-2 border-slate-100 rounded-2xl text-sm font-bold text-slate-800 focus:border-indigo-600 outline-none transition-all appearance-none"
                       >
@@ -296,7 +359,7 @@ const BatchGenerateAds = () => {
                   </div>
 
                   <div className="space-y-3">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1 flex items-center gap-1.5"><Hash size={12} className="text-slate-800" /> Threads 账户</label>
+                    <label className="text-[10px] font-black text-slate-400 tracking-widest px-1 flex items-center gap-1.5"><Hash size={12} className="text-slate-800" /> Threads 账户</label>
                     <input 
                       type="text"
                       value={threadsAccount}
@@ -343,7 +406,7 @@ const BatchGenerateAds = () => {
                 <p className="text-sm font-bold text-slate-400">正在创建 Campaign, AdSets 和素材资产，请勿刷新页面</p>
               </div>
               <div className="w-full space-y-3">
-                 <div className="flex items-center gap-3 text-[10px] font-black text-slate-400 uppercase tracking-widest animate-pulse">
+                 <div className="flex items-center gap-3 text-[10px] font-black text-slate-400 tracking-widest animate-pulse">
                    <Loader2 size={14} className="animate-spin text-indigo-600" />
                    {publishProgress < 30 ? '初始化发布环境...' : publishProgress < 60 ? '正在生成 AdSet 结构与受众策略...' : '正在上传 4K AI 创意素材并关联 URL...'}
                  </div>
@@ -361,18 +424,18 @@ const BatchGenerateAds = () => {
                 <p className="text-sm font-bold text-slate-400">您的广告已成功推送到 Meta 广告管理后台</p>
               </div>
               <div className="bg-slate-50 border border-slate-100 rounded-3xl p-6 w-full space-y-3">
-                 <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-slate-400">
+                 <div className="flex justify-between items-center text-[10px] font-black tracking-widest text-slate-400">
                     <span>发布时间</span>
                     <span className="text-slate-900">{new Date().toLocaleString()}</span>
                  </div>
-                 <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-slate-400">
+                 <div className="flex justify-between items-center text-[10px] font-black tracking-widest text-slate-400">
                     <span>目标账户</span>
-                    <span className="text-slate-900">{selectedAccount.name}</span>
+                    <span className="text-slate-900">{selectedAccount?.name}</span>
                  </div>
               </div>
               <button 
                 onClick={() => { setShowPublishModal(false); setView('config'); setPublishStep('SELECT'); setHasGeneratedOnce(true); localStorage.setItem('has_generated_once', 'true'); }}
-                className="w-full py-5 bg-slate-900 text-white rounded-2xl font-black uppercase tracking-widest hover:bg-black transition-all"
+                className="w-full py-5 bg-slate-900 text-white rounded-2xl font-black tracking-widest hover:bg-black transition-all"
               >
                 回到首页
               </button>
@@ -385,104 +448,383 @@ const BatchGenerateAds = () => {
 
   return (
     <div className="min-h-screen bg-slate-50/50 flex flex-col">
-      {showBrandSuggestion && view === 'config' && (
-        <BrandBar brand={detectedBrand} onSave={() => { setIsBrandSaved(true); setShowBrandSuggestion(false); }} onIgnore={() => setShowBrandSuggestion(false)} isSaved={isBrandSaved} />
+      {/* Top Sticky Account Info Card */}
+      {selectedAccount && view === 'config' && (
+        <div className="sticky top-0 z-[60] w-full px-4 md:px-8 py-2 animate-in slide-in-from-top-full duration-500">
+          <div className="max-w-7xl mx-auto bg-slate-900 text-white rounded-2xl shadow-2xl p-4 flex items-center justify-between border border-slate-800 backdrop-blur-md bg-opacity-95">
+            <div className="flex items-center gap-4">
+              <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center">
+                <Briefcase size={20} />
+              </div>
+              <div>
+                <p className="text-[10px] font-black tracking-widest text-slate-400">当前投放广告账户</p>
+                <p className="text-sm font-black truncate max-w-xs">{selectedAccount.name}</p>
+              </div>
+              <div className="h-8 w-px bg-slate-800 mx-2"></div>
+              <div className="hidden sm:block">
+                <p className="text-[10px] font-black tracking-widest text-slate-400">账户 ID</p>
+                <p className="text-xs font-bold text-indigo-400">{selectedAccount.id}</p>
+              </div>
+            </div>
+            <button 
+              onClick={() => setShowAccountSelector(true)}
+              className="px-6 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-xs font-black tracking-widest transition-all flex items-center gap-2 group"
+            >
+              <RefreshCw size={14} className="group-hover:rotate-180 transition-transform duration-500" />
+              Change
+            </button>
+          </div>
+        </div>
       )}
 
       <main className="flex-1 p-4 md:p-8 flex justify-center overflow-auto">
-        <div className="w-full max-w-7xl bg-white rounded-[3.5rem] shadow-2xl shadow-slate-200/40 border border-slate-100 overflow-hidden relative mb-20 animate-fade-in">
+        <div className="w-full max-w-7xl">
           
-          <div className="p-10 border-b border-slate-50 flex items-center justify-between bg-white sticky top-0 z-40">
-            <div className="flex items-center space-x-5">
-              <div className="w-14 h-14 bg-indigo-600 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-indigo-200">
-                <Target size={28} />
-              </div>
-              <div>
-                <h1 className="text-2xl font-black text-slate-900 tracking-tight">
-                  {view === 'config' ? '多产品智能并行发布计划' : '发布方案预览'}
-                </h1>
-                <p className="text-[11px] text-slate-400 font-black uppercase tracking-[0.2em] mt-1">Next-Gen Media Planning System</p>
-              </div>
-            </div>
-            <button className="w-12 h-12 flex items-center justify-center text-slate-300 hover:bg-slate-50 hover:text-slate-900 rounded-full transition-all">
-              <X size={24} />
-            </button>
-          </div>
+          {view === 'config' ? (
+            <div className="space-y-8 animate-fade-in pb-20">
 
-          <div className="p-10 md:p-14">
-            {view === 'config' ? (
-              <div className="space-y-12">
-                
-                <div className="space-y-4">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-                    <SelectionField 
-                      id="country" label="投放国家/地区" value={country} icon={<Globe size={20} />} 
-                      options={['United States (US)', 'United Kingdom (GB)', 'Brazil (BR)']} onSelect={setCountry} 
-                    />
-                    <SelectionField 
-                      id="media" label="投放渠道媒体" value={media} icon={<Monitor size={20} />} 
-                      options={['Meta (FB/IG)', 'TikTok']} onSelect={setMedia} 
-                    />
-                    <SelectionField 
-                      id="goal" label="核心投放目标" value={goal} icon={<Target size={20} />} 
-                      options={['销量', '线索']} onSelect={setGoal} 
-                    />
-                    <SelectionField 
-                      id="event" label="转化优化事件" value={optEvent} icon={<ShoppingBag size={20} />} 
-                      options={['成功购买', '加入购物车', '完成注册']} onSelect={setOptEvent} 
-                    />
-                  </div>
-                  <p className="text-[10px] text-slate-400 font-medium px-1 flex items-center gap-1.5">
-                    <Info size={12} className="text-indigo-300" />
-                    如果您目前无法确定，可以在 URL 分析完成后根据 AI 建议再填写。
-                  </p>
+              {/* Card 1: Targeting & Objectives */}
+              <div className="bg-white rounded-[2.5rem] p-10 shadow-sm border border-slate-100">
+                <div className="flex items-center gap-3 mb-8">
+                   <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white"><Target size={20} /></div>
+                   <h3 className="text-xl font-black text-slate-900">投放目标与渠道</h3>
                 </div>
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 relative z-[200]">
+                  {/* Location Selector */}
+                  <div className="relative" ref={openDropdown === 'location' ? dropdownRef : null}>
+                    <div 
+                      onClick={() => setOpenDropdown(openDropdown === 'location' ? null : 'location')}
+                      className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm flex flex-col gap-2 group cursor-pointer hover:border-indigo-200 transition-all h-full"
+                    >
+                      <span className="text-[10px] font-bold text-slate-400 tracking-wider">投放国家/地区</span>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          <MapPin size={16} className="text-indigo-500 shrink-0" />
+                          <span className="text-sm font-bold text-slate-700 truncate">
+                            {selectedLocations[0]?.name}
+                            {selectedLocations.length > 1 && '...'}
+                          </span>
+                        </div>
+                        <ChevronDown size={14} className={`text-slate-300 transition-transform ${openDropdown === 'location' ? 'rotate-180' : ''}`} />
+                      </div>
+                    </div>
+                    {openDropdown === 'location' && (
+                      <div className="absolute top-full left-0 mt-2 w-[500px] bg-white rounded-3xl shadow-2xl border border-slate-100 overflow-hidden flex animate-in fade-in zoom-in-95 duration-200">
+                        {/* Left: Search & List */}
+                        <div className="w-1/2 border-r border-slate-50 flex flex-col">
+                          <div className="p-4 border-b border-slate-50">
+                            <div className="relative">
+                              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-300 w-3.5 h-3.5" />
+                              <input 
+                                className="w-full pl-9 pr-3 py-2 bg-slate-50 border-none rounded-xl text-xs font-bold text-slate-900 focus:ring-2 focus:ring-indigo-500/10"
+                                placeholder="Search locations..."
+                                value={locationSearch}
+                                onChange={(e) => setLocationSearch(e.target.value)}
+                                autoFocus
+                              />
+                            </div>
+                          </div>
+                          <div className="flex-1 max-h-[300px] overflow-y-auto custom-scrollbar p-2 space-y-1">
+                            {filteredCountries.map(c => (
+                              <button 
+                                key={c.code}
+                                onClick={() => toggleLocation(c)}
+                                className={`w-full text-left px-3 py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-between ${
+                                  selectedLocations.some(l => l.code === c.code) ? 'bg-indigo-50 text-indigo-600' : 'text-slate-600 hover:bg-slate-50'
+                                }`}
+                              >
+                                {c.name}
+                                {selectedLocations.some(l => l.code === c.code) && <Check size={12} />}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                        {/* Right: Selected */}
+                        <div className="w-1/2 bg-slate-50/30 flex flex-col">
+                          <div className="p-4 border-b border-slate-50 flex items-center justify-between">
+                            <span className="text-[10px] font-black text-slate-400 tracking-widest">Selected ({selectedLocations.length})</span>
+                          </div>
+                          <div className="flex-1 max-h-[300px] overflow-y-auto custom-scrollbar p-4 flex flex-wrap gap-2 content-start">
+                            {selectedLocations.map(l => (
+                              <div key={l.code} className="flex items-center gap-1.5 px-2.5 py-1.5 bg-white border border-slate-100 rounded-lg shadow-sm animate-in zoom-in">
+                                <span className="text-[10px] font-black text-slate-700">{l.code}</span>
+                                <button onClick={() => toggleLocation(l)} className="text-slate-300 hover:text-rose-500 transition-colors">
+                                  <X size={10} strokeWidth={3} />
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
 
-                <section>
-                  <div className="bg-white rounded-[3.5rem] border border-slate-100 shadow-sm p-10 md:p-14 space-y-14 relative overflow-hidden">
-                    <div className="absolute top-0 right-0 w-[40rem] h-[40rem] bg-indigo-50/20 rounded-full -translate-y-[20rem] translate-x-[20rem] blur-[120px] pointer-events-none"></div>
-                    
-                    <ProductSelector 
-                      selectedProducts={selectedProducts} 
-                      onSelectProducts={setSelectedProducts}
-                      productCreatives={productCreativesMap}
-                      onUpdateCreatives={handleUpdateProductCreatives}
-                      onAnalysisStart={() => { setIsAnalyzing(true); setAnalysisFinished(false); }}
-                      onAnalysisComplete={(reports) => { 
-                        setIsAnalyzing(false); 
-                        setAnalysisFinished(true); 
-                        setProductReportsMap(reports);
+                  {/* Platform Selector */}
+                  <div className="relative" ref={openDropdown === 'platform' ? dropdownRef : null}>
+                    <div 
+                      onClick={() => setOpenDropdown(openDropdown === 'platform' ? null : 'platform')}
+                      className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm flex flex-col gap-2 group cursor-pointer hover:border-indigo-200 transition-all h-full"
+                    >
+                      <span className="text-[10px] font-bold text-slate-400 tracking-wider">投放渠道媒体</span>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          <img src={platform.logo} className="w-5 h-5 rounded object-contain shrink-0" alt="" />
+                          <span className="text-sm font-bold text-slate-700 truncate">{platform.name}</span>
+                        </div>
+                        <ChevronDown size={14} className={`text-slate-300 transition-transform ${openDropdown === 'platform' ? 'rotate-180' : ''}`} />
+                      </div>
+                    </div>
+                    {openDropdown === 'platform' && (
+                      <div className="absolute top-full left-0 mt-2 w-full min-w-[200px] bg-white rounded-2xl shadow-2xl border border-slate-100 p-2 space-y-1 animate-in fade-in zoom-in-95 duration-200">
+                        {PLATFORMS.map(p => (
+                          <button 
+                            key={p.id}
+                            disabled={p.disabled}
+                            onClick={() => {
+                              setPlatform(p);
+                              setOpenDropdown(null);
+                            }}
+                            className={`w-full group flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all relative ${
+                              p.disabled ? 'opacity-40 cursor-not-allowed' : 
+                              platform.id === p.id ? 'bg-indigo-50 text-indigo-600' : 'hover:bg-slate-50 text-slate-600'
+                            }`}
+                          >
+                            <img src={p.logo} className="w-5 h-5 rounded object-contain shrink-0" alt="" />
+                            <span className="text-xs font-bold">{p.name}</span>
+                            {p.disabled && (
+                              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                <div className="bg-slate-900 text-white text-[8px] font-black px-2 py-1 rounded shadow-lg">COMING SOON</div>
+                              </div>
+                            )}
+                            {!p.disabled && platform.id === p.id && <Check size={12} className="ml-auto" />}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Objective Selector */}
+                  <div className="relative" ref={openDropdown === 'objective' ? dropdownRef : null}>
+                    <div 
+                      onClick={() => {
+                        setOpenDropdown(openDropdown === 'objective' ? null : 'objective');
+                        setObjectiveStage('goal');
                       }}
-                      hasGeneratedOnce={hasGeneratedOnce}
-                      analysisFinished={analysisFinished}
-                      isAnalyzing={isAnalyzing}
-                      campaignType={campaignType}
-                      onCampaignTypeChange={(type) => {
-                        setCampaignType(type);
-                        setAnalysisFinished(false);
-                        setIsAnalyzing(false);
+                      className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm flex flex-col gap-2 group cursor-pointer hover:border-indigo-200 transition-all h-full"
+                    >
+                      <span className="text-[10px] font-bold text-slate-400 tracking-wider">核心投放目标</span>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          <Target size={16} className="text-indigo-500 shrink-0" />
+                          <span className="text-sm font-bold text-slate-700 truncate">{currentObjectiveObj?.label}</span>
+                        </div>
+                        <ChevronDown size={14} className={`text-slate-300 transition-transform ${openDropdown === 'objective' ? 'rotate-180' : ''}`} />
+                      </div>
+                    </div>
+                    {openDropdown === 'objective' && (
+                      <div className="absolute top-full left-0 mt-2 w-[320px] bg-white rounded-3xl shadow-2xl border border-slate-100 p-4 space-y-3 animate-in fade-in zoom-in-95 duration-200">
+                        <p className="text-[10px] font-black text-slate-400 tracking-widest px-2">Select objective</p>
+                        <div className="space-y-1.5">
+                          {CAMPAIGN_OBJECTIVES.map(obj => {
+                            const Icon = obj.icon;
+                            return (
+                              <button 
+                                key={obj.value}
+                                onClick={() => {
+                                  setObjective(obj.value);
+                                  setAdsetGoal(ADSET_GOALS_MAPPING[obj.value][0].value);
+                                  setOpenDropdown(null);
+                                }}
+                                className={`w-full text-left p-3 rounded-xl transition-all flex items-center gap-3 ${
+                                  objective === obj.value ? 'bg-indigo-50 text-indigo-600 ring-1 ring-indigo-100 shadow-sm' : 'hover:bg-slate-50 text-slate-600'
+                                }`}
+                              >
+                                <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${objective === obj.value ? 'bg-indigo-500 text-white' : obj.bg + ' ' + obj.color}`}>
+                                  <Icon size={18} />
+                                </div>
+                                <div className="min-w-0">
+                                  <p className="text-xs font-bold leading-none mb-1">{obj.label}</p>
+                                  <p className="text-[9px] font-medium opacity-60 truncate">{obj.description}</p>
+                                </div>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Event Selector (Cascading) */}
+                  <div className="relative" ref={openDropdown === 'event' ? dropdownRef : null}>
+                    <div 
+                      onClick={() => {
+                        setOpenDropdown(openDropdown === 'event' ? null : 'event');
+                        setObjectiveStage('goal');
                       }}
+                      className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm flex flex-col gap-2 group cursor-pointer hover:border-indigo-200 transition-all h-full"
+                    >
+                      <span className="text-[10px] font-bold text-slate-400 tracking-wider">转化优化事件</span>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          <Zap size={16} className="text-indigo-500 shrink-0" />
+                          <div className="flex items-center gap-1 min-w-0">
+                            <span className="text-sm font-bold text-slate-700 truncate">{currentGoalObj?.label}</span>
+                            {event && <><ChevronRight size={10} className="text-slate-300 shrink-0" /><span className="text-sm font-bold text-indigo-600 truncate">{event}</span></>}
+                          </div>
+                        </div>
+                        <ChevronDown size={14} className={`text-slate-300 transition-transform ${openDropdown === 'event' ? 'rotate-180' : ''}`} />
+                      </div>
+                    </div>
+                    {openDropdown === 'event' && (
+                      <div className="absolute top-full right-0 mt-2 w-[340px] bg-white rounded-3xl shadow-2xl border border-slate-100 p-4 animate-in fade-in zoom-in-95 duration-200">
+                        {objectiveStage === 'goal' ? (
+                          <div className="space-y-3">
+                            <p className="text-[10px] font-black text-slate-400 tracking-widest px-2">Select conversion event</p>
+                            <div className="space-y-1">
+                              {availableGoals.map(goal => (
+                                <button
+                                  key={goal.value}
+                                  onClick={() => {
+                                    setAdsetGoal(goal.value);
+                                    if (goal.needsEvent) {
+                                      setObjectiveStage('event');
+                                    } else {
+                                      setEvent('');
+                                      setOpenDropdown(null);
+                                    }
+                                  }}
+                                  className={`w-full text-left px-4 py-3 rounded-xl text-xs font-bold transition-all flex items-center justify-between group ${
+                                    adsetGoal === goal.value ? 'bg-slate-900 text-white shadow-lg' : 'hover:bg-slate-50 text-slate-600'
+                                  }`}
+                                >
+                                  {goal.label}
+                                  {goal.needsEvent ? <ArrowRight size={12} className="opacity-40 group-hover:translate-x-1 transition-all" /> : (adsetGoal === goal.value && <CheckCircle2 size={12} />)}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="space-y-4">
+                            <div className="flex items-center gap-2">
+                              <button onClick={() => setObjectiveStage('goal')} className="p-1.5 hover:bg-slate-50 rounded-lg transition-colors text-slate-400">
+                                <ChevronLeft size={16} />
+                              </button>
+                              <p className="text-[10px] font-black text-slate-400 tracking-widest">BACK</p>
+                            </div>
+                            <div className="relative px-1">
+                              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 w-3.5 h-3.5" />
+                              <input 
+                                className="w-full pl-9 pr-3 py-2.5 bg-slate-50 border-none rounded-xl text-xs font-bold text-slate-900 focus:ring-2 focus:ring-indigo-500/10"
+                                placeholder="Search events..."
+                                value={eventSearch}
+                                onChange={(e) => setEventSearch(e.target.value)}
+                                autoFocus
+                              />
+                            </div>
+                            <div className="max-h-[240px] overflow-y-auto custom-scrollbar px-1 space-y-1">
+                              {filteredEvents.map(ev => (
+                                <button
+                                  key={ev}
+                                  onClick={() => {
+                                    setEvent(ev);
+                                    setOpenDropdown(null);
+                                  }}
+                                  className={`w-full text-left px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-between ${
+                                    event === ev ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200' : 'hover:bg-slate-50 text-slate-600'
+                                  }`}
+                                >
+                                  {ev}
+                                  {event === ev && <Check size={12} />}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <p className="text-[10px] text-slate-400 font-medium px-1 flex items-center gap-1.5 mt-6">
+                  <Info size={12} className="text-indigo-300" />
+                  如果您目前无法确定，可以在 URL 分析完成后根据 AI 建议再填写。
+                </p>
+              </div>
+
+              {/* Card 2: Add Product */}
+              <div className="bg-white rounded-[2.5rem] p-10 shadow-sm border border-slate-100">
+                <div className="flex items-center gap-3 mb-8">
+                   <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white"><ShoppingBag size={20} /></div>
+                   <h3 className="text-xl font-black text-slate-900">添加投放产品</h3>
+                </div>
+                <ProductSelector 
+                  selectedProducts={selectedProducts} 
+                  onSelectProducts={setSelectedProducts}
+                  productCreatives={productCreativesMap}
+                  onUpdateCreatives={handleUpdateProductCreatives}
+                  onAnalysisStart={() => { setIsAnalyzing(true); setAnalysisFinished(false); }}
+                  onAnalysisComplete={(reports) => { 
+                    setIsAnalyzing(false); 
+                    setAnalysisFinished(true); 
+                    setProductReportsMap(reports);
+                  }}
+                  onReset={() => {
+                    setAnalysisFinished(false);
+                    setIsAnalyzing(false);
+                  }}
+                  hasGeneratedOnce={hasGeneratedOnce}
+                  analysisFinished={analysisFinished}
+                  isAnalyzing={isAnalyzing}
+                  campaignType={campaignType}
+                  onCampaignTypeChange={(type) => {
+                    setCampaignType(type);
+                    setAnalysisFinished(false);
+                    setIsAnalyzing(false);
+                  }}
+                  selectedAccount={selectedAccount}
+                  onSelectAccount={setSelectedAccount}
+                />
+              </div>
+
+              {/* Card 3: Strategy & Budget */}
+              {analysisFinished && (
+                 <div className="bg-white rounded-[2.5rem] p-10 shadow-sm border border-slate-100 animate-in fade-in slide-in-from-top-8">
+                    <div className="flex items-center gap-3 mb-8">
+                       <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center text-white"><Layers size={20} /></div>
+                       <h3 className="text-xl font-black text-slate-900">架构策略与预算</h3>
+                    </div>
+                    <CampaignPlanView 
+                      structure={structure} onStructureChange={setStructure}
+                      budgetType={budgetType} onBudgetTypeChange={setBudgetType}
+                      dailyBudget={dailyBudget} onBudgetChange={setDailyBudget}
+                      adsetAudiences={adsetAudiences} onToggleAudience={handleToggleAudienceType}
+                      lalOptions={lalOptions} onToggleLalOption={handleToggleLalOption}
+                      selectedProducts={selectedProducts}
+                      productCreativesMap={productCreativesMap}
+                      isExistingCampaign={!!selectedCampaignId}
+                      selectedCampaign={selectedCampaign}
+                      onSelectCampaign={() => setShowCampaignModal(true)}
                     />
+                 </div>
+              )}
 
-                    {analysisFinished && (
-                      <div className="animate-in fade-in slide-in-from-top-12 duration-1000 space-y-16 pt-16 border-t border-slate-50">
-                        <section className="space-y-12">
-                          <CampaignPlanView 
-                            structure={structure} onStructureChange={setStructure}
-                            budgetType={budgetType} onBudgetTypeChange={setBudgetType}
-                            dailyBudget={dailyBudget} onBudgetChange={setDailyBudget}
-                            adsetAudiences={adsetAudiences} onToggleAudience={handleToggleAudienceType}
-                            lalOptions={lalOptions} onToggleLalOption={handleToggleLalOption}
-                            selectedProducts={selectedProducts}
-                            productCreativesMap={productCreativesMap}
-                            isExistingCampaign={!!selectedCampaignId}
-                            selectedCampaign={selectedCampaign}
-                            onSelectCampaign={() => setShowCampaignModal(true)}
-                          />
+              {/* Card 4: Advanced Settings */}
+              {analysisFinished && (
+                 <div className="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden animate-in fade-in slide-in-from-top-8">
+                    <button onClick={() => setAdvancedOpen(!advancedOpen)} className="w-full p-10 flex items-center justify-between hover:bg-slate-50 transition-colors">
+                        <div className="flex items-center gap-3">
+                           <div className="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center text-slate-500"><Settings size={20} /></div>
+                           <h3 className="text-xl font-black text-slate-900">高级设置 (落地页 / 文案 / 排期)</h3>
+                        </div>
+                        <ChevronDown className={`transition-transform duration-300 ${advancedOpen ? 'rotate-180' : ''}`} />
+                    </button>
 
-                          <div className="space-y-6">
+                    {advancedOpen && (
+                        <div className="p-10 pt-0 space-y-12 border-t border-slate-50 mt-6">
+                           
+                           {/* Landing Page Strategy */}
+                           <div className="space-y-6 pt-10">
                             <div className="flex items-center gap-2 px-1">
-                              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">投放落地页策略</label>
+                              <label className="text-[10px] font-black text-slate-400 tracking-widest">投放落地页策略</label>
                               <Info size={12} className="text-slate-300" />
                             </div>
                             
@@ -505,7 +847,7 @@ const BatchGenerateAds = () => {
                                       {opt.icon}
                                     </div>
                                     <div className="text-left">
-                                      <p className={`text-xs font-black uppercase ${lpType === opt.id ? 'text-slate-900' : 'text-slate-500'}`}>{opt.label}</p>
+                                      <p className={`text-xs font-black ${lpType === opt.id ? 'text-slate-900' : 'text-slate-500'}`}>{opt.label}</p>
                                       <p className="text-[10px] text-slate-400 font-bold mt-0.5">{opt.desc}</p>
                                     </div>
                                   </button>
@@ -521,15 +863,15 @@ const BatchGenerateAds = () => {
                                             <Target size={20} />
                                           </div>
                                           <div>
-                                            <h4 className="text-xs font-black text-slate-900 tracking-tight">自动路由至商品单页</h4>
+                                            <h4 className="text-xs font-black text-slate-900 tracking-tight">自动路由至产品单页</h4>
                                             <p className="text-[10px] text-slate-500 font-medium leading-relaxed mt-1">
-                                              系统将使用所选商品的原始落地页。您可以在下方为所有单品 URL 统一增加 UTM 追踪参数。
+                                              系统将使用所选产品的原始落地页。您可以在下方为所有单品 URL 统一增加 UTM 追踪参数。
                                             </p>
                                           </div>
                                        </div>
                                     </div>
                                     <div className="space-y-3">
-                                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">统一 UTM 追踪参数</label>
+                                      <label className="text-[10px] font-black text-slate-400 tracking-widest px-1">统一 UTM 追踪参数</label>
                                       <div className="relative group">
                                         <div className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-indigo-600 transition-colors">
                                           <Settings size={22} />
@@ -547,7 +889,7 @@ const BatchGenerateAds = () => {
                                 ) : (
                                   <div className="space-y-6 animate-in fade-in slide-in-from-left-4">
                                     <div className="space-y-3">
-                                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">落地页模板 URL (支持动态参数)</label>
+                                      <label className="text-[10px] font-black text-slate-400 tracking-widest px-1">落地页模板 URL (支持动态参数)</label>
                                       <div className="relative group">
                                         <div className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-indigo-600 transition-colors">
                                           <Link2 size={24} />
@@ -565,18 +907,19 @@ const BatchGenerateAds = () => {
                                 )}
                               </div>
                             </div>
-                          </div>
+                           </div>
 
-                          <div className="space-y-6">
+                           {/* Ad Copy Strategy */}
+                           <div className="space-y-6">
                             <div className="flex items-center gap-2 px-1">
-                              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">广告文案标题策略</label>
+                              <label className="text-[10px] font-black text-slate-400 tracking-widest">广告文案标题策略</label>
                               <Info size={12} className="text-slate-300" />
                             </div>
                             
                             <div className="bg-slate-50/50 border border-slate-100 rounded-[2.5rem] p-10 flex flex-col md:flex-row gap-10">
                               <div className="flex flex-col gap-3 w-full md:w-80">
                                 {[
-                                  { id: 'AI_CUSTOM', label: 'AI 为每个商品定制', desc: 'Custom per SKU', icon: <Sparkles size={18} /> },
+                                  { id: 'AI_CUSTOM', label: 'AI 为每个产品定制', desc: 'Custom per SKU', icon: <Sparkles size={18} /> },
                                   { id: 'UNIFIED', label: '为所有广告输入统一文案', desc: 'Unified Headlines & Text', icon: <FileText size={18} /> },
                                 ].map(opt => (
                                   <button
@@ -592,7 +935,7 @@ const BatchGenerateAds = () => {
                                       {opt.icon}
                                     </div>
                                     <div className="text-left">
-                                      <p className={`text-xs font-black uppercase ${copyStrategy === opt.id ? 'text-slate-900' : 'text-slate-500'}`}>{opt.label}</p>
+                                      <p className={`text-xs font-black ${copyStrategy === opt.id ? 'text-slate-900' : 'text-slate-500'}`}>{opt.label}</p>
                                       <p className="text-[10px] text-slate-400 font-bold mt-0.5">{opt.desc}</p>
                                     </div>
                                   </button>
@@ -609,7 +952,7 @@ const BatchGenerateAds = () => {
                                         <div>
                                           <h4 className="text-sm font-black text-slate-900 tracking-tight">AI 智能深度定制文案</h4>
                                           <p className="text-[11px] text-slate-500 font-medium leading-relaxed mt-2">
-                                            基于落地页分析报告，Agent 将为每一个商品自动撰写差异化的广告标题和正文，最大化转化率。
+                                            基于落地页分析报告，Agent 将为每一个产品自动撰写差异化的广告标题和正文，最大化转化率。
                                           </p>
                                         </div>
                                      </div>
@@ -617,7 +960,7 @@ const BatchGenerateAds = () => {
                                 ) : (
                                   <div className="space-y-6 animate-in fade-in slide-in-from-left-4">
                                     <div className="space-y-3">
-                                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">统一广告标题</label>
+                                      <label className="text-[10px] font-black text-slate-400 tracking-widest px-1">统一广告标题</label>
                                       <input 
                                         type="text"
                                         value={unifiedHeadline}
@@ -627,7 +970,7 @@ const BatchGenerateAds = () => {
                                       />
                                     </div>
                                     <div className="space-y-3">
-                                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">统一广告正文</label>
+                                      <label className="text-[10px] font-black text-slate-400 tracking-widest px-1">统一广告正文</label>
                                       <textarea 
                                         value={unifiedBody}
                                         onChange={(e) => setUnifiedBody(e.target.value)}
@@ -639,11 +982,12 @@ const BatchGenerateAds = () => {
                                 )} 
                               </div>
                             </div>
-                          </div>
+                           </div>
 
-                          <div className="space-y-6">
+                           {/* Schedule */}
+                           <div className="space-y-6">
                             <div className="flex items-center gap-2 px-1">
-                              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">广告投放排期</label>
+                              <label className="text-[10px] font-black text-slate-400 tracking-widest">广告投放排期</label>
                               <Info size={12} className="text-slate-300" />
                             </div>
                             
@@ -666,7 +1010,7 @@ const BatchGenerateAds = () => {
                                       {opt.icon}
                                     </div>
                                     <div className="text-left">
-                                      <p className={`text-xs font-black uppercase ${scheduleType === opt.id ? 'text-slate-900' : 'text-slate-500'}`}>{opt.label}</p>
+                                      <p className={`text-xs font-black ${scheduleType === opt.id ? 'text-slate-900' : 'text-slate-500'}`}>{opt.label}</p>
                                       <p className="text-[10px] text-slate-400 font-bold mt-0.5">{opt.desc}</p>
                                     </div>
                                   </button>
@@ -692,7 +1036,7 @@ const BatchGenerateAds = () => {
                                   <div className="space-y-8 animate-in fade-in slide-in-from-left-4">
                                     <div className="grid grid-cols-2 gap-6">
                                       <div className="space-y-3">
-                                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">开始日期</label>
+                                        <label className="text-[10px] font-black text-slate-400 tracking-widest px-1">开始日期</label>
                                         <input 
                                           type="date"
                                           value={startDate}
@@ -701,7 +1045,7 @@ const BatchGenerateAds = () => {
                                         />
                                       </div>
                                       <div className="space-y-3">
-                                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">结束日期</label>
+                                        <label className="text-[10px] font-black text-slate-400 tracking-widest px-1">结束日期</label>
                                         <input 
                                           type="date"
                                           value={endDate}
@@ -711,7 +1055,7 @@ const BatchGenerateAds = () => {
                                       </div>
                                     </div>
                                     <div className="space-y-3">
-                                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">快速设置时长</label>
+                                      <label className="text-[10px] font-black text-slate-400 tracking-widest px-1">快速设置时长</label>
                                       <div className="flex gap-3">
                                         {[3, 7, 14, 30].map(days => (
                                           <button
@@ -728,58 +1072,124 @@ const BatchGenerateAds = () => {
                                 )} 
                               </div>
                             </div>
-                          </div>
-                        </section>
+                           </div>
 
-                        <div className="flex flex-col items-center">
-                          <button
-                            onClick={() => setView('preview')}
-                            className="group relative w-full max-w-4xl py-8 px-16 rounded-[2.5rem] font-black text-2xl flex items-center justify-center bg-slate-900 text-white hover:bg-black shadow-2xl transition-all"
-                          >
-                            <Sparkles size={28} className="mr-5" />
-                            预览发布计划
-                          </button>
                         </div>
-                      </div>
-                    )} 
+                    )}
+                 </div>
+              )}
+
+              {/* Preview Button */}
+              {analysisFinished && (
+                <div className="flex flex-col items-center">
+                  <button
+                    onClick={() => setView('preview')}
+                    className="group relative w-full max-w-4xl py-8 px-16 rounded-[2.5rem] font-black text-2xl flex items-center justify-center bg-slate-900 text-white hover:bg-black shadow-2xl transition-all"
+                  >
+                    <Sparkles size={28} className="mr-5" />
+                    预览发布计划
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            // Preview View Wrapper - Keeping the original card style for the preview page
+            <div className="bg-white rounded-[3.5rem] shadow-2xl shadow-slate-200/40 border border-slate-100 overflow-hidden relative mb-20 animate-fade-in">
+              <div className="p-10 border-b border-slate-50 flex items-center justify-between bg-white sticky top-0 z-40">
+                <div className="flex items-center space-x-5">
+                  <div className="w-14 h-14 bg-indigo-600 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-indigo-200">
+                    <Target size={28} />
                   </div>
-                </section>
+                  <div>
+                    <h1 className="text-2xl font-black text-slate-900 tracking-tight">发布方案预览</h1>
+                    <p className="text-[11px] text-slate-400 font-black tracking-[0.2em] mt-1">Next-Gen Media Planning System</p>
+                  </div>
+                </div>
+                <button 
+                  onClick={() => setView('config')}
+                  className="w-12 h-12 flex items-center justify-center text-slate-300 hover:bg-slate-50 hover:text-slate-900 rounded-full transition-all"
+                >
+                  <X size={24} />
+                </button>
               </div>
-            ) : (
-              <CampaignPreviewView 
-                structure={structure}
-                budgetType={budgetType} 
-                dailyBudget={dailyBudget}
-                initialAdsetAudiences={adsetAudiences} 
-                productCreativesMap={productCreativesMap}
-                selectedProducts={selectedProducts}
-                brand={detectedBrand}
-                onBack={() => setView('config')}
-                onPublish={() => setShowPublishModal(true)}
-                campaignName={selectedCampaign?.name || 'NEW-AI-CAMPAIGN-001'}
-                optimizationEvent={optEvent}
-                landingPageType={lpType}
-                landingPageTemplate={lpTemplateUrl}
-                productUtm={productLpUtm}
-                copyStrategy={copyStrategy}
-                unifiedHeadline={unifiedHeadline}
-                unifiedBody={unifiedBody}
-                campaignType={campaignType}
-              />
-            )}
-          </div>
+
+              <div className="p-10 md:p-14">
+                <CampaignPreviewView 
+                  structure={structure}
+                  budgetType={budgetType} 
+                  dailyBudget={dailyBudget}
+                  initialAdsetAudiences={adsetAudiences} 
+                  productCreativesMap={productCreativesMap}
+                  selectedProducts={selectedProducts}
+                  brand={detectedBrand}
+                  onBack={() => setView('config')}
+                  onPublish={() => setShowPublishModal(true)}
+                  campaignName={selectedCampaign?.name || 'NEW-AI-CAMPAIGN-001'}
+                  optimizationEvent={event}
+                  landingPageType={lpType}
+                  landingPageTemplate={lpTemplateUrl}
+                  productUtm={productLpUtm}
+                  copyStrategy={copyStrategy}
+                  unifiedHeadline={unifiedHeadline}
+                  unifiedBody={unifiedBody}
+                  campaignType={campaignType}
+                />
+              </div>
+            </div>
+          )}
+          
         </div>
       </main>
 
       {showCampaignModal && <CampaignSearchModal />}
       {showPublishModal && <PublishModal />}
+      
+      {showAccountSelector && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in">
+          <div className="bg-white w-full max-w-xl rounded-[3rem] shadow-2xl p-10 space-y-8 animate-in slide-in-from-bottom-8">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center text-white shadow-lg"><Briefcase size={24} /></div>
+                <div>
+                  <h4 className="text-xl font-black text-slate-900">切换广告账户</h4>
+                  <p className="text-slate-400 text-xs font-bold tracking-widest mt-1">Select an active ad account</p>
+                </div>
+              </div>
+              <button onClick={() => setShowAccountSelector(false)} className="p-2 hover:bg-slate-50 rounded-full text-slate-300 transition-colors"><X size={24} /></button>
+            </div>
+            <div className="space-y-3">
+              {MOCK_ACCOUNTS.map(acc => (
+                <button
+                  key={acc.id}
+                  onClick={() => {
+                    setSelectedAccount(acc);
+                    setShowAccountSelector(false);
+                  }}
+                  className={`w-full p-6 rounded-2xl border-2 flex items-center justify-between transition-all ${
+                    selectedAccount?.id === acc.id ? 'border-indigo-600 bg-indigo-50 shadow-lg shadow-indigo-100' : 'border-slate-100 bg-white hover:border-slate-200'
+                  }`}
+                >
+                  <div className="flex items-center gap-4 text-left">
+                    <div className={`p-2 rounded-lg ${selectedAccount?.id === acc.id ? 'bg-indigo-600 text-white' : 'bg-slate-50 text-slate-400'}`}><Briefcase size={16} /></div>
+                    <div>
+                      <p className={`text-sm font-black ${selectedAccount?.id === acc.id ? 'text-indigo-900' : 'text-slate-600'}`}>{acc.name}</p>
+                      <p className="text-[10px] text-slate-400 font-bold">ID: {acc.id}</p>
+                    </div>
+                  </div>
+                  {selectedAccount?.id === acc.id && <Check size={20} className="text-indigo-600" />}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       <footer className="py-16 flex flex-col items-center opacity-40">
         <div className="flex items-center gap-3 mb-3">
           <div className="w-8 h-8 bg-slate-900 rounded-xl flex items-center justify-center text-white text-xs font-black shadow-lg">AG</div>
           <span className="text-lg font-black text-slate-900 tracking-tighter">AdsGo Campaign Architect</span>
         </div>
-        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.3em]">Next Generation Multi-Channel Orchestration Engine</p>
+        <p className="text-[10px] font-bold text-slate-400 tracking-[0.3em]">Next Generation Multi-Channel Orchestration Engine</p>
       </footer>
     </div>
   );
