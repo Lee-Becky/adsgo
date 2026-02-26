@@ -406,6 +406,9 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
   const [selectedMatchOptions, setSelectedMatchOptions] = useState(new Set(['24h']));
 
   const anyConnected = Object.values(authStatus).some(v => v);
+  
+  // 判断是否所有产品都已就绪（分析完成或来自历史记录无需分析）
+  const allReady = analysisFinished || (isAnalyzing && selectedProducts.length > 0 && selectedProducts.every(p => p.isFromHistory));
 
   const handleImportAnalyzeUrl = () => {
     if (!productUrl) { setUrlError('Please provide a valid product URL'); return; }
@@ -732,7 +735,7 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
                   </div>
                   <p className="text-xs text-slate-400 font-bold tracking-widest">Orchestrate creative production at scale</p>
                 </div>
-                {analysisFinished && (
+                {allReady && (
                   <div className="flex items-center gap-4 bg-slate-50 p-2 rounded-2xl border border-slate-100">
                     <button onClick={() => setActiveModal('batch_match')} className="flex items-center gap-2.5 px-6 py-3.5 bg-white border border-slate-200 rounded-xl text-xs font-black tracking-widest text-slate-700 hover:border-indigo-600 hover:text-indigo-600 transition-all shadow-sm group">
                       <Database size={16} className="group-hover:scale-110 transition-transform" /> 批量匹配素材库
@@ -817,7 +820,7 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
                             </div>
                           )}
                         </div>
-                        {!isAnalyzing && (
+                        {(!isAnalyzing || p.isFromHistory) && (
                           <div className="shrink-0 flex items-center">
                             <button onClick={() => removeProduct(p.id)} className="p-3 text-slate-300 hover:text-rose-500 transition-colors rounded-xl hover:bg-rose-50">
                               <Trash2 size={18} />
