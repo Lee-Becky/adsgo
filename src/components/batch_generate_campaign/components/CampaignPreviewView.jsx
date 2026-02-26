@@ -5,6 +5,7 @@ import {
   Layers, Target, Box, Plus, Tag, Link as LinkIcon, Megaphone,
   ChevronDown
 } from 'lucide-react';
+import { Z_INDEX } from '../../../constants/zIndex';
 
 const AUDIENCE_NAMES = {
   LAL: 'LAL 1% US Purchase',
@@ -186,7 +187,10 @@ const CampaignPreviewView = ({
     if (editingAdSetIndex === null) return null;
     const adSet = localAdSets[editingAdSetIndex];
     return (
-      <div className="fixed inset-0 z-[250] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in">
+      <div 
+        className="fixed inset-0 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in"
+        style={{ zIndex: Z_INDEX.MODAL_BASE + 80 }}
+      >
         <div className="bg-white w-full max-w-xl rounded-[3rem] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
           <div className="p-8 border-b border-slate-100 flex items-center justify-between">
             <h3 className="text-xl font-black text-slate-900">编辑广告组 (AdSet)</h3>
@@ -267,7 +271,10 @@ const CampaignPreviewView = ({
     const { asIndex, adIndex } = editingAdInfo;
     const ad = localAdSets[asIndex].ads[adIndex];
     return (
-      <div className="fixed inset-0 z-[250] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in">
+      <div 
+        className="fixed inset-0 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in"
+        style={{ zIndex: Z_INDEX.MODAL_BASE + 90 }}
+      >
         <div className="bg-white w-full max-w-xl rounded-[3rem] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
           <div className="p-8 border-b border-slate-100 flex items-center justify-between">
             <h3 className="text-xl font-black text-slate-900">编辑广告素材 (Ad)</h3>
@@ -499,7 +506,10 @@ const CampaignPreviewView = ({
         </div>
       </div>
 
-      <div className="fixed bottom-0 left-0 right-0 bg-slate-900 text-white p-8 z-[100] border-t border-white/5 backdrop-blur-xl bg-opacity-95 shadow-[0_-20px_40px_rgba(0,0,0,0.1)]">
+      <div 
+        className="fixed bottom-0 left-0 right-0 bg-slate-900 text-white p-8 border-t border-white/5 backdrop-blur-xl bg-opacity-95 shadow-[0_-20px_40px_rgba(0,0,0,0.1)]"
+        style={{ zIndex: Z_INDEX.DROPDOWN }}
+      >
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex flex-col sm:flex-row gap-16">
             <div className="flex items-center gap-4">

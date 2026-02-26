@@ -6,6 +6,7 @@ import {
   CheckCircle2, Layers, RefreshCw, MapPin, Zap, ArrowRight, ChevronLeft, 
   Megaphone, MousePointer2, Users, Smartphone, ChevronRight 
 } from 'lucide-react';
+import { Z_INDEX } from '../../constants/zIndex';
 import ProductSelector from './components/ProductSelector';
 import CampaignPlanView from './components/CampaignPlanView';
 import CampaignPreviewView from './components/CampaignPreviewView';
@@ -260,7 +261,10 @@ const BatchGenerateAds = () => {
     );
 
     return (
-      <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in">
+      <div 
+        className="fixed inset-0 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in"
+        style={{ zIndex: Z_INDEX.MODAL_BASE + 10 }}
+      >
         <div className="bg-white w-full max-w-xl rounded-[3rem] shadow-2xl overflow-hidden animate-in slide-in-from-bottom-8">
           <div className="p-8 border-b border-slate-100 flex items-center justify-between">
             <h3 className="text-xl font-black text-slate-900">选择已有投放系列</h3>
@@ -307,7 +311,10 @@ const BatchGenerateAds = () => {
 
   const PublishModal = () => {
     return (
-      <div className="fixed inset-0 z-[300] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-xl animate-in fade-in">
+      <div 
+        className="fixed inset-0 flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-xl animate-in fade-in"
+        style={{ zIndex: Z_INDEX.MODAL_BASE + 20 }}
+      >
         <div className="bg-white w-full max-w-2xl rounded-[3rem] shadow-[0_32px_64px_-12px_rgba(0,0,0,0.3)] overflow-hidden animate-in slide-in-from-bottom-12">
           
           {publishStep === 'SELECT' && (
@@ -450,7 +457,10 @@ const BatchGenerateAds = () => {
     <div className="min-h-screen bg-slate-50/50 flex flex-col">
       {/* Top Sticky Account Info Card */}
       {selectedAccount && view === 'config' && (
-        <div className="sticky top-0 z-[60] w-full px-4 md:px-8 py-2 animate-in slide-in-from-top-full duration-500">
+        <div 
+          className="sticky top-0 w-full px-4 md:px-8 py-2 animate-in slide-in-from-top-full duration-500"
+          style={{ zIndex: Z_INDEX.HEADER }}
+        >
           <div className="max-w-7xl mx-auto bg-slate-900 text-white rounded-2xl shadow-2xl p-4 flex items-center justify-between border border-slate-800 backdrop-blur-md bg-opacity-95">
             <div className="flex items-center gap-4">
               <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center">
@@ -489,7 +499,7 @@ const BatchGenerateAds = () => {
                    <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white"><Target size={20} /></div>
                    <h3 className="text-xl font-black text-slate-900">投放目标与渠道</h3>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 relative z-[200]">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 relative z-[10]">
                   {/* Location Selector */}
                   <div className="relative" ref={openDropdown === 'location' ? dropdownRef : null}>
                     <div 
@@ -1145,7 +1155,10 @@ const BatchGenerateAds = () => {
       {showPublishModal && <PublishModal />}
       
       {showAccountSelector && (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in">
+        <div 
+          className="fixed inset-0 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in"
+          style={{ zIndex: Z_INDEX.MODAL_BASE + 30 }}
+        >
           <div className="bg-white w-full max-w-xl rounded-[3rem] shadow-2xl p-10 space-y-8 animate-in slide-in-from-bottom-8">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">

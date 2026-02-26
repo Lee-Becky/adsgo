@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Users, Info, Sparkles, DollarSign, ChevronDown, Briefcase, Target, Layers, Lock, Edit3, Check } from 'lucide-react';
+import { Z_INDEX } from '../../../constants/zIndex';
 
 const AUDIENCE_SHORT_LABELS = {
   LAL: 'LAL',
@@ -210,7 +211,10 @@ const CampaignPlanView = ({
                     </div>
 
                     {showLalDropdown && (
-                      <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-purple-100 rounded-2xl shadow-2xl z-50 overflow-hidden animate-in zoom-in-95 duration-150">
+                      <div 
+                        className="absolute top-full left-0 right-0 mt-2 bg-white border border-purple-100 rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-150"
+                        style={{ zIndex: Z_INDEX.DROPDOWN }}
+                      >
                         {['US Purchase 1%', 'US add to cart 5%', 'US register last30days 1%~3%'].map((opt) => {
                           const isSel = lalOptions.includes(opt);
                           return (
