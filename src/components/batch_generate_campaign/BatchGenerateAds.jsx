@@ -454,7 +454,7 @@ const BatchGenerateAds = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50/50 flex flex-col">
+    <div className="bg-slate-50/50 min-h-full">
       {/* Top Sticky Account Info Card */}
       {selectedAccount && view === 'config' && (
         <div 
@@ -487,7 +487,7 @@ const BatchGenerateAds = () => {
         </div>
       )}
 
-      <main className="flex-1 p-4 md:p-8 flex justify-center overflow-auto">
+      <div className="p-4 md:p-8 flex justify-center">
         <div className="w-full max-w-7xl">
           
           {view === 'config' ? (
@@ -1149,7 +1149,7 @@ const BatchGenerateAds = () => {
           )}
           
         </div>
-      </main>
+      </div>
 
       {showCampaignModal && <CampaignSearchModal />}
       {showPublishModal && <PublishModal />}
@@ -1197,13 +1197,6 @@ const BatchGenerateAds = () => {
         </div>
       )}
 
-      <footer className="py-16 flex flex-col items-center opacity-40">
-        <div className="flex items-center gap-3 mb-3">
-          <div className="w-8 h-8 bg-slate-900 rounded-xl flex items-center justify-center text-white text-xs font-black shadow-lg">AG</div>
-          <span className="text-lg font-black text-slate-900 tracking-tighter">AdsGo Campaign Architect</span>
-        </div>
-        <p className="text-[10px] font-bold text-slate-400 tracking-[0.3em]">Next Generation Multi-Channel Orchestration Engine</p>
-      </footer>
     </div>
   );
 };

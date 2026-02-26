@@ -326,7 +326,8 @@ const SelectionModal = ({
               onUpdateCreatives(modalContext, [...(productCreatives[modalContext] || []), ...selectedCreatives.map(c => ({ ...c, id: `${c.id}-${Date.now()}`, productId: modalContext }))]);
             } else {
               const pool = getItems();
-              const toAdd = pool.filter(i => localSelected.has(i.id) && !selectedProducts.some(p => p.id === i.id));
+              const toAdd = pool.filter(i => localSelected.has(i.id) && !selectedProducts.some(p => p.id === i.id))
+                                .map(p => ({ ...p, isFromHistory: type === 'history' }));
               onSelectProducts([...selectedProducts, ...toAdd]);
             }
             onClose();
@@ -448,26 +449,172 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
     setIsAuthLoading(false);
   };
 
+  const handleBatchAIGC = () => { setActiveModal(null); };
+
+  const handleAIGCForProduct = (id) => {
+    // Placeholder
+  };
+
+  const handleUploadForProduct = (id) => {
+    // Placeholder
+  };
+
   return (
     <div className="space-y-10">
       <div className={`relative transition-all duration-500 ${(analysisFinished || isAnalyzing) ? 'pointer-events-none select-none' : ''}`}>
-        {(analysisFinished || isAnalyzing) && (<div className="absolute inset-0 z-20 bg-white/60 backdrop-blur-[1px] rounded-[2.5rem] flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity pointer-events-auto cursor-pointer" onClick={onReset}><button className="px-8 py-3 bg-slate-900 text-white rounded-xl font-black tracking-widest transform scale-95 group-hover:scale-100 transition-all flex items-center gap-2"><RefreshCw size={16} /> 重新添加产品</button></div>)}
+        {(analysisFinished || isAnalyzing) && (
+          <div className="absolute inset-0 z-20 bg-white/60 backdrop-blur-[1px] rounded-[2.5rem] flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity pointer-events-auto cursor-pointer" onClick={onReset}>
+            <button className="px-8 py-3 bg-slate-900 text-white rounded-xl font-black tracking-widest transform scale-95 group-hover:scale-100 transition-all flex items-center gap-2">
+              <RefreshCw size={16} /> 重新添加产品
+            </button>
+          </div>
+        )}
         <div className={(analysisFinished || isAnalyzing) ? 'opacity-40 grayscale-[0.5] blur-[0.5px]' : ''}>
-          <div className="flex justify-center mb-4"><div className="bg-slate-100/50 p-1 rounded-2xl border border-slate-100 flex items-center shadow-sm"><button onClick={() => onCampaignTypeChange('PRODUCT')} className={`px-8 py-3 rounded-xl text-xs font-black tracking-widest transition-all ${campaignType === 'PRODUCT' ? 'bg-white text-indigo-600 shadow-md' : 'text-slate-400 hover:text-slate-600'}`}>投放产品广告</button><button onClick={() => onCampaignTypeChange('CATALOG')} className={`px-8 py-3 rounded-xl text-xs font-black tracking-widest transition-all ${campaignType === 'CATALOG' ? 'bg-white text-indigo-600 shadow-md' : 'text-slate-400 hover:text-slate-600'}`}>投放目录广告</button></div></div>
+          <div className="flex justify-center mb-4">
+            <div className="bg-slate-100/50 p-1 rounded-2xl border border-slate-100 flex items-center shadow-sm">
+              <button onClick={() => onCampaignTypeChange('PRODUCT')} className={`px-8 py-3 rounded-xl text-xs font-black tracking-widest transition-all ${campaignType === 'PRODUCT' ? 'bg-white text-indigo-600 shadow-md' : 'text-slate-400 hover:text-slate-600'}`}>投放产品广告</button>
+              <button onClick={() => onCampaignTypeChange('CATALOG')} className={`px-8 py-3 rounded-xl text-xs font-black tracking-widest transition-all ${campaignType === 'CATALOG' ? 'bg-white text-indigo-600 shadow-md' : 'text-slate-400 hover:text-slate-600'}`}>投放目录广告</button>
+            </div>
+          </div>
           {campaignType === 'PRODUCT' ? (
             <div className="space-y-6">
-              <div className="relative">{hasGeneratedOnce && (<div className="absolute -top-4 left-6 z-10"><div className="flex items-center gap-1.5 px-3 py-1 bg-indigo-600 text-white rounded-full shadow-lg border border-white/20"><PackageCheck size={12} className="text-indigo-200" /><span className="text-[9px] font-black tracking-widest">出品</span></div><div className="w-[2px] h-4 bg-indigo-600 ml-5 opacity-50"></div></div>)}<div className={`bg-slate-50 border-2 border-dashed border-slate-200 rounded-[2.5rem] p-6 flex items-center gap-6 focus-within:bg-white focus-within:border-indigo-500 transition-all ${selectedProducts.length > 0 ? 'border-slate-300' : ''}`}><div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-slate-300 shadow-sm border border-slate-100"><Link2 size={24} /></div><input type="text" placeholder="粘贴投放目标 URL，回车立即解析..." className="flex-1 bg-transparent border-none outline-none text-base font-medium text-slate-800 placeholder:text-slate-300" value={urlInput} onChange={(e) => setUrlInput(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter' && urlInput) { const newP = { id: `manual-${Date.now()}`, name: `落地页商品 - ${selectedProducts.length + 1}`, url: urlInput, imageUrl: `https://picsum.photos/seed/${Date.now()}/400/400` }; onSelectProducts([...selectedProducts, newP]); setUrlInput(''); } }} /></div></div>
-              <div className="flex gap-4 px-2"><button onClick={() => setActiveModal('history')} className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-100 rounded-xl text-[10px] font-black tracking-widest text-slate-400 hover:text-indigo-600 hover:border-indigo-100 transition-all shadow-sm"><History size={14} /> 从产品库选择历史商品</button><button onClick={() => setActiveModal('shopify')} className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-100 rounded-xl text-[10px] font-black tracking-widest text-slate-400 hover:text-indigo-600 hover:border-indigo-100 transition-all shadow-sm"><ShoppingBag size={14} /> 从 Shopify 选择产品</button></div>
+              <div className="relative">
+                {hasGeneratedOnce && (
+                  <div className="absolute -top-4 left-6 z-10">
+                    <div className="flex items-center gap-1.5 px-3 py-1 bg-indigo-600 text-white rounded-full shadow-lg border border-white/20">
+                      <PackageCheck size={12} className="text-indigo-200" />
+                      <span className="text-[9px] font-black tracking-widest">出品</span>
+                    </div>
+                    <div className="w-[2px] h-4 bg-indigo-600 ml-5 opacity-50"></div>
+                  </div>
+                )}
+                <div className={`bg-slate-50 border-2 border-dashed border-slate-200 rounded-[2.5rem] p-6 flex items-center gap-6 focus-within:bg-white focus-within:border-indigo-500 transition-all ${selectedProducts.length > 0 ? 'border-slate-300' : ''}`}>
+                  <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-slate-300 shadow-sm border border-slate-100"><Link2 size={24} /></div>
+                  <input type="text" placeholder="粘贴投放目标 URL，回车立即解析..." className="flex-1 bg-transparent border-none outline-none text-base font-medium text-slate-800 placeholder:text-slate-300" value={urlInput} onChange={(e) => setUrlInput(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter' && urlInput) { const newP = { id: `manual-${Date.now()}`, name: `落地页商品 - ${selectedProducts.length + 1}`, url: urlInput, imageUrl: `https://picsum.photos/seed/${Date.now()}/400/400` }; onSelectProducts([...selectedProducts, newP]); setUrlInput(''); } }} />
+                </div>
+              </div>
+              <div className="flex gap-4 px-2">
+                <button onClick={() => setActiveModal('history')} className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-100 rounded-xl text-[10px] font-black tracking-widest text-slate-400 hover:text-indigo-600 hover:border-indigo-100 transition-all shadow-sm"><History size={14} /> 从产品库选择历史商品</button>
+                <button onClick={() => setActiveModal('shopify')} className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-100 rounded-xl text-[10px] font-black tracking-widest text-slate-400 hover:text-indigo-600 hover:border-indigo-100 transition-all shadow-sm"><ShoppingBag size={14} /> 从 Shopify 选择产品</button>
+              </div>
             </div>
-          ) : (<div className="space-y-8 animate-in fade-in slide-in-from-top-4">{!authStatus.meta ? (<div className="bg-white border-2 border-dashed border-slate-200 rounded-[2.5rem] p-12 flex flex-col items-center text-center space-y-6"><div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center shadow-sm"><Facebook size={32} /></div><div className="max-w-md space-y-2"><h4 className="text-lg font-black text-slate-900">投放目录广告需先授权 Meta feeds</h4><p className="text-xs text-slate-400 font-bold leading-relaxed">我们需要访问您的 Meta 广告账户以获取目录（Catalog）及其关联的产品系列（Product Sets）数据。</p></div><button onClick={() => handleAuthorize('meta')} disabled={isAuthLoading} className="px-12 py-4 bg-slate-900 text-white rounded-2xl font-black tracking-widest hover:bg-black transition-all shadow-xl flex items-center gap-3">{isAuthLoading ? <Loader2 size={20} className="animate-spin" /> : <Facebook size={20} />}立即连接</button></div>) : !selectedAccount ? (<div className="bg-indigo-50/50 border-2 border-indigo-100 rounded-[2.5rem] p-10 flex items-center justify-between animate-in slide-in-from-top-4"><div className="flex items-center gap-6"><div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-indigo-600 shadow-sm"><RefreshCw size={28} className="animate-spin-slow" /></div><div><h4 className="text-base font-black text-slate-900">Meta 已授权，请选择关联广告账户</h4><p className="text-[10px] text-slate-400 font-bold tracking-widest mt-1">Found 2 available accounts</p></div></div><button onClick={() => setActiveModal('select_account')} className="px-8 py-4 bg-indigo-600 text-white rounded-xl font-black tracking-widest hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100">选择广告账户</button></div>) : (<div className="grid grid-cols-1 md:grid-cols-2 gap-8 animate-in slide-in-from-top-4"><div className="space-y-3 relative"><label className="text-[10px] font-black text-slate-400 tracking-widest px-1">选择目录 (catalog)</label><div onClick={() => setCatalogDropdownOpen(!catalogDropdownOpen)} className={`flex items-center justify-between p-6 bg-white border-2 rounded-[1.5rem] cursor-pointer hover:border-indigo-600 hover:shadow-lg transition-all ${catalogDropdownOpen ? 'border-indigo-600 shadow-lg' : 'border-slate-100'}`}><div className="flex items-center gap-4 min-w-0"><div className="w-11 h-11 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center shrink-0"><Database size={22} /></div><div className="min-w-0"><p className="text-xs font-black text-slate-800 truncate">{selectedCatalog?.name || '请选择一个目录...'}</p>{selectedCatalog && <p className="text-[10px] text-slate-400 font-bold tracking-widest mt-0.5">id: {selectedCatalog.id}</p>}</div></div><ChevronDown size={14} className={`text-slate-300 transition-transform ${catalogDropdownOpen ? 'rotate-180' : ''}`} /></div>{catalogDropdownOpen && (<div className="absolute top-full left-0 right-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl z-[100] overflow-hidden animate-in fade-in slide-in-from-top-2">{MOCK_CATALOGS.length > 0 ? (MOCK_CATALOGS.map(c => (<div key={c.id} onClick={() => { setSelectedCatalog(c); setCatalogDropdownOpen(false); }} className="flex items-center justify-between px-6 py-4 hover:bg-slate-50 cursor-pointer transition-colors group"><div><p className="text-xs font-black text-slate-800 group-hover:text-indigo-600 transition-colors">{c.name}</p><p className="text-[10px] text-slate-400 font-bold tracking-widest">id: {c.id}</p></div>{selectedCatalog?.id === c.id && <Check size={16} className="text-indigo-600" />}</div>))) : (<div className="p-8 text-center space-y-4"><AlertCircle size={32} className="mx-auto text-slate-200" /><p className="text-xs font-bold text-slate-400">暂无可用目录，请先在 Meta 后台创建</p><a href="#" className="inline-flex items-center gap-1.5 text-[10px] font-black text-indigo-600 tracking-widest hover:underline"><ExternalLink size={12} /> 查看 Meta feeds 创建帮助文档</a></div>)}</div>)}</div><div className="space-y-3 relative"><label className="text-[10px] font-black text-slate-400 tracking-widest px-1">产品系列 (Product set)</label><div onClick={() => setSetDropdownOpen(!setDropdownOpen)} className={`flex items-center justify-between p-6 bg-white border-2 rounded-[1.5rem] cursor-pointer hover:border-indigo-600 hover:shadow-lg transition-all ${setDropdownOpen ? 'border-indigo-600 shadow-lg' : 'border-slate-100'}`}><div className="flex items-center gap-4 min-w-0"><div className="w-11 h-11 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center shrink-0"><ListFilter size={22} /></div><div><p className="text-xs font-black text-slate-800">{selectedProductSet || '选择产品系列...'}</p><p className="text-[10px] text-slate-400 font-bold tracking-widest mt-0.5">set criteria</p></div></div><ChevronDown size={14} className={`text-slate-300 transition-transform ${setDropdownOpen ? 'rotate-180' : ''}`} /></div>{setDropdownOpen && (<div className="absolute top-full left-0 right-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl z-[100] overflow-hidden animate-in fade-in slide-in-from-top-2">{['All Products', 'Best Sellers', 'New Arrivals'].map(s => (<div key={s} onClick={() => { setSelectedProductSet(s); setSetDropdownOpen(false); }} className="flex items-center justify-between px-6 py-4 hover:bg-slate-50 cursor-pointer transition-colors group"><p className="text-xs font-black text-slate-800 group-hover:text-indigo-600 transition-colors">{s}</p>{selectedProductSet === s && <Check size={16} className="text-indigo-600" />}</div>))}</div>)}</div></div>)}</div>)}
+          ) : (
+            <div className="space-y-8 animate-in fade-in slide-in-from-top-4">
+              {!authStatus.meta ? (
+                <div className="bg-white border-2 border-dashed border-slate-200 rounded-[2.5rem] p-12 flex flex-col items-center text-center space-y-6">
+                  <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center shadow-sm"><Facebook size={32} /></div>
+                  <div className="max-w-md space-y-2">
+                    <h4 className="text-lg font-black text-slate-900">投放目录广告需先授权 Meta feeds</h4>
+                    <p className="text-xs text-slate-400 font-bold leading-relaxed">我们需要访问您的 Meta 广告账户以获取目录（Catalog）及其关联的产品系列（Product Sets）数据。</p>
+                  </div>
+                  <button onClick={() => handleAuthorize('meta')} disabled={isAuthLoading} className="px-12 py-4 bg-slate-900 text-white rounded-2xl font-black tracking-widest hover:bg-black transition-all shadow-xl flex items-center gap-3">{isAuthLoading ? <Loader2 size={20} className="animate-spin" /> : <Facebook size={20} />}立即连接</button>
+                </div>
+              ) : !selectedAccount ? (
+                <div className="bg-indigo-50/50 border-2 border-indigo-100 rounded-[2.5rem] p-10 flex items-center justify-between animate-in slide-in-from-top-4">
+                  <div className="flex items-center gap-6">
+                    <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-indigo-600 shadow-sm"><RefreshCw size={28} className="animate-spin-slow" /></div>
+                    <div>
+                      <h4 className="text-base font-black text-slate-900">Meta 已授权，请选择关联广告账户</h4>
+                      <p className="text-[10px] text-slate-400 font-bold tracking-widest mt-1">Found 2 available accounts</p>
+                    </div>
+                  </div>
+                  <button onClick={() => setActiveModal('select_account')} className="px-8 py-4 bg-indigo-600 text-white rounded-xl font-black tracking-widest hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100">选择广告账户</button>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 animate-in slide-in-from-top-4">
+                  <div className="space-y-3 relative">
+                    <label className="text-[10px] font-black text-slate-400 tracking-widest px-1">选择目录 (catalog)</label>
+                    <div onClick={() => setCatalogDropdownOpen(!catalogDropdownOpen)} className={`flex items-center justify-between p-6 bg-white border-2 rounded-[1.5rem] cursor-pointer hover:border-indigo-600 hover:shadow-lg transition-all ${catalogDropdownOpen ? 'border-indigo-600 shadow-lg' : 'border-slate-100'}`}>
+                      <div className="flex items-center gap-4 min-w-0">
+                        <div className="w-11 h-11 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center shrink-0"><Database size={22} /></div>
+                        <div className="min-w-0">
+                          <p className="text-xs font-black text-slate-800 truncate">{selectedCatalog?.name || '请选择一个目录...'}</p>
+                          {selectedCatalog && <p className="text-[10px] text-slate-400 font-bold tracking-widest mt-0.5">id: {selectedCatalog.id}</p>}
+                        </div>
+                      </div>
+                      <ChevronDown size={14} className={`text-slate-300 transition-transform ${catalogDropdownOpen ? 'rotate-180' : ''}`} />
+                    </div>
+                    {catalogDropdownOpen && (
+                      <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl z-[100] overflow-hidden animate-in fade-in slide-in-from-top-2">
+                        {MOCK_CATALOGS.length > 0 ? (
+                          MOCK_CATALOGS.map(c => (
+                            <div key={c.id} onClick={() => { setSelectedCatalog(c); setCatalogDropdownOpen(false); }} className="flex items-center justify-between px-6 py-4 hover:bg-slate-50 cursor-pointer transition-colors group">
+                              <div>
+                                <p className="text-xs font-black text-slate-800 group-hover:text-indigo-600 transition-colors">{c.name}</p>
+                                <p className="text-[10px] text-slate-400 font-bold tracking-widest">id: {c.id}</p>
+                              </div>
+                              {selectedCatalog?.id === c.id && <Check size={16} className="text-indigo-600" />}
+                            </div>
+                          ))
+                        ) : (
+                          <div className="p-8 text-center space-y-4">
+                            <AlertCircle size={32} className="mx-auto text-slate-200" /><p className="text-xs font-bold text-slate-400">暂无可用目录，请先在 Meta 后台创建</p>
+                            <a href="#" className="inline-flex items-center gap-1.5 text-[10px] font-black text-indigo-600 tracking-widest hover:underline"><ExternalLink size={12} /> 查看 Meta feeds 创建帮助文档</a>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                  <div className="space-y-3 relative">
+                    <label className="text-[10px] font-black text-slate-400 tracking-widest px-1">产品系列 (Product set)</label>
+                    <div onClick={() => setSetDropdownOpen(!setDropdownOpen)} className={`flex items-center justify-between p-6 bg-white border-2 rounded-[1.5rem] cursor-pointer hover:border-indigo-600 hover:shadow-lg transition-all ${setDropdownOpen ? 'border-indigo-600 shadow-lg' : 'border-slate-100'}`}>
+                      <div className="flex items-center gap-4 min-w-0">
+                        <div className="w-11 h-11 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center shrink-0"><ListFilter size={22} /></div>
+                        <div>
+                          <p className="text-xs font-black text-slate-800">{selectedProductSet || '选择产品系列...'}</p>
+                          <p className="text-[10px] text-slate-400 font-bold tracking-widest mt-0.5">set criteria</p>
+                        </div>
+                      </div>
+                      <ChevronDown size={14} className={`text-slate-300 transition-transform ${setDropdownOpen ? 'rotate-180' : ''}`} />
+                    </div>
+                    {setDropdownOpen && (
+                      <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl z-[100] overflow-hidden animate-in fade-in slide-in-from-top-2">
+                        {['All Products', 'Best Sellers', 'New Arrivals'].map(s => (
+                          <div key={s} onClick={() => { setSelectedProductSet(s); setSetDropdownOpen(false); }} className="flex items-center justify-between px-6 py-4 hover:bg-slate-50 cursor-pointer transition-colors group">
+                            <p className="text-xs font-black text-slate-800 group-hover:text-indigo-600 transition-colors">{s}</p>
+                            {selectedProductSet === s && <Check size={16} className="text-indigo-600" />}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
           {!analysisFinished && !isAnalyzing && selectedProducts.length > 0 && campaignType === 'PRODUCT' && (
             <div className="flex flex-col items-center pt-8 border-t border-slate-50 space-y-10 animate-in fade-in slide-in-from-bottom-6">
               <div className="w-full flex flex-col items-center space-y-8">
                 <div className="w-full max-w-4xl space-y-4">
-                  <div className="flex items-center justify-between px-6"><h5 className="text-[10px] font-black text-slate-400 tracking-widest flex items-center gap-2"><Layers size={14} className="text-indigo-400" /> 待解析产品清单 ({selectedProducts.length})</h5><p className="text-[9px] text-slate-400 font-bold tracking-widest">Ready for agent deep scan</p></div>
-                  <div className="w-full space-y-3 px-2">{selectedProducts.map((p) => (<div key={p.id} className="group relative flex items-center justify-between bg-white border border-slate-100 rounded-[1.5rem] p-4 shadow-sm hover:shadow-md hover:border-indigo-100 transition-all"><div className="flex items-center gap-4"><div className="w-12 h-12 rounded-xl overflow-hidden border border-slate-100 shrink-0 relative bg-slate-50">{p.imageUrl ? (<img src={p.imageUrl} className="w-full h-full object-cover" />) : (<div className="w-full h-full flex items-center justify-center text-slate-300"><ShoppingBag size={16} /></div>)}</div><div className="min-w-0"><p className="text-sm font-black text-slate-800 truncate max-w-xs">{p.name || '未命名产品'}</p><div className="flex items-center gap-1.5 mt-1 opacity-60"><Link2 size={12} className="shrink-0 text-slate-400" /><p className="text-[10px] font-bold text-slate-400 truncate max-w-xs">{p.url}</p></div></div></div><button onClick={() => removeProduct(p.id)} className="p-3 text-slate-300 hover:text-rose-500 transition-colors rounded-xl hover:bg-rose-50"><Trash2 size={18} /></button></div>))}</div>
+                  <div className="flex items-center justify-between px-6">
+                    <h5 className="text-[10px] font-black text-slate-400 tracking-widest flex items-center gap-2"><Layers size={14} className="text-indigo-400" /> 待解析产品清单 ({selectedProducts.length})</h5>
+                    <p className="text-[9px] text-slate-400 font-bold tracking-widest">Ready for agent deep scan</p>
+                  </div>
+                  <div className="w-full space-y-3 px-2">
+                    {selectedProducts.map((p) => (
+                      <div key={p.id} className="group relative flex items-center justify-between bg-white border border-slate-100 rounded-[1.5rem] p-4 shadow-sm hover:shadow-md hover:border-indigo-100 transition-all">
+                        <div className="flex items-center gap-4">
+                          <div className="w-12 h-12 rounded-xl overflow-hidden border border-slate-100 shrink-0 relative bg-slate-50">
+                            {p.imageUrl ? (<img src={p.imageUrl} className="w-full h-full object-cover" />) : (<div className="w-full h-full flex items-center justify-center text-slate-300"><ShoppingBag size={16} /></div>)}
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-sm font-black text-slate-800 truncate max-w-xs">{p.name || '未命名产品'}</p>
+                            <div className="flex items-center gap-1.5 mt-1 opacity-60">
+                              <Link2 size={12} className="shrink-0 text-slate-400" />
+                              <p className="text-[10px] font-bold text-slate-400 truncate max-w-xs">{p.url}</p>
+                            </div>
+                          </div>
+                        </div>
+                        <button onClick={() => removeProduct(p.id)} className="p-3 text-slate-300 hover:text-rose-500 transition-colors rounded-xl hover:bg-rose-50">
+                          <Trash2 size={18} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-                <button onClick={onAnalysisStart} className="h-24 px-20 bg-slate-900 text-white rounded-[3rem] text-lg font-black tracking-widest flex items-center gap-6 hover:bg-black transition-all shadow-[0_20px_50px_rgba(0,0,0,0.2)] hover:scale-105 active:scale-95 group"><Wand2 size={32} className="group-hover:rotate-12 transition-transform" /> 开启 {selectedProducts.length} 个产品的智能并行解析与生产 <ChevronRight size={32} /></button>
+                <button onClick={onAnalysisStart} className="h-24 px-20 bg-slate-900 text-white rounded-[3rem] text-lg font-black tracking-widest flex items-center gap-6 hover:bg-black transition-all shadow-[0_20px_50px_rgba(0,0,0,0.2)] hover:scale-105 active:scale-95 group">
+                  <Wand2 size={32} className="group-hover:rotate-12 transition-transform" /> 开启 {selectedProducts.length} 个产品的智能并行解析与生产 <ChevronRight size={32} />
+                </button>
               </div>
               <p className="text-xs text-slate-400 font-bold tracking-[0.3em]">Next-gen media planning system</p>
             </div>
@@ -485,16 +632,117 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
           <div className="bg-slate-50/80 border border-slate-200/60 rounded-[3rem] overflow-hidden shadow-inner">
             <div className="p-8 md:p-10 bg-white border-b border-slate-100 space-y-8">
               <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-                <div><div className="flex items-center gap-3 mb-2"><div className="w-10 h-10 bg-indigo-600 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-100"><Zap size={20} /></div><h3 className="text-xl font-black text-slate-900 tracking-tight">智能素材生产工作台</h3></div><p className="text-xs text-slate-400 font-bold tracking-widest">Orchestrate creative production at scale</p></div>
+                <div>
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="w-10 h-10 bg-indigo-600 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-100"><Zap size={20} /></div>
+                    <h3 className="text-xl font-black text-slate-900 tracking-tight">智能素材生产工作台</h3>
+                  </div>
+                  <p className="text-xs text-slate-400 font-bold tracking-widest">Orchestrate creative production at scale</p>
+                </div>
                 {analysisFinished && (
                   <div className="flex items-center gap-4 bg-slate-50 p-2 rounded-2xl border border-slate-100">
-                    <button onClick={() => setActiveModal('batch_match')} className="flex items-center gap-2.5 px-6 py-3.5 bg-white border border-slate-200 rounded-xl text-xs font-black tracking-widest text-slate-700 hover:border-indigo-600 hover:text-indigo-600 transition-all shadow-sm group"><Database size={16} className="group-hover:scale-110 transition-transform" /> 批量匹配素材库</button>
-                    <button onClick={() => setActiveModal('batch_aigc')} className="flex items-center gap-2.5 px-6 py-3.5 bg-indigo-600 text-white rounded-xl text-xs font-black tracking-widest hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200 group"><Sparkles size={16} className="group-hover:rotate-12 transition-transform" /> 批量 AIGC 生成</button>
+                    <button onClick={() => setActiveModal('batch_match')} className="flex items-center gap-2.5 px-6 py-3.5 bg-white border border-slate-200 rounded-xl text-xs font-black tracking-widest text-slate-700 hover:border-indigo-600 hover:text-indigo-600 transition-all shadow-sm group">
+                      <Database size={16} className="group-hover:scale-110 transition-transform" /> 批量匹配素材库
+                    </button>
+                    <button onClick={() => setActiveModal('batch_aigc')} className="flex items-center gap-2.5 px-6 py-3.5 bg-indigo-600 text-white rounded-xl text-xs font-black tracking-widest hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200 group">
+                      <Sparkles size={16} className="group-hover:rotate-12 transition-transform" /> 批量 AIGC 生成
+                    </button>
                   </div>
                 )}
               </div>
             </div>
-            <div className="p-4 md:p-6 space-y-4 max-h-[700px] overflow-y-auto no-scrollbar">{selectedProducts.map((p, idx) => { const creatives = productCreatives[p.id] || []; const isExpanded = expandedAnalysisId === p.id; return (<div key={p.id} className="space-y-3"><div className={`bg-white border rounded-[2rem] p-4 md:p-6 transition-all hover:shadow-xl hover:shadow-slate-200/50 group ${creatives.length === 0 && analysisFinished ? 'border-amber-100 ring-2 ring-amber-500/5' : 'border-slate-100'}`}><div className="flex flex-col lg:flex-row gap-6"><div className="flex items-center gap-4 lg:w-72 shrink-0"><div className="w-12 h-12 rounded-xl overflow-hidden border border-slate-100 shrink-0 shadow-sm relative"><img src={p.imageUrl} className="w-full h-full object-cover" />{creatives.length === 0 && analysisFinished && (<div className="absolute inset-0 bg-amber-500/80 flex items-center justify-center"><Flame size={14} className="text-white animate-bounce" /></div>)}</div><div className="min-w-0 flex-1"><h4 className="text-sm font-black text-slate-800 truncate">{p.name}</h4>{analysisFinished && (<div className="flex items-center gap-2 mt-1"><span className={`text-[9px] font-black px-2 py-0.5 rounded-full ${creatives.length > 0 ? 'bg-indigo-50 text-indigo-600' : 'bg-amber-50 text-amber-600'}`}>{creatives.length} 素材</span><button onClick={() => setShowReportFor(p.id)} className="text-[9px] font-black text-slate-400 underline hover:text-indigo-600">分析报告</button></div>)}</div></div><div className="flex-1 flex flex-col justify-center">{isAnalyzing ? (<div className="w-full flex justify-end"><button onClick={() => setExpandedAnalysisId(isExpanded ? null : p.id)} className="flex items-center gap-2 px-3 py-1.5 bg-indigo-50 text-indigo-600 rounded-lg text-[10px] font-black tracking-widest hover:bg-indigo-100 transition-colors"><Loader2 size={12} className="animate-spin" />Analyzing...{isExpanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />}</button></div>) : (<div className="flex flex-col md:flex-row items-center gap-6 overflow-hidden"><div className="w-full flex items-center gap-3 overflow-x-auto no-scrollbar py-1">{creatives.map(c => (<div key={c.id} className="relative w-14 h-20 rounded-lg overflow-hidden shrink-0 border border-slate-100 group/item shadow-sm"><img src={c.url} className="w-full h-full object-cover" /><button onClick={() => onUpdateCreatives(p.id, creatives.filter(prev => prev.id !== c.id))} className="absolute top-1 right-1 w-5 h-5 bg-white/90 rounded-full flex items-center justify-center opacity-0 group-hover/item:opacity-100 transition-all text-rose-500 shadow-md"><X size={10} /></button></div>))}<div className="flex gap-2 shrink-0 ml-2"><button onClick={() => { setModalContext(p.id); setActiveModal('creative_lib'); }} className="w-14 h-20 rounded-lg border-2 border-dashed border-slate-100 flex flex-col items-center justify-center text-slate-300 hover:border-indigo-400 hover:text-indigo-400 hover:bg-indigo-50 transition-all gap-1" title="从素材库选择"><Database size={16} /><span className="text-[7px] font-black">库</span></button><button onClick={() => handleAIGCForProduct(p.id)} className="w-14 h-20 rounded-lg border-2 border-dashed border-purple-100 flex flex-col items-center justify-center text-purple-400 hover:border-purple-400 hover:bg-purple-50 transition-all gap-1" title="AI 生成"><Sparkles size={16} /><span className="text-[7px] font-black">AI</span></button><button onClick={() => handleUploadForProduct(p.id)} className="w-14 h-20 rounded-lg border-2 border-dashed border-slate-100 flex flex-col items-center justify-center text-slate-300 hover:border-slate-400 hover:bg-slate-50 transition-all gap-1" title="本地上传"><Upload size={16} /><span className="text-[7px] font-black">传</span></button></div></div></div>)}</div>{!isAnalyzing && (<div className="shrink-0 flex items-center"><button onClick={() => removeProduct(p.id)} className="p-3 text-slate-300 hover:text-rose-500 transition-colors rounded-xl hover:bg-rose-50"><Trash2 size={18} /></button></div>)}</div></div>{isAnalyzing && isExpanded && (<div className="bg-slate-50/50 rounded-3xl p-8 border border-slate-100 mx-4 animate-in slide-in-from-top-2"><div className="space-y-4">{ANALYSIS_STEPS.map((step, stepIdx) => (<div key={stepIdx} className={`flex items-center gap-4 transition-all ${stepIdx <= currentStep ? 'opacity-100' : 'opacity-30'}`}><div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${stepIdx < currentStep ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-100' : 'bg-white border-2 border-slate-100 text-slate-300'}`}>{stepIdx < currentStep ? <Check size={16} /> : step.icon}</div><p className="text-xs font-bold text-slate-600 tracking-wide">{step.text}</p></div>))}</div></div>)}</div>); })}</div>
+            <div className="p-4 md:p-6 space-y-4">
+              {selectedProducts.map((p, idx) => {
+                const creatives = productCreatives[p.id] || [];
+                const isExpanded = expandedAnalysisId === p.id;
+                const showAnalysisResult = analysisFinished || (isAnalyzing && p.isFromHistory);
+                
+                return (
+                  <div key={p.id} className="space-y-3">
+                    <div className={`bg-white border rounded-[2rem] p-4 md:p-6 transition-all hover:shadow-xl hover:shadow-slate-200/50 group ${creatives.length === 0 && showAnalysisResult ? 'border-amber-100 ring-2 ring-amber-500/5' : 'border-slate-100'}`}>
+                      <div className="flex flex-col lg:flex-row gap-6">
+                        <div className="flex items-center gap-4 lg:w-72 shrink-0">
+                          <div className="w-12 h-12 rounded-xl overflow-hidden border border-slate-100 shrink-0 shadow-sm relative">
+                            <img src={p.imageUrl} className="w-full h-full object-cover" />
+                            {creatives.length === 0 && showAnalysisResult && (
+                              <div className="absolute inset-0 bg-amber-500/80 flex items-center justify-center">
+                                <Flame size={14} className="text-white animate-bounce" />
+                              </div>
+                            )}
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <h4 className="text-sm font-black text-slate-800 truncate">{p.name}</h4>
+                            {showAnalysisResult && (
+                              <div className="flex items-center gap-2 mt-1">
+                                <span className={`text-[9px] font-black px-2 py-0.5 rounded-full ${creatives.length > 0 ? 'bg-indigo-50 text-indigo-600' : 'bg-amber-50 text-amber-600'}`}>{creatives.length} 素材</span>
+                                <button onClick={() => setShowReportFor(p.id)} className="text-[9px] font-black text-slate-400 underline hover:text-indigo-600">分析报告</button>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex-1 flex flex-col justify-center">
+                          {(!showAnalysisResult && isAnalyzing) ? (
+                            <div className="w-full flex justify-end">
+                              <button onClick={() => setExpandedAnalysisId(isExpanded ? null : p.id)} className="flex items-center gap-2 px-3 py-1.5 bg-indigo-50 text-indigo-600 rounded-lg text-[10px] font-black tracking-widest hover:bg-indigo-100 transition-colors">
+                                <Loader2 size={12} className="animate-spin" />Analyzing...{isExpanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+                              </button>
+                            </div>
+                          ) : (
+                            <div className="flex flex-col md:flex-row items-center gap-6 overflow-hidden">
+                              <div className="w-full flex items-center gap-3 overflow-x-auto no-scrollbar py-1">
+                                {creatives.map(c => (
+                                  <div key={c.id} className="relative w-14 h-20 rounded-lg overflow-hidden shrink-0 border border-slate-100 group/item shadow-sm">
+                                    <img src={c.url} className="w-full h-full object-cover" />
+                                    <button onClick={() => onUpdateCreatives(p.id, creatives.filter(prev => prev.id !== c.id))} className="absolute top-1 right-1 w-5 h-5 bg-white/90 rounded-full flex items-center justify-center opacity-0 group-hover/item:opacity-100 transition-all text-rose-500 shadow-md">
+                                      <X size={10} />
+                                    </button>
+                                  </div>
+                                ))}
+                                <div className="flex gap-2 shrink-0 ml-2">
+                                  <button onClick={() => { setModalContext(p.id); setActiveModal('creative_lib'); }} className="w-14 h-20 rounded-lg border-2 border-dashed border-slate-100 flex flex-col items-center justify-center text-slate-300 hover:border-indigo-400 hover:text-indigo-400 hover:bg-indigo-50 transition-all gap-1" title="从素材库选择">
+                                    <Database size={16} />
+                                    <span className="text-[7px] font-black">库</span>
+                                  </button>
+                                  <button onClick={() => handleAIGCForProduct(p.id)} className="w-14 h-20 rounded-lg border-2 border-dashed border-purple-100 flex flex-col items-center justify-center text-purple-400 hover:border-purple-400 hover:bg-purple-50 transition-all gap-1" title="AI 生成">
+                                    <Sparkles size={16} />
+                                    <span className="text-[7px] font-black">AI</span>
+                                  </button>
+                                  <button onClick={() => handleUploadForProduct(p.id)} className="w-14 h-20 rounded-lg border-2 border-dashed border-slate-100 flex flex-col items-center justify-center text-slate-300 hover:border-slate-400 hover:bg-slate-50 transition-all gap-1" title="本地上传">
+                                    <Upload size={16} />
+                                    <span className="text-[7px] font-black">传</span>
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                        {!isAnalyzing && (
+                          <div className="shrink-0 flex items-center">
+                            <button onClick={() => removeProduct(p.id)} className="p-3 text-slate-300 hover:text-rose-500 transition-colors rounded-xl hover:bg-rose-50">
+                              <Trash2 size={18} />
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    {isAnalyzing && isExpanded && !p.isFromHistory && (
+                      <div className="bg-slate-50/50 rounded-3xl p-8 border border-slate-100 mx-4 animate-in slide-in-from-top-2">
+                        <div className="space-y-4">
+                          {ANALYSIS_STEPS.map((step, stepIdx) => (
+                            <div key={stepIdx} className={`flex items-center gap-4 transition-all ${stepIdx <= currentStep ? 'opacity-100' : 'opacity-30'}`}>
+                              <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${stepIdx < currentStep ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-100' : 'bg-white border-2 border-slate-100 text-slate-300'}`}>
+                                {stepIdx < currentStep ? <Check size={16} /> : step.icon}
+                              </div>
+                              <p className="text-xs font-bold text-slate-600 tracking-wide">{step.text}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </section>
       )}
@@ -509,17 +757,105 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
       )}
       {activeModal === 'batch_match' && (
         <ModalWrapper zIndex={Z_INDEX.MODAL_BASE + 40}>
-          <div className="bg-white w-full max-w-xl rounded-[3rem] shadow-2xl p-10 space-y-8 animate-in slide-in-from-bottom-8"><div className="flex items-center justify-between"><div className="flex items-center gap-4"><div className="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center text-white shadow-lg"><Database size={24} /></div><div><h4 className="text-xl font-black text-slate-900">批量匹配素材库</h4><p className="text-slate-400 text-xs font-bold tracking-widest mt-1">智能分析并关联现有营销资产</p></div></div><button onClick={() => setActiveModal(null)} className="p-2 hover:bg-slate-50 rounded-full text-slate-300"><X size={24} /></button></div><div className="space-y-4">{[{ id: '24h', label: '智能匹配 24h 内上传素材', icon: <Sparkles size={16} /> }, { id: 'unused', label: '智能匹配历史从未投放过素材', icon: <FileText size={16} /> }, { id: 'top7d', label: '智能匹配近 7 天 TOP 素材', icon: <Flame size={16} /> }].map(opt => (<button key={opt.id} onClick={() => setActiveModal(null)} className="w-full p-6 rounded-2xl border-2 flex items-center justify-between border-slate-100 bg-white hover:border-indigo-600 transition-all"><div className="flex items-center gap-4"><div className="p-2 rounded-lg bg-slate-50 text-slate-400">{opt.icon}</div><span className="text-sm font-black text-slate-600">{opt.label}</span></div><Check size={20} className="text-indigo-600 opacity-0 group-hover:opacity-100" /></button>))}</div><button onClick={() => setActiveModal(null)} className="w-full py-5 rounded-2xl font-black tracking-widest shadow-xl bg-slate-900 text-white hover:bg-black transition-all">确认并开始批量匹配</button></div>
+          <div className="bg-white w-full max-w-xl rounded-[3rem] shadow-2xl p-10 space-y-8 animate-in slide-in-from-bottom-8">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center text-white shadow-lg"><Database size={24} /></div>
+                <div>
+                  <h4 className="text-xl font-black text-slate-900">批量匹配素材库</h4>
+                  <p className="text-slate-400 text-xs font-bold tracking-widest mt-1">智能分析并关联现有营销资产</p>
+                </div>
+              </div>
+              <button onClick={() => setActiveModal(null)} className="p-2 hover:bg-slate-50 rounded-full text-slate-300"><X size={24} /></button>
+            </div>
+            <div className="space-y-4">
+              {[{ id: '24h', label: '智能匹配 24h 内上传素材', icon: <Sparkles size={16} /> }, { id: 'unused', label: '智能匹配历史从未投放过素材', icon: <FileText size={16} /> }, { id: 'top7d', label: '智能匹配近 7 天 TOP 素材', icon: <Flame size={16} /> }].map(opt => (
+                <button key={opt.id} onClick={() => setActiveModal(null)} className="w-full p-6 rounded-2xl border-2 flex items-center justify-between border-slate-100 bg-white hover:border-indigo-600 transition-all group">
+                  <div className="flex items-center gap-4">
+                    <div className="p-2 rounded-lg bg-slate-50 text-slate-400">{opt.icon}</div>
+                    <span className="text-sm font-black text-slate-600">{opt.label}</span>
+                  </div>
+                  <Check size={20} className="text-indigo-600 opacity-0 group-hover:opacity-100" />
+                </button>
+              ))}
+            </div>
+            <button onClick={() => setActiveModal(null)} className="w-full py-5 rounded-2xl font-black tracking-widest shadow-xl bg-slate-900 text-white hover:bg-black transition-all">确认并开始批量匹配</button>
+          </div>
         </ModalWrapper>
       )}
       {activeModal === 'batch_aigc' && (
         <ModalWrapper zIndex={Z_INDEX.MODAL_BASE + 50}>
-          <div className="bg-white w-full max-w-2xl rounded-[3rem] shadow-2xl p-10 space-y-8 animate-in slide-in-from-bottom-8"><div className="flex items-center justify-between"><div className="flex items-center gap-4"><div className="w-12 h-12 bg-purple-600 rounded-2xl flex items-center justify-center text-white shadow-lg"><Sparkles size={24} /></div><div><h4 className="text-xl font-black text-slate-900">批量 AIGC 生成素材</h4><p className="text-slate-400 text-xs font-bold tracking-widest mt-1">为每个所选商品并行生成差异化创意</p></div></div><button onClick={() => setActiveModal(null)} className="p-2 hover:bg-slate-50 rounded-full text-slate-300"><X size={24} /></button></div><div className="space-y-6"><div className="space-y-3"><label className="text-[10px] font-black text-slate-400 tracking-widest">每个商品生成的素材数量</label><div className="grid grid-cols-5 gap-3">{[1, 2, 3, 4, 5].map(n => (<button key={n} onClick={() => setBatchAIGCCount(n)} className={`h-12 rounded-xl font-black text-sm border-2 transition-all ${batchAIGCCount === n ? 'bg-purple-600 border-purple-600 text-white shadow-lg shadow-purple-100' : 'bg-white border-slate-100 text-slate-400 hover:border-slate-200'}`}>{n}</button>))}</div></div><div className="space-y-3"><label className="text-[10px] font-black text-slate-400 tracking-widest">选择执行商品 ({selectedProducts.length - batchAIGCExclusions.size})</label><div className="max-h-60 overflow-y-auto space-y-2 no-scrollbar pr-2">{selectedProducts.map(p => (<div key={p.id} onClick={() => { const next = new Set(batchAIGCExclusions); if (next.has(p.id)) next.delete(p.id); else next.add(p.id); setBatchAIGCExclusions(next); }} className={`flex items-center justify-between p-4 rounded-xl border-2 cursor-pointer transition-all ${!batchAIGCExclusions.has(p.id) ? 'border-purple-100 bg-white' : 'border-slate-100 opacity-50 grayscale'}`}><div className="flex items-center gap-3 min-w-0"><img src={p.imageUrl} className="w-8 h-8 rounded-lg object-cover" /><p className="text-xs font-bold text-slate-800 truncate">{p.name}</p></div><div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${!batchAIGCExclusions.has(p.id) ? 'bg-purple-600 border-purple-600' : 'bg-transparent border-slate-200'}`}>{!batchAIGCExclusions.has(p.id) && <Check size={12} className="text-white" />}</div></div>))}</div></div></div><button onClick={handleBatchAIGC} className="w-full py-5 bg-slate-900 text-white rounded-2xl font-black tracking-widest shadow-xl hover:bg-black transition-all flex items-center justify-center gap-3"><Sparkles size={20} /> 开始并行生成创意</button></div>
+          <div className="bg-white w-full max-w-2xl rounded-[3rem] shadow-2xl p-10 space-y-8 animate-in slide-in-from-bottom-8">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-purple-600 rounded-2xl flex items-center justify-center text-white shadow-lg"><Sparkles size={24} /></div>
+                <div>
+                  <h4 className="text-xl font-black text-slate-900">批量 AIGC 生成素材</h4>
+                  <p className="text-slate-400 text-xs font-bold tracking-widest mt-1">为每个所选商品并行生成差异化创意</p>
+                </div>
+              </div>
+              <button onClick={() => setActiveModal(null)} className="p-2 hover:bg-slate-50 rounded-full text-slate-300"><X size={24} /></button>
+            </div>
+            <div className="space-y-6">
+              <div className="space-y-3">
+                <label className="text-[10px] font-black text-slate-400 tracking-widest">每个商品生成的素材数量</label>
+                <div className="grid grid-cols-5 gap-3">
+                  {[1, 2, 3, 4, 5].map(n => (
+                    <button key={n} onClick={() => setBatchAIGCCount(n)} className={`h-12 rounded-xl font-black text-sm border-2 transition-all ${batchAIGCCount === n ? 'bg-purple-600 border-purple-600 text-white shadow-lg shadow-purple-100' : 'bg-white border-slate-100 text-slate-400 hover:border-slate-200'}`}>{n}</button>
+                  ))}
+                </div>
+              </div>
+              <div className="space-y-3">
+                <label className="text-[10px] font-black text-slate-400 tracking-widest">选择执行商品 ({selectedProducts.length - batchAIGCExclusions.size})</label>
+                <div className="max-h-60 overflow-y-auto space-y-2 no-scrollbar pr-2">
+                  {selectedProducts.map(p => (
+                    <div key={p.id} onClick={() => { const next = new Set(batchAIGCExclusions); if (next.has(p.id)) next.delete(p.id); else next.add(p.id); setBatchAIGCExclusions(next); }} className={`flex items-center justify-between p-4 rounded-xl border-2 cursor-pointer transition-all ${!batchAIGCExclusions.has(p.id) ? 'border-purple-100 bg-white' : 'border-slate-100 opacity-50 grayscale'}`}>
+                      <div className="flex items-center gap-3 min-w-0">
+                        <img src={p.imageUrl} className="w-8 h-8 rounded-lg object-cover" />
+                        <p className="text-xs font-bold text-slate-800 truncate">{p.name}</p>
+                      </div>
+                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${!batchAIGCExclusions.has(p.id) ? 'bg-purple-600 border-purple-600' : 'bg-transparent border-slate-200'}`}>
+                        {!batchAIGCExclusions.has(p.id) && <Check size={12} className="text-white" />}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <button onClick={handleBatchAIGC} className="w-full py-5 bg-slate-900 text-white rounded-2xl font-black tracking-widest shadow-xl hover:bg-black transition-all flex items-center justify-center gap-3">
+              <Sparkles size={20} /> 开始并行生成创意
+            </button>
+          </div>
         </ModalWrapper>
       )}
       {activeModal === 'select_account' && (
         <ModalWrapper zIndex={Z_INDEX.MODAL_BASE + 60}>
-          <div className="bg-white w-full max-w-xl rounded-[3rem] shadow-2xl p-10 space-y-8 animate-in slide-in-from-bottom-8"><div className="flex items-center justify-between"><div className="flex items-center gap-4"><div className="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center text-white shadow-lg"><Briefcase size={24} /></div><div><h4 className="text-xl font-black text-slate-900">选择 Meta 广告账户</h4><p className="text-slate-400 text-xs font-bold tracking-widest mt-1">关联目录并同步商品数据</p></div></div><button onClick={() => setActiveModal(null)} className="p-2 hover:bg-slate-50 rounded-full text-slate-300"><X size={24} /></button></div><div className="space-y-3">{MOCK_ACCOUNTS.map(acc => (<button key={acc.id} onClick={() => { onSelectAccount(acc); setActiveModal(null); }} className={`w-full p-6 rounded-2xl border-2 flex items-center justify-between transition-all ${selectedAccount?.id === acc.id ? 'border-indigo-600 bg-indigo-50 shadow-lg shadow-indigo-100' : 'border-slate-100 bg-white hover:border-slate-200'}`}><div className="flex items-center gap-4 text-left"><div className={`p-2 rounded-lg ${selectedAccount?.id === acc.id ? 'bg-indigo-600 text-white' : 'bg-slate-50 text-slate-400'}`}><Briefcase size={16} /></div><div><p className={`text-sm font-black ${selectedAccount?.id === acc.id ? 'text-indigo-900' : 'text-slate-600'}`}>{acc.name}</p><p className="text-[10px] text-slate-400 font-bold tracking-widest">id: {acc.id}</p></div></div>{selectedAccount?.id === acc.id && <Check size={20} className="text-indigo-600" />}</button>))}</div></div>
+          <div className="bg-white w-full max-w-xl rounded-[3rem] shadow-2xl p-10 space-y-8 animate-in slide-in-from-bottom-8">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center text-white shadow-lg"><Briefcase size={24} /></div>
+                <div>
+                  <h4 className="text-xl font-black text-slate-900">选择 Meta 广告账户</h4>
+                  <p className="text-slate-400 text-xs font-bold tracking-widest mt-1">关联目录并同步商品数据</p>
+                </div>
+              </div>
+              <button onClick={() => setActiveModal(null)} className="p-2 hover:bg-slate-50 rounded-full text-slate-300"><X size={24} /></button>
+            </div>
+            <div className="space-y-3">
+              {MOCK_ACCOUNTS.map(acc => (
+                <button key={acc.id} onClick={() => { onSelectAccount(acc); setActiveModal(null); }} className={`w-full p-6 rounded-2xl border-2 flex items-center justify-between transition-all ${selectedAccount?.id === acc.id ? 'border-indigo-600 bg-indigo-50 shadow-lg shadow-indigo-100' : 'border-slate-100 bg-white hover:border-slate-200'}`}>
+                  <div className="flex items-center gap-4 text-left">
+                    <div className={`p-2 rounded-lg ${selectedAccount?.id === acc.id ? 'bg-indigo-600 text-white' : 'bg-slate-50 text-slate-400'}`}><Briefcase size={16} /></div>
+                    <div>
+                      <p className={`text-sm font-black ${selectedAccount?.id === acc.id ? 'text-indigo-900' : 'text-slate-600'}`}>{acc.name}</p>
+                      <p className="text-[10px] text-slate-400 font-bold tracking-widest">id: {acc.id}</p>
+                    </div>
+                  </div>
+                  {selectedAccount?.id === acc.id && <Check size={20} className="text-indigo-600" />}
+                </button>
+              ))}
+            </div>
+          </div>
         </ModalWrapper>
       )}
       {isAddModalOpen && (
@@ -528,8 +864,24 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
           style={{ zIndex: Z_INDEX.MODAL_BASE + 70 }}
         >
           <div className={`bg-white rounded-[40px] w-full shadow-2xl border border-slate-100 animate-in zoom-in-95 duration-200 flex flex-col relative transition-all duration-500 ${addStep === 'setup' ? 'max-w-4xl h-[90vh]' : 'max-w-2xl min-h-[400px]'}`}>
-            {isImportAnalyzing && (<div className="absolute inset-0 z-[120] bg-white rounded-[40px] flex flex-col items-center justify-center p-10 text-center animate-in fade-in duration-300"><div className="w-20 h-20 rounded-[32px] bg-indigo-50 flex items-center justify-center mb-6 shadow-inner relative"><div className="absolute inset-0 rounded-[32px] border-4 border-indigo-100 border-t-indigo-500 animate-spin" /><Loader2 className="text-indigo-500 animate-spin" size={32} /></div><h3 className="text-xl font-bold text-slate-900 mb-2 font-sans">Analyzing product info...</h3><p className="text-xs text-slate-400 font-medium mb-10 max-w-[320px] font-sans">We're fetching details from the URL. This might take a few moments.</p><button onClick={closeAddModal} className="px-10 py-3.5 bg-slate-900 text-white rounded-2xl font-bold text-sm hover:bg-black transition-all active:scale-95 shadow-lg shadow-slate-200 font-sans">Close and analyze in background</button></div>)}
-            <div className="p-8 pb-4 flex justify-between items-center shrink-0"><div className="flex items-center gap-4">{addStep !== 'options' && (<button onClick={() => setAddStep('options')} className="p-2.5 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-full transition-all"><ArrowLeft size={20} /></button>)}<h3 className="text-xl font-bold text-slate-900 font-sans">{addStep === 'options' ? '请选择同步产品数据的方式' : addStep === 'url' ? 'Import from URL' : addStep === 'setup' ? 'Setup your product' : addStep === 'shopify' ? 'Sync from Shopify' : addStep === 'gmc' ? 'Sync from Google GMC' : 'Sync from Meta feeds'}</h3></div><button onClick={closeAddModal} className="p-2.5 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-full transition-all"><X size={20} /></button></div>
+            {isImportAnalyzing && (
+              <div className="absolute inset-0 z-[120] bg-white rounded-[40px] flex flex-col items-center justify-center p-10 text-center animate-in fade-in duration-300">
+                <div className="w-20 h-20 rounded-[32px] bg-indigo-50 flex items-center justify-center mb-6 shadow-inner relative">
+                  <div className="absolute inset-0 rounded-[32px] border-4 border-indigo-100 border-t-indigo-500 animate-spin" />
+                  <Loader2 className="text-indigo-500 animate-spin" size={32} />
+                </div>
+                <h3 className="text-xl font-bold text-slate-900 mb-2 font-sans">Analyzing product info...</h3>
+                <p className="text-xs text-slate-400 font-medium mb-10 max-w-[320px] font-sans">We're fetching details from the URL. This might take a few moments.</p>
+                <button onClick={closeAddModal} className="px-10 py-3.5 bg-slate-900 text-white rounded-2xl font-bold text-sm hover:bg-black transition-all active:scale-95 shadow-lg shadow-slate-200 font-sans">Close and analyze in background</button>
+              </div>
+            )}
+            <div className="p-8 pb-4 flex justify-between items-center shrink-0">
+              <div className="flex items-center gap-4">
+                {addStep !== 'options' && (<button onClick={() => setAddStep('options')} className="p-2.5 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-full transition-all"><ArrowLeft size={20} /></button>)}
+                <h3 className="text-xl font-bold text-slate-900 font-sans">{addStep === 'options' ? '请选择同步产品数据的方式' : addStep === 'url' ? 'Import from URL' : addStep === 'setup' ? 'Setup your product' : addStep === 'shopify' ? 'Sync from Shopify' : addStep === 'gmc' ? 'Sync from Google GMC' : 'Sync from Meta feeds'}</h3>
+              </div>
+              <button onClick={closeAddModal} className="p-2.5 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-full transition-all"><X size={20} /></button>
+            </div>
             <div className="px-8 pb-8 flex-1 flex flex-col overflow-hidden">
               {addStep === 'options' && (
                 <div className="space-y-4 pt-4">
@@ -555,10 +907,111 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
                   })}
                 </div>
               )}
-              {addStep === 'url' && (<div className="flex-1 flex flex-col pt-6 px-10 text-center"><div className="space-y-8 mb-12"><h2 className="text-3xl font-bold text-slate-900 leading-tight font-sans">Paste your <span className="text-indigo-500">product link</span> to get product info</h2><div className="space-y-4"><p className="text-[10px] font-bold text-slate-400 tracking-[0.2em] font-sans">AdsGo supports</p><div className="flex items-center justify-center gap-4">{PLATFORM_ICONS.map(icon => (<div key={icon.id} className="w-10 h-10 rounded-full bg-white border border-slate-100 flex items-center justify-center p-2 shadow-sm hover:shadow-md hover:scale-110 transition-all cursor-default"><img src={icon.logo} alt={icon.id} className="w-full h-full object-contain" /></div>))}<div className="w-10 h-10 rounded-full bg-white border border-slate-100 flex items-center justify-center text-slate-300 font-bold text-sm">...</div></div></div></div><div className="space-y-8 max-w-[520px] mx-auto w-full flex-1 flex flex-col"><div className="space-y-3"><div className="relative group"><input type="text" value={productUrl} onChange={(e) => setProductUrl(e.target.value)} placeholder="e.g. amazon product link, shopify product link, etc." className={`w-full bg-slate-50 border-[1.5px] rounded-[24px] px-8 py-6 text-sm font-medium text-slate-700 placeholder:text-slate-300 focus:outline-none transition-all duration-300 ${urlError ? 'border-rose-400 bg-rose-50/20' : 'border-slate-100 focus:bg-white focus:border-indigo-300 focus:ring-[8px] focus:ring-indigo-500/5 shadow-inner'}`} />{urlError && <div className="absolute -bottom-7 left-4 flex items-center gap-1.5 text-rose-500 font-bold text-[10px] animate-in slide-in-from-top-1"><AlertTriangle size={12} />{urlError}</div>}</div></div><div className="mt-auto"><button onClick={handleImportAnalyzeUrl} className="w-full bg-indigo-600 text-white py-5 rounded-[22px] font-bold text-base hover:bg-indigo-700 shadow-xl shadow-indigo-100 transition-all active:scale-[0.97] font-sans">Analyze URL</button></div></div></div>)}
+              {addStep === 'url' && (
+                <div className="flex-1 flex flex-col pt-6 px-10 text-center">
+                  <div className="space-y-8 mb-12">
+                    <h2 className="text-3xl font-bold text-slate-900 leading-tight font-sans">Paste your <span className="text-indigo-500">product link</span> to get product info</h2>
+                    <div className="space-y-4">
+                      <p className="text-[10px] font-bold text-slate-400 tracking-[0.2em] font-sans">AdsGo supports</p>
+                      <div className="flex items-center justify-center gap-4">
+                        {PLATFORM_ICONS.map(icon => (<div key={icon.id} className="w-10 h-10 rounded-full bg-white border border-slate-100 flex items-center justify-center p-2 shadow-sm hover:shadow-md hover:scale-110 transition-all cursor-default"><img src={icon.logo} alt={icon.id} className="w-full h-full object-contain" /></div>))}
+                        <div className="w-10 h-10 rounded-full bg-white border border-slate-100 flex items-center justify-center text-slate-300 font-bold text-sm">...</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="space-y-8 max-w-[520px] mx-auto w-full flex-1 flex flex-col">
+                    <div className="space-y-3">
+                      <div className="relative group">
+                        <input type="text" value={productUrl} onChange={(e) => setProductUrl(e.target.value)} placeholder="e.g. amazon product link, shopify product link, etc." className={`w-full bg-slate-50 border-[1.5px] rounded-[24px] px-8 py-6 text-sm font-medium text-slate-700 placeholder:text-slate-300 focus:outline-none transition-all duration-300 ${urlError ? 'border-rose-400 bg-rose-50/20' : 'border-slate-100 focus:bg-white focus:border-indigo-300 focus:ring-[8px] focus:ring-indigo-500/5 shadow-inner'}`} />
+                        {urlError && <div className="absolute -bottom-7 left-4 flex items-center gap-1.5 text-rose-500 font-bold text-[10px] animate-in slide-in-from-top-1"><AlertTriangle size={12} />{urlError}</div>}
+                      </div>
+                    </div>
+                    <div className="mt-auto">
+                      <button onClick={handleImportAnalyzeUrl} className="w-full bg-indigo-600 text-white py-5 rounded-[22px] font-bold text-base hover:bg-indigo-700 shadow-xl shadow-indigo-100 transition-all active:scale-[0.97] font-sans">Analyze URL</button>
+                    </div>
+                  </div>
+                </div>
+              )}
               {addStep === 'setup' && (<ProductSetupForm isOpen={true} initialData={productForm} onClose={() => setAddStep('options')} onCreate={handleCreateProduct} />)}
-              {addStep === 'shopify' && (<div className="flex-1 flex flex-col justify-center items-center text-center space-y-8 py-6">{!isShopifyConnected ? (<><div className="w-20 h-20 rounded-[24px] bg-slate-50 border border-slate-100 flex items-center justify-center p-4 shadow-inner"><img src="https://cdn.worldvectorlogo.com/logos/shopify.svg" alt="" className="w-full h-full object-contain" /></div><div className="max-w-[320px] space-y-2"><h4 className="text-lg font-bold text-slate-900 font-sans">Connect to Shopify</h4><p className="text-xs text-slate-400 leading-relaxed font-medium font-sans">Link your Shopify store to automatically import products and keep assets in sync.</p></div><button onClick={handleShopifyConnect} className="w-full max-w-[280px] bg-slate-900 text-white py-4 rounded-2xl font-bold text-sm hover:bg-black shadow-lg shadow-slate-200 transition-all active:scale-95 font-sans">Connect Shopify store</button></>) : (<><div className="relative"><div className="w-20 h-20 rounded-[24px] bg-green-50 border border-green-100 flex items-center justify-center p-4 shadow-inner"><img src="https://cdn.worldvectorlogo.com/logos/shopify.svg" alt="" className="w-full h-full object-contain" /></div><div className="absolute -top-1.5 -right-1.5 w-6 h-6 bg-green-500 border-4 border-white rounded-full flex items-center justify-center shadow-sm"><div className="w-1.5 h-1.5 bg-white rounded-full" /></div></div><div className="space-y-2"><h4 className="text-lg font-bold text-slate-900 font-sans">{shopifyStoreName}</h4><div className="flex items-center justify-center gap-2"><span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" /><p className="text-xs text-green-600 font-bold tracking-wide font-sans">Connected</p></div></div><div className="w-full pt-6"><button onClick={() => { setIsShopifyConnected(false); setAuthStatus(p => ({ ...p, shopify: false })); }} className="px-8 py-3 bg-slate-50 border border-slate-100 rounded-2xl text-slate-400 hover:text-rose-500 hover:bg-rose-50 hover:border-rose-100 font-bold text-[13px] transition-all flex items-center gap-2 mx-auto shadow-sm font-sans"><Link2Off size={18} />Disconnect store</button></div></>)}</div>)}
-              {(addStep === 'gmc' || addStep === 'meta') && (<div className="flex-1 flex flex-col justify-center items-center text-center space-y-8 py-6">{syncStates[addStep].isConnecting ? (<div className="flex flex-col items-center gap-4"><div className="w-20 h-20 rounded-[32px] bg-indigo-50 flex items-center justify-center shadow-inner"><Loader2 className="text-indigo-500 animate-spin" size={32} /></div><p className="text-sm font-bold text-slate-900">Fetching your assets...</p></div>) : !syncStates[addStep].isConnected ? (<><div className="w-20 h-20 rounded-[24px] bg-slate-50 border border-slate-100 flex items-center justify-center p-4 shadow-inner"><img src={addStep === 'gmc' ? 'https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://google.com&size=256' : 'https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://meta.com&size=256'} alt="" className="w-full h-full object-contain" /></div><div className="max-w-[320px] space-y-2"><h4 className="text-lg font-bold text-slate-900 font-sans">{addStep === 'gmc' ? 'Google GMC' : 'Meta feeds'}</h4><p className="text-xs text-slate-400 leading-relaxed font-medium font-sans">{addStep === 'gmc' ? 'Connect to Google Merchant Center to sync your products.' : 'Connect to Meta Commerce Manager to sync your product feeds.'}</p></div><button onClick={() => handleSyncConnect(addStep)} className="w-full max-w-[280px] bg-slate-900 text-white py-4 rounded-2xl font-bold text-sm hover:bg-black shadow-lg shadow-slate-200 transition-all active:scale-95 font-sans">Connect</button></>) : (<><div className="relative"><div className="w-20 h-20 rounded-[24px] bg-green-50 border border-green-100 flex items-center justify-center p-4 shadow-inner"><img src={addStep === 'gmc' ? 'https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://google.com&size=256' : 'https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://meta.com&size=256'} alt="" className="w-full h-full object-contain" /></div><div className="absolute -top-1.5 -right-1.5 w-6 h-6 bg-green-500 border-4 border-white rounded-full flex items-center justify-center shadow-sm"><div className="w-1.5 h-1.5 bg-white rounded-full" /></div></div><div className="space-y-2"><h4 className="text-lg font-bold text-slate-900 font-sans">{syncStates[addStep].email}</h4><div className="flex items-center justify-center gap-2"><span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" /><p className="text-xs text-green-600 font-bold tracking-wide font-sans">Connected</p></div></div><div className="w-full pt-6"><button onClick={() => handleSyncDisconnect(addStep)} className="px-8 py-3 bg-rose-50 text-rose-500 border border-rose-100 rounded-2xl font-bold text-[13px] transition-all flex items-center gap-2 mx-auto shadow-sm font-sans"><Link2Off size={18} />Disconnect</button></div></>)}</div>)}
+              {addStep === 'shopify' && (
+                <div className="flex-1 flex flex-col justify-center items-center text-center space-y-8 py-6">
+                  {!isShopifyConnected ? (
+                    <>
+                      <div className="w-20 h-20 rounded-[24px] bg-slate-50 border border-slate-100 flex items-center justify-center p-4 shadow-inner">
+                        <img src="https://cdn.worldvectorlogo.com/logos/shopify.svg" alt="" className="w-full h-full object-contain" />
+                      </div>
+                      <div className="max-w-[320px] space-y-2">
+                        <h4 className="text-lg font-bold text-slate-900 font-sans">Connect to Shopify</h4>
+                        <p className="text-xs text-slate-400 leading-relaxed font-medium font-sans">Link your Shopify store to automatically import products and keep assets in sync.</p>
+                      </div>
+                      <button onClick={handleShopifyConnect} className="w-full max-w-[280px] bg-slate-900 text-white py-4 rounded-2xl font-bold text-sm hover:bg-black shadow-lg shadow-slate-200 transition-all active:scale-95 font-sans">Connect Shopify store</button>
+                    </>
+                  ) : (
+                    <>
+                      <div className="relative">
+                        <div className="w-20 h-20 rounded-[24px] bg-green-50 border border-green-100 flex items-center justify-center p-4 shadow-inner">
+                          <img src="https://cdn.worldvectorlogo.com/logos/shopify.svg" alt="" className="w-full h-full object-contain" />
+                        </div>
+                        <div className="absolute -top-1.5 -right-1.5 w-6 h-6 bg-green-500 border-4 border-white rounded-full flex items-center justify-center shadow-sm"><div className="w-1.5 h-1.5 bg-white rounded-full" /></div>
+                      </div>
+                      <div className="space-y-2">
+                        <h4 className="text-lg font-bold text-slate-900 font-sans">{shopifyStoreName}</h4>
+                        <div className="flex items-center justify-center gap-2">
+                          <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                          <p className="text-xs text-green-600 font-bold tracking-wide font-sans">Connected</p>
+                        </div>
+                      </div>
+                      <div className="w-full pt-6">
+                        <button onClick={() => { setIsShopifyConnected(false); setAuthStatus(p => ({ ...p, shopify: false })); }} className="px-8 py-3 bg-slate-50 border border-slate-100 rounded-2xl text-slate-400 hover:text-rose-500 hover:bg-rose-50 hover:border-rose-100 font-bold text-[13px] transition-all flex items-center gap-2 mx-auto shadow-sm font-sans"><Link2Off size={18} />Disconnect store</button>
+                      </div>
+                    </>
+                  )}
+                </div>
+              )}
+              {(addStep === 'gmc' || addStep === 'meta') && (
+                <div className="flex-1 flex flex-col justify-center items-center text-center space-y-8 py-6">
+                  {syncStates[addStep].isConnecting ? (
+                    <div className="flex flex-col items-center gap-4">
+                      <div className="w-20 h-20 rounded-[32px] bg-indigo-50 flex items-center justify-center shadow-inner">
+                        <Loader2 className="text-indigo-500 animate-spin" size={32} />
+                      </div>
+                      <p className="text-sm font-bold text-slate-900">Fetching your assets...</p>
+                    </div>
+                  ) : !syncStates[addStep].isConnected ? (
+                    <>
+                      <div className="w-20 h-20 rounded-[24px] bg-slate-50 border border-slate-100 flex items-center justify-center p-4 shadow-inner">
+                        <img src={addStep === 'gmc' ? 'https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://google.com&size=256' : 'https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://meta.com&size=256'} alt="" className="w-full h-full object-contain" />
+                      </div>
+                      <div className="max-w-[320px] space-y-2">
+                        <h4 className="text-lg font-bold text-slate-900 font-sans">{addStep === 'gmc' ? 'Google GMC' : 'Meta feeds'}</h4>
+                        <p className="text-xs text-slate-400 leading-relaxed font-medium font-sans">{addStep === 'gmc' ? 'Connect to Google Merchant Center to sync your products.' : 'Connect to Meta Commerce Manager to sync your product feeds.'}</p>
+                      </div>
+                      <button onClick={() => handleSyncConnect(addStep)} className="w-full max-w-[280px] bg-slate-900 text-white py-4 rounded-2xl font-bold text-sm hover:bg-black shadow-lg shadow-slate-200 transition-all active:scale-95 font-sans">Connect</button>
+                    </>
+                  ) : (
+                    <>
+                      <div className="relative">
+                        <div className="w-20 h-20 rounded-[24px] bg-green-50 border border-green-100 flex items-center justify-center p-4 shadow-inner">
+                          <img src={addStep === 'gmc' ? 'https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://google.com&size=256' : 'https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://meta.com&size=256'} alt="" className="w-full h-full object-contain" />
+                        </div>
+                        <div className="absolute -top-1.5 -right-1.5 w-6 h-6 bg-green-500 border-4 border-white rounded-full flex items-center justify-center shadow-sm">
+                          <div className="w-1.5 h-1.5 bg-white rounded-full" />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <h4 className="text-lg font-bold text-slate-900 font-sans">{syncStates[addStep].email}</h4>
+                        <div className="flex items-center justify-center gap-2">
+                          <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                          <p className="text-xs text-green-600 font-bold tracking-wide font-sans">Connected</p>
+                        </div>
+                      </div>
+                      <div className="w-full pt-6">
+                        <button onClick={() => handleSyncDisconnect(addStep)} className="px-8 py-3 bg-rose-50 text-rose-500 border border-rose-100 rounded-2xl font-bold text-[13px] transition-all flex items-center gap-2 mx-auto shadow-sm font-sans"><Link2Off size={18} />Disconnect</button>
+                      </div>
+                    </>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -575,5 +1028,9 @@ const ModalWrapper = ({ children, zIndex }) => (
     {children}
   </div>
 );
+
+const ProductSetupForm = ({ isOpen, initialData, onClose, onCreate }) => {
+  return null; // Placeholder
+};
 
 export default ProductSelector;
