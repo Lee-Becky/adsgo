@@ -1141,24 +1141,6 @@ const BatchGenerateAds = () => {
           ) : (
             // Preview View Wrapper - Keeping the original card style for the preview page
             <div className="bg-white rounded-[3.5rem] shadow-2xl shadow-slate-200/40 border border-slate-100 overflow-hidden relative mb-20 animate-fade-in">
-              <div className="p-10 border-b border-slate-50 flex items-center justify-between bg-white sticky top-0 z-40">
-                <div className="flex items-center space-x-5">
-                  <div className="w-14 h-14 bg-indigo-600 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-indigo-200">
-                    <Target size={28} />
-                  </div>
-                  <div>
-                    <h1 className="text-2xl font-black text-slate-900 tracking-tight">发布方案预览</h1>
-                    <p className="text-[11px] text-slate-400 font-black tracking-[0.2em] mt-1">Next-Gen Media Planning System</p>
-                  </div>
-                </div>
-                <button 
-                  onClick={() => setView('config')}
-                  className="w-12 h-12 flex items-center justify-center text-slate-300 hover:bg-slate-50 hover:text-slate-900 rounded-full transition-all"
-                >
-                  <X size={24} />
-                </button>
-              </div>
-
               <div className="p-10 md:p-14">
                 <CampaignPreviewView 
                   structure={structure}
