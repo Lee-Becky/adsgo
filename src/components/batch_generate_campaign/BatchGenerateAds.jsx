@@ -630,7 +630,7 @@ const BatchGenerateAds = () => {
   return (
     <div className="bg-slate-50/50 min-h-full">
       {/* Top Sticky Account Info Card */}
-      {selectedAccount && (view === 'config' || view === 'preview') && (
+      {selectedAccount && view === 'config' && (
         <div 
           className="sticky top-0 w-full px-4 md:px-8 py-2 animate-in slide-in-from-top-full duration-500"
           style={{ zIndex: Z_INDEX.HEADER }}
