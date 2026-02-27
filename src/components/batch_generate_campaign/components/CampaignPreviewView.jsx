@@ -5,7 +5,6 @@ import {
   Layers, Target, Box, Plus, Tag, Link as LinkIcon, Megaphone,
   ChevronDown
 } from 'lucide-react';
-import { Z_INDEX } from '../../../constants/zIndex';
 
 const AUDIENCE_NAMES = {
   LAL: 'LAL 1% US Purchase',
@@ -25,7 +24,8 @@ const CTA_OPTIONS = [
 ];
 
 const CampaignPreviewView = ({
-  structure, budgetType, dailyBudget, initialAdsetAudiences, productCreativesMap, selectedProducts, brand, onBack, onPublish, campaignName, optimizationEvent, landingPageType, landingPageTemplate, productUtm, copyStrategy, unifiedHeadline, unifiedBody, campaignType
+  structure, budgetType, dailyBudget, initialAdsetAudiences, productCreativesMap, selectedProducts, brand, onBack, onPublish, campaignName, optimizationEvent, landingPageType, landingPageTemplate, productUtm, copyStrategy, unifiedHeadline, unifiedBody, campaignType,
+  estimatedTotalDaily, adSetGroupsCount
 }) => {
   
   const [localAdSets, setLocalAdSets] = useState([]);
@@ -55,12 +55,13 @@ const CampaignPreviewView = ({
 
   useMemo(() => {
     let adSets = [];
+    const targetAdSetCount = adSetGroupsCount || 0;
+
     if (campaignType === 'CATALOG') {
-      const numAdsets = 3; 
-      for (let i = 0; i < numAdsets; i++) {
+      for (let i = 0; i < targetAdSetCount; i++) {
         const audienceType = initialAdsetAudiences[i % initialAdsetAudiences.length] || 'ADV';
         adSets.push({
-          name: `Catalog Set ${i + 1} - ${AUDIENCE_NAMES[audienceType]}`,
+          name: `DPA-${i + 1} - ${AUDIENCE_NAMES[audienceType]}`,
           audienceType,
           ageMin: 18, ageMax: 65, gender: 'All', interests: ['Broad Shopping'], placements: ['All'], optimizationEvent,
           ads: [{
@@ -79,33 +80,40 @@ const CampaignPreviewView = ({
       }
     } else {
       if (structure.strategy === 'PER_PRODUCT') {
-        selectedProducts.forEach((p, idx) => {
+        const activeProducts = selectedProducts.filter(p => (productCreativesMap[p.id] || []).length > 0);
+        const adsetsPerProduct = structure.numAdsetsPerProduct || 1;
+        
+        activeProducts.forEach((p, pIdx) => {
           const creatives = productCreativesMap[p.id] || [];
-          const audienceType = initialAdsetAudiences[idx % initialAdsetAudiences.length] || 'ADV';
           const copy = getAdCopy(p);
-          adSets.push({
-            name: `${p.name} - ${AUDIENCE_NAMES[audienceType]}`,
-            audienceType,
-            ageMin: 18, ageMax: 65, gender: 'All', interests: ['E-commerce', 'Shopping'], placements: ['Feed', 'Stories', 'Reels'], optimizationEvent,
-            ads: creatives.map((c, cIdx) => ({
-              id: `${idx}-${cIdx}`,
-              name: `AD - ${p.name} - ${c.id.slice(-4)}`,
-              headline: copy.headline,
-              primaryText: copy.body,
-              imageUrl: c.url,
-              cta: 'Shop Now',
-              destinationUrl: getAdUrl(p),
-              utmParams: ``,
-              productId: p.id,
-              offerType: 'AUTO',
-              promoCode: '90%OFF'
-            }))
-          });
+          
+          for (let i = 0; i < adsetsPerProduct; i++) {
+            const adSetOverallIdx = (pIdx * adsetsPerProduct) + i;
+            const audienceType = initialAdsetAudiences[adSetOverallIdx % initialAdsetAudiences.length] || 'ADV';
+            
+            adSets.push({
+              name: adsetsPerProduct > 1 ? `${p.name} - 组 ${i + 1} - ${AUDIENCE_NAMES[audienceType]}` : `${p.name} - ${AUDIENCE_NAMES[audienceType]}`,
+              audienceType,
+              ageMin: 18, ageMax: 65, gender: 'All', interests: ['E-commerce', 'Shopping'], placements: ['Feed', 'Stories', 'Reels'], optimizationEvent,
+              ads: creatives.map((c, cIdx) => ({
+                id: `${p.id}-${i}-${cIdx}`,
+                name: `AD - ${p.name} - ${c.id.slice(-4)}`,
+                headline: copy.headline,
+                primaryText: copy.body,
+                imageUrl: c.url,
+                cta: 'Shop Now',
+                destinationUrl: getAdUrl(p),
+                utmParams: ``,
+                productId: p.id,
+                offerType: 'AUTO',
+                promoCode: '90%OFF'
+              }))
+            });
+          }
         });
       } else if (structure.strategy === 'ALL_PRODUCTS_PER_SET') {
-        const numAdsets = structure.numAdsets || 1;
         const allCreativesPool = selectedProducts.flatMap(p => (productCreativesMap[p.id] || []).map(c => ({...c, productId: p.id})));
-        for (let i = 0; i < numAdsets; i++) {
+        for (let i = 0; i < targetAdSetCount; i++) {
           const audienceType = initialAdsetAudiences[i % initialAdsetAudiences.length] || 'ADV';
           adSets.push({
             name: `混合组 ${i + 1} - ${AUDIENCE_NAMES[audienceType]}`,
@@ -132,40 +140,48 @@ const CampaignPreviewView = ({
         }
       } else if (structure.strategy === 'BY_AD_COUNT') {
         const allAdsPool = selectedProducts.flatMap(p => (productCreativesMap[p.id] || []).map(c => ({...c, productId: p.id})));
-        const adsPerSet = structure.adsPerSet || 1;
-        for (let i = 0; i < allAdsPool.length; i += adsPerSet) {
-          const adSetIdx = Math.floor(i / adsPerSet);
-          const audienceType = initialAdsetAudiences[adSetIdx % initialAdsetAudiences.length] || 'ADV';
-          const chunk = allAdsPool.slice(i, i + adsPerSet);
-          adSets.push({
-            name: `Dynamic Set ${adSetIdx + 1} - ${AUDIENCE_NAMES[audienceType]}`,
-            audienceType,
-            ageMin: 18, ageMax: 65, gender: 'All', interests: ['Fashion'], placements: ['Feed'], optimizationEvent,
-            ads: chunk.map((c, cIdx) => {
-              const p = selectedProducts.find(prod => prod.id === c.productId);
-              const copy = getAdCopy(p);
-              return {
-                id: `${adSetIdx}-${cIdx}`,
-                name: `AD - Set${adSetIdx + 1} - ${c.id.slice(-4)}`,
-                headline: copy.headline,
-                primaryText: copy.body,
-                imageUrl: c.url,
-                cta: 'Shop Now',
-                destinationUrl: getAdUrl(p),
-                utmParams: ``,
-                productId: p.id,
-                offerType: 'AUTO',
-                promoCode: '90%OFF'
-              };
-            })
-          });
+        if (allAdsPool.length > 0) {
+          const numGroups = targetAdSetCount;
+          let currentIndex = 0;
+          
+          for (let i = 0; i < numGroups; i++) {
+            const audienceType = initialAdsetAudiences[i % initialAdsetAudiences.length] || 'ADV';
+            const remainingAds = allAdsPool.length - currentIndex;
+            const remainingGroups = numGroups - i;
+            const currentGroupSize = Math.ceil(remainingAds / remainingGroups);
+            const chunk = allAdsPool.slice(currentIndex, currentIndex + currentGroupSize);
+            
+            adSets.push({
+              name: `智能分组 ${i + 1} - ${AUDIENCE_NAMES[audienceType]}`,
+              audienceType,
+              ageMin: 18, ageMax: 65, gender: 'All', interests: ['Fashion'], placements: ['Feed'], optimizationEvent,
+              ads: chunk.map((c, cIdx) => {
+                const p = selectedProducts.find(prod => prod.id === c.productId);
+                const copy = getAdCopy(p);
+                return {
+                  id: `${i}-${cIdx}`,
+                  name: `AD - G${i + 1} - ${c.id.slice(-4)}`,
+                  headline: copy.headline,
+                  primaryText: copy.body,
+                  imageUrl: c.url,
+                  cta: 'Shop Now',
+                  destinationUrl: getAdUrl(p),
+                  utmParams: ``,
+                  productId: p.id,
+                  offerType: 'AUTO',
+                  promoCode: '90%OFF'
+                };
+              })
+            });
+            currentIndex += currentGroupSize;
+          }
         }
       }
     }
     setLocalAdSets(adSets);
-  }, [campaignType, selectedProducts, structure, productCreativesMap, initialAdsetAudiences, landingPageType, landingPageTemplate, productUtm, copyStrategy, unifiedHeadline, unifiedBody, optimizationEvent]);
+  }, [campaignType, selectedProducts, structure, productCreativesMap, initialAdsetAudiences, landingPageType, landingPageTemplate, productUtm, copyStrategy, unifiedHeadline, unifiedBody, optimizationEvent, adSetGroupsCount]);
 
-  const totalDailyBudget = budgetType === 'CBO' ? dailyBudget : dailyBudget * localAdSets.length;
+  const totalDailyBudget = estimatedTotalDaily || (budgetType === 'CBO' ? dailyBudget : dailyBudget * localAdSets.length);
 
   const addInterest = (asIndex) => {
     if (!interestInput.trim()) return;
@@ -187,10 +203,7 @@ const CampaignPreviewView = ({
     if (editingAdSetIndex === null) return null;
     const adSet = localAdSets[editingAdSetIndex];
     return (
-      <div 
-        className="fixed inset-0 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in"
-        style={{ zIndex: Z_INDEX.MODAL_BASE + 80 }}
-      >
+      <div className="fixed inset-0 z-[250] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in">
         <div className="bg-white w-full max-w-xl rounded-[3rem] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
           <div className="p-8 border-b border-slate-100 flex items-center justify-between">
             <h3 className="text-xl font-black text-slate-900">编辑广告组 (AdSet)</h3>
@@ -198,14 +211,14 @@ const CampaignPreviewView = ({
           </div>
           <div className="flex-1 overflow-y-auto p-10 space-y-8 no-scrollbar">
             <div className="space-y-3">
-              <label className="text-[10px] font-black text-slate-400 tracking-widest px-1">广告组名称</label>
+              <label className="text-[10px] font-black text-slate-400 px-1">广告组名称</label>
               <input type="text" value={adSet.name} onChange={e => {
                 const next = [...localAdSets]; next[editingAdSetIndex].name = e.target.value; setLocalAdSets(next);
               }} className="w-full h-12 px-5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold focus:border-indigo-600 outline-none transition-all" />
             </div>
             
             <div className="space-y-3">
-              <label className="text-[10px] font-black text-slate-400 tracking-widest px-1">兴趣词配置 (Interests)</label>
+              <label className="text-[10px] font-black text-slate-400 px-1">兴趣词配置 (Interests)</label>
               <div className="flex gap-2">
                 <input 
                   type="text" 
@@ -235,20 +248,20 @@ const CampaignPreviewView = ({
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-3">
-                <label className="text-[10px] font-black text-slate-400 tracking-widest px-1">最小年龄</label>
+                <label className="text-[10px] font-black text-slate-400 px-1">最小年龄</label>
                 <input type="number" value={adSet.ageMin} onChange={e => {
                   const next = [...localAdSets]; next[editingAdSetIndex].ageMin = Number(e.target.value); setLocalAdSets(next);
                 }} className="w-full h-12 px-5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold" />
               </div>
               <div className="space-y-3">
-                <label className="text-[10px] font-black text-slate-400 tracking-widest px-1">最大年龄</label>
+                <label className="text-[10px] font-black text-slate-400 px-1">最大年龄</label>
                 <input type="number" value={adSet.ageMax} onChange={e => {
                   const next = [...localAdSets]; next[editingAdSetIndex].ageMax = Number(e.target.value); setLocalAdSets(next);
                 }} className="w-full h-12 px-5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold" />
               </div>
             </div>
             <div className="space-y-3">
-              <label className="text-[10px] font-black text-slate-400 tracking-widest px-1">性别 (Gender)</label>
+              <label className="text-[10px] font-black text-slate-400 px-1">性别 (Gender)</label>
               <div className="flex gap-2">
                 {['All', 'Men', 'Women'].map(g => (
                   <button key={g} onClick={() => {
@@ -259,7 +272,7 @@ const CampaignPreviewView = ({
             </div>
           </div>
           <div className="p-8 bg-slate-50 border-t border-slate-100 flex justify-end">
-            <button onClick={() => setEditingAdSetIndex(null)} className="px-10 py-4 bg-slate-900 text-white rounded-2xl font-black tracking-widest text-xs">保存修改</button>
+            <button onClick={() => setEditingAdSetIndex(null)} className="px-10 py-4 bg-slate-900 text-white rounded-2xl font-black text-xs">保存修改</button>
           </div>
         </div>
       </div>
@@ -271,10 +284,7 @@ const CampaignPreviewView = ({
     const { asIndex, adIndex } = editingAdInfo;
     const ad = localAdSets[asIndex].ads[adIndex];
     return (
-      <div 
-        className="fixed inset-0 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in"
-        style={{ zIndex: Z_INDEX.MODAL_BASE + 90 }}
-      >
+      <div className="fixed inset-0 z-[250] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in">
         <div className="bg-white w-full max-w-xl rounded-[3rem] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
           <div className="p-8 border-b border-slate-100 flex items-center justify-between">
             <h3 className="text-xl font-black text-slate-900">编辑广告素材 (Ad)</h3>
@@ -282,20 +292,20 @@ const CampaignPreviewView = ({
           </div>
           <div className="flex-1 overflow-y-auto p-10 space-y-8 no-scrollbar">
             <div className="space-y-3">
-              <label className="text-[10px] font-black text-slate-400 tracking-widest px-1">广告标题 (Headline)</label>
+              <label className="text-[10px] font-black text-slate-400 px-1">广告标题 (Headline)</label>
               <input type="text" value={ad.headline} onChange={e => {
                 const next = [...localAdSets]; next[asIndex].ads[adIndex].headline = e.target.value; setLocalAdSets(next);
               }} className="w-full h-12 px-5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold focus:border-indigo-600 outline-none transition-all" />
             </div>
             <div className="space-y-3">
-              <label className="text-[10px] font-black text-slate-400 tracking-widest px-1">广告正文 (Primary Text)</label>
+              <label className="text-[10px] font-black text-slate-400 px-1">广告正文 (Primary Text)</label>
               <textarea value={ad.primaryText} onChange={e => {
                 const next = [...localAdSets]; next[asIndex].ads[adIndex].primaryText = e.target.value; setLocalAdSets(next);
               }} className="w-full p-5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold h-32 resize-none focus:border-indigo-600 outline-none transition-all" />
             </div>
 
             <div className="space-y-3">
-              <label className="text-[10px] font-black text-slate-400 tracking-widest px-1 flex items-center gap-2"><Megaphone size={12} className="text-indigo-600"/> 行动号召 (CTA)</label>
+              <label className="text-[10px] font-black text-slate-400 px-1 flex items-center gap-2"><Megaphone size={12} className="text-indigo-600"/> 行动号召 (CTA)</label>
               <div className="relative">
                 <select 
                   value={ad.cta} 
@@ -311,7 +321,7 @@ const CampaignPreviewView = ({
             </div>
 
             <div className="space-y-3">
-              <label className="text-[10px] font-black text-slate-400 tracking-widest px-1 flex items-center gap-2"><LinkIcon size={12} className="text-indigo-600"/> 落地页 URL</label>
+              <label className="text-[10px] font-black text-slate-400 px-1 flex items-center gap-2"><LinkIcon size={12} className="text-indigo-600"/> 落地页 URL</label>
               <input 
                 type="text" 
                 value={ad.destinationUrl} 
@@ -323,7 +333,7 @@ const CampaignPreviewView = ({
             </div>
 
             <div className="space-y-3">
-              <label className="text-[10px] font-black text-slate-400 tracking-widest px-1 flex items-center gap-2"><Tag size={12} className="text-indigo-600"/> 突显优惠 (Promo Offer)</label>
+              <label className="text-[10px] font-black text-slate-400 px-1 flex items-center gap-2"><Tag size={12} className="text-indigo-600"/> 突显优惠 (Promo Offer)</label>
               <div className="p-5 bg-slate-50 rounded-2xl border border-slate-100 space-y-5">
                 <div className="flex gap-2">
                   <button 
@@ -361,7 +371,7 @@ const CampaignPreviewView = ({
             </div>
           </div>
           <div className="p-8 bg-slate-50 border-t border-slate-100 flex justify-end">
-            <button onClick={() => setEditingAdInfo(null)} className="px-10 py-4 bg-slate-900 text-white rounded-2xl font-black tracking-widest text-xs">保存修改</button>
+            <button onClick={() => setEditingAdInfo(null)} className="px-10 py-4 bg-slate-900 text-white rounded-2xl font-black text-xs">保存修改</button>
           </div>
         </div>
       </div>
@@ -373,7 +383,7 @@ const CampaignPreviewView = ({
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-3xl font-black text-slate-900 tracking-tight">发布方案预览</h2>
-          <p className="text-sm text-slate-400 font-medium mt-1 tracking-widest">{campaignName} • {campaignType === 'CATALOG' ? '目录广告' : '产品广告'} 架构</p>
+          <p className="text-sm text-slate-400 font-medium mt-1 tracking-widest">{campaignName} • {campaignType === 'CATALOG' ? '目录广告' : '商品广告'} 架构</p>
         </div>
         <button onClick={onBack} className="px-6 py-3 bg-white border border-slate-100 text-slate-400 rounded-2xl font-black text-xs hover:bg-slate-50 transition-all flex items-center gap-2">
           <ChevronLeft size={16} /> 返回修改配置
@@ -407,7 +417,7 @@ const CampaignPreviewView = ({
             </div>
             <div className="bg-white/5 rounded-2xl p-4 border border-white/5">
               <p className="text-[9px] font-black text-slate-500 tracking-widest mb-1">AdSets 数量</p>
-              <p className="text-sm font-bold">{localAdSets.length}</p>
+              <p className="text-sm font-bold">{adSetGroupsCount || localAdSets.length}</p>
             </div>
             <div className="bg-white/5 rounded-2xl p-4 border border-white/5">
               <p className="text-[9px] font-black text-slate-500 tracking-widest mb-1">Campaign 类型</p>
@@ -487,7 +497,7 @@ const CampaignPreviewView = ({
                         {product && (
                           <div className="p-2.5 bg-indigo-50/50 border-t border-indigo-100 flex items-center gap-2">
                              <img src={product.imageUrl} className="w-6 h-6 rounded-md object-cover border border-indigo-200" />
-                             <div className="min-w-0 flex-1"><p className="text-[8px] font-black text-indigo-400 tracking-tighter">关联产品</p><p className="text-[9px] font-bold text-indigo-900 truncate">{product.name}</p></div>
+                             <div className="min-w-0 flex-1"><p className="text-[8px] font-black text-indigo-400 tracking-tighter">关联商品</p><p className="text-[9px] font-bold text-indigo-900 truncate">{product.name}</p></div>
                           </div>
                         )}
                         {ad.isDynamic && (
@@ -506,15 +516,12 @@ const CampaignPreviewView = ({
         </div>
       </div>
 
-      <div 
-        className="fixed bottom-0 left-0 right-0 bg-slate-900 text-white p-8 border-t border-white/5 backdrop-blur-xl bg-opacity-95 shadow-[0_-20px_40px_rgba(0,0,0,0.1)]"
-        style={{ zIndex: Z_INDEX.DROPDOWN }}
-      >
+      <div className="fixed bottom-0 left-0 right-0 bg-slate-900 text-white p-8 z-[100] border-t border-white/5 backdrop-blur-xl bg-opacity-95 shadow-[0_-20px_40px_rgba(0,0,0,0.1)]">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex flex-col sm:flex-row gap-16">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center shadow-lg"><Layers size={24} /></div>
-              <div><p className="text-[10px] font-black text-slate-400 tracking-widest">结构方案</p><p className="text-xl font-black">{localAdSets.length} Adsets • {campaignType === 'CATALOG' ? 'Dynamic' : localAdSets.reduce((acc, as) => acc + as.ads.length, 0)} Ads</p></div>
+              <div><p className="text-[10px] font-black text-slate-400 tracking-widest">结构方案</p><p className="text-xl font-black">{adSetGroupsCount || localAdSets.length} Adsets • {campaignType === 'CATALOG' ? 'Dynamic' : localAdSets.reduce((acc, as) => acc + as.ads.length, 0)} Ads</p></div>
             </div>
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 bg-emerald-600 rounded-2xl flex items-center justify-center shadow-lg"><DollarSign size={24} /></div>

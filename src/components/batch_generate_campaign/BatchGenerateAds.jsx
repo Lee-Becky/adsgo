@@ -238,6 +238,22 @@ const BatchGenerateAds = () => {
     setEndDate(end.toISOString().split('T')[0]);
   };
 
+  const adSetGroupsCount = useMemo(() => {
+    if (structure.strategy === 'PER_PRODUCT') {
+      const activeProducts = selectedProducts.filter(p => (productCreativesMap[p.id] || []).length > 0);
+      return activeProducts.length * (structure.numAdsetsPerProduct || 1);
+    } else if (structure.strategy === 'ALL_PRODUCTS_PER_SET') {
+      return structure.numAdsets || 1;
+    } else if (structure.strategy === 'BY_AD_COUNT') {
+      return structure.adsPerSet || 1; // 智能拆组模式下 adsPerSet 存储的是组数
+    }
+    return 0;
+  }, [structure, selectedProducts, productCreativesMap]);
+
+  const estimatedTotalDaily = useMemo(() => {
+    return budgetType === 'ABO' ? dailyBudget * adSetGroupsCount : dailyBudget;
+  }, [budgetType, dailyBudget, adSetGroupsCount]);
+
   const toggleLocation = (country) => {
     const isSelected = selectedLocations.some(l => l.code === country.code);
     if (isSelected) {
@@ -1312,6 +1328,8 @@ const BatchGenerateAds = () => {
                   unifiedHeadline={unifiedHeadline}
                   unifiedBody={unifiedBody}
                   campaignType={campaignType}
+                  estimatedTotalDaily={estimatedTotalDaily}
+                  adSetGroupsCount={adSetGroupsCount}
                 />
               </div>
             </div>
