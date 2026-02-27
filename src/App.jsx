@@ -24,6 +24,7 @@ import AIGenerate from './components/creativeHub/AIGenerate'
 import CreativeLibrary from './components/creativeHub/CreativeLibrary'
 import { ProductList, ProductDetails } from './components/brand/products'
 import { Competitors } from './components/brand/competitors'
+import BrandProfile from './components/brand/BrandProfile'
 import CreateBrandModal from './components/brand/CreateBrandModal'
 import BrandSwitchLoading from './components/brand/BrandSwitchLoading'
 import ComingSoon from './components/ComingSoon'
@@ -238,6 +239,8 @@ function App() {
       case 'basicInfo':
         console.log('Rendering BasicInfo component')
         return <BasicInfo onSave={() => {}} onCancel={() => handlePageChange('overview')} />
+      case 'brandProfile':
+        return <BrandProfile />
       case 'optimizeGoals':
         return <OptimizeGoals />
       case 'products':

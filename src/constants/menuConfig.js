@@ -105,6 +105,14 @@ export const MENU_ITEMS = [
     icon: 'ShieldCheck',
     children: [
       {
+        key: 'brandProfile',
+        label: 'Brand Profile(Designing)',
+        shortLabel: 'Prof',
+        icon: 'Award',
+        title: 'Brand Profile',
+        subtitle: 'Comprehensive view of brand identity and market position'
+      },
+      {
         key: 'optimizeGoals',
         label: 'Optimize Goals',
         shortLabel: 'Goal',
