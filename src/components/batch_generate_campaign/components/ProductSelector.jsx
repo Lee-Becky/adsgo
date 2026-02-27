@@ -22,11 +22,29 @@ const MOCK_CATALOGS = [
 ];
 
 const ANALYSIS_STEPS = [
-  { icon: <Globe size={14} />, text: '正在批量访问多目标落地页并解析元数据...' },
-  { icon: <Tag size={14} />, text: '识别差异化卖点并统一人格化视觉风格...' },
-  { icon: <Target size={14} />, text: '多维度匹配高转化受众及兴趣交叉点...' },
-  { icon: <LayoutGrid size={14} />, text: '构建多产品并行投放的系列架构方案...' },
-  { icon: <Sparkles size={14} />, text: '智能匹配最佳素材测试路径与 A/B test 计划...' },
+  { text: "Task received: Analyzing https://www.cupshe.com with comprehensive product and audience analysis.", type: 'system' },
+  { text: "Accessing website", type: 'action_header' },
+  { text: "Intelligently capturing core content from the 'E-commerce website' homepage...", type: 'action' },
+  { url: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=2426", type: 'image' },
+  { text: "Analyzing product positioning, features, pricing and use cases", type: 'action_header' },
+  { text: "Searching for 'Cupshe brand positioning and target market' analysis data...", type: 'action' },
+  { text: "Retrieving 'affordable swimwear market' consumer behavior insights...", type: 'action' },
+  { text: "Extracting 'Cupshe product characteristics' and user feedback data...", type: 'action' },
+  { text: "Brand Positioning:", value: "Cupshe is an affordable fashion swimwear and resortwear brand targeting budget-conscious millennial and Gen Z women. Originally founded in Nanjing, China in 2015, the brand pivoted from general fast fashion to focus exclusively on swimwear in 2016 after identifying a market gap for stylish, affordable swimsuits in North America (Target audience: annual income $30k-70k / 18-45 years old, with core demographic 25-34 years).", type: 'key_value' },
+  { text: "Business Type:", value: "Online Shopping", type: 'key_value' },
+  { text: "Product Pricing:", value: "$25-$43 per item (budget-to-mid-range market). Bikini sets average $39, one-pieces $35-$43, resortwear/dresses $25-$32. This positions Cupshe significantly below premium brands like Victoria's Secret while maintaining higher quality than ultra-cheap competitors.", type: 'key_value' },
+  { text: "Core Selling Points:", type: 'header' },
+  { text: "Affordable trend-forward designs - Fashion-conscious styles at accessible price points", type: 'bullet' },
+  { text: "Inclusive sizing - Up to 4X sizing for diverse body types", type: 'bullet' },
+  { text: "Direct-to-consumer model - Leveraging China's supply chain advantages for cost efficiency", type: 'bullet' },
+  { text: "Year-round collections - Beyond seasonal swimwear with resortwear, dresses, and shapewear", type: 'bullet' },
+  { text: "Strong digital presence - 6M+ monthly website visitors, 2,000+ units/month on Amazon", type: 'bullet' },
+  { text: "Use Cases:", type: 'header' },
+  { text: "Beach vacations & resort holidays - Core swimwear and cover-ups for leisure travel", type: 'ordered' },
+  { text: "Poolside lounging & water sports - Functional yet stylish swimwear for active use", type: 'ordered' },
+  { text: "Everyday summer wear - Resortwear, dresses, and casual pieces for warm-weather lifestyle", type: 'ordered' },
+  { text: "💡 Data Source: CJDropshipping brand analysis + Mordor Intelligence market research + Cupshe official website + Trustpilot customer reviews (4.3/5 rating, 22K+ reviews)", type: 'source' },
+  { text: "AdsGo has created a brand profile based on your page. Please review the information — it'll be used in future ad generation and optimization.", type: 'footer' }
 ];
 
 const HISTORY_PRODUCTS = [
@@ -440,12 +458,21 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
       if (platform === 'shopify') setIsShopifyConnected(true);
       if (platform === 'meta' || platform === 'google') {
         setSyncStates(prev => ({ ...prev, [platform]: { isConnected: true, isConnecting: false, email: 'user@example.com' } }));
+        // 授权成功后，如果尚未选择账号，立即弹出选择账号弹窗
+        if (!selectedAccount) {
+          setActiveModal('select_account');
+        }
       }
     }
     setIsAuthLoading(false);
   };
 
   const removeProduct = (id) => { onSelectProducts(selectedProducts.filter(p => p.id !== id)); };
+
+  const analysisEndRef = useRef(null);
+  const scrollToBottom = () => {
+    analysisEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
 
   useEffect(() => {
     if (isAnalyzing) {
@@ -459,15 +486,19 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
               selectedProducts.forEach(p => { mockReports[p.id] = { summary: `${p.name} 网页核心卖点：高品质复古设计，适用于多种场景。`, recommendedAudience: "25-45 岁，对极简主义和高质感生活有追求的都市人群。", competitors: ["Lululemon", "Everlane", "Zara Home"] }; });
               setReports(mockReports);
               onAnalysisComplete(mockReports);
-            }, 800);
+            }, 1500);
             return prev;
           }
           return prev + 1;
         });
-      }, 1000);
+      }, 600);
       return () => clearInterval(interval);
     } else { setCurrentStep(0); }
   }, [isAnalyzing, onAnalysisComplete, selectedProducts]);
+
+  useEffect(() => {
+    if (isAnalyzing) scrollToBottom();
+  }, [currentStep, isAnalyzing]);
 
   const handleBatchAIGC = async () => {
     setActiveModal(null);
@@ -821,16 +852,86 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
                       </div>
                     </div>
                     {isAnalyzing && isExpanded && !p.isFromHistory && (
-                      <div className="bg-slate-50/50 rounded-3xl p-8 border border-slate-100 mx-4 animate-in slide-in-from-top-2">
-                        <div className="space-y-4">
-                          {ANALYSIS_STEPS.map((step, stepIdx) => (
-                            <div key={stepIdx} className={`flex items-center gap-4 transition-all ${stepIdx <= currentStep ? 'opacity-100' : 'opacity-30'}`}>
-                              <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${stepIdx < currentStep ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-100' : 'bg-white border-2 border-slate-100 text-slate-300'}`}>
-                                {stepIdx < currentStep ? <Check size={16} /> : step.icon}
+                      <div className="bg-white rounded-[2.5rem] p-10 border border-slate-100 mx-4 animate-in slide-in-from-top-2 shadow-xl overflow-hidden">
+                        <div className="h-[500px] overflow-y-auto custom-scrollbar pr-4 space-y-6">
+                          {ANALYSIS_STEPS.slice(0, currentStep + 1).map((step, stepIdx) => {
+                            let listIdx = 0;
+                            if (step.type === 'ordered') {
+                              listIdx = ANALYSIS_STEPS.slice(0, stepIdx + 1).filter(s => s.type === 'ordered').length;
+                            }
+                            
+                            return (
+                              <div key={stepIdx} className="animate-in fade-in slide-in-from-bottom-2 duration-500">
+                                {step.type === 'system' && (
+                                  <div className="pb-4 border-b border-slate-100 mb-4">
+                                    <p className="text-[13px] font-medium text-slate-600">
+                                      {step.text.split('https://www.cupshe.com').map((part, i, arr) => (
+                                        <React.Fragment key={i}>
+                                          {part}
+                                          {i < arr.length - 1 && <span className="text-indigo-600 font-bold underline cursor-pointer">https://www.cupshe.com</span>}
+                                        </React.Fragment>
+                                      ))}
+                                    </p>
+                                  </div>
+                                )}
+                                {step.type === 'action_header' && (
+                                  <h4 className="text-lg font-black text-slate-900 tracking-tight mb-2">{step.text}</h4>
+                                )}
+                                {step.type === 'action' && (
+                                  <div className="flex items-start gap-3 pl-4 border-l-2 border-slate-50 mb-2">
+                                    <p className="text-[13px] font-medium text-slate-400">{step.text}</p>
+                                  </div>
+                                )}
+                                {step.type === 'image' && (
+                                  <div className="pl-4 mb-6">
+                                    <div className="rounded-[2rem] border border-slate-200 overflow-hidden shadow-2xl max-w-2xl transition-all hover:scale-[1.01]">
+                                      <img src={step.url} alt="Captured UI" className="w-full h-auto" />
+                                    </div>
+                                  </div>
+                                )}
+                                {step.type === 'key_value' && (
+                                  <p className="text-[13px] leading-relaxed mb-2">
+                                    <span className="font-black text-slate-900">{step.text}</span>
+                                    <span className="text-slate-600 ml-1.5">{step.value}</span>
+                                  </p>
+                                )}
+                                {step.type === 'header' && (
+                                  <p className="text-[13px] font-black text-slate-900 pt-2 mb-2">{step.text}</p>
+                                )}
+                                {step.type === 'bullet' && (
+                                  <div className="flex items-start gap-3 pl-4 mb-1.5">
+                                    <span className="text-slate-900 mt-1.5 text-xs font-black">•</span>
+                                    <p className="text-[13px] font-medium text-slate-600 leading-relaxed">
+                                      {step.text.split('-').map((part, i) => (
+                                        i === 0 ? <span key={i} className="font-black text-slate-900">{part}</span> : <span key={i}>- {part}</span>
+                                      ))}
+                                    </p>
+                                  </div>
+                                )}
+                                {step.type === 'ordered' && (
+                                  <div className="flex items-start gap-3 pl-4 mb-1.5">
+                                    <span className="text-slate-900 text-[13px] font-black">{listIdx}.</span>
+                                    <p className="text-[13px] font-medium text-slate-600 leading-relaxed">
+                                      {step.text.split('-').map((part, i) => (
+                                        i === 0 ? <span key={i} className="font-black text-slate-900">{part}</span> : <span key={i}>- {part}</span>
+                                      ))}
+                                    </p>
+                                  </div>
+                                )}
+                                {step.type === 'source' && (
+                                  <div className="mt-6 pt-6 border-t border-slate-100">
+                                    <p className="text-[13px] font-medium text-slate-600 leading-relaxed">{step.text}</p>
+                                  </div>
+                                )}
+                                {step.type === 'footer' && (
+                                  <div className="mt-4">
+                                    <p className="text-[13px] font-medium text-slate-600 italic">{step.text}</p>
+                                  </div>
+                                )}
                               </div>
-                              <p className="text-xs font-bold text-slate-600 tracking-wide">{step.text}</p>
-                            </div>
-                          ))}
+                            );
+                          })}
+                          <div ref={analysisEndRef} />
                         </div>
                       </div>
                     )}

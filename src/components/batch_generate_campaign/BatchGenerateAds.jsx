@@ -33,7 +33,7 @@ const MOCK_PAGES = [
 
 const PLATFORMS = [
   { id: 'meta', name: 'Meta', logo: 'https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://meta.com&size=256' },
-  { id: 'google', name: 'Google', logo: 'https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://google.com&size=256' },
+  { id: 'google', name: 'Google', logo: 'https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://google.com&size=256', disabled: true },
   { id: 'tiktok', name: 'TikTok', logo: 'https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://tiktok.com&size=256', disabled: true },
   { id: 'bing', name: 'Bing', logo: 'https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://bing.com&size=256', disabled: true }
 ];
@@ -95,6 +95,7 @@ const ALL_COUNTRIES = [
 const BatchGenerateAds = () => {
   const [selectedProducts, setSelectedProducts] = useState([]);
   const [productCreativesMap, setProductCreativesMap] = useState({});
+  const [selectedAccount, setSelectedAccount] = useState(null);
   const [productReportsMap, setProductReportsMap] = useState({});
   
   const [campaignType, setCampaignType] = useState('PRODUCT');
@@ -160,7 +161,6 @@ const BatchGenerateAds = () => {
   const [view, setView] = useState('config');
 
   const [showPublishModal, setShowPublishModal] = useState(false);
-  const [selectedAccount, setSelectedAccount] = useState(MOCK_ACCOUNTS[0]);
 
   const selectedCampaign = useMemo(() => 
     MOCK_EXISTING_CAMPAIGNS.find(c => c.id === selectedCampaignId), 
@@ -579,7 +579,7 @@ const BatchGenerateAds = () => {
   return (
     <div className="bg-slate-50/50 min-h-full">
       {/* Top Sticky Account Info Card */}
-      {selectedAccount && view === 'config' && (
+      {selectedAccount && (view === 'config' || view === 'preview') && (
         <div 
           className="sticky top-0 w-full px-4 md:px-8 py-2 animate-in slide-in-from-top-full duration-500"
           style={{ zIndex: Z_INDEX.HEADER }}
@@ -710,27 +710,30 @@ const BatchGenerateAds = () => {
                     {openDropdown === 'platform' && (
                       <div className="absolute top-full left-0 mt-2 w-full min-w-[200px] bg-white rounded-2xl shadow-2xl border border-slate-100 p-2 space-y-1 animate-in fade-in zoom-in-95 duration-200">
                         {PLATFORMS.map(p => (
-                          <button 
-                            key={p.id}
-                            disabled={p.disabled}
-                            onClick={() => {
-                              setPlatform(p);
-                              setOpenDropdown(null);
-                            }}
-                            className={`w-full group flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all relative ${
-                              p.disabled ? 'opacity-40 cursor-not-allowed' : 
-                              platform.id === p.id ? 'bg-indigo-50 text-indigo-600' : 'hover:bg-slate-50 text-slate-600'
-                            }`}
-                          >
-                            <img src={p.logo} className="w-5 h-5 rounded object-contain shrink-0" alt="" />
-                            <span className="text-xs font-bold">{p.name}</span>
+                          <div key={p.id} className="relative group">
+                            <button 
+                              disabled={p.disabled}
+                              onClick={() => {
+                                if (!p.disabled) {
+                                  setPlatform(p);
+                                  setOpenDropdown(null);
+                                }
+                              }}
+                              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all ${
+                                p.disabled ? 'opacity-40 cursor-not-allowed' : 
+                                platform.id === p.id ? 'bg-indigo-50 text-indigo-600' : 'hover:bg-slate-50 text-slate-600'
+                              }`}
+                            >
+                              <img src={p.logo} className="w-5 h-5 rounded object-contain shrink-0" alt="" />
+                              <span className="text-xs font-bold">{p.name}</span>
+                              {!p.disabled && platform.id === p.id && <Check size={12} className="ml-auto" />}
+                            </button>
                             {p.disabled && (
-                              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                <div className="bg-slate-900 text-white text-[8px] font-black px-2 py-1 rounded shadow-lg">COMING SOON</div>
+                              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                                <div className="bg-slate-900 text-white text-[8px] font-black px-2 py-1 rounded shadow-lg tracking-widest">COMING SOON</div>
                               </div>
                             )}
-                            {!p.disabled && platform.id === p.id && <Check size={12} className="ml-auto" />}
-                          </button>
+                          </div>
                         ))}
                       </div>
                     )}
