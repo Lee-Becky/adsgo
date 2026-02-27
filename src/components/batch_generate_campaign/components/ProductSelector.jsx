@@ -500,6 +500,128 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
     if (isAnalyzing) scrollToBottom();
   }, [currentStep, isAnalyzing]);
 
+  const AnalysisReportModal = ({ productId, onClose }) => {
+    const product = selectedProducts.find(p => p.id === productId);
+    const zIndex = useZIndex(true);
+    
+    if (!product) return null;
+
+    return (
+      <div 
+        className="fixed inset-0 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in"
+        style={{ zIndex }}
+      >
+        <div className="bg-white w-full max-w-4xl rounded-[3rem] shadow-2xl overflow-hidden animate-in slide-in-from-bottom-8 flex flex-col max-h-[90vh]">
+          <div className="p-8 border-b border-slate-100 flex items-center justify-between bg-white shrink-0">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-2xl overflow-hidden border border-slate-100 shrink-0 shadow-sm">
+                <img src={product.imageUrl} className="w-full h-full object-cover" />
+              </div>
+              <div>
+                <h3 className="text-xl font-black text-slate-900">产品分析报告</h3>
+                <p className="text-xs text-slate-400 font-bold tracking-widest mt-1 uppercase">{product.name}</p>
+              </div>
+            </div>
+            <button onClick={onClose} className="p-2 hover:bg-slate-50 rounded-full text-slate-300 transition-colors"><X size={24} /></button>
+          </div>
+          
+          <div className="flex-1 overflow-y-auto p-10 no-scrollbar bg-slate-50/30">
+            <div className="bg-white rounded-[2.5rem] p-10 border border-slate-100 shadow-xl overflow-hidden">
+              <div className="space-y-6">
+                {ANALYSIS_STEPS.map((step, stepIdx) => {
+                  let listIdx = 0;
+                  if (step.type === 'ordered') {
+                    listIdx = ANALYSIS_STEPS.slice(0, stepIdx + 1).filter(s => s.type === 'ordered').length;
+                  }
+                  
+                  return (
+                    <div key={stepIdx} className="animate-in fade-in slide-in-from-bottom-2 duration-500">
+                      {step.type === 'system' && (
+                        <div className="pb-4 border-b border-slate-100 mb-4">
+                          <p className="text-[13px] font-medium text-slate-600">
+                            {step.text.split('https://www.cupshe.com').map((part, i, arr) => (
+                              <React.Fragment key={i}>
+                                {part}
+                                {i < arr.length - 1 && <span className="text-indigo-600 font-bold underline cursor-pointer">https://www.cupshe.com</span>}
+                              </React.Fragment>
+                            ))}
+                          </p>
+                        </div>
+                      )}
+                      {step.type === 'action_header' && (
+                        <h4 className="text-lg font-black text-slate-900 tracking-tight mb-2">{step.text}</h4>
+                      )}
+                      {step.type === 'action' && (
+                        <div className="flex items-start gap-3 pl-4 border-l-2 border-slate-50 mb-2">
+                          <p className="text-[13px] font-medium text-slate-400">{step.text}</p>
+                        </div>
+                      )}
+                      {step.type === 'image' && (
+                        <div className="pl-4 mb-6">
+                          <div className="rounded-[2rem] border border-slate-200 overflow-hidden shadow-2xl max-w-2xl transition-all hover:scale-[1.01]">
+                            <img src={step.url} alt="Captured UI" className="w-full h-auto" />
+                          </div>
+                        </div>
+                      )}
+                      {step.type === 'key_value' && (
+                        <p className="text-[13px] leading-relaxed mb-2">
+                          <span className="font-black text-slate-900">{step.text}</span>
+                          <span className="text-slate-600 ml-1.5">{step.value}</span>
+                        </p>
+                      )}
+                      {step.type === 'header' && (
+                        <p className="text-[13px] font-black text-slate-900 pt-2 mb-2">{step.text}</p>
+                      )}
+                      {step.type === 'bullet' && (
+                        <div className="flex items-start gap-3 pl-4 mb-1.5">
+                          <span className="text-slate-900 mt-1.5 text-xs font-black">•</span>
+                          <p className="text-[13px] font-medium text-slate-600 leading-relaxed">
+                            {step.text.split('-').map((part, i) => (
+                              i === 0 ? <span key={i} className="font-black text-slate-900">{part}</span> : <span key={i}>- {part}</span>
+                            ))}
+                          </p>
+                        </div>
+                      )}
+                      {step.type === 'ordered' && (
+                        <div className="flex items-start gap-3 pl-4 mb-1.5">
+                          <span className="text-slate-900 text-[13px] font-black">{listIdx}.</span>
+                          <p className="text-[13px] font-medium text-slate-600 leading-relaxed">
+                            {step.text.split('-').map((part, i) => (
+                              i === 0 ? <span key={i} className="font-black text-slate-900">{part}</span> : <span key={i}>- {part}</span>
+                            ))}
+                          </p>
+                        </div>
+                      )}
+                      {step.type === 'source' && (
+                        <div className="mt-6 pt-6 border-t border-slate-100">
+                          <p className="text-[13px] font-medium text-slate-600 leading-relaxed">{step.text}</p>
+                        </div>
+                      )}
+                      {step.type === 'footer' && (
+                        <div className="mt-4">
+                          <p className="text-[13px] font-medium text-slate-600 italic">{step.text}</p>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+          
+          <div className="p-8 bg-white border-t border-slate-100 flex justify-end shrink-0">
+            <button 
+              onClick={onClose}
+              className="px-10 py-4 bg-slate-900 text-white rounded-2xl font-black tracking-widest hover:bg-black transition-all shadow-xl active:scale-95"
+            >
+              关闭报告
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   const handleBatchAIGC = async () => {
     setActiveModal(null);
     const productsToGenerate = selectedProducts.filter(p => !batchAIGCExclusions.has(p.id));
@@ -1060,6 +1182,12 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
             </div>
           </div>
         </ModalWrapper>
+      )}
+      {showReportFor && (
+        <AnalysisReportModal 
+          productId={showReportFor} 
+          onClose={() => setShowReportFor(null)} 
+        />
       )}
       {isAddModalOpen && <AddProductModal onClose={closeAddModal} authStatus={authStatus} handleAuthorize={handleAuthorize} isAuthLoading={isAuthLoading} shopifyStoreName={shopifyStoreName} setAuthStatus={setAuthStatus} setIsShopifyConnected={setIsShopifyConnected} isShopifyConnected={isShopifyConnected} syncStates={syncStates} handleSyncConnect={handleSyncConnect} handleSyncDisconnect={handleSyncDisconnect} addStep={addStep} setAddStep={setAddStep} productUrl={productUrl} setProductUrl={setProductUrl} urlError={urlError} handleImportAnalyzeUrl={handleImportAnalyzeUrl} isImportAnalyzing={isImportAnalyzing} productForm={productForm} handleCreateProduct={handleCreateProduct} />}
     </div>

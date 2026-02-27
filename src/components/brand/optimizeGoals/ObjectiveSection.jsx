@@ -108,9 +108,11 @@ const ObjectiveSection = ({ formData, updateFormData, validation, setValidation 
                 <button
                   key={obj.value}
                   onClick={() => {
+                    const goals = getAdsetGoals(obj.value);
+                    const firstGoal = goals[0];
                     updateFormData('campaignObjective', obj.value)
-                    updateFormData('adsetGoal', '')
-                    updateFormData('event', '')
+                    updateFormData('adsetGoal', firstGoal?.value || '')
+                    updateFormData('event', firstGoal?.needsEvent ? 'Purchase' : '')
                     resetSelector()
                   }}
                   className={`group relative flex flex-col items-center justify-center p-6 rounded-2xl border-2 transition-all duration-300 ${

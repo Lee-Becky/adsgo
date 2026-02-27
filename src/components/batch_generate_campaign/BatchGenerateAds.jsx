@@ -830,8 +830,10 @@ const BatchGenerateAds = () => {
                               <button 
                                 key={obj.value}
                                 onClick={() => {
+                                  const firstGoal = ADSET_GOALS_MAPPING[obj.value][0];
                                   setObjective(obj.value);
-                                  setAdsetGoal(ADSET_GOALS_MAPPING[obj.value][0].value);
+                                  setAdsetGoal(firstGoal.value);
+                                  setEvent(firstGoal.needsEvent ? 'Purchase' : '');
                                   setOpenDropdown(null);
                                 }}
                                 className={`w-full text-left p-3 rounded-xl transition-all flex items-center gap-3 ${
@@ -867,7 +869,9 @@ const BatchGenerateAds = () => {
                         <div className="flex items-center gap-2.5 min-w-0">
                           <Zap size={16} className="text-indigo-500 shrink-0" />
                           <div className="flex items-center gap-1 min-w-0">
-                            <span className="text-sm font-bold text-slate-700 truncate">{currentGoalObj?.label}</span>
+                            <span className="text-sm font-bold text-slate-700 truncate">
+                              {currentGoalObj?.label || '选择优化目标...'}
+                            </span>
                             {event && <><ChevronRight size={10} className="text-slate-300 shrink-0" /><span className="text-sm font-bold text-indigo-600 truncate">{event}</span></>}
                           </div>
                         </div>
@@ -1342,6 +1346,10 @@ const BatchGenerateAds = () => {
                   campaignType={campaignType}
                   estimatedTotalDaily={estimatedTotalDaily}
                   adSetGroupsCount={adSetGroupsCount}
+                  authStatus={authStatus}
+                  selectedAccount={selectedAccount}
+                  onAuthStatusChange={setAuthStatus}
+                  onSelectAccount={() => setShowAccountSelector(true)}
                 />
               </div>
             </div>
