@@ -320,53 +320,46 @@ const CampaignPreviewView = ({
               </div>
             </div>
 
-            <div className="space-y-3">
-              <label className="text-[10px] font-black text-slate-400 px-1 flex items-center gap-2"><LinkIcon size={12} className="text-indigo-600"/> 落地页 URL</label>
-              <input 
-                type="text" 
-                value={ad.destinationUrl} 
-                onChange={e => {
-                  const next = [...localAdSets]; next[asIndex].ads[adIndex].destinationUrl = e.target.value; setLocalAdSets(next);
-                }} 
-                className="w-full h-12 px-5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold focus:border-indigo-600 outline-none transition-all" 
-              />
-            </div>
+            {campaignType !== 'CATALOG' && (
+              <div className="space-y-3">
+                <label className="text-[10px] font-black text-slate-400 px-1 flex items-center gap-2"><LinkIcon size={12} className="text-indigo-600"/> 落地页 URL</label>
+                <input 
+                  type="text" 
+                  value={ad.destinationUrl} 
+                  onChange={e => {
+                    const next = [...localAdSets]; next[asIndex].ads[adIndex].destinationUrl = e.target.value; setLocalAdSets(next);
+                  }} 
+                  className="w-full h-12 px-5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold focus:border-indigo-600 outline-none transition-all" 
+                />
+              </div>
+            )}
 
             <div className="space-y-3">
               <label className="text-[10px] font-black text-slate-400 px-1 flex items-center gap-2"><Tag size={12} className="text-indigo-600"/> 突显优惠 (Promo Offer)</label>
-              <div className="p-5 bg-slate-50 rounded-2xl border border-slate-100 space-y-5">
-                <div className="flex gap-2">
-                  <button 
-                    onClick={() => {
-                      const next = [...localAdSets];
-                      next[asIndex].ads[adIndex].offerType = 'AUTO';
-                      next[asIndex].ads[adIndex].promoCode = '90%OFF';
-                      setLocalAdSets(next);
-                    }}
-                    className={`flex-1 py-3 rounded-xl text-[10px] font-black transition-all ${ad.offerType === 'AUTO' ? 'bg-indigo-600 text-white shadow-lg' : 'bg-white border border-slate-200 text-slate-400'}`}
-                  >自动获取 (90% OFF)</button>
-                  <button 
-                    onClick={() => {
-                      const next = [...localAdSets];
-                      next[asIndex].ads[adIndex].offerType = 'MANUAL';
-                      setLocalAdSets(next);
-                    }}
-                    className={`flex-1 py-3 rounded-xl text-[10px] font-black transition-all ${ad.offerType === 'MANUAL' ? 'bg-indigo-600 text-white shadow-lg' : 'bg-white border border-slate-200 text-slate-400'}`}
-                  >手动输入</button>
-                </div>
-                {ad.offerType === 'MANUAL' && (
-                  <div className="animate-in slide-in-from-top-2 duration-200">
-                    <input 
-                      type="text" 
-                      placeholder="输入优惠码，例如: SAVE20" 
-                      value={ad.promoCode || ''}
-                      onChange={e => {
-                        const next = [...localAdSets]; next[asIndex].ads[adIndex].promoCode = e.target.value; setLocalAdSets(next);
-                      }}
-                      className="w-full h-11 px-4 bg-white border border-slate-200 rounded-xl text-xs font-bold outline-none focus:border-indigo-600 transition-all"
-                    />
+              <div className="p-5 bg-slate-50 rounded-2xl border border-slate-100">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${ad.offerType === 'AUTO' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-100' : 'bg-white text-slate-300 border border-slate-100'}`}>
+                      <Sparkles size={18} />
+                    </div>
+                    <div>
+                      <p className="text-xs font-black text-slate-800">自动获取优惠</p>
+                      <p className="text-[9px] font-bold text-slate-400 mt-0.5">Auto-fetch</p>
+                    </div>
                   </div>
-                )}
+                  <button 
+                    onClick={() => {
+                      const next = [...localAdSets];
+                      const currentType = next[asIndex].ads[adIndex].offerType;
+                      next[asIndex].ads[adIndex].offerType = currentType === 'AUTO' ? 'NONE' : 'AUTO';
+                      next[asIndex].ads[adIndex].promoCode = next[asIndex].ads[adIndex].offerType === 'AUTO' ? '90%OFF' : '';
+                      setLocalAdSets(next);
+                    }}
+                    className={`w-12 h-6 rounded-full transition-all relative ${ad.offerType === 'AUTO' ? 'bg-indigo-600' : 'bg-slate-200'}`}
+                  >
+                    <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${ad.offerType === 'AUTO' ? 'left-7' : 'left-1'}`} />
+                  </button>
+                </div>
               </div>
             </div>
           </div>
