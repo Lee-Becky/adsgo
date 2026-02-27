@@ -62,6 +62,9 @@ function App() {
   const [isInsightsDataFetching, setIsInsightsDataFetching] = useState(false) // Ad Insights page data fetching state
   const [brands, setBrands] = useState(['Default Brand'])
   const [selectedBrand, setSelectedBrand] = useState('Default Brand')
+  const [brandDetails, setBrandDetails] = useState({
+    'Default Brand': { url: '', isAnalyzed: false }
+  })
   const [isBrandSwitching, setIsBrandSwitching] = useState(false)
   const [isCreateBrandModalOpen, setIsCreateBrandModalOpen] = useState(false)
   const [editingBrand, setEditingBrand] = useState(null)
@@ -216,7 +219,18 @@ function App() {
       case 'insights360':
         return <Analysis360 onPageChange={handlePageChange} />
       case 'aiAnalysis':
-        return <AIAnalysis />
+        return (
+          <AIAnalysis 
+            selectedBrand={selectedBrand}
+            brandDetail={brandDetails[selectedBrand] || { url: '', isAnalyzed: false }}
+            onUpdateDetail={(details) => {
+              setBrandDetails(prev => ({
+                ...prev,
+                [selectedBrand]: { ...prev[selectedBrand], ...details }
+              }))
+            }}
+          />
+        )
       case 'drafts':
         return <Drafts />
       case 'settings':
@@ -331,6 +345,10 @@ function App() {
                 console.log('New Brand Created:', newBrand);
                 const brandName = newBrand.name;
                 setBrands(prev => [...prev, brandName]);
+                setBrandDetails(prev => ({
+                  ...prev,
+                  [brandName]: { url: newBrand.url || '', isAnalyzed: false }
+                }));
                 handleBrandChange(brandName);
               }}
             />
