@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Users, Info, Sparkles, DollarSign, ChevronDown, Briefcase, Target, Layers, Lock, Edit3, Check, LayoutGrid } from 'lucide-react';
+import { Users, Info, Sparkles, DollarSign, ChevronDown, Briefcase, Target, Layers, Lock, Edit3, Check, LayoutGrid, Facebook } from 'lucide-react';
 import { Z_INDEX } from '../../../constants/zIndex';
 
 const AUDIENCE_SHORT_LABELS = {
@@ -26,7 +26,11 @@ const CampaignPlanView = ({
   productCreativesMap,
   isExistingCampaign,
   selectedCampaign,
-  onSelectCampaign
+  onSelectCampaign,
+  selectedAccount,
+  onSelectAccount,
+  authStatus,
+  handleAuthorize
 }) => {
   const [showLalDropdown, setShowLalDropdown] = useState(false);
   const [showIntDropdown, setShowIntDropdown] = useState(false);
@@ -269,7 +273,7 @@ const CampaignPlanView = ({
                       className="w-full p-4 bg-white border-2 border-purple-100 rounded-2xl flex items-center justify-between cursor-pointer hover:border-purple-300 transition-all"
                     >
                       <div className="flex flex-wrap gap-1.5 overflow-hidden max-w-[90%]">
-                        {lalOptions.length === 0 ? (
+                        {(!selectedAccount || lalOptions.length === 0) ? (
                           <span className="text-xs font-bold text-slate-300">请选择 LAL 受众源...</span>
                         ) : (
                           lalOptions.map(opt => (
@@ -289,19 +293,39 @@ const CampaignPlanView = ({
                           className="absolute top-full left-0 right-0 mt-2 bg-white border border-purple-100 rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-150"
                           style={{ zIndex: 200 }}
                         >
-                          {['US Purchase 1%', 'US add to cart 5%', 'US register last30days 1%~3%'].map((opt) => {
-                            const isSel = lalOptions.includes(opt);
-                            return (
-                              <div 
-                                key={opt}
-                                onClick={() => onToggleLalOption(opt)}
-                                className="flex items-center justify-between px-5 py-3 hover:bg-purple-50 cursor-pointer transition-colors"
+                          {!authStatus?.meta ? (
+                            <div className="p-4">
+                              <button 
+                                onClick={() => { handleAuthorize('meta'); setShowLalDropdown(false); }}
+                                className="w-full py-3 bg-indigo-600 text-white rounded-xl text-[11px] font-black tracking-widest hover:bg-indigo-700 transition-all shadow-lg flex items-center justify-center gap-2"
                               >
-                                <span className={`text-[11px] font-bold ${isSel ? 'text-purple-700' : 'text-slate-600'}`}>{opt}</span>
-                                {isSel && <Check size={14} className="text-purple-600" />}
-                              </div>
-                            );
-                          })}
+                                <Facebook size={14} /> 立即连接 Meta
+                              </button>
+                            </div>
+                          ) : !selectedAccount ? (
+                            <div className="p-4">
+                              <button 
+                                onClick={() => { onSelectAccount(); setShowLalDropdown(false); }}
+                                className="w-full py-3 bg-indigo-600 text-white rounded-xl text-[11px] font-black tracking-widest hover:bg-indigo-700 transition-all shadow-lg flex items-center justify-center gap-2"
+                              >
+                                <Briefcase size={14} /> 选择广告账户
+                              </button>
+                            </div>
+                          ) : (
+                            ['US Purchase 1%', 'US add to cart 5%', 'US register last30days 1%~3%'].map((opt) => {
+                              const isSel = lalOptions.includes(opt);
+                              return (
+                                <div 
+                                  key={opt}
+                                  onClick={() => onToggleLalOption(opt)}
+                                  className="flex items-center justify-between px-5 py-3 hover:bg-purple-50 cursor-pointer transition-colors"
+                                >
+                                  <span className={`text-[11px] font-bold ${isSel ? 'text-purple-700' : 'text-slate-600'}`}>{opt}</span>
+                                  {isSel && <Check size={14} className="text-purple-600" />}
+                                </div>
+                              );
+                            })
+                          )}
                         </div>
                       </>
                     )}

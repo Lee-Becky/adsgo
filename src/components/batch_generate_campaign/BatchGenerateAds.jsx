@@ -96,6 +96,7 @@ const BatchGenerateAds = () => {
   const [selectedProducts, setSelectedProducts] = useState([]);
   const [productCreativesMap, setProductCreativesMap] = useState({});
   const [selectedAccount, setSelectedAccount] = useState(null);
+  const [authStatus, setAuthStatus] = useState({ shopify: false, meta: false, google: false });
   const [productReportsMap, setProductReportsMap] = useState({});
   
   const [campaignType, setCampaignType] = useState('PRODUCT');
@@ -154,7 +155,7 @@ const BatchGenerateAds = () => {
     numAdsetsPerProduct: 1
   });
   const [adsetAudiences, setAdsetAudiences] = useState(Array(50).fill('ADV'));
-  const [lalOptions, setLalOptions] = useState(['US Purchase 1%']);
+  const [lalOptions, setLalOptions] = useState([]);
   const [intOptions, setIntOptions] = useState([]);
   const [budgetType, setBudgetType] = useState('CBO');
   const [dailyBudget, setDailyBudget] = useState(50);
@@ -270,6 +271,9 @@ const BatchGenerateAds = () => {
       c.name.toLowerCase().includes(search.toLowerCase()) || c.id.includes(search)
     );
 
+    // 检查 Meta 平台是否已连接
+    const isMetaConnected = authStatus.meta;
+
     return (
       <div 
         className="fixed inset-0 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in"
@@ -293,26 +297,57 @@ const BatchGenerateAds = () => {
           <div className="max-h-80 overflow-y-auto p-4 no-scrollbar">
             <div 
               onClick={() => { setSelectedCampaignId(null); setShowCampaignModal(false); }}
-              className="p-4 rounded-xl hover:bg-slate-50 cursor-pointer flex items-center justify-between group"
+              className="p-4 rounded-xl hover:bg-slate-50 cursor-pointer flex items-center justify-between group border border-transparent hover:border-indigo-100"
             >
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-indigo-50 text-indigo-400 rounded-lg flex items-center justify-center"><Plus size={20}/></div>
                 <span className="text-sm font-black text-slate-400">创建全新系列 (Default)</span>
               </div>
+              {!selectedCampaignId && <Check size={18} className="text-indigo-600" />}
             </div>
-            {filtered.map(c => (
-              <div 
-                key={c.id} 
-                onClick={() => { setSelectedCampaignId(c.id); setShowCampaignModal(false); }}
-                className="p-4 rounded-xl hover:bg-indigo-50 cursor-pointer flex items-center justify-between group transition-colors"
-              >
-                <div>
-                  <p className="text-sm font-black text-slate-800">{c.name}</p>
-                  <p className="text-[10px] font-bold text-slate-400">ID: {c.id} • {c.budgetType}</p>
+
+            <div className="mt-4 pt-4 border-t border-slate-50 space-y-2">
+              {!isMetaConnected ? (
+                <div className="p-4">
+                  <button 
+                    onClick={() => {
+                      // 触发 Meta 授权逻辑，并立即联动触发账号选择，不关闭当前弹窗
+                      setAuthStatus(prev => ({ ...prev, meta: true }));
+                      setShowAccountSelector(true);
+                    }}
+                    className="w-full py-4 bg-indigo-600 text-white rounded-2xl text-xs font-black tracking-widest hover:bg-indigo-700 transition-all shadow-lg flex items-center justify-center gap-3"
+                  >
+                    <Facebook size={18} /> 立即连接 Meta 以加载系列
+                  </button>
                 </div>
-                {selectedCampaignId === c.id && <Check size={18} className="text-indigo-600" />}
-              </div>
-            ))}
+              ) : !selectedAccount ? (
+                <div className="p-4">
+                  <button 
+                    onClick={() => {
+                      setShowAccountSelector(true);
+                      setShowCampaignModal(false);
+                    }}
+                    className="w-full py-4 bg-indigo-600 text-white rounded-2xl text-xs font-black tracking-widest hover:bg-indigo-700 transition-all shadow-lg flex items-center justify-center gap-3"
+                  >
+                    <Briefcase size={18} /> 选择广告账户
+                  </button>
+                </div>
+              ) : (
+                filtered.map(c => (
+                  <div 
+                    key={c.id} 
+                    onClick={() => { setSelectedCampaignId(c.id); setShowCampaignModal(false); }}
+                    className="p-4 rounded-xl hover:bg-indigo-50 cursor-pointer flex items-center justify-between group transition-colors"
+                  >
+                    <div>
+                      <p className="text-sm font-black text-slate-800">{c.name}</p>
+                      <p className="text-[10px] font-bold text-slate-400">ID: {c.id} • {c.budgetType}</p>
+                    </div>
+                    {selectedCampaignId === c.id && <Check size={18} className="text-indigo-600" />}
+                  </div>
+                ))
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -897,6 +932,8 @@ const BatchGenerateAds = () => {
                   onSelectProducts={setSelectedProducts}
                   productCreatives={productCreativesMap}
                   onUpdateCreatives={handleUpdateProductCreatives}
+                  authStatus={authStatus}
+                  onAuthStatusChange={setAuthStatus}
                   onAnalysisStart={() => { setIsAnalyzing(true); setAnalysisFinished(false); }}
                   onAnalysisComplete={(reports) => { 
                     setIsAnalyzing(false); 
@@ -954,6 +991,15 @@ const BatchGenerateAds = () => {
                       isExistingCampaign={!!selectedCampaignId}
                       selectedCampaign={selectedCampaign}
                       onSelectCampaign={() => setShowCampaignModal(true)}
+                      selectedAccount={selectedAccount}
+                      onSelectAccount={() => setShowAccountSelector(true)}
+                      authStatus={authStatus}
+                      handleAuthorize={(platformId) => { 
+                        setAuthStatus(prev => ({ ...prev, [platformId]: true }));
+                        if (platformId === 'meta') {
+                          setShowAccountSelector(true);
+                        }
+                      }}
                     />
                  </div>
               )}
