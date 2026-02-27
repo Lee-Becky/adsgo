@@ -4,7 +4,7 @@ import {
   Briefcase, Check, Layout, Tag, Link2, Info, Settings, Plus, FileText, 
   Type, Calendar, Clock, Rocket, Facebook, Instagram, Hash, Loader2, 
   CheckCircle2, Layers, RefreshCw, MapPin, Zap, ArrowRight, ChevronLeft, 
-  Megaphone, MousePointer2, Users, Smartphone, ChevronRight 
+  Megaphone, MousePointer2, Users, Smartphone, ChevronRight, Link2Off
 } from 'lucide-react';
 import { Z_INDEX } from '../../constants/zIndex';
 import { useZIndex } from '../../hooks/useZIndex';
@@ -379,7 +379,7 @@ const BatchGenerateAds = () => {
 
     const [step, setStep] = useState(1);
     const [showAccountChoice, setShowAccountChoice] = useState(true);
-    const [selectedAccountType, setSelectedAccountType] = useState(null);
+    const [selectedAccountType, setSelectedAccountType] = useState('own');
     const [showAdsgoReminder, setShowAdsgoReminder] = useState(false);
     const [hideMainModal, setHideMainModal] = useState(false);
     const [connectedPlatform, setConnectedPlatform] = useState(null);
@@ -489,30 +489,51 @@ const BatchGenerateAds = () => {
 
     const renderStep1 = () => (
       <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-        <div className="grid grid-cols-2 gap-4">
-          <div className="relative overflow-hidden group bg-white rounded-2xl border border-slate-100 p-6 shadow-sm hover:shadow-md transition-all">
-            <div className="flex items-center gap-4 mb-6">
-              <div className="w-12 h-12 rounded-xl bg-slate-50 p-2.5 flex items-center justify-center border border-slate-100"><img src={LOGO_LINKS.meta} alt="Meta" className="w-full h-full object-contain" /></div>
-              <div><h3 className="font-black text-slate-800">Meta Ads</h3><p className="text-[10px] font-bold text-slate-400 tracking-widest">Social media platform</p></div>
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 mb-2 px-1">
+            <div className="w-5 h-5 rounded-full bg-indigo-100 flex items-center justify-center">
+              <div className="w-2 h-2 rounded-full bg-indigo-600" />
             </div>
-            {platforms.meta.connected ? (
-              <div className="space-y-4"><div className="bg-indigo-50/50 rounded-xl p-3 border border-indigo-100/50"><p className="text-[10px] font-bold text-indigo-400 mb-1">Connected account</p><p className="text-xs font-black text-indigo-900">{platforms.meta.email}</p></div><button onClick={() => handleDisconnect('meta')} className="w-full py-2.5 bg-red-50 text-red-600 rounded-xl text-[11px] font-bold hover:bg-red-100 transition-colors">Disconnect</button></div>
-            ) : (
-              <button onClick={() => handleConnect('meta')} disabled={!!isConnecting} className="w-full py-3 bg-slate-900 text-white rounded-xl text-xs font-bold hover:bg-black transition-all disabled:opacity-50">Connect</button>
-            )}
-            {isConnecting === 'meta' && (<div className="absolute inset-0 bg-white/90 backdrop-blur-sm flex flex-col items-center justify-center animate-in fade-in duration-300"><Loader2 size={32} className="text-indigo-600 animate-spin mb-3" /><p className="text-xs font-black text-slate-900 animate-pulse">Fetching your assets...</p></div>)}
+            <span className="text-[13px] font-black text-slate-700">Meta Connection</span>
           </div>
-          <div className="relative overflow-hidden group bg-white rounded-2xl border border-slate-100 p-6 shadow-sm hover:shadow-md transition-all">
-            <div className="flex items-center gap-4 mb-6">
-              <div className="w-12 h-12 rounded-xl bg-slate-50 p-2.5 flex items-center justify-center border border-slate-100"><img src={LOGO_LINKS.google} alt="Google" className="w-full h-full object-contain" /></div>
-              <div><h3 className="font-black text-slate-800">Google Ads</h3><p className="text-[10px] font-bold text-slate-400 tracking-widest">Search & network</p></div>
+          
+          <div className="relative overflow-hidden group bg-white rounded-2xl border border-slate-100 shadow-sm flex items-center transition-all h-16 hover:border-indigo-100">
+            <div className="flex items-center gap-4 px-6 flex-1 min-w-0">
+              <div className="w-8 h-8 shrink-0 bg-slate-50 rounded-lg p-1.5 border border-slate-100"><img src={LOGO_LINKS.meta} alt="Meta" className="w-full h-full object-contain" /></div>
+              <div className="flex items-center gap-10 w-full">
+                <span className="text-sm font-black text-slate-800 shrink-0">Meta Ads</span>
+                {platforms.meta.connected ? (
+                  <span className="text-sm font-bold text-slate-400 truncate">{platforms.meta.email.split('@')[0]}</span>
+                ) : (
+                  <span className="text-sm font-bold text-slate-200">Not connected</span>
+                )}
+              </div>
             </div>
-            {platforms.google.connected ? (
-              <div className="space-y-4"><div className="bg-amber-50/50 rounded-xl p-3 border border-amber-100/50"><p className="text-[10px] font-bold text-amber-500 mb-1">Connected account</p><p className="text-xs font-black text-amber-900">{platforms.google.email}</p></div><button onClick={() => handleDisconnect('google')} className="w-full py-2.5 bg-red-50 text-red-600 rounded-xl text-[11px] font-bold hover:bg-red-100 transition-colors">Disconnect</button></div>
-            ) : (
-              <button onClick={() => handleConnect('google')} disabled={!!isConnecting} className="w-full py-3 bg-slate-900 text-white rounded-xl text-xs font-bold hover:bg-black transition-all disabled:opacity-50">Connect</button>
+            
+            <div className="h-full shrink-0 flex items-center pr-4">
+              {platforms.meta.connected ? (
+                <button 
+                  onClick={() => handleDisconnect('meta')}
+                  className="px-6 py-2 text-rose-500 text-xs font-black hover:bg-rose-50 rounded-xl transition-colors flex items-center gap-2"
+                >
+                  <Link2Off size={14} /> Disconnect
+                </button>
+              ) : (
+                <button 
+                  onClick={() => handleConnect('meta')}
+                  disabled={!!isConnecting}
+                  className="px-8 py-2.5 bg-slate-900 text-white text-xs font-black rounded-xl hover:bg-black transition-all disabled:opacity-50 shadow-lg shadow-slate-200"
+                >
+                  {isConnecting === 'meta' ? <Loader2 size={14} className="animate-spin" /> : 'Connect'}
+                </button>
+              )}
+            </div>
+
+            {isConnecting === 'meta' && (
+              <div className="absolute inset-0 bg-white/60 backdrop-blur-[1px] flex items-center justify-center animate-in fade-in duration-300">
+                <p className="text-[10px] font-black text-indigo-600 animate-pulse tracking-widest">CONNECTING...</p>
+              </div>
             )}
-            {isConnecting === 'google' && (<div className="absolute inset-0 bg-white/90 backdrop-blur-sm flex flex-col items-center justify-center animate-in fade-in duration-300"><Loader2 size={32} className="text-indigo-600 animate-spin mb-3" /><p className="text-xs font-black text-slate-900 animate-pulse">Fetching your assets...</p></div>)}
           </div>
         </div>
       </div>
@@ -576,11 +597,8 @@ const BatchGenerateAds = () => {
     );
 
     const renderAccountChoiceStep = () => (
-      <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-        <div className="grid grid-cols-2 gap-4">
-          <div onClick={() => setSelectedAccountType('own')} className={`relative overflow-hidden cursor-pointer rounded-2xl border-2 p-6 transition-all ${selectedAccountType === 'own' ? 'bg-indigo-50 border-indigo-500 shadow-lg shadow-indigo-200/30' : 'bg-white border-slate-100 hover:border-slate-300 hover:shadow-md'}`}>{selectedAccountType === 'own' && (<div className="absolute top-4 right-4 w-6 h-6 bg-indigo-500 rounded-full flex items-center justify-center"><Check size={14} className="text-white" /></div>)}<div className="flex flex-col items-center text-center space-y-4"><div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center"><span className="text-2xl">👤</span></div><div><h4 className="text-sm font-black text-slate-900 mb-1">Use your own ad account</h4><p className="text-[11px] font-medium text-slate-500">Connect and use your existing accounts</p></div></div></div>
-          <div onClick={() => setSelectedAccountType('adsgo')} className={`relative overflow-hidden cursor-pointer rounded-2xl border-2 p-6 transition-all ${selectedAccountType === 'adsgo' ? 'bg-emerald-50 border-emerald-500 shadow-lg shadow-emerald-200/30' : 'bg-white border-slate-100 hover:border-slate-300 hover:shadow-md'}`}>{selectedAccountType === 'adsgo' && (<div className="absolute top-4 right-4 w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center"><Check size={14} className="text-white" /></div>)}<div className="flex flex-col items-center text-center space-y-4"><div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-100 to-teal-100 flex items-center justify-center"><span className="text-2xl">🏢</span></div><div><h4 className="text-sm font-black text-slate-900 mb-1">Use account provided by adsgo</h4><p className="text-[11px] font-medium text-slate-500">Let AdsGo manage your advertising setup</p></div></div></div>
-        </div>
+      <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 hidden">
+        {/* 原本的选择逻辑保留在状态中，UI 按照新样式在 AccountChoiceModal 中重构 */}
       </div>
     );
 
@@ -592,20 +610,14 @@ const BatchGenerateAds = () => {
             <div className="px-10 pt-10 pb-6 flex items-start justify-between shrink-0">
               <div>
                 <div className="flex items-center gap-3 mb-2">
-                  <span className={`px-3 py-1 rounded-full text-[9px] font-black tracking-widest ${step === 1 ? 'bg-indigo-50 text-indigo-600' : step === 2 ? 'bg-purple-50 text-purple-600' : step === 3 ? 'bg-amber-50 text-amber-600' : 'bg-emerald-50 text-emerald-600'}`}>Step {step} of 4</span>
-                  <div className="flex gap-1">{[1, 2, 3, 4].map((i) => (<div key={i} className={`h-1 rounded-full transition-all duration-500 ${i < step ? 'w-4 bg-emerald-500' : i === step ? 'w-8 bg-slate-900' : 'w-2 bg-slate-200'}`} />))}</div>
+                  <span className={`px-3 py-1 rounded-full text-[9px] font-black tracking-widest ${step === 2 ? 'bg-purple-50 text-purple-600' : step === 3 ? 'bg-amber-50 text-amber-600' : 'bg-emerald-50 text-emerald-600'}`}>Step {step - 1} of 3</span>
+                  <div className="flex gap-1">{[2, 3, 4].map((i) => (<div key={i} className={`h-1 rounded-full transition-all duration-500 ${i < step ? 'w-4 bg-emerald-500' : i === step ? 'w-8 bg-slate-900' : 'w-2 bg-slate-200'}`} />))}</div>
                 </div>
-                <h2 className="text-2xl font-black text-slate-900 tracking-tight">{step === 1 && 'Connect ad platform'}{step === 2 && 'Select your assets'}{step === 3 && 'Publishing status'}{step === 4 && 'Confirm brand optimize goal'}</h2>
+                <h2 className="text-2xl font-black text-slate-900 tracking-tight">{step === 2 && 'Select your assets'}{step === 3 && 'Publishing status'}{step === 4 && 'Confirm brand optimize goal'}</h2>
               </div>
               <button onClick={() => setShowPublishModal(false)} className="p-2 hover:bg-slate-100 rounded-xl text-slate-400 transition-colors"><X size={20} /></button>
             </div>
-            <div className="flex-1 overflow-y-auto px-10 pb-10 custom-scrollbar">{step === 1 && renderStep1()}{step === 2 && renderStep2()}{step === 3 && renderStep3()}{step === 4 && renderStep4()}</div>
-            {step === 1 && (
-              <div className="px-10 py-6 border-t border-slate-50 flex items-center justify-between bg-slate-50/50 shrink-0">
-                <button onClick={() => setShowPublishModal(false)} className="text-xs font-bold text-slate-400 hover:text-slate-600 px-6 py-2 transition-colors">Cancel</button>
-                <button onClick={() => setStep(2)} disabled={!connectedPlatform} className="px-10 py-3 bg-slate-900 text-white rounded-xl text-xs font-bold hover:bg-black transition-all disabled:opacity-30 flex items-center gap-2">Select account <ChevronRight size={16} /></button>
-              </div>
-            )}
+            <div className="flex-1 overflow-y-auto px-10 pb-10 custom-scrollbar">{step === 2 && renderStep2()}{step === 3 && renderStep3()}{step === 4 && renderStep4()}</div>
             {step === 4 && (
               <div className="absolute bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-white via-white to-white/0 pt-16 z-[200]">
                 <button onClick={handlePublishComplete} className="w-full py-5 bg-gradient-to-r from-emerald-600 to-teal-700 text-white rounded-2xl text-base font-black flex items-center justify-center gap-3 hover:scale-[1.02] active:scale-98 transition-all shadow-2xl shadow-emerald-200/50">Confirm strategy & finish <ArrowRight size={20} /></button>
@@ -620,8 +632,9 @@ const BatchGenerateAds = () => {
             setHideMainModal(true);
           } else {
             setShowAccountChoice(false);
+            setStep(2); // 自有账号选择并连接后，直接进入 PublishModal 的资产选择步
           }
-        }} onClose={() => { setShowAccountChoice(false); setShowPublishModal(false); }} selectedAccountType={selectedAccountType} setSelectedAccountType={setSelectedAccountType} renderAccountChoiceStep={renderAccountChoiceStep} />}
+        }} onClose={() => { setShowAccountChoice(false); setShowPublishModal(false); }} selectedAccountType={selectedAccountType} setSelectedAccountType={setSelectedAccountType} renderAccountChoiceStep={renderAccountChoiceStep} renderStep1={renderStep1} connectedPlatform={connectedPlatform} />}
         {showAdsgoReminder && <AdsGoReminderModal onClose={() => { setShowAdsgoReminder(false); setShowPublishModal(false); }} setShowPublishModal={setShowPublishModal} />}
       </div>
     );
@@ -1347,15 +1360,55 @@ const BatchGenerateAds = () => {
   );
 };
 
-const AccountChoiceModal = ({ onSelect, onClose, selectedAccountType, setSelectedAccountType, renderAccountChoiceStep }) => {
+const AccountChoiceModal = ({ onSelect, onClose, selectedAccountType, setSelectedAccountType, renderStep1, connectedPlatform }) => {
   const zIndex = useZIndex(true);
   return (
     <div className="fixed inset-0 flex items-center justify-center px-4 animate-in fade-in duration-300" style={{ zIndex }}>
       <div className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm animate-in fade-in duration-300" onClick={onClose} />
-      <div className="relative bg-white w-full max-w-xl rounded-[2.5rem] shadow-2xl flex flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-300 overflow-hidden">
-        <div className="px-10 pt-10 pb-6 flex items-center justify-between shrink-0"><h2 className="text-2xl font-black text-slate-900 tracking-tight">Two ways to run your ads</h2><button onClick={onClose} className="p-2 hover:bg-slate-100 rounded-xl text-slate-400 transition-colors"><X size={20} /></button></div>
-        <div className="flex-1 overflow-y-auto px-10 pb-6 custom-scrollbar">{renderAccountChoiceStep()}</div>
-        <div className="px-10 py-6 border-t border-slate-50 flex items-center justify-between bg-slate-50/50 shrink-0"><button onClick={onClose} className="text-xs font-bold text-slate-400 hover:text-slate-600 px-6 py-2 transition-colors">Cancel</button><button onClick={() => onSelect(selectedAccountType)} disabled={!selectedAccountType} className="px-10 py-3 bg-slate-900 text-white rounded-xl text-xs font-bold hover:bg-black transition-all disabled:opacity-30 flex items-center gap-2">Confirm <ChevronRight size={16} /></button></div>
+      <div className="relative bg-white w-full max-w-2xl rounded-[3rem] shadow-2xl flex flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-300 overflow-hidden">
+        <div className="px-10 pt-10 pb-8 space-y-6">
+          <div className="flex items-start justify-between">
+            <div className="space-y-1">
+              <h2 className="text-2xl font-black text-slate-900 tracking-tight">Account Connection Needed</h2>
+              <p className="text-[13px] font-medium text-slate-500 leading-relaxed max-w-md">
+                Please connect your Meta account, and select a valid ad account and Facebook page to publish your ads.
+              </p>
+            </div>
+            <button 
+              onClick={() => setSelectedAccountType(selectedAccountType === 'own' ? 'adsgo' : 'own')}
+              className="px-4 py-2 border-2 border-indigo-100 text-indigo-600 rounded-xl text-xs font-black flex items-center gap-2 hover:bg-indigo-50 transition-all group"
+            >
+              {selectedAccountType === 'own' ? "Use AdsGo's account" : "Use my own account"}
+              <RefreshCw size={14} className="group-hover:rotate-180 transition-transform duration-500" />
+            </button>
+          </div>
+
+          {selectedAccountType === 'own' ? (
+            <div className="animate-in fade-in slide-in-from-top-2 duration-500">
+              {renderStep1()}
+            </div>
+          ) : (
+            <div className="p-10 bg-emerald-50/50 border-2 border-dashed border-emerald-200 rounded-[2rem] flex flex-col items-center text-center space-y-4 animate-in zoom-in-95">
+              <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center text-emerald-500 shadow-sm"><Briefcase size={32} /></div>
+              <div className="space-y-1">
+                <h4 className="text-base font-black text-slate-900">AdsGo Managed Account</h4>
+                <p className="text-xs font-medium text-slate-500">We will provide a dedicated ad account for your campaigns</p>
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="px-10 py-8 border-t border-slate-50 flex items-center justify-between bg-slate-50/50 shrink-0">
+          <button onClick={onClose} className="text-xs font-bold text-slate-400 hover:text-slate-600 px-6 py-2 transition-colors font-sans">Cancel</button>
+          <button 
+            onClick={() => onSelect(selectedAccountType)} 
+            disabled={selectedAccountType === 'own' && !connectedPlatform} 
+            className="px-12 py-4 bg-slate-900 text-white rounded-2xl text-[13px] font-black hover:bg-black transition-all disabled:opacity-30 flex items-center gap-3 shadow-xl shadow-slate-200"
+          >
+            {selectedAccountType === 'own' ? 'Select account' : 'Confirm'} 
+            <ArrowRight size={18} />
+          </button>
+        </div>
       </div>
     </div>
   );
