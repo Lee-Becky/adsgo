@@ -4,7 +4,7 @@ import {
   Briefcase, Check, Layout, Tag, Link2, Info, Settings, Plus, FileText, 
   Type, Calendar, Clock, Rocket, Facebook, Instagram, Hash, Loader2, 
   CheckCircle2, Layers, RefreshCw, MapPin, Zap, ArrowRight, ChevronLeft, 
-  Megaphone, MousePointer2, Users, Smartphone, ChevronRight, Link2Off
+  Megaphone, MousePointer2, Users, Smartphone, ChevronRight, Link2Off, AlertCircle
 } from 'lucide-react';
 import { Z_INDEX } from '../../constants/zIndex';
 import { useZIndex } from '../../hooks/useZIndex';
@@ -390,7 +390,7 @@ const BatchGenerateAds = () => {
     });
 
     const [selections, setSelections] = useState({
-      adAccount: '',
+      adAccount: selectedAccount?.id || '',
       fbPage: '',
       pixel: '',
       event: '',
@@ -555,7 +555,6 @@ const BatchGenerateAds = () => {
             )}
             {!canPublish && selections.adAccount && (<div className="flex items-center gap-2 p-3 bg-indigo-50 text-indigo-600 rounded-xl text-[10px] font-bold animate-pulse"><AlertCircle size={14} />Please complete all required selections to proceed</div>)}
           </div>
-          <button onClick={() => { setActiveDropdown(null); setStep(3); }} disabled={!canPublish} className="w-full py-4 bg-slate-900 text-white rounded-2xl text-sm font-black flex items-center justify-center gap-2 hover:bg-black transition-all disabled:opacity-30 disabled:grayscale">Publish now <Rocket size={18} /></button>
         </div>
       );
     };
@@ -610,14 +609,14 @@ const BatchGenerateAds = () => {
             <div className="px-10 pt-10 pb-6 flex items-start justify-between shrink-0">
               <div>
                 <div className="flex items-center gap-3 mb-2">
-                  <span className={`px-3 py-1 rounded-full text-[9px] font-black tracking-widest ${step === 2 ? 'bg-purple-50 text-purple-600' : step === 3 ? 'bg-amber-50 text-amber-600' : 'bg-emerald-50 text-emerald-600'}`}>Step {step - 1} of 3</span>
-                  <div className="flex gap-1">{[2, 3, 4].map((i) => (<div key={i} className={`h-1 rounded-full transition-all duration-500 ${i < step ? 'w-4 bg-emerald-500' : i === step ? 'w-8 bg-slate-900' : 'w-2 bg-slate-200'}`} />))}</div>
+                  <span className={`px-3 py-1 rounded-full text-[9px] font-black tracking-widest ${step === 3 ? 'bg-amber-50 text-amber-600' : 'bg-emerald-50 text-emerald-600'}`}>Step {step === 3 ? 1 : 2} of 2</span>
+                  <div className="flex gap-1">{[3, 4].map((i) => (<div key={i} className={`h-1 rounded-full transition-all duration-500 ${i < step ? 'w-4 bg-emerald-500' : i === step ? 'w-8 bg-slate-900' : 'w-2 bg-slate-200'}`} />))}</div>
                 </div>
-                <h2 className="text-2xl font-black text-slate-900 tracking-tight">{step === 2 && 'Select your assets'}{step === 3 && 'Publishing status'}{step === 4 && 'Confirm brand optimize goal'}</h2>
+                <h2 className="text-2xl font-black text-slate-900 tracking-tight">{step === 3 && 'Publishing status'}{step === 4 && 'Confirm brand optimize goal'}</h2>
               </div>
               <button onClick={() => setShowPublishModal(false)} className="p-2 hover:bg-slate-100 rounded-xl text-slate-400 transition-colors"><X size={20} /></button>
             </div>
-            <div className="flex-1 overflow-y-auto px-10 pb-10 custom-scrollbar">{step === 2 && renderStep2()}{step === 3 && renderStep3()}{step === 4 && renderStep4()}</div>
+            <div className="flex-1 overflow-y-auto px-10 pb-10 custom-scrollbar">{step === 3 && renderStep3()}{step === 4 && renderStep4()}</div>
             {step === 4 && (
               <div className="absolute bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-white via-white to-white/0 pt-16 z-[200]">
                 <button onClick={handlePublishComplete} className="w-full py-5 bg-gradient-to-r from-emerald-600 to-teal-700 text-white rounded-2xl text-base font-black flex items-center justify-center gap-3 hover:scale-[1.02] active:scale-98 transition-all shadow-2xl shadow-emerald-200/50">Confirm strategy & finish <ArrowRight size={20} /></button>
@@ -632,9 +631,9 @@ const BatchGenerateAds = () => {
             setHideMainModal(true);
           } else {
             setShowAccountChoice(false);
-            setStep(2); // 自有账号选择并连接后，直接进入 PublishModal 的资产选择步
+            setStep(3); // 自有账号及资产确认后，直接进入发布进度步
           }
-        }} onClose={() => { setShowAccountChoice(false); setShowPublishModal(false); }} selectedAccountType={selectedAccountType} setSelectedAccountType={setSelectedAccountType} renderAccountChoiceStep={renderAccountChoiceStep} renderStep1={renderStep1} connectedPlatform={connectedPlatform} />}
+        }} onClose={() => { setShowAccountChoice(false); setShowPublishModal(false); }} selectedAccountType={selectedAccountType} setSelectedAccountType={setSelectedAccountType} renderAccountChoiceStep={renderAccountChoiceStep} renderStep1={renderStep1} renderStep2={renderStep2} connectedPlatform={connectedPlatform} selections={selections} />}
         {showAdsgoReminder && <AdsGoReminderModal onClose={() => { setShowAdsgoReminder(false); setShowPublishModal(false); }} setShowPublishModal={setShowPublishModal} />}
       </div>
     );
@@ -1360,23 +1359,32 @@ const BatchGenerateAds = () => {
   );
 };
 
-const AccountChoiceModal = ({ onSelect, onClose, selectedAccountType, setSelectedAccountType, renderStep1, connectedPlatform }) => {
+const AccountChoiceModal = ({ onSelect, onClose, selectedAccountType, setSelectedAccountType, renderStep1, renderStep2, connectedPlatform, selections }) => {
   const zIndex = useZIndex(true);
+  const isMeta = connectedPlatform === 'meta';
+  const canProceed = isMeta 
+    ? (selections.adAccount && selections.fbPage && selections.pixel && selections.event)
+    : (selections.adAccount && selections.conversionDataset && selections.event);
+
   return (
     <div className="fixed inset-0 flex items-center justify-center px-4 animate-in fade-in duration-300" style={{ zIndex }}>
       <div className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm animate-in fade-in duration-300" onClick={onClose} />
       <div className="relative bg-white w-full max-w-2xl rounded-[3rem] shadow-2xl flex flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-300 overflow-hidden">
-        <div className="px-10 pt-10 pb-8 space-y-6">
+        <div className="px-10 pt-10 pb-8 space-y-6 flex-1 overflow-y-auto custom-scrollbar">
           <div className="flex items-start justify-between">
             <div className="space-y-1">
-              <h2 className="text-2xl font-black text-slate-900 tracking-tight">Account Connection Needed</h2>
+              <h2 className="text-2xl font-black text-slate-900 tracking-tight">
+                {selectedAccountType === 'own' ? 'Account Connection Needed' : 'Let AdsGo Handle Everything'}
+              </h2>
               <p className="text-[13px] font-medium text-slate-500 leading-relaxed max-w-md">
-                Please connect your Meta account, and select a valid ad account and Facebook page to publish your ads.
+                {selectedAccountType === 'own' 
+                  ? 'Please connect your Meta account, and select a valid ad account and Facebook page to publish your ads.'
+                  : "We've prepped everything for you : Stable ad accounts, professional Facebook Pages."}
               </p>
             </div>
             <button 
               onClick={() => setSelectedAccountType(selectedAccountType === 'own' ? 'adsgo' : 'own')}
-              className="px-4 py-2 border-2 border-indigo-100 text-indigo-600 rounded-xl text-xs font-black flex items-center gap-2 hover:bg-indigo-50 transition-all group"
+              className="px-4 py-2 border-2 border-indigo-100 text-indigo-600 rounded-xl text-xs font-black flex items-center gap-2 hover:bg-indigo-50 transition-all group shrink-0"
             >
               {selectedAccountType === 'own' ? "Use AdsGo's account" : "Use my own account"}
               <RefreshCw size={14} className="group-hover:rotate-180 transition-transform duration-500" />
@@ -1386,13 +1394,29 @@ const AccountChoiceModal = ({ onSelect, onClose, selectedAccountType, setSelecte
           {selectedAccountType === 'own' ? (
             <div className="animate-in fade-in slide-in-from-top-2 duration-500">
               {renderStep1()}
+              {connectedPlatform && (
+                <div className="pt-6 border-t border-slate-50 animate-in slide-in-from-bottom-4 duration-500">
+                  <div className="mb-6"><h4 className="text-sm font-black text-slate-900 mb-1">Select your assets</h4><p className="text-[11px] font-medium text-slate-500">Configure the ad account and tracking for this campaign</p></div>
+                  {renderStep2()}
+                </div>
+              )}
             </div>
           ) : (
-            <div className="p-10 bg-emerald-50/50 border-2 border-dashed border-emerald-200 rounded-[2rem] flex flex-col items-center text-center space-y-4 animate-in zoom-in-95">
-              <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center text-emerald-500 shadow-sm"><Briefcase size={32} /></div>
-              <div className="space-y-1">
-                <h4 className="text-base font-black text-slate-900">AdsGo Managed Account</h4>
-                <p className="text-xs font-medium text-slate-500">We will provide a dedicated ad account for your campaigns</p>
+            <div className="mt-6 p-1 relative group overflow-hidden rounded-[2.5rem]">
+              <div className="absolute inset-0 bg-gradient-to-br from-emerald-400/20 via-teal-500/10 to-indigo-500/20 animate-pulse" />
+              <div className="relative bg-white/80 backdrop-blur-xl border border-white/50 rounded-[2.4rem] p-12 flex flex-col items-center text-center space-y-6 shadow-2xl shadow-emerald-100/50 animate-in zoom-in-95">
+                <div className="relative">
+                  <div className="absolute inset-0 bg-emerald-400 blur-2xl opacity-20 animate-pulse" />
+                  <div className="w-20 h-20 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-3xl flex items-center justify-center text-white shadow-xl shadow-emerald-200 relative z-10">
+                    <Briefcase size={36} />
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  <p className="text-sm font-bold text-emerald-600/80 tracking-wide">Let AdsGo manage your advertising setup</p>
+                </div>
+                <div className="flex gap-1.5 pt-2">
+                  {[1, 2, 3].map(i => <div key={i} className="w-1.5 h-1.5 rounded-full bg-emerald-200 animate-bounce" style={{ animationDelay: `${i * 0.2}s` }} />)}
+                </div>
               </div>
             </div>
           )}
@@ -1402,10 +1426,10 @@ const AccountChoiceModal = ({ onSelect, onClose, selectedAccountType, setSelecte
           <button onClick={onClose} className="text-xs font-bold text-slate-400 hover:text-slate-600 px-6 py-2 transition-colors font-sans">Cancel</button>
           <button 
             onClick={() => onSelect(selectedAccountType)} 
-            disabled={selectedAccountType === 'own' && !connectedPlatform} 
+            disabled={selectedAccountType === 'own' ? !canProceed : false} 
             className="px-12 py-4 bg-slate-900 text-white rounded-2xl text-[13px] font-black hover:bg-black transition-all disabled:opacity-30 flex items-center gap-3 shadow-xl shadow-slate-200"
           >
-            {selectedAccountType === 'own' ? 'Select account' : 'Confirm'} 
+            {selectedAccountType === 'own' ? 'Confirm and Publish' : 'Confirm'} 
             <ArrowRight size={18} />
           </button>
         </div>
@@ -1421,7 +1445,7 @@ const AdsGoReminderModal = ({ onClose, setShowPublishModal }) => {
       <div className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm animate-in fade-in duration-300" />
       <div className="relative bg-white w-full max-w-md rounded-[2rem] shadow-2xl flex flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-300 overflow-hidden p-10">
         <button onClick={onClose} className="absolute top-6 right-6 p-2 hover:bg-slate-100 rounded-xl text-slate-400 transition-colors"><X size={20} /></button>
-        <div className="flex flex-col items-center text-center space-y-6 pt-4"><div className="w-20 h-20 bg-gradient-to-br from-emerald-100 to-teal-100 rounded-full flex items-center justify-center animate-bounce"><Loader2 size={40} className="text-emerald-600 animate-spin" /></div><div className="space-y-3"><h3 className="text-lg font-black text-slate-900 tracking-tight">Setting up your dedicated ad account</h3><p className="text-sm font-medium text-slate-600 leading-relaxed">Once your account is ready, you can republish from the <button onClick={() => { setShowPublishModal(false); window.location.href = '/ai-optimize/draft-recom'; }} className="text-indigo-600 hover:text-indigo-700 underline transition-colors bg-transparent border-0 p-0 cursor-pointer">Draft & Recom.</button> page.</p><p className="text-xs font-bold text-slate-500">Contact us at<br/><a href="mailto:support@adsgo.ai" className="text-indigo-600 hover:text-indigo-700 transition-colors">support@adsgo.ai</a> for real-time updates</p></div></div>
+        <div className="flex flex-col items-center text-center space-y-6 pt-4"><div className="w-20 h-20 bg-gradient-to-br from-emerald-100 to-teal-100 rounded-full flex items-center justify-center animate-bounce"><Loader2 size={40} className="text-emerald-600 animate-spin" /></div><div className="space-y-3"><h3 className="text-lg font-black text-slate-900 tracking-tight">Setting up your dedicated ad account</h3><p className="text-sm font-medium text-slate-600 leading-relaxed">An advertising specialist will contact you at your registered email address shortly; please check your email. you can republish from the <button onClick={() => { setShowPublishModal(false); window.location.href = '/ai-optimize/autoRegeneration'; }} className="text-indigo-600 hover:text-indigo-700 underline transition-colors bg-transparent border-0 p-0 cursor-pointer">Draft & Recom.</button> page.</p><p className="text-xs font-bold text-slate-500">Contact us at<br/><a href="mailto:support@adsgo.ai" className="text-indigo-600 hover:text-indigo-700 transition-colors">support@adsgo.ai</a> for real-time updates</p></div></div>
       </div>
     </div>
   );
