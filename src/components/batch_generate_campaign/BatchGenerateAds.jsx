@@ -947,10 +947,6 @@ const BatchGenerateAds = () => {
                     )}
                   </div>
                 </div>
-                <p className="text-[10px] text-slate-400 font-medium px-1 flex items-center gap-1.5 mt-6">
-                  <Info size={12} className="text-indigo-300" />
-                  如果您目前无法确定，可以在 URL 分析完成后根据 AI 建议再填写。
-                </p>
               </div>
 
               {/* Card 2: Add Product */}

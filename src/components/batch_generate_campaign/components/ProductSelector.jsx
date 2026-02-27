@@ -424,6 +424,19 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
   const [selectedMatchOptions, setSelectedMatchOptions] = useState(new Set(['24h']));
 
   const anyConnected = Object.values(authStatus).some(v => v);
+
+  const handleAddUrl = () => {
+    if (urlInput.trim()) {
+      const newP = { 
+        id: `manual-${Date.now()}`, 
+        name: `落地页产品 - ${selectedProducts.length + 1}`, 
+        url: urlInput, 
+        imageUrl: '' // URL 输入方式初次添加时无法获取主图
+      }; 
+      onSelectProducts([...selectedProducts, newP]); 
+      setUrlInput(''); 
+    }
+  };
   
   // 判断是否所有产品都已就绪（分析完成或来自历史记录无需分析）
   const allReady = analysisFinished || (isAnalyzing && selectedProducts.length > 0 && selectedProducts.every(p => p.isFromHistory));
@@ -730,11 +743,24 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
                 )}
                 <div className={`bg-slate-50 border-2 border-dashed border-slate-200 rounded-[2.5rem] p-6 flex items-center gap-6 focus-within:bg-white focus-within:border-indigo-500 transition-all ${selectedProducts.length > 0 ? 'border-slate-300' : ''}`}>
                   <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-slate-300 shadow-sm border border-slate-100"><Link2 size={24} /></div>
-                  <input type="text" placeholder="粘贴投放目标 URL，回车立即解析..." className="flex-1 bg-transparent border-none outline-none text-base font-medium text-slate-800 placeholder:text-slate-300" value={urlInput} onChange={(e) => setUrlInput(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter' && urlInput) { const newP = { id: `manual-${Date.now()}`, name: `落地页商品 - ${selectedProducts.length + 1}`, url: urlInput, imageUrl: `https://picsum.photos/seed/${Date.now()}/400/400` }; onSelectProducts([...selectedProducts, newP]); setUrlInput(''); } }} />
+                  <input 
+                    type="text" 
+                    placeholder="粘贴投放目标 URL，回车立即解析..." 
+                    className="flex-1 bg-transparent border-none outline-none text-base font-medium text-slate-800 placeholder:text-slate-300" 
+                    value={urlInput} 
+                    onChange={(e) => setUrlInput(e.target.value)} 
+                    onKeyDown={(e) => { if (e.key === 'Enter') handleAddUrl(); }} 
+                  />
+                  <button 
+                    onClick={handleAddUrl}
+                    className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all ${urlInput.trim() ? 'bg-indigo-600 text-white shadow-lg hover:bg-indigo-700 active:scale-95' : 'bg-white text-slate-200 border border-slate-100'}`}
+                  >
+                    <Plus size={24} />
+                  </button>
                 </div>
               </div>
               <div className="flex gap-4 px-2">
-                <button onClick={() => setActiveModal('history')} className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-100 rounded-xl text-[10px] font-black tracking-widest text-slate-400 hover:text-indigo-600 hover:border-indigo-100 transition-all shadow-sm"><History size={14} /> 从产品库选择历史商品</button>
+                <button onClick={() => setActiveModal('history')} className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-100 rounded-xl text-[10px] font-black tracking-widest text-slate-400 hover:text-indigo-600 hover:border-indigo-100 transition-all shadow-sm"><History size={14} /> 从产品库选择历史产品</button>
                 <button onClick={() => setActiveModal('shopify')} className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-100 rounded-xl text-[10px] font-black tracking-widest text-slate-400 hover:text-indigo-600 hover:border-indigo-100 transition-all shadow-sm"><ShoppingBag size={14} /> 从 Shopify 选择产品</button>
               </div>
             </div>
@@ -834,8 +860,21 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
                     {selectedProducts.map((p) => (
                       <div key={p.id} className="group relative flex items-center justify-between bg-white border border-slate-100 rounded-[1.5rem] p-4 shadow-sm hover:shadow-md hover:border-indigo-100 transition-all">
                         <div className="flex items-center gap-4">
-                          <div className="w-12 h-12 rounded-xl overflow-hidden border border-slate-100 shrink-0 relative bg-slate-50">
-                            {p.imageUrl ? (<img src={p.imageUrl} className="w-full h-full object-cover" />) : (<div className="w-full h-full flex items-center justify-center text-slate-300"><ShoppingBag size={16} /></div>)}
+                          <div className="w-12 h-12 rounded-xl overflow-hidden border border-slate-100 shrink-0 relative bg-slate-50 group-hover:bg-white transition-colors">
+                            {p.imageUrl ? (
+                              <img src={p.imageUrl} className="w-full h-full object-cover" />
+                            ) : (
+                              <div className="w-full h-full flex flex-col items-center justify-center bg-slate-50 text-slate-300 gap-1 border border-slate-100 rounded-xl relative overflow-hidden">
+                                <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-transparent" />
+                                <div className="relative">
+                                  <ImageIcon size={18} />
+                                  <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-0.5 shadow-sm">
+                                    <Link2 size={8} className="text-indigo-500" />
+                                  </div>
+                                </div>
+                                <span className="text-[6px] font-black text-slate-400 uppercase tracking-tighter relative z-10">Waiting...</span>
+                              </div>
+                            )}
                           </div>
                           <div className="min-w-0">
                             <p className="text-sm font-black text-slate-800 truncate max-w-xs">{p.name || '未命名产品'}</p>
@@ -904,7 +943,20 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
                       <div className="flex flex-col lg:flex-row gap-6">
                         <div className="flex items-center gap-4 lg:w-72 shrink-0">
                           <div className="w-12 h-12 rounded-xl overflow-hidden border border-slate-100 shrink-0 shadow-sm relative bg-slate-50">
-                            <img src={p.imageUrl} className="w-full h-full object-cover" />
+                            {p.imageUrl ? (
+                              <img src={p.imageUrl} className="w-full h-full object-cover" />
+                            ) : (
+                              <div className="w-full h-full flex flex-col items-center justify-center bg-slate-50 text-slate-300 gap-1 border border-slate-50 rounded-xl relative overflow-hidden">
+                                <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-transparent" />
+                                <div className="relative">
+                                  <ImageIcon size={18} />
+                                  <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-0.5 shadow-sm">
+                                    <Link2 size={8} className="text-indigo-500" />
+                                  </div>
+                                </div>
+                                <span className="text-[6px] font-black text-slate-400 uppercase tracking-tighter relative z-10">Analyzed</span>
+                              </div>
+                            )}
                             {creatives.length === 0 && generatingCount === 0 && showAnalysisResult && (
                               <div className="absolute inset-0 bg-amber-500/80 flex items-center justify-center">
                                 <Flame size={14} className="text-white animate-bounce" />
