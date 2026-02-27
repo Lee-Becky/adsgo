@@ -1,9 +1,10 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { 
   Briefcase, Sparkles, ChevronLeft, 
   Rocket, Edit3, DollarSign, X, Check, Globe, 
   Layers, Target, Box, Plus, Tag, Link as LinkIcon, Megaphone,
-  ChevronDown
+  ChevronDown, Search, Languages, Users, UserPlus, UserMinus,
+  ShoppingBag, Monitor, Smartphone, Layout
 } from 'lucide-react';
 
 const AUDIENCE_NAMES = {
@@ -23,6 +24,52 @@ const CTA_OPTIONS = [
   'Watch More'
 ];
 
+// DPA Style Placeholder Component
+const DPAPreviewCard = () => {
+  return (
+    <div className="w-full h-full bg-[#E2E8F0] p-4 flex flex-col gap-3 relative overflow-hidden group/dpa">
+      <div className="grid grid-cols-2 grid-rows-2 gap-2 h-full">
+        {/* Mock Product Items */}
+        <div className="bg-white rounded-lg shadow-sm flex flex-col items-center justify-center p-2 transform transition-transform group-hover/dpa:scale-105 duration-500">
+          <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mb-1">
+            <ShoppingBag size={16} className="text-blue-500" />
+          </div>
+          <div className="w-8 h-1 bg-slate-100 rounded-full mb-0.5" />
+          <div className="w-5 h-1 bg-slate-50 rounded-full" />
+        </div>
+        <div className="bg-white rounded-lg shadow-sm flex flex-col items-center justify-center p-2 transform transition-transform group-hover/dpa:scale-105 delay-75 duration-500">
+          <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center mb-1">
+            <Monitor size={16} className="text-purple-500" />
+          </div>
+          <div className="w-8 h-1 bg-slate-100 rounded-full mb-0.5" />
+          <div className="w-5 h-1 bg-slate-50 rounded-full" />
+        </div>
+        <div className="bg-white rounded-lg shadow-sm flex flex-col items-center justify-center p-2 transform transition-transform group-hover/dpa:scale-105 delay-150 duration-500">
+          <div className="w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center mb-1">
+            <Smartphone size={16} className="text-emerald-500" />
+          </div>
+          <div className="w-8 h-1 bg-slate-100 rounded-full mb-0.5" />
+          <div className="w-5 h-1 bg-slate-50 rounded-full" />
+        </div>
+        <div className="bg-white rounded-lg shadow-sm flex flex-col items-center justify-center p-2 transform transition-transform group-hover/dpa:scale-105 delay-200 duration-500">
+          <div className="w-8 h-8 bg-rose-100 rounded-full flex items-center justify-center mb-1">
+            <Layout size={16} className="text-rose-500" />
+          </div>
+          <div className="w-8 h-1 bg-slate-100 rounded-full mb-0.5" />
+          <div className="w-5 h-1 bg-slate-50 rounded-full" />
+        </div>
+      </div>
+      
+      {/* Decorative Floating Elements */}
+      <div className="absolute -right-4 -bottom-4 w-16 h-16 bg-indigo-500/10 rounded-full blur-xl animate-pulse" />
+      <div className="absolute -left-4 -top-4 w-16 h-16 bg-purple-500/10 rounded-full blur-xl animate-pulse" />
+      
+      {/* Dynamic Overlay */}
+      <div className="absolute inset-0 bg-gradient-to-t from-white/20 to-transparent pointer-events-none" />
+    </div>
+  );
+};
+
 const CampaignPreviewView = ({
   structure, budgetType, dailyBudget, initialAdsetAudiences, productCreativesMap, selectedProducts, brand, onBack, onPublish, campaignName, optimizationEvent, landingPageType, landingPageTemplate, productUtm, copyStrategy, unifiedHeadline, unifiedBody, campaignType,
   estimatedTotalDaily, adSetGroupsCount
@@ -32,8 +79,50 @@ const CampaignPreviewView = ({
   const [editingAdSetIndex, setEditingAdSetIndex] = useState(null);
   const [editingAdInfo, setEditingAdInfo] = useState(null);
   
-  // Temporary state for interest input
-  const [interestInput, setInterestInput] = useState('');
+  // States for search and dropdowns in Edit Modal
+  const [locationSearch, setLocationSearch] = useState('');
+  const [showLocationDropdown, setShowLocationDropdown] = useState(false);
+  const [interestSearch, setInterestSearch] = useState('');
+  const [showInterestDropdown, setShowInterestDropdown] = useState(false);
+  const [languageSearch, setLanguageSearch] = useState('');
+  const [showLanguageDropdown, setShowLanguageDropdown] = useState(false);
+  
+  const [showCustomIncDropdown, setShowCustomIncDropdown] = useState(false);
+  const [showLalIncDropdown, setShowLalIncDropdown] = useState(false);
+  const [showCustomExcDropdown, setShowCustomExcDropdown] = useState(false);
+  const [showLalExcDropdown, setShowLalExcDropdown] = useState(false);
+
+  // Mock data for search suggestions
+  const AVAILABLE_LOCATIONS = [
+    { id: 'US', name: 'United States' },
+    { id: 'UK', name: 'United Kingdom' },
+    { id: 'CA', name: 'Canada' },
+    { id: 'AU', name: 'Australia' },
+    { id: 'DE', name: 'Germany' },
+    { id: 'FR', name: 'France' },
+    { id: 'JP', name: 'Japan' },
+  ];
+
+  const AVAILABLE_INTERESTS = [
+    'Fashion', 'E-commerce', 'Online Shopping', 'Luxury Goods', 
+    'Beauty', 'Lifestyle', 'Travel', 'Technology', 'Fitness'
+  ];
+
+  const LANGUAGES = ['All languages', 'English', 'Chinese', 'Spanish', 'French', 'German', 'Japanese'];
+
+  const CUSTOM_AUDIENCES = [
+    { id: 'ca1', name: 'Website Visitors - 30d' },
+    { id: 'ca2', name: 'Purchasers - Last 180d' },
+    { id: 'ca3', name: 'Lead Form Submissions' },
+    { id: 'ca4', name: 'Video Viewers 50%' }
+  ];
+
+  const LAL_AUDIENCES = [
+    { id: 'lal1', name: 'LAL (US, 1%) - Purchase' },
+    { id: 'lal2', name: 'LAL (US, 5%) - Purchase' },
+    { id: 'lal3', name: 'LAL (UK, 1%) - Add to Cart' },
+    { id: 'lal4', name: 'LAL (All, 10%) - Page View' }
+  ];
 
   const getAdUrl = (p) => {
     if (landingPageType === 'PRODUCT') {
@@ -63,13 +152,21 @@ const CampaignPreviewView = ({
         adSets.push({
           name: `DPA-${i + 1} - ${AUDIENCE_NAMES[audienceType]}`,
           audienceType,
-          ageMin: 18, ageMax: 65, gender: 'All', interests: ['Broad Shopping'], placements: ['All'], optimizationEvent,
+          ageMin: 18, ageMax: 65, gender: 'All', 
+          locations: ['United States'],
+          interests: ['Broad Shopping'], 
+          language: 'All languages',
+          customInclude: [],
+          lalInclude: [],
+          customExclude: [],
+          lalExclude: [],
+          placements: ['All'], optimizationEvent,
           ads: [{
             id: `cat-${i}`,
             name: `Dynamic Catalog Creative`,
             headline: '{{product.name}}',
             primaryText: 'Check out our latest arrivals. {{product.description}}',
-            imageUrl: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=400',
+            imageUrl: 'https://img.clipp.io/img/ad_preview_dpa.png', // 固定为 DPA 样式图片
             cta: 'Shop Now',
             destinationUrl: '{{product.url}}',
             isDynamic: true,
@@ -94,7 +191,15 @@ const CampaignPreviewView = ({
             adSets.push({
               name: adsetsPerProduct > 1 ? `${p.name} - 组 ${i + 1} - ${AUDIENCE_NAMES[audienceType]}` : `${p.name} - ${AUDIENCE_NAMES[audienceType]}`,
               audienceType,
-              ageMin: 18, ageMax: 65, gender: 'All', interests: ['E-commerce', 'Shopping'], placements: ['Feed', 'Stories', 'Reels'], optimizationEvent,
+              ageMin: 18, ageMax: 65, gender: 'All', 
+              locations: ['United States'],
+              interests: ['E-commerce', 'Shopping'], 
+              language: 'All languages',
+              customInclude: [],
+              lalInclude: [],
+              customExclude: [],
+              lalExclude: [],
+              placements: ['Feed', 'Stories', 'Reels'], optimizationEvent,
               ads: creatives.map((c, cIdx) => ({
                 id: `${p.id}-${i}-${cIdx}`,
                 name: `AD - ${p.name} - ${c.id.slice(-4)}`,
@@ -118,7 +223,15 @@ const CampaignPreviewView = ({
           adSets.push({
             name: `混合组 ${i + 1} - ${AUDIENCE_NAMES[audienceType]}`,
             audienceType,
-            ageMin: 18, ageMax: 65, gender: 'All', interests: ['E-commerce', 'Shopping'], placements: ['Feed', 'Stories'], optimizationEvent,
+            ageMin: 18, ageMax: 65, gender: 'All', 
+            locations: ['United States'],
+            interests: ['E-commerce', 'Shopping'], 
+            language: 'All languages',
+            customInclude: [],
+            lalInclude: [],
+            customExclude: [],
+            lalExclude: [],
+            placements: ['Feed', 'Stories'], optimizationEvent,
             ads: allCreativesPool.map((c, cIdx) => {
               const p = selectedProducts.find(prod => prod.id === c.productId);
               const copy = getAdCopy(p);
@@ -154,7 +267,15 @@ const CampaignPreviewView = ({
             adSets.push({
               name: `智能分组 ${i + 1} - ${AUDIENCE_NAMES[audienceType]}`,
               audienceType,
-              ageMin: 18, ageMax: 65, gender: 'All', interests: ['Fashion'], placements: ['Feed'], optimizationEvent,
+              ageMin: 18, ageMax: 65, gender: 'All', 
+              locations: ['United States'],
+              interests: ['Fashion'], 
+              language: 'All languages',
+              customInclude: [],
+              lalInclude: [],
+              customExclude: [],
+              lalExclude: [],
+              placements: ['Feed'], optimizationEvent,
               ads: chunk.map((c, cIdx) => {
                 const p = selectedProducts.find(prod => prod.id === c.productId);
                 const copy = getAdCopy(p);
@@ -202,77 +323,381 @@ const CampaignPreviewView = ({
   const EditAdSetModal = () => {
     if (editingAdSetIndex === null) return null;
     const adSet = localAdSets[editingAdSetIndex];
+
+    const toggleItemInArray = (arrayField, item) => {
+      const next = [...localAdSets];
+      const currentArray = next[editingAdSetIndex][arrayField] || [];
+      if (currentArray.includes(item)) {
+        next[editingAdSetIndex][arrayField] = currentArray.filter(i => i !== item);
+      } else {
+        next[editingAdSetIndex][arrayField] = [...currentArray, item];
+      }
+      setLocalAdSets(next);
+    };
+
+    const updateField = (field, value) => {
+      const next = [...localAdSets];
+      next[editingAdSetIndex][field] = value;
+      setLocalAdSets(next);
+    };
+
     return (
       <div className="fixed inset-0 z-[250] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in">
-        <div className="bg-white w-full max-w-xl rounded-[3rem] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
-          <div className="p-8 border-b border-slate-100 flex items-center justify-between">
-            <h3 className="text-xl font-black text-slate-900">编辑广告组 (AdSet)</h3>
-            <button onClick={() => setEditingAdSetIndex(null)} className="p-2 hover:bg-slate-50 rounded-full text-slate-300"><X size={24} /></button>
-          </div>
-          <div className="flex-1 overflow-y-auto p-10 space-y-8 no-scrollbar">
-            <div className="space-y-3">
-              <label className="text-[10px] font-black text-slate-400 px-1">广告组名称</label>
-              <input type="text" value={adSet.name} onChange={e => {
-                const next = [...localAdSets]; next[editingAdSetIndex].name = e.target.value; setLocalAdSets(next);
-              }} className="w-full h-12 px-5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold focus:border-indigo-600 outline-none transition-all" />
+        <div className="bg-white w-full max-w-2xl rounded-[3rem] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+          <div className="p-8 border-b border-slate-100 flex items-center justify-between shrink-0">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center shadow-sm">
+                <Users size={24} />
+              </div>
+              <div>
+                <h3 className="text-xl font-black text-slate-900 leading-none">编辑广告组配置</h3>
+                <p className="text-[10px] font-bold text-slate-400 tracking-widest mt-2 uppercase">AdSet Level Configuration</p>
+              </div>
             </div>
-            
+            <button onClick={() => setEditingAdSetIndex(null)} className="p-2 hover:bg-slate-50 rounded-full text-slate-300 transition-colors">
+              <X size={24} />
+            </button>
+          </div>
+
+          <div className="flex-1 overflow-y-auto p-10 space-y-10 no-scrollbar pb-32">
+            {/* Adset Name */}
             <div className="space-y-3">
-              <label className="text-[10px] font-black text-slate-400 px-1">兴趣词配置 (Interests)</label>
-              <div className="flex gap-2">
+              <label className="text-[10px] font-black text-slate-400 px-1 tracking-widest uppercase">广告组名称</label>
+              <div className="relative group">
+                <Edit3 size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-indigo-500 transition-colors" />
                 <input 
                   type="text" 
-                  value={interestInput} 
-                  onChange={e => setInterestInput(e.target.value)}
-                  onKeyDown={e => e.key === 'Enter' && addInterest(editingAdSetIndex)}
-                  placeholder="输入兴趣词后回车或点击添加..."
-                  className="flex-1 h-12 px-5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold focus:border-indigo-600 outline-none transition-all"
+                  value={adSet.name} 
+                  onChange={e => updateField('name', e.target.value)} 
+                  className="w-full h-14 pl-12 pr-5 bg-slate-50 border-2 border-slate-50 rounded-2xl text-sm font-bold focus:bg-white focus:border-indigo-500 outline-none transition-all shadow-inner" 
                 />
-                <button 
-                  onClick={() => addInterest(editingAdSetIndex)}
-                  className="px-6 bg-slate-900 text-white rounded-xl font-black text-xs"
-                >添加</button>
-              </div>
-              <div className="flex flex-wrap gap-2 pt-2">
-                {adSet.interests.map(i => (
-                  <span key={i} className="px-3 py-1.5 bg-indigo-50 text-indigo-600 rounded-lg text-[10px] font-black flex items-center gap-2 border border-indigo-100 group">
-                    {i}
-                    <button onClick={() => removeInterest(editingAdSetIndex, i)} className="text-indigo-300 hover:text-rose-500 transition-colors">
-                      <X size={12} />
-                    </button>
-                  </span>
-                ))}
-                {adSet.interests.length === 0 && <p className="text-[10px] text-slate-300 font-bold italic">暂无兴趣词，建议添加以优化投放效果</p>}
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-3">
-                <label className="text-[10px] font-black text-slate-400 px-1">最小年龄</label>
-                <input type="number" value={adSet.ageMin} onChange={e => {
-                  const next = [...localAdSets]; next[editingAdSetIndex].ageMin = Number(e.target.value); setLocalAdSets(next);
-                }} className="w-full h-12 px-5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold" />
+            <div className="h-px bg-slate-100" />
+
+            <div className="space-y-8">
+              <div className="flex items-center gap-2 px-1">
+                <Target size={16} className="text-indigo-600" />
+                <h4 className="text-sm font-black text-slate-900">Audience 受众设置</h4>
               </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {/* Age */}
+                <div className="space-y-3">
+                  <label className="text-[10px] font-black text-slate-400 px-1 tracking-widest uppercase">年龄范围 (Age)</label>
+                  <div className="flex items-center gap-3">
+                    <div className="flex-1 relative">
+                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[10px] font-black text-slate-300 uppercase">Min</span>
+                      <input 
+                        type="number" 
+                        placeholder="18"
+                        value={adSet.ageMin || ''} 
+                        onChange={e => updateField('ageMin', Number(e.target.value))} 
+                        className="w-full h-12 pl-12 pr-4 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold focus:border-indigo-500 outline-none transition-all" 
+                      />
+                    </div>
+                    <div className="w-4 h-0.5 bg-slate-200 rounded-full" />
+                    <div className="flex-1 relative">
+                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[10px] font-black text-slate-300 uppercase">Max</span>
+                      <input 
+                        type="number" 
+                        placeholder="65"
+                        value={adSet.ageMax || ''} 
+                        onChange={e => updateField('ageMax', Number(e.target.value))} 
+                        className="w-full h-12 pl-12 pr-4 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold focus:border-indigo-500 outline-none transition-all" 
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Gender */}
+                <div className="space-y-3">
+                  <label className="text-[10px] font-black text-slate-400 px-1 tracking-widest uppercase">性别 (Gender)</label>
+                  <div className="flex bg-slate-50 p-1 rounded-xl border border-slate-200">
+                    {['All', 'Men', 'Women'].map(g => (
+                      <button 
+                        key={g} 
+                        onClick={() => updateField('gender', g)} 
+                        className={`flex-1 py-2.5 rounded-lg text-xs font-black transition-all ${adSet.gender === g ? 'bg-white text-indigo-600 shadow-sm border border-slate-100' : 'text-slate-400 hover:text-slate-600'}`}
+                      >
+                        {g === 'Men' ? '男' : g === 'Women' ? '女' : 'All'}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Locations (Multi-select with tags) */}
               <div className="space-y-3">
-                <label className="text-[10px] font-black text-slate-400 px-1">最大年龄</label>
-                <input type="number" value={adSet.ageMax} onChange={e => {
-                  const next = [...localAdSets]; next[editingAdSetIndex].ageMax = Number(e.target.value); setLocalAdSets(next);
-                }} className="w-full h-12 px-5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold" />
+                <label className="text-[10px] font-black text-slate-400 px-1 tracking-widest uppercase">地理位置 (Locations)</label>
+                <div className="relative">
+                  <div className="min-h-[3.5rem] p-2 bg-slate-50 border border-slate-200 rounded-2xl flex flex-wrap gap-2 items-center focus-within:border-indigo-500 focus-within:bg-white transition-all cursor-text" onClick={() => setShowLocationDropdown(true)}>
+                    <Globe size={16} className="text-slate-300 ml-2" />
+                    {adSet.locations?.map(loc => (
+                      <span key={loc} className="px-3 py-1 bg-indigo-50 text-indigo-600 rounded-full text-[10px] font-black flex items-center gap-1.5 border border-indigo-100 animate-in zoom-in-95">
+                        {loc}
+                        <X size={12} className="cursor-pointer hover:text-rose-500" onClick={(e) => { e.stopPropagation(); toggleItemInArray('locations', loc); }} />
+                      </span>
+                    ))}
+                    <input 
+                      type="text" 
+                      className="flex-1 bg-transparent border-none outline-none text-sm font-bold min-w-[120px] px-2" 
+                      placeholder={adSet.locations?.length > 0 ? "" : "搜索地理位置..."}
+                      value={locationSearch}
+                      onChange={e => { setLocationSearch(e.target.value); setShowLocationDropdown(true); }}
+                      onFocus={() => setShowLocationDropdown(true)}
+                    />
+                  </div>
+                  {showLocationDropdown && (
+                    <>
+                      <div className="fixed inset-0 z-[260]" onClick={() => setShowLocationDropdown(false)} />
+                      <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl z-[270] max-h-60 overflow-y-auto p-2 animate-in slide-in-from-top-2">
+                        {AVAILABLE_LOCATIONS.filter(l => l.name.toLowerCase().includes(locationSearch.toLowerCase())).map(loc => {
+                          const isSel = adSet.locations?.includes(loc.name);
+                          return (
+                            <div key={loc.id} onClick={() => toggleItemInArray('locations', loc.name)} className="flex items-center justify-between px-4 py-3 hover:bg-slate-50 rounded-xl cursor-pointer transition-colors group">
+                              <span className={`text-xs font-bold ${isSel ? 'text-indigo-600' : 'text-slate-600'}`}>{loc.name}</span>
+                              {isSel && <Check size={14} className="text-indigo-600" />}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+
+              {/* Interests (Multi-select with search) */}
+              <div className="space-y-3">
+                <label className="text-[10px] font-black text-slate-400 px-1 tracking-widest uppercase">兴趣词 (Interests)</label>
+                <div className="relative">
+                  <div className="min-h-[3.5rem] p-2 bg-slate-50 border border-slate-200 rounded-2xl flex flex-wrap gap-2 items-center focus-within:border-indigo-500 focus-within:bg-white transition-all cursor-text" onClick={() => setShowInterestDropdown(true)}>
+                    <Target size={16} className="text-slate-300 ml-2" />
+                    {adSet.interests?.map(i => (
+                      <span key={i} className="px-3 py-1 bg-amber-50 text-amber-600 rounded-full text-[10px] font-black flex items-center gap-1.5 border border-amber-100 animate-in zoom-in-95">
+                        {i}
+                        <X size={12} className="cursor-pointer hover:text-rose-500" onClick={(e) => { e.stopPropagation(); toggleItemInArray('interests', i); }} />
+                      </span>
+                    ))}
+                    <input 
+                      type="text" 
+                      className="flex-1 bg-transparent border-none outline-none text-sm font-bold min-w-[120px] px-2" 
+                      placeholder={adSet.interests?.length > 0 ? "" : "搜索兴趣词..."}
+                      value={interestSearch}
+                      onChange={e => { setInterestSearch(e.target.value); setShowInterestDropdown(true); }}
+                      onFocus={() => setShowInterestDropdown(true)}
+                    />
+                  </div>
+                  {showInterestDropdown && (
+                    <>
+                      <div className="fixed inset-0 z-[260]" onClick={() => setShowInterestDropdown(false)} />
+                      <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl z-[270] max-h-60 overflow-y-auto p-2 animate-in slide-in-from-top-2">
+                        {AVAILABLE_INTERESTS.filter(i => i.toLowerCase().includes(interestSearch.toLowerCase())).map(i => {
+                          const isSel = adSet.interests?.includes(i);
+                          return (
+                            <div key={i} onClick={() => toggleItemInArray('interests', i)} className="flex items-center justify-between px-4 py-3 hover:bg-slate-50 rounded-xl cursor-pointer transition-colors group">
+                              <span className={`text-xs font-bold ${isSel ? 'text-amber-600' : 'text-slate-600'}`}>{i}</span>
+                              {isSel && <Check size={14} className="text-amber-600" />}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+
+              {/* Language (Single search select) */}
+              <div className="space-y-3">
+                <label className="text-[10px] font-black text-slate-400 px-1 tracking-widest uppercase">语言 (Language)</label>
+                <div className="relative">
+                  <div onClick={() => setShowLanguageDropdown(!showLanguageDropdown)} className="w-full h-14 px-5 bg-slate-50 border border-slate-200 rounded-2xl flex items-center justify-between cursor-pointer hover:border-slate-300 transition-all">
+                    <div className="flex items-center gap-3">
+                      <Languages size={18} className="text-slate-400" />
+                      <span className="text-sm font-bold text-slate-700">{adSet.language || 'All languages'}</span>
+                    </div>
+                    <ChevronDown size={16} className={`text-slate-300 transition-transform duration-300 ${showLanguageDropdown ? 'rotate-180' : ''}`} />
+                  </div>
+                  {showLanguageDropdown && (
+                    <>
+                      <div className="fixed inset-0 z-[260]" onClick={() => setShowLanguageDropdown(false)} />
+                      <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl z-[270] max-h-60 overflow-hidden flex flex-col animate-in slide-in-from-top-2">
+                        <div className="p-3 border-b border-slate-50 bg-slate-50/50">
+                          <input 
+                            autoFocus
+                            type="text" 
+                            className="w-full h-10 px-4 bg-white border border-slate-200 rounded-xl text-xs font-bold outline-none focus:border-indigo-500 shadow-sm" 
+                            placeholder="搜索语言..."
+                            value={languageSearch}
+                            onChange={e => setLanguageSearch(e.target.value)}
+                          />
+                        </div>
+                        <div className="overflow-y-auto p-2">
+                          {LANGUAGES.filter(l => l.toLowerCase().includes(languageSearch.toLowerCase())).map(l => (
+                            <div key={l} onClick={() => { updateField('language', l); setShowLanguageDropdown(false); setLanguageSearch(''); }} className={`px-4 py-3 rounded-xl text-xs font-bold cursor-pointer mb-1 last:mb-0 transition-colors ${adSet.language === l ? 'bg-indigo-50 text-indigo-600' : 'text-slate-600 hover:bg-slate-50'}`}>
+                              {l}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </div>
               </div>
             </div>
-            <div className="space-y-3">
-              <label className="text-[10px] font-black text-slate-400 px-1">性别 (Gender)</label>
-              <div className="flex gap-2">
-                {['All', 'Men', 'Women'].map(g => (
-                  <button key={g} onClick={() => {
-                    const next = [...localAdSets]; next[editingAdSetIndex].gender = g; setLocalAdSets(next);
-                  }} className={`flex-1 py-3 rounded-xl text-xs font-black transition-all ${adSet.gender === g ? 'bg-indigo-600 text-white shadow-lg' : 'bg-slate-50 text-slate-400'}`}>{g}</button>
-                ))}
+
+            <div className="h-px bg-slate-100" />
+
+            {/* Custom Audience Section */}
+            <div className="space-y-8">
+              <div className="flex items-center gap-2 px-1">
+                <Sparkles size={16} className="text-purple-600" />
+                <h4 className="text-sm font-black text-slate-900">自定义受众编辑</h4>
+              </div>
+
+              {/* Includes */}
+              <div className="p-6 bg-slate-50/50 rounded-3xl border border-slate-100 space-y-6">
+                <div className="flex items-center gap-2 text-[10px] font-black text-slate-400 tracking-widest uppercase">
+                  <UserPlus size={12} className="text-emerald-500" />
+                  Includes (包含受众)
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Custom Audience Include */}
+                  <div className="space-y-3 relative">
+                    <label className="text-[9px] font-bold text-slate-400 px-1 uppercase">Custom Audience</label>
+                    <div onClick={() => setShowCustomIncDropdown(!showCustomIncDropdown)} className="min-h-[3rem] px-4 py-2 bg-white border border-slate-200 rounded-xl flex flex-wrap gap-2 items-center cursor-pointer hover:border-indigo-300 transition-all shadow-sm">
+                      {adSet.customInclude?.length > 0 ? adSet.customInclude.map(id => (
+                        <span key={id} className="px-2 py-0.5 bg-indigo-50 text-indigo-600 rounded-md text-[9px] font-black border border-indigo-100">
+                          {CUSTOM_AUDIENCES.find(ca => ca.id === id)?.name}
+                        </span>
+                      )) : <span className="text-xs font-bold text-slate-300">选择自定义受众...</span>}
+                    </div>
+                    {showCustomIncDropdown && (
+                      <>
+                        <div className="fixed inset-0 z-[260]" onClick={() => setShowCustomIncDropdown(false)} />
+                        <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-slate-100 rounded-xl shadow-2xl z-[270] max-h-48 overflow-y-auto p-1 animate-in zoom-in-95 duration-150">
+                          {CUSTOM_AUDIENCES.map(ca => {
+                            const isSel = adSet.customInclude?.includes(ca.id);
+                            return (
+                              <div key={ca.id} onClick={() => toggleItemInArray('customInclude', ca.id)} className="flex items-center justify-between px-4 py-2.5 hover:bg-slate-50 rounded-lg cursor-pointer group">
+                                <span className={`text-[11px] font-bold ${isSel ? 'text-indigo-600' : 'text-slate-600'}`}>{ca.name}</span>
+                                {isSel && <Check size={12} className="text-indigo-600" />}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </>
+                    )}
+                  </div>
+
+                  {/* LAL Include */}
+                  <div className="space-y-3 relative">
+                    <label className="text-[9px] font-bold text-slate-400 px-1 uppercase">Lookalike Audience</label>
+                    <div onClick={() => setShowLalIncDropdown(!showLalIncDropdown)} className="min-h-[3rem] px-4 py-2 bg-white border border-slate-200 rounded-xl flex flex-wrap gap-2 items-center cursor-pointer hover:border-purple-300 transition-all shadow-sm">
+                      {adSet.lalInclude?.length > 0 ? adSet.lalInclude.map(id => (
+                        <span key={id} className="px-2 py-0.5 bg-purple-50 text-purple-600 rounded-md text-[9px] font-black border border-purple-100">
+                          {LAL_AUDIENCES.find(la => la.id === id)?.name?.split(' ')[1] || 'LAL'}
+                        </span>
+                      )) : <span className="text-xs font-bold text-slate-300">选择 LAL 受众...</span>}
+                    </div>
+                    {showLalIncDropdown && (
+                      <>
+                        <div className="fixed inset-0 z-[260]" onClick={() => setShowLalIncDropdown(false)} />
+                        <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-purple-100 rounded-xl shadow-2xl z-[270] max-h-48 overflow-y-auto p-1 animate-in zoom-in-95 duration-150">
+                          {LAL_AUDIENCES.map(la => {
+                            const isSel = adSet.lalInclude?.includes(la.id);
+                            return (
+                              <div key={la.id} onClick={() => toggleItemInArray('lalInclude', la.id)} className="flex items-center justify-between px-4 py-2.5 hover:bg-purple-50 rounded-lg cursor-pointer group">
+                                <span className={`text-[11px] font-bold ${isSel ? 'text-purple-600' : 'text-slate-600'}`}>{la.name}</span>
+                                {isSel && <Check size={12} className="text-purple-600" />}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Exclusions */}
+              <div className="p-6 bg-slate-50/50 rounded-3xl border border-slate-100 space-y-6">
+                <div className="flex items-center gap-2 text-[10px] font-black text-slate-400 tracking-widest uppercase">
+                  <UserMinus size={12} className="text-rose-500" />
+                  Exclusions (排除受众)
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Custom Audience Exclude */}
+                  <div className="space-y-3 relative">
+                    <label className="text-[9px] font-bold text-slate-400 px-1 uppercase">Custom Audience</label>
+                    <div onClick={() => setShowCustomExcDropdown(!showCustomExcDropdown)} className="min-h-[3rem] px-4 py-2 bg-white border border-slate-200 rounded-xl flex flex-wrap gap-2 items-center cursor-pointer hover:border-indigo-300 transition-all shadow-sm">
+                      {adSet.customExclude?.length > 0 ? adSet.customExclude.map(id => (
+                        <span key={id} className="px-2 py-0.5 bg-slate-200 text-slate-600 rounded-md text-[9px] font-black border border-slate-300">
+                          {CUSTOM_AUDIENCES.find(ca => ca.id === id)?.name}
+                        </span>
+                      )) : <span className="text-xs font-bold text-slate-300">选择排除自定义受众...</span>}
+                    </div>
+                    {showCustomExcDropdown && (
+                      <>
+                        <div className="fixed inset-0 z-[260]" onClick={() => setShowCustomExcDropdown(false)} />
+                        <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-slate-100 rounded-xl shadow-2xl z-[270] max-h-48 overflow-y-auto p-1 animate-in zoom-in-95 duration-150">
+                          {CUSTOM_AUDIENCES.map(ca => {
+                            const isSel = adSet.customExclude?.includes(ca.id);
+                            return (
+                              <div key={ca.id} onClick={() => toggleItemInArray('customExclude', ca.id)} className="flex items-center justify-between px-4 py-2.5 hover:bg-slate-50 rounded-lg cursor-pointer group">
+                                <span className={`text-[11px] font-bold ${isSel ? 'text-indigo-600' : 'text-slate-600'}`}>{ca.name}</span>
+                                {isSel && <Check size={12} className="text-indigo-600" />}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </>
+                    )}
+                  </div>
+
+                  {/* LAL Exclude */}
+                  <div className="space-y-3 relative">
+                    <label className="text-[9px] font-bold text-slate-400 px-1 uppercase">Lookalike Audience</label>
+                    <div onClick={() => setShowLalExcDropdown(!showLalExcDropdown)} className="min-h-[3rem] px-4 py-2 bg-white border border-slate-200 rounded-xl flex flex-wrap gap-2 items-center cursor-pointer hover:border-purple-300 transition-all shadow-sm">
+                      {adSet.lalExclude?.length > 0 ? adSet.lalExclude.map(id => (
+                        <span key={id} className="px-2 py-0.5 bg-slate-200 text-slate-600 rounded-md text-[9px] font-black border border-slate-300">
+                          {LAL_AUDIENCES.find(la => la.id === id)?.name?.split(' ')[1] || 'LAL'}
+                        </span>
+                      )) : <span className="text-xs font-bold text-slate-300">选择排除 LAL 受众...</span>}
+                    </div>
+                    {showLalExcDropdown && (
+                      <>
+                        <div className="fixed inset-0 z-[260]" onClick={() => setShowLalExcDropdown(false)} />
+                        <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-purple-100 rounded-xl shadow-2xl z-[270] max-h-48 overflow-y-auto p-1 animate-in zoom-in-95 duration-150">
+                          {LAL_AUDIENCES.map(la => {
+                            const isSel = adSet.lalExclude?.includes(la.id);
+                            return (
+                              <div key={la.id} onClick={() => toggleItemInArray('lalExclude', la.id)} className="flex items-center justify-between px-4 py-2.5 hover:bg-purple-50 rounded-lg cursor-pointer group">
+                                <span className={`text-[11px] font-bold ${isSel ? 'text-purple-600' : 'text-slate-600'}`}>{la.name}</span>
+                                {isSel && <Check size={12} className="text-purple-600" />}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-          <div className="p-8 bg-slate-50 border-t border-slate-100 flex justify-end">
-            <button onClick={() => setEditingAdSetIndex(null)} className="px-10 py-4 bg-slate-900 text-white rounded-2xl font-black text-xs">保存修改</button>
+
+          <div className="p-8 bg-white/80 backdrop-blur-xl border-t border-slate-100 flex justify-end shrink-0 z-[300] shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
+            <button 
+              onClick={() => setEditingAdSetIndex(null)} 
+              className="px-16 py-4 bg-slate-900 text-white rounded-2xl font-black text-sm hover:bg-black transition-all shadow-xl active:scale-95 flex items-center gap-3"
+            >
+              保存修改
+              <Check size={18} strokeWidth={3} />
+            </button>
           </div>
         </div>
       </div>
@@ -343,8 +768,8 @@ const CampaignPreviewView = ({
                       <Sparkles size={18} />
                     </div>
                     <div>
-                      <p className="text-xs font-black text-slate-800">自动获取优惠</p>
-                      <p className="text-[9px] font-bold text-slate-400 mt-0.5">Auto-fetch</p>
+                      <p className="text-xs font-black text-slate-800">自动获取品牌优惠码</p>
+                      <p className="text-[9px] font-bold text-slate-400 mt-0.5">Auto-fetch: 90% OFF active</p>
                     </div>
                   </div>
                   <button 
@@ -477,7 +902,11 @@ const CampaignPreviewView = ({
                           <p className="text-[10px] text-slate-700 leading-relaxed line-clamp-2">{ad.primaryText}</p>
                         </div>
                         <div className="aspect-square bg-slate-100 relative overflow-hidden">
-                           <img src={ad.imageUrl} className="w-full h-full object-cover" />
+                           {campaignType === 'CATALOG' ? (
+                             <DPAPreviewCard />
+                           ) : (
+                             <img src={ad.imageUrl} className="w-full h-full object-cover" />
+                           )}
                            {ad.isDynamic && <div className="absolute inset-0 bg-black/40 flex items-center justify-center text-white text-xs font-black tracking-widest">Dynamic Catalog Preview</div>}
                         </div>
                         <div className="p-4 bg-slate-50 flex items-center justify-between gap-4">
