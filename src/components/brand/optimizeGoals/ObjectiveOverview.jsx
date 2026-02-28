@@ -85,7 +85,7 @@ const ObjectiveOverview = ({ formData }) => {
         <MetricCard 
           icon={Globe}
           label="Target locations"
-          value={uniqueLocations.length > 0 ? `${uniqueLocations.length} Regions` : 'Global'}
+          value={uniqueLocations.length > 0 ? `${uniqueLocations.length} locations` : 'Global'}
           subValue={locationText}
           bgClass="bg-blue-50"
           colorClass="text-blue-600"
