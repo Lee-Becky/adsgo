@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { 
   Link, 
   Check, 
@@ -118,6 +119,7 @@ const analysisSteps = [
 ];
 
 const BrandProfile = () => {
+  const location = useLocation();
   const [profile, setProfile] = useState(emptyProfile);
   const [isEditMode, setIsEditMode] = useState(false);
   const [domainAtEditStart, setDomainAtEditStart] = useState("");
@@ -143,6 +145,21 @@ const BrandProfile = () => {
       setUpdateDomain(profile.domain || '');
     }
   }, [isUpdateModalOpen, profile.domain]);
+
+  // Listen for newBrand state from navigation
+  useEffect(() => {
+    if (location.state?.newBrand) {
+      setProfile(emptyProfile);
+      setIsUpdateModalOpen(true);
+      setUpdateDomain("");
+      setElapsedTime(0);
+      setIsUpdating(false);
+      setIsEditMode(false);
+      
+      // Clear state to prevent re-triggering on manual refreshes
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);
 
   const handleSave = () => {
     setIsEditMode(false);
@@ -370,7 +387,7 @@ const BrandProfile = () => {
             <div className="w-[360px] flex flex-col p-8 shrink-0 overflow-y-auto border-r border-slate-100 bg-white shadow-sm">
               <div className="mb-10">
                 <div className="flex items-center justify-between mb-4">
-                  <span className="text-sm font-black text-slate-900 tracking-widest">生成进度</span>
+                  <span className="text-sm font-black text-slate-900  tracking-widest">生成进度</span>
                   <span className="text-sm font-mono font-bold text-blue-600">{analysisProgress}%</span>
                 </div>
                 <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
@@ -557,11 +574,13 @@ const BrandProfile = () => {
             </div>
           </div>
 
-          <main className="py-6 pb-24">
+          <main className="py-6 pb-24 relative">
             <div className="max-w-[1280px] mx-auto px-8 space-y-12">
+              
               {/* Brand Header Card */}
               <div className={`bg-white rounded-3xl p-10 border border-slate-200 shadow-sm animate-fadeIn relative transition-all ${isEditMode ? 'ring-2 ring-amber-500/10' : ''}`}>
                 <div className="flex flex-col lg:flex-row gap-10 items-start mb-8 pb-8 border-b border-slate-100">
+                  
                   {/* Logo Section */}
                   <div className="shrink-0 space-y-4 w-32">
                     <div className="relative group/main">
@@ -574,6 +593,7 @@ const BrandProfile = () => {
                         )}
                       </div>
                     </div>
+                    
                     <div className="grid grid-cols-3 gap-1.5 px-0.5">
                       {profile.logos?.map((logo, i) => (
                         <div 
@@ -634,7 +654,7 @@ const BrandProfile = () => {
                                   domain: e.target.value
                                 });
                               }}
-                              placeholder="Brand Url"
+                              placeholder="Brand Domain"
                               className={`text-sm font-bold bg-slate-50 border-b border-slate-200 outline-none rounded px-2 py-0.5 transition-all w-64 ${
                                 !!domainAtEditStart ? 'text-slate-300 cursor-not-allowed' : 'text-slate-400 focus:bg-white focus:border-amber-500'
                               }`}
@@ -926,7 +946,7 @@ const BrandProfile = () => {
                     );
                   })}
                   {isEditMode && (
-                    <button onClick={() => setProfile({...profile, product_features: [...profile.product_features, { text: '新特性：描述内容', keywords: [] }]})} className="bg-white rounded-3xl p-8 border-2 border-dashed border-slate-200 text-slate-400 font-bold hover:border-amber-500 hover:text-amber-500 transition-all flex flex-col items-center justify-center gap-4 min-h-[300px] shadow-sm"><Plus size={48} /> Add feature</button>
+                    <button onClick={() => setProfile({...profile, product_features: [...profile.product_features, { text: '新特性：描述内容', keywords: [] }]})} className="bg-white rounded-3xl p-8 border-2 border-dashed border-slate-200 text-slate-400 font-bold hover:border-amber-500 hover:text-amber-500 transition-all flex items-center justify-center gap-4 min-h-[300px] shadow-sm"><Plus size={48} /> Add feature</button>
                   )}
                 </div>
               </div>
@@ -1191,65 +1211,67 @@ const BrandProfile = () => {
       )}
 
       {/* One-click Update Modal */}
-      <BaseModal isOpen={isUpdateModalOpen} onClose={() => {}}>
-        <div className="bg-white rounded-[32px] overflow-hidden shadow-2xl w-full max-w-[500px] flex flex-col animate-in zoom-in-95 duration-300">
-          <div className="p-8 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
-            <div className="flex items-center gap-3">
-              <div className="p-2.5 bg-indigo-600 text-white rounded-xl shadow-lg shadow-indigo-200">
-                <Sparkles size={20} />
-              </div>
-              <h4 className="font-bold text-slate-900 text-lg">Create Brand Profile</h4>
-            </div>
-          </div>
-          
-          <div className="p-10 space-y-8">
-            <div className="bg-indigo-50/50 p-6 rounded-2xl border border-indigo-100 flex gap-4">
-              <div className="shrink-0 mt-1">
-                <Info size={18} className="text-indigo-600" />
-              </div>
-              <p className="text-sm font-bold text-indigo-900 leading-relaxed">
-                AI预计需要2-3分钟后自动完成品牌画像的分析创建
-              </p>
-            </div>
-
-            <div className="space-y-4">
-              <label className="text-[11px] font-black text-slate-400 tracking-widest flex items-center gap-2">
-                <Globe size={12} />
-                Brand Url
-              </label>
-              <div className="relative group">
-                <input 
-                  type="text" 
-                  value={updateDomain}
-                  onChange={(e) => setUpdateDomain(e.target.value)}
-                  disabled={!!profile.domain}
-                  placeholder="e.g. https://www.adsgo.ai"
-                  className={`w-full bg-slate-50 border border-slate-200 rounded-2xl px-6 py-4 text-sm font-bold transition-all ${
-                    !!profile.domain 
-                      ? 'text-slate-400 cursor-not-allowed bg-slate-100' 
-                      : 'text-slate-700 focus:ring-4 focus:ring-indigo-500/5 focus:border-indigo-400 focus:bg-white'
-                  }`}
-                />
-                {!!profile.domain && (
-                  <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 bg-white/50 px-2 py-1 rounded text-[10px] font-bold border border-slate-100">
-                    Read Only
-                  </div>
-                )}
+      {isUpdateModalOpen && (
+        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[100] flex items-center justify-center animate-in fade-in duration-300">
+          <div className="bg-white rounded-[32px] overflow-hidden shadow-2xl w-full max-w-[500px] flex flex-col animate-in zoom-in-95 duration-300">
+            <div className="p-8 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 bg-indigo-600 text-white rounded-xl shadow-lg shadow-indigo-200">
+                  <Sparkles size={20} />
+                </div>
+                <h4 className="font-bold text-slate-900 text-lg">Create Brand Profile</h4>
               </div>
             </div>
             
-            <div className="flex gap-4 pt-4">
-              <button 
-                onClick={handleStartUpdate}
-                className="w-full py-4 bg-indigo-600 text-white rounded-2xl font-bold text-sm hover:bg-indigo-700 shadow-xl shadow-indigo-100 transition-all flex items-center justify-center gap-2 hover:translate-y-[-2px] active:translate-y-0"
-              >
-                <Check size={18} strokeWidth={3} />
-                Start update
-              </button>
+            <div className="p-10 space-y-8">
+              <div className="bg-indigo-50/50 p-6 rounded-2xl border border-indigo-100 flex gap-4">
+                <div className="shrink-0 mt-1">
+                  <Info size={18} className="text-indigo-600" />
+                </div>
+                <p className="text-sm font-bold text-indigo-900 leading-relaxed">
+                  AI预计需要2-3分钟后自动完成品牌画像的分析创建
+                </p>
+              </div>
+
+              <div className="space-y-4">
+                <label className="text-[11px] font-black text-slate-400 tracking-widest flex items-center gap-2">
+                  <Globe size={12} />
+                  Brand Url
+                </label>
+                <div className="relative group">
+                  <input 
+                    type="text" 
+                    value={updateDomain}
+                    onChange={(e) => setUpdateDomain(e.target.value)}
+                    disabled={!!profile.domain}
+                    placeholder="e.g. https://www.adsgo.ai"
+                    className={`w-full bg-slate-50 border border-slate-200 rounded-2xl px-6 py-4 text-sm font-bold transition-all ${
+                      !!profile.domain 
+                        ? 'text-slate-400 cursor-not-allowed bg-slate-100' 
+                        : 'text-slate-700 focus:ring-4 focus:ring-indigo-500/5 focus:border-indigo-400 focus:bg-white'
+                    }`}
+                  />
+                  {!!profile.domain && (
+                    <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 bg-white/50 px-2 py-1 rounded text-[10px] font-bold border border-slate-100">
+                      Read Only
+                    </div>
+                  )}
+                </div>
+              </div>
+              
+              <div className="flex gap-4 pt-4">
+                <button 
+                  onClick={handleStartUpdate}
+                  className="w-full py-4 bg-indigo-600 text-white rounded-2xl font-bold text-sm hover:bg-indigo-700 shadow-xl shadow-indigo-100 transition-all flex items-center justify-center gap-2 hover:translate-y-[-2px] active:translate-y-0"
+                >
+                  <Check size={18} strokeWidth={3} />
+                  Start update
+                </button>
+              </div>
             </div>
           </div>
         </div>
-      </BaseModal>
+      )}
     </div>
   );
 };

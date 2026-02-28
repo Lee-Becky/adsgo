@@ -215,7 +215,7 @@ const Sidebar = ({ isMobile, isPinned, onTogglePinned, onClose, selectedBrand, o
                 <button
                   onClick={() => {
                     setIsBrandDropdownOpen(false)
-                    onCreateBrand()
+                    navigate('/brandCenter/brandProfile', { state: { newBrand: true } })
                   }}
                   className="w-full flex items-center justify-center gap-2 px-3 py-1.5 bg-white border border-primary text-primary rounded-xl hover:bg-primary/5 transition-all group"
                 >
