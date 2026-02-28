@@ -62,7 +62,7 @@ const BrandProfile = () => {
   const [selectedLogoIndex, setSelectedLogoIndex] = useState(0);
   const [currentAudienceIndex, setCurrentAudienceIndex] = useState(0);
   const [showBackToTop, setShowBackToTop] = useState(false);
-  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(true);
   const [updateUrl, setUpdateUrl] = useState(mockProfile.website || '');
   const [isUpdating, setIsUpdating] = useState(false);
   const [elapsedTime, setElapsedTime] = useState(0);
@@ -975,10 +975,13 @@ const BrandProfile = () => {
             
             <div className="flex gap-4 pt-4">
               <button 
-                onClick={() => setIsUpdateModalOpen(false)}
+                onClick={() => {
+                  setIsUpdateModalOpen(false);
+                  setIsEditMode(true);
+                }}
                 className="flex-1 py-4 rounded-2xl text-sm font-bold text-slate-500 hover:bg-slate-50 transition-all border border-transparent hover:border-slate-200"
               >
-                Cancel
+                Manual Edit
               </button>
               <button 
                 onClick={handleStartUpdate}
