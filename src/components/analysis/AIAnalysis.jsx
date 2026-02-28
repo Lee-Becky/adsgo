@@ -19,6 +19,7 @@ import {
   ChevronRight,
   Check,
   X,
+  Square,
   Globe,
   History,
   FileText,
@@ -33,7 +34,9 @@ import {
   PieChart,
   Users,
   Clock,
-  Building2
+  Building2,
+  Minus,
+  Maximize2
 } from 'lucide-react';
 
 const AIAnalysis = ({ selectedBrand, brandDetail, onUpdateDetail }) => {
@@ -41,6 +44,8 @@ const AIAnalysis = ({ selectedBrand, brandDetail, onUpdateDetail }) => {
   const [url, setUrl] = React.useState(brandDetail.url || '');
   const [isUpdateModalOpen, setIsUpdateModalOpen] = React.useState(!brandDetail.isAnalyzed);
   const [isHistoryModalOpen, setIsHistoryModalOpen] = React.useState(false);
+  const [isProcessModalOpen, setIsProcessModalOpen] = React.useState(false);
+  const [isProcessMinimized, setIsProcessMinimized] = React.useState(false);
   const [previewReport, setPreviewReport] = React.useState(null);
   const [selectedCategory, setSelectedCategory] = React.useState('全部类型');
   const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = React.useState(false);
@@ -50,6 +55,11 @@ const AIAnalysis = ({ selectedBrand, brandDetail, onUpdateDetail }) => {
   const [isAnalyzing, setIsAnalyzing] = React.useState(false);
   const [analysisProgress, setAnalysisProgress] = React.useState(0);
   const [currentStep, setCurrentStep] = React.useState(0);
+  
+  const isMinimizedRef = React.useRef(isProcessMinimized);
+  React.useEffect(() => {
+    isMinimizedRef.current = isProcessMinimized;
+  }, [isProcessMinimized]);
 
   const reportCategories = [
     "全部类型", "市场分析", "竞品分析", "受众分析", "投放策略", "产品分析", "ROAS预测"
@@ -143,11 +153,20 @@ const AIAnalysis = ({ selectedBrand, brandDetail, onUpdateDetail }) => {
   const handleStartMarketGeneration = () => {
     setIsMarketModalOpen(false);
     setIsMarketAnalyzing(true);
+    setIsProcessModalOpen(true);
+    setIsProcessMinimized(false);
+    
     // Simulate generation process
     setTimeout(() => {
       setIsMarketAnalyzing(false);
+      const currentMinimized = isMinimizedRef.current;
+      setIsProcessModalOpen(false);
       setHasNewReport(true);
-    }, 5000);
+      
+      if (!currentMinimized) {
+        setPreviewReport(mockHistoryData[1]);
+      }
+    }, 8000);
   };
 
   const stages = [
@@ -200,7 +219,7 @@ const AIAnalysis = ({ selectedBrand, brandDetail, onUpdateDetail }) => {
     {
       id: 2,
       title: "策略阶段",
-      subtitle: "定义目标受众和投放方案",
+      subtitle: "定义目标受众 and 投放方案",
       cards: [
         {
           icon: <UserCircle className="text-green-500" size={24} />,
@@ -221,7 +240,7 @@ const AIAnalysis = ({ selectedBrand, brandDetail, onUpdateDetail }) => {
     {
       id: 3,
       title: "执行阶段",
-      subtitle: "生成素材和方案",
+      subtitle: "生成素材 and 方案",
       cards: [
         {
           icon: <ShoppingCart className="text-cyan-500" size={24} />,
@@ -242,7 +261,7 @@ const AIAnalysis = ({ selectedBrand, brandDetail, onUpdateDetail }) => {
     {
       id: 4,
       title: "监控阶段",
-      subtitle: "预测效果和实时追踪",
+      subtitle: "预测效果 and 实时追踪",
       cards: [
         {
           icon: <LineChart className="text-amber-600" size={24} />,
@@ -366,13 +385,6 @@ const AIAnalysis = ({ selectedBrand, brandDetail, onUpdateDetail }) => {
             </div>
 
             <div className="mt-auto pt-8 flex items-center gap-3 px-2">
-              <div className="w-10 h-10 rounded-full bg-white border border-slate-100 shadow-sm flex items-center justify-center text-green-500 overflow-hidden">
-                <img src={`https://api.dicebear.com/7.x/bottts/svg?seed=${selectedBrand}`} alt="" className="w-7 h-7" />
-              </div>
-              <div className="flex flex-col">
-                <span className="text-[10px] font-bold text-slate-400 tracking-widest">Brand Name</span>
-                <span className="text-sm font-black text-slate-700">{selectedBrand}</span>
-              </div>
             </div>
           </div>
 
@@ -488,8 +500,26 @@ const AIAnalysis = ({ selectedBrand, brandDetail, onUpdateDetail }) => {
 
   return (
     <div className="relative min-h-screen">
+      <div className="fixed top-24 right-10 z-30">
+        <button 
+          onClick={() => {
+            setIsHistoryModalOpen(true);
+            setHasNewReport(false);
+          }}
+          className="group relative px-8 py-4 bg-indigo-600 text-white rounded-2xl font-black shadow-[0_20px_40px_-12px_rgba(79,70,229,0.4)] hover:bg-indigo-700 hover:shadow-[0_25px_50px_-12px_rgba(79,70,229,0.5)] hover:-translate-y-1 transition-all flex items-center gap-4 active:scale-95 border-4 border-white"
+        >
+          <History size={22} strokeWidth={3} className="group-hover:rotate-[-10deg] transition-transform" />
+          <span className="text-base tracking-tight">历史报告记录</span>
+          
+          {hasNewReport && (
+            <div className="absolute -top-4 -right-3 px-3 py-1.5 bg-rose-500 text-white text-[10px] font-black rounded-full animate-bounce shadow-lg shadow-rose-500/40 whitespace-nowrap border-2 border-white">
+              NEW REPORT
+            </div>
+          )}
+        </button>
+      </div>
+
       <div className={`bg-gray-50/30 p-8 pt-12 animate-in fade-in duration-500 min-h-screen`}>
-        {/* Top Header Section (Centered) */}
         <div className="flex flex-col items-center mb-16 text-center">
           <div className="flex flex-col items-center gap-2 mb-4">
             <p className="text-gray-400 text-[11px] font-black tracking-[0.2em]">
@@ -506,30 +536,12 @@ const AIAnalysis = ({ selectedBrand, brandDetail, onUpdateDetail }) => {
                   品牌画像
                   <ChevronRight size={10} strokeWidth={3} />
                 </button>
-                <div className="relative">
-                  <button 
-                    onClick={() => {
-                      setIsHistoryModalOpen(true);
-                      setHasNewReport(false);
-                    }}
-                    className="px-3 py-1.5 bg-indigo-50 text-indigo-600 border border-indigo-100 rounded-xl text-[10px] font-black hover:bg-indigo-100 transition-all shadow-sm flex items-center gap-1.5 tracking-tighter"
-                  >
-                    <History size={12} strokeWidth={3} />
-                    历史报告
-                  </button>
-                  {hasNewReport && (
-                    <div className="absolute -top-2.5 -right-2 px-2 py-0.5 bg-rose-500 text-white text-[8px] font-black rounded-full animate-pulse shadow-lg shadow-rose-500/40 whitespace-nowrap border border-white z-10">
-                      NEW REPORT
-                    </div>
-                  )}
-                </div>
               </div>
             </div>
           </div>
           <p className="text-gray-500 font-bold text-sm">选择功能快速开始</p>
         </div>
 
-        {/* Main Content Sections */}
         <div className="max-w-[1400px] mx-auto space-y-16">
           {stages.map((stage) => (
             <div key={stage.id} className="space-y-6">
@@ -557,9 +569,11 @@ const AIAnalysis = ({ selectedBrand, brandDetail, onUpdateDetail }) => {
                         if (isMarketResearch && isAnalyzed) setIsMarketModalOpen(true);
                       }}
                       className={`group relative bg-white rounded-2xl p-6 border transition-all duration-300 ${
-                        (isDisabled || (isMarketResearch && isMarketAnalyzing))
+                        isDisabled
                           ? 'opacity-40 grayscale cursor-not-allowed border-gray-100' 
-                          : 'shadow-sm hover:shadow-xl hover:border-blue-100 cursor-pointer border-gray-100'
+                          : (isMarketResearch && isMarketAnalyzing)
+                            ? 'border-blue-100 shadow-sm'
+                            : 'shadow-sm hover:shadow-xl hover:border-blue-100 cursor-pointer border-gray-100'
                       } ${isSpecialBrandCard && !isAnalyzed ? 'ring-2 ring-indigo-500 ring-offset-2' : ''}`}
                     >
                       {card.badge && (
@@ -589,11 +603,28 @@ const AIAnalysis = ({ selectedBrand, brandDetail, onUpdateDetail }) => {
                         ))}
                       </div>
 
-                      {/* Analyzing state overlay for Market Research */}
                       {isMarketResearch && isMarketAnalyzing && (
-                        <div className="absolute inset-0 bg-white/80 rounded-2xl z-10 flex flex-col items-center justify-center animate-in fade-in duration-300">
-                          <RefreshCcw className="text-blue-500 animate-spin mb-2" size={24} />
-                          <span className="text-xs font-black text-blue-600 tracking-tighter">正在分析中...</span>
+                        <div className="absolute inset-0 bg-white/60 backdrop-blur-[1px] rounded-2xl z-10 flex flex-col items-center justify-center animate-in fade-in duration-300 overflow-hidden">
+                          {isProcessMinimized ? (
+                            <button 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setIsProcessModalOpen(true);
+                                setIsProcessMinimized(false);
+                              }}
+                              className="flex flex-col items-center justify-center group/eye"
+                            >
+                              <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 group-hover/eye:scale-110 group-hover/eye:bg-blue-100 transition-all shadow-sm">
+                                <Eye size={24} />
+                              </div>
+                              <span className="text-xs font-black text-blue-600 mt-2 tracking-tighter">正在分析中...</span>
+                            </button>
+                          ) : (
+                            <>
+                              <RefreshCcw className="text-blue-600 animate-spin mb-2" size={24} />
+                              <span className="text-xs font-bold text-blue-600 tracking-tighter">正在分析中...</span>
+                            </>
+                          )}
                         </div>
                       )}
                     </div>
@@ -605,7 +636,6 @@ const AIAnalysis = ({ selectedBrand, brandDetail, onUpdateDetail }) => {
         </div>
       </div>
 
-      {/* Brand Creation Modal */}
       {isUpdateModalOpen && (
         <div 
           className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[40] flex items-center justify-center animate-in fade-in duration-300 pointer-events-auto"
@@ -673,7 +703,6 @@ const AIAnalysis = ({ selectedBrand, brandDetail, onUpdateDetail }) => {
         </div>
       )}
 
-      {/* Market Research Confirmation Modal */}
       {isMarketModalOpen && (
         <div 
           className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[40] flex items-center justify-center animate-in fade-in duration-300 pointer-events-auto"
@@ -718,7 +747,124 @@ const AIAnalysis = ({ selectedBrand, brandDetail, onUpdateDetail }) => {
         </div>
       )}
 
-      {/* History Reports Modal */}
+      {isProcessModalOpen && (
+        <div 
+          className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[40] flex items-center justify-center animate-in fade-in duration-300 pointer-events-auto"
+        >
+          <div className="bg-white rounded-[32px] overflow-hidden shadow-2xl w-full max-w-[800px] flex flex-col animate-in zoom-in-95 duration-300 mx-6">
+            <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-white">
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 bg-blue-50 text-blue-600 rounded-xl">
+                  <BarChart3 size={20} />
+                </div>
+                <div>
+                  <h4 className="font-bold text-slate-900 text-base leading-tight">市场调研报告</h4>
+                  <p className="text-[11px] text-slate-400 font-bold tracking-widest">{selectedBrand}</p>
+                </div>
+              </div>
+              
+            <div className="flex items-center gap-2">
+              <button 
+                onClick={() => {
+                  setIsProcessModalOpen(false);
+                  setIsProcessMinimized(true);
+                }}
+                className="p-2 hover:bg-slate-50 rounded-lg transition-colors text-slate-400 group relative"
+              >
+                <Minus size={18} className="group-hover:scale-110 transition-transform" />
+                <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-2 py-1 bg-slate-900 text-white text-[10px] font-bold rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                  最小化
+                </div>
+              </button>
+              <button 
+                onClick={() => {
+                  setIsProcessModalOpen(false);
+                  setIsMarketAnalyzing(false);
+                }}
+                className="p-2 hover:bg-red-50 rounded-full transition-colors text-red-500 group relative"
+              >
+                <Square size={16} fill="currentColor" className="group-hover:scale-110 transition-transform" />
+                <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-2 py-1 bg-slate-900 text-white text-[10px] font-bold rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                  停止分析
+                </div>
+              </button>
+            </div>
+            </div>
+            
+            <div className="p-8 space-y-6">
+              <div className="bg-amber-50/50 border border-amber-100 rounded-3xl p-6 flex items-center gap-6">
+                <div className="w-12 h-12 rounded-full border-4 border-amber-200 border-t-amber-500 animate-spin" />
+                <div>
+                  <h5 className="font-black text-slate-900">正在生成市场调研</h5>
+                  <p className="text-xs text-slate-400 font-bold mt-1">AI 多智能体协作分析中...</p>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <div className="bg-white border border-slate-100 rounded-2xl p-4 flex items-center gap-4 shadow-sm">
+                  <div className="w-10 h-10 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center">
+                    <BarChart3 size={18} />
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-sm font-black text-slate-900">📊 市场分析</span>
+                      <span className="text-xs font-black text-amber-600 bg-amber-50 px-2 py-0.5 rounded-md tracking-tighter">15%</span>
+                    </div>
+                    <p className="text-[11px] text-slate-400 font-bold">搜索 企业服务/SaaS 行业数据，共 19 个维度（最近12个月）</p>
+                  </div>
+                  <RefreshCcw size={16} className="text-amber-500 animate-spin" />
+                </div>
+
+                <div className="bg-white border border-slate-100 rounded-2xl p-4 flex items-center gap-4 shadow-sm opacity-60">
+                  <div className="w-10 h-10 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center">
+                    <Compass size={18} />
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-sm font-black text-slate-900">🎯 任务协调</span>
+                    </div>
+                    <p className="text-[11px] text-slate-400 font-bold">启动 市场分析 模块</p>
+                  </div>
+                  <RefreshCcw size={16} className="text-slate-300 animate-spin" />
+                </div>
+              </div>
+
+              <div className="pt-4 space-y-4 relative">
+                <div className="absolute left-3 top-6 bottom-4 w-0.5 bg-slate-100" />
+                <div className="flex items-center gap-4 relative z-10">
+                  <div className="w-6 h-6 bg-amber-50 text-amber-600 rounded-full flex items-center justify-center border-2 border-white shadow-sm ring-4 ring-white">
+                    <RefreshCcw size={12} className="animate-spin" />
+                  </div>
+                  <p className="text-xs font-black text-slate-900">开始分析...</p>
+                </div>
+                <div className="flex items-center gap-4 relative z-10">
+                  <div className="w-6 h-6 bg-amber-50 text-amber-600 rounded-full flex items-center justify-center border-2 border-white shadow-sm ring-4 ring-white">
+                    <RefreshCcw size={12} className="animate-spin" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-black text-slate-900">🎯 任务协调</span>
+                    </div>
+                    <p className="text-[10px] text-slate-400 font-bold mt-0.5">启动 市场分析 模块</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-4 relative z-10">
+                  <div className="w-6 h-6 bg-amber-50 text-amber-600 rounded-full flex items-center justify-center border-2 border-white shadow-sm ring-4 ring-white">
+                    <RefreshCcw size={12} className="animate-spin" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-black text-slate-900">📊 市场分析</span>
+                    </div>
+                    <p className="text-[10px] text-slate-400 font-bold mt-0.5">为 Adsgo 分析市场环境 | 当前状态 | 地区: global</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {isHistoryModalOpen && (
         <div 
           className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[40] flex items-center justify-center animate-in fade-in duration-300 pointer-events-auto"
@@ -815,12 +961,17 @@ const AIAnalysis = ({ selectedBrand, brandDetail, onUpdateDetail }) => {
             </div>
             
             <div className="p-8 bg-slate-50/50 border-t border-slate-100 flex justify-end">
+              <button 
+                onClick={() => setIsHistoryModalOpen(false)}
+                className="px-10 py-3 bg-white border border-slate-200 text-slate-600 rounded-xl font-bold text-sm hover:bg-slate-50 transition-all active:scale-95 shadow-sm"
+              >
+                关闭
+              </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Report Preview Modal */}
       {previewReport && (
         <div 
           className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[50] flex items-center justify-center animate-in fade-in duration-300 pointer-events-auto"
@@ -919,7 +1070,7 @@ const AIAnalysis = ({ selectedBrand, brandDetail, onUpdateDetail }) => {
                     <div className="w-16 h-16 bg-white rounded-2xl shadow-xl flex items-center justify-center">
                       <PieChart className="text-indigo-600" size={32} />
                     </div>
-                    <p className="text-sm font-bold text-slate-700">受众偏好：视频素材 > 轮播素材 > 单图</p>
+                    <p className="text-sm font-bold text-slate-700">受众偏好：视频素材 {'〉'} 轮播素材 {'〉'} 单图</p>
                     <p className="text-[11px] text-slate-400 font-medium leading-relaxed">AI 建议增加 TikTok 短视频风格的素材投放，CTR 预计可提升 30%</p>
                   </div>
                 </div>
