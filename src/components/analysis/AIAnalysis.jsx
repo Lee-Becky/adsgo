@@ -492,7 +492,7 @@ const AIAnalysis = ({ selectedBrand, brandDetail, onUpdateDetail }) => {
         <div className="flex items-center gap-3">
           <p className="text-gray-400 font-medium">当前品牌: <span className="text-slate-900 font-bold">{selectedBrand}</span></p>
           <button 
-            onClick={() => navigate('/brandCenter/basicInfo')}
+            onClick={() => navigate('/brandCenter/brandProfile')}
             className="px-3 py-1 bg-white border border-slate-200 rounded-lg text-[11px] font-bold text-slate-600 hover:border-blue-200 hover:text-blue-600 hover:bg-blue-50 transition-all shadow-sm flex items-center gap-1.5"
           >
             查看当前品牌画像
