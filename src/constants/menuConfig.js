@@ -106,7 +106,7 @@ export const MENU_ITEMS = [
     children: [
       {
         key: 'brandProfile',
-        label: 'Brand Profile(Designing)',
+        label: 'Brand Profile',
         shortLabel: 'Prof',
         icon: 'Award',
         title: 'Brand Profile',
@@ -121,28 +121,12 @@ export const MENU_ITEMS = [
         subtitle: 'Set and manage optimization goals'
       },
       {
-        key: 'basicInfo',
-        label: 'Brand Info',
-        shortLabel: 'Info',
-        icon: 'Info',
-        title: 'Brand Info',
-        subtitle: 'Manage basic brand information'
-      },
-      {
         key: 'products',
         label: 'Products',
         shortLabel: 'Prod',
         icon: 'Package',
         title: 'Products',
         subtitle: 'Manage product information'
-      },
-      {
-        key: 'competitors',
-        label: 'Competitors',
-        shortLabel: 'Comp',
-        icon: 'Swords',
-        title: 'Competitors',
-        subtitle: 'Campaign generation will take competitor information into account.'
       }
     ]
   }

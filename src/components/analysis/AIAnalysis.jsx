@@ -665,7 +665,7 @@ const AIAnalysis = ({ selectedBrand, brandDetail, onUpdateDetail }) => {
                   }`}
                 >
                   <Check size={18} strokeWidth={3} />
-                  Start update
+                  Start Analysis
                 </button>
               </div>
             </div>
