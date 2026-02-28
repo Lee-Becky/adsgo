@@ -41,9 +41,13 @@ import {
   CreditCard,
   Search,
   Radio,
-  Image as ImageIcon
+  Image as ImageIcon,
+  MousePointer2,
+  Info,
+  Loader2
 } from 'lucide-react';
 import { mockProfile } from './mockData';
+import BaseModal from './Common';
 
 const industryOptions = [
   "时尚/配饰", "美妆/个护", "服装/鞋履", "体育/户外", "消费电子/3C",
@@ -58,6 +62,10 @@ const BrandProfile = () => {
   const [selectedLogoIndex, setSelectedLogoIndex] = useState(0);
   const [currentAudienceIndex, setCurrentAudienceIndex] = useState(0);
   const [showBackToTop, setShowBackToTop] = useState(false);
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+  const [updateUrl, setUpdateUrl] = useState(mockProfile.website || '');
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [elapsedTime, setElapsedTime] = useState(0);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -86,6 +94,28 @@ const BrandProfile = () => {
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    let timer;
+    if (isUpdating && elapsedTime < 10) {
+      timer = setInterval(() => {
+        setElapsedTime(prev => {
+          if (prev >= 9) {
+            setIsUpdating(false);
+            return 10;
+          }
+          return prev + 1;
+        });
+      }, 1000);
+    }
+    return () => clearInterval(timer);
+  }, [isUpdating, elapsedTime]);
+
+  const handleStartUpdate = () => {
+    setIsUpdateModalOpen(false);
+    setIsUpdating(true);
+    setElapsedTime(0);
   };
 
   const nextAudience = () => {
@@ -231,14 +261,23 @@ const BrandProfile = () => {
       `}</style>
 
       <div className="sticky top-0 z-50 py-3 px-10 pointer-events-none no-print">
-        <div className="max-w-[1400px] mx-auto flex justify-end">
+        <div className="max-w-[1400px] mx-auto flex justify-end gap-3">
           {!isEditMode ? (
-            <button 
-              onClick={handleEdit} 
-              className="pointer-events-auto bg-white text-slate-900 border border-slate-200 px-8 py-2.5 rounded-xl font-bold text-sm hover:bg-slate-50 transition-all active:scale-95 shadow-lg shadow-slate-100"
-            >
-              Edit profile
-            </button>
+            <>
+              <button 
+                onClick={() => setIsUpdateModalOpen(true)} 
+                className="pointer-events-auto bg-indigo-600 text-white px-6 py-2.5 rounded-xl font-bold text-sm hover:bg-indigo-700 transition-all active:scale-95 shadow-lg shadow-indigo-100 flex items-center gap-2"
+              >
+                <MousePointer2 size={16} />
+                One-click update
+              </button>
+              <button 
+                onClick={handleEdit} 
+                className="pointer-events-auto bg-white text-slate-900 border border-slate-200 px-8 py-2.5 rounded-xl font-bold text-sm hover:bg-slate-50 transition-all active:scale-95 shadow-lg shadow-slate-100"
+              >
+                Edit profile
+              </button>
+            </>
           ) : (
             <button 
               onClick={handleSave} 
@@ -879,6 +918,132 @@ const BrandProfile = () => {
       </main>
 
       <button onClick={scrollToTop} className={`fixed bottom-8 right-8 w-14 h-14 bg-slate-900 text-white rounded-full flex items-center justify-center shadow-2xl z-[100] transition-all duration-300 no-print ${showBackToTop ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0'} hover:scale-110 active:scale-95`}><ArrowUp size={24} /></button>
+
+      {/* One-click Update Modal */}
+      <BaseModal isOpen={isUpdateModalOpen} onClose={() => setIsUpdateModalOpen(false)}>
+        <div className="bg-white rounded-[32px] overflow-hidden shadow-2xl w-full max-w-[500px] flex flex-col animate-in zoom-in-95 duration-300">
+          <div className="p-8 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 bg-indigo-600 text-white rounded-xl shadow-lg shadow-indigo-200">
+                <Sparkles size={20} />
+              </div>
+              <h4 className="font-bold text-slate-900 text-lg">One-click update</h4>
+            </div>
+            <button 
+              onClick={() => setIsUpdateModalOpen(false)} 
+              className="p-2 hover:bg-slate-200 rounded-full transition-colors group"
+            >
+              <X size={20} className="text-slate-400 group-hover:text-slate-600" />
+            </button>
+          </div>
+          
+          <div className="p-10 space-y-8">
+            <div className="bg-indigo-50/50 p-6 rounded-2xl border border-indigo-100 flex gap-4">
+              <div className="shrink-0 mt-1">
+                <Info size={18} className="text-indigo-600" />
+              </div>
+              <p className="text-sm font-bold text-indigo-900 leading-relaxed">
+                AI将在后台预计花费2-3分钟完成品牌画像的更新
+              </p>
+            </div>
+
+            <div className="space-y-4">
+              <label className="text-[11px] font-black text-slate-400 tracking-widest flex items-center gap-2">
+                <Globe size={12} />
+                Brand URL
+              </label>
+              <div className="relative group">
+                <input 
+                  type="text" 
+                  value={updateUrl}
+                  onChange={(e) => setUpdateUrl(e.target.value)}
+                  disabled={!!mockProfile.website}
+                  placeholder="https://www.example.com"
+                  className={`w-full bg-slate-50 border border-slate-200 rounded-2xl px-6 py-4 text-sm font-bold transition-all ${
+                    !!mockProfile.website 
+                      ? 'text-slate-400 cursor-not-allowed bg-slate-100' 
+                      : 'text-slate-700 focus:ring-4 focus:ring-indigo-500/5 focus:border-indigo-400 focus:bg-white'
+                  }`}
+                />
+                {!!mockProfile.website && (
+                  <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 bg-white/50 px-2 py-1 rounded text-[10px] font-bold border border-slate-100">
+                    Read Only
+                  </div>
+                )}
+              </div>
+            </div>
+            
+            <div className="flex gap-4 pt-4">
+              <button 
+                onClick={() => setIsUpdateModalOpen(false)}
+                className="flex-1 py-4 rounded-2xl text-sm font-bold text-slate-500 hover:bg-slate-50 transition-all border border-transparent hover:border-slate-200"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={handleStartUpdate}
+                className="flex-1 py-4 bg-indigo-600 text-white rounded-2xl font-bold text-sm hover:bg-indigo-700 shadow-xl shadow-indigo-100 transition-all flex items-center justify-center gap-2 hover:translate-y-[-2px] active:translate-y-0"
+              >
+                <Check size={18} strokeWidth={3} />
+                Start update
+              </button>
+            </div>
+          </div>
+        </div>
+      </BaseModal>
+
+      {/* Updating Floating Status */}
+      {isUpdating && (
+        <div className="fixed bottom-8 right-8 z-[110] animate-in slide-in-from-bottom-10 fade-in duration-500">
+          <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-2xl flex items-center gap-5 min-w-[320px] ring-4 ring-indigo-500/10">
+            <div className="relative w-14 h-14 shrink-0 flex items-center justify-center">
+              <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 100 100">
+                <circle 
+                  cx="50" cy="50" r="45" 
+                  fill="none" 
+                  stroke="#F1F5F9" 
+                  strokeWidth="8" 
+                />
+                <circle 
+                  cx="50" cy="50" r="45" 
+                  fill="none" 
+                  stroke="#4F46E5" 
+                  strokeWidth="8" 
+                  strokeLinecap="round"
+                  style={{ 
+                    strokeDasharray: '283',
+                    strokeDashoffset: 283 - (283 * elapsedTime) / 10,
+                    transition: 'stroke-dashoffset 1s linear'
+                  }}
+                />
+              </svg>
+              <Loader2 className="animate-spin text-indigo-600" size={24} />
+            </div>
+            
+            <div className="flex-1 space-y-1">
+              <div className="flex items-center justify-between">
+                <h4 className="text-sm font-black text-slate-900 tracking-tight">AI Analyzing...</h4>
+                <span className="text-xs font-mono font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full">
+                  {elapsedTime}s
+                </span>
+              </div>
+              <div className="w-full h-1 bg-slate-100 rounded-full overflow-hidden mt-2">
+                <div 
+                  className="h-full bg-indigo-500 transition-all duration-1000 linear"
+                  style={{ width: `${(elapsedTime) * 10}%` }}
+                />
+              </div>
+            </div>
+            
+            <button 
+              onClick={() => setIsUpdating(false)} 
+              className="p-1.5 hover:bg-slate-50 rounded-lg text-slate-300 hover:text-slate-500 transition-all"
+            >
+              <X size={16} />
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
