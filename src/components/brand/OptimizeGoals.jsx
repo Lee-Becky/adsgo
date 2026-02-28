@@ -1,25 +1,31 @@
 import { useState } from 'react'
 import { Save } from 'lucide-react'
-import ObjectiveSection from './optimizeGoals/ObjectiveSection'
-import BudgetKPISection from './optimizeGoals/BudgetKPISection'
-import AssetSection from './optimizeGoals/AssetSection'
-import RulesLibrarySection from './optimizeGoals/RulesLibrarySection'
+import { 
+  ObjectiveSection, 
+  BudgetKPISection, 
+  AssetSection, 
+  RulesLibrarySection,
+  ObjectiveOverview 
+} from './optimizeGoals/index'
 
 const OptimizeGoals = () => {
   const [formData, setFormData] = useState({
-    campaignObjective: '',
-    adsetGoal: '',
-    event: '',
+    campaignObjective: 'sales_conversions',
+    adsetGoal: 'in_web_actions',
+    event: 'Purchase',
     marketGroups: [
       {
         id: crypto.randomUUID(),
-        targetLocations: [],
+        targetLocations: [
+          { value: 'us', label: 'United States' },
+          { value: 'uk', label: 'United Kingdom' }
+        ],
         budgetMode: 'unified',
-        unifiedBudget: '',
+        unifiedBudget: '500',
         splitBudgets: {},
         kpiType: 'ROAS',
         kpiMode: 'unified',
-        unifiedKPI: '',
+        unifiedKPI: '3.5',
         splitKPIs: {}
       }
     ],
@@ -63,6 +69,8 @@ const OptimizeGoals = () => {
       <main className="flex-1 max-w-6xl mx-auto w-full px-10 py-12">
         <div className="space-y-10">
           
+          <ObjectiveOverview formData={formData} />
+
           {/* Section 1: Objective */}
           <div className="bg-white rounded-[32px] border border-slate-200 shadow-[0_4px_24px_rgba(0,0,0,0.04)] relative z-20">
             <ObjectiveSection 
