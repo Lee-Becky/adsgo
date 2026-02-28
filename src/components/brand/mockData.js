@@ -1,8 +1,8 @@
 export const mockProfile = {
   brand_name: "Adsgo Ai",
-  website: "https://adsgo.ai",
+  website: "",
   logos: ["🐾", "🎨", "🚀"],
-  domain: "adsgo.ai",
+  domain: "",
   businessType: "企业服务/Saas",
   phone: "+1 (555) 000-0000",
   email: "contact@adsgo.ai",

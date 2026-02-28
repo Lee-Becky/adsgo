@@ -59,11 +59,12 @@ const industryOptions = [
 const BrandProfile = () => {
   const [profile, setProfile] = useState(mockProfile);
   const [isEditMode, setIsEditMode] = useState(false);
+  const [domainAtEditStart, setDomainAtEditStart] = useState("");
   const [selectedLogoIndex, setSelectedLogoIndex] = useState(0);
   const [currentAudienceIndex, setCurrentAudienceIndex] = useState(0);
   const [showBackToTop, setShowBackToTop] = useState(false);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(true);
-  const [updateUrl, setUpdateUrl] = useState(mockProfile.website || '');
+  const [updateDomain, setUpdateDomain] = useState(mockProfile.domain || '');
   const [isUpdating, setIsUpdating] = useState(false);
   const [elapsedTime, setElapsedTime] = useState(0);
 
@@ -75,6 +76,13 @@ const BrandProfile = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Sync updateDomain with current profile.domain whenever modal is opened
+  useEffect(() => {
+    if (isUpdateModalOpen) {
+      setUpdateDomain(profile.domain || '');
+    }
+  }, [isUpdateModalOpen, profile.domain]);
+
   const handleSave = () => {
     setIsEditMode(false);
     console.log('Profile saved:', profile);
@@ -82,6 +90,7 @@ const BrandProfile = () => {
   };
 
   const handleEdit = () => {
+    setDomainAtEditStart(profile.domain || "");
     setIsEditMode(true);
   };
 
@@ -116,6 +125,8 @@ const BrandProfile = () => {
     setIsUpdateModalOpen(false);
     setIsUpdating(true);
     setElapsedTime(0);
+    // Persist domain value from modal to profile state
+    setProfile(prev => ({ ...prev, domain: updateDomain }));
   };
 
   const nextAudience = () => {
@@ -355,10 +366,32 @@ const BrandProfile = () => {
                   )}
                   
                   <div className="flex flex-wrap gap-6 items-center">
-                    <a href={`https://${profile.domain}`} target="_blank" rel="noreferrer" className="flex items-center gap-2 group/link hover:opacity-80 transition-opacity">
-                      <Globe size={14} className="text-slate-400 group-hover/link:text-indigo-500 transition-colors" />
-                      <span className="text-base font-bold text-slate-400 group-hover/link:text-indigo-500 transition-colors border-b border-transparent group-hover/link:border-indigo-200">{profile.domain}</span>
-                    </a>
+                    <div className="flex items-center gap-2">
+                      <Globe size={14} className="text-slate-400" />
+                      {isEditMode ? (
+                        <input 
+                          type="text"
+                          value={profile.domain}
+                          disabled={!!domainAtEditStart}
+                          onChange={e => {
+                            setProfile({
+                              ...profile, 
+                              domain: e.target.value
+                            });
+                          }}
+                          placeholder="Brand Domain"
+                          className={`text-sm font-bold bg-slate-50 border-b border-slate-200 outline-none rounded px-2 py-0.5 transition-all w-64 ${
+                            !!domainAtEditStart ? 'text-slate-300 cursor-not-allowed' : 'text-slate-400 focus:bg-white focus:border-amber-500'
+                          }`}
+                        />
+                      ) : (
+                        <a href={`https://${profile.domain}`} target="_blank" rel="noreferrer" className="group/link hover:opacity-80 transition-opacity">
+                          <span className="text-base font-bold text-slate-400 group-hover/link:text-indigo-500 transition-colors border-b border-transparent group-hover/link:border-indigo-200">
+                            {profile.domain || 'Brand URL required'}
+                          </span>
+                        </a>
+                      )}
+                    </div>
                     
                     <div className="flex items-center gap-2">
                       <Building2 size={14} className="text-slate-400" />
@@ -950,22 +983,22 @@ const BrandProfile = () => {
             <div className="space-y-4">
               <label className="text-[11px] font-black text-slate-400 tracking-widest flex items-center gap-2">
                 <Globe size={12} />
-                Brand URL
+                Brand Domain
               </label>
               <div className="relative group">
                 <input 
                   type="text" 
-                  value={updateUrl}
-                  onChange={(e) => setUpdateUrl(e.target.value)}
-                  disabled={!!mockProfile.website}
-                  placeholder="https://www.example.com"
+                  value={updateDomain}
+                  onChange={(e) => setUpdateDomain(e.target.value)}
+                  disabled={!!profile.domain}
+                  placeholder="e.g. https://www.adsgo.ai"
                   className={`w-full bg-slate-50 border border-slate-200 rounded-2xl px-6 py-4 text-sm font-bold transition-all ${
-                    !!mockProfile.website 
+                    !!profile.domain 
                       ? 'text-slate-400 cursor-not-allowed bg-slate-100' 
                       : 'text-slate-700 focus:ring-4 focus:ring-indigo-500/5 focus:border-indigo-400 focus:bg-white'
                   }`}
                 />
-                {!!mockProfile.website && (
+                {!!profile.domain && (
                   <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 bg-white/50 px-2 py-1 rounded text-[10px] font-bold border border-slate-100">
                     Read Only
                   </div>
@@ -976,8 +1009,8 @@ const BrandProfile = () => {
             <div className="flex gap-4 pt-4">
               <button 
                 onClick={() => {
+                  handleEdit();
                   setIsUpdateModalOpen(false);
-                  setIsEditMode(true);
                 }}
                 className="flex-1 py-4 rounded-2xl text-sm font-bold text-slate-500 hover:bg-slate-50 transition-all border border-transparent hover:border-slate-200"
               >
