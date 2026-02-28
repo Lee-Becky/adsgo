@@ -17,16 +17,56 @@ import {
   ArrowUp,
   Link,
   ChevronRight,
-  Check
+  Check,
+  X,
+  Globe,
+  History,
+  FileText,
+  Calendar,
+  ExternalLink,
+  Eye,
+  Download,
+  Filter,
+  Swords,
+  ChevronDown,
+  TrendingUp,
+  PieChart,
+  Users,
+  Clock,
+  Building2
 } from 'lucide-react';
 
 const AIAnalysis = ({ selectedBrand, brandDetail, onUpdateDetail }) => {
   const navigate = useNavigate();
   const [url, setUrl] = React.useState(brandDetail.url || '');
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = React.useState(!brandDetail.isAnalyzed);
+  const [isHistoryModalOpen, setIsHistoryModalOpen] = React.useState(false);
+  const [previewReport, setPreviewReport] = React.useState(null);
+  const [selectedCategory, setSelectedCategory] = React.useState('全部类型');
+  const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = React.useState(false);
+  const [isMarketModalOpen, setIsMarketModalOpen] = React.useState(false);
+  const [isMarketAnalyzing, setIsMarketAnalyzing] = React.useState(false);
+  const [hasNewReport, setHasNewReport] = React.useState(false);
   const [isAnalyzing, setIsAnalyzing] = React.useState(false);
   const [analysisProgress, setAnalysisProgress] = React.useState(0);
   const [currentStep, setCurrentStep] = React.useState(0);
-  const [completedSteps, setCompletedSteps] = React.useState([]);
+
+  const reportCategories = [
+    "全部类型", "市场分析", "竞品分析", "受众分析", "投放策略", "产品分析", "ROAS预测"
+  ];
+
+  const mockHistoryData = [
+    { id: 1, type: '竞品分析', title: '竞争对手策略与差异化机会', time: '3 天前', icon: <Swords size={12} />, color: 'text-orange-600', bg: 'bg-orange-50', border: 'border-orange-100' },
+    { id: 2, type: '市场分析', title: '2024年全球电商市场趋势报告', time: '5 天前', icon: <BarChart3 size={12} />, color: 'text-blue-600', bg: 'bg-blue-50', border: 'border-blue-100' },
+    { id: 3, type: '受众分析', title: '目标受众行为特征与媒体偏好', time: '1 周前', icon: <UserCircle size={12} />, color: 'text-green-600', bg: 'bg-green-50', border: 'border-green-100' },
+    { id: 4, type: '投放策略', title: 'Meta与Google广告投放预算分配建议', time: '2 周前', icon: <Compass size={12} />, color: 'text-purple-600', bg: 'bg-purple-50', border: 'border-purple-100' },
+    { id: 5, type: '产品分析', title: '产品卖点提炼与用户反馈分析', time: '1 个月前', icon: <Box size={12} />, color: 'text-emerald-600', bg: 'bg-emerald-50', border: 'border-emerald-100' },
+    { id: 6, type: 'ROAS预测', title: 'Q1季度投放效果预测与ROAS模拟', time: '1 个月前', icon: <LineChart size={12} />, color: 'text-amber-600', bg: 'bg-amber-50', border: 'border-amber-100' },
+  ];
+
+  const filteredHistory = selectedCategory === '全部类型' 
+    ? mockHistoryData 
+    : mockHistoryData.filter(item => item.type === selectedCategory);
 
   const analysisSteps = [
     {
@@ -61,7 +101,10 @@ const AIAnalysis = ({ selectedBrand, brandDetail, onUpdateDetail }) => {
 
   React.useEffect(() => {
     setUrl(brandDetail.url || '');
-  }, [brandDetail.url, selectedBrand]);
+    if (!brandDetail.isAnalyzed) {
+      setIsUpdateModalOpen(true);
+    }
+  }, [brandDetail.url, selectedBrand, brandDetail.isAnalyzed]);
 
   React.useEffect(() => {
     if (isAnalyzing) {
@@ -77,7 +120,6 @@ const AIAnalysis = ({ selectedBrand, brandDetail, onUpdateDetail }) => {
           }
           const next = prev + 1;
           
-          // Update steps based on progress
           if (next < 25) setCurrentStep(0);
           else if (next < 50) setCurrentStep(1);
           else if (next < 75) setCurrentStep(2);
@@ -92,18 +134,39 @@ const AIAnalysis = ({ selectedBrand, brandDetail, onUpdateDetail }) => {
 
   const handleStartAnalysis = () => {
     if (!url.trim()) return;
+    setIsUpdateModalOpen(false);
     setIsAnalyzing(true);
     setAnalysisProgress(0);
     setCurrentStep(0);
+  };
+
+  const handleStartMarketGeneration = () => {
+    setIsMarketModalOpen(false);
+    setIsMarketAnalyzing(true);
+    // Simulate generation process
+    setTimeout(() => {
+      setIsMarketAnalyzing(false);
+      setHasNewReport(true);
+    }, 5000);
   };
 
   const stages = [
     {
       id: 1,
       title: "洞察阶段",
-      subtitle: "了解市场、竞品和产品",
+      subtitle: "了解市场、竞品 and 产品",
       cards: [
         {
+          id: 'brand-init',
+          icon: <Sparkles className="text-indigo-500" size={24} />,
+          iconBg: "bg-indigo-50",
+          title: "品牌分析",
+          desc: "请先进行一次详细的品牌画像分析",
+          tags: ["基础配置", "AI分析"],
+          isCore: true
+        },
+        {
+          id: 'market-research',
           icon: <BarChart3 className="text-blue-500" size={24} />,
           iconBg: "bg-blue-50",
           title: "市场调研",
@@ -216,7 +279,6 @@ const AIAnalysis = ({ selectedBrand, brandDetail, onUpdateDetail }) => {
   if (isAnalyzing) {
     return (
       <div className="absolute inset-0 bg-[#F8FAFC] z-10 flex flex-col overflow-hidden animate-in fade-in duration-500 rounded-3xl">
-        {/* Top Status Bar */}
         <div className="h-14 flex items-center justify-center px-6 shrink-0 relative">
           <div className="flex items-center gap-3">
             <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
@@ -230,7 +292,6 @@ const AIAnalysis = ({ selectedBrand, brandDetail, onUpdateDetail }) => {
         </div>
 
         <div className="flex-1 flex min-h-0">
-          {/* Left Sidebar */}
           <div className="w-[320px] flex flex-col p-6 shrink-0 overflow-y-auto">
             <div className="mb-8">
               <div className="flex items-center justify-between mb-4">
@@ -309,20 +370,18 @@ const AIAnalysis = ({ selectedBrand, brandDetail, onUpdateDetail }) => {
                 <img src={`https://api.dicebear.com/7.x/bottts/svg?seed=${selectedBrand}`} alt="" className="w-7 h-7" />
               </div>
               <div className="flex flex-col">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Brand Name</span>
+                <span className="text-[10px] font-bold text-slate-400 tracking-widest">Brand Name</span>
                 <span className="text-sm font-black text-slate-700">{selectedBrand}</span>
               </div>
             </div>
           </div>
 
-          {/* Main Preview Area */}
           <div className="flex-1 bg-slate-50/50 p-8 pt-4 overflow-hidden flex flex-col">
             <div className="mb-4 flex items-center justify-between px-2">
-              <span className="text-[11px] font-black text-slate-400 tracking-widest uppercase">浏览器实时预览</span>
+              <span className="text-[11px] font-black text-slate-400 tracking-widest">浏览器实时预览</span>
             </div>
             
             <div className="flex-1 bg-white rounded-[32px] border border-slate-200 shadow-[0_32px_64px_-12px_rgba(0,0,0,0.12)] overflow-hidden flex flex-col relative group/browser">
-              {/* Browser Header */}
               <div className="h-14 bg-slate-50 border-b border-slate-100 flex items-center px-6 gap-6">
                 <div className="flex gap-2">
                   <div className="w-3 h-3 rounded-full bg-[#FF5F57] shadow-inner" />
@@ -344,10 +403,8 @@ const AIAnalysis = ({ selectedBrand, brandDetail, onUpdateDetail }) => {
                 </div>
               </div>
               
-              {/* Preview Content */}
               <div className="flex-1 bg-white relative overflow-hidden flex flex-col">
                 <div className="absolute inset-0 p-8">
-                  {/* Mock Website Content - High Fidelity */}
                   <div className="w-full h-full flex flex-col animate-in fade-in zoom-in-95 duration-1000">
                     <nav className="flex items-center justify-between mb-16 px-4">
                       <div className="flex items-center gap-3">
@@ -368,7 +425,7 @@ const AIAnalysis = ({ selectedBrand, brandDetail, onUpdateDetail }) => {
                     <div className="flex-1 flex flex-col items-center justify-center text-center max-w-3xl mx-auto space-y-10 relative">
                       <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-24 h-24 bg-indigo-500/5 rounded-full blur-3xl" />
                       
-                      <div className="px-5 py-2 bg-indigo-50 text-indigo-600 rounded-full text-[11px] font-black tracking-[0.2em] border border-indigo-100 shadow-sm uppercase">
+                      <div className="px-5 py-2 bg-indigo-50 text-indigo-600 rounded-full text-[11px] font-black tracking-[0.2em] border border-indigo-100 shadow-sm">
                         New: AI-Powered Campaign Analysis
                       </div>
                       
@@ -404,7 +461,6 @@ const AIAnalysis = ({ selectedBrand, brandDetail, onUpdateDetail }) => {
                   </div>
                 </div>
                 
-                {/* High Fidelity Scanner Effect */}
                 <div className="absolute inset-0 pointer-events-none">
                   <div className="absolute inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-blue-500 to-transparent shadow-[0_0_15px_rgba(59,130,246,0.8)] z-20 animate-scan" />
                   <div className="absolute inset-0 bg-blue-500/5 backdrop-blur-[1px] animate-pulse" />
@@ -429,166 +485,449 @@ const AIAnalysis = ({ selectedBrand, brandDetail, onUpdateDetail }) => {
     );
   }
 
-  if (!brandDetail.isAnalyzed) {
-    return (
-      <div className="min-h-[80vh] flex flex-col items-center justify-center px-6 animate-in fade-in duration-700">
-        <div className="max-w-4xl w-full text-center space-y-8">
-          {/* Header */}
-          <div className="space-y-6">
-            <h1 className="text-[56px] lg:text-[72px] font-black text-[#0F172A] leading-[1.1] tracking-tight">
-              AI Marketing Strategy<br />
-              Backed by
-            </h1>
-            <p className="text-xl text-slate-500 max-w-2xl mx-auto leading-relaxed font-medium">
-              Stop guessing. Our multi-agent system analyzes your product, competitors, and <span className="text-slate-900 font-bold">comprehensive industry data</span> to generate high-ROAS campaigns.
-            </p>
-          </div>
 
-          {/* Input Area */}
-          <div className="mt-12 max-w-3xl mx-auto">
-            <div className="relative group">
-              <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-[2rem] blur opacity-10 group-focus-within:opacity-20 transition duration-1000"></div>
-              <div className="relative flex items-center bg-white rounded-3xl border border-slate-100 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.08)] p-2 hover:border-slate-200 transition-all duration-300 group-focus-within:border-blue-200 group-focus-within:shadow-[0_20px_50px_-12px_rgba(59,130,246,0.12)]">
-                <div className="flex-1 flex items-center pl-6">
-                  <div className="text-slate-300 group-focus-within:text-blue-500 transition-colors mr-4">
-                    <Link size={20} />
+  return (
+    <div className="relative min-h-screen">
+      <div className={`bg-gray-50/30 p-8 pt-12 animate-in fade-in duration-500 min-h-screen`}>
+        {/* Top Header Section (Centered) */}
+        <div className="flex flex-col items-center mb-16 text-center">
+          <div className="flex flex-col items-center gap-2 mb-4">
+            <p className="text-gray-400 text-[11px] font-black tracking-[0.2em]">
+              当前品牌
+            </p>
+            <div className="flex items-center gap-4">
+              <h1 className="text-3xl font-black text-slate-900 tracking-tight">{selectedBrand}</h1>
+              <div className="h-6 w-px bg-slate-200" />
+              <div className="flex items-center gap-2">
+                <button 
+                  onClick={() => navigate('/brandCenter/brandProfile')}
+                  className="px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-[10px] font-black text-slate-600 hover:border-blue-200 hover:text-blue-600 hover:bg-blue-50 transition-all shadow-sm flex items-center gap-1.5 tracking-tighter"
+                >
+                  品牌画像
+                  <ChevronRight size={10} strokeWidth={3} />
+                </button>
+                <div className="relative">
+                  <button 
+                    onClick={() => {
+                      setIsHistoryModalOpen(true);
+                      setHasNewReport(false);
+                    }}
+                    className="px-3 py-1.5 bg-indigo-50 text-indigo-600 border border-indigo-100 rounded-xl text-[10px] font-black hover:bg-indigo-100 transition-all shadow-sm flex items-center gap-1.5 tracking-tighter"
+                  >
+                    <History size={12} strokeWidth={3} />
+                    历史报告
+                  </button>
+                  {hasNewReport && (
+                    <div className="absolute -top-2.5 -right-2 px-2 py-0.5 bg-rose-500 text-white text-[8px] font-black rounded-full animate-pulse shadow-lg shadow-rose-500/40 whitespace-nowrap border border-white z-10">
+                      NEW REPORT
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+          <p className="text-gray-500 font-bold text-sm">选择功能快速开始</p>
+        </div>
+
+        {/* Main Content Sections */}
+        <div className="max-w-[1400px] mx-auto space-y-16">
+          {stages.map((stage) => (
+            <div key={stage.id} className="space-y-6">
+              <div className="flex items-center gap-4">
+                <div className="w-8 h-8 bg-amber-100/50 text-amber-600 rounded-lg flex items-center justify-center font-bold text-sm border border-amber-200/50">
+                  {stage.id}
+                </div>
+                <h2 className="text-lg font-bold text-gray-900">{stage.title}</h2>
+                <span className="text-gray-400 text-sm">{stage.subtitle}</span>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {stage.cards.map((card, idx) => {
+                  const isAnalyzed = brandDetail.isAnalyzed;
+                  const isDisabled = !isAnalyzed && !card.isCore;
+                  const isSpecialBrandCard = card.id === 'brand-init';
+                  const isMarketResearch = card.id === 'market-research';
+
+                  return (
+                    <div 
+                      key={idx} 
+                      onClick={() => {
+                        if (isDisabled || (isMarketResearch && isMarketAnalyzing)) return;
+                        if (isSpecialBrandCard) setIsUpdateModalOpen(true);
+                        if (isMarketResearch && isAnalyzed) setIsMarketModalOpen(true);
+                      }}
+                      className={`group relative bg-white rounded-2xl p-6 border transition-all duration-300 ${
+                        (isDisabled || (isMarketResearch && isMarketAnalyzing))
+                          ? 'opacity-40 grayscale cursor-not-allowed border-gray-100' 
+                          : 'shadow-sm hover:shadow-xl hover:border-blue-100 cursor-pointer border-gray-100'
+                      } ${isSpecialBrandCard && !isAnalyzed ? 'ring-2 ring-indigo-500 ring-offset-2' : ''}`}
+                    >
+                      {card.badge && (
+                        <div className="absolute top-4 right-4 px-2 py-1 bg-orange-500 text-white text-[10px] font-bold rounded flex items-center gap-1">
+                          <Zap size={10} fill="currentColor" />
+                          {card.badge}
+                        </div>
+                      )}
+
+                      <div className={`w-12 h-12 ${card.iconBg} rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
+                        {card.icon}
+                      </div>
+
+                      <h3 className="text-lg font-bold text-gray-900 mb-2">{card.title}</h3>
+                      <p className="text-gray-500 text-sm leading-relaxed mb-6 line-clamp-2">
+                        {card.desc}
+                      </p>
+
+                      <div className="flex flex-wrap gap-2 pt-4 border-t border-gray-50">
+                        {card.tags.map((tag, tIdx) => (
+                          <span 
+                            key={tIdx} 
+                            className="px-3 py-1 bg-gray-50 text-gray-500 text-xs rounded-full group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors duration-300"
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+
+                      {/* Analyzing state overlay for Market Research */}
+                      {isMarketResearch && isMarketAnalyzing && (
+                        <div className="absolute inset-0 bg-white/80 rounded-2xl z-10 flex flex-col items-center justify-center animate-in fade-in duration-300">
+                          <RefreshCcw className="text-blue-500 animate-spin mb-2" size={24} />
+                          <span className="text-xs font-black text-blue-600 tracking-tighter">正在分析中...</span>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Brand Creation Modal */}
+      {isUpdateModalOpen && (
+        <div 
+          className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[40] flex items-center justify-center animate-in fade-in duration-300 pointer-events-auto"
+        >
+          <div className="bg-white rounded-[32px] overflow-hidden shadow-2xl w-full max-w-[500px] flex flex-col animate-in zoom-in-95 duration-300 mx-6">
+            <div className="p-8 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 bg-indigo-600 text-white rounded-xl shadow-lg shadow-indigo-200">
+                  <Sparkles size={20} />
+                </div>
+                <h4 className="font-bold text-slate-900 text-lg">Create Brand Profile</h4>
+              </div>
+              <button 
+                onClick={() => setIsUpdateModalOpen(false)}
+                className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-400"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            
+            <div className="p-10 space-y-8">
+              <div className="bg-indigo-50/50 p-6 rounded-2xl border border-indigo-100 flex gap-4">
+                <div className="shrink-0 mt-1">
+                  <div className="w-5 h-5 rounded-full bg-indigo-100 flex items-center justify-center">
+                    <span className="text-[10px] font-bold text-indigo-600">i</span>
                   </div>
+                </div>
+                <p className="text-sm font-bold text-indigo-900 leading-relaxed">
+                  AI预计需要2-3分钟后自动完成品牌画像的分析创建
+                </p>
+              </div>
+
+              <div className="space-y-4">
+                <label className="text-[11px] font-black text-slate-400 tracking-widest flex items-center gap-2">
+                  <Globe size={12} />
+                  Brand Url
+                </label>
+                <div className="relative group">
                   <input 
                     type="text" 
                     value={url}
                     onChange={(e) => setUrl(e.target.value)}
-                    placeholder="https://www.your-brand.com"
-                    className="w-full bg-transparent border-none outline-none text-lg font-bold text-slate-700 placeholder:text-slate-300 py-4"
+                    placeholder="e.g. https://www.adsgo.ai"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-6 py-4 text-sm font-bold transition-all text-slate-700 focus:ring-4 focus:ring-indigo-500/5 focus:border-indigo-400 focus:bg-white outline-none"
                   />
                 </div>
+              </div>
+              
+              <div className="flex gap-4 pt-4">
                 <button 
                   onClick={handleStartAnalysis}
                   disabled={!url.trim()}
-                  className={`px-8 py-4 rounded-2xl font-bold text-base flex items-center gap-2 transition-all duration-300 active:scale-95 ${
+                  className={`w-full py-4 rounded-2xl font-bold text-sm transition-all flex items-center justify-center gap-2 hover:translate-y-[-2px] active:translate-y-0 ${
                     url.trim() 
-                      ? 'bg-[#0F172A] text-white hover:bg-slate-800 shadow-xl' 
+                      ? 'bg-indigo-600 text-white shadow-xl shadow-indigo-100 hover:bg-indigo-700' 
                       : 'bg-slate-100 text-slate-400 cursor-not-allowed'
                   }`}
                 >
-                  Start Analysis
-                  <ChevronRight size={18} strokeWidth={3} />
+                  <Check size={18} strokeWidth={3} />
+                  Start update
                 </button>
               </div>
             </div>
           </div>
         </div>
-      </div>
-    );
-  }
+      )}
 
-  return (
-    <div className="min-h-screen bg-gray-50/30 p-8 pt-12 animate-in fade-in duration-500">
-      {/* Header Section */}
-      <div className="flex flex-col items-center mb-16 text-center">
-        <div className="w-16 h-16 bg-amber-50 rounded-2xl flex items-center justify-center mb-6 shadow-sm">
-          <Sparkles className="text-amber-400" size={32} />
-        </div>
-        <h1 className="text-4xl font-bold text-gray-900 mb-2">开始营销分析</h1>
-        <div className="flex items-center gap-3">
-          <p className="text-gray-400 font-medium">当前品牌: <span className="text-slate-900 font-bold">{selectedBrand}</span></p>
-          <button 
-            onClick={() => navigate('/brandCenter/brandProfile')}
-            className="px-3 py-1 bg-white border border-slate-200 rounded-lg text-[11px] font-bold text-slate-600 hover:border-blue-200 hover:text-blue-600 hover:bg-blue-50 transition-all shadow-sm flex items-center gap-1.5"
-          >
-            查看当前品牌画像
-            <ChevronRight size={12} />
-          </button>
-        </div>
-        <p className="text-gray-500 mt-2">选择功能快速开始，或直接输入问题</p>
-      </div>
-
-      {/* Main Content Sections */}
-      <div className="max-w-[1400px] mx-auto space-y-16">
-        {stages.map((stage) => (
-          <div key={stage.id} className="space-y-6">
-            {/* Stage Title */}
-            <div className="flex items-center gap-4">
-              <div className="w-8 h-8 bg-amber-100/50 text-amber-600 rounded-lg flex items-center justify-center font-bold text-sm border border-amber-200/50">
-                {stage.id}
+      {/* Market Research Confirmation Modal */}
+      {isMarketModalOpen && (
+        <div 
+          className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[40] flex items-center justify-center animate-in fade-in duration-300 pointer-events-auto"
+        >
+          <div className="bg-white rounded-[32px] overflow-hidden shadow-2xl w-full max-w-[440px] flex flex-col animate-in zoom-in-95 duration-300 mx-6">
+            <div className="p-10 flex flex-col items-center text-center">
+              <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mb-6 shadow-sm">
+                <BarChart3 size={32} />
               </div>
-              <h2 className="text-lg font-bold text-gray-900">{stage.title}</h2>
-              <span className="text-gray-400 text-sm">{stage.subtitle}</span>
-            </div>
-
-            {/* Cards Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {stage.cards.map((card, idx) => (
-                <div 
-                  key={idx} 
-                  className="group relative bg-white rounded-2xl p-6 border border-gray-100 shadow-sm hover:shadow-xl hover:border-blue-100 transition-all duration-300 cursor-pointer"
+              <h4 className="text-xl font-black text-slate-900 mb-4">市场调研报告</h4>
+              <p className="text-sm text-slate-500 font-medium leading-relaxed mb-8">
+                整合 World Bank、Google Trends、YouTube、Reddit 等平台数据，生成包含市场规模、增长趋势、区域分析、竞争格局、消费者触媒习惯的完整市场报告
+              </p>
+              
+              <div className="w-full bg-slate-50 rounded-2xl p-4 flex items-center justify-between mb-8">
+                <div className="flex items-center gap-2 text-slate-600 font-bold text-xs">
+                  <Building2 size={14} className="text-slate-400" />
+                  Adsgo
+                </div>
+                <div className="flex items-center gap-2 text-slate-400 font-bold text-xs">
+                  <Clock size={14} />
+                  2-5 分钟
+                </div>
+              </div>
+              
+              <div className="flex gap-4 w-full">
+                <button 
+                  onClick={() => setIsMarketModalOpen(false)}
+                  className="flex-1 py-4 bg-white border border-slate-200 text-slate-600 rounded-2xl font-bold text-sm hover:bg-slate-50 transition-all active:scale-95"
                 >
-                  {/* Badge */}
-                  {card.badge && (
-                    <div className="absolute top-4 right-4 px-2 py-1 bg-orange-500 text-white text-[10px] font-bold rounded flex items-center gap-1">
-                      <Zap size={10} fill="currentColor" />
-                      {card.badge}
+                  取消
+                </button>
+                <button 
+                  onClick={handleStartMarketGeneration}
+                  className="flex-1 py-4 bg-blue-600 text-white rounded-2xl font-black text-sm hover:bg-blue-700 shadow-xl shadow-blue-100 transition-all active:scale-95"
+                >
+                  开始生成
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* History Reports Modal */}
+      {isHistoryModalOpen && (
+        <div 
+          className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[40] flex items-center justify-center animate-in fade-in duration-300 pointer-events-auto"
+        >
+          <div className="bg-white rounded-[32px] overflow-hidden shadow-2xl w-full max-w-[900px] flex flex-col animate-in zoom-in-95 duration-300 mx-6">
+            <div className="p-8 border-b border-slate-100 flex items-center justify-between bg-white">
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 bg-indigo-600 text-white rounded-xl shadow-lg shadow-indigo-200">
+                  <History size={20} />
+                </div>
+                <h4 className="font-bold text-slate-900 text-lg">历史报告记录</h4>
+              </div>
+              
+              <div className="flex items-center gap-4">
+                <div className="relative">
+                  <button 
+                    onClick={() => setIsCategoryDropdownOpen(!isCategoryDropdownOpen)}
+                    className={`flex items-center gap-2 px-4 py-2 border rounded-xl text-xs font-bold transition-all ${isCategoryDropdownOpen ? 'bg-white border-indigo-500 text-indigo-600 shadow-lg shadow-indigo-500/10' : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-white hover:border-indigo-200'}`}
+                  >
+                    <Filter size={14} className={isCategoryDropdownOpen ? 'text-indigo-500' : 'text-slate-400'} />
+                    <span>{selectedCategory}</span>
+                    <ChevronDown size={14} className={`transition-transform duration-200 ${isCategoryDropdownOpen ? 'rotate-180 text-indigo-500' : 'text-slate-400'}`} />
+                  </button>
+                  
+                  {isCategoryDropdownOpen && (
+                    <div className="absolute right-0 top-full mt-2 min-w-[160px] bg-white border border-slate-100 rounded-xl shadow-2xl z-50 p-1.5 animate-in fade-in slide-in-from-top-2 duration-200">
+                      {reportCategories.map(cat => (
+                        <button 
+                          key={cat}
+                          onClick={() => {
+                            setSelectedCategory(cat);
+                            setIsCategoryDropdownOpen(false);
+                          }}
+                          className={`w-full text-left px-3 py-2.5 rounded-lg text-[11px] font-bold transition-colors ${selectedCategory === cat ? 'bg-indigo-50 text-indigo-600' : 'text-slate-500 hover:bg-slate-50'}`}
+                        >
+                          {cat}
+                        </button>
+                      ))}
                     </div>
                   )}
+                </div>
 
-                  {/* Icon */}
-                  <div className={`w-12 h-12 ${card.iconBg} rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
-                    {card.icon}
-                  </div>
+                <button 
+                  onClick={() => setIsHistoryModalOpen(false)}
+                  className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-400"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+            </div>
+            
+            <div className="flex-1 overflow-y-auto max-h-[60vh] custom-scrollbar bg-white">
+              <table className="w-full border-collapse">
+                <thead>
+                  <tr className="bg-slate-50/50 border-b border-slate-100">
+                    <th className="px-8 py-4 text-left text-[11px] font-black text-slate-400 tracking-widest w-[150px]">类型</th>
+                    <th className="px-8 py-4 text-left text-[11px] font-black text-slate-400 tracking-widest">标题</th>
+                    <th className="px-8 py-4 text-left text-[11px] font-black text-slate-400 tracking-widest w-[120px]">时间</th>
+                    <th className="px-8 py-4 text-right text-[11px] font-black text-slate-400 tracking-widest w-[120px]">操作</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-50">
+                  {filteredHistory.map((report) => (
+                    <tr key={report.id} className="hover:bg-slate-50/50 transition-colors group">
+                      <td className="px-8 py-5">
+                        <div className={`inline-flex items-center gap-2 px-2.5 py-1 ${report.bg} ${report.color} ${report.border} border rounded-lg text-[11px] font-black whitespace-nowrap`}>
+                          {report.icon}
+                          {report.type}
+                        </div>
+                      </td>
+                      <td className="px-8 py-5">
+                        <span className="text-sm font-bold text-slate-700 leading-relaxed">{report.title}</span>
+                      </td>
+                      <td className="px-8 py-5">
+                        <span className="text-xs font-bold text-slate-400">{report.time}</span>
+                      </td>
+                      <td className="px-8 py-5 text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <button 
+                            onClick={() => setPreviewReport(report)}
+                            className="p-2 text-amber-500 bg-amber-50 hover:bg-amber-100 rounded-lg transition-all border border-amber-100"
+                          >
+                            <Eye size={16} />
+                          </button>
+                          <button className="p-2 text-slate-400 bg-white hover:bg-slate-50 rounded-lg transition-all border border-slate-200">
+                            <Download size={16} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            
+            <div className="p-8 bg-slate-50/50 border-t border-slate-100 flex justify-end">
+            </div>
+          </div>
+        </div>
+      )}
 
-                  {/* Content */}
-                  <h3 className="text-lg font-bold text-gray-900 mb-2">{card.title}</h3>
-                  <p className="text-gray-500 text-sm leading-relaxed mb-6 line-clamp-2">
-                    {card.desc}
-                  </p>
-
-                  {/* Tags */}
-                  <div className="flex flex-wrap gap-2 pt-4 border-t border-gray-50">
-                    {card.tags.map((tag, tIdx) => (
-                      <span 
-                        key={tIdx} 
-                        className="px-3 py-1 bg-gray-50 text-gray-500 text-xs rounded-full group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors duration-300"
-                      >
-                        {tag}
-                      </span>
-                    ))}
+      {/* Report Preview Modal */}
+      {previewReport && (
+        <div 
+          className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[50] flex items-center justify-center animate-in fade-in duration-300 pointer-events-auto"
+        >
+          <div className="bg-white rounded-[40px] overflow-hidden shadow-2xl w-full max-w-[1000px] max-h-[90vh] flex flex-col animate-in zoom-in-95 duration-300 mx-6 border border-white/20">
+            <div className="p-8 border-b border-slate-100 flex items-center justify-between bg-white sticky top-0 z-10">
+              <div className="flex items-center gap-4">
+                <div className={`p-3 ${previewReport.bg} ${previewReport.color} rounded-2xl shadow-sm`}>
+                  {previewReport.icon}
+                </div>
+                <div>
+                  <h4 className="font-black text-slate-900 text-xl tracking-tight">{previewReport.title}</h4>
+                  <div className="flex items-center gap-3 mt-1">
+                    <span className="text-xs font-bold text-slate-400 flex items-center gap-1"><Calendar size={12} /> {previewReport.time}</span>
+                    <span className="text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-lg">{previewReport.type}</span>
                   </div>
                 </div>
-              ))}
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <button 
+                  onClick={() => window.open(previewReport.url || 'https://www.adsgo.ai', '_blank')}
+                  className="p-3 hover:bg-slate-100 rounded-full transition-colors text-slate-400 group relative"
+                >
+                  <ExternalLink size={22} />
+                  <div className="absolute top-full right-0 mt-2 px-2 py-1 bg-slate-900 text-white text-[10px] font-bold rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                    新标签页打开
+                  </div>
+                </button>
+                <button className="p-3 hover:bg-slate-100 rounded-full transition-colors text-slate-400 group relative">
+                  <Download size={24} />
+                  <div className="absolute top-full right-0 mt-2 px-2 py-1 bg-slate-900 text-white text-[10px] font-bold rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                    导出报告
+                  </div>
+                </button>
+                <button 
+                  onClick={() => setPreviewReport(null)}
+                  className="p-3 hover:bg-slate-100 rounded-full transition-colors text-slate-400 group"
+                >
+                  <X size={24} className="group-hover:rotate-90 transition-transform duration-300" />
+                </button>
+              </div>
+            </div>
+            
+            <div className="flex-1 overflow-y-auto p-10 custom-scrollbar space-y-12">
+              <section className="space-y-6">
+                <div className="flex items-center gap-3">
+                  <TrendingUp className="text-indigo-500" size={20} />
+                  <h5 className="font-black text-slate-900 text-lg">分析摘要</h5>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {[
+                    { label: '市场健康度', value: '优秀', color: 'text-green-600', bg: 'bg-green-50' },
+                    { label: '竞争强度', value: '中等', color: 'text-amber-600', bg: 'bg-amber-50' },
+                    { label: '增长潜力', value: '+24%', color: 'text-blue-600', bg: 'bg-blue-50' }
+                  ].map(stat => (
+                    <div key={stat.label} className={`${stat.bg} p-6 rounded-3xl border border-white shadow-sm`}>
+                      <p className="text-xs font-bold text-slate-400 tracking-widest mb-2">{stat.label}</p>
+                      <p className={`text-2xl font-black ${stat.color}`}>{stat.value}</p>
+                    </div>
+                  ))}
+                </div>
+                <p className="text-slate-600 leading-relaxed font-medium bg-slate-50 p-6 rounded-3xl border border-slate-100">
+                  基于对该品牌近期市场表现的深度学习分析，我们发现其在社交媒体渠道的品牌提及率显著提升。竞品对比显示，品牌在“高性价比”和“设计感”两个维度的差异化优势明显，建议在下一阶段投放中加大针对年轻受众的视觉素材投入。
+                </p>
+              </section>
+
+              <section className="space-y-6">
+                <div className="flex items-center gap-3">
+                  <Users className="text-indigo-500" size={20} />
+                  <h5 className="font-black text-slate-900 text-lg">受众画像洞察</h5>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="space-y-4">
+                    <p className="text-sm font-bold text-slate-400">核心受众分布</p>
+                    <div className="space-y-3">
+                      {[
+                        { label: '18-24 岁', percent: 45 },
+                        { label: '25-34 岁', percent: 35 },
+                        { label: '35-44 岁', percent: 15 },
+                        { label: '其他', percent: 5 },
+                      ].map(item => (
+                        <div key={item.label} className="space-y-1.5">
+                          <div className="flex justify-between text-xs font-bold text-slate-600 px-1">
+                            <span>{item.label}</span>
+                            <span>{item.percent}%</span>
+                          </div>
+                          <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                            <div className="h-full bg-indigo-500 rounded-full" style={{ width: `${item.percent}%` }} />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="bg-indigo-50/30 rounded-[32px] p-8 flex flex-col items-center justify-center text-center space-y-4">
+                    <div className="w-16 h-16 bg-white rounded-2xl shadow-xl flex items-center justify-center">
+                      <PieChart className="text-indigo-600" size={32} />
+                    </div>
+                    <p className="text-sm font-bold text-slate-700">受众偏好：视频素材 > 轮播素材 > 单图</p>
+                    <p className="text-[11px] text-slate-400 font-medium leading-relaxed">AI 建议增加 TikTok 短视频风格的素材投放，CTR 预计可提升 30%</p>
+                  </div>
+                </div>
+              </section>
             </div>
           </div>
-        ))}
-      </div>
-      
-      {/* Bottom Padding for floating input */}
-      <div className="h-40" />
-
-      {/* Floating Chat Input */}
-      <div className="fixed bottom-10 left-1/2 -translate-x-1/2 w-full max-w-[1000px] px-6 z-50">
-        <div className="relative group">
-          {/* Main Input Container */}
-          <div className="flex items-center bg-white rounded-[24px] border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.06)] p-2 pr-2 hover:border-blue-200 transition-all duration-300">
-            {/* Sparkle Icon */}
-            <div className="pl-4 pr-3">
-              <Sparkles className="text-amber-500" size={20} />
-            </div>
-
-            {/* Input Field */}
-            <input 
-              type="text" 
-              placeholder="输入你的问题..."
-              className="flex-1 bg-transparent border-none outline-none text-gray-700 placeholder:text-gray-400 text-sm py-3"
-            />
-
-            {/* Send Button */}
-            <button className="w-10 h-10 bg-orange-500 text-white rounded-[16px] flex items-center justify-center shadow-lg hover:bg-orange-600 hover:scale-105 active:scale-95 transition-all duration-200">
-              <ArrowUp size={20} strokeWidth={2.5} />
-            </button>
-          </div>
-          
-          {/* Subtle Glow Effect on Hover */}
-          <div className="absolute -inset-1 bg-gradient-to-r from-blue-500/0 via-blue-500/5 to-purple-500/0 rounded-[32px] opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
         </div>
-      </div>
+      )}
     </div>
   );
 };

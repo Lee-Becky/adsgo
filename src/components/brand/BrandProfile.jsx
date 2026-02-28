@@ -516,7 +516,8 @@ const BrandProfile = () => {
                       <div className="flex-1 flex flex-col items-center justify-center text-center max-w-4xl mx-auto space-y-12 py-10 relative">
                         <div className="absolute -top-40 left-1/2 -translate-x-1/2 w-96 h-96 bg-indigo-500/10 rounded-full blur-[120px]" />
                         
-                        <div className="px-6 py-2.5 bg-indigo-50 text-indigo-600 rounded-full text-xs font-black tracking-[0.3em] border border-indigo-100 shadow-sm">
+                        <div className="px-6 py-2.5 bg-indigo-50 text-indigo-600 rounded-full text-xs font-black tracking-[0.3em] border border-indigo-100 shadow-sm
+                        ">
                           AI-Powered Market Intelligence
                         </div>
                         
@@ -1265,7 +1266,7 @@ const BrandProfile = () => {
                   className="w-full py-4 bg-indigo-600 text-white rounded-2xl font-bold text-sm hover:bg-indigo-700 shadow-xl shadow-indigo-100 transition-all flex items-center justify-center gap-2 hover:translate-y-[-2px] active:translate-y-0"
                 >
                   <Check size={18} strokeWidth={3} />
-                  Start update
+                  Start Analysis
                 </button>
               </div>
             </div>
