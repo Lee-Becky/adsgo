@@ -359,10 +359,11 @@ const BrandProfile = () => {
                       type="text" 
                       value={profile.brand_name} 
                       onChange={(e) => setProfile({...profile, brand_name: e.target.value})}
+                      placeholder="Enter brand name..."
                       className="text-4xl font-black text-slate-900 w-full border-b-2 border-slate-200 focus:border-amber-500 outline-none pb-2 bg-slate-50 px-4 py-2 rounded-xl"
                     />
                   ) : (
-                    <h1 className="text-4xl font-black text-slate-900 tracking-tight">{profile.brand_name}</h1>
+                    <h1 className="text-4xl font-black text-slate-900 tracking-tight">{profile.brand_name || 'Default Brand'}</h1>
                   )}
                   
                   <div className="flex flex-wrap gap-6 items-center">
