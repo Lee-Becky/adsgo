@@ -1,6 +1,22 @@
 import { useState, useEffect, useRef } from 'react'
-import { Globe, DollarSign, CheckCircle2, Search, Plus, X, Zap, Target, Trash2, Copy, LayoutGrid, PlusCircle, Settings2, Info, ArrowRight, MoreVertical, Layers, Sparkles, ChevronRight, ChevronLeft, Monitor } from 'lucide-react'
+import { Globe, DollarSign, CheckCircle2, Search, Plus, X, Zap, Target, Trash2, Copy, LayoutGrid, PlusCircle, Settings2, Info, ArrowRight, MoreVertical, Layers, Sparkles, ChevronRight, ChevronLeft, Monitor, Phone } from 'lucide-react'
 import { campaignObjectives, getAdsetGoals, allEvents } from './ObjectiveSection'
+
+const COUNTRY_CODES = [
+  { code: '+1', country: 'United States', iso: 'us' },
+  { code: '+86', country: 'China', iso: 'cn' },
+  { code: '+44', country: 'United Kingdom', iso: 'uk' },
+  { code: '+49', country: 'Germany', iso: 'de' },
+  { code: '+33', country: 'France', iso: 'fr' },
+  { code: '+81', country: 'Japan', iso: 'jp' },
+  { code: '+82', country: 'South Korea', iso: 'kr' },
+  { code: '+61', country: 'Australia', iso: 'au' },
+  { code: '+65', country: 'Singapore', iso: 'sg' },
+  { code: '+91', country: 'India', iso: 'in' },
+  { code: '+55', country: 'Brazil', iso: 'br' },
+  { code: '+52', country: 'Mexico', iso: 'mx' },
+  { code: '+971', country: 'United Arab Emirates', iso: 'ae' }
+]
 
 const PLATFORMS = [
   { id: 'meta', label: 'Meta', icon: 'https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://meta.com&size=256' },
@@ -8,6 +24,12 @@ const PLATFORMS = [
   { id: 'tiktok', label: 'Tik Tok', icon: 'https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://tiktok.com&size=256' },
   { id: 'bing', label: 'Bing', icon: 'https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://bing.com&size=256' },
   { id: 'applovin', label: 'Applovin', icon: 'https://www.google.com/s2/favicons?domain=applovin.com&sz=128' }
+]
+
+const COLLECTED_INFO_OPTIONS = [
+  { id: 'full_name', label: 'Full name' },
+  { id: 'email', label: 'Email' },
+  { id: 'phone_number', label: 'Phone number' }
 ]
 
 // Component for Input with Dynamic Unit Follow and Validation
@@ -81,6 +103,139 @@ const UnitFollowInput = ({ value, onChange, placeholder, unit, className = '', c
           {unit}
         </span>
       )}
+    </div>
+  )
+}
+
+const CollectedInfoSelector = ({ group, updateGroup }) => {
+  const [isOpen, setIsOpen] = useState(false)
+  const selectedInfo = group.collectedInfo || ['full_name', 'email', 'phone_number']
+
+  const toggleInfo = (id) => {
+    const next = selectedInfo.includes(id)
+      ? selectedInfo.filter(item => item !== id)
+      : [...selectedInfo, id]
+    updateGroup(group.id, { collectedInfo: next })
+  }
+
+  const selectedLabels = selectedInfo.map(id => COLLECTED_INFO_OPTIONS.find(o => o.id === id)?.label).join(', ')
+
+  return (
+    <div className="relative">
+      <div 
+        onClick={() => setIsOpen(!isOpen)}
+        className={`flex items-center justify-between px-4 h-10 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer transition-all hover:bg-white hover:border-indigo-200 ${
+          isOpen ? 'border-indigo-500 bg-white shadow-sm' : ''
+        }`}
+      >
+        <div className="flex flex-col truncate">
+          <span className="text-[11px] font-black text-slate-900 truncate">
+            {selectedInfo.length > 0 ? selectedLabels : 'Select info...'}
+          </span>
+        </div>
+        <ChevronRight size={14} className={`text-slate-300 transition-transform ${isOpen ? 'rotate-90' : ''}`} />
+      </div>
+
+      {isOpen && (
+        <div className="absolute z-[120] mt-1 w-full bg-white border border-slate-100 rounded-xl shadow-xl p-1.5 animate-in fade-in zoom-in-95 duration-200">
+          <div className="grid grid-cols-1 gap-0.5">
+            {COLLECTED_INFO_OPTIONS.map(opt => {
+              const isSelected = selectedInfo.includes(opt.id)
+              return (
+                <button
+                  key={opt.id}
+                  onClick={() => toggleInfo(opt.id)}
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-lg transition-all ${
+                    isSelected ? 'bg-indigo-50 text-indigo-600' : 'hover:bg-slate-50 text-slate-600'
+                  }`}
+                >
+                  <span className="text-[10px] font-bold">{opt.label}</span>
+                  {isSelected && <CheckCircle2 size={14} />}
+                </button>
+              )
+            })}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+const PhoneNumberInput = ({ group, updateGroup }) => {
+  const [isOpen, setIsOpen] = useState(false)
+  const [search, setSearch] = useState('')
+  const dropdownRef = useRef(null)
+
+  const selectedCode = group.phoneCountryCode || '+1'
+  const filteredCodes = COUNTRY_CODES.filter(c => 
+    c.country.toLowerCase().includes(search.toLowerCase()) || 
+    c.code.includes(search)
+  )
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  return (
+    <div className="flex gap-2 animate-in slide-in-from-top-2 duration-300">
+      <div className="relative w-[84px] shrink-0" ref={dropdownRef}>
+        <div 
+          onClick={() => setIsOpen(!isOpen)}
+          className="h-10 px-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between cursor-pointer hover:bg-white hover:border-indigo-200 transition-all"
+        >
+          <span className="text-xs font-black text-slate-900">{selectedCode}</span>
+          <ChevronRight size={14} className={`text-slate-300 transition-transform ${isOpen ? 'rotate-90' : ''}`} />
+        </div>
+
+        {isOpen && (
+          <div className="absolute z-[130] mt-1 w-48 bg-white border border-slate-100 rounded-xl shadow-xl p-2 animate-in fade-in zoom-in-95 duration-200">
+            <div className="relative mb-2">
+              <Search size={12} className="absolute left-2 top-1/2 -translate-y-1/2 text-slate-300" />
+              <input 
+                className="w-full pl-7 pr-2 py-1.5 bg-slate-50 border-none rounded-lg text-[10px] font-bold focus:ring-1 focus:ring-indigo-500/20"
+                placeholder="Search..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                autoFocus
+              />
+            </div>
+            <div className="max-h-40 overflow-y-auto custom-scrollbar">
+              {filteredCodes.map(c => (
+                <button
+                  key={c.iso}
+                  onClick={() => {
+                    updateGroup(group.id, { phoneCountryCode: c.code })
+                    setIsOpen(false)
+                  }}
+                  className={`w-full text-left px-2 py-1.5 rounded-lg text-[10px] font-bold flex items-center justify-between transition-colors ${
+                    selectedCode === c.code ? 'bg-indigo-50 text-indigo-600' : 'hover:bg-slate-50 text-slate-600'
+                  }`}
+                >
+                  <span className="truncate mr-2">{c.country}</span>
+                  <span className="text-slate-400 font-medium">{c.code}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div className="flex-1 relative">
+        <Phone size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-300" />
+        <input 
+          type="tel"
+          placeholder="Phone number"
+          value={group.phoneNumber || ''}
+          onChange={(e) => updateGroup(group.id, { phoneNumber: e.target.value })}
+          className="w-full h-10 pl-9 pr-4 bg-slate-50 border border-slate-200 rounded-xl text-xs font-black text-slate-900 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none"
+        />
+      </div>
     </div>
   )
 }
@@ -183,10 +338,17 @@ const ObjectiveSelector = ({ group, updateGroup }) => {
   }
 
   const handleGoalSelect = (goal) => {
-    updateGroup(group.id, {
+    const updates = {
       adsetGoal: goal.value,
       event: goal.needsEvent ? (group.event || 'Purchase') : ''
-    })
+    }
+    
+    if (goal.value === 'instant_form_leads') {
+      updates.collectedInfo = ['full_name', 'email', 'phone_number']
+    }
+    
+    updateGroup(group.id, updates)
+    
     if (goal.needsEvent) {
       setStage('event')
     } else {
@@ -370,6 +532,9 @@ const BudgetKPISection = ({ formData, updateFormData, updateFormDataDeep, valida
       campaignObjective: 'sales_conversions',
       adsetGoal: 'in_web_actions',
       event: 'Purchase',
+      phoneNumber: '',
+      phoneCountryCode: '+1',
+      collectedInfo: ['full_name', 'email', 'phone_number'],
       budgetMode: 'unified',
       unifiedBudget: '',
       splitBudgets: {},
@@ -449,7 +614,10 @@ const BudgetKPISection = ({ formData, updateFormData, updateFormDataDeep, valida
       const currentGoal = adsetGoals.find(g => g.value === group.adsetGoal)
       const objectiveValid = !!(group.campaignObjective && group.adsetGoal && (!currentGoal?.needsEvent || group.event))
       
-      return locValid && platformsValid && budgetValid && objectiveValid
+      const phoneValid = (group.adsetGoal === 'calls' || group.adsetGoal === 'instant_form_leads') ? !!group.phoneNumber : true
+      const infoValid = group.adsetGoal === 'instant_form_leads' ? (group.collectedInfo || []).length > 0 : true
+      
+      return locValid && platformsValid && budgetValid && objectiveValid && phoneValid && infoValid
     })
     setValidation(prev => ({ ...prev, marketGroups: allGroupsValid }))
   }, [formData.marketGroups, setValidation])
@@ -612,6 +780,31 @@ const BudgetKPISection = ({ formData, updateFormData, updateFormDataDeep, valida
                     </div>
                   </div>
 
+                  {/* Dynamic Fields Row: Phone for Calls, or Collected Info + Phone for Lead Form */}
+                  {(group.adsetGoal === 'calls' || group.adsetGoal === 'instant_form_leads') && (
+                    <div className="p-4 bg-slate-50/80 rounded-[20px] border border-slate-100 animate-in fade-in slide-in-from-top-2 duration-500">
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        {group.adsetGoal === 'calls' ? (
+                          <div className="space-y-2">
+                            <span className="text-[10px] font-black text-slate-400 tracking-widest px-1">Contact Phone <span className="text-rose-500">*</span></span>
+                            <PhoneNumberInput group={group} updateGroup={updateGroup} />
+                          </div>
+                        ) : (
+                          <>
+                            <div className="space-y-2">
+                              <span className="text-[10px] font-black text-slate-400 tracking-widest px-1">Collected Info <span className="text-rose-500">*</span></span>
+                              <CollectedInfoSelector group={group} updateGroup={updateGroup} />
+                            </div>
+                            <div className="space-y-2">
+                              <span className="text-[10px] font-black text-slate-400 tracking-widest px-1">Contact Phone <span className="text-rose-500">*</span></span>
+                              <PhoneNumberInput group={group} updateGroup={updateGroup} />
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
                   {/* Row for Budget and KPI */}
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     {/* Daily Budget Section */}
@@ -714,7 +907,7 @@ const BudgetKPISection = ({ formData, updateFormData, updateFormDataDeep, valida
                                 containerClassName="flex-1"
                                 className="w-full py-2 bg-transparent border-none text-sm font-bold focus:outline-none"
                               />
-                              <button onClick={() => applyBatchKPI(group.id)} className="px-3 h-8 border-2 border-indigo-600 text-indigo-600 rounded-lg text-[10px] font-black hover:bg-indigo-50 transition-all">
+                              <button onClick={() => applyBatchKPI(group.id)} className="px-3 h-8 border-2 border-indigo-600 text-indigo-600 rounded-lg text-[11px] font-black hover:bg-indigo-50 transition-all">
                                 Apply
                               </button>
                             </div>
