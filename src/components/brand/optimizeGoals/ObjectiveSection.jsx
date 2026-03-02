@@ -1,54 +1,54 @@
 import { useState, useEffect } from 'react'
 import { Target, Sparkles, CheckCircle2, ChevronRight, Layout, Users, MousePointer2, Megaphone, Smartphone, ShoppingBag, Search, X, Flag, Layers, ChevronLeft, ArrowRight } from 'lucide-react'
 
+export const campaignObjectives = [
+  { value: 'awareness_engagement', label: 'Awareness & Engagement', icon: Megaphone, color: 'text-rose-500', bg: 'bg-rose-50', description: 'Reach more people' },
+  { value: 'traffic', label: 'Traffic', icon: MousePointer2, color: 'text-blue-500', bg: 'bg-blue-50', description: 'Drive site visits' },
+  { value: 'leads', label: 'Leads', icon: Users, color: 'text-amber-500', bg: 'bg-amber-50', description: 'Find prospects' },
+  { value: 'sales_conversions', label: 'Sales & Conversions', icon: ShoppingBag, color: 'text-emerald-500', bg: 'bg-emerald-50', description: 'Drive transactions' },
+  { value: 'app_promotion', label: 'App Promotion', icon: Smartphone, color: 'text-indigo-500', bg: 'bg-indigo-50', description: 'Install & usage' }
+]
+
+export const getAdsetGoals = (objective) => {
+  const mapping = {
+    awareness_engagement: [
+      { value: 'impressions', label: 'Impressions' },
+      { value: 'post_engagement', label: 'Post engagement' },
+      { value: 'conversations', label: 'Conversations' }
+    ],
+    traffic: [
+      { value: 'impressions', label: 'Impressions' },
+      { value: 'link_clicks', label: 'Link clicks' },
+      { value: 'page_views', label: 'Page views' }
+    ],
+    leads: [
+      { value: 'leads_landing_page', label: 'Leads within landing-page', needsEvent: true },
+      { value: 'instant_form_leads', label: 'Instant form leads' },
+      { value: 'whatsapp', label: 'WhatsApp' },
+      { value: 'calls', label: 'Calls' }
+    ],
+    sales_conversions: [
+      { value: 'in_web_actions', label: 'In-web actions', needsEvent: true }
+    ],
+    app_promotion: [
+      { value: 'installs', label: 'Installs' },
+      { value: 'in_app_actions', label: 'In-app actions', needsEvent: true }
+    ]
+  }
+  return mapping[objective] || []
+}
+
+export const allEvents = [
+  'Purchase', 'AddToCart', 'InitiateCheckout', 'Lead', 
+  'CompleteRegistration', 'SubmitApplication', 'Contact', 
+  'Search', 'ViewContent', 'Subscribe', 'CustomizeProduct',
+  'Donate', 'FindLocation', 'Schedule', 'StartTrial'
+]
+
 const ObjectiveSection = ({ formData, updateFormData, validation, setValidation }) => {
   const [isEventSelectOpen, setIsEventSelectOpen] = useState(false)
   const [eventSearch, setEventSearch] = useState('')
   const [selectorStage, setSelectorStage] = useState('goal') // 'goal' or 'event'
-
-  const campaignObjectives = [
-    { value: 'awareness_engagement', label: 'Awareness & Engagement', icon: Megaphone, color: 'text-rose-500', bg: 'bg-rose-50', description: 'Reach more people' },
-    { value: 'traffic', label: 'Traffic', icon: MousePointer2, color: 'text-blue-500', bg: 'bg-blue-50', description: 'Drive site visits' },
-    { value: 'leads', label: 'Leads', icon: Users, color: 'text-amber-500', bg: 'bg-amber-50', description: 'Find prospects' },
-    { value: 'sales_conversions', label: 'Sales & Conversions', icon: ShoppingBag, color: 'text-emerald-500', bg: 'bg-emerald-50', description: 'Drive transactions' },
-    { value: 'app_promotion', label: 'App Promotion', icon: Smartphone, color: 'text-indigo-500', bg: 'bg-indigo-50', description: 'Install & usage' }
-  ]
-
-  const getAdsetGoals = (objective) => {
-    const mapping = {
-      awareness_engagement: [
-        { value: 'impressions', label: 'Impressions' },
-        { value: 'post_engagement', label: 'Post engagement' },
-        { value: 'conversations', label: 'Conversations' }
-      ],
-      traffic: [
-        { value: 'impressions', label: 'Impressions' },
-        { value: 'link_clicks', label: 'Link clicks' },
-        { value: 'page_views', label: 'Page views' }
-      ],
-      leads: [
-        { value: 'leads_landing_page', label: 'Leads within landing-page', needsEvent: true },
-        { value: 'instant_form_leads', label: 'Instant form leads' },
-        { value: 'whatsapp', label: 'WhatsApp' },
-        { value: 'calls', label: 'Calls' }
-      ],
-      sales_conversions: [
-        { value: 'in_web_actions', label: 'In-web actions', needsEvent: true }
-      ],
-      app_promotion: [
-        { value: 'installs', label: 'Installs' },
-        { value: 'in_app_actions', label: 'In-app actions', needsEvent: true }
-      ]
-    }
-    return mapping[objective] || []
-  }
-
-  const allEvents = [
-    'Purchase', 'AddToCart', 'InitiateCheckout', 'Lead', 
-    'CompleteRegistration', 'SubmitApplication', 'Contact', 
-    'Search', 'ViewContent', 'Subscribe', 'CustomizeProduct',
-    'Donate', 'FindLocation', 'Schedule', 'StartTrial'
-  ]
 
   const filteredEvents = allEvents.filter(ev => ev.toLowerCase().includes(eventSearch.toLowerCase()))
 

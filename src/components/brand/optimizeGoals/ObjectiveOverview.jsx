@@ -1,5 +1,5 @@
 import React from 'react'
-import { Globe, Monitor, Target, DollarSign, BarChart3, ChevronRight } from 'lucide-react'
+import { Globe, Monitor, Target, DollarSign, ChevronRight } from 'lucide-react'
 
 const MetricCard = ({ icon: Icon, label, value, subValue, colorClass, bgClass }) => (
   <div className="flex-1 min-w-[180px] p-5 rounded-[24px] bg-white border border-slate-100 shadow-sm hover:shadow-md transition-all group">
@@ -10,14 +10,16 @@ const MetricCard = ({ icon: Icon, label, value, subValue, colorClass, bgClass })
       <span className="text-[11px] font-black text-slate-400 tracking-wider">{label}</span>
     </div>
     <div className="space-y-1">
-      <div className="text-lg font-black text-slate-900 truncate">{value || 'Not set'}</div>
+      <div className="text-lg font-black text-slate-900 truncate">
+        {typeof value === 'string' || typeof value === 'number' ? (value || 'Not set') : value}
+      </div>
       {subValue && <div className="text-[10px] font-bold text-slate-400 truncate">{subValue}</div>}
     </div>
   </div>
 )
 
 const ObjectiveOverview = ({ formData }) => {
-  // Calculate unique locations
+  // Aggregate Locations
   const allLocations = formData.marketGroups.flatMap(g => g.targetLocations.map(l => l.label || l))
   const uniqueLocations = [...new Set(allLocations)]
   const locationText = uniqueLocations.length > 0 
@@ -25,6 +27,24 @@ const ObjectiveOverview = ({ formData }) => {
         ? `${uniqueLocations[0]}, ${uniqueLocations[1]} +${uniqueLocations.length - 2}`
         : uniqueLocations.join(', '))
     : 'No locations'
+
+  // Aggregate Platforms
+  const platformIcons = {
+    'meta': 'https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://meta.com&size=256',
+    'google': 'https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://google.com&size=256',
+    'tiktok': 'https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://tiktok.com&size=256',
+    'bing': 'https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://bing.com&size=256',
+    'applovin': 'https://www.google.com/s2/favicons?domain=applovin.com&sz=128'
+  }
+  const allPlatforms = formData.marketGroups.flatMap(g => g.platforms || [])
+  const uniquePlatforms = [...new Set(allPlatforms)]
+
+  // Aggregate Conversion Events
+  const allEvents = formData.marketGroups.map(g => g.event || g.adsetGoal).filter(Boolean)
+  const uniqueEvents = [...new Set(allEvents)]
+  const eventText = uniqueEvents.length > 0
+    ? (uniqueEvents.length > 1 ? `${uniqueEvents[0]} +${uniqueEvents.length - 1}` : uniqueEvents[0])
+    : 'No events'
 
   // Calculate total budget
   const totalDailyBudget = formData.marketGroups.reduce((acc, group) => {
@@ -36,18 +56,8 @@ const ObjectiveOverview = ({ formData }) => {
     }
   }, 0)
 
-  // Platforms (Mocking for now as it's not in formData yet, or use connected status)
-  const platforms = [
-    { id: 'meta', icon: 'https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://meta.com&size=256' },
-    { id: 'google', icon: 'https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://google.com&size=256' }
-  ]
-
-  // KPI Info
-  const kpiType = formData.marketGroups[0]?.kpiType || 'ROAS'
-  const kpiValue = formData.marketGroups[0]?.unifiedKPI || 'Not set'
-  const kpiText = kpiValue !== 'Not set' ? `${kpiValue}${kpiType === 'ROAS' ? 'x' : '$'}` : 'Not set'
-
-  // Objective Label
+  // Objective Summary (based on first group or general)
+  const firstGroup = formData.marketGroups[0] || {}
   const objectiveLabels = {
     'awareness_engagement': 'Awareness',
     'traffic': 'Traffic',
@@ -55,7 +65,7 @@ const ObjectiveOverview = ({ formData }) => {
     'sales_conversions': 'Sales',
     'app_promotion': 'App Promo'
   }
-  const objectiveLabel = objectiveLabels[formData.campaignObjective] || formData.campaignObjective || 'Objective'
+  const objectiveLabel = objectiveLabels[firstGroup.campaignObjective] || firstGroup.campaignObjective || 'Strategy'
 
   return (
     <div className="bg-slate-900 rounded-[40px] p-10 text-white relative overflow-hidden shadow-2xl shadow-indigo-900/20 group/container">
@@ -69,19 +79,12 @@ const ObjectiveOverview = ({ formData }) => {
           <div className="flex items-center gap-3">
             <div className="px-3 py-1 bg-indigo-500 rounded-full text-[10px] font-black tracking-[0.2em]">Strategy Overview</div>
             <div className="w-1 h-1 rounded-full bg-slate-700" />
-            <span className="text-slate-400 text-xs font-bold">{formData.campaignObjective ? '' : 'Drafting goal'}</span>
+            <span className="text-slate-400 text-xs font-bold">{formData.marketGroups.length} Strategy Groups</span>
           </div>
-          <h1 className="text-3xl font-black tracking-tight flex items-center gap-3">
-            {objectiveLabel} Strategy
-            <ChevronRight className="text-slate-700" size={28} />
-          </h1>
-        </div>
-
-        <div className="flex items-center gap-6 bg-slate-800/50 backdrop-blur-md p-4 rounded-[24px] border border-white/5">
         </div>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <MetricCard 
           icon={Globe}
           label="Target locations"
@@ -96,13 +99,13 @@ const ObjectiveOverview = ({ formData }) => {
           label="Ad Platforms"
           value={
             <div className="flex items-center gap-2">
-              {platforms.map(p => (
-                <img key={p.id} src={p.icon} className="w-5 h-5 rounded-md" alt={p.id} />
+              {uniquePlatforms.map(id => (
+                <img key={id} src={platformIcons[id]} className="w-5 h-5 rounded-md border border-white/10" alt={id} />
               ))}
-              <span className="text-xs ml-1 text-slate-400">+{platforms.length}</span>
+              {uniquePlatforms.length === 0 && <span className="text-xs text-slate-400">None</span>}
             </div>
           }
-          subValue="Cross-channel reach"
+          subValue={`${uniquePlatforms.length} ad platforms`}
           bgClass="bg-indigo-50"
           colorClass="text-indigo-600"
         />
@@ -110,8 +113,8 @@ const ObjectiveOverview = ({ formData }) => {
         <MetricCard 
           icon={Target}
           label="Conversion Events"
-          value={formData.event || formData.adsetGoal || 'Purchase'}
-          subValue={formData.adsetGoal ? `Goal: ${formData.adsetGoal}` : 'Primary event'}
+          value={uniqueEvents.length > 0 ? `${uniqueEvents.length} events` : 'Not set'}
+          subValue={eventText}
           bgClass="bg-rose-50"
           colorClass="text-rose-600"
         />
@@ -120,18 +123,9 @@ const ObjectiveOverview = ({ formData }) => {
           icon={DollarSign}
           label="Total Daily Budget"
           value={`$${totalDailyBudget.toLocaleString()}`}
-          subValue="Allocated across groups"
+          subValue="Sum of all groups"
           bgClass="bg-emerald-50"
           colorClass="text-emerald-600"
-        />
-
-        <MetricCard 
-          icon={BarChart3}
-          label="Target KPI"
-          value={kpiText}
-          subValue={`Min. target ${kpiType}`}
-          bgClass="bg-amber-50"
-          colorClass="text-amber-600"
         />
       </div>
     </div>

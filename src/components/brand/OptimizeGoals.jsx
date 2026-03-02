@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { Save } from 'lucide-react'
 import { 
-  ObjectiveSection, 
   BudgetKPISection, 
   AssetSection, 
   RulesLibrarySection,
@@ -10,9 +9,6 @@ import {
 
 const OptimizeGoals = () => {
   const [formData, setFormData] = useState({
-    campaignObjective: 'sales_conversions',
-    adsetGoal: 'in_web_actions',
-    event: 'Purchase',
     marketGroups: [
       {
         id: crypto.randomUUID(),
@@ -20,6 +16,10 @@ const OptimizeGoals = () => {
           { value: 'us', label: 'United States' },
           { value: 'uk', label: 'United Kingdom' }
         ],
+        platforms: ['meta', 'google'],
+        campaignObjective: 'sales_conversions',
+        adsetGoal: 'in_web_actions',
+        event: 'Purchase',
         budgetMode: 'unified',
         unifiedBudget: '500',
         splitBudgets: {},
@@ -35,7 +35,6 @@ const OptimizeGoals = () => {
   })
 
   const [validation, setValidation] = useState({
-    objective: false,
     marketGroups: false,
     assets: false
   })
@@ -70,16 +69,6 @@ const OptimizeGoals = () => {
         <div className="space-y-10">
           
           <ObjectiveOverview formData={formData} />
-
-          {/* Section 1: Objective */}
-          <div className="bg-white rounded-[32px] border border-slate-200 shadow-[0_4px_24px_rgba(0,0,0,0.04)] relative z-20">
-            <ObjectiveSection 
-              formData={formData}
-              updateFormData={updateFormData}
-              validation={validation}
-              setValidation={setValidation}
-            />
-          </div>
 
           {/* Section 2: Market Strategy Groups (Directly listed without heavy container) */}
           <BudgetKPISection 

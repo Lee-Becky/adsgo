@@ -1,5 +1,14 @@
 import { useState, useEffect, useRef } from 'react'
-import { Globe, DollarSign, CheckCircle2, Search, Plus, X, Zap, Target, Trash2, Copy, LayoutGrid, PlusCircle, Settings2, Info, ArrowRight, MoreVertical, Layers } from 'lucide-react'
+import { Globe, DollarSign, CheckCircle2, Search, Plus, X, Zap, Target, Trash2, Copy, LayoutGrid, PlusCircle, Settings2, Info, ArrowRight, MoreVertical, Layers, Sparkles, ChevronRight, ChevronLeft, Monitor } from 'lucide-react'
+import { campaignObjectives, getAdsetGoals, allEvents } from './ObjectiveSection'
+
+const PLATFORMS = [
+  { id: 'meta', label: 'Meta', icon: 'https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://meta.com&size=256' },
+  { id: 'google', label: 'Google', icon: 'https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://google.com&size=256' },
+  { id: 'tiktok', label: 'Tik Tok', icon: 'https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://tiktok.com&size=256' },
+  { id: 'bing', label: 'Bing', icon: 'https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://bing.com&size=256' },
+  { id: 'applovin', label: 'Applovin', icon: 'https://www.google.com/s2/favicons?domain=applovin.com&sz=128' }
+]
 
 // Component for Input with Dynamic Unit Follow and Validation
 const UnitFollowInput = ({ value, onChange, placeholder, unit, className = '', containerClassName = '', align = 'left' }) => {
@@ -76,6 +85,247 @@ const UnitFollowInput = ({ value, onChange, placeholder, unit, className = '', c
   )
 }
 
+const PlatformSelector = ({ group, updateGroup }) => {
+  const [isOpen, setIsOpen] = useState(false)
+  const selectedPlatforms = group.platforms || []
+
+  const togglePlatform = (id) => {
+    const next = selectedPlatforms.includes(id)
+      ? selectedPlatforms.filter(p => p !== id)
+      : [...selectedPlatforms, id]
+    updateGroup(group.id, { platforms: next })
+  }
+
+  return (
+    <div className="relative">
+      <div 
+        onClick={() => setIsOpen(!isOpen)}
+        className={`flex items-center justify-between px-6 py-3.5 bg-slate-50 border-2 rounded-2xl cursor-pointer transition-all ${
+          isOpen ? 'border-indigo-500 bg-white shadow-lg' : 'border-slate-100 hover:border-indigo-100 hover:bg-white'
+        }`}
+      >
+        <div className="flex items-center gap-3">
+          <div className="flex flex-col">
+            <div className="flex items-center gap-2">
+              {selectedPlatforms.length > 0 ? (
+                <div className="flex -space-x-1.5">
+                  {selectedPlatforms.map(id => {
+                    const p = PLATFORMS.find(item => item.id === id)
+                    return (
+                      <div key={id} className="w-5 h-5 rounded-full border border-white overflow-hidden bg-white shadow-sm">
+                        <img src={p?.icon} alt={id} className="w-full h-full object-cover" />
+                      </div>
+                    )
+                  })}
+                </div>
+              ) : (
+                <span className="text-[13px] font-black text-slate-900">Choose Ad Platforms</span>
+              )}
+            </div>
+            {selectedPlatforms.length > 0 && (
+              <span className="text-[10px] font-bold text-slate-400 mt-0.5">
+                {selectedPlatforms.length} Platforms selected
+              </span>
+            )}
+          </div>
+        </div>
+        <ChevronRight size={16} className={`text-slate-300 transition-transform duration-300 ${isOpen ? 'rotate-90 text-indigo-500' : ''}`} />
+      </div>
+
+      {isOpen && (
+        <div className="absolute z-[120] mt-2 w-full bg-white border border-slate-100 rounded-[24px] shadow-[0_20px_50px_rgba(0,0,0,0.15)] p-2 animate-in fade-in zoom-in-95 duration-200">
+          <div className="grid grid-cols-1 gap-1">
+            {PLATFORMS.map(p => {
+              const isSelected = selectedPlatforms.includes(p.id)
+              return (
+                <button
+                  key={p.id}
+                  onClick={() => togglePlatform(p.id)}
+                  className={`w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all ${
+                    isSelected ? 'bg-indigo-50 text-indigo-600' : 'hover:bg-slate-50 text-slate-600'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-6 h-6 rounded-lg overflow-hidden bg-white shadow-sm border border-slate-100 p-0.5">
+                      <img src={p.icon} alt={p.id} className="w-full h-full object-contain" />
+                    </div>
+                    <span className="text-xs font-bold">{p.label}</span>
+                  </div>
+                  {isSelected && <CheckCircle2 size={16} />}
+                </button>
+              )
+            })}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+const ObjectiveSelector = ({ group, updateGroup }) => {
+  const [isOpen, setIsOpen] = useState(false)
+  const [stage, setStage] = useState('objective') // 'objective', 'goal', 'event'
+  const [eventSearch, setEventSearch] = useState('')
+
+  const adsetGoals = getAdsetGoals(group.campaignObjective)
+  const currentObjective = campaignObjectives.find(o => o.value === group.campaignObjective)
+  const currentGoal = adsetGoals.find(g => g.value === group.adsetGoal)
+  const filteredEvents = allEvents.filter(ev => ev.toLowerCase().includes(eventSearch.toLowerCase()))
+
+  const handleObjectiveSelect = (obj) => {
+    const goals = getAdsetGoals(obj.value)
+    updateGroup(group.id, {
+      campaignObjective: obj.value,
+      adsetGoal: goals[0]?.value || '',
+      event: goals[0]?.needsEvent ? 'Purchase' : ''
+    })
+    setStage('goal')
+  }
+
+  const handleGoalSelect = (goal) => {
+    updateGroup(group.id, {
+      adsetGoal: goal.value,
+      event: goal.needsEvent ? (group.event || 'Purchase') : ''
+    })
+    if (goal.needsEvent) {
+      setStage('event')
+    } else {
+      setIsOpen(false)
+    }
+  }
+
+  const handleEventSelect = (ev) => {
+    updateGroup(group.id, { event: ev })
+    setIsOpen(false)
+  }
+
+  return (
+    <div className="relative">
+      <div 
+        onClick={() => {
+          setIsOpen(!isOpen)
+          setStage('objective')
+        }}
+        className={`flex items-center justify-between px-6 py-3.5 bg-slate-50 border-2 rounded-2xl cursor-pointer transition-all ${
+          isOpen ? 'border-indigo-500 bg-white shadow-lg' : 'border-slate-100 hover:border-indigo-100 hover:bg-white'
+        }`}
+      >
+        <div className="flex items-center gap-3">
+          <div className="flex flex-col">
+            <span className="text-[13px] font-black text-slate-900">
+              {group.event || currentGoal?.label || 'Select Objective'}
+            </span>
+            <div className="flex items-center gap-1.5 mt-0.5">
+              {group.event ? (
+                <>
+                  <span className="text-[10px] font-bold text-slate-400">
+                    {currentObjective?.label}
+                  </span>
+                  <ChevronRight size={8} className="text-slate-300" />
+                  <span className="text-[10px] font-bold text-slate-400">
+                    {currentGoal?.label}
+                  </span>
+                </>
+              ) : (
+                <span className="text-[10px] font-bold text-slate-400">
+                  {currentObjective?.label || 'None'}
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+        <ChevronRight size={16} className={`text-slate-300 transition-transform duration-300 ${isOpen ? 'rotate-90 text-indigo-500' : ''}`} />
+      </div>
+
+      {isOpen && (
+        <div className="absolute z-[110] mt-2 w-full bg-white border border-slate-100 rounded-[24px] shadow-[0_20px_50px_rgba(0,0,0,0.15)] p-3 animate-in fade-in zoom-in-95 duration-200">
+          {stage === 'objective' && (
+            <div className="space-y-1">
+              <p className="text-[10px] font-black text-slate-400 tracking-widest mb-2 px-2">1. Campaign Objective</p>
+              <div className="grid grid-cols-1 gap-1">
+                {campaignObjectives.map(obj => (
+                  <button
+                    key={obj.value}
+                    onClick={() => handleObjectiveSelect(obj)}
+                    className={`w-full text-left px-3 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-3 ${
+                      group.campaignObjective === obj.value ? 'bg-slate-900 text-white shadow-md' : 'hover:bg-slate-50 text-slate-600'
+                    }`}
+                  >
+                    <div className={`w-6 h-6 rounded-lg flex items-center justify-center ${group.campaignObjective === obj.value ? 'bg-indigo-500 text-white' : `${obj.bg} ${obj.color}`}`}>
+                      <obj.icon size={14} />
+                    </div>
+                    <span>{obj.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {stage === 'goal' && (
+            <div className="space-y-1">
+              <div className="flex items-center gap-2 mb-2 px-1">
+                <button onClick={() => setStage('objective')} className="p-1 hover:bg-slate-100 rounded-md transition-colors text-slate-400">
+                  <ChevronLeft size={14} />
+                </button>
+                <p className="text-[10px] font-black text-slate-400 tracking-widest">2. Conversion Goal</p>
+              </div>
+              <div className="grid grid-cols-1 gap-1">
+                {adsetGoals.map(goal => (
+                  <button
+                    key={goal.value}
+                    onClick={() => handleGoalSelect(goal)}
+                    className={`w-full text-left px-3 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-between group ${
+                      group.adsetGoal === goal.value ? 'bg-slate-900 text-white shadow-md' : 'hover:bg-slate-50 text-slate-600'
+                    }`}
+                  >
+                    <span>{goal.label}</span>
+                    {goal.needsEvent ? <ArrowRight size={12} className="opacity-30 group-hover:opacity-100" /> : (group.adsetGoal === goal.value && <CheckCircle2 size={12} />)}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {stage === 'event' && (
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 px-1">
+                <button onClick={() => setStage('goal')} className="p-1 hover:bg-slate-100 rounded-md transition-colors text-slate-400">
+                  <ChevronLeft size={14} />
+                </button>
+                <p className="text-[10px] font-black text-slate-400 tracking-widest">3. Pixel Event</p>
+              </div>
+              <div className="relative px-1">
+                <Search size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" />
+                <input 
+                  className="w-full pl-9 pr-3 py-2 bg-slate-50 border-none rounded-lg text-xs font-bold text-slate-900 focus:ring-2 focus:ring-indigo-500/20"
+                  placeholder="Search events..."
+                  value={eventSearch}
+                  onChange={(e) => setEventSearch(e.target.value)}
+                  autoFocus
+                />
+              </div>
+              <div className="max-h-48 overflow-y-auto custom-scrollbar space-y-0.5 pr-1">
+                {filteredEvents.map(ev => (
+                  <button
+                    key={ev}
+                    onClick={() => handleEventSelect(ev)}
+                    className={`w-full text-left px-3 py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-between group ${
+                      group.event === ev ? 'bg-indigo-600 text-white shadow-md' : 'hover:bg-slate-50 text-slate-600'
+                    }`}
+                  >
+                    {ev}
+                    {group.event === ev && <CheckCircle2 size={12} />}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
 const BudgetKPISection = ({ formData, updateFormData, updateFormDataDeep, validation, setValidation }) => {
   const [searchQuery, setSearchQuery] = useState('')
   const [activeSearchGroupId, setActiveSearchGroupId] = useState(null)
@@ -116,6 +366,10 @@ const BudgetKPISection = ({ formData, updateFormData, updateFormDataDeep, valida
     const newGroup = {
       id: newId,
       targetLocations: [],
+      platforms: ['meta', 'google'],
+      campaignObjective: 'sales_conversions',
+      adsetGoal: 'in_web_actions',
+      event: 'Purchase',
       budgetMode: 'unified',
       unifiedBudget: '',
       splitBudgets: {},
@@ -188,9 +442,14 @@ const BudgetKPISection = ({ formData, updateFormData, updateFormDataDeep, valida
   useEffect(() => {
     const allGroupsValid = formData.marketGroups.length > 0 && formData.marketGroups.every(group => {
       const locValid = group.targetLocations.length > 0
+      const platformsValid = (group.platforms || []).length > 0
       let budgetValid = group.budgetMode === 'unified' ? !!group.unifiedBudget : (locValid && group.targetLocations.every(loc => group.splitBudgets[loc.value]))
-      // KPI is optional now
-      return locValid && budgetValid
+      
+      const adsetGoals = getAdsetGoals(group.campaignObjective)
+      const currentGoal = adsetGoals.find(g => g.value === group.adsetGoal)
+      const objectiveValid = !!(group.campaignObjective && group.adsetGoal && (!currentGoal?.needsEvent || group.event))
+      
+      return locValid && platformsValid && budgetValid && objectiveValid
     })
     setValidation(prev => ({ ...prev, marketGroups: allGroupsValid }))
   }, [formData.marketGroups, setValidation])
@@ -205,7 +464,7 @@ const BudgetKPISection = ({ formData, updateFormData, updateFormDataDeep, valida
       <header className="px-10 py-6 bg-slate-100 border-b border-slate-200 flex items-center justify-between rounded-t-[32px]">
         <div className="flex items-center gap-3">
           <Layers size={20} className="text-slate-900" />
-          <h2 className="text-sm font-black text-slate-900">Budget & Performance KPI <span className="text-rose-500 ml-1">*</span></h2>
+          <h2 className="text-sm font-black text-slate-900">Budget & Performance KPI Group <span className="text-rose-500 ml-1">*</span></h2>
         </div>
         {validation.marketGroups && (
           <div className="text-emerald-500 animate-in zoom-in duration-500">
@@ -330,115 +589,141 @@ const BudgetKPISection = ({ formData, updateFormData, updateFormDataDeep, valida
                     </div>
                   )}
 
-                  {/* Daily Budget Section */}
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
+                  {/* Platforms & Objective Selection Section */}
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div className="space-y-4">
                       <div className="flex items-center gap-2.5">
                         <div className="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
-                          <DollarSign size={18} />
+                          <Monitor size={18} />
                         </div>
-                        <h4 className="text-sm font-black text-slate-900">Daily Budget</h4>
+                        <h4 className="text-sm font-black text-slate-900">Ad Platforms</h4>
                       </div>
+                      <PlatformSelector group={group} updateGroup={updateGroup} />
                     </div>
 
-                    {group.budgetMode === 'unified' ? (
-                      <UnitFollowInput
-                        value={group.unifiedBudget}
-                        unit="$"
-                        onChange={(e) => updateGroup(group.id, { unifiedBudget: e.target.value })}
-                        placeholder="0.00"
-                        className="w-full pr-12 py-2.5 bg-slate-50 border border-slate-100 rounded-2xl text-base font-black text-slate-900 focus:outline-none focus:border-indigo-500 transition-all"
-                      />
-                    ) : (
-                      <div className="space-y-2">
-                         <div className="flex gap-2 p-1 bg-indigo-50/50 rounded-xl">
-                          <UnitFollowInput
-                            value={batchSettings[group.id]?.budget || ''}
-                            unit="$"
-                            onChange={(e) => setBatchSettings(prev => ({ ...prev, [group.id]: { ...prev[group.id], budget: e.target.value } }))}
-                            placeholder="Batch set..."
-                            containerClassName="flex-1"
-                            className="w-full py-2 bg-white border-none rounded-lg text-sm font-bold focus:outline-none"
-                          />
-                          <button onClick={() => applyBatchBudget(group.id)} className="px-4 py-2 border-2 border-indigo-600 text-indigo-600 rounded-lg text-[11px] font-black hover:bg-indigo-50 transition-all">
-                            Apply
-                          </button>
-                        </div>
-                        <div className="grid grid-cols-2 gap-2">
-                          {group.targetLocations.map(loc => (
-                            <div key={loc.value} className="px-3 py-1.5 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-between">
-                              <span className="text-[10px] font-black text-slate-600 truncate mr-1">{loc.label}</span>
-                              <UnitFollowInput
-                                value={group.splitBudgets[loc.value] || ''}
-                                unit="$"
-                                align="right"
-                                onChange={(e) => updateGroup(group.id, { splitBudgets: { ...group.splitBudgets, [loc.value]: e.target.value } })}
-                                containerClassName="w-24"
-                                className="w-full py-1 bg-white border border-slate-200 rounded-lg text-[10px] font-bold text-right"
-                              />
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* KPI Section */}
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
+                    <div className="space-y-4">
                       <div className="flex items-center gap-2.5">
-                        <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                        <div className="w-9 h-9 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center">
                           <Target size={18} />
                         </div>
-                        <h4 className="text-sm font-black text-slate-900">KPI</h4>
+                        <h4 className="text-sm font-black text-slate-900">Promote Objective</h4>
                       </div>
+                      <ObjectiveSelector group={group} updateGroup={updateGroup} />
+                    </div>
+                  </div>
+
+                  {/* Row for Budget and KPI */}
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    {/* Daily Budget Section */}
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
+                            <DollarSign size={18} />
+                          </div>
+                          <h4 className="text-sm font-black text-slate-900">Daily Budget</h4>
+                        </div>
+                      </div>
+
+                      {group.budgetMode === 'unified' ? (
+                        <UnitFollowInput
+                          value={group.unifiedBudget}
+                          unit="$"
+                          onChange={(e) => updateGroup(group.id, { unifiedBudget: e.target.value })}
+                          placeholder="0.00"
+                          className="w-full pr-12 py-2.5 bg-slate-50 border border-slate-100 rounded-2xl text-base font-black text-slate-900 focus:outline-none focus:border-indigo-500 transition-all"
+                        />
+                      ) : (
+                        <div className="space-y-2">
+                          <div className="flex gap-2 p-1 bg-indigo-50/50 rounded-xl">
+                            <UnitFollowInput
+                              value={batchSettings[group.id]?.budget || ''}
+                              unit="$"
+                              onChange={(e) => setBatchSettings(prev => ({ ...prev, [group.id]: { ...prev[group.id], budget: e.target.value } }))}
+                              placeholder="Batch set..."
+                              containerClassName="flex-1"
+                              className="w-full py-2 bg-white border-none rounded-lg text-sm font-bold focus:outline-none"
+                            />
+                            <button onClick={() => applyBatchBudget(group.id)} className="px-4 py-2 border-2 border-indigo-600 text-indigo-600 rounded-lg text-[11px] font-black hover:bg-indigo-50 transition-all">
+                              Apply
+                            </button>
+                          </div>
+                          <div className="grid grid-cols-2 gap-2">
+                            {group.targetLocations.map(loc => (
+                              <div key={loc.value} className="px-3 py-1.5 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-between">
+                                <span className="text-[10px] font-black text-slate-600 truncate mr-1">{loc.label}</span>
+                                <UnitFollowInput
+                                  value={group.splitBudgets[loc.value] || ''}
+                                  unit="$"
+                                  align="right"
+                                  onChange={(e) => updateGroup(group.id, { splitBudgets: { ...group.splitBudgets, [loc.value]: e.target.value } })}
+                                  containerClassName="w-24"
+                                  className="w-full py-1 bg-white border border-slate-200 rounded-lg text-[10px] font-bold text-right"
+                                />
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
 
-                    <div className="flex items-center gap-8 pl-2">
-                      <span className="text-sm font-black text-slate-500">KPI Type</span>
-                      <div className="flex items-center gap-8">
-                        {['ROAS', 'CPA'].map(type => (
-                          <label key={type} className="flex items-center gap-3 cursor-pointer group/radio">
-                            <div 
+                    {/* KPI Section */}
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                            <Zap size={18} />
+                          </div>
+                          <h4 className="text-sm font-black text-slate-900">Performance KPI</h4>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-4">
+                        <div className="flex items-center bg-slate-50 border border-slate-100 rounded-2xl p-1.5 h-12">
+                          {['ROAS', 'CPA'].map(type => (
+                            <button
+                              key={type}
                               onClick={() => updateGroup(group.id, { kpiType: type })}
-                              className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
-                                group.kpiType === type ? 'border-indigo-600 bg-indigo-600' : 'border-slate-300 bg-white group-hover/radio:border-indigo-400'
+                              className={`px-4 h-full rounded-xl text-[11px] font-black transition-all ${
+                                group.kpiType === type 
+                                  ? 'bg-white text-indigo-600 shadow-sm border border-slate-100' 
+                                  : 'text-slate-400 hover:text-slate-600'
                               }`}
                             >
-                              {group.kpiType === type && <div className="w-2 h-2 rounded-full bg-white animate-in zoom-in duration-200" />}
-                            </div>
-                            <span className={`text-sm font-black transition-colors ${group.kpiType === type ? 'text-slate-900' : 'text-slate-400'}`}>
                               {type}
-                            </span>
-                          </label>
-                        ))}
-                      </div>
-                    </div>
-
-                    {group.kpiMode === 'unified' ? (
-                      <UnitFollowInput
-                        value={group.unifiedKPI}
-                        unit={group.kpiType === 'ROAS' ? 'x' : '$'}
-                        onChange={(e) => updateGroup(group.id, { unifiedKPI: e.target.value })}
-                        placeholder={`Target ${group.kpiType}`}
-                        className="w-full pr-12 py-2.5 bg-slate-50 border border-slate-100 rounded-2xl text-base font-black text-slate-900 focus:outline-none focus:border-emerald-500 transition-all"
-                      />
-                    ) : (
-                      <div className="space-y-2">
-                         <div className="flex gap-2 p-1 bg-emerald-50/50 rounded-xl">
-                          <UnitFollowInput
-                            value={batchSettings[group.id]?.kpi || ''}
-                            unit={group.kpiType === 'ROAS' ? 'x' : '$'}
-                            onChange={(e) => setBatchSettings(prev => ({ ...prev, [group.id]: { ...prev[group.id], kpi: e.target.value } }))}
-                            placeholder="Batch set..."
-                            containerClassName="flex-1"
-                            className="w-full py-2 bg-white border-none rounded-lg text-sm font-bold focus:outline-none"
-                          />
-                          <button onClick={() => applyBatchKPI(group.id)} className="px-4 py-2 border-2 border-indigo-600 text-indigo-600 rounded-lg text-[11px] font-black hover:bg-indigo-50 transition-all">
-                            Apply
-                          </button>
+                            </button>
+                          ))}
                         </div>
-                        <div className="grid grid-cols-2 gap-2">
+
+                        <div className="flex-1">
+                          {group.kpiMode === 'unified' ? (
+                            <UnitFollowInput
+                              value={group.unifiedKPI}
+                              unit={group.kpiType === 'ROAS' ? 'x' : '$'}
+                              onChange={(e) => updateGroup(group.id, { unifiedKPI: e.target.value })}
+                              placeholder={`Target ${group.kpiType}`}
+                              className="w-full pr-12 py-2.5 bg-slate-50 border border-slate-100 rounded-2xl text-base font-black text-slate-900 focus:outline-none focus:border-emerald-500 transition-all h-12"
+                            />
+                          ) : (
+                            <div className="flex gap-2 p-1 bg-emerald-50/50 rounded-xl h-12 items-center">
+                              <UnitFollowInput
+                                value={batchSettings[group.id]?.kpi || ''}
+                                unit={group.kpiType === 'ROAS' ? 'x' : '$'}
+                                onChange={(e) => setBatchSettings(prev => ({ ...prev, [group.id]: { ...prev[group.id], kpi: e.target.value } }))}
+                                placeholder="Batch set..."
+                                containerClassName="flex-1"
+                                className="w-full py-2 bg-transparent border-none text-sm font-bold focus:outline-none"
+                              />
+                              <button onClick={() => applyBatchKPI(group.id)} className="px-3 h-8 border-2 border-indigo-600 text-indigo-600 rounded-lg text-[10px] font-black hover:bg-indigo-50 transition-all">
+                                Apply
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {group.kpiMode !== 'unified' && (
+                        <div className="grid grid-cols-2 gap-2 mt-2">
                           {group.targetLocations.map(loc => (
                             <div key={loc.value} className="px-3 py-1.5 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-between">
                               <span className="text-[10px] font-black text-slate-600 truncate mr-1">{loc.label}</span>
@@ -453,9 +738,10 @@ const BudgetKPISection = ({ formData, updateFormData, updateFormDataDeep, valida
                             </div>
                           ))}
                         </div>
-                      </div>
-                    )}
+                      )}
+                    </div>
                   </div>
+
                 </div>
               </div>
             </div>
