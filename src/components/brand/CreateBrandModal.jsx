@@ -99,7 +99,7 @@ const ImageCropper = ({ imageSrc, onCrop, onCancel }) => {
   );
 };
 
-const CreateBrandModal = ({ isOpen, onClose, onCreate, initialData }) => {
+const CreateBrandModal = ({ isOpen, onClose, onCreate, initialData, isForceOpen = false }) => {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [errors, setErrors] = useState({});
@@ -269,12 +269,14 @@ const CreateBrandModal = ({ isOpen, onClose, onCreate, initialData }) => {
           {/* Header */}
           <div className="px-10 pt-10 pb-6 flex items-center justify-between shrink-0">
             <h3 className="text-2xl font-bold text-slate-900">{initialData ? 'Edit Brand' : 'Create New Brand'}</h3>
-            <button 
-              onClick={onClose}
-              className="p-2.5 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-full transition-all"
-            >
-              <X size={24} />
-            </button>
+            {!isForceOpen && (
+              <button 
+                onClick={onClose}
+                className="p-2.5 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-full transition-all"
+              >
+                <X size={24} />
+              </button>
+            )}
           </div>
 
           <div className="flex-1 overflow-y-auto custom-scrollbar">
@@ -416,13 +418,16 @@ const CreateBrandModal = ({ isOpen, onClose, onCreate, initialData }) => {
 
           {/* Footer Actions (Sticky) */}
           <div className="px-10 py-8 bg-white/90 backdrop-blur-md border-t border-slate-50 flex items-center justify-end gap-4 shrink-0">
-            <button 
-              type="button"
-              onClick={onClose}
-              className="px-8 py-3.5 rounded-2xl text-sm font-bold text-slate-500 hover:text-slate-700 hover:bg-slate-50 transition-all"
-            >
-              Cancel
-            </button>
+            {!isForceOpen && (
+              <button 
+                type="button"
+                onClick={onClose}
+                className="px-8 py-3.5 rounded-2xl text-sm font-bold text-slate-500 hover:text-slate-700 hover:bg-slate-50 transition-all"
+              >
+                Cancel
+              </button>
+            )}
+
             <button 
               type="submit"
               form="create-brand-form"

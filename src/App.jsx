@@ -342,15 +342,22 @@ function App() {
 
             {/* Create Brand Modal */}
             <CreateBrandModal 
-              isOpen={isCreateBrandModalOpen}
+              isOpen={isCreateBrandModalOpen || brands.length === 0}
+              isForceOpen={brands.length === 0}
               onClose={() => setIsCreateBrandModalOpen(false)}
               onCreate={(newBrand) => {
                 console.log('New Brand Created:', newBrand);
                 const brandName = newBrand.name;
-                setBrands(prev => [...prev, brandName]);
+                setBrands(prev => {
+                  if (prev.includes(brandName)) return prev;
+                  return [...prev, brandName];
+                });
                 setBrandDetails(prev => ({
                   ...prev,
-                  [brandName]: { url: newBrand.url || '', isAnalyzed: false }
+                  [brandName]: { 
+                    url: newBrand.url || '', 
+                    isAnalyzed: false // 此时仅创建了名字/配置，尚未进行 URL 分析
+                  }
                 }));
                 handleBrandChange(brandName);
               }}

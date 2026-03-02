@@ -42,7 +42,7 @@ import {
 const AIAnalysis = ({ selectedBrand, brandDetail, onUpdateDetail }) => {
   const navigate = useNavigate();
   const [url, setUrl] = React.useState(brandDetail.url || '');
-  const [isUpdateModalOpen, setIsUpdateModalOpen] = React.useState(!brandDetail.isAnalyzed);
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = React.useState(!brandDetail.isAnalyzed && !brandDetail.url);
   const [isHistoryModalOpen, setIsHistoryModalOpen] = React.useState(false);
   const [isProcessModalOpen, setIsProcessModalOpen] = React.useState(false);
   const [isProcessMinimized, setIsProcessMinimized] = React.useState(false);
@@ -111,8 +111,11 @@ const AIAnalysis = ({ selectedBrand, brandDetail, onUpdateDetail }) => {
 
   React.useEffect(() => {
     setUrl(brandDetail.url || '');
-    if (!brandDetail.isAnalyzed) {
+    // 只有当品牌既没有分析过，也没有 URL（即完全为空）时，才自动弹出初始化弹窗
+    if (!brandDetail.isAnalyzed && !brandDetail.url) {
       setIsUpdateModalOpen(true);
+    } else {
+      setIsUpdateModalOpen(false);
     }
   }, [brandDetail.url, selectedBrand, brandDetail.isAnalyzed]);
 
@@ -175,15 +178,6 @@ const AIAnalysis = ({ selectedBrand, brandDetail, onUpdateDetail }) => {
       title: "洞察阶段",
       subtitle: "了解市场、竞品 and 产品",
       cards: [
-        {
-          id: 'brand-init',
-          icon: <Sparkles className="text-indigo-500" size={24} />,
-          iconBg: "bg-indigo-50",
-          title: "品牌分析",
-          desc: "请先进行一次详细的品牌画像分析",
-          tags: ["基础配置", "AI分析"],
-          isCore: true
-        },
         {
           id: 'market-research',
           icon: <BarChart3 className="text-blue-500" size={24} />,
@@ -648,12 +642,14 @@ const AIAnalysis = ({ selectedBrand, brandDetail, onUpdateDetail }) => {
                 </div>
                 <h4 className="font-bold text-slate-900 text-lg">Create Brand Profile</h4>
               </div>
-              <button 
-                onClick={() => setIsUpdateModalOpen(false)}
-                className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-400"
-              >
-                <X size={20} />
-              </button>
+              {(brandDetail.isAnalyzed || isAnalyzing || brandDetail.url) && (
+                <button 
+                  onClick={() => setIsUpdateModalOpen(false)}
+                  className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-400"
+                >
+                  <X size={20} />
+                </button>
+              )}
             </div>
             
             <div className="p-10 space-y-8">
