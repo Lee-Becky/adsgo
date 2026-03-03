@@ -322,7 +322,7 @@ const ProductList = ({ onProductClick }) => {
             <table className="w-full text-left border-collapse table-fixed min-w-[1000px]">
               <thead>
                 <tr className="border-b border-slate-50 text-slate-400 text-sm font-bold tracking-wider">
-                  <th className="px-8 py-5 w-[35%]">Product</th>
+                  <th className="px-8 py-5 w-[35%]">Landingpage</th>
                   <th className="px-8 py-5 w-[12%]">Category</th>
                   <th className="px-8 py-5 w-[10%]">Type</th>
                   <th className="px-8 py-5 w-[10%]">Source</th>
@@ -432,7 +432,7 @@ const ProductList = ({ onProductClick }) => {
               <h3 className="text-xl font-bold text-slate-900 font-sans">Delete product?</h3>
               <button onClick={closeDeleteModal} className="p-2.5 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-full transition-all"><X size={20} /></button>
             </div>
-            <div className="px-8 py-2"><p className="text-sm font-medium text-slate-500 leading-relaxed font-sans">解除连接后，商品信息将不再更新，确认吗？</p></div>
+            <div className="px-8 py-2"><p className="text-sm font-medium text-slate-500 leading-relaxed font-sans">确认删除此产品吗？</p></div>
             <div className="p-8 flex items-center gap-3">
               <button onClick={closeDeleteModal} className="flex-1 px-6 py-3 border border-slate-200 rounded-2xl text-sm font-bold text-slate-600 hover:bg-slate-50 transition-all active:scale-95">Cancel</button>
               <button onClick={handleDelete} className="flex-1 px-6 py-3 bg-rose-500 text-white rounded-2xl text-sm font-bold hover:bg-rose-600 shadow-lg shadow-rose-200 transition-all active:scale-95">Delete</button>

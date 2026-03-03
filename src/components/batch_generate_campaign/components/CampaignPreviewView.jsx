@@ -583,6 +583,62 @@ const EditAdSetModal = ({ isOpen, adSet, onUpdateField, onToggleItem, onClose, a
   );
 };
 
+const AdSkeleton = () => (
+  <div className="bg-white rounded-[2rem] border border-slate-200 overflow-hidden shadow-sm relative">
+    <div className="p-4 space-y-4">
+      <div className="flex items-center gap-2">
+        <div className="w-8 h-8 rounded-full bg-slate-100 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
+        </div>
+        <div className="space-y-2">
+          <div className="w-20 h-2 bg-slate-100 rounded relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
+          </div>
+          <div className="w-12 h-1.5 bg-slate-50 rounded relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
+          </div>
+        </div>
+      </div>
+      <div className="space-y-2">
+        <div className="w-full h-2 bg-slate-50 rounded relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
+        </div>
+        <div className="w-4/5 h-2 bg-slate-50 rounded relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
+        </div>
+      </div>
+    </div>
+    <div className="aspect-square bg-slate-50 relative overflow-hidden flex items-center justify-center">
+      <div className="relative">
+        <Sparkles className="text-indigo-500/30 w-16 h-16 animate-[pulse_2s_infinite_ease-in-out]" />
+        <Sparkles className="text-purple-500/40 w-12 h-12 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-[spin_4s_infinite_linear]" />
+      </div>
+      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
+    </div>
+    <div className="p-4 flex items-center justify-between gap-4">
+      <div className="flex-1 space-y-2">
+        <div className="w-24 h-1.5 bg-slate-50 rounded relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
+        </div>
+        <div className="w-32 h-2.5 bg-slate-100 rounded relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
+        </div>
+      </div>
+      <div className="w-16 h-8 bg-slate-100 rounded-lg relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
+      </div>
+    </div>
+    <div className="p-3 bg-slate-50/50 flex items-center gap-2">
+      <div className="w-6 h-6 rounded-md bg-slate-100 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
+      </div>
+      <div className="w-20 h-2 bg-slate-100 rounded relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
+      </div>
+    </div>
+  </div>
+);
+
 const CampaignPreviewView = ({
   structure, budgetType, dailyBudget, initialAdsetAudiences, productCreativesMap, selectedProducts, brand, onBack, onPublish, campaignName, optimizationEvent, landingPageType, landingPageTemplate, productUtm, copyStrategy, unifiedHeadline, unifiedBody, campaignType,
   estimatedTotalDaily, adSetGroupsCount, authStatus, selectedAccount, onAuthStatusChange, onSelectAccount
@@ -591,6 +647,20 @@ const CampaignPreviewView = ({
   const [localAdSets, setLocalAdSets] = useState([]);
   const [editingAdSetIndex, setEditingAdSetIndex] = useState(null);
   const [editingAdInfo, setEditingAdInfo] = useState(null);
+  const [loadedAdsCount, setLoadedAdsCount] = useState(0);
+
+  const totalAdsCount = useMemo(() => {
+    return localAdSets.reduce((acc, as) => acc + (as.ads?.length || 0), 0);
+  }, [localAdSets]);
+
+  useEffect(() => {
+    if (totalAdsCount > 0 && loadedAdsCount < totalAdsCount) {
+      const timer = setTimeout(() => {
+        setLoadedAdsCount(prev => prev + 1);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [loadedAdsCount, totalAdsCount]);
   
   const getAdUrl = (p) => {
     if (landingPageType === 'PRODUCT') {
@@ -902,7 +972,7 @@ const CampaignPreviewView = ({
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-3xl font-black text-slate-900 tracking-tight">发布方案预览</h2>
-          <p className="text-sm text-slate-400 font-medium mt-1 tracking-widest">{campaignName} • {campaignType === 'CATALOG' ? '目录广告' : '商品广告'} 架构</p>
+          <p className="text-sm text-slate-400 font-medium mt-1 tracking-widest">{campaignName} • {campaignType === 'CATALOG' ? '目录广告' : '落地页广告'} 架构</p>
         </div>
         <button onClick={onBack} className="px-6 py-3 bg-white border border-slate-100 text-slate-400 rounded-2xl font-black text-xs hover:bg-slate-50 transition-all flex items-center gap-2">
           <ChevronLeft size={16} /> 返回修改配置
@@ -978,9 +1048,18 @@ const CampaignPreviewView = ({
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                 {adSet.ads.map((ad, aIdx) => {
                   const product = selectedProducts.find(p => p.id === ad.productId);
+                  // Calculate global ad index
+                  const previousAdsetsCount = localAdSets.slice(0, asIdx).reduce((acc, as) => acc + as.ads.length, 0);
+                  const globalAdIdx = previousAdsetsCount + aIdx;
+                  const isLoaded = globalAdIdx < loadedAdsCount;
+
+                  if (!isLoaded) {
+                    return <AdSkeleton key={aIdx} />;
+                  }
+
                   return (
                     <div key={aIdx} className="group relative">
-                      <div className="bg-white rounded-[2rem] border border-slate-200 overflow-hidden shadow-sm transition-all hover:shadow-xl hover:border-indigo-200 relative">
+                      <div className="bg-white rounded-[2rem] border border-slate-200 overflow-hidden shadow-sm transition-all hover:shadow-xl hover:border-indigo-200 relative animate-in fade-in zoom-in-95 duration-500">
                         <button 
                           onClick={() => setEditingAdInfo({ asIndex: asIdx, adIndex: aIdx })}
                           className="absolute top-4 right-4 z-10 w-8 h-8 bg-white/90 rounded-full flex items-center justify-center text-slate-400 opacity-0 group-hover:opacity-100 transition-all hover:text-indigo-600 shadow-lg"
@@ -1020,7 +1099,7 @@ const CampaignPreviewView = ({
                         {product && (
                           <div className="p-2.5 bg-indigo-50/50 border-t border-indigo-100 flex items-center gap-2">
                              <img src={product.imageUrl} className="w-6 h-6 rounded-md object-cover border border-indigo-200" />
-                             <div className="min-w-0 flex-1"><p className="text-[8px] font-black text-indigo-400 tracking-tighter">关联商品</p><p className="text-[9px] font-bold text-indigo-900 truncate">{product.name}</p></div>
+                             <div className="min-w-0 flex-1"><p className="text-[8px] font-black text-indigo-400 tracking-tighter">关联落地页</p><p className="text-[9px] font-bold text-indigo-900 truncate">{product.name}</p></div>
                           </div>
                         )}
                         {ad.isDynamic && (
@@ -1051,8 +1130,25 @@ const CampaignPreviewView = ({
               <div><p className="text-[10px] font-black text-slate-400 tracking-widest">预估日消耗</p><p className="text-2xl font-black text-emerald-400">${totalDailyBudget}</p></div>
             </div>
           </div>
-          <button onClick={onPublish} className="px-12 py-5 bg-white text-slate-900 rounded-2xl font-black text-base shadow-2xl hover:scale-105 active:scale-[0.98] transition-all flex items-center gap-3">
-            <Rocket size={20} className="text-indigo-600" /> 立即发布方案
+          <button 
+            onClick={onPublish} 
+            disabled={loadedAdsCount < totalAdsCount}
+            className={`px-12 py-5 rounded-2xl font-black text-base shadow-2xl transition-all flex items-center gap-3 ${
+              loadedAdsCount < totalAdsCount 
+                ? 'bg-slate-700 text-slate-400 cursor-not-allowed' 
+                : 'bg-white text-slate-900 hover:scale-105 active:scale-[0.98]'
+            }`}
+          >
+            {loadedAdsCount < totalAdsCount ? (
+              <>
+                <Sparkles size={20} className="animate-spin text-indigo-400" />
+                AI 生成中... ({loadedAdsCount}/{totalAdsCount})
+              </>
+            ) : (
+              <>
+                <Rocket size={20} className="text-indigo-600" /> 立即发布方案
+              </>
+            )}
           </button>
         </div>
       </div>
