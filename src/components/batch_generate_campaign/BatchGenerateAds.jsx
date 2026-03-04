@@ -98,7 +98,8 @@ const BatchGenerateAds = () => {
   const [selectedAccount, setSelectedAccount] = useState(null);
   const [authStatus, setAuthStatus] = useState({ shopify: false, meta: false, google: false });
   const [productReportsMap, setProductReportsMap] = useState({});
-  
+  const [productAnalyses, setProductAnalyses] = useState({});
+
   const [campaignType, setCampaignType] = useState('PRODUCT');
 
   const [lpType, setLpType] = useState('PRODUCT');
@@ -167,10 +168,24 @@ const BatchGenerateAds = () => {
     MOCK_EXISTING_CAMPAIGNS.find(c => c.id === selectedCampaignId), 
   [selectedCampaignId]);
 
+  const isMultiMode = selectedProducts.length > 1;
+
+  const allAnalysesComplete = useMemo(() => {
+    if (selectedProducts.length === 0) return false;
+    return selectedProducts.every(p => productAnalyses[p.id]?.status === 'complete' || p.isFromHistory);
+  }, [selectedProducts, productAnalyses]);
+
+  const allProductsReady = useMemo(() => {
+    if (campaignType === 'CATALOG') return analysisFinished;
+    if (selectedProducts.length === 0) return false;
+    return analysisFinished;
+  }, [campaignType, selectedProducts, analysisFinished]);
+
   const isAnyProductMissingCreatives = useMemo(() => {
+    if (campaignType === 'CATALOG') return false;
     if (selectedProducts.length === 0) return true;
     return selectedProducts.some(p => (productCreativesMap[p.id] || []).length === 0);
-  }, [selectedProducts, productCreativesMap]);
+  }, [campaignType, selectedProducts, productCreativesMap]);
 
   useEffect(() => {
     if (selectedCampaign) {
@@ -201,8 +216,7 @@ const BatchGenerateAds = () => {
         ? creativesOrUpdater(currentCreatives) 
         : creativesOrUpdater;
       
-      // 限制每个产品最多 10 个素材
-      const creativesWithId = nextCreatives.slice(0, 10).map(c => ({ ...c, productId }));
+      const creativesWithId = nextCreatives.map(c => ({ ...c, productId }));
       return { ...prev, [productId]: creativesWithId };
     });
   };
@@ -225,9 +239,34 @@ const BatchGenerateAds = () => {
   };
 
   const handleToggleIntOption = (option) => {
-    setIntOptions(prev => 
-      prev.includes(option) ? prev.filter(o => o !== option) : [...prev, option]
-    );
+    setIntOptions(prev => {
+      const exists = prev.find(o => o.id === option.id);
+      if (exists) return prev.filter(o => o.id !== option.id);
+      return [...prev, option];
+    });
+  };
+
+  const handleApplyAiStrategy = (parsedConfig) => {
+    // Structure is already set by CampaignPlanView via onStructureChange
+    // Here we only handle audience assignment
+    if (parsedConfig.audienceAssignment) {
+      setAdsetAudiences(prev => {
+        const next = [...prev];
+        const perProduct = parsedConfig.numAdsetsPerProduct || 1;
+        const productCount = selectedProducts.filter(p => (productCreativesMap[p.id] || []).length > 0).length;
+        const totalAdsets = parsedConfig.strategy === 'PER_PRODUCT' ? productCount * perProduct : perProduct;
+        if (parsedConfig.audienceAssignment === 'ALL_INT') {
+          for (let i = 0; i < totalAdsets; i++) next[i] = 'INT';
+        } else if (parsedConfig.audienceAssignment === 'ALL_LAL') {
+          for (let i = 0; i < totalAdsets; i++) next[i] = 'LAL';
+        } else if (parsedConfig.audienceAssignment === 'MIXED') {
+          for (let i = 0; i < totalAdsets; i++) {
+            next[i] = i < totalAdsets - 1 ? 'LAL' : 'INT';
+          }
+        }
+        return next;
+      });
+    }
   };
 
   const handleQuickSchedule = (days) => {
@@ -954,22 +993,24 @@ const BatchGenerateAds = () => {
                    <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white"><ShoppingBag size={20} /></div>
                    <h3 className="text-xl font-black text-slate-900">添加投放产品</h3>
                 </div>
-                <ProductSelector 
-                  selectedProducts={selectedProducts} 
+                <ProductSelector
+                  selectedProducts={selectedProducts}
                   onSelectProducts={setSelectedProducts}
                   productCreatives={productCreativesMap}
                   onUpdateCreatives={handleUpdateProductCreatives}
                   authStatus={authStatus}
                   onAuthStatusChange={setAuthStatus}
                   onAnalysisStart={() => { setIsAnalyzing(true); setAnalysisFinished(false); }}
-                  onAnalysisComplete={(reports) => { 
-                    setIsAnalyzing(false); 
-                    setAnalysisFinished(true); 
+                  onAnalysisComplete={(reports) => {
+                    setIsAnalyzing(false);
+                    setAnalysisFinished(true);
                     setProductReportsMap(reports);
                   }}
                   onReset={() => {
                     setAnalysisFinished(false);
                     setIsAnalyzing(false);
+                    setProductAnalyses({});
+                    setIntOptions([]);
                   }}
                   hasGeneratedOnce={hasGeneratedOnce}
                   analysisFinished={analysisFinished}
@@ -979,14 +1020,20 @@ const BatchGenerateAds = () => {
                     setCampaignType(type);
                     setAnalysisFinished(false);
                     setIsAnalyzing(false);
+                    setProductAnalyses({});
+                    if (type === 'CATALOG') {
+                      setStructure(prev => ({ ...prev, strategy: 'ALL_PRODUCTS_PER_SET' }));
+                    }
                   }}
                   selectedAccount={selectedAccount}
                   onSelectAccount={setSelectedAccount}
+                  productAnalyses={productAnalyses}
+                  onProductAnalysesChange={setProductAnalyses}
                 />
               </div>
 
               {/* Reminder Component when creatives are missing */}
-              {analysisFinished && isAnyProductMissingCreatives && campaignType !== 'CATALOG' && (
+              {allProductsReady && isAnyProductMissingCreatives && campaignType !== 'CATALOG' && (
                 <div className="bg-white rounded-[2.5rem] p-16 shadow-sm border border-slate-100 flex flex-col items-center justify-center text-center animate-in fade-in slide-in-from-top-4">
                   <div className="w-20 h-20 bg-slate-50 border-2 border-dashed border-slate-200 rounded-3xl flex items-center justify-center text-slate-200 mb-8">
                     <Plus size={40} />
@@ -999,22 +1046,25 @@ const BatchGenerateAds = () => {
               )}
 
               {/* Card 3: Strategy & Budget */}
-              {analysisFinished && (!isAnyProductMissingCreatives || campaignType === 'CATALOG') && (
+              {allProductsReady && (!isAnyProductMissingCreatives || campaignType === 'CATALOG') && (
                  <div className="bg-white rounded-[2.5rem] p-10 shadow-sm border border-slate-100 animate-in fade-in slide-in-from-top-8">
                     <div className="flex items-center gap-3 mb-8">
                        <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center text-white"><Layers size={20} /></div>
                        <h3 className="text-xl font-black text-slate-900">架构策略与预算</h3>
                     </div>
-                    <CampaignPlanView 
+                    <CampaignPlanView
                       structure={structure} onStructureChange={setStructure}
                       campaignType={campaignType}
                       budgetType={budgetType} onBudgetTypeChange={setBudgetType}
                       dailyBudget={dailyBudget} onBudgetChange={setDailyBudget}
                       adsetAudiences={adsetAudiences} onToggleAudience={handleToggleAudienceType}
                       lalOptions={lalOptions} onToggleLalOption={handleToggleLalOption}
-                      intOptions={intOptions} onToggleIntOption={handleToggleIntOption}
+                      intOptions={intOptions} onIntOptionsChange={setIntOptions} onToggleIntOption={handleToggleIntOption}
                       selectedProducts={selectedProducts}
                       productCreativesMap={productCreativesMap}
+                      productAnalyses={productAnalyses}
+                      allAnalysesComplete={allAnalysesComplete}
+                      onApplyAiStrategy={handleApplyAiStrategy}
                       isExistingCampaign={!!selectedCampaignId}
                       selectedCampaign={selectedCampaign}
                       onSelectCampaign={() => setShowCampaignModal(true)}
@@ -1032,7 +1082,7 @@ const BatchGenerateAds = () => {
               )}
 
               {/* Card 4: Advanced Settings */}
-              {analysisFinished && (!isAnyProductMissingCreatives || campaignType === 'CATALOG') && (
+              {allProductsReady && (!isAnyProductMissingCreatives || campaignType === 'CATALOG') && (
                  <div className="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden animate-in fade-in slide-in-from-top-8">
                     <button onClick={() => setAdvancedOpen(!advancedOpen)} className="w-full p-10 flex items-center justify-between hover:bg-slate-50 transition-colors">
                         <div className="flex items-center gap-3">
@@ -1304,7 +1354,7 @@ const BatchGenerateAds = () => {
               )}
 
               {/* Preview Button */}
-              {analysisFinished && (!isAnyProductMissingCreatives || campaignType === 'CATALOG') && (
+              {allProductsReady && (!isAnyProductMissingCreatives || campaignType === 'CATALOG') && (
                 <div className="flex flex-col items-center">
                   <button
                     onClick={() => setView('preview')}

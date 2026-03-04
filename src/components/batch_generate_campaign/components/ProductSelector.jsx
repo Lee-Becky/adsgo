@@ -380,7 +380,11 @@ const SelectionModal = ({
               const pool = getItems();
               const toAdd = pool.filter(i => localSelected.has(i.id) && !selectedProducts.some(p => p.id === i.id))
                                 .map(p => ({ ...p, isFromHistory: type === 'history' }));
-              onSelectProducts([...selectedProducts, ...toAdd]);
+              const remaining = 10 - selectedProducts.length;
+              if (remaining <= 0) { alert('最多添加 10 个产品'); onClose(); return; }
+              const trimmed = toAdd.slice(0, remaining);
+              if (trimmed.length < toAdd.length) { alert(`最多添加 10 个产品，已自动选择前 ${trimmed.length} 个`); }
+              onSelectProducts([...selectedProducts, ...trimmed]);
             }
             onClose();
           }} className={`px-10 py-4 rounded-2xl font-black tracking-widest shadow-xl transition-all ${localSelected.size === 0 ? 'bg-slate-200 text-white cursor-not-allowed shadow-none' : 'bg-slate-900 text-white hover:bg-black'}`}>
@@ -394,7 +398,7 @@ const SelectionModal = ({
 
 // --- ProductSelector component ---
 
-const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives, onUpdateCreatives, onAnalysisStart, onAnalysisComplete, onReset, hasGeneratedOnce, analysisFinished, isAnalyzing, campaignType, onCampaignTypeChange, selectedAccount, onSelectAccount }) => {
+const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives, onUpdateCreatives, onAnalysisStart, onAnalysisComplete, onReset, hasGeneratedOnce, analysisFinished, isAnalyzing, campaignType, onCampaignTypeChange, selectedAccount, onSelectAccount, productAnalyses, onProductAnalysesChange }) => {
   const [urlInput, setUrlInput] = useState('');
   const [isAuthLoading, setIsAuthLoading] = useState(false);
   const [authStatus, setAuthStatus] = useState({ shopify: false, meta: false, google: false });
@@ -424,17 +428,23 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
   const [selectedMatchOptions, setSelectedMatchOptions] = useState(new Set(['24h']));
 
   const anyConnected = Object.values(authStatus).some(v => v);
+  const isMultiMode = selectedProducts.length > 1;
+  const multiAnalysisTimers = useRef({});
 
   const handleAddUrl = () => {
     if (urlInput.trim()) {
-      const newP = { 
-        id: `manual-${Date.now()}`, 
-        name: `落地页产品 - ${selectedProducts.length + 1}`, 
-        url: urlInput, 
-        imageUrl: '' // URL 输入方式初次添加时无法获取主图
-      }; 
-      onSelectProducts([...selectedProducts, newP]); 
-      setUrlInput(''); 
+      if (selectedProducts.length >= 10) {
+        alert('最多添加 10 个产品');
+        return;
+      }
+      const newP = {
+        id: `manual-${Date.now()}`,
+        name: `落地页产品 - ${selectedProducts.length + 1}`,
+        url: urlInput,
+        imageUrl: ''
+      };
+      onSelectProducts([...selectedProducts, newP]);
+      setUrlInput('');
     }
   };
   
@@ -450,6 +460,7 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
   };
 
   const handleCreateProduct = (formData) => {
+    if (selectedProducts.length >= 10) { alert('最多添加 10 个产品'); return; }
     const newProduct = { id: `manual-${Date.now()}`, name: formData.name, url: formData.url, imageUrl: formData.assets.main?.[0]?.url || `https://picsum.photos/seed/${Date.now()}/400/400` };
     onSelectProducts([...selectedProducts, newProduct]);
     closeAddModal();
@@ -480,16 +491,103 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
     setIsAuthLoading(false);
   };
 
-  const removeProduct = (id) => { onSelectProducts(selectedProducts.filter(p => p.id !== id)); };
+  const removeProduct = (id) => {
+    if (multiAnalysisTimers.current[id]) {
+      clearTimeout(multiAnalysisTimers.current[id]);
+      delete multiAnalysisTimers.current[id];
+    }
+    onProductAnalysesChange(prev => {
+      const next = { ...prev };
+      delete next[id];
+      return next;
+    });
+    onSelectProducts(selectedProducts.filter(p => p.id !== id));
+  };
 
   const analysisEndRef = useRef(null);
   const scrollToBottom = () => {
     analysisEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
+  // Mock interest keywords per product category for AI recommendations
+  const MOCK_PRODUCT_INTERESTS = [
+    ['Online shopping', 'E-commerce', 'Fashion accessories', 'Luxury goods', 'Beauty'],
+    ['Fitness', 'Travel', 'Sustainable fashion', 'Home decor', 'Technology'],
+    ['Fashion accessories', 'Beauty', 'Lifestyle', 'Online shopping', 'Wellness'],
+    ['Travel', 'Luxury goods', 'Technology', 'E-commerce', 'Home decor'],
+    ['Fitness', 'Fashion accessories', 'Online shopping', 'Sustainable fashion', 'Beauty'],
+  ];
+
+  // Start per-product background analysis (multi mode)
+  const startMultiAnalysis = (products) => {
+    // Immediately tell parent to unlock flow
+    const mockReports = {};
+    products.forEach(p => {
+      mockReports[p.id] = { summary: `${p.name} 网页核心卖点：高品质复古设计，适用于多种场景。`, recommendedAudience: "25-45 岁，对极简主义和高质感生活有追求的都市人群。", competitors: ["Lululemon", "Everlane", "Zara Home"] };
+    });
+    setReports(mockReports);
+    onAnalysisComplete(mockReports);
+
+    // Start per-product independent analysis timers
+    products.forEach((p, idx) => {
+      if (p.isFromHistory) {
+        onProductAnalysesChange(prev => ({
+          ...prev,
+          [p.id]: { status: 'complete', currentStep: ANALYSIS_STEPS.length - 1, extractedName: p.name, urlSlug: p.url.split('/').pop()?.split('?')[0] || '', recommendedInterests: MOCK_PRODUCT_INTERESTS[idx % MOCK_PRODUCT_INTERESTS.length], productDescription: `High-quality ${p.name} for modern lifestyle.` }
+        }));
+        return;
+      }
+
+      // Set initial analyzing state
+      onProductAnalysesChange(prev => ({
+        ...prev,
+        [p.id]: { status: 'analyzing', currentStep: 0, extractedName: p.name, urlSlug: p.url.split('/').pop()?.split('?')[0] || '', recommendedInterests: [], productDescription: '' }
+      }));
+
+      // Per-product step progression (random 400-800ms per step)
+      let step = 0;
+      const advanceStep = () => {
+        step++;
+        if (step >= ANALYSIS_STEPS.length) {
+          onProductAnalysesChange(prev => ({
+            ...prev,
+            [p.id]: { ...prev[p.id], status: 'complete', currentStep: ANALYSIS_STEPS.length - 1, recommendedInterests: MOCK_PRODUCT_INTERESTS[idx % MOCK_PRODUCT_INTERESTS.length], productDescription: `High-quality ${p.name} for modern lifestyle.` }
+          }));
+          return;
+        }
+        onProductAnalysesChange(prev => ({
+          ...prev,
+          [p.id]: { ...prev[p.id], currentStep: step }
+        }));
+        multiAnalysisTimers.current[p.id] = setTimeout(advanceStep, 400 + Math.random() * 400);
+      };
+      multiAnalysisTimers.current[p.id] = setTimeout(advanceStep, 1000 + Math.random() * 2000);
+    });
+  };
+
+  // Cleanup multi analysis timers
   useEffect(() => {
-    if (isAnalyzing) {
+    return () => {
+      Object.values(multiAnalysisTimers.current).forEach(t => clearTimeout(t));
+    };
+  }, []);
+
+  // Single-product analysis (existing logic)
+  useEffect(() => {
+    if (isAnalyzing && !isMultiMode) {
       if (selectedProducts.length > 0) { setExpandedAnalysisId(selectedProducts[0].id); }
+
+      // History product fast path: skip animation, complete immediately
+      if (selectedProducts.length > 0 && selectedProducts[0].isFromHistory) {
+        const p = selectedProducts[0];
+        const mockReports = {};
+        mockReports[p.id] = { summary: `${p.name} 网页核心卖点：高品质复古设计，适用于多种场景。`, recommendedAudience: "25-45 岁，对极简主义和高质感生活有追求的都市人群。", competitors: ["Lululemon", "Everlane", "Zara Home"] };
+        setReports(mockReports);
+        setCurrentStep(ANALYSIS_STEPS.length - 1);
+        onAnalysisComplete(mockReports);
+        return;
+      }
+
       const interval = setInterval(() => {
         setCurrentStep(prev => {
           if (prev >= ANALYSIS_STEPS.length - 1) {
@@ -506,21 +604,32 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
         });
       }, 600);
       return () => clearInterval(interval);
-    } else { setCurrentStep(0); }
-  }, [isAnalyzing, onAnalysisComplete, selectedProducts]);
+    } else if (!isAnalyzing) { setCurrentStep(0); }
+  }, [isAnalyzing, isMultiMode, onAnalysisComplete, selectedProducts]);
 
   useEffect(() => {
-    if (isAnalyzing) scrollToBottom();
-  }, [currentStep, isAnalyzing]);
+    if (isAnalyzing && !isMultiMode) scrollToBottom();
+  }, [currentStep, isAnalyzing, isMultiMode]);
 
   const AnalysisReportModal = ({ productId, onClose }) => {
     const product = selectedProducts.find(p => p.id === productId);
     const zIndex = useZIndex(true);
-    
+    const productAnalysis = productAnalyses[productId];
+    const isProductAnalyzing = isMultiMode && productAnalysis?.status === 'analyzing';
+    const productCurrentStep = isProductAnalyzing ? (productAnalysis?.currentStep ?? 0) : ANALYSIS_STEPS.length - 1;
+    const visibleSteps = ANALYSIS_STEPS.slice(0, productCurrentStep + 1);
+    const modalScrollRef = useRef(null);
+
+    useEffect(() => {
+      if (modalScrollRef.current) {
+        modalScrollRef.current.scrollTop = modalScrollRef.current.scrollHeight;
+      }
+    }, [productCurrentStep]);
+
     if (!product) return null;
 
     return (
-      <div 
+      <div
         className="fixed inset-0 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in"
         style={{ zIndex }}
       >
@@ -531,17 +640,24 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
                 <img src={product.imageUrl} className="w-full h-full object-cover" />
               </div>
               <div>
-                <h3 className="text-xl font-black text-slate-900">产品分析报告</h3>
+                <h3 className="text-xl font-black text-slate-900 flex items-center gap-2">
+                  产品分析报告
+                  {isProductAnalyzing && (
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-indigo-100 text-indigo-600 rounded-full text-[10px] font-black animate-pulse">
+                      <Loader2 size={10} className="animate-spin" /> 分析中
+                    </span>
+                  )}
+                </h3>
                 <p className="text-xs text-slate-400 font-bold tracking-widest mt-1 uppercase">{product.name}</p>
               </div>
             </div>
             <button onClick={onClose} className="p-2 hover:bg-slate-50 rounded-full text-slate-300 transition-colors"><X size={24} /></button>
           </div>
-          
-          <div className="flex-1 overflow-y-auto p-10 no-scrollbar bg-slate-50/30">
+
+          <div ref={modalScrollRef} className="flex-1 overflow-y-auto p-10 no-scrollbar bg-slate-50/30">
             <div className="bg-white rounded-[2.5rem] p-10 border border-slate-100 shadow-xl overflow-hidden">
               <div className="space-y-6">
-                {ANALYSIS_STEPS.map((step, stepIdx) => {
+                {visibleSteps.map((step, stepIdx) => {
                   let listIdx = 0;
                   if (step.type === 'ordered') {
                     listIdx = ANALYSIS_STEPS.slice(0, stepIdx + 1).filter(s => s.type === 'ordered').length;
@@ -848,13 +964,13 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
               )}
             </div>
           )}
-          {!analysisFinished && !isAnalyzing && selectedProducts.length > 0 && campaignType === 'PRODUCT' && (
+          {selectedProducts.length > 0 && campaignType === 'PRODUCT' && (!analysisFinished && !isAnalyzing) && (
             <div className="flex flex-col items-center pt-8 border-t border-slate-50 space-y-10 animate-in fade-in slide-in-from-bottom-6">
               <div className="w-full flex flex-col items-center space-y-8">
                 <div className="w-full max-w-4xl space-y-4">
                   <div className="flex items-center justify-between px-6">
-                    <h5 className="text-[10px] font-black text-slate-400 tracking-widest flex items-center gap-2"><Layers size={14} className="text-indigo-400" /> 待解析产品清单 ({selectedProducts.length})</h5>
-                    <p className="text-[9px] text-slate-400 font-bold tracking-widest">Ready for agent deep scan</p>
+                    <h5 className="text-[10px] font-black text-slate-400 tracking-widest flex items-center gap-2"><Layers size={14} className="text-indigo-400" /> {(analysisFinished || isAnalyzing) ? '产品清单' : '待解析产品清单'} ({selectedProducts.length})</h5>
+                    <p className="text-[9px] text-slate-400 font-bold tracking-widest">{(analysisFinished || isAnalyzing) ? 'Add more products below' : 'Ready for agent deep scan'}</p>
                   </div>
                   <div className="w-full space-y-3 px-2">
                     {selectedProducts.map((p) => (
@@ -872,7 +988,7 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
                                     <Link2 size={8} className="text-indigo-500" />
                                   </div>
                                 </div>
-                                <span className="text-[6px] font-black text-slate-400 uppercase tracking-tighter relative z-10">Waiting...</span>
+                                <span className="text-[6px] font-black text-slate-400 uppercase tracking-tighter relative z-10">{(analysisFinished || isAnalyzing) ? 'Analyzed' : 'Waiting...'}</span>
                               </div>
                             )}
                           </div>
@@ -891,11 +1007,20 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
                     ))}
                   </div>
                 </div>
-                <button onClick={onAnalysisStart} className="h-24 px-20 bg-slate-900 text-white rounded-[3rem] text-lg font-black tracking-widest flex items-center gap-6 hover:bg-black transition-all shadow-[0_20px_50px_rgba(0,0,0,0.2)] hover:scale-105 active:scale-95 group">
-                  <Wand2 size={32} className="group-hover:rotate-12 transition-transform" /> 开启 {selectedProducts.length} 个产品的智能并行解析与生产 <ChevronRight size={32} />
-                </button>
+                {!analysisFinished && !isAnalyzing && (
+                  <button onClick={() => {
+                    onAnalysisStart();
+                    if (isMultiMode) {
+                      startMultiAnalysis(selectedProducts);
+                    }
+                  }} className="h-24 px-20 bg-slate-900 text-white rounded-[3rem] text-lg font-black tracking-widest flex items-center gap-6 hover:bg-black transition-all shadow-[0_20px_50px_rgba(0,0,0,0.2)] hover:scale-105 active:scale-95 group">
+                    <Wand2 size={32} className="group-hover:rotate-12 transition-transform" /> 开启 {selectedProducts.length} 个产品的智能并行解析与生产 <ChevronRight size={32} />
+                  </button>
+                )}
               </div>
-              <p className="text-xs text-slate-400 font-bold tracking-[0.3em]">Next-gen media planning system</p>
+              {!analysisFinished && !isAnalyzing && (
+                <p className="text-xs text-slate-400 font-bold tracking-[0.3em]">Next-gen media planning system</p>
+              )}
             </div>
           )}
           {!analysisFinished && !isAnalyzing && campaignType === 'CATALOG' && selectedCatalog && (
@@ -965,10 +1090,16 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
                           </div>
                           <div className="min-w-0 flex-1">
                             <h4 className="text-sm font-black text-slate-800 truncate">{p.name}</h4>
-                            {showAnalysisResult && (
+                            {(showAnalysisResult || (isMultiMode && (analysisFinished || isAnalyzing))) && (
                               <div className="flex items-center gap-2 mt-1">
                                 <span className={`text-[9px] font-black px-2 py-0.5 rounded-full ${creatives.length > 0 ? 'bg-indigo-50 text-indigo-600' : 'bg-amber-50 text-amber-600'}`}>{creatives.length} 素材</span>
-                                <button onClick={() => setShowReportFor(p.id)} className="text-[9px] font-black text-slate-400 underline hover:text-indigo-600">分析报告</button>
+                                {isMultiMode && productAnalyses[p.id]?.status === 'analyzing' ? (
+                                  <button onClick={() => setShowReportFor(p.id)} className="text-[9px] font-black text-indigo-500 hover:text-indigo-700 flex items-center gap-1">
+                                    <Loader2 size={10} className="animate-spin" /> AI 分析产品中
+                                  </button>
+                                ) : (
+                                  <button onClick={() => setShowReportFor(p.id)} className="text-[9px] font-black text-slate-400 underline hover:text-indigo-600">分析报告</button>
+                                )}
                               </div>
                             )}
                           </div>
@@ -996,8 +1127,7 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
                                   <NanoBananaSkeleton key={`gen-${i}`} />
                                 ))}
 
-                                {creatives.length < 10 && (
-                                  <div className="flex gap-2 shrink-0 ml-2">
+                                <div className="flex gap-2 shrink-0 ml-2">
                                     <button onClick={() => { setModalContext(p.id); setActiveModal('creative_lib'); }} className="w-14 h-20 rounded-lg border-2 border-dashed border-slate-100 flex flex-col items-center justify-center text-slate-300 hover:border-indigo-400 hover:text-indigo-400 hover:bg-indigo-50 transition-all gap-1" title="从素材库选择">
                                       <Database size={16} />
                                       <span className="text-[7px] font-black">库</span>
@@ -1011,7 +1141,6 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
                                       <span className="text-[7px] font-black">传</span>
                                     </button>
                                   </div>
-                                )}
                               </div>
                             </div>
                           )}

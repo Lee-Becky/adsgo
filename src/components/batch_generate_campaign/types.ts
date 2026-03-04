@@ -44,6 +44,8 @@ export interface Creative {
   url: string;
   productId?: string;
   isMain?: boolean;
+  fileName?: string;
+  matchType?: 'exact' | 'fuzzy' | 'manual';
 }
 
 export enum CreativeStrategy {
@@ -72,7 +74,8 @@ export enum BudgetType {
 export enum StructureStrategy {
   PER_PRODUCT = 'PER_PRODUCT',
   ALL_PRODUCTS_PER_SET = 'ALL_PRODUCTS_PER_SET',
-  BY_AD_COUNT = 'BY_AD_COUNT'
+  BY_AD_COUNT = 'BY_AD_COUNT',
+  AI_STRATEGY = 'AI_STRATEGY'
 }
 
 export interface CampaignStructure {
@@ -116,6 +119,22 @@ export enum OptimizationEvent {
   PURCHASE = '成功购买 (Purchase)',
   ADD_TO_CART = '加入购物车 (AddToCart)',
   REGISTER = '完成注册 (Register)'
+}
+
+export interface ProductAnalysis {
+  status: 'pending' | 'analyzing' | 'complete';
+  currentStep: number;
+  extractedName: string;
+  urlSlug: string;
+  recommendedInterests: string[];
+  productDescription: string;
+}
+
+export interface InterestOption {
+  id: string;
+  name: string;
+  source: 'ai' | 'manual';
+  size?: string;
 }
 
 export interface AdSetSettings {
