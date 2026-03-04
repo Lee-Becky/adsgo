@@ -850,11 +850,6 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
               <div className="relative">
                 {hasGeneratedOnce && (
                   <div className="absolute -top-4 left-6 z-10">
-                    <div className="flex items-center gap-1.5 px-3 py-1 bg-indigo-600 text-white rounded-full shadow-lg border border-white/20">
-                      <PackageCheck size={12} className="text-indigo-200" />
-                      <span className="text-[9px] font-black tracking-widest">出品</span>
-                    </div>
-                    <div className="w-[2px] h-4 bg-indigo-600 ml-5 opacity-50"></div>
                   </div>
                 )}
                 <div className={`bg-slate-50 border-2 border-dashed border-slate-200 rounded-[2.5rem] p-6 flex items-center gap-6 focus-within:bg-white focus-within:border-indigo-500 transition-all ${selectedProducts.length > 0 ? 'border-slate-300' : ''}`}>

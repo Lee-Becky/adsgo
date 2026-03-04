@@ -92,6 +92,272 @@ const ALL_COUNTRIES = [
   { code: 'IN', name: 'India' }
 ];
 
+// AI Recommendation mock values
+const AI_RECOMMENDED = {
+  platform: PLATFORMS[0], // Meta
+  objective: 'sales_conversions',
+  adsetGoal: 'in_web_actions',
+  event: 'Purchase',
+  locations: [{ code: 'US', name: 'United States' }]
+};
+
+// Module-level flag: survives SPA navigation, resets on browser refresh
+let _hasGeneratedOnce = false;
+
+// Extracted Targeting & Channel Card component
+const TargetingChannelCard = ({
+  platform, setPlatform, objective, setObjective, adsetGoal, setAdsetGoal, event, setEvent,
+  selectedLocations, setSelectedLocations, openDropdown, setOpenDropdown, dropdownRef,
+  locationSearch, setLocationSearch, eventSearch, setEventSearch, objectiveStage, setObjectiveStage,
+  filteredCountries, filteredEvents, toggleLocation, currentObjectiveObj, currentGoalObj, availableGoals,
+  showAiRecommendation, allAnalysesComplete
+}) => {
+  const AiLabel = ({ field, recommendedLabel, onApply }) => {
+    if (!showAiRecommendation) return null;
+    if (!allAnalysesComplete) {
+      return (
+        <div className="flex items-center gap-1.5 mt-2 px-1">
+          <Loader2 size={11} className="animate-spin text-amber-500" />
+          <span className="text-[10px] font-black text-amber-500">AI 分析推荐中...</span>
+        </div>
+      );
+    }
+    return (
+      <div className="flex items-center gap-2 mt-2 px-1">
+        <span className="text-[10px] font-black text-indigo-500">✦ AI recommended：{recommendedLabel}</span>
+        <button onClick={onApply} className="px-2 py-0.5 text-[9px] font-black text-white bg-indigo-500 rounded-full hover:bg-indigo-600 transition-colors">
+          Apply
+        </button>
+      </div>
+    );
+  };
+
+  return (
+    <div className="bg-white rounded-[2.5rem] p-10 shadow-sm border border-slate-100 animate-in fade-in slide-in-from-bottom-4">
+      <div className="flex items-center gap-3 mb-8">
+        <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white"><Target size={20} /></div>
+        <h3 className="text-xl font-black text-slate-900">投放目标与渠道</h3>
+        {showAiRecommendation && !allAnalysesComplete && (
+          <span className="flex items-center gap-1.5 px-3 py-1 bg-amber-50 text-amber-500 rounded-full text-[10px] font-black">
+            <Loader2 size={11} className="animate-spin" /> AI 智能推荐配置中...
+          </span>
+        )}
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 relative z-[10]">
+        {/* Location Selector */}
+        <div>
+          <div className="relative" ref={openDropdown === 'location' ? dropdownRef : null}>
+            <div onClick={() => setOpenDropdown(openDropdown === 'location' ? null : 'location')}
+              className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm flex flex-col gap-2 group cursor-pointer hover:border-indigo-200 transition-all h-full">
+              <span className="text-[10px] font-bold text-slate-400 tracking-wider">投放国家/地区</span>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <MapPin size={16} className="text-indigo-500 shrink-0" />
+                  <span className="text-sm font-bold text-slate-700 truncate">
+                    {selectedLocations.length > 0 ? (<>{selectedLocations[0]?.name}{selectedLocations.length > 1 && '...'}</>) : <span className="text-slate-300">待选择...</span>}
+                  </span>
+                </div>
+                <ChevronDown size={14} className={`text-slate-300 transition-transform ${openDropdown === 'location' ? 'rotate-180' : ''}`} />
+              </div>
+            </div>
+            {openDropdown === 'location' && (
+              <div className="absolute top-full left-0 mt-2 w-[500px] bg-white rounded-3xl shadow-2xl border border-slate-100 overflow-hidden flex animate-in fade-in zoom-in-95 duration-200">
+                <div className="w-1/2 border-r border-slate-50 flex flex-col">
+                  <div className="p-4 border-b border-slate-50">
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-300 w-3.5 h-3.5" />
+                      <input className="w-full pl-9 pr-3 py-2 bg-slate-50 border-none rounded-xl text-xs font-bold text-slate-900 focus:ring-2 focus:ring-indigo-500/10"
+                        placeholder="Search locations..." value={locationSearch} onChange={(e) => setLocationSearch(e.target.value)} autoFocus />
+                    </div>
+                  </div>
+                  <div className="flex-1 max-h-[300px] overflow-y-auto custom-scrollbar p-2 space-y-1">
+                    {filteredCountries.map(c => (
+                      <button key={c.code} onClick={() => toggleLocation(c)}
+                        className={`w-full text-left px-3 py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-between ${
+                          selectedLocations.some(l => l.code === c.code) ? 'bg-indigo-50 text-indigo-600' : 'text-slate-600 hover:bg-slate-50'}`}>
+                        {c.name}
+                        {selectedLocations.some(l => l.code === c.code) && <Check size={12} />}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div className="w-1/2 bg-slate-50/30 flex flex-col">
+                  <div className="p-4 border-b border-slate-50 flex items-center justify-between">
+                    <span className="text-[10px] font-black text-slate-400 tracking-widest">Selected ({selectedLocations.length})</span>
+                  </div>
+                  <div className="flex-1 max-h-[300px] overflow-y-auto custom-scrollbar p-4 flex flex-wrap gap-2 content-start">
+                    {selectedLocations.map(l => (
+                      <div key={l.code} className="flex items-center gap-1.5 px-2.5 py-1.5 bg-white border border-slate-100 rounded-lg shadow-sm animate-in zoom-in">
+                        <span className="text-[10px] font-black text-slate-700">{l.code}</span>
+                        <button onClick={() => toggleLocation(l)} className="text-slate-300 hover:text-rose-500 transition-colors"><X size={10} strokeWidth={3} /></button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+          <AiLabel field="location" recommendedLabel="United States" onApply={() => setSelectedLocations(AI_RECOMMENDED.locations)} />
+        </div>
+
+        {/* Platform Selector */}
+        <div>
+          <div className="relative" ref={openDropdown === 'platform' ? dropdownRef : null}>
+            <div onClick={() => setOpenDropdown(openDropdown === 'platform' ? null : 'platform')}
+              className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm flex flex-col gap-2 group cursor-pointer hover:border-indigo-200 transition-all h-full">
+              <span className="text-[10px] font-bold text-slate-400 tracking-wider">投放渠道媒体</span>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  {platform ? (
+                    <><img src={platform.logo} className="w-5 h-5 rounded object-contain shrink-0" alt="" /><span className="text-sm font-bold text-slate-700 truncate">{platform.name}</span></>
+                  ) : <span className="text-sm font-bold text-slate-300">待选择...</span>}
+                </div>
+                <ChevronDown size={14} className={`text-slate-300 transition-transform ${openDropdown === 'platform' ? 'rotate-180' : ''}`} />
+              </div>
+            </div>
+            {openDropdown === 'platform' && (
+              <div className="absolute top-full left-0 mt-2 w-full min-w-[200px] bg-white rounded-2xl shadow-2xl border border-slate-100 p-2 space-y-1 animate-in fade-in zoom-in-95 duration-200">
+                {PLATFORMS.map(p => (
+                  <div key={p.id} className="relative group">
+                    <button disabled={p.disabled}
+                      onClick={() => { if (!p.disabled) { setPlatform(p); setOpenDropdown(null); } }}
+                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all ${
+                        p.disabled ? 'opacity-40 cursor-not-allowed' : platform?.id === p.id ? 'bg-indigo-50 text-indigo-600' : 'hover:bg-slate-50 text-slate-600'}`}>
+                      <img src={p.logo} className="w-5 h-5 rounded object-contain shrink-0" alt="" />
+                      <span className="text-xs font-bold">{p.name}</span>
+                      {!p.disabled && platform?.id === p.id && <Check size={12} className="ml-auto" />}
+                    </button>
+                    {p.disabled && (
+                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                        <div className="bg-slate-900 text-white text-[8px] font-black px-2 py-1 rounded shadow-lg tracking-widest">COMING SOON</div>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+          <AiLabel field="platform" recommendedLabel="Meta" onApply={() => setPlatform(AI_RECOMMENDED.platform)} />
+        </div>
+
+        {/* Objective Selector */}
+        <div>
+          <div className="relative" ref={openDropdown === 'objective' ? dropdownRef : null}>
+            <div onClick={() => { setOpenDropdown(openDropdown === 'objective' ? null : 'objective'); setObjectiveStage('goal'); }}
+              className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm flex flex-col gap-2 group cursor-pointer hover:border-indigo-200 transition-all h-full">
+              <span className="text-[10px] font-bold text-slate-400 tracking-wider">核心投放目标</span>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <Target size={16} className="text-indigo-500 shrink-0" />
+                  <span className="text-sm font-bold text-slate-700 truncate">{currentObjectiveObj?.label || <span className="text-slate-300">待选择...</span>}</span>
+                </div>
+                <ChevronDown size={14} className={`text-slate-300 transition-transform ${openDropdown === 'objective' ? 'rotate-180' : ''}`} />
+              </div>
+            </div>
+            {openDropdown === 'objective' && (
+              <div className="absolute top-full left-0 mt-2 w-[320px] bg-white rounded-3xl shadow-2xl border border-slate-100 p-4 space-y-3 animate-in fade-in zoom-in-95 duration-200">
+                <p className="text-[10px] font-black text-slate-400 tracking-widest px-2">Select objective</p>
+                <div className="space-y-1.5">
+                  {CAMPAIGN_OBJECTIVES.map(obj => {
+                    const Icon = obj.icon;
+                    return (
+                      <button key={obj.value} onClick={() => {
+                        const firstGoal = ADSET_GOALS_MAPPING[obj.value][0];
+                        setObjective(obj.value); setAdsetGoal(firstGoal.value); setEvent(firstGoal.needsEvent ? 'Purchase' : ''); setOpenDropdown(null);
+                      }} className={`w-full text-left p-3 rounded-xl transition-all flex items-center gap-3 ${
+                        objective === obj.value ? 'bg-indigo-50 text-indigo-600 ring-1 ring-indigo-100 shadow-sm' : 'hover:bg-slate-50 text-slate-600'}`}>
+                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${objective === obj.value ? 'bg-indigo-500 text-white' : obj.bg + ' ' + obj.color}`}>
+                          <Icon size={18} />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-xs font-bold leading-none mb-1">{obj.label}</p>
+                          <p className="text-[9px] font-medium opacity-60 truncate">{obj.description}</p>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+          <AiLabel field="objective" recommendedLabel="Sales & Conversions" onApply={() => {
+            setObjective(AI_RECOMMENDED.objective);
+            setAdsetGoal(AI_RECOMMENDED.adsetGoal);
+            setEvent(AI_RECOMMENDED.event);
+          }} />
+        </div>
+
+        {/* Event Selector */}
+        <div>
+          <div className="relative" ref={openDropdown === 'event' ? dropdownRef : null}>
+            <div onClick={() => { setOpenDropdown(openDropdown === 'event' ? null : 'event'); setObjectiveStage('goal'); }}
+              className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm flex flex-col gap-2 group cursor-pointer hover:border-indigo-200 transition-all h-full">
+              <span className="text-[10px] font-bold text-slate-400 tracking-wider">转化优化事件</span>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <Zap size={16} className="text-indigo-500 shrink-0" />
+                  <div className="flex items-center gap-1 min-w-0">
+                    <span className="text-sm font-bold text-slate-700 truncate">{currentGoalObj?.label || <span className="text-slate-300">待选择...</span>}</span>
+                    {event && <><ChevronRight size={10} className="text-slate-300 shrink-0" /><span className="text-sm font-bold text-indigo-600 truncate">{event}</span></>}
+                  </div>
+                </div>
+                <ChevronDown size={14} className={`text-slate-300 transition-transform ${openDropdown === 'event' ? 'rotate-180' : ''}`} />
+              </div>
+            </div>
+            {openDropdown === 'event' && (
+              <div className="absolute top-full right-0 mt-2 w-[340px] bg-white rounded-3xl shadow-2xl border border-slate-100 p-4 animate-in fade-in zoom-in-95 duration-200">
+                {objectiveStage === 'goal' ? (
+                  <div className="space-y-3">
+                    <p className="text-[10px] font-black text-slate-400 tracking-widest px-2">Select conversion event</p>
+                    <div className="space-y-1">
+                      {availableGoals.map(goal => (
+                        <button key={goal.value} onClick={() => {
+                          setAdsetGoal(goal.value);
+                          if (goal.needsEvent) { setObjectiveStage('event'); } else { setEvent(''); setOpenDropdown(null); }
+                        }} className={`w-full text-left px-4 py-3 rounded-xl text-xs font-bold transition-all flex items-center justify-between group ${
+                          adsetGoal === goal.value ? 'bg-slate-900 text-white shadow-lg' : 'hover:bg-slate-50 text-slate-600'}`}>
+                          {goal.label}
+                          {goal.needsEvent ? <ArrowRight size={12} className="opacity-40 group-hover:translate-x-1 transition-all" /> : (adsetGoal === goal.value && <CheckCircle2 size={12} />)}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2">
+                      <button onClick={() => setObjectiveStage('goal')} className="p-1.5 hover:bg-slate-50 rounded-lg transition-colors text-slate-400"><ChevronLeft size={16} /></button>
+                      <p className="text-[10px] font-black text-slate-400 tracking-widest">BACK</p>
+                    </div>
+                    <div className="relative px-1">
+                      <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 w-3.5 h-3.5" />
+                      <input className="w-full pl-9 pr-3 py-2.5 bg-slate-50 border-none rounded-xl text-xs font-bold text-slate-900 focus:ring-2 focus:ring-indigo-500/10"
+                        placeholder="Search events..." value={eventSearch} onChange={(e) => setEventSearch(e.target.value)} autoFocus />
+                    </div>
+                    <div className="max-h-[240px] overflow-y-auto custom-scrollbar px-1 space-y-1">
+                      {filteredEvents.map(ev => (
+                        <button key={ev} onClick={() => { setEvent(ev); setOpenDropdown(null); }}
+                          className={`w-full text-left px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-between ${
+                            event === ev ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200' : 'hover:bg-slate-50 text-slate-600'}`}>
+                          {ev}
+                          {event === ev && <Check size={12} />}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+          <AiLabel field="event" recommendedLabel="In-web actions → Purchase" onApply={() => {
+            setAdsetGoal(AI_RECOMMENDED.adsetGoal);
+            setEvent(AI_RECOMMENDED.event);
+          }} />
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const BatchGenerateAds = () => {
   const [selectedProducts, setSelectedProducts] = useState([]);
   const [productCreativesMap, setProductCreativesMap] = useState({});
@@ -114,11 +380,21 @@ const BatchGenerateAds = () => {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
 
-  const [selectedLocations, setSelectedLocations] = useState([{ code: 'US', name: 'United States' }]);
-  const [platform, setPlatform] = useState(PLATFORMS[0]);
-  const [objective, setObjective] = useState('sales_conversions');
-  const [adsetGoal, setAdsetGoal] = useState('in_web_actions');
-  const [event, setEvent] = useState('Purchase');
+  const [selectedLocations, setSelectedLocations] = useState(() =>
+    _hasGeneratedOnce ? [{ code: 'US', name: 'United States' }] : []
+  );
+  const [platform, setPlatform] = useState(() =>
+    _hasGeneratedOnce ? PLATFORMS[0] : null
+  );
+  const [objective, setObjective] = useState(() =>
+    _hasGeneratedOnce ? 'sales_conversions' : ''
+  );
+  const [adsetGoal, setAdsetGoal] = useState(() =>
+    _hasGeneratedOnce ? 'in_web_actions' : ''
+  );
+  const [event, setEvent] = useState(() =>
+    _hasGeneratedOnce ? 'Purchase' : ''
+  );
 
   const [openDropdown, setOpenDropdown] = useState(null); // 'location', 'platform', 'objective', 'event'
   const [locationSearch, setLocationSearch] = useState('');
@@ -145,9 +421,7 @@ const BatchGenerateAds = () => {
   
   const [advancedOpen, setAdvancedOpen] = useState(false);
   
-  const [hasGeneratedOnce, setHasGeneratedOnce] = useState(() => {
-    return localStorage.getItem('has_generated_once') === 'true';
-  });
+  const [hasGeneratedOnce, setHasGeneratedOnce] = useState(_hasGeneratedOnce);
 
   const [structure, setStructure] = useState({ 
     strategy: 'PER_PRODUCT',
@@ -717,275 +991,21 @@ const BatchGenerateAds = () => {
           {view === 'config' ? (
             <div className="space-y-8 animate-fade-in pb-20">
 
-              {/* Card 1: Targeting & Objectives */}
-              <div className="bg-white rounded-[2.5rem] p-10 shadow-sm border border-slate-100">
-                <div className="flex items-center gap-3 mb-8">
-                   <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white"><Target size={20} /></div>
-                   <h3 className="text-xl font-black text-slate-900">投放目标与渠道</h3>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 relative z-[10]">
-                  {/* Location Selector */}
-                  <div className="relative" ref={openDropdown === 'location' ? dropdownRef : null}>
-                    <div 
-                      onClick={() => setOpenDropdown(openDropdown === 'location' ? null : 'location')}
-                      className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm flex flex-col gap-2 group cursor-pointer hover:border-indigo-200 transition-all h-full"
-                    >
-                      <span className="text-[10px] font-bold text-slate-400 tracking-wider">投放国家/地区</span>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2.5 min-w-0">
-                          <MapPin size={16} className="text-indigo-500 shrink-0" />
-                          <span className="text-sm font-bold text-slate-700 truncate">
-                            {selectedLocations[0]?.name}
-                            {selectedLocations.length > 1 && '...'}
-                          </span>
-                        </div>
-                        <ChevronDown size={14} className={`text-slate-300 transition-transform ${openDropdown === 'location' ? 'rotate-180' : ''}`} />
-                      </div>
-                    </div>
-                    {openDropdown === 'location' && (
-                      <div className="absolute top-full left-0 mt-2 w-[500px] bg-white rounded-3xl shadow-2xl border border-slate-100 overflow-hidden flex animate-in fade-in zoom-in-95 duration-200">
-                        {/* Left: Search & List */}
-                        <div className="w-1/2 border-r border-slate-50 flex flex-col">
-                          <div className="p-4 border-b border-slate-50">
-                            <div className="relative">
-                              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-300 w-3.5 h-3.5" />
-                              <input 
-                                className="w-full pl-9 pr-3 py-2 bg-slate-50 border-none rounded-xl text-xs font-bold text-slate-900 focus:ring-2 focus:ring-indigo-500/10"
-                                placeholder="Search locations..."
-                                value={locationSearch}
-                                onChange={(e) => setLocationSearch(e.target.value)}
-                                autoFocus
-                              />
-                            </div>
-                          </div>
-                          <div className="flex-1 max-h-[300px] overflow-y-auto custom-scrollbar p-2 space-y-1">
-                            {filteredCountries.map(c => (
-                              <button 
-                                key={c.code}
-                                onClick={() => toggleLocation(c)}
-                                className={`w-full text-left px-3 py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-between ${
-                                  selectedLocations.some(l => l.code === c.code) ? 'bg-indigo-50 text-indigo-600' : 'text-slate-600 hover:bg-slate-50'
-                                }`}
-                              >
-                                {c.name}
-                                {selectedLocations.some(l => l.code === c.code) && <Check size={12} />}
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-                        {/* Right: Selected */}
-                        <div className="w-1/2 bg-slate-50/30 flex flex-col">
-                          <div className="p-4 border-b border-slate-50 flex items-center justify-between">
-                            <span className="text-[10px] font-black text-slate-400 tracking-widest">Selected ({selectedLocations.length})</span>
-                          </div>
-                          <div className="flex-1 max-h-[300px] overflow-y-auto custom-scrollbar p-4 flex flex-wrap gap-2 content-start">
-                            {selectedLocations.map(l => (
-                              <div key={l.code} className="flex items-center gap-1.5 px-2.5 py-1.5 bg-white border border-slate-100 rounded-lg shadow-sm animate-in zoom-in">
-                                <span className="text-[10px] font-black text-slate-700">{l.code}</span>
-                                <button onClick={() => toggleLocation(l)} className="text-slate-300 hover:text-rose-500 transition-colors">
-                                  <X size={10} strokeWidth={3} />
-                                </button>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Platform Selector */}
-                  <div className="relative" ref={openDropdown === 'platform' ? dropdownRef : null}>
-                    <div 
-                      onClick={() => setOpenDropdown(openDropdown === 'platform' ? null : 'platform')}
-                      className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm flex flex-col gap-2 group cursor-pointer hover:border-indigo-200 transition-all h-full"
-                    >
-                      <span className="text-[10px] font-bold text-slate-400 tracking-wider">投放渠道媒体</span>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2.5 min-w-0">
-                          <img src={platform.logo} className="w-5 h-5 rounded object-contain shrink-0" alt="" />
-                          <span className="text-sm font-bold text-slate-700 truncate">{platform.name}</span>
-                        </div>
-                        <ChevronDown size={14} className={`text-slate-300 transition-transform ${openDropdown === 'platform' ? 'rotate-180' : ''}`} />
-                      </div>
-                    </div>
-                    {openDropdown === 'platform' && (
-                      <div className="absolute top-full left-0 mt-2 w-full min-w-[200px] bg-white rounded-2xl shadow-2xl border border-slate-100 p-2 space-y-1 animate-in fade-in zoom-in-95 duration-200">
-                        {PLATFORMS.map(p => (
-                          <div key={p.id} className="relative group">
-                            <button 
-                              disabled={p.disabled}
-                              onClick={() => {
-                                if (!p.disabled) {
-                                  setPlatform(p);
-                                  setOpenDropdown(null);
-                                }
-                              }}
-                              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all ${
-                                p.disabled ? 'opacity-40 cursor-not-allowed' : 
-                                platform.id === p.id ? 'bg-indigo-50 text-indigo-600' : 'hover:bg-slate-50 text-slate-600'
-                              }`}
-                            >
-                              <img src={p.logo} className="w-5 h-5 rounded object-contain shrink-0" alt="" />
-                              <span className="text-xs font-bold">{p.name}</span>
-                              {!p.disabled && platform.id === p.id && <Check size={12} className="ml-auto" />}
-                            </button>
-                            {p.disabled && (
-                              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                                <div className="bg-slate-900 text-white text-[8px] font-black px-2 py-1 rounded shadow-lg tracking-widest">COMING SOON</div>
-                              </div>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Objective Selector */}
-                  <div className="relative" ref={openDropdown === 'objective' ? dropdownRef : null}>
-                    <div 
-                      onClick={() => {
-                        setOpenDropdown(openDropdown === 'objective' ? null : 'objective');
-                        setObjectiveStage('goal');
-                      }}
-                      className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm flex flex-col gap-2 group cursor-pointer hover:border-indigo-200 transition-all h-full"
-                    >
-                      <span className="text-[10px] font-bold text-slate-400 tracking-wider">核心投放目标</span>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2.5 min-w-0">
-                          <Target size={16} className="text-indigo-500 shrink-0" />
-                          <span className="text-sm font-bold text-slate-700 truncate">{currentObjectiveObj?.label}</span>
-                        </div>
-                        <ChevronDown size={14} className={`text-slate-300 transition-transform ${openDropdown === 'objective' ? 'rotate-180' : ''}`} />
-                      </div>
-                    </div>
-                    {openDropdown === 'objective' && (
-                      <div className="absolute top-full left-0 mt-2 w-[320px] bg-white rounded-3xl shadow-2xl border border-slate-100 p-4 space-y-3 animate-in fade-in zoom-in-95 duration-200">
-                        <p className="text-[10px] font-black text-slate-400 tracking-widest px-2">Select objective</p>
-                        <div className="space-y-1.5">
-                          {CAMPAIGN_OBJECTIVES.map(obj => {
-                            const Icon = obj.icon;
-                            return (
-                              <button 
-                                key={obj.value}
-                                onClick={() => {
-                                  const firstGoal = ADSET_GOALS_MAPPING[obj.value][0];
-                                  setObjective(obj.value);
-                                  setAdsetGoal(firstGoal.value);
-                                  setEvent(firstGoal.needsEvent ? 'Purchase' : '');
-                                  setOpenDropdown(null);
-                                }}
-                                className={`w-full text-left p-3 rounded-xl transition-all flex items-center gap-3 ${
-                                  objective === obj.value ? 'bg-indigo-50 text-indigo-600 ring-1 ring-indigo-100 shadow-sm' : 'hover:bg-slate-50 text-slate-600'
-                                }`}
-                              >
-                                <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${objective === obj.value ? 'bg-indigo-500 text-white' : obj.bg + ' ' + obj.color}`}>
-                                  <Icon size={18} />
-                                </div>
-                                <div className="min-w-0">
-                                  <p className="text-xs font-bold leading-none mb-1">{obj.label}</p>
-                                  <p className="text-[9px] font-medium opacity-60 truncate">{obj.description}</p>
-                                </div>
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Event Selector (Cascading) */}
-                  <div className="relative" ref={openDropdown === 'event' ? dropdownRef : null}>
-                    <div 
-                      onClick={() => {
-                        setOpenDropdown(openDropdown === 'event' ? null : 'event');
-                        setObjectiveStage('goal');
-                      }}
-                      className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm flex flex-col gap-2 group cursor-pointer hover:border-indigo-200 transition-all h-full"
-                    >
-                      <span className="text-[10px] font-bold text-slate-400 tracking-wider">转化优化事件</span>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2.5 min-w-0">
-                          <Zap size={16} className="text-indigo-500 shrink-0" />
-                          <div className="flex items-center gap-1 min-w-0">
-                            <span className="text-sm font-bold text-slate-700 truncate">
-                              {currentGoalObj?.label || '选择优化目标...'}
-                            </span>
-                            {event && <><ChevronRight size={10} className="text-slate-300 shrink-0" /><span className="text-sm font-bold text-indigo-600 truncate">{event}</span></>}
-                          </div>
-                        </div>
-                        <ChevronDown size={14} className={`text-slate-300 transition-transform ${openDropdown === 'event' ? 'rotate-180' : ''}`} />
-                      </div>
-                    </div>
-                    {openDropdown === 'event' && (
-                      <div className="absolute top-full right-0 mt-2 w-[340px] bg-white rounded-3xl shadow-2xl border border-slate-100 p-4 animate-in fade-in zoom-in-95 duration-200">
-                        {objectiveStage === 'goal' ? (
-                          <div className="space-y-3">
-                            <p className="text-[10px] font-black text-slate-400 tracking-widest px-2">Select conversion event</p>
-                            <div className="space-y-1">
-                              {availableGoals.map(goal => (
-                                <button
-                                  key={goal.value}
-                                  onClick={() => {
-                                    setAdsetGoal(goal.value);
-                                    if (goal.needsEvent) {
-                                      setObjectiveStage('event');
-                                    } else {
-                                      setEvent('');
-                                      setOpenDropdown(null);
-                                    }
-                                  }}
-                                  className={`w-full text-left px-4 py-3 rounded-xl text-xs font-bold transition-all flex items-center justify-between group ${
-                                    adsetGoal === goal.value ? 'bg-slate-900 text-white shadow-lg' : 'hover:bg-slate-50 text-slate-600'
-                                  }`}
-                                >
-                                  {goal.label}
-                                  {goal.needsEvent ? <ArrowRight size={12} className="opacity-40 group-hover:translate-x-1 transition-all" /> : (adsetGoal === goal.value && <CheckCircle2 size={12} />)}
-                                </button>
-                              ))}
-                            </div>
-                          </div>
-                        ) : (
-                          <div className="space-y-4">
-                            <div className="flex items-center gap-2">
-                              <button onClick={() => setObjectiveStage('goal')} className="p-1.5 hover:bg-slate-50 rounded-lg transition-colors text-slate-400">
-                                <ChevronLeft size={16} />
-                              </button>
-                              <p className="text-[10px] font-black text-slate-400 tracking-widest">BACK</p>
-                            </div>
-                            <div className="relative px-1">
-                              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 w-3.5 h-3.5" />
-                              <input 
-                                className="w-full pl-9 pr-3 py-2.5 bg-slate-50 border-none rounded-xl text-xs font-bold text-slate-900 focus:ring-2 focus:ring-indigo-500/10"
-                                placeholder="Search events..."
-                                value={eventSearch}
-                                onChange={(e) => setEventSearch(e.target.value)}
-                                autoFocus
-                              />
-                            </div>
-                            <div className="max-h-[240px] overflow-y-auto custom-scrollbar px-1 space-y-1">
-                              {filteredEvents.map(ev => (
-                                <button
-                                  key={ev}
-                                  onClick={() => {
-                                    setEvent(ev);
-                                    setOpenDropdown(null);
-                                  }}
-                                  className={`w-full text-left px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-between ${
-                                    event === ev ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200' : 'hover:bg-slate-50 text-slate-600'
-                                  }`}
-                                >
-                                  {ev}
-                                  {event === ev && <Check size={12} />}
-                                </button>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
+              {/* Card 1: Targeting & Objectives — only for non-first-time users */}
+              {hasGeneratedOnce && (
+                <TargetingChannelCard
+                  platform={platform} setPlatform={setPlatform} objective={objective} setObjective={setObjective}
+                  adsetGoal={adsetGoal} setAdsetGoal={setAdsetGoal} event={event} setEvent={setEvent}
+                  selectedLocations={selectedLocations} setSelectedLocations={setSelectedLocations}
+                  openDropdown={openDropdown} setOpenDropdown={setOpenDropdown} dropdownRef={dropdownRef}
+                  locationSearch={locationSearch} setLocationSearch={setLocationSearch}
+                  eventSearch={eventSearch} setEventSearch={setEventSearch}
+                  objectiveStage={objectiveStage} setObjectiveStage={setObjectiveStage}
+                  filteredCountries={filteredCountries} filteredEvents={filteredEvents} toggleLocation={toggleLocation}
+                  currentObjectiveObj={currentObjectiveObj} currentGoalObj={currentGoalObj} availableGoals={availableGoals}
+                  showAiRecommendation={false} allAnalysesComplete={false}
+                />
+              )}
 
               {/* Card 2: Add Product */}
               <div className="bg-white rounded-[2.5rem] p-10 shadow-sm border border-slate-100">
@@ -1043,6 +1063,22 @@ const BatchGenerateAds = () => {
                     点击上方产品的 “AI” 或 “上传” 按钮填充创意资产。完成后系统将自动开启 Campaign 架构生成模块。
                   </p>
                 </div>
+              )}
+
+              {/* Card 1.5: Targeting & Objectives — first-time users, gated like Card 3 */}
+              {!hasGeneratedOnce && allProductsReady && (!isAnyProductMissingCreatives || campaignType === 'CATALOG') && (
+                <TargetingChannelCard
+                  platform={platform} setPlatform={setPlatform} objective={objective} setObjective={setObjective}
+                  adsetGoal={adsetGoal} setAdsetGoal={setAdsetGoal} event={event} setEvent={setEvent}
+                  selectedLocations={selectedLocations} setSelectedLocations={setSelectedLocations}
+                  openDropdown={openDropdown} setOpenDropdown={setOpenDropdown} dropdownRef={dropdownRef}
+                  locationSearch={locationSearch} setLocationSearch={setLocationSearch}
+                  eventSearch={eventSearch} setEventSearch={setEventSearch}
+                  objectiveStage={objectiveStage} setObjectiveStage={setObjectiveStage}
+                  filteredCountries={filteredCountries} filteredEvents={filteredEvents} toggleLocation={toggleLocation}
+                  currentObjectiveObj={currentObjectiveObj} currentGoalObj={currentGoalObj} availableGoals={availableGoals}
+                  showAiRecommendation={true} allAnalysesComplete={allAnalysesComplete}
+                />
               )}
 
               {/* Card 3: Strategy & Budget */}
@@ -1357,7 +1393,7 @@ const BatchGenerateAds = () => {
               {allProductsReady && (!isAnyProductMissingCreatives || campaignType === 'CATALOG') && (
                 <div className="flex flex-col items-center">
                   <button
-                    onClick={() => setView('preview')}
+                    onClick={() => { setView('preview'); _hasGeneratedOnce = true; setHasGeneratedOnce(true); }}
                     className="group relative w-full max-w-4xl py-8 px-16 rounded-[2.5rem] font-black text-2xl flex items-center justify-center bg-slate-900 text-white hover:bg-black shadow-2xl transition-all"
                   >
                     <Sparkles size={28} className="mr-5" />
