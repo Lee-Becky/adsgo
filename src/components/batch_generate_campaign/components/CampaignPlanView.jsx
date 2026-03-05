@@ -174,14 +174,14 @@ const IntInterestSelector = ({ intOptions, onIntOptionsChange, productAnalyses, 
           <>
             <div className="fixed inset-0 z-[190]" onClick={() => setShowPanel(false)} />
             <div
-              className="absolute top-full left-0 mt-2 w-[500px] bg-white rounded-3xl shadow-2xl border border-slate-100 overflow-hidden animate-in fade-in zoom-in-95 duration-200 flex flex-col"
+              className="absolute top-full left-0 mt-2 w-[500px] bg-white rounded-xl shadow-2xl border border-slate-100 overflow-hidden animate-in fade-in zoom-in-95 duration-200 flex flex-col"
               style={{ zIndex: 200 }}
             >
               {/* Top bar: restore button + AI status */}
               <div className="px-4 py-3 border-b border-slate-50 flex items-center justify-between bg-slate-50/30">
                 <button
                   onClick={restoreAiRecommended}
-                  className="flex items-center gap-1.5 text-[10px] font-black text-indigo-500 hover:text-indigo-700 transition-colors"
+                  className="flex items-center gap-1.5 text-[10px] font-black text-[#7033F5] hover:text-[#5221CF] transition-colors"
                 >
                   <RefreshCw size={11} /> 恢复至初始化AI推荐
                 </button>
@@ -278,7 +278,7 @@ const CollapsibleThink = ({ thinkLines }) => {
         onClick={() => setCollapsed(!collapsed)}
       >
         <div className="flex items-center gap-1.5">
-          <Sparkles size={12} className="text-indigo-400" />
+          <Sparkles size={12} className="text-[#7033F5]/70" />
           <span className="text-[10px] font-black text-slate-400 tracking-widest">&lt;think&gt;</span>
         </div>
         {collapsed ? <ChevronDown size={12} className="text-slate-300" /> : <ChevronUp size={12} className="text-slate-300" />}
@@ -385,7 +385,7 @@ const AiStrategyDialog = ({ onApplyStrategy, onApplied }) => {
           {messages.map((msg, idx) => (
             <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
               {msg.role === 'user' ? (
-                <div className="max-w-[80%] bg-indigo-600 text-white px-4 py-2.5 rounded-2xl rounded-br-md text-xs font-bold">
+                <div className="max-w-[80%] bg-[#7033F5] text-white px-4 py-2.5 rounded-2xl rounded-br-md text-xs font-bold">
                   {msg.content}
                 </div>
               ) : msg.role === 'ai_result' ? (
@@ -421,7 +421,7 @@ const AiStrategyDialog = ({ onApplyStrategy, onApplied }) => {
                 onClick={() => setThinkCollapsed(!thinkCollapsed)}
               >
                 <div className="flex items-center gap-1.5">
-                  <Sparkles size={12} className="text-indigo-400" />
+                  <Sparkles size={12} className="text-[#7033F5]/70" />
                   <span className="text-[10px] font-black text-slate-400 tracking-widest">&lt;think&gt;</span>
                 </div>
                 {thinkCollapsed ? <ChevronDown size={12} className="text-slate-300" /> : <ChevronUp size={12} className="text-slate-300" />}
@@ -435,8 +435,8 @@ const AiStrategyDialog = ({ onApplyStrategy, onApplied }) => {
                   ))}
                   {isThinking && (
                     <div className="flex items-center gap-1.5 mt-1">
-                      <Loader2 size={10} className="animate-spin text-indigo-400" />
-                      <span className="text-[10px] text-indigo-400 font-bold">思考中...</span>
+                      <Loader2 size={10} className="animate-spin text-[#7033F5]/70" />
+                      <span className="text-[10px] text-[#7033F5]/70 font-bold">思考中...</span>
                     </div>
                   )}
                 </div>
@@ -446,12 +446,12 @@ const AiStrategyDialog = ({ onApplyStrategy, onApplied }) => {
 
           {/* Result card */}
           {pendingResult && (
-            <div className="bg-white border-2 border-indigo-100 rounded-2xl p-4 animate-in fade-in slide-in-from-bottom-2">
+            <div className="bg-white border-2 border-[#7033F5]/15 rounded-2xl p-4 animate-in fade-in slide-in-from-bottom-2">
               <div className="flex items-center gap-2 mb-3">
-                <Layers size={14} className="text-indigo-500" />
+                <Layers size={14} className="text-[#7033F5]" />
                 <span className="text-xs font-black text-slate-800">广告结构方案</span>
               </div>
-              <div className="space-y-1.5 text-[11px] text-slate-600 font-bold pl-2 border-l-2 border-indigo-100">
+              <div className="space-y-1.5 text-[11px] text-slate-600 font-bold pl-2 border-l-2 border-[#7033F5]/15">
                 <p>• 架构策略: {strategyLabel(pendingResult.strategy)}</p>
                 <p>• 每产品 Adset 数: {pendingResult.numAdsetsPerProduct}</p>
                 <p>• 受众分配: {audienceLabel(pendingResult.audienceAssignment)}</p>
@@ -459,7 +459,7 @@ const AiStrategyDialog = ({ onApplyStrategy, onApplied }) => {
               <div className="mt-4">
                 <button
                   onClick={handleApply}
-                  className="flex items-center gap-1.5 px-4 py-2 bg-indigo-600 text-white rounded-xl text-[10px] font-black tracking-widest hover:bg-indigo-700 transition-all shadow-sm"
+                  className="flex items-center gap-1.5 px-4 py-2 bg-[#7033F5] text-white rounded-xl text-[10px] font-black tracking-widest hover:bg-[#5221CF] transition-all shadow-sm"
                 >
                   <Check size={12} /> 确认应用
                 </button>
@@ -477,7 +477,7 @@ const AiStrategyDialog = ({ onApplyStrategy, onApplied }) => {
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter') handleSend(); }}
             placeholder='例：每个产品创建3组adset，第1组和第2组用LAL受众，第3组用兴趣词受众'
-            className="flex-1 bg-slate-50 border-none rounded-xl px-4 py-2.5 text-xs font-bold text-slate-800 placeholder:text-slate-300 outline-none focus:ring-2 focus:ring-indigo-500/10"
+            className="flex-1 bg-slate-50 border-none rounded-xl px-4 py-2.5 text-xs font-bold text-slate-800 placeholder:text-slate-300 outline-none focus:ring-2 focus:ring-[#7033F5]/10"
             disabled={isThinking}
           />
           <button
@@ -485,7 +485,7 @@ const AiStrategyDialog = ({ onApplyStrategy, onApplied }) => {
             disabled={!inputValue.trim() || isThinking}
             className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${
               inputValue.trim() && !isThinking
-                ? 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-sm'
+                ? 'bg-[#7033F5] text-white hover:bg-[#5221CF] shadow-sm'
                 : 'bg-slate-100 text-slate-300'
             }`}
           >
@@ -646,12 +646,12 @@ const CampaignPlanView = ({
       <div className="space-y-4">
         <div className="flex items-center gap-2 px-2">
           <h4 className="text-[11px] font-black text-slate-400 tracking-widest">Campaign 架构策略</h4>
-          <div className="w-5 h-5 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center cursor-help shadow-sm">
+          <div className="w-5 h-5 bg-[#F5F1FF] text-[#7033F5] rounded-full flex items-center justify-center cursor-help shadow-sm">
             <Info size={12} />
           </div>
         </div>
 
-        <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm space-y-6">
+        <div className="bg-white p-8 rounded-xl border border-slate-100 shadow-sm space-y-6">
           <div className="space-y-3">
             <label className="text-[10px] font-bold text-slate-400 tracking-widest px-1">选择发布逻辑</label>
             <div className={`grid ${campaignType === 'CATALOG' ? 'grid-cols-1' : 'grid-cols-4'} gap-3`}>
@@ -669,11 +669,11 @@ const CampaignPlanView = ({
                   onClick={() => onStructureChange({ ...structure, strategy: opt.id })}
                   className={`p-4 rounded-2xl border text-left transition-all ${
                     (structure.strategy === opt.id || campaignType === 'CATALOG')
-                      ? 'border-indigo-600 bg-indigo-50 ring-2 ring-indigo-500/10'
+                      ? 'border-[#7033F5] bg-[#F5F1FF] ring-2 ring-[#7033F5]/10'
                       : 'border-slate-100 hover:border-slate-200 bg-white'
                   }`}
                 >
-                  <p className={`text-[11px] font-black ${(structure.strategy === opt.id || campaignType === 'CATALOG') ? 'text-indigo-600' : 'text-slate-800'}`}>{opt.label}</p>
+                  <p className={`text-[11px] font-black ${(structure.strategy === opt.id || campaignType === 'CATALOG') ? 'text-[#7033F5]' : 'text-slate-800'}`}>{opt.label}</p>
                   <p className="text-[9px] text-slate-400 font-bold mt-1">{opt.desc}</p>
                 </button>
               ))}
@@ -689,7 +689,7 @@ const CampaignPlanView = ({
                     setAiStrategyApplied(false);
                     onStructureChange({ ...structure, _aiResolvedStrategy: undefined });
                   }}
-                  className="flex items-center gap-2 px-5 py-3 bg-indigo-50 border border-indigo-200 text-indigo-600 rounded-full text-xs font-black hover:bg-indigo-100 transition-all"
+                  className="flex items-center gap-2 px-5 py-3 bg-[#F5F1FF] border border-[#7033F5]/20 text-[#7033F5] rounded-full text-xs font-black hover:bg-[#F5F1FF] transition-all"
                 >
                   <RefreshCw size={14} /> 重新生成策略
                 </button>
@@ -711,10 +711,10 @@ const CampaignPlanView = ({
                <div className="relative max-w-[240px]">
                   <div
                     onClick={() => setShowNumAdsetsDropdown(!showNumAdsetsDropdown)}
-                    className="w-full h-12 bg-white border-2 border-indigo-50 rounded-2xl px-5 flex items-center justify-between cursor-pointer hover:border-indigo-200 transition-all shadow-sm"
+                    className="w-full h-12 bg-white border-2 border-[#F5F1FF] rounded-2xl px-5 flex items-center justify-between cursor-pointer hover:border-[#7033F5]/20 transition-all shadow-sm"
                   >
                     <div className="flex items-center gap-3">
-                      <Layers size={16} className="text-indigo-500" />
+                      <Layers size={16} className="text-[#7033F5]" />
                       <span className="text-sm font-black text-slate-700">
                         {structure.strategy === 'PER_PRODUCT' ? (structure.numAdsetsPerProduct || 1) : (structure.strategy === 'BY_AD_COUNT' ? (structure.adsPerSet || 1) : (structure.numAdsets || 1))} 组
                       </span>
@@ -726,7 +726,7 @@ const CampaignPlanView = ({
                     <>
                       <div className="fixed inset-0 z-[190]" onClick={() => setShowNumAdsetsDropdown(false)} />
                       <div
-                        className="absolute top-full left-0 right-0 mt-2 bg-white border border-indigo-50 rounded-[1.5rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-150 py-2"
+                        className="absolute top-full left-0 right-0 mt-2 bg-white border border-[#F5F1FF] rounded-lg shadow-2xl overflow-hidden animate-in zoom-in-95 duration-150 py-2"
                         style={{ zIndex: 200 }}
                       >
                         {Array.from({ length: structure.strategy === 'BY_AD_COUNT' ? allAdsCount : 10 }, (_, i) => i + 1).map((n) => {
@@ -747,10 +747,10 @@ const CampaignPlanView = ({
                                 });
                                 setShowNumAdsetsDropdown(false);
                               }}
-                              className={`flex items-center justify-between px-5 py-3 hover:bg-indigo-50 cursor-pointer transition-colors group ${isSel ? 'bg-indigo-50/50' : ''}`}
+                              className={`flex items-center justify-between px-5 py-3 hover:bg-[#F5F1FF] cursor-pointer transition-colors group ${isSel ? 'bg-[#F5F1FF]/50' : ''}`}
                             >
-                              <span className={`text-xs font-black ${isSel ? 'text-indigo-600' : 'text-slate-600 group-hover:text-indigo-600'}`}>{n} 组 Adsets</span>
-                              {isSel && <Check size={14} className="text-indigo-600" />}
+                              <span className={`text-xs font-black ${isSel ? 'text-[#7033F5]' : 'text-slate-600 group-hover:text-[#7033F5]'}`}>{n} 组 Adsets</span>
+                              {isSel && <Check size={14} className="text-[#7033F5]" />}
                             </div>
                           );
                         })}
@@ -762,7 +762,7 @@ const CampaignPlanView = ({
           )}
 
           {(structure.strategy !== 'AI_STRATEGY' || aiStrategyApplied) && (
-          <div className="bg-slate-50/50 rounded-[2rem] p-8 mt-6">
+          <div className="bg-slate-50/50 rounded-[20px] p-8 mt-6">
             <div className="flex flex-col items-center">
               <div className="flex flex-col items-center mb-10 relative">
                 <div className="w-14 h-14 bg-slate-900 text-white rounded-2xl flex items-center justify-center shadow-xl z-10 border-4 border-white">
@@ -784,7 +784,7 @@ const CampaignPlanView = ({
                         className={`w-10 h-10 rounded-xl border shadow-sm flex flex-col items-center justify-center transition-all hover:scale-110 active:scale-95 mb-2 relative group ${
                           audienceType === 'LAL' ? 'bg-purple-50 text-purple-600 border-purple-100' :
                           audienceType === 'INT' ? 'bg-amber-50 text-amber-600 border-amber-100' :
-                          'bg-indigo-50 text-indigo-600 border-indigo-100'
+                          'bg-[#F5F1FF] text-[#7033F5] border-[#7033F5]/15'
                         }`}
                         title="点击切换受众策略 (Adv+ / LAL / INT)"
                       >
@@ -799,17 +799,17 @@ const CampaignPlanView = ({
 
                       <div className="flex flex-wrap gap-1 justify-center max-w-[120px]">
                         {campaignType === 'CATALOG' ? (
-                          <div className="w-16 h-20 rounded-lg border-2 border-dashed border-indigo-200 bg-indigo-50/30 flex flex-col items-center justify-center p-2 relative overflow-hidden group/catalog">
+                          <div className="w-16 h-20 rounded-lg border-2 border-dashed border-[#7033F5]/20 bg-[#F5F1FF]/30 flex flex-col items-center justify-center p-2 relative overflow-hidden group/catalog">
                             <div className="grid grid-cols-2 gap-1 opacity-40 group-hover/catalog:opacity-60 transition-opacity">
                               {[1, 2, 3, 4].map(i => (
-                                <div key={i} className="w-4 h-4 rounded-sm bg-indigo-200" />
+                                <div key={i} className="w-4 h-4 rounded-sm bg-[#F5F1FF]" />
                               ))}
                             </div>
                             <div className="absolute inset-0 flex items-center justify-center">
-                              <LayoutGrid size={24} className="text-indigo-400" />
+                              <LayoutGrid size={24} className="text-[#7033F5]/70" />
                             </div>
                             <div className="absolute bottom-1 w-full flex justify-center">
-                              <span className="text-[6px] font-black text-indigo-400 uppercase tracking-tighter">Dynamic Feed</span>
+                              <span className="text-[6px] font-black text-[#7033F5]/70 uppercase tracking-tighter">Dynamic Feed</span>
                             </div>
                           </div>
                         ) : (
@@ -868,7 +868,7 @@ const CampaignPlanView = ({
                             <div className="p-4">
                               <button
                                 onClick={() => { handleAuthorize('meta'); setShowLalDropdown(false); }}
-                                className="w-full py-3 bg-indigo-600 text-white rounded-xl text-[11px] font-black tracking-widest hover:bg-indigo-700 transition-all shadow-lg flex items-center justify-center gap-2"
+                                className="w-full py-3 bg-[#7033F5] text-white rounded-xl text-[11px] font-black tracking-widest hover:bg-[#5221CF] transition-all shadow-lg flex items-center justify-center gap-2"
                               >
                                 <Facebook size={14} /> 立即连接 Meta
                               </button>
@@ -877,7 +877,7 @@ const CampaignPlanView = ({
                             <div className="p-4">
                               <button
                                 onClick={() => { onSelectAccount(); setShowLalDropdown(false); }}
-                                className="w-full py-3 bg-indigo-600 text-white rounded-xl text-[11px] font-black tracking-widest hover:bg-indigo-700 transition-all shadow-lg flex items-center justify-center gap-2"
+                                className="w-full py-3 bg-[#7033F5] text-white rounded-xl text-[11px] font-black tracking-widest hover:bg-[#5221CF] transition-all shadow-lg flex items-center justify-center gap-2"
                               >
                                 <Briefcase size={14} /> 选择广告账户
                               </button>
@@ -921,29 +921,29 @@ const CampaignPlanView = ({
 
       <div className="space-y-4">
         <h4 className="text-[11px] font-black text-slate-400 tracking-widest px-2">预算配置与预估消耗</h4>
-        <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm flex flex-col gap-6 h-full">
+        <div className="bg-white p-8 rounded-xl border border-slate-100 shadow-sm flex flex-col gap-6 h-full">
           <div className="space-y-3">
             <div className="flex items-center justify-between px-1">
               <label className="text-[10px] font-black text-slate-400 tracking-widest px-1">目标投放系列 (Campaign)</label>
               <button
                 onClick={onSelectCampaign}
-                className="flex items-center gap-1.5 text-indigo-600 hover:text-indigo-700 transition-colors"
+                className="flex items-center gap-1.5 text-[#7033F5] hover:text-[#5221CF] transition-colors"
               >
                 <Edit3 size={12} />
                 <span className="text-[10px] font-black">选择已有</span>
               </button>
             </div>
-            <div className={`flex items-center gap-4 p-5 rounded-[1.5rem] border-2 transition-all ${isExistingCampaign ? 'bg-indigo-50 border-indigo-200' : 'bg-slate-50 border-slate-100'}`}>
-              <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${isExistingCampaign ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200' : 'bg-white text-slate-400 shadow-sm'}`}>
+            <div className={`flex items-center gap-4 p-5 rounded-lg border-2 transition-all ${isExistingCampaign ? 'bg-[#F5F1FF] border-[#7033F5]/20' : 'bg-slate-50 border-slate-100'}`}>
+              <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${isExistingCampaign ? 'bg-[#7033F5] text-white shadow-lg shadow-[#7033F5]/15' : 'bg-white text-slate-400 shadow-sm'}`}>
                 <Briefcase size={20} />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-xs font-black text-slate-900 truncate">
                   {selectedCampaign?.name || '创建全新系列 (Create New)'}
                 </p>
-                {isExistingCampaign && <p className="text-[9px] text-indigo-400 font-bold mt-0.5">ID: {selectedCampaign.id}</p>}
+                {isExistingCampaign && <p className="text-[9px] text-[#7033F5]/70 font-bold mt-0.5">ID: {selectedCampaign.id}</p>}
               </div>
-              {isExistingCampaign && <Lock size={14} className="text-indigo-300 shrink-0" />}
+              {isExistingCampaign && <Lock size={14} className="text-[#7033F5]/40 shrink-0" />}
             </div>
           </div>
 
@@ -955,20 +955,20 @@ const CampaignPlanView = ({
             <div className={`flex p-1 bg-slate-100/80 rounded-xl border border-slate-100 ${isExistingCampaign ? 'opacity-60 grayscale pointer-events-none' : ''}`}>
               <button
                 onClick={() => onBudgetTypeChange('CBO')}
-                className={`px-4 py-1.5 rounded-lg text-[10px] font-black transition-all ${budgetType === 'CBO' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-400'}`}>
+                className={`px-4 py-1.5 rounded-lg text-[10px] font-black transition-all ${budgetType === 'CBO' ? 'bg-white text-[#7033F5] shadow-sm' : 'text-slate-400'}`}>
                 CBO (均衡)
               </button>
               <button
                 onClick={() => onBudgetTypeChange('ABO')}
-                className={`px-4 py-1.5 rounded-lg text-[10px] font-black transition-all ${budgetType === 'ABO' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-400'}`}>
+                className={`px-4 py-1.5 rounded-lg text-[10px] font-black transition-all ${budgetType === 'ABO' ? 'bg-white text-[#7033F5] shadow-sm' : 'text-slate-400'}`}>
                 ABO (单组)
               </button>
             </div>
           </div>
 
-          <div className="bg-slate-50/80 border border-slate-100 rounded-[2rem] p-6 flex flex-col items-center relative overflow-hidden group">
+          <div className="bg-slate-50/80 border border-slate-100 rounded-[20px] p-6 flex flex-col items-center relative overflow-hidden group">
             <div className="flex items-center w-full">
-              <DollarSign className="text-slate-300 absolute left-8 pointer-events-none group-focus-within:text-indigo-500 transition-colors" size={32} />
+              <DollarSign className="text-slate-300 absolute left-8 pointer-events-none group-focus-within:text-[#7033F5] transition-colors" size={32} />
               <input
                 type="number"
                 value={dailyBudget}
@@ -981,21 +981,21 @@ const CampaignPlanView = ({
             </div>
           </div>
 
-          <div className="bg-slate-900 p-8 rounded-[2rem] text-white shadow-xl relative overflow-hidden">
+          <div className="bg-slate-900 p-8 rounded-[20px] text-white shadow-xl relative overflow-hidden">
              <div className="flex items-center gap-2 mb-2">
-                <Sparkles size={14} className="text-indigo-400" />
+                <Sparkles size={14} className="text-[#7033F5]/70" />
                 <p className="text-[10px] font-black opacity-60 tracking-widest">预估日均消耗</p>
               </div>
               <div className="flex items-end justify-between">
                 <div>
                   <p className="text-4xl font-black text-white">${estimatedTotalDaily}</p>
-                  <p className="text-[10px] text-indigo-400 font-bold mt-1 tracking-widest">
+                  <p className="text-[10px] text-[#7033F5]/70 font-bold mt-1 tracking-widest">
                     {budgetType === 'ABO' ? `${dailyBudget} * ${adSetGroups.length} Adsets` : '系列全局消耗'}
                   </p>
                 </div>
                 <div className="text-right">
                   <div className="flex items-center gap-1.5 justify-end mb-1">
-                    <Layers size={14} className="text-indigo-400" />
+                    <Layers size={14} className="text-[#7033F5]/70" />
                     <p className="text-xl font-black text-white">{adSetGroups.length}</p>
                   </div>
                   <p className="text-[9px] text-slate-400 font-bold tracking-widest">AdSets 数量</p>

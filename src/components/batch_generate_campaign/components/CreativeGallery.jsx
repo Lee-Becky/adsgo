@@ -55,7 +55,7 @@ const CreativeGallery = ({ creatives, onAdd, onRemove, selectedProductName }) =>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <button 
           onClick={() => setShowLibraryModal(true)}
-          className="flex flex-col items-center justify-center p-6 rounded-2xl border-2 border-dashed bg-white border-slate-100 text-slate-400 hover:border-indigo-200 hover:bg-slate-50 transition-all group"
+          className="flex flex-col items-center justify-center p-6 rounded-2xl border-2 border-dashed bg-white border-slate-100 text-slate-400 hover:border-[#7033F5]/20 hover:bg-slate-50 transition-all group"
         >
           <ImageIcon size={28} className="mb-2 group-hover:scale-110 transition-transform" />
           <span className="text-xs font-black uppercase tracking-widest">从素材库选择</span>
@@ -63,7 +63,7 @@ const CreativeGallery = ({ creatives, onAdd, onRemove, selectedProductName }) =>
 
         <button 
           onClick={handleUpload}
-          className="flex flex-col items-center justify-center p-6 rounded-2xl border-2 border-dashed bg-white border-slate-100 text-slate-400 hover:border-indigo-200 hover:bg-slate-50 transition-all group"
+          className="flex flex-col items-center justify-center p-6 rounded-2xl border-2 border-dashed bg-white border-slate-100 text-slate-400 hover:border-[#7033F5]/20 hover:bg-slate-50 transition-all group"
         >
           <Upload size={28} className="mb-2 group-hover:scale-110 transition-transform" />
           <span className="text-xs font-black uppercase tracking-widest">本地上传素材</span>
@@ -72,7 +72,7 @@ const CreativeGallery = ({ creatives, onAdd, onRemove, selectedProductName }) =>
         <button 
           disabled={isGenerating}
           onClick={handleAIGC}
-          className="flex flex-col items-center justify-center p-6 rounded-2xl border-2 border-dashed bg-indigo-50/30 border-indigo-100 text-indigo-500 hover:border-indigo-300 hover:bg-indigo-50 transition-all group relative overflow-hidden"
+          className="flex flex-col items-center justify-center p-6 rounded-2xl border-2 border-dashed bg-[#F5F1FF]/30 border-[#7033F5]/15 text-[#7033F5] hover:border-[#7033F5]/30 hover:bg-[#F5F1FF] transition-all group relative overflow-hidden"
         >
           {isGenerating ? (
             <div className="flex flex-col items-center animate-pulse">
@@ -89,8 +89,8 @@ const CreativeGallery = ({ creatives, onAdd, onRemove, selectedProductName }) =>
       </div>
 
       {showLibraryModal && (
-        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in">
-          <div className="bg-white w-full max-w-4xl rounded-[2.5rem] shadow-2xl flex flex-col max-h-[85vh] overflow-hidden">
+        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in">
+          <div className="bg-white w-full max-w-4xl rounded-xl shadow-2xl flex flex-col max-h-[85vh] overflow-hidden">
             <div className="p-8 border-b border-slate-50 flex items-center justify-between">
               <div>
                 <h3 className="text-xl font-black text-slate-900 tracking-tight">公司素材库</h3>
@@ -107,10 +107,10 @@ const CreativeGallery = ({ creatives, onAdd, onRemove, selectedProductName }) =>
                 <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">过滤选项</span>
               </div>
               <label className="flex items-center gap-3 cursor-pointer group">
-                <span className={`text-[10px] font-black uppercase transition-colors ${showOnlyRelated ? 'text-indigo-600' : 'text-slate-400'}`}>仅显示关联素材</span>
+                <span className={`text-[10px] font-black uppercase transition-colors ${showOnlyRelated ? 'text-[#7033F5]' : 'text-slate-400'}`}>仅显示关联素材</span>
                 <div 
                   onClick={() => setShowOnlyRelated(!showOnlyRelated)}
-                  className={`w-10 h-5 rounded-full relative transition-colors ${showOnlyRelated ? 'bg-indigo-600' : 'bg-slate-200'}`}
+                  className={`w-10 h-5 rounded-full relative transition-colors ${showOnlyRelated ? 'bg-[#7033F5]' : 'bg-[#CBD5E1]'}`}
                 >
                   <div className={`absolute top-1 w-3 h-3 bg-white rounded-full transition-transform ${showOnlyRelated ? 'translate-x-6' : 'translate-x-1'}`} />
                 </div>
@@ -125,11 +125,11 @@ const CreativeGallery = ({ creatives, onAdd, onRemove, selectedProductName }) =>
                     <div 
                       key={item.id} 
                       onClick={() => toggleLibraryItem(item)}
-                      className={`relative aspect-[3/4] rounded-2xl overflow-hidden cursor-pointer group ring-offset-2 transition-all ${isSelected ? 'ring-4 ring-indigo-600' : 'hover:ring-2 hover:ring-slate-300'}`}
+                      className={`relative aspect-[3/4] rounded-2xl overflow-hidden cursor-pointer group ring-offset-2 transition-all ${isSelected ? 'ring-4 ring-[#7033F5]' : 'hover:ring-2 hover:ring-slate-300'}`}
                     >
                       <img src={item.url} className="w-full h-full object-cover" />
-                      <div className={`absolute inset-0 flex items-center justify-center transition-opacity ${isSelected ? 'bg-indigo-600/20 opacity-100' : 'bg-black/40 opacity-0 group-hover:opacity-100'}`}>
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center shadow-xl ${isSelected ? 'bg-indigo-600 text-white' : 'bg-white text-slate-900'}`}>
+                      <div className={`absolute inset-0 flex items-center justify-center transition-opacity ${isSelected ? 'bg-[#7033F5]/20 opacity-100' : 'bg-black/40 opacity-0 group-hover:opacity-100'}`}>
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center shadow-xl ${isSelected ? 'bg-[#7033F5] text-white' : 'bg-white text-slate-900'}`}>
                           {isSelected ? <Check size={20} /> : <Plus size={20} />}
                         </div>
                       </div>
@@ -142,7 +142,7 @@ const CreativeGallery = ({ creatives, onAdd, onRemove, selectedProductName }) =>
             <div className="p-6 bg-slate-50 border-t border-slate-100 flex justify-end">
                <button 
                  onClick={() => setShowLibraryModal(false)}
-                 className="px-8 py-3 bg-slate-900 text-white rounded-2xl text-xs font-black uppercase tracking-widest shadow-xl shadow-slate-200"
+                 className="px-8 py-3 bg-[#7033F5] text-white rounded-2xl text-xs font-black uppercase tracking-widest shadow-xl shadow-slate-200"
                >
                  确认选择 ({creatives.length})
                </button>
@@ -158,7 +158,7 @@ const CreativeGallery = ({ creatives, onAdd, onRemove, selectedProductName }) =>
         </div>
         
         {creatives.length === 0 ? (
-          <div className="py-12 flex flex-col items-center justify-center bg-slate-50/50 rounded-3xl border border-dashed border-slate-200">
+          <div className="py-12 flex flex-col items-center justify-center bg-slate-50/50 rounded-xl border border-dashed border-slate-200">
             <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">尚未添加任何素材</p>
           </div>
         ) : (
@@ -168,10 +168,10 @@ const CreativeGallery = ({ creatives, onAdd, onRemove, selectedProductName }) =>
                 <img src={c.url} alt="Creative" className="w-full h-full object-cover" />
                 <div className="absolute top-2 left-2 flex gap-1">
                   {idx === 0 && (
-                    <span className="px-2 py-0.5 bg-indigo-600 text-white text-[8px] font-black rounded uppercase tracking-tighter">主图</span>
+                    <span className="px-2 py-0.5 bg-[#7033F5] text-white text-[8px] font-black rounded-[25px] uppercase tracking-tighter">主图</span>
                   )}
                   {c.id.startsWith('aigc') && (
-                    <span className="px-2 py-0.5 bg-purple-600 text-white text-[8px] font-black rounded uppercase tracking-tighter">AI</span>
+                    <span className="px-2 py-0.5 bg-[#7033F5] text-white text-[8px] font-black rounded-[25px] uppercase tracking-tighter">AI</span>
                   )}
                 </div>
                 <button 

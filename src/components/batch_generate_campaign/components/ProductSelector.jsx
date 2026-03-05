@@ -127,12 +127,12 @@ const PLATFORM_ICONS = [
 ];
 
 const NanoBananaSkeleton = () => (
-  <div className="relative w-14 h-20 rounded-lg overflow-hidden shrink-0 border border-indigo-100 bg-indigo-50/30 animate-pulse flex flex-col items-center justify-center gap-1">
-    <div className="w-6 h-6 bg-indigo-100 rounded-full flex items-center justify-center">
-      <Loader2 size={12} className="text-indigo-400 animate-spin" />
+  <div className="relative w-14 h-20 rounded-lg overflow-hidden shrink-0 border border-[#7033F5]/15 bg-[#F5F1FF]/30 animate-pulse flex flex-col items-center justify-center gap-1">
+    <div className="w-6 h-6 bg-[#F5F1FF] rounded-full flex items-center justify-center">
+      <Loader2 size={12} className="text-[#7033F5]/70 animate-spin" />
     </div>
-    <span className="text-[6px] font-black text-indigo-300 uppercase tracking-tighter text-center px-1">Nano Banana</span>
-    <span className="text-[5px] font-bold text-indigo-200 uppercase text-center">Generating...</span>
+    <span className="text-[6px] font-black text-[#7033F5]/40 uppercase tracking-tighter text-center px-1">Nano Banana</span>
+    <span className="text-[5px] font-bold text-[#F5F1FF] uppercase text-center">Generating...</span>
   </div>
 );
 
@@ -171,16 +171,16 @@ const AssetGrid = ({ title, subtitle, assets = [], onAssetsChange, maxCount = 99
       <div className="flex items-center justify-between"><div className="space-y-1"><div className="flex items-center gap-2"><div className="w-1 h-3 bg-blue-400 rounded-full" /><h5 className="text-[13px] font-black text-slate-900">{title}</h5></div><p className="text-[10px] text-slate-400 font-medium leading-tight">{subtitle}</p></div></div>
       <div className={`flex flex-wrap gap-4 items-start ${isExpandable && !isExpanded ? 'overflow-hidden max-h-[140px]' : ''}`}>
         {assets.length < maxCount && (
-          <div onClick={() => fileInputRef.current?.click()} className="w-[140px] aspect-square bg-slate-50 border-2 border-dashed border-slate-200 rounded-[24px] flex items-center justify-center cursor-pointer hover:bg-indigo-50 hover:border-indigo-300 transition-all group active:scale-[0.97] shrink-0"><Plus size={32} className="text-slate-300 group-hover:text-indigo-50 transition-colors" /></div>
+          <div onClick={() => fileInputRef.current?.click()} className="w-[140px] aspect-square bg-slate-50 border-2 border-dashed border-slate-200 rounded-[24px] flex items-center justify-center cursor-pointer hover:bg-[#F5F1FF] hover:border-[#7033F5]/30 transition-all group active:scale-[0.97] shrink-0"><Plus size={32} className="text-slate-300 group-hover:text-[#F5F1FF] transition-colors" /></div>
         )}
         {displayAssets.map((asset, i) => (
           <div key={i} className="w-[140px] aspect-square bg-white border border-slate-100 rounded-[24px] relative overflow-hidden group shadow-sm hover:shadow-md transition-all shrink-0">
             <img src={asset.url || `https://picsum.photos/seed/${title}${i}/300/300`} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-            <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2"><button onClick={() => onAssetsChange(assets.filter((_, idx) => idx !== i))} className="p-2 bg-white rounded-xl text-rose-500 shadow-lg hover:scale-110 active:scale-90 transition-all"><Trash2 size={14} /></button></div>
+            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2"><button onClick={() => onAssetsChange(assets.filter((_, idx) => idx !== i))} className="p-2 bg-white rounded-xl text-rose-500 shadow-lg hover:scale-110 active:scale-90 transition-all"><Trash2 size={14} /></button></div>
           </div>
         ))}
         {isExpandable && !isExpanded && assets.length > 4 && (
-          <div onClick={onToggle} className="w-[140px] aspect-square bg-slate-900 rounded-[24px] flex flex-col items-center justify-center cursor-pointer hover:bg-black transition-all shadow-xl group shrink-0"><span className="text-lg font-black text-white">{moreCount} more</span><span className="text-[10px] font-bold text-white/60 tracking-widest mt-1">assets</span></div>
+          <div onClick={onToggle} className="w-[140px] aspect-square bg-slate-900 rounded-[24px] flex flex-col items-center justify-center cursor-pointer hover:bg-[#5221CF] transition-all shadow-xl group shrink-0"><span className="text-lg font-black text-white">{moreCount} more</span><span className="text-[10px] font-bold text-white/60 tracking-widest mt-1">assets</span></div>
         )}
         {isExpandable && isExpanded && (
           <div onClick={onToggle} className="w-[140px] aspect-square bg-slate-100 border border-slate-200 rounded-[24px] flex flex-col items-center justify-center cursor-pointer hover:bg-slate-200 transition-all group shrink-0"><ChevronRight size={24} className="text-slate-400 rotate-180 mb-1" /><span className="text-[10px] font-black text-slate-50 tracking-widest">collapse</span></div>
@@ -197,11 +197,11 @@ const SearchableSelect = ({ options, value, onChange, placeholder, isSearchable 
   const selectedOption = options.find(opt => opt.value === value);
   return (
     <div className="relative">
-      <div onClick={() => setIsOpen(!isOpen)} className={`w-full bg-white border rounded-2xl px-5 py-3.5 text-sm font-bold text-slate-700 flex items-center justify-between cursor-pointer transition-all ${isOpen ? 'border-indigo-400 ring-4 ring-indigo-500/5' : error ? 'border-rose-400' : 'border-slate-200 hover:border-slate-300 shadow-sm'}`}><span className={!value ? 'text-slate-300' : ''}>{selectedOption ? selectedOption.label : placeholder}</span><ChevronDown size={16} className={`text-slate-400 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} /></div>
+      <div onClick={() => setIsOpen(!isOpen)} className={`w-full bg-white border rounded-2xl px-5 py-3.5 text-sm font-bold text-slate-700 flex items-center justify-between cursor-pointer transition-all ${isOpen ? 'border-[#7033F5] ring-4 ring-[#7033F5]/5' : error ? 'border-rose-400' : 'border-slate-200 hover:border-slate-300 shadow-sm'}`}><span className={!value ? 'text-slate-300' : ''}>{selectedOption ? selectedOption.label : placeholder}</span><ChevronDown size={16} className={`text-slate-400 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} /></div>
       {isOpen && (
         <div className="absolute z-[200] top-full mt-2 w-full bg-white border border-slate-100 rounded-[24px] shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-          {isSearchable && (<div className="p-3 border-b border-slate-50 bg-slate-50/50"><input autoFocus className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2 text-xs font-bold outline-none focus:border-indigo-400" placeholder="Search..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} /></div>)}
-          <div className="max-h-[240px] overflow-y-auto p-2">{filteredOptions.map(opt => (<div key={opt.value} onClick={() => { onChange(opt.value); setIsOpen(false); }} className={`px-4 py-3 rounded-xl text-xs font-bold cursor-pointer mb-1 last:mb-0 ${value === opt.value ? 'bg-indigo-50 text-indigo-600' : 'hover:bg-slate-50'}`}>{opt.label}</div>))}</div>
+          {isSearchable && (<div className="p-3 border-b border-slate-50 bg-slate-50/50"><input autoFocus className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2 text-xs font-bold outline-none focus:border-[#7033F5]" placeholder="Search..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} /></div>)}
+          <div className="max-h-[240px] overflow-y-auto p-2">{filteredOptions.map(opt => (<div key={opt.value} onClick={() => { onChange(opt.value); setIsOpen(false); }} className={`px-4 py-3 rounded-xl text-xs font-bold cursor-pointer mb-1 last:mb-0 ${value === opt.value ? 'bg-[#F5F1FF] text-[#7033F5]' : 'hover:bg-slate-50'}`}>{opt.label}</div>))}</div>
         </div>
       )}
     </div>
@@ -225,17 +225,17 @@ const SearchableTreeSelect = ({ options, value, onChange, placeholder, isSearcha
   useEffect(() => { if (value && !hoveredParent) { const parent = options.find(p => p.children?.some(c => c.value === value)); if (parent) setHoveredParent(parent); } }, [value, options, hoveredParent]);
   return (
     <div className="relative">
-      <div onClick={() => setIsOpen(!isOpen)} className={`w-full bg-white border rounded-2xl px-5 py-3.5 text-sm font-bold text-slate-700 flex items-center justify-between cursor-pointer transition-all ${isOpen ? 'border-indigo-400 ring-4 ring-indigo-500/5' : error ? 'border-rose-400' : 'border-slate-200 hover:border-slate-300 shadow-sm'}`}><span className={!value ? 'text-slate-300' : ''}>{getDisplayValue()}</span><ChevronDown size={16} className={`text-slate-400 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} /></div>
+      <div onClick={() => setIsOpen(!isOpen)} className={`w-full bg-white border rounded-2xl px-5 py-3.5 text-sm font-bold text-slate-700 flex items-center justify-between cursor-pointer transition-all ${isOpen ? 'border-[#7033F5] ring-4 ring-[#7033F5]/5' : error ? 'border-rose-400' : 'border-slate-200 hover:border-slate-300 shadow-sm'}`}><span className={!value ? 'text-slate-300' : ''}>{getDisplayValue()}</span><ChevronDown size={16} className={`text-slate-400 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} /></div>
       {isOpen && (
         <div className="absolute z-[200] top-full mt-2 w-[560px] bg-white border border-slate-100 rounded-[24px] shadow-2xl flex overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 h-[380px]">
           <div className={`w-[240px] border-r border-slate-100 flex flex-col bg-slate-50/30`}>
-            {isSearchable && (<div className="p-4 border-b border-slate-100 bg-white sticky top-0 z-10"><div className="relative"><Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" /><input autoFocus className="w-full bg-slate-50 border border-slate-100 rounded-xl pl-9 pr-4 py-2 text-xs font-bold outline-none focus:border-indigo-400 transition-all" placeholder="Search..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} /></div></div>)}
-            <div className="flex-1 overflow-y-auto custom-scrollbar p-2">{filteredTree.map((parent) => (<div key={parent.value} onMouseEnter={() => setHoveredParent(parent)} className={`px-4 py-3 rounded-xl text-xs font-bold cursor-pointer transition-all mb-1 flex items-center justify-between group ${hoveredParent?.value === parent.value ? 'bg-white text-indigo-600 shadow-sm border border-slate-100' : 'text-slate-500 hover:text-slate-900 hover:bg-white/50'}`}><span className="truncate pr-2">{parent.label}</span>{parent.children?.length > 0 && <ChevronRight size={14} className={`transition-transform ${hoveredParent?.value === parent.value ? 'translate-x-0.5 opacity-100' : 'opacity-30'}`} />}</div>))}</div>
+            {isSearchable && (<div className="p-4 border-b border-slate-100 bg-white sticky top-0 z-10"><div className="relative"><Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" /><input autoFocus className="w-full bg-slate-50 border border-slate-100 rounded-xl pl-9 pr-4 py-2 text-xs font-bold outline-none focus:border-[#7033F5] transition-all" placeholder="Search..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} /></div></div>)}
+            <div className="flex-1 overflow-y-auto custom-scrollbar p-2">{filteredTree.map((parent) => (<div key={parent.value} onMouseEnter={() => setHoveredParent(parent)} className={`px-4 py-3 rounded-xl text-xs font-bold cursor-pointer transition-all mb-1 flex items-center justify-between group ${hoveredParent?.value === parent.value ? 'bg-white text-[#7033F5] shadow-sm border border-slate-100' : 'text-slate-500 hover:text-slate-900 hover:bg-white/50'}`}><span className="truncate pr-2">{parent.label}</span>{parent.children?.length > 0 && <ChevronRight size={14} className={`transition-transform ${hoveredParent?.value === parent.value ? 'translate-x-0.5 opacity-100' : 'opacity-30'}`} />}</div>))}</div>
           </div>
           <div className="flex-1 bg-white flex flex-col">
             <div className="p-4 border-b border-slate-50"><h6 className="text-[10px] font-black text-slate-400 tracking-widest">{hoveredParent ? hoveredParent.label : 'Select category'}</h6></div>
             <div className="flex-1 overflow-y-auto custom-scrollbar p-2">
-              {hoveredParent?.children?.length > 0 ? (<div className="grid grid-cols-1 gap-1">{hoveredParent.children.map((child) => (<div key={child.value} onClick={() => { onChange(child.value); setIsOpen(false); setSearchTerm(''); }} className={`px-4 py-3 rounded-xl text-xs font-bold cursor-pointer transition-all ${value === child.value ? 'bg-indigo-50 text-indigo-600' : 'text-slate-600 hover:bg-slate-50'}`}>{child.label}</div>))}</div>) : (<div className="h-full flex flex-col items-center justify-center text-slate-300 p-8 text-center"><div className="w-12 h-12 rounded-full bg-slate-50 flex items-center justify-center mb-3"><Layers size={20} className="opacity-20" /></div><p className="text-[10px] font-bold tracking-tighter opacity-40">{hoveredParent ? 'No sub-categories' : 'Hover a category to view details'}</p></div>)}
+              {hoveredParent?.children?.length > 0 ? (<div className="grid grid-cols-1 gap-1">{hoveredParent.children.map((child) => (<div key={child.value} onClick={() => { onChange(child.value); setIsOpen(false); setSearchTerm(''); }} className={`px-4 py-3 rounded-xl text-xs font-bold cursor-pointer transition-all ${value === child.value ? 'bg-[#F5F1FF] text-[#7033F5]' : 'text-slate-600 hover:bg-slate-50'}`}>{child.label}</div>))}</div>) : (<div className="h-full flex flex-col items-center justify-center text-slate-300 p-8 text-center"><div className="w-12 h-12 rounded-full bg-slate-50 flex items-center justify-center mb-3"><Layers size={20} className="opacity-20" /></div><p className="text-[10px] font-bold tracking-tighter opacity-40">{hoveredParent ? 'No sub-categories' : 'Hover a category to view details'}</p></div>)}
             </div>
           </div>
         </div>
@@ -301,35 +301,35 @@ const SelectionModal = ({
 
   return (
     <div 
-      className="fixed inset-0 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in"
+      className="fixed inset-0 flex items-center justify-center p-4 bg-black/50 backdrop-blur-md animate-in fade-in"
       style={{ zIndex }}
     >
-      <div className="bg-white w-full max-w-4xl rounded-[3rem] shadow-2xl overflow-hidden animate-in slide-in-from-bottom-8 flex flex-col max-h-[90vh]">
+      <div className="bg-white w-full max-w-4xl rounded-[20px] shadow-2xl overflow-hidden animate-in slide-in-from-bottom-8 flex flex-col max-h-[90vh]">
         <div className="p-8 border-b border-slate-100 flex items-center justify-between bg-white shrink-0">
           <h3 className="text-xl font-black text-slate-900">{type === 'history' ? '历史分析产品库' : type === 'shopify' ? '请选择products' : '从创意素材库选择'}</h3>
           <button onClick={onClose} className="p-2 hover:bg-slate-50 rounded-full text-slate-300 transition-colors"><X size={24} /></button>
         </div>
         {type === 'shopify' && (
           <div className="px-8 py-4 bg-slate-50 border-b border-slate-100 flex items-center gap-4 shrink-0">
-            {anyConnected && (<button onClick={() => setIsAddModalOpen(true)} className="w-10 h-10 bg-indigo-600 text-white rounded-xl flex items-center justify-center shadow-lg hover:bg-indigo-700 transition-all shrink-0 group" title="Connect product data source"><Plus size={20} className="group-hover:rotate-90 transition-transform" /></button>)}
+            {anyConnected && (<button onClick={() => setIsAddModalOpen(true)} className="w-10 h-10 bg-[#7033F5] text-white rounded-xl flex items-center justify-center shadow-lg hover:bg-[#5221CF] transition-all shrink-0 group" title="Connect product data source"><Plus size={20} className="group-hover:rotate-90 transition-transform" /></button>)}
             <div className="flex bg-white p-1 rounded-xl border border-slate-200 shadow-sm">
               {[{ id: 'ALL', label: '全部', icon: <Box size={14} /> }, { id: 'shopify', label: 'Shopify', icon: <ShoppingBag size={14} />, color: 'text-emerald-600' }, { id: 'meta', label: 'Facebook feeds', icon: <Facebook size={14} />, color: 'text-blue-600' }, { id: 'google', label: 'Google GMC', icon: <Chrome size={14} />, color: 'text-orange-500' }].map(p => (
-                <button key={p.id} onClick={() => setActivePlatform(p.id)} className={`flex items-center gap-2 px-4 py-2 rounded-lg text-[10px] font-black tracking-widest transition-all ${activePlatform === p.id ? 'bg-slate-900 text-white shadow-md' : `${p.color || 'text-slate-400'} hover:bg-slate-50`} ${p.id !== 'ALL' && !authStatus[p.id] ? 'opacity-60' : ''}`}>{p.icon} {p.label}</button>
+                <button key={p.id} onClick={() => setActivePlatform(p.id)} className={`flex items-center gap-2 px-4 py-2 rounded-lg text-[10px] font-black tracking-widest transition-all ${activePlatform === p.id ? 'bg-[#7033F5] text-white shadow-md' : `${p.color || 'text-slate-400'} hover:bg-slate-50`} ${p.id !== 'ALL' && !authStatus[p.id] ? 'opacity-60' : ''}`}>{p.icon} {p.label}</button>
               ))}
             </div>
-            <div className="relative flex-1"><Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={16} /><input type="text" autoFocus placeholder="搜索商品名称、链接..." className="w-full pl-12 pr-4 h-11 bg-white border border-slate-200 rounded-xl outline-none text-xs font-bold focus:border-indigo-500 shadow-sm" value={search} onChange={(e) => setSearch(e.target.value)} /></div>
+            <div className="relative flex-1"><Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={16} /><input type="text" autoFocus placeholder="搜索商品名称、链接..." className="w-full pl-12 pr-4 h-11 bg-white border border-slate-200 rounded-xl outline-none text-xs font-bold focus:border-[#7033F5] shadow-sm" value={search} onChange={(e) => setSearch(e.target.value)} /></div>
           </div>
         )}
         <div className="flex-1 overflow-y-auto p-8 no-scrollbar relative min-h-[400px]">
           {isAuthLoading ? (
-            <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/80 backdrop-blur-sm z-[150] animate-in fade-in"><Loader2 size={48} className="text-indigo-600 animate-spin mb-4" /><p className="text-sm font-black text-slate-900 tracking-widest">正在拉取并同步云端商品数据...</p></div>
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/80 backdrop-blur-sm z-[150] animate-in fade-in"><Loader2 size={48} className="text-[#7033F5] animate-spin mb-4" /><p className="text-sm font-black text-slate-900 tracking-widest">正在拉取并同步云端商品数据...</p></div>
           ) : isFetchingProducts ? (
-            <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/80 backdrop-blur-sm z-10 animate-in fade-in"><Loader2 size={48} className="text-indigo-600 animate-spin mb-4" /><p className="text-sm font-black text-slate-900 tracking-widest">Fetching products data...</p></div>
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/80 backdrop-blur-sm z-10 animate-in fade-in"><Loader2 size={48} className="text-[#7033F5] animate-spin mb-4" /><p className="text-sm font-black text-slate-900 tracking-widest">Fetching products data...</p></div>
           ) : needsConnection ? (
             <div className="absolute inset-0 flex flex-col items-center justify-center p-12 text-center animate-in fade-in zoom-in-95">
-              <div className="w-20 h-20 bg-slate-50 rounded-3xl flex items-center justify-center text-slate-200 mb-6"><ShoppingBag size={40} /></div>
+              <div className="w-20 h-20 bg-slate-50 rounded-xl flex items-center justify-center text-slate-200 mb-6"><ShoppingBag size={40} /></div>
               <p className="text-sm text-slate-400 font-bold mb-8 max-w-sm">Connect your store to sync products automatically or manually set up a product for analysis.</p>
-              <button onClick={() => setIsAddModalOpen(true)} className="px-10 py-4 bg-indigo-600 text-white rounded-2xl font-black tracking-widest hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-100 flex items-center gap-3"><Plus size={20} /> Connect product data source</button>
+              <button onClick={() => setIsAddModalOpen(true)} className="px-10 py-4 bg-[#7033F5] text-white rounded-full font-black tracking-widest hover:bg-[#5221CF] transition-all shadow-xl shadow-[#7033F5]/10 flex items-center gap-3"><Plus size={20} /> Connect product data source</button>
             </div>
           ) : filtered.length === 0 ? (
             <div className="absolute inset-0 flex flex-col items-center justify-center p-12 text-center opacity-40"><AlertCircle size={48} className="mb-4" /><p className="text-sm font-bold">未找到符合条件的产品</p></div>
@@ -338,10 +338,10 @@ const SelectionModal = ({
               {filtered.map((item) => {
                 const isSel = localSelected.has(item.id);
                 return (
-                  <div key={item.id} onClick={() => toggleItem(item.id)} className={`relative p-3 bg-white border-2 rounded-2xl transition-all cursor-pointer group ${isSel ? 'border-indigo-600 shadow-lg shadow-indigo-50' : 'border-slate-100 hover:border-slate-300'}`}>
+                  <div key={item.id} onClick={() => toggleItem(item.id)} className={`relative p-3 bg-white border-2 rounded-2xl transition-all cursor-pointer group ${isSel ? 'border-[#7033F5] shadow-lg shadow-[#F5F1FF]' : 'border-slate-100 hover:border-slate-300'}`}>
                     <div className="aspect-square rounded-xl overflow-hidden mb-3 relative bg-slate-50">
                       {(item.imageUrl || item.url) ? (<img src={item.imageUrl || item.url} className="w-full h-full object-cover transition-transform group-hover:scale-110" />) : (<div className="w-full h-full flex flex-col items-center justify-center gap-2 text-slate-300 bg-slate-50"><PackageCheck size={32} /><span className="text-[8px] font-black">暂无预览图</span></div>)}
-                      <div className={`absolute top-2 right-2 w-6 h-6 rounded-full border-2 flex items-center justify-center shadow-lg ${isSel ? 'bg-indigo-600 border-indigo-600' : 'bg-black/20 border-white/40'}`}>{isSel && <Check size={14} className="text-white" />}</div>
+                      <div className={`absolute top-2 right-2 w-6 h-6 rounded-full border-2 flex items-center justify-center shadow-lg ${isSel ? 'bg-[#7033F5] border-[#7033F5]' : 'bg-black/20 border-white/40'}`}>{isSel && <Check size={14} className="text-white" />}</div>
                     </div>
                     <div className="space-y-1">
                       <p className="text-[10px] font-black text-slate-800 truncate px-1">
@@ -363,7 +363,7 @@ const SelectionModal = ({
         <div className="p-8 bg-slate-50 border-t border-slate-100 flex items-center justify-between shrink-0 sticky bottom-0 z-20">
           <div className="text-sm font-bold text-slate-400">
             {type === 'creative_lib' ? '已选 ' : '已选中 '}
-            <span className="text-indigo-600 font-black">{localSelected.size}</span> 
+            <span className="text-[#7033F5] font-black">{localSelected.size}</span> 
             {type === 'creative_lib' ? ' 个创意' : ' 个项目'}
           </div>
           <button disabled={localSelected.size === 0} onClick={() => {
@@ -387,7 +387,7 @@ const SelectionModal = ({
               onSelectProducts([...selectedProducts, ...trimmed]);
             }
             onClose();
-          }} className={`px-10 py-4 rounded-2xl font-black tracking-widest shadow-xl transition-all ${localSelected.size === 0 ? 'bg-slate-200 text-white cursor-not-allowed shadow-none' : 'bg-slate-900 text-white hover:bg-black'}`}>
+          }} className={`px-10 py-4 rounded-2xl font-black tracking-widest shadow-xl transition-all ${localSelected.size === 0 ? 'bg-slate-200 text-white cursor-not-allowed shadow-none' : 'bg-[#7033F5] text-white hover:bg-[#5221CF]'}`}>
             {type === 'creative_lib' ? '确认' : '确认选择产品'}
           </button>
         </div>
@@ -630,10 +630,10 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
 
     return (
       <div
-        className="fixed inset-0 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in"
+        className="fixed inset-0 flex items-center justify-center p-4 bg-black/50 backdrop-blur-md animate-in fade-in"
         style={{ zIndex }}
       >
-        <div className="bg-white w-full max-w-4xl rounded-[3rem] shadow-2xl overflow-hidden animate-in slide-in-from-bottom-8 flex flex-col max-h-[90vh]">
+        <div className="bg-white w-full max-w-4xl rounded-[20px] shadow-2xl overflow-hidden animate-in slide-in-from-bottom-8 flex flex-col max-h-[90vh]">
           <div className="p-8 border-b border-slate-100 flex items-center justify-between bg-white shrink-0">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 rounded-2xl overflow-hidden border border-slate-100 shrink-0 shadow-sm">
@@ -643,7 +643,7 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
                 <h3 className="text-xl font-black text-slate-900 flex items-center gap-2">
                   产品分析报告
                   {isProductAnalyzing && (
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-indigo-100 text-indigo-600 rounded-full text-[10px] font-black animate-pulse">
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-[#F5F1FF] text-[#7033F5] rounded-full text-[10px] font-black animate-pulse">
                       <Loader2 size={10} className="animate-spin" /> 分析中
                     </span>
                   )}
@@ -655,7 +655,7 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
           </div>
 
           <div ref={modalScrollRef} className="flex-1 overflow-y-auto p-10 no-scrollbar bg-slate-50/30">
-            <div className="bg-white rounded-[2.5rem] p-10 border border-slate-100 shadow-xl overflow-hidden">
+            <div className="bg-white rounded-xl p-10 border border-slate-100 shadow-xl overflow-hidden">
               <div className="space-y-6">
                 {visibleSteps.map((step, stepIdx) => {
                   let listIdx = 0;
@@ -671,7 +671,7 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
                             {step.text.split('https://www.cupshe.com').map((part, i, arr) => (
                               <React.Fragment key={i}>
                                 {part}
-                                {i < arr.length - 1 && <span className="text-indigo-600 font-bold underline cursor-pointer">https://www.cupshe.com</span>}
+                                {i < arr.length - 1 && <span className="text-[#7033F5] font-bold underline cursor-pointer">https://www.cupshe.com</span>}
                               </React.Fragment>
                             ))}
                           </p>
@@ -687,7 +687,7 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
                       )}
                       {step.type === 'image' && (
                         <div className="pl-4 mb-6">
-                          <div className="rounded-[2rem] border border-slate-200 overflow-hidden shadow-2xl max-w-2xl transition-all hover:scale-[1.01]">
+                          <div className="rounded-[20px] border border-slate-200 overflow-hidden shadow-2xl max-w-2xl transition-all hover:scale-[1.01]">
                             <img src={step.url} alt="Captured UI" className="w-full h-auto" />
                           </div>
                         </div>
@@ -741,7 +741,7 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
           <div className="p-8 bg-white border-t border-slate-100 flex justify-end shrink-0">
             <button 
               onClick={onClose}
-              className="px-10 py-4 bg-slate-900 text-white rounded-2xl font-black tracking-widest hover:bg-black transition-all shadow-xl active:scale-95"
+              className="px-10 py-4 bg-[#7033F5] text-white rounded-2xl font-black tracking-widest hover:bg-[#5221CF] transition-all shadow-xl active:scale-95"
             >
               关闭报告
             </button>
@@ -832,8 +832,8 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
     <div className="space-y-10">
       <div className={`relative transition-all duration-500 ${(analysisFinished || isAnalyzing) ? 'pointer-events-none select-none' : ''}`}>
         {(analysisFinished || isAnalyzing) && (
-          <div className="absolute inset-0 z-20 bg-white/60 backdrop-blur-[1px] rounded-[2.5rem] flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity pointer-events-auto cursor-pointer" onClick={onReset}>
-            <button className="px-8 py-3 bg-slate-900 text-white rounded-xl font-black tracking-widest transform scale-95 group-hover:scale-100 transition-all flex items-center gap-2">
+          <div className="absolute inset-0 z-20 bg-white/60 backdrop-blur-[1px] rounded-xl flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity pointer-events-auto cursor-pointer" onClick={onReset}>
+            <button className="px-8 py-3 bg-[#7033F5] text-white rounded-xl font-black tracking-widest transform scale-95 group-hover:scale-100 transition-all flex items-center gap-2">
               <RefreshCw size={16} /> 重新添加产品
             </button>
           </div>
@@ -841,8 +841,8 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
         <div className={(analysisFinished || isAnalyzing) ? 'opacity-40 grayscale-[0.5] blur-[0.5px]' : ''}>
           <div className="flex justify-center mb-4">
             <div className="bg-slate-100/50 p-1 rounded-2xl border border-slate-100 flex items-center shadow-sm">
-              <button onClick={() => onCampaignTypeChange('PRODUCT')} className={`px-8 py-3 rounded-xl text-xs font-black tracking-widest transition-all ${campaignType === 'PRODUCT' ? 'bg-white text-indigo-600 shadow-md' : 'text-slate-400 hover:text-slate-600'}`}>投放产品广告</button>
-              <button onClick={() => onCampaignTypeChange('CATALOG')} className={`px-8 py-3 rounded-xl text-xs font-black tracking-widest transition-all ${campaignType === 'CATALOG' ? 'bg-white text-indigo-600 shadow-md' : 'text-slate-400 hover:text-slate-600'}`}>投放目录广告</button>
+              <button onClick={() => onCampaignTypeChange('PRODUCT')} className={`px-8 py-3 rounded-xl text-xs font-black tracking-widest transition-all ${campaignType === 'PRODUCT' ? 'bg-white text-[#7033F5] shadow-md' : 'text-slate-400 hover:text-slate-600'}`}>投放产品广告</button>
+              <button onClick={() => onCampaignTypeChange('CATALOG')} className={`px-8 py-3 rounded-xl text-xs font-black tracking-widest transition-all ${campaignType === 'CATALOG' ? 'bg-white text-[#7033F5] shadow-md' : 'text-slate-400 hover:text-slate-600'}`}>投放目录广告</button>
             </div>
           </div>
           {campaignType === 'PRODUCT' ? (
@@ -852,7 +852,7 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
                   <div className="absolute -top-4 left-6 z-10">
                   </div>
                 )}
-                <div className={`bg-slate-50 border-2 border-dashed border-slate-200 rounded-[2.5rem] p-6 flex items-center gap-6 focus-within:bg-white focus-within:border-indigo-500 transition-all ${selectedProducts.length > 0 ? 'border-slate-300' : ''}`}>
+                <div className={`bg-slate-50 border-2 border-dashed border-slate-200 rounded-xl p-6 flex items-center gap-6 focus-within:bg-white focus-within:border-[#7033F5] transition-all ${selectedProducts.length > 0 ? 'border-slate-300' : ''}`}>
                   <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-slate-300 shadow-sm border border-slate-100"><Link2 size={24} /></div>
                   <input 
                     type="text" 
@@ -864,46 +864,46 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
                   />
                   <button 
                     onClick={handleAddUrl}
-                    className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all ${urlInput.trim() ? 'bg-indigo-600 text-white shadow-lg hover:bg-indigo-700 active:scale-95' : 'bg-white text-slate-200 border border-slate-100'}`}
+                    className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all ${urlInput.trim() ? 'bg-[#7033F5] text-white shadow-lg hover:bg-[#5221CF] active:scale-95' : 'bg-white text-slate-200 border border-slate-100'}`}
                   >
                     <Plus size={24} />
                   </button>
                 </div>
               </div>
               <div className="flex gap-4 px-2">
-                <button onClick={() => setActiveModal('history')} className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-100 rounded-xl text-[10px] font-black tracking-widest text-slate-400 hover:text-indigo-600 hover:border-indigo-100 transition-all shadow-sm"><History size={14} /> 从产品库选择历史产品</button>
-                <button onClick={() => setActiveModal('shopify')} className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-100 rounded-xl text-[10px] font-black tracking-widest text-slate-400 hover:text-indigo-600 hover:border-indigo-100 transition-all shadow-sm"><ShoppingBag size={14} /> 从 Shopify 选择产品</button>
+                <button onClick={() => setActiveModal('history')} className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-100 rounded-xl text-[10px] font-black tracking-widest text-slate-400 hover:text-[#7033F5] hover:border-[#7033F5]/15 transition-all shadow-sm"><History size={14} /> 从产品库选择历史产品</button>
+                <button onClick={() => setActiveModal('shopify')} className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-100 rounded-xl text-[10px] font-black tracking-widest text-slate-400 hover:text-[#7033F5] hover:border-[#7033F5]/15 transition-all shadow-sm"><ShoppingBag size={14} /> 从 Shopify 选择产品</button>
               </div>
             </div>
           ) : (
             <div className="space-y-8 animate-in fade-in slide-in-from-top-4">
               {!authStatus.meta ? (
-                <div className="bg-white border-2 border-dashed border-slate-200 rounded-[2.5rem] p-12 flex flex-col items-center text-center space-y-6">
+                <div className="bg-white border-2 border-dashed border-slate-200 rounded-xl p-12 flex flex-col items-center text-center space-y-6">
                   <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center shadow-sm"><Facebook size={32} /></div>
                   <div className="max-w-md space-y-2">
                     <h4 className="text-lg font-black text-slate-900">投放目录广告需先授权 Meta feeds</h4>
                     <p className="text-xs text-slate-400 font-bold leading-relaxed">我们需要访问您的 Meta 广告账户以获取目录（Catalog）及其关联的产品系列（Product Sets）数据。</p>
                   </div>
-                  <button onClick={() => handleAuthorize('meta')} disabled={isAuthLoading} className="px-12 py-4 bg-slate-900 text-white rounded-2xl font-black tracking-widest hover:bg-black transition-all shadow-xl flex items-center gap-3">{isAuthLoading ? <Loader2 size={20} className="animate-spin" /> : <Facebook size={20} />}立即连接</button>
+                  <button onClick={() => handleAuthorize('meta')} disabled={isAuthLoading} className="px-12 py-4 bg-[#7033F5] text-white rounded-full font-black tracking-widest hover:bg-[#5221CF] transition-all shadow-xl flex items-center gap-3">{isAuthLoading ? <Loader2 size={20} className="animate-spin" /> : <Facebook size={20} />}立即连接</button>
                 </div>
               ) : !selectedAccount ? (
-                <div className="bg-indigo-50/50 border-2 border-indigo-100 rounded-[2.5rem] p-10 flex items-center justify-between animate-in slide-in-from-top-4">
+                <div className="bg-[#F5F1FF]/50 border-2 border-[#7033F5]/15 rounded-xl p-10 flex items-center justify-between animate-in slide-in-from-top-4">
                   <div className="flex items-center gap-6">
-                    <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-indigo-600 shadow-sm"><RefreshCw size={28} className="animate-spin-slow" /></div>
+                    <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-[#7033F5] shadow-sm"><RefreshCw size={28} className="animate-spin-slow" /></div>
                     <div>
                       <h4 className="text-base font-black text-slate-900">Meta 已授权，请选择关联广告账户</h4>
                       <p className="text-[10px] text-slate-400 font-bold tracking-widest mt-1">Found 2 available accounts</p>
                     </div>
                   </div>
-                  <button onClick={() => setActiveModal('select_account')} className="px-8 py-4 bg-indigo-600 text-white rounded-xl font-black tracking-widest hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100">选择广告账户</button>
+                  <button onClick={() => setActiveModal('select_account')} className="px-8 py-4 bg-[#7033F5] text-white rounded-xl font-black tracking-widest hover:bg-[#5221CF] transition-all shadow-lg shadow-[#7033F5]/10">选择广告账户</button>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 animate-in slide-in-from-top-4">
                   <div className="space-y-3 relative">
                     <label className="text-[10px] font-black text-slate-400 tracking-widest px-1">选择目录 (catalog)</label>
-                    <div onClick={() => setCatalogDropdownOpen(!catalogDropdownOpen)} className={`flex items-center justify-between p-6 bg-white border-2 rounded-[1.5rem] cursor-pointer hover:border-indigo-600 hover:shadow-lg transition-all ${catalogDropdownOpen ? 'border-indigo-600 shadow-lg' : 'border-slate-100'}`}>
+                    <div onClick={() => setCatalogDropdownOpen(!catalogDropdownOpen)} className={`flex items-center justify-between p-6 bg-white border-2 rounded-lg cursor-pointer hover:border-[#7033F5] hover:shadow-lg transition-all ${catalogDropdownOpen ? 'border-[#7033F5] shadow-lg' : 'border-slate-100'}`}>
                       <div className="flex items-center gap-4 min-w-0">
-                        <div className="w-11 h-11 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center shrink-0"><Database size={22} /></div>
+                        <div className="w-11 h-11 bg-[#F5F1FF] text-[#7033F5] rounded-xl flex items-center justify-center shrink-0"><Database size={22} /></div>
                         <div className="min-w-0">
                           <p className="text-xs font-black text-slate-800 truncate">{selectedCatalog?.name || '请选择一个目录...'}</p>
                           {selectedCatalog && <p className="text-[10px] text-slate-400 font-bold tracking-widest mt-0.5">id: {selectedCatalog.id}</p>}
@@ -917,16 +917,16 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
                           MOCK_CATALOGS.map(c => (
                             <div key={c.id} onClick={() => { setSelectedCatalog(c); setCatalogDropdownOpen(false); }} className="flex items-center justify-between px-6 py-4 hover:bg-slate-50 cursor-pointer transition-colors group">
                               <div>
-                                <p className="text-xs font-black text-slate-800 group-hover:text-indigo-600 transition-colors">{c.name}</p>
+                                <p className="text-xs font-black text-slate-800 group-hover:text-[#7033F5] transition-colors">{c.name}</p>
                                 <p className="text-[10px] text-slate-400 font-bold tracking-widest">id: {c.id}</p>
                               </div>
-                              {selectedCatalog?.id === c.id && <Check size={16} className="text-indigo-600" />}
+                              {selectedCatalog?.id === c.id && <Check size={16} className="text-[#7033F5]" />}
                             </div>
                           ))
                         ) : (
                           <div className="p-8 text-center space-y-4">
                             <AlertCircle size={32} className="mx-auto text-slate-200" /><p className="text-xs font-bold text-slate-400">暂无可用目录，请先在 Meta 后台创建</p>
-                            <a href="#" className="inline-flex items-center gap-1.5 text-[10px] font-black text-indigo-600 tracking-widest hover:underline"><ExternalLink size={12} /> 查看 Meta feeds 创建帮助文档</a>
+                            <a href="#" className="inline-flex items-center gap-1.5 text-[10px] font-black text-[#7033F5] tracking-widest hover:underline"><ExternalLink size={12} /> 查看 Meta feeds 创建帮助文档</a>
                           </div>
                         )}
                       </div>
@@ -934,7 +934,7 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
                   </div>
                   <div className="space-y-3 relative">
                     <label className="text-[10px] font-black text-slate-400 tracking-widest px-1">产品系列 (Product set)</label>
-                    <div onClick={() => setSetDropdownOpen(!setDropdownOpen)} className={`flex items-center justify-between p-6 bg-white border-2 rounded-[1.5rem] cursor-pointer hover:border-indigo-600 hover:shadow-lg transition-all ${setDropdownOpen ? 'border-indigo-600 shadow-lg' : 'border-slate-100'}`}>
+                    <div onClick={() => setSetDropdownOpen(!setDropdownOpen)} className={`flex items-center justify-between p-6 bg-white border-2 rounded-lg cursor-pointer hover:border-[#7033F5] hover:shadow-lg transition-all ${setDropdownOpen ? 'border-[#7033F5] shadow-lg' : 'border-slate-100'}`}>
                       <div className="flex items-center gap-4 min-w-0">
                         <div className="w-11 h-11 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center shrink-0"><ListFilter size={22} /></div>
                         <div>
@@ -948,8 +948,8 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
                       <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl z-[100] overflow-hidden animate-in fade-in slide-in-from-top-2">
                         {['All Products', 'Best Sellers', 'New Arrivals'].map(s => (
                           <div key={s} onClick={() => { setSelectedProductSet(s); setSetDropdownOpen(false); }} className="flex items-center justify-between px-6 py-4 hover:bg-slate-50 cursor-pointer transition-colors group">
-                            <p className="text-xs font-black text-slate-800 group-hover:text-indigo-600 transition-colors">{s}</p>
-                            {selectedProductSet === s && <Check size={16} className="text-indigo-600" />}
+                            <p className="text-xs font-black text-slate-800 group-hover:text-[#7033F5] transition-colors">{s}</p>
+                            {selectedProductSet === s && <Check size={16} className="text-[#7033F5]" />}
                           </div>
                         ))}
                       </div>
@@ -964,23 +964,23 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
               <div className="w-full flex flex-col items-center space-y-8">
                 <div className="w-full max-w-4xl space-y-4">
                   <div className="flex items-center justify-between px-6">
-                    <h5 className="text-[10px] font-black text-slate-400 tracking-widest flex items-center gap-2"><Layers size={14} className="text-indigo-400" /> {(analysisFinished || isAnalyzing) ? '产品清单' : '待解析产品清单'} ({selectedProducts.length})</h5>
+                    <h5 className="text-[10px] font-black text-slate-400 tracking-widest flex items-center gap-2"><Layers size={14} className="text-[#7033F5]/70" /> {(analysisFinished || isAnalyzing) ? '产品清单' : '待解析产品清单'} ({selectedProducts.length})</h5>
                     <p className="text-[9px] text-slate-400 font-bold tracking-widest">{(analysisFinished || isAnalyzing) ? 'Add more products below' : 'Ready for agent deep scan'}</p>
                   </div>
                   <div className="w-full space-y-3 px-2">
                     {selectedProducts.map((p) => (
-                      <div key={p.id} className="group relative flex items-center justify-between bg-white border border-slate-100 rounded-[1.5rem] p-4 shadow-sm hover:shadow-md hover:border-indigo-100 transition-all">
+                      <div key={p.id} className="group relative flex items-center justify-between bg-white border border-slate-100 rounded-lg p-4 shadow-sm hover:shadow-md hover:border-[#7033F5]/15 transition-all">
                         <div className="flex items-center gap-4">
                           <div className="w-12 h-12 rounded-xl overflow-hidden border border-slate-100 shrink-0 relative bg-slate-50 group-hover:bg-white transition-colors">
                             {p.imageUrl ? (
                               <img src={p.imageUrl} className="w-full h-full object-cover" />
                             ) : (
                               <div className="w-full h-full flex flex-col items-center justify-center bg-slate-50 text-slate-300 gap-1 border border-slate-100 rounded-xl relative overflow-hidden">
-                                <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-transparent" />
+                                <div className="absolute inset-0 bg-gradient-to-br from-[#7033F5]/5 to-transparent" />
                                 <div className="relative">
                                   <ImageIcon size={18} />
                                   <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-0.5 shadow-sm">
-                                    <Link2 size={8} className="text-indigo-500" />
+                                    <Link2 size={8} className="text-[#7033F5]" />
                                   </div>
                                 </div>
                                 <span className="text-[6px] font-black text-slate-400 uppercase tracking-tighter relative z-10">{(analysisFinished || isAnalyzing) ? 'Analyzed' : 'Waiting...'}</span>
@@ -1008,7 +1008,7 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
                     if (isMultiMode) {
                       startMultiAnalysis(selectedProducts);
                     }
-                  }} className="h-24 px-20 bg-slate-900 text-white rounded-[3rem] text-lg font-black tracking-widest flex items-center gap-6 hover:bg-black transition-all shadow-[0_20px_50px_rgba(0,0,0,0.2)] hover:scale-105 active:scale-95 group">
+                  }} className="h-24 px-20 bg-[#7033F5] text-white rounded-[20px] text-lg font-black tracking-widest flex items-center gap-6 hover:bg-[#5221CF] transition-all shadow-[0_20px_50px_rgba(0,0,0,0.2)] hover:scale-105 active:scale-95 group">
                     <Wand2 size={32} className="group-hover:rotate-12 transition-transform" /> 开启 {selectedProducts.length} 个产品的智能并行解析与生产 <ChevronRight size={32} />
                   </button>
                 )}
@@ -1020,7 +1020,7 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
           )}
           {!analysisFinished && !isAnalyzing && campaignType === 'CATALOG' && selectedCatalog && (
             <div className="flex flex-col items-center pt-8 border-t border-slate-50 space-y-10 animate-in fade-in slide-in-from-bottom-6">
-              <button onClick={() => onAnalysisComplete({})} className="h-24 px-20 bg-slate-900 text-white rounded-[3rem] text-lg font-black tracking-widest flex items-center gap-6 hover:bg-black transition-all shadow-[0_20px_50px_rgba(0,0,0,0.2)] hover:scale-105 active:scale-95 group"><Box size={32} className="group-hover:scale-110 transition-transform" /> 配置 {selectedProductSet} 的 feeds 广告结构 <ChevronRight size={32} /></button>
+              <button onClick={() => onAnalysisComplete({})} className="h-24 px-20 bg-[#7033F5] text-white rounded-[20px] text-lg font-black tracking-widest flex items-center gap-6 hover:bg-[#5221CF] transition-all shadow-[0_20px_50px_rgba(0,0,0,0.2)] hover:scale-105 active:scale-95 group"><Box size={32} className="group-hover:scale-110 transition-transform" /> 配置 {selectedProductSet} 的 feeds 广告结构 <ChevronRight size={32} /></button>
               <p className="text-xs text-slate-400 font-bold tracking-[0.3em]">Next-gen media planning system</p>
             </div>
           )}
@@ -1028,22 +1028,22 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
       </div>
       {campaignType === 'PRODUCT' && (analysisFinished || isAnalyzing) && (
         <section className="animate-in fade-in duration-700">
-          <div className="bg-slate-50/80 border border-slate-200/60 rounded-[3rem] overflow-hidden shadow-inner">
+          <div className="bg-slate-50/80 border border-slate-200/60 rounded-[20px] overflow-hidden shadow-inner">
             <div className="p-8 md:p-10 bg-white border-b border-slate-100 space-y-8">
               <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                 <div>
                   <div className="flex items-center gap-3 mb-2">
-                    <div className="w-10 h-10 bg-indigo-600 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-100"><Zap size={20} /></div>
+                    <div className="w-10 h-10 bg-[#7033F5] text-white rounded-2xl flex items-center justify-center shadow-lg shadow-[#7033F5]/10"><Zap size={20} /></div>
                     <h3 className="text-xl font-black text-slate-900 tracking-tight">智能素材生产工作台</h3>
                   </div>
                   <p className="text-xs text-slate-400 font-bold tracking-widest">Orchestrate creative production at scale</p>
                 </div>
                 {allReady && (
                   <div className="flex items-center gap-4 bg-slate-50 p-2 rounded-2xl border border-slate-100">
-                    <button onClick={() => setActiveModal('batch_match')} className="flex items-center gap-2.5 px-6 py-3.5 bg-white border border-slate-200 rounded-xl text-xs font-black tracking-widest text-slate-700 hover:border-indigo-600 hover:text-indigo-600 transition-all shadow-sm group">
+                    <button onClick={() => setActiveModal('batch_match')} className="flex items-center gap-2.5 px-6 py-3.5 bg-white border border-slate-200 rounded-xl text-xs font-black tracking-widest text-slate-700 hover:border-[#7033F5] hover:text-[#7033F5] transition-all shadow-sm group">
                       <Database size={16} className="group-hover:scale-110 transition-transform" /> 批量匹配素材库
                     </button>
-                    <button onClick={() => setActiveModal('batch_aigc')} className="flex items-center gap-2.5 px-6 py-3.5 bg-indigo-600 text-white rounded-xl text-xs font-black tracking-widest hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200 group">
+                    <button onClick={() => setActiveModal('batch_aigc')} className="flex items-center gap-2.5 px-6 py-3.5 bg-[#7033F5] text-white rounded-xl text-xs font-black tracking-widest hover:bg-[#5221CF] transition-all shadow-lg shadow-[#7033F5]/15 group">
                       <Sparkles size={16} className="group-hover:rotate-12 transition-transform" /> 批量 AIGC 生成
                     </button>
                   </div>
@@ -1059,7 +1059,7 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
                 
                 return (
                   <div key={p.id} className="space-y-3">
-                    <div className={`bg-white border rounded-[2rem] p-4 md:p-6 transition-all hover:shadow-xl hover:shadow-slate-200/50 group ${creatives.length === 0 && generatingCount === 0 && showAnalysisResult ? 'border-amber-100 ring-2 ring-amber-500/5' : 'border-slate-100'}`}>
+                    <div className={`bg-white border rounded-[20px] p-4 md:p-6 transition-all hover:shadow-xl hover:shadow-slate-200/50 group ${creatives.length === 0 && generatingCount === 0 && showAnalysisResult ? 'border-amber-100 ring-2 ring-amber-500/5' : 'border-slate-100'}`}>
                       <div className="flex flex-col lg:flex-row gap-6">
                         <div className="flex items-center gap-4 lg:w-72 shrink-0">
                           <div className="w-12 h-12 rounded-xl overflow-hidden border border-slate-100 shrink-0 shadow-sm relative bg-slate-50">
@@ -1067,11 +1067,11 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
                               <img src={p.imageUrl} className="w-full h-full object-cover" />
                             ) : (
                               <div className="w-full h-full flex flex-col items-center justify-center bg-slate-50 text-slate-300 gap-1 border border-slate-50 rounded-xl relative overflow-hidden">
-                                <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-transparent" />
+                                <div className="absolute inset-0 bg-gradient-to-br from-[#7033F5]/5 to-transparent" />
                                 <div className="relative">
                                   <ImageIcon size={18} />
                                   <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-0.5 shadow-sm">
-                                    <Link2 size={8} className="text-indigo-500" />
+                                    <Link2 size={8} className="text-[#7033F5]" />
                                   </div>
                                 </div>
                                 <span className="text-[6px] font-black text-slate-400 uppercase tracking-tighter relative z-10">Analyzed</span>
@@ -1087,13 +1087,13 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
                             <h4 className="text-sm font-black text-slate-800 truncate">{p.name}</h4>
                             {(showAnalysisResult || (isMultiMode && (analysisFinished || isAnalyzing))) && (
                               <div className="flex items-center gap-2 mt-1">
-                                <span className={`text-[9px] font-black px-2 py-0.5 rounded-full ${creatives.length > 0 ? 'bg-indigo-50 text-indigo-600' : 'bg-amber-50 text-amber-600'}`}>{creatives.length} 素材</span>
+                                <span className={`text-[9px] font-black px-2 py-0.5 rounded-full ${creatives.length > 0 ? 'bg-[#F5F1FF] text-[#7033F5]' : 'bg-amber-50 text-amber-600'}`}>{creatives.length} 素材</span>
                                 {isMultiMode && productAnalyses[p.id]?.status === 'analyzing' ? (
-                                  <button onClick={() => setShowReportFor(p.id)} className="text-[9px] font-black text-indigo-500 hover:text-indigo-700 flex items-center gap-1">
+                                  <button onClick={() => setShowReportFor(p.id)} className="text-[9px] font-black text-[#7033F5] hover:text-[#5221CF] flex items-center gap-1">
                                     <Loader2 size={10} className="animate-spin" /> AI 分析产品中
                                   </button>
                                 ) : (
-                                  <button onClick={() => setShowReportFor(p.id)} className="text-[9px] font-black text-slate-400 underline hover:text-indigo-600">分析报告</button>
+                                  <button onClick={() => setShowReportFor(p.id)} className="text-[9px] font-black text-slate-400 underline hover:text-[#7033F5]">分析报告</button>
                                 )}
                               </div>
                             )}
@@ -1102,7 +1102,7 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
                         <div className="flex-1 flex flex-col justify-center min-w-0">
                           {(!showAnalysisResult && isAnalyzing) ? (
                             <div className="w-full flex justify-end">
-                              <button onClick={() => setExpandedAnalysisId(isExpanded ? null : p.id)} className="flex items-center gap-2 px-3 py-1.5 bg-indigo-50 text-indigo-600 rounded-lg text-[10px] font-black tracking-widest hover:bg-indigo-100 transition-colors">
+                              <button onClick={() => setExpandedAnalysisId(isExpanded ? null : p.id)} className="flex items-center gap-2 px-3 py-1.5 bg-[#F5F1FF] text-[#7033F5] rounded-lg text-[10px] font-black tracking-widest hover:bg-[#F5F1FF] transition-colors">
                                 <Loader2 size={12} className="animate-spin" />Analyzing...{isExpanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
                               </button>
                             </div>
@@ -1123,7 +1123,7 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
                                 ))}
 
                                 <div className="flex gap-2 shrink-0 ml-2">
-                                    <button onClick={() => { setModalContext(p.id); setActiveModal('creative_lib'); }} className="w-14 h-20 rounded-lg border-2 border-dashed border-slate-100 flex flex-col items-center justify-center text-slate-300 hover:border-indigo-400 hover:text-indigo-400 hover:bg-indigo-50 transition-all gap-1" title="从素材库选择">
+                                    <button onClick={() => { setModalContext(p.id); setActiveModal('creative_lib'); }} className="w-14 h-20 rounded-lg border-2 border-dashed border-slate-100 flex flex-col items-center justify-center text-slate-300 hover:border-[#7033F5] hover:text-[#7033F5]/70 hover:bg-[#F5F1FF] transition-all gap-1" title="从素材库选择">
                                       <Database size={16} />
                                       <span className="text-[7px] font-black">库</span>
                                     </button>
@@ -1150,7 +1150,7 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
                       </div>
                     </div>
                     {isAnalyzing && isExpanded && !p.isFromHistory && (
-                      <div className="bg-white rounded-[2.5rem] p-10 border border-slate-100 mx-4 animate-in slide-in-from-top-2 shadow-xl overflow-hidden">
+                      <div className="bg-white rounded-xl p-10 border border-slate-100 mx-4 animate-in slide-in-from-top-2 shadow-xl overflow-hidden">
                         <div className="h-[500px] overflow-y-auto custom-scrollbar pr-4 space-y-6">
                           {ANALYSIS_STEPS.slice(0, currentStep + 1).map((step, stepIdx) => {
                             let listIdx = 0;
@@ -1166,7 +1166,7 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
                                       {step.text.split('https://www.cupshe.com').map((part, i, arr) => (
                                         <React.Fragment key={i}>
                                           {part}
-                                          {i < arr.length - 1 && <span className="text-indigo-600 font-bold underline cursor-pointer">https://www.cupshe.com</span>}
+                                          {i < arr.length - 1 && <span className="text-[#7033F5] font-bold underline cursor-pointer">https://www.cupshe.com</span>}
                                         </React.Fragment>
                                       ))}
                                     </p>
@@ -1182,7 +1182,7 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
                                 )}
                                 {step.type === 'image' && (
                                   <div className="pl-4 mb-6">
-                                    <div className="rounded-[2rem] border border-slate-200 overflow-hidden shadow-2xl max-w-2xl transition-all hover:scale-[1.01]">
+                                    <div className="rounded-[20px] border border-slate-200 overflow-hidden shadow-2xl max-w-2xl transition-all hover:scale-[1.01]">
                                       <img src={step.url} alt="Captured UI" className="w-full h-auto" />
                                     </div>
                                   </div>
@@ -1251,10 +1251,10 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
       )}
       {activeModal === 'batch_match' && (
         <ModalWrapper>
-          <div className="bg-white w-full max-w-xl rounded-[3rem] shadow-2xl p-10 space-y-8 animate-in slide-in-from-bottom-8">
+          <div className="bg-white w-full max-w-xl rounded-[20px] shadow-2xl p-10 space-y-8 animate-in slide-in-from-bottom-8">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center text-white shadow-lg"><Database size={24} /></div>
+                <div className="w-12 h-12 bg-[#7033F5] rounded-2xl flex items-center justify-center text-white shadow-lg"><Database size={24} /></div>
                 <div>
                   <h4 className="text-xl font-black text-slate-900">批量匹配素材库</h4>
                   <p className="text-slate-400 text-xs font-bold tracking-widest mt-1">智能分析并关联现有营销资产</p>
@@ -1270,26 +1270,26 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
                     const next = new Set(selectedMatchOptions);
                     if (next.has(opt.id)) next.delete(opt.id); else next.add(opt.id);
                     setSelectedMatchOptions(next);
-                  }} className={`w-full p-6 rounded-2xl border-2 flex items-center justify-between transition-all group ${isSel ? 'border-indigo-600 bg-indigo-50 shadow-sm' : 'border-slate-100 bg-white hover:border-slate-200'}`}>
+                  }} className={`w-full p-6 rounded-2xl border-2 flex items-center justify-between transition-all group ${isSel ? 'border-[#7033F5] bg-[#F5F1FF] shadow-sm' : 'border-slate-100 bg-white hover:border-slate-200'}`}>
                     <div className="flex items-center gap-4">
-                      <div className={`p-2 rounded-lg ${isSel ? 'bg-indigo-600 text-white' : 'bg-slate-50 text-slate-400'}`}>{opt.icon}</div>
-                      <span className={`text-sm font-black ${isSel ? 'text-indigo-900' : 'text-slate-600'}`}>{opt.label}</span>
+                      <div className={`p-2 rounded-lg ${isSel ? 'bg-[#7033F5] text-white' : 'bg-slate-50 text-slate-400'}`}>{opt.icon}</div>
+                      <span className={`text-sm font-black ${isSel ? 'text-[#5E26D6]' : 'text-slate-600'}`}>{opt.label}</span>
                     </div>
-                    {isSel && <Check size={20} className="text-indigo-600" />}
+                    {isSel && <Check size={20} className="text-[#7033F5]" />}
                   </button>
                 );
               })}
             </div>
-            <button onClick={handleBatchMatch} className="w-full py-5 rounded-2xl font-black tracking-widest shadow-xl bg-slate-900 text-white hover:bg-black transition-all">确认并开始批量匹配</button>
+            <button onClick={handleBatchMatch} className="w-full py-5 rounded-full font-black tracking-widest shadow-xl bg-[#7033F5] text-white hover:bg-[#5221CF] transition-all">确认并开始批量匹配</button>
           </div>
         </ModalWrapper>
       )}
       {activeModal === 'batch_aigc' && (
         <ModalWrapper>
-          <div className="bg-white w-full max-w-2xl rounded-[3rem] shadow-2xl p-10 space-y-8 animate-in slide-in-from-bottom-8">
+          <div className="bg-white w-full max-w-2xl rounded-[20px] shadow-2xl p-10 space-y-8 animate-in slide-in-from-bottom-8">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-purple-600 rounded-2xl flex items-center justify-center text-white shadow-lg"><Sparkles size={24} /></div>
+                <div className="w-12 h-12 bg-[#7033F5] rounded-2xl flex items-center justify-center text-white shadow-lg"><Sparkles size={24} /></div>
                 <div>
                   <h4 className="text-xl font-black text-slate-900">批量 AIGC 生成素材</h4>
                   <p className="text-slate-400 text-xs font-bold tracking-widest mt-1">为每个所选商品并行生成差异化创意</p>
@@ -1302,7 +1302,7 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
                 <label className="text-[10px] font-black text-slate-400 tracking-widest">每个商品生成的素材数量</label>
                 <div className="grid grid-cols-5 gap-3">
                   {[1, 2, 3, 4, 5].map(n => (
-                    <button key={n} onClick={() => setBatchAIGCCount(n)} className={`h-12 rounded-xl font-black text-sm border-2 transition-all ${batchAIGCCount === n ? 'bg-purple-600 border-purple-600 text-white shadow-lg shadow-purple-100' : 'bg-white border-slate-100 text-slate-400 hover:border-slate-200'}`}>{n}</button>
+                    <button key={n} onClick={() => setBatchAIGCCount(n)} className={`h-12 rounded-xl font-black text-sm border-2 transition-all ${batchAIGCCount === n ? 'bg-[#7033F5] border-[#7033F5] text-white shadow-lg shadow-[#7033F5]/10' : 'bg-white border-slate-100 text-slate-400 hover:border-slate-200'}`}>{n}</button>
                   ))}
                 </div>
               </div>
@@ -1315,7 +1315,7 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
                         <img src={p.imageUrl} className="w-8 h-8 rounded-lg object-cover" />
                         <p className="text-xs font-bold text-slate-800 truncate">{p.name}</p>
                       </div>
-                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${!batchAIGCExclusions.has(p.id) ? 'bg-purple-600 border-purple-600' : 'bg-transparent border-slate-200'}`}>
+                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${!batchAIGCExclusions.has(p.id) ? 'bg-[#7033F5] border-[#7033F5]' : 'bg-transparent border-slate-200'}`}>
                         {!batchAIGCExclusions.has(p.id) && <Check size={12} className="text-white" />}
                       </div>
                     </div>
@@ -1323,7 +1323,7 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
                 </div>
               </div>
             </div>
-            <button onClick={handleBatchAIGC} className="w-full py-5 bg-slate-900 text-white rounded-2xl font-black tracking-widest shadow-xl hover:bg-black transition-all flex items-center justify-center gap-3">
+            <button onClick={handleBatchAIGC} className="w-full py-5 bg-[#7033F5] text-white rounded-full font-black tracking-widest shadow-xl hover:bg-[#5221CF] transition-all flex items-center justify-center gap-3">
               <Sparkles size={20} /> 开始并行生成创意
             </button>
           </div>
@@ -1331,10 +1331,10 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
       )}
       {activeModal === 'select_account' && (
         <ModalWrapper>
-          <div className="bg-white w-full max-w-xl rounded-[3rem] shadow-2xl p-10 space-y-8 animate-in slide-in-from-bottom-8">
+          <div className="bg-white w-full max-w-xl rounded-[20px] shadow-2xl p-10 space-y-8 animate-in slide-in-from-bottom-8">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center text-white shadow-lg"><Briefcase size={24} /></div>
+                <div className="w-12 h-12 bg-[#7033F5] rounded-2xl flex items-center justify-center text-white shadow-lg"><Briefcase size={24} /></div>
                 <div>
                   <h4 className="text-xl font-black text-slate-900">选择 Meta 广告账户</h4>
                   <p className="text-slate-400 text-xs font-bold tracking-widest mt-1">关联目录并同步商品数据</p>
@@ -1344,15 +1344,15 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
             </div>
             <div className="space-y-3">
               {MOCK_ACCOUNTS.map(acc => (
-                <button key={acc.id} onClick={() => { onSelectAccount(acc); setActiveModal(null); }} className={`w-full p-6 rounded-2xl border-2 flex items-center justify-between transition-all ${selectedAccount?.id === acc.id ? 'border-indigo-600 bg-indigo-50 shadow-lg shadow-indigo-100' : 'border-slate-100 bg-white hover:border-slate-200'}`}>
+                <button key={acc.id} onClick={() => { onSelectAccount(acc); setActiveModal(null); }} className={`w-full p-6 rounded-full border-2 flex items-center justify-between transition-all ${selectedAccount?.id === acc.id ? 'border-[#7033F5] bg-[#F5F1FF] shadow-lg shadow-[#7033F5]/10' : 'border-slate-100 bg-white hover:border-slate-200'}`}>
                   <div className="flex items-center gap-4 text-left">
-                    <div className={`p-2 rounded-lg ${selectedAccount?.id === acc.id ? 'bg-indigo-600 text-white' : 'bg-slate-50 text-slate-400'}`}><Briefcase size={16} /></div>
+                    <div className={`p-2 rounded-lg ${selectedAccount?.id === acc.id ? 'bg-[#7033F5] text-white' : 'bg-slate-50 text-slate-400'}`}><Briefcase size={16} /></div>
                     <div>
-                      <p className={`text-sm font-black ${selectedAccount?.id === acc.id ? 'text-indigo-900' : 'text-slate-600'}`}>{acc.name}</p>
+                      <p className={`text-sm font-black ${selectedAccount?.id === acc.id ? 'text-[#5E26D6]' : 'text-slate-600'}`}>{acc.name}</p>
                       <p className="text-[10px] text-slate-400 font-bold tracking-widest">id: {acc.id}</p>
                     </div>
                   </div>
-                  {selectedAccount?.id === acc.id && <Check size={20} className="text-indigo-600" />}
+                  {selectedAccount?.id === acc.id && <Check size={20} className="text-[#7033F5]" />}
                 </button>
               ))}
             </div>
@@ -1374,7 +1374,7 @@ const ModalWrapper = ({ children }) => {
   const zIndex = useZIndex(true);
   return (
     <div 
-      className="fixed inset-0 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in"
+      className="fixed inset-0 flex items-center justify-center p-4 bg-black/50 backdrop-blur-md animate-in fade-in"
       style={{ zIndex }}
     >
       {children}
@@ -1392,13 +1392,13 @@ const AddProductModal = ({ onClose, authStatus, handleAuthorize, isAuthLoading, 
       <div className={`bg-white rounded-[40px] w-full shadow-2xl border border-slate-100 animate-in zoom-in-95 duration-200 flex flex-col relative transition-all duration-500 ${addStep === 'setup' ? 'max-w-4xl h-[90vh]' : 'max-w-2xl min-h-[400px]'}`}>
         {isImportAnalyzing && (
           <div className="absolute inset-0 z-[120] bg-white rounded-[40px] flex flex-col items-center justify-center p-10 text-center animate-in fade-in duration-300">
-            <div className="w-20 h-20 rounded-[32px] bg-indigo-50 flex items-center justify-center mb-6 shadow-inner relative">
-              <div className="absolute inset-0 rounded-[32px] border-4 border-indigo-100 border-t-indigo-500 animate-spin" />
-              <Loader2 className="text-indigo-500 animate-spin" size={32} />
+            <div className="w-20 h-20 rounded-[32px] bg-[#F5F1FF] flex items-center justify-center mb-6 shadow-inner relative">
+              <div className="absolute inset-0 rounded-[32px] border-4 border-[#7033F5]/15 border-t-[#7033F5] animate-spin" />
+              <Loader2 className="text-[#7033F5] animate-spin" size={32} />
             </div>
             <h3 className="text-xl font-bold text-slate-900 mb-2 font-sans">Analyzing product info...</h3>
             <p className="text-xs text-slate-400 font-medium mb-10 max-w-[320px] font-sans">We're fetching details from the URL. This might take a few moments.</p>
-            <button onClick={onClose} className="px-10 py-3.5 bg-slate-900 text-white rounded-2xl font-bold text-sm hover:bg-black transition-all active:scale-95 shadow-lg shadow-slate-200 font-sans">Close and analyze in background</button>
+            <button onClick={onClose} className="px-10 py-3.5 bg-[#7033F5] text-white rounded-full font-bold text-sm hover:bg-[#5221CF] transition-all active:scale-95 shadow-lg shadow-slate-200 font-sans">Close and analyze in background</button>
           </div>
         )}
         <div className="p-8 pb-4 flex justify-between items-center shrink-0">
@@ -1414,8 +1414,8 @@ const AddProductModal = ({ onClose, authStatus, handleAuthorize, isAuthLoading, 
               {ADD_OPTIONS.filter(opt => ['shopify', 'meta', 'gmc'].includes(opt.id)).map((option) => {
                 const isConnected = option.id === 'shopify' ? authStatus.shopify : option.id === 'meta' ? authStatus.meta : authStatus.google;
                 return (
-                  <button key={option.id} onClick={() => setAddStep(option.id)} className="w-full group flex items-center gap-6 p-6 bg-slate-50 border border-slate-100 rounded-[28px] hover:bg-white hover:shadow-xl hover:border-indigo-100 transition-all text-left">
-                    <div className="w-14 h-14 rounded-2xl bg-white border border-slate-100 flex items-center justify-center text-slate-400 group-hover:text-indigo-50 group-hover:border-indigo-50 group-hover:shadow-inner transition-all overflow-hidden p-3 shrink-0">
+                  <button key={option.id} onClick={() => setAddStep(option.id)} className="w-full group flex items-center gap-6 p-6 bg-slate-50 border border-slate-100 rounded-[28px] hover:bg-white hover:shadow-xl hover:border-[#7033F5]/15 transition-all text-left">
+                    <div className="w-14 h-14 rounded-2xl bg-white border border-slate-100 flex items-center justify-center text-slate-400 group-hover:text-[#F5F1FF] group-hover:border-[#F5F1FF] group-hover:shadow-inner transition-all overflow-hidden p-3 shrink-0">
                       {option.logo ? <img src={option.logo} alt="" className="w-full h-full object-contain" /> : <option.icon size={26} />}
                     </div>
                     <div className="flex-1">
@@ -1427,7 +1427,7 @@ const AddProductModal = ({ onClose, authStatus, handleAuthorize, isAuthLoading, 
                       </div>
                       <p className="text-xs font-medium text-slate-400 leading-relaxed font-sans">{option.subtitle}</p>
                     </div>
-                    <ChevronRight size={20} className="text-slate-300 group-hover:text-indigo-400 group-hover:translate-x-1 transition-all" />
+                    <ChevronRight size={20} className="text-slate-300 group-hover:text-[#7033F5]/70 group-hover:translate-x-1 transition-all" />
                   </button>
                 );
               })}
@@ -1436,7 +1436,7 @@ const AddProductModal = ({ onClose, authStatus, handleAuthorize, isAuthLoading, 
           {addStep === 'url' && (
             <div className="flex-1 flex flex-col pt-6 px-10 text-center">
               <div className="space-y-8 mb-12">
-                <h2 className="text-3xl font-bold text-slate-900 leading-tight font-sans">Paste your <span className="text-indigo-500">product link</span> to get product info</h2>
+                <h2 className="text-3xl font-bold text-slate-900 leading-tight font-sans">Paste your <span className="text-[#7033F5]">product link</span> to get product info</h2>
                 <div className="space-y-4">
                   <p className="text-[10px] font-bold text-slate-400 tracking-[0.2em] font-sans">AdsGo supports</p>
                   <div className="flex items-center justify-center gap-4">
@@ -1448,12 +1448,12 @@ const AddProductModal = ({ onClose, authStatus, handleAuthorize, isAuthLoading, 
               <div className="space-y-8 max-w-[520px] mx-auto w-full flex-1 flex flex-col">
                 <div className="space-y-3">
                   <div className="relative group">
-                    <input type="text" value={productUrl} onChange={(e) => setProductUrl(e.target.value)} placeholder="e.g. amazon product link, shopify product link, etc." className={`w-full bg-slate-50 border-[1.5px] rounded-[24px] px-8 py-6 text-sm font-medium text-slate-700 placeholder:text-slate-300 focus:outline-none transition-all duration-300 ${urlError ? 'border-rose-400 bg-rose-50/20' : 'border-slate-100 focus:bg-white focus:border-indigo-300 focus:ring-[8px] focus:ring-indigo-500/5 shadow-inner'}`} />
+                    <input type="text" value={productUrl} onChange={(e) => setProductUrl(e.target.value)} placeholder="e.g. amazon product link, shopify product link, etc." className={`w-full bg-slate-50 border-[1.5px] rounded-[24px] px-8 py-6 text-sm font-medium text-slate-700 placeholder:text-slate-300 focus:outline-none transition-all duration-300 ${urlError ? 'border-rose-400 bg-rose-50/20' : 'border-slate-100 focus:bg-white focus:border-[#7033F5] focus:ring-[8px] focus:ring-[#7033F5]/5 shadow-inner'}`} />
                     {urlError && <div className="absolute -bottom-7 left-4 flex items-center gap-1.5 text-rose-500 font-bold text-[10px] animate-in slide-in-from-top-1"><AlertTriangle size={12} />{urlError}</div>}
                   </div>
                 </div>
                 <div className="mt-auto">
-                  <button onClick={handleImportAnalyzeUrl} className="w-full bg-indigo-600 text-white py-5 rounded-[22px] font-bold text-base hover:bg-indigo-700 shadow-xl shadow-indigo-100 transition-all active:scale-[0.97] font-sans">Analyze URL</button>
+                  <button onClick={handleImportAnalyzeUrl} className="w-full bg-[#7033F5] text-white py-5 rounded-[22px] font-bold text-base hover:bg-[#5221CF] shadow-xl shadow-[#7033F5]/10 transition-all active:scale-[0.97] font-sans">Analyze URL</button>
                 </div>
               </div>
             </div>
@@ -1470,7 +1470,7 @@ const AddProductModal = ({ onClose, authStatus, handleAuthorize, isAuthLoading, 
                     <h4 className="text-lg font-bold text-slate-900 font-sans">Connect to Shopify</h4>
                     <p className="text-xs text-slate-400 leading-relaxed font-medium font-sans">Link your Shopify store to automatically import products and keep assets in sync.</p>
                   </div>
-                  <button onClick={() => handleAuthorize('shopify')} disabled={isAuthLoading} className="w-full max-w-[280px] bg-slate-900 text-white py-4 rounded-2xl font-bold text-sm hover:bg-black shadow-lg shadow-slate-200 transition-all active:scale-95 font-sans">Connect Shopify store</button>
+                  <button onClick={() => handleAuthorize('shopify')} disabled={isAuthLoading} className="w-full max-w-[280px] bg-[#7033F5] text-white py-4 rounded-full font-bold text-sm hover:bg-[#5221CF] shadow-lg shadow-slate-200 transition-all active:scale-95 font-sans">Connect Shopify store</button>
                 </>
               ) : (
                 <>
@@ -1485,7 +1485,7 @@ const AddProductModal = ({ onClose, authStatus, handleAuthorize, isAuthLoading, 
                     <div className="flex items-center justify-center gap-2"><span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" /><p className="text-xs text-green-600 font-bold tracking-wide font-sans">Connected</p></div>
                   </div>
                   <div className="w-full pt-6">
-                    <button onClick={() => { setIsShopifyConnected(false); setAuthStatus(p => ({ ...p, shopify: false })); }} className="px-8 py-3 bg-slate-50 border border-slate-100 rounded-2xl text-slate-400 hover:text-rose-500 hover:bg-rose-50 hover:border-rose-100 font-bold text-[13px] transition-all flex items-center gap-2 mx-auto shadow-sm font-sans"><Link2Off size={18} />Disconnect store</button>
+                    <button onClick={() => { setIsShopifyConnected(false); setAuthStatus(p => ({ ...p, shopify: false })); }} className="px-8 py-3 bg-slate-50 border border-slate-100 rounded-full text-slate-400 hover:text-rose-500 hover:bg-rose-50 hover:border-rose-100 font-bold text-[13px] transition-all flex items-center gap-2 mx-auto shadow-sm font-sans"><Link2Off size={18} />Disconnect store</button>
                   </div>
                 </>
               )}
@@ -1495,8 +1495,8 @@ const AddProductModal = ({ onClose, authStatus, handleAuthorize, isAuthLoading, 
             <div className="flex-1 flex flex-col justify-center items-center text-center space-y-8 py-6">
               {syncStates[addStep].isConnecting ? (
                 <div className="flex flex-col items-center gap-4">
-                  <div className="w-20 h-20 rounded-[32px] bg-indigo-50 flex items-center justify-center shadow-inner">
-                    <Loader2 className="text-indigo-500 animate-spin" size={32} />
+                  <div className="w-20 h-20 rounded-[32px] bg-[#F5F1FF] flex items-center justify-center shadow-inner">
+                    <Loader2 className="text-[#7033F5] animate-spin" size={32} />
                   </div>
                   <p className="text-sm font-bold text-slate-900">Fetching your assets...</p>
                 </div>
@@ -1509,7 +1509,7 @@ const AddProductModal = ({ onClose, authStatus, handleAuthorize, isAuthLoading, 
                     <h4 className="text-lg font-bold text-slate-900 font-sans">{addStep === 'gmc' ? 'Google GMC' : 'Meta feeds'}</h4>
                     <p className="text-xs text-slate-400 leading-relaxed font-medium font-sans">{addStep === 'gmc' ? 'Connect to Google Merchant Center to sync your products.' : 'Connect to Meta Commerce Manager to sync your product feeds.'}</p>
                   </div>
-                  <button onClick={() => handleSyncConnect(addStep)} className="w-full max-w-[280px] bg-slate-900 text-white py-4 rounded-2xl font-bold text-sm hover:bg-black shadow-lg shadow-slate-200 transition-all active:scale-95 font-sans">Connect</button>
+                  <button onClick={() => handleSyncConnect(addStep)} className="w-full max-w-[280px] bg-[#7033F5] text-white py-4 rounded-full font-bold text-sm hover:bg-[#5221CF] shadow-lg shadow-slate-200 transition-all active:scale-95 font-sans">Connect</button>
                 </>
               ) : (
                 <>
@@ -1529,7 +1529,7 @@ const AddProductModal = ({ onClose, authStatus, handleAuthorize, isAuthLoading, 
                     </div>
                   </div>
                   <div className="w-full pt-6">
-                    <button onClick={() => handleSyncDisconnect(addStep)} className="px-8 py-3 bg-rose-50 text-rose-500 border border-rose-100 rounded-2xl font-bold text-[13px] transition-all flex items-center gap-2 mx-auto shadow-sm font-sans"><Link2Off size={18} />Disconnect</button>
+                    <button onClick={() => handleSyncDisconnect(addStep)} className="px-8 py-3 bg-rose-50 text-rose-500 border border-rose-100 rounded-full font-bold text-[13px] transition-all flex items-center gap-2 mx-auto shadow-sm font-sans"><Link2Off size={18} />Disconnect</button>
                   </div>
                 </>
               )}

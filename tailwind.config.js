@@ -7,8 +7,11 @@ export default {
   theme: {
     extend: {
       colors: {
-        primary: '#3B82F6', // Modern Blue
-        'primary-hover': '#2563EB',
+        primary: '#7033F5',
+        'primary-hover': '#5221CF',
+        'primary-light': '#F5F1FF',
+        'primary-mid': '#EDE8FF',
+        'primary-text': '#5E26D6',
         secondary: '#64748b',
         success: '#10b981',
         warning: '#f59e0b',
@@ -18,7 +21,7 @@ export default {
         border: '#e2e8f0',
       },
       fontFamily: {
-        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+        sans: ['Outfit', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
       },
     },
   },
