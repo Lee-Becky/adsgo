@@ -10,8 +10,7 @@
 
 body {
   font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-  background-color: #f8fafc;
-  color: #1e293b;
+  @apply bg-gray-50 text-gray-900;
 }
 
 #root {
@@ -25,61 +24,108 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  @apply bg-gray-100;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  @apply bg-gray-300;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  @apply bg-gray-400;
 }
 
-/* Custom styles for badges */
+/* Isabel Tag / Badge */
 .badge {
-  @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  @apply inline-flex items-center px-2 py-0.5 text-xs font-medium;
+  border-radius: 6px;
 }
 
 .badge-success {
-  @apply bg-green-100 text-green-800;
+  @apply bg-green-50 text-green-700;
 }
 
 .badge-warning {
-  @apply bg-yellow-100 text-yellow-800;
+  @apply bg-orange-50 text-orange-700;
 }
 
 .badge-danger {
-  @apply bg-red-100 text-red-800;
+  @apply bg-red-50 text-red-700;
 }
 
 .badge-gray {
-  @apply bg-gray-100 text-gray-800;
+  @apply bg-gray-100 text-gray-500;
 }
 
-/* Enhanced form styles for Foundation Tab */
+/* Isabel Input */
 .enhanced-input {
-  @apply w-full px-4 py-3 bg-gradient-to-br from-slate-50 to-slate-50/50 border border-slate-200/80 rounded-lg focus:border-[#7033F5] focus:bg-white focus:shadow-lg focus:ring-0 text-sm text-slate-700 placeholder:text-slate-400 transition-all duration-300;
+  width: 100%;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 400;
+  color: #374151;
+  background-color: #fff;
+  outline: none;
+  box-shadow: none;
+  transition: all 0.2s;
+}
+.enhanced-input::placeholder {
+  color: #9ca3af;
+}
+.enhanced-input:hover:not(:focus):not(:disabled) {
+  border-color: #d1d5db;
+}
+.enhanced-input:focus {
+  border-color: #7033F5;
+  box-shadow: 0 4px 14px 0 rgba(112,51,245,0.2);
+  outline: none;
+}
+.enhanced-input:disabled {
+  background-color: #f9fafb;
+  color: #9ca3af;
+  cursor: not-allowed;
 }
 
+/* Isabel Select */
 .enhanced-select {
-  @apply w-full px-4 py-3 bg-gradient-to-br from-slate-50 to-slate-50/50 border border-slate-200/80 rounded-lg focus:border-[#7033F5] focus:bg-white focus:shadow-lg focus:ring-0 text-sm text-slate-700 transition-all duration-300 appearance-none cursor-pointer;
+  width: 100%;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 400;
+  color: #374151;
+  background-color: #fff;
+  appearance: none;
+  cursor: pointer;
+  outline: none;
+  box-shadow: none;
+  transition: all 0.2s;
 }
-
-/* Custom focus styles for better UX */
-.enhanced-input:focus,
+.enhanced-select:hover:not(:focus):not(:disabled) {
+  border-color: #d1d5db;
+}
 .enhanced-select:focus {
-  @apply outline-none ring-2 ring-[#7033F5]/20;
+  border-color: #7033F5;
+  box-shadow: 0 4px 14px 0 rgba(112,51,245,0.2);
+  outline: none;
+}
+.enhanced-select:disabled {
+  background-color: #f9fafb;
+  cursor: not-allowed;
 }
 
-/* Hover effects for enhanced inputs */
-.enhanced-input:hover:not(:focus),
-.enhanced-select:hover:not(:focus) {
-  @apply border-slate-300 bg-white/80;
+/* Isabel Card Shadow */
+.adsgo-card-shadow {
+  box-shadow: 0 1px 3px 0 rgba(0,0,0,0.05);
 }
 
-/* Animation utilities for Foundation Tab */
+/* Animation utilities */
 @keyframes fadeInUp {
   from {
     opacity: 0;
@@ -111,19 +157,15 @@ body {
 
 /* Gradient text effect */
 .gradient-text {
-  background: linear-gradient(135deg, #7033F5, #5E26D6);
+  background: linear-gradient(135deg, #7033F5, #5f3dc4);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-/* Enhanced shadow utilities */
-.shadow-glow-blue {
-  box-shadow: 0 0 20px rgba(112, 51, 245, 0.15);
-}
-
-.shadow-glow-indigo {
-  box-shadow: 0 0 20px rgba(112, 51, 245, 0.15);
+/* Isabel shadow utilities */
+.shadow-glow-primary {
+  box-shadow: 0 4px 14px 0 rgba(112, 51, 245, 0.2);
 }
 
 .shadow-glow-emerald {
@@ -156,14 +198,13 @@ body {
   }
 }
 
-/* Card hover enhancement */
+/* Isabel Card hover */
 .card-hover-effect {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  @apply transition-all duration-200;
 }
 
 .card-hover-effect:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 14px 0 rgba(112, 51, 245, 0.2);
 }
 
 /* Status indicator pulse */
