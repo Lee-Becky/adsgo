@@ -59,6 +59,15 @@ function mockParseStrategy(input) {
   return result;
 }
 
+// AI Interest Packs - 5 audience persona packs
+const AI_INTEREST_PACKS = [
+  { id: 'pack-1', name: 'Fashion Enthusiasts', interests: ['Fashion accessories', 'Luxury goods', 'Streetwear', 'Vintage clothing', 'Jewelry'] },
+  { id: 'pack-2', name: 'Digital Shoppers', interests: ['Online shopping', 'E-commerce', 'Technology', 'Gaming', 'Photography'] },
+  { id: 'pack-3', name: 'Health & Wellness', interests: ['Fitness', 'Wellness', 'Yoga', 'Skincare', 'Outdoor activities'] },
+  { id: 'pack-4', name: 'Lifestyle & Home', interests: ['Home decor', 'Cooking', 'DIY crafts', 'Coffee culture', 'Minimalism'] },
+  { id: 'pack-5', name: 'Travel & Culture', interests: ['Travel', 'Sustainable fashion', 'Music', 'Reading', 'Pet lovers'] },
+];
+
 // INT Interest Dual-Panel Component
 const IntInterestSelector = ({ intOptions, onIntOptionsChange, productAnalyses, allAnalysesComplete, selectedProducts }) => {
   const [showPanel, setShowPanel] = useState(false);
@@ -109,7 +118,7 @@ const IntInterestSelector = ({ intOptions, onIntOptionsChange, productAnalyses, 
 
   const analyzingCount = productAnalyses ? Object.values(productAnalyses).filter(p => p.status === 'analyzing').length : 0;
   const totalCount = selectedProducts?.length || 0;
-  const completeCount = totalCount - analyzingCount;
+  const isAnalyzing = analyzingCount > 0;
 
   const filteredInterests = useMemo(() => {
     if (!searchQuery.trim()) return [];
@@ -128,13 +137,27 @@ const IntInterestSelector = ({ intOptions, onIntOptionsChange, productAnalyses, 
     }
   };
 
-  const removeInterest = (interest) => {
-    onIntOptionsChange(intOptions.filter(o => o.name !== interest.name));
+  const removeInterest = (name) => {
+    onIntOptionsChange(intOptions.filter(o => o.name !== name));
   };
 
-  const restoreAiRecommended = () => {
-    onIntOptionsChange(aiRecommendedInterests);
+  const togglePack = (pack) => {
+    const allInPack = pack.interests.every(name => intOptions.some(o => o.name === name));
+    if (allInPack) {
+      onIntOptionsChange(intOptions.filter(o => !pack.interests.includes(o.name)));
+    } else {
+      const existingNames = new Set(intOptions.map(o => o.name));
+      const newInterests = pack.interests
+        .filter(name => !existingNames.has(name))
+        .map(name => {
+          const found = MOCK_ALL_INTERESTS.find(i => i.name === name);
+          return found ? { ...found, source: 'ai' } : { id: `ai_${name}`, name, source: 'ai', size: '100M-200M' };
+        });
+      onIntOptionsChange([...intOptions, ...newInterests]);
+    }
   };
+
+  const isPackSelected = (pack) => pack.interests.every(name => intOptions.some(o => o.name === name));
 
   return (
     <div className="w-full mt-4 pt-4 border-t border-gray-200/50 animate-in fade-in slide-in-from-top-2">
@@ -143,29 +166,29 @@ const IntInterestSelector = ({ intOptions, onIntOptionsChange, productAnalyses, 
           <Target size={10} className="text-amber-500" />
           INT 兴趣定向
         </label>
+
+        {/* Tags area - always visible above trigger */}
+        {intOptions.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 mb-2">
+            {intOptions.map(opt => (
+              <span key={opt.name} className="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-50 text-amber-600 rounded-tag text-xs font-medium border border-amber-100">
+                {opt.name}
+                <button onClick={(e) => { e.stopPropagation(); removeInterest(opt.name); }} className="text-amber-300 hover:text-rose-500 transition-colors">
+                  <X size={10} strokeWidth={3} />
+                </button>
+              </span>
+            ))}
+          </div>
+        )}
+
         {/* Trigger button */}
         <div
           onClick={() => setShowPanel(!showPanel)}
-          className="w-full p-4 bg-white border-2 border-amber-100 rounded-base flex items-center justify-between cursor-pointer hover:border-amber-300 transition-all"
+          className="w-full px-4 py-3 bg-white border-2 border-amber-100 rounded-base flex items-center justify-between cursor-pointer hover:border-amber-300 transition-all"
         >
-          <div className="flex flex-wrap gap-1.5 overflow-hidden max-w-[90%]">
-            {intOptions.length === 0 ? (
-              <span className="text-xs font-bold text-gray-300">点击选择兴趣词定向...</span>
-            ) : (
-              <>
-                {intOptions.slice(0, 4).map(opt => (
-                  <span key={opt.name} className="px-2 py-0.5 bg-amber-50 text-amber-600 rounded-tag text-xs font-medium border border-amber-100">
-                    {opt.name}
-                  </span>
-                ))}
-                {intOptions.length > 4 && (
-                  <span className="px-2 py-0.5 bg-gray-50 text-gray-400 rounded-tag text-xs font-medium">
-                    +{intOptions.length - 4}
-                  </span>
-                )}
-              </>
-            )}
-          </div>
+          <span className="text-xs font-medium text-gray-300">
+            {intOptions.length === 0 ? '点击选择兴趣词定向...' : '添加更多兴趣词...'}
+          </span>
           <ChevronDown size={14} className={`text-amber-300 transition-transform ${showPanel ? 'rotate-180' : ''}`} />
         </div>
 
@@ -174,28 +197,13 @@ const IntInterestSelector = ({ intOptions, onIntOptionsChange, productAnalyses, 
           <>
             <div className="fixed inset-0 z-[190]" onClick={() => setShowPanel(false)} />
             <div
-              className="absolute top-full left-0 mt-2 w-[500px] bg-white rounded-section shadow-xl border border-gray-100 overflow-hidden animate-in fade-in zoom-in-95 duration-200 flex flex-col"
+              className="absolute top-full left-0 mt-2 w-[560px] bg-white rounded-section shadow-xl border border-gray-100 overflow-hidden animate-in fade-in zoom-in-95 duration-200 flex flex-col"
               style={{ zIndex: 200 }}
             >
-              {/* Top bar: restore button + AI status */}
-              <div className="px-4 py-3 border-b border-gray-50 flex items-center justify-between bg-gray-50/30">
-                <button
-                  onClick={restoreAiRecommended}
-                  className="flex items-center gap-1.5 text-xs font-medium text-primary-500 hover:text-primary-600 transition-colors"
-                >
-                  <RefreshCw size={11} /> 恢复至初始化AI推荐
-                </button>
-                {analyzingCount > 0 && (
-                  <span className="flex items-center gap-1.5 text-xs font-medium text-amber-500">
-                    <Loader2 size={11} className="animate-spin" /> AI 推荐中... ({completeCount}/{totalCount})
-                  </span>
-                )}
-              </div>
-
-              <div className="flex" style={{ height: '340px' }}>
-                {/* Left: Search & List */}
-                <div className="w-1/2 border-r border-gray-50 flex flex-col">
-                  <div className="p-4 border-b border-gray-50">
+              <div className="flex" style={{ height: '360px' }}>
+                {/* Left: Search & List (~55%) */}
+                <div className="w-[55%] border-r border-gray-100 flex flex-col">
+                  <div className="p-3 border-b border-gray-100">
                     <div className="relative">
                       <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300 w-3.5 h-3.5" />
                       <input
@@ -207,14 +215,14 @@ const IntInterestSelector = ({ intOptions, onIntOptionsChange, productAnalyses, 
                       />
                     </div>
                   </div>
-                  <div className="flex-1 overflow-y-auto custom-scrollbar p-2 space-y-1">
+                  <div className="flex-1 overflow-y-auto custom-scrollbar p-2 space-y-0.5">
                     {!searchQuery.trim() ? (
                       <div className="h-full flex items-center justify-center">
-                        <p className="text-xs text-gray-300 font-bold">请输入关键词查询</p>
+                        <p className="text-xs text-gray-300 font-medium">请输入关键词查询</p>
                       </div>
                     ) : filteredInterests.length === 0 ? (
                       <div className="h-full flex items-center justify-center">
-                        <p className="text-xs text-gray-300 font-bold">未找到匹配的兴趣词</p>
+                        <p className="text-xs text-gray-300 font-medium">未找到匹配的兴趣词</p>
                       </div>
                     ) : (
                       filteredInterests.map(interest => {
@@ -223,13 +231,13 @@ const IntInterestSelector = ({ intOptions, onIntOptionsChange, productAnalyses, 
                           <button
                             key={interest.id}
                             onClick={() => toggleInterest(interest)}
-                            className={`w-full text-left px-3 py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-between ${
+                            className={`w-full text-left px-3 py-2 rounded-base text-xs font-medium transition-all flex items-center justify-between ${
                               sel ? 'bg-amber-50 text-amber-600' : 'text-gray-600 hover:bg-gray-50'
                             }`}
                           >
                             <div>
                               <span>{interest.name}</span>
-                              <span className="ml-2 text-xs text-gray-400">{interest.size}</span>
+                              <span className="ml-2 text-gray-400">{interest.size}</span>
                             </div>
                             {sel && <Check size={12} />}
                           </button>
@@ -238,24 +246,48 @@ const IntInterestSelector = ({ intOptions, onIntOptionsChange, productAnalyses, 
                     )}
                   </div>
                 </div>
-                {/* Right: Selected */}
-                <div className="w-1/2 bg-gray-50/30 flex flex-col">
-                  <div className="p-4 border-b border-gray-50 flex items-center justify-between">
-                    <span className="text-xs font-medium text-gray-500">Selected ({intOptions.length})</span>
+                {/* Right: AI Recommended (~45%) */}
+                <div className="w-[45%] bg-gray-50/50 flex flex-col">
+                  <div className="px-4 py-3 border-b border-gray-100 flex items-center gap-2">
+                    <Sparkles size={12} className="text-primary-500" />
+                    <span className="text-xs font-semibold text-gray-700">AI recommends interest packs</span>
                   </div>
-                  <div className="flex-1 overflow-y-auto custom-scrollbar p-4 flex flex-wrap gap-2 content-start">
-                    {intOptions.map(opt => (
-                      <div key={opt.name} className="flex items-center gap-1.5 px-2.5 py-1.5 bg-white border border-amber-100 rounded-tag shadow-adsgo-card animate-in zoom-in">
-                        <span className="text-xs font-medium text-gray-700">{opt.name}</span>
-                        <button onClick={() => removeInterest(opt)} className="text-gray-300 hover:text-rose-500 transition-colors">
-                          <X size={10} strokeWidth={3} />
-                        </button>
+                  <div className="flex-1 overflow-y-auto custom-scrollbar p-3 space-y-2">
+                    {isAnalyzing ? (
+                      <div className="space-y-2">
+                        {[1,2,3,4,5].map(i => (
+                          <div key={i} className="p-3 rounded-inner border border-gray-100 bg-white animate-pulse">
+                            <div className="h-3 bg-gray-200 rounded w-3/4 mb-2"></div>
+                            <div className="h-2 bg-gray-100 rounded w-1/2"></div>
+                          </div>
+                        ))}
+                        <p className="text-xs text-gray-400 font-medium text-center pt-2">
+                          <Loader2 size={12} className="inline animate-spin mr-1" />
+                          AI 分析推荐中...
+                        </p>
                       </div>
-                    ))}
-                    {intOptions.length === 0 && (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <p className="text-xs text-gray-300 font-bold text-center">尚未选择兴趣词</p>
-                      </div>
+                    ) : (
+                      AI_INTEREST_PACKS.map(pack => {
+                        const selected = isPackSelected(pack);
+                        return (
+                          <button
+                            key={pack.id}
+                            onClick={() => togglePack(pack)}
+                            title={`${pack.name}: ${pack.interests.join(', ')}`}
+                            className={`w-full text-left p-3 rounded-inner border transition-all ${
+                              selected ? 'border-primary-500 bg-primary-50/50 shadow-sm' : 'border-gray-100 bg-white hover:border-gray-200 hover:shadow-sm'
+                            }`}
+                          >
+                            <div className="flex items-center justify-between mb-1">
+                              <span className="text-xs font-semibold text-gray-800 line-clamp-1">{pack.name}</span>
+                              <div className={`w-4 h-4 rounded flex items-center justify-center flex-shrink-0 ml-2 ${selected ? 'bg-primary-500 text-white' : 'border border-gray-200'}`}>
+                                {selected && <Check size={10} />}
+                              </div>
+                            </div>
+                            <p className="text-xs text-gray-400 line-clamp-2">{pack.interests.join(', ')}</p>
+                          </button>
+                        );
+                      })
                     )}
                   </div>
                 </div>
@@ -642,7 +674,7 @@ const CampaignPlanView = ({
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <div className="grid grid-cols-1 lg:grid-cols-[65fr_35fr] gap-8">
       <div className="space-y-4">
         <div className="flex items-center gap-2 px-2">
           <h4 className="text-xl font-semibold text-gray-900">Campaign 架构策略</h4>
@@ -921,7 +953,7 @@ const CampaignPlanView = ({
 
       <div className="space-y-4">
         <h4 className="text-xl font-semibold text-gray-900 px-2">预算配置与预估消耗</h4>
-        <div className="bg-white p-8 rounded-section adsgo-card-shadow flex flex-col gap-6 h-full">
+        <div className="bg-white p-5 rounded-section adsgo-card-shadow flex flex-col gap-4 h-full">
           <div className="space-y-3">
             <div className="flex items-center justify-between px-1">
               <label className="text-xs font-medium text-gray-500 px-1">目标投放系列 (Campaign)</label>
@@ -933,7 +965,7 @@ const CampaignPlanView = ({
                 <span className="text-xs font-medium">选择已有</span>
               </button>
             </div>
-            <div className={`flex items-center gap-4 p-5 rounded-inner border-2 transition-all ${isExistingCampaign ? 'bg-primary-50 border-primary-500/20' : 'bg-gray-50 border-gray-100'}`}>
+            <div className={`flex items-center gap-4 p-4 rounded-inner border-2 transition-all ${isExistingCampaign ? 'bg-primary-50 border-primary-500/20' : 'bg-gray-50 border-gray-100'}`}>
               <div className={`w-10 h-10 rounded-base flex items-center justify-center ${isExistingCampaign ? 'bg-primary-500 text-white shadow-lg shadow-primary-500/15' : 'bg-white text-gray-400 shadow-adsgo-card'}`}>
                 <Briefcase size={20} />
               </div>
@@ -966,14 +998,14 @@ const CampaignPlanView = ({
             </div>
           </div>
 
-          <div className="bg-gray-50/80 border border-gray-100 rounded-inner p-6 flex flex-col items-center relative overflow-hidden group">
+          <div className="bg-gray-50/80 border border-gray-100 rounded-inner p-4 flex flex-col items-center relative overflow-hidden group">
             <div className="flex items-center w-full">
-              <DollarSign className="text-gray-300 absolute left-8 pointer-events-none group-focus-within:text-primary-500 transition-colors" size={32} />
+              <DollarSign className="text-gray-300 absolute left-6 pointer-events-none group-focus-within:text-primary-500 transition-colors" size={24} />
               <input
                 type="number"
                 value={dailyBudget}
                 onChange={(e) => onBudgetChange(Number(e.target.value))}
-                className="w-full bg-transparent border-none outline-none pl-16 pr-4 text-4xl font-bold text-gray-900"
+                className="w-full bg-transparent border-none outline-none pl-12 pr-4 text-3xl font-bold text-gray-900"
               />
               <span className="text-xs font-medium text-gray-500 mr-4">
                 {budgetType === 'ABO' ? 'Per AdSet' : 'Total Campaign'}
@@ -981,14 +1013,14 @@ const CampaignPlanView = ({
             </div>
           </div>
 
-          <div className="bg-gray-900 p-8 rounded-section text-white shadow-xl relative overflow-hidden">
+          <div className="bg-gray-900 p-5 rounded-section text-white shadow-xl relative overflow-hidden">
              <div className="flex items-center gap-2 mb-2">
                 <Sparkles size={14} className="text-primary-500/70" />
                 <p className="text-xs font-medium opacity-60">预估日均消耗</p>
               </div>
               <div className="flex items-end justify-between">
                 <div>
-                  <p className="text-4xl font-bold text-white">${estimatedTotalDaily}</p>
+                  <p className="text-3xl font-bold text-white">${estimatedTotalDaily}</p>
                   <p className="text-xs text-primary-500/70 font-medium mt-1">
                     {budgetType === 'ABO' ? `${dailyBudget} * ${adSetGroups.length} Adsets` : '系列全局消耗'}
                   </p>

@@ -61,6 +61,14 @@ const AVAILABLE_INTERESTS = [
   { id: 'int_24', name: 'Sports', size: '600M-800M' },
 ];
 
+const AI_INTEREST_PACKS = [
+  { id: 'pack-1', name: 'Fashion Enthusiasts', interests: ['Fashion accessories', 'Luxury goods', 'Streetwear', 'Jewelry', 'Fashion'] },
+  { id: 'pack-2', name: 'Digital Shoppers', interests: ['Online shopping', 'E-commerce', 'Technology', 'Gaming', 'Photography'] },
+  { id: 'pack-3', name: 'Health & Wellness', interests: ['Fitness', 'Wellness', 'Yoga', 'Skincare', 'Outdoor activities'] },
+  { id: 'pack-4', name: 'Lifestyle & Home', interests: ['Home decor', 'Cooking', 'Lifestyle', 'Pet lovers', 'Music'] },
+  { id: 'pack-5', name: 'Travel & Culture', interests: ['Travel', 'Sustainable fashion', 'Beauty', 'Sports', 'Streetwear'] },
+];
+
 const LANGUAGES = ['All languages', 'English', 'Chinese', 'Spanish', 'French', 'German', 'Japanese'];
 
 const CUSTOM_AUDIENCES = [
@@ -281,46 +289,48 @@ const EditAdSetModal = ({ isOpen, adSet, onUpdateField, onToggleItem, onClose, a
               </div>
             </div>
 
-            {/* Interests (Dual-panel fuzzy search) */}
+            {/* Interests (Dual-panel: search + AI packs) */}
             <div className="space-y-3">
               <label className="text-xs font-medium text-gray-500 px-1">兴趣词 (Interests)</label>
+              {/* Tags above trigger */}
+              {adSet.interests?.length > 0 && (
+                <div className="flex flex-wrap gap-1.5 px-1">
+                  {adSet.interests.map(name => (
+                    <span key={name} className="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-50 text-amber-600 rounded-tag text-xs font-medium border border-amber-100">
+                      {name}
+                      <button onClick={(e) => { e.stopPropagation(); onToggleItem('interests', name); }} className="text-amber-300 hover:text-rose-500 transition-colors">
+                        <X size={10} strokeWidth={3} />
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              )}
               <div className="relative">
                 {/* Trigger */}
                 <div
-                  className="min-h-[3.5rem] p-3 border border-gray-200 rounded-base flex flex-wrap gap-2 items-center cursor-pointer hover:border-amber-300 transition-all"
+                  className="px-4 py-3 border border-gray-200 rounded-base flex items-center justify-between cursor-pointer hover:border-amber-300 transition-all"
                   onClick={() => setShowInterestDropdown(!showInterestDropdown)}
                 >
-                  <Target size={16} className="text-gray-300 ml-1" />
-                  {adSet.interests?.length > 0 ? (
-                    <>
-                      {adSet.interests.slice(0, 3).map(i => (
-                        <span key={i} className="px-2.5 py-1 bg-amber-50 text-amber-600 rounded-tag text-xs font-medium border border-amber-100">
-                          {i}
-                        </span>
-                      ))}
-                      {adSet.interests.length > 3 && (
-                        <span className="px-2 py-1 bg-gray-100 text-gray-400 rounded-tag text-xs font-medium">
-                          +{adSet.interests.length - 3}
-                        </span>
-                      )}
-                    </>
-                  ) : (
-                    <span className="text-xs font-medium text-gray-300 ml-1">点击选择兴趣词...</span>
-                  )}
-                  <ChevronDown size={14} className={`text-gray-300 ml-auto transition-transform ${showInterestDropdown ? 'rotate-180' : ''}`} />
+                  <div className="flex items-center gap-2">
+                    <Target size={14} className="text-gray-300" />
+                    <span className="text-xs font-medium text-gray-300">
+                      {adSet.interests?.length > 0 ? '添加更多兴趣词...' : '点击选择兴趣词...'}
+                    </span>
+                  </div>
+                  <ChevronDown size={14} className={`text-gray-300 transition-transform ${showInterestDropdown ? 'rotate-180' : ''}`} />
                 </div>
                 {/* Dual-panel dropdown */}
                 {showInterestDropdown && (
                   <>
                     <div className="fixed inset-0 z-[260]" onClick={() => setShowInterestDropdown(false)} />
-                    <div className="absolute top-full left-0 mt-2 w-[480px] bg-white rounded-inner shadow-xl border border-gray-100 overflow-hidden flex animate-in fade-in zoom-in-95 duration-200 z-[270]">
+                    <div className="absolute top-full left-0 mt-2 w-[540px] bg-white rounded-section shadow-xl border border-gray-100 overflow-hidden flex animate-in fade-in zoom-in-95 duration-200 z-[270]">
                       {/* Left: Search & List */}
-                      <div className="w-1/2 border-r border-gray-50 flex flex-col">
-                        <div className="p-3 border-b border-gray-50">
+                      <div className="w-[55%] border-r border-gray-100 flex flex-col">
+                        <div className="p-3 border-b border-gray-100">
                           <div className="relative">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300 w-3.5 h-3.5" />
                             <input
-                              className="w-full pl-9 pr-3 py-2 bg-gray-50 border-none rounded-base text-xs font-medium text-gray-900 focus:ring-2 focus:ring-amber-500/10 outline-none"
+                              className="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-base text-sm text-gray-700 bg-white focus:outline-none focus:border-primary-500 transition-all duration-200"
                               placeholder="搜索兴趣词..."
                               value={interestSearch}
                               onChange={e => setInterestSearch(e.target.value)}
@@ -328,10 +338,10 @@ const EditAdSetModal = ({ isOpen, adSet, onUpdateField, onToggleItem, onClose, a
                             />
                           </div>
                         </div>
-                        <div className="flex-1 max-h-[280px] overflow-y-auto custom-scrollbar p-2 space-y-1">
+                        <div className="flex-1 max-h-[320px] overflow-y-auto custom-scrollbar p-2 space-y-0.5">
                           {!interestSearch.trim() ? (
                             <div className="h-full flex items-center justify-center py-12">
-                              <p className="text-xs text-gray-300 font-bold">请输入关键词查询</p>
+                              <p className="text-xs text-gray-300 font-medium">请输入关键词查询</p>
                             </div>
                           ) : (
                             AVAILABLE_INTERESTS
@@ -342,13 +352,13 @@ const EditAdSetModal = ({ isOpen, adSet, onUpdateField, onToggleItem, onClose, a
                                   <button
                                     key={interest.id}
                                     onClick={() => onToggleItem('interests', interest.name)}
-                                    className={`w-full text-left px-3 py-2 rounded-lg text-xs font-medium transition-all flex items-center justify-between ${
+                                    className={`w-full text-left px-3 py-2 rounded-base text-xs font-medium transition-all flex items-center justify-between ${
                                       isSel ? 'bg-amber-50 text-amber-600' : 'text-gray-600 hover:bg-gray-50'
                                     }`}
                                   >
                                     <div>
                                       <span>{interest.name}</span>
-                                      <span className="ml-2 text-xs text-gray-400">{interest.size}</span>
+                                      <span className="ml-2 text-gray-400">{interest.size}</span>
                                     </div>
                                     {isSel && <Check size={12} />}
                                   </button>
@@ -357,25 +367,45 @@ const EditAdSetModal = ({ isOpen, adSet, onUpdateField, onToggleItem, onClose, a
                           )}
                         </div>
                       </div>
-                      {/* Right: Selected */}
-                      <div className="w-1/2 bg-gray-50/30 flex flex-col">
-                        <div className="p-3 border-b border-gray-50 flex items-center justify-between">
-                          <span className="text-xs font-medium text-gray-500">Selected ({adSet.interests?.length || 0})</span>
+                      {/* Right: AI Recommended */}
+                      <div className="w-[45%] bg-gray-50/50 flex flex-col">
+                        <div className="px-4 py-3 border-b border-gray-100 flex items-center gap-2">
+                          <Sparkles size={12} className="text-primary-500" />
+                          <span className="text-xs font-semibold text-gray-700">AI Recommended</span>
                         </div>
-                        <div className="flex-1 max-h-[280px] overflow-y-auto custom-scrollbar p-3 flex flex-wrap gap-2 content-start">
-                          {adSet.interests?.map(name => (
-                            <div key={name} className="flex items-center gap-1.5 px-2.5 py-1.5 bg-white border border-amber-100 rounded-lg shadow-sm animate-in zoom-in">
-                              <span className="text-xs font-medium text-gray-700">{name}</span>
-                              <button onClick={() => onToggleItem('interests', name)} className="text-gray-300 hover:text-rose-500 transition-colors">
-                                <X size={10} strokeWidth={3} />
+                        <div className="flex-1 max-h-[320px] overflow-y-auto custom-scrollbar p-3 space-y-2">
+                          {AI_INTEREST_PACKS.map(pack => {
+                            const interests = adSet.interests || [];
+                            const allIn = pack.interests.every(name => interests.includes(name));
+                            return (
+                              <button
+                                key={pack.id}
+                                onClick={() => {
+                                  if (allIn) {
+                                    pack.interests.forEach(name => {
+                                      if (interests.includes(name)) onToggleItem('interests', name);
+                                    });
+                                  } else {
+                                    pack.interests.forEach(name => {
+                                      if (!interests.includes(name)) onToggleItem('interests', name);
+                                    });
+                                  }
+                                }}
+                                title={`${pack.name}: ${pack.interests.join(', ')}`}
+                                className={`w-full text-left p-3 rounded-inner border transition-all ${
+                                  allIn ? 'border-primary-500 bg-primary-50/50 shadow-sm' : 'border-gray-100 bg-white hover:border-gray-200 hover:shadow-sm'
+                                }`}
+                              >
+                                <div className="flex items-center justify-between mb-1">
+                                  <span className="text-xs font-semibold text-gray-800 line-clamp-1">{pack.name}</span>
+                                  <div className={`w-4 h-4 rounded flex items-center justify-center flex-shrink-0 ml-2 ${allIn ? 'bg-primary-500 text-white' : 'border border-gray-200'}`}>
+                                    {allIn && <Check size={10} />}
+                                  </div>
+                                </div>
+                                <p className="text-xs text-gray-400 line-clamp-2">{pack.interests.join(', ')}</p>
                               </button>
-                            </div>
-                          ))}
-                          {(!adSet.interests || adSet.interests.length === 0) && (
-                            <div className="w-full h-full flex items-center justify-center py-12">
-                              <p className="text-xs text-gray-300 font-bold text-center">尚未选择兴趣词</p>
-                            </div>
-                          )}
+                            );
+                          })}
                         </div>
                       </div>
                     </div>
@@ -1065,36 +1095,36 @@ const CampaignPreviewView = ({
       </div>
 
       <div className="space-y-16">
-        <div className="bg-gray-900 p-10 rounded-section shadow-xl text-white relative overflow-hidden">
+        <div className="bg-gray-900 p-6 rounded-section shadow-xl text-white relative overflow-hidden">
           <div className="absolute top-0 right-0 w-80 h-80 bg-primary-500/10 rounded-full blur-[100px] -translate-y-40 translate-x-40"></div>
-          <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center gap-4">
-              <div className="w-14 h-14 bg-primary-500 rounded-inner flex items-center justify-center shadow-lg border-2 border-white/10"><Briefcase size={28} /></div>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <div className="w-11 h-11 bg-primary-500 rounded-inner flex items-center justify-center shadow-lg border-2 border-white/10"><Briefcase size={22} /></div>
               <div>
                 <p className="text-xs font-medium text-gray-500">Campaign Overview</p>
-                <h3 className="text-2xl font-semibold">{campaignName}</h3>
+                <h3 className="text-xl font-semibold">{campaignName}</h3>
               </div>
             </div>
             <div className="text-right">
               <p className="text-xs font-medium text-gray-500 tracking-widest">总日消耗</p>
-              <p className="text-2xl font-semibold text-emerald-400">${totalDailyBudget}</p>
+              <p className="text-xl font-semibold text-emerald-400">${totalDailyBudget}</p>
             </div>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="bg-white/5 rounded-inner p-4 border border-white/5">
-              <p className="text-xs font-medium text-gray-500 mb-1">投放国家</p>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div className="bg-white/5 rounded-inner p-3 border border-white/5">
+              <p className="text-xs font-medium text-gray-500 mb-0.5">投放国家</p>
               <p className="text-sm font-medium">{brand.country}</p>
             </div>
-            <div className="bg-white/5 rounded-inner p-4 border border-white/5">
-              <p className="text-xs font-medium text-gray-500 mb-1">优化目标</p>
+            <div className="bg-white/5 rounded-inner p-3 border border-white/5">
+              <p className="text-xs font-medium text-gray-500 mb-0.5">优化目标</p>
               <p className="text-sm font-medium truncate">{optimizationEvent.split(' ')[0]}</p>
             </div>
-            <div className="bg-white/5 rounded-inner p-4 border border-white/5">
-              <p className="text-xs font-medium text-gray-500 mb-1">AdSets 数量</p>
+            <div className="bg-white/5 rounded-inner p-3 border border-white/5">
+              <p className="text-xs font-medium text-gray-500 mb-0.5">AdSets 数量</p>
               <p className="text-sm font-medium">{adSetGroupsCount || localAdSets.length}</p>
             </div>
-            <div className="bg-white/5 rounded-inner p-4 border border-white/5">
-              <p className="text-xs font-medium text-gray-500 mb-1">Campaign 类型</p>
+            <div className="bg-white/5 rounded-inner p-3 border border-white/5">
+              <p className="text-xs font-medium text-gray-500 mb-0.5">Campaign 类型</p>
               <p className="text-sm font-medium">{campaignType}</p>
             </div>
           </div>
@@ -1203,22 +1233,22 @@ const CampaignPreviewView = ({
         </div>
       </div>
 
-      <div className="fixed bottom-0 left-0 right-0 bg-gray-900 text-white p-8 z-[100] border-t border-white/5 backdrop-blur-xl bg-opacity-95 shadow-[0_-20px_40px_rgba(0,0,0,0.1)]">
+      <div className="fixed bottom-0 left-0 right-0 bg-gray-900 text-white px-8 py-4 z-[100] border-t border-white/5 backdrop-blur-xl bg-opacity-95 shadow-[0_-20px_40px_rgba(0,0,0,0.1)]">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-16">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-primary-500 rounded-inner flex items-center justify-center shadow-lg"><Layers size={24} /></div>
-              <div><p className="text-xs font-medium text-gray-500">结构方案</p><p className="text-xl font-semibold">{adSetGroupsCount || localAdSets.length} Adsets • {campaignType === 'CATALOG' ? 'Dynamic' : localAdSets.reduce((acc, as) => acc + as.ads.length, 0)} Ads</p></div>
+          <div className="flex items-center gap-12">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-primary-500 rounded-base flex items-center justify-center shadow-lg"><Layers size={20} /></div>
+              <div><p className="text-xs font-medium text-gray-500">结构方案</p><p className="text-base font-semibold">{adSetGroupsCount || localAdSets.length} Adsets • {campaignType === 'CATALOG' ? 'Dynamic' : localAdSets.reduce((acc, as) => acc + as.ads.length, 0)} Ads</p></div>
             </div>
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-emerald-600 rounded-inner flex items-center justify-center shadow-lg"><DollarSign size={24} /></div>
-              <div><p className="text-xs font-medium text-gray-500">预估日消耗</p><p className="text-2xl font-semibold text-emerald-400">${totalDailyBudget}</p></div>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-emerald-600 rounded-base flex items-center justify-center shadow-lg"><DollarSign size={20} /></div>
+              <div><p className="text-xs font-medium text-gray-500">预估日消耗</p><p className="text-xl font-semibold text-emerald-400">${totalDailyBudget}</p></div>
             </div>
           </div>
-          <button 
-            onClick={onPublish} 
+          <button
+            onClick={onPublish}
             disabled={loadedAdsCount < totalAdsCount}
-            className={`px-12 py-5 rounded-base text-sm font-medium transition-all duration-200 flex items-center gap-3 focus:outline-none focus:shadow-primary-focus ${
+            className={`px-10 py-3.5 rounded-base text-sm font-medium transition-all duration-200 flex items-center gap-3 focus:outline-none focus:shadow-primary-focus ${
               loadedAdsCount < totalAdsCount
                 ? 'bg-gray-700 text-gray-400 cursor-not-allowed disabled:opacity-50 disabled:cursor-not-allowed'
                 : 'bg-primary-500 text-white hover:bg-primary-600 active:bg-primary-700'
@@ -1231,7 +1261,7 @@ const CampaignPreviewView = ({
               </>
             ) : (
               <>
-                <Rocket size={20} className="text-primary-500" /> 立即发布方案
+                <Rocket size={20} /> 立即发布方案
               </>
             )}
           </button>
