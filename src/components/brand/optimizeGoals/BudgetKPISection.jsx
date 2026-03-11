@@ -871,49 +871,70 @@ const BudgetKPISection = ({ formData, updateFormData, updateFormDataDeep, valida
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-4">
-                        <div className="flex items-center bg-slate-50 border border-slate-100 rounded-2xl p-1.5 h-12">
-                          {['ROAS', 'CPA'].map(type => (
-                            <button
-                              key={type}
-                              onClick={() => updateGroup(group.id, { kpiType: type })}
-                              className={`px-4 h-full rounded-xl text-[11px] font-black transition-all ${
-                                group.kpiType === type 
-                                  ? 'bg-white text-indigo-600 shadow-sm border border-slate-100' 
-                                  : 'text-slate-400 hover:text-slate-600'
-                              }`}
-                            >
-                              {type}
-                            </button>
-                          ))}
-                        </div>
-
-                        <div className="flex-1">
-                          {group.kpiMode === 'unified' ? (
-                            <UnitFollowInput
-                              value={group.unifiedKPI}
-                              unit={group.kpiType === 'ROAS' ? 'x' : '$'}
-                              onChange={(e) => updateGroup(group.id, { unifiedKPI: e.target.value })}
-                              placeholder={`Target ${group.kpiType}`}
-                              className="w-full pr-12 py-2.5 bg-slate-50 border border-slate-100 rounded-2xl text-base font-black text-slate-900 focus:outline-none focus:border-emerald-500 transition-all h-12"
-                            />
-                          ) : (
-                            <div className="flex gap-2 p-1 bg-emerald-50/50 rounded-xl h-12 items-center">
-                              <UnitFollowInput
-                                value={batchSettings[group.id]?.kpi || ''}
-                                unit={group.kpiType === 'ROAS' ? 'x' : '$'}
-                                onChange={(e) => setBatchSettings(prev => ({ ...prev, [group.id]: { ...prev[group.id], kpi: e.target.value } }))}
-                                placeholder="Batch set..."
-                                containerClassName="flex-1"
-                                className="w-full py-2 bg-transparent border-none text-sm font-bold focus:outline-none"
-                              />
-                              <button onClick={() => applyBatchKPI(group.id)} className="px-3 h-8 border-2 border-indigo-600 text-indigo-600 rounded-lg text-[11px] font-black hover:bg-indigo-50 transition-all">
-                                Apply
+                      {group.kpiMode === 'unified' ? (
+                        <div className="flex items-center rounded-2xl h-12 overflow-hidden border border-slate-200 focus-within:border-emerald-500 transition-all">
+                          <div className="flex items-center bg-slate-100 self-stretch px-1.5 gap-0.5 border-r border-slate-200">
+                            {['ROAS', 'CPA'].map(type => (
+                              <button
+                                key={type}
+                                onClick={() => updateGroup(group.id, { kpiType: type })}
+                                className={`px-2.5 py-1 rounded-lg text-[10px] font-black tracking-wide transition-all ${
+                                  group.kpiType === type
+                                    ? 'bg-indigo-600 text-white shadow-sm'
+                                    : 'text-slate-400 hover:text-slate-500'
+                                }`}
+                              >
+                                {type}
                               </button>
-                            </div>
-                          )}
+                            ))}
+                          </div>
+                          <UnitFollowInput
+                            value={group.unifiedKPI}
+                            unit={group.kpiType === 'ROAS' ? 'x' : '$'}
+                            onChange={(e) => updateGroup(group.id, { unifiedKPI: e.target.value })}
+                            placeholder={`Target ${group.kpiType}`}
+                            containerClassName="flex-1 bg-white"
+                            className="w-full pr-12 py-2.5 bg-transparent border-none text-base font-black text-slate-900 focus:outline-none h-full"
+                          />
                         </div>
-                      </div>
+                      ) : (
+                        <div className="space-y-2">
+                          <div className="flex items-center bg-slate-100/60 rounded-xl p-0.5 self-start w-fit">
+                            {['ROAS', 'CPA'].map(type => (
+                              <button
+                                key={type}
+                                onClick={() => updateGroup(group.id, { kpiType: type })}
+                                className={`px-2.5 py-1 rounded-lg text-[10px] font-black tracking-wide transition-all ${
+                                  group.kpiType === type
+                                    ? 'bg-indigo-600 text-white shadow-sm'
+                                    : 'text-slate-400 hover:text-slate-500'
+                                }`}
+                              >
+                                {type}
+                              </button>
+                            ))}
+                          </div>
+                          <div className="flex gap-2 p-1 bg-emerald-50/50 rounded-xl h-12 items-center">
+                            <UnitFollowInput
+                              value={batchSettings[group.id]?.kpi || ''}
+                              unit={group.kpiType === 'ROAS' ? 'x' : '$'}
+                              onChange={(e) => setBatchSettings(prev => ({ ...prev, [group.id]: { ...prev[group.id], kpi: e.target.value } }))}
+                              placeholder="Batch set..."
+                              containerClassName="flex-1"
+                              className="w-full py-2 bg-transparent border-none text-sm font-bold focus:outline-none"
+                            />
+                            <button onClick={() => applyBatchKPI(group.id)} className="px-3 h-8 border-2 border-indigo-600 text-indigo-600 rounded-lg text-[11px] font-black hover:bg-indigo-50 transition-all">
+                              Apply
+                            </button>
+                          </div>
+                        </div>
+                      )}
+
+                      {group.kpiType === 'ROAS' && group.unifiedKPI && group.kpiMode === 'unified' && (
+                        <p className="text-xs text-orange-500 font-medium mt-1.5 ml-1">
+                          Hoping to earn ${group.unifiedKPI} per $1 ad spent
+                        </p>
+                      )}
 
                       {group.kpiMode !== 'unified' && (
                         <div className="grid grid-cols-2 gap-2 mt-2">
