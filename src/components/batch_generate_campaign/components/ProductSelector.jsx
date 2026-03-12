@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { 
   Link2, Search, History, ShoppingBag, X, ChevronRight, 
   LayoutGrid, Wand2, 
@@ -14,6 +14,7 @@ import { Z_INDEX } from '../../../constants/zIndex';
 import { useZIndex } from '../../../hooks/useZIndex';
 import { generateAIGCCreative } from '../services/mockAiService';
 import { authorizePlatform, MOCK_ACCOUNTS } from '../services/authService';
+import useDropdownLoading from '../../../hooks/useDropdownLoading';
 
 const MOCK_CATALOGS = [
   { id: 'cat_8820192', name: 'Luminaire official catalog 2024' },
@@ -258,9 +259,11 @@ const SelectionModal = ({
   const [activePlatform, setActivePlatform] = useState('ALL');
   
   const isCurrentPlatformConnected = activePlatform === 'ALL' ? anyConnected : authStatus[activePlatform];
-  const [isFetchingProducts, setIsFetchingProducts] = useState(isCurrentPlatformConnected && !isAddModalOpen);
+  const skipFetching = type === 'history' || type === 'creative_lib';
+  const [isFetchingProducts, setIsFetchingProducts] = useState(!skipFetching && isCurrentPlatformConnected && !isAddModalOpen);
 
   useEffect(() => {
+    if (skipFetching) { setIsFetchingProducts(false); return; }
     if (isCurrentPlatformConnected && !isAddModalOpen) {
       setIsFetchingProducts(true);
       const timer = setTimeout(() => setIsFetchingProducts(false), 3000);
@@ -268,7 +271,7 @@ const SelectionModal = ({
     } else {
       setIsFetchingProducts(false);
     }
-  }, [activePlatform, isCurrentPlatformConnected, isAddModalOpen]);
+  }, [activePlatform, isCurrentPlatformConnected, isAddModalOpen, skipFetching]);
 
   const getItems = () => {
     if (type !== 'shopify') return type === 'history' ? HISTORY_PRODUCTS : CREATIVE_LIBRARY;
@@ -398,10 +401,9 @@ const SelectionModal = ({
 
 // --- ProductSelector component ---
 
-const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives, onUpdateCreatives, onAnalysisStart, onAnalysisComplete, onReset, hasGeneratedOnce, analysisFinished, isAnalyzing, campaignType, onCampaignTypeChange, selectedAccount, onSelectAccount, productAnalyses, onProductAnalysesChange }) => {
+const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives, onUpdateCreatives, onAnalysisStart, onAnalysisComplete, onReset, hasGeneratedOnce, analysisFinished, isAnalyzing, campaignType, onCampaignTypeChange, selectedAccount, onSelectAccount, productAnalyses, onProductAnalysesChange, authStatus, onAuthStatusChange, onMetaAccountPick }) => {
   const [urlInput, setUrlInput] = useState('');
   const [isAuthLoading, setIsAuthLoading] = useState(false);
-  const [authStatus, setAuthStatus] = useState({ shopify: false, meta: false, google: false });
   const [currentStep, setCurrentStep] = useState(0);
   const [reports, setReports] = useState({});
   const [showReportFor, setShowReportFor] = useState(null);
@@ -412,6 +414,9 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
   const [selectedProductSet, setSelectedProductSet] = useState('All Products');
   const [catalogDropdownOpen, setCatalogDropdownOpen] = useState(false);
   const [setDropdownOpen, setSetDropdownOpen] = useState(false);
+  const accountLoading = useDropdownLoading('accounts', authStatus?.meta);
+  const catalogLoading = useDropdownLoading('catalogs', authStatus?.meta);
+  const productSetLoading = useDropdownLoading('productSets', authStatus?.meta);
   const [batchAIGCCount, setBatchAIGCCount] = useState(3);
   const [batchAIGCExclusions, setBatchAIGCExclusions] = useState(new Set());
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -426,6 +431,11 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
 
   const [generatingCounts, setGeneratingCounts] = useState({});
   const [selectedMatchOptions, setSelectedMatchOptions] = useState(new Set(['24h']));
+
+  // 下拉打开时触发loading
+  useEffect(() => { if (activeModal === 'select_account') accountLoading.triggerLoad(); }, [activeModal]);
+  useEffect(() => { if (catalogDropdownOpen) catalogLoading.triggerLoad(); }, [catalogDropdownOpen]);
+  useEffect(() => { if (setDropdownOpen) productSetLoading.triggerLoad(); }, [setDropdownOpen]);
 
   const anyConnected = Object.values(authStatus).some(v => v);
   const isMultiMode = selectedProducts.length > 1;
@@ -477,14 +487,15 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
   const handleAuthorize = async (platform) => {
     setIsAuthLoading(true);
     const success = await authorizePlatform(platform);
-    if (success) { 
-      setAuthStatus(prev => ({ ...prev, [platform]: true })); 
+    if (success) {
+      onAuthStatusChange(prev => ({ ...prev, [platform]: true }));
       if (platform === 'shopify') setIsShopifyConnected(true);
       if (platform === 'meta' || platform === 'google') {
         setSyncStates(prev => ({ ...prev, [platform]: { isConnected: true, isConnecting: false, email: 'user@example.com' } }));
         // 授权成功后，如果尚未选择账号，立即弹出选择账号弹窗
         if (!selectedAccount) {
-          setActiveModal('select_account');
+          if (onMetaAccountPick) onMetaAccountPick();
+          else setActiveModal('select_account');
         }
       }
     }
@@ -819,13 +830,13 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
     setSyncStates(prev => ({ ...prev, [platform]: { ...prev[platform], isConnecting: true } }));
     setTimeout(() => { 
       setSyncStates(prev => ({ ...prev, [platform]: { isConnected: true, isConnecting: false, email: 'user@example.com' } })); 
-      setAuthStatus(prev => ({ ...prev, [platform]: true }));
+      onAuthStatusChange(prev => ({ ...prev, [platform]: true }));
     }, 3000);
   };
 
   const handleSyncDisconnect = (platform) => {
     setSyncStates(prev => ({ ...prev, [platform]: { isConnected: false, isConnecting: false, email: '' } }));
-    setAuthStatus(prev => ({ ...prev, [platform]: false }));
+    onAuthStatusChange(prev => ({ ...prev, [platform]: false }));
   };
 
   return (
@@ -913,7 +924,12 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
                     </div>
                     {catalogDropdownOpen && (
                       <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-100 rounded-base shadow-xl z-[100] overflow-hidden animate-in fade-in slide-in-from-top-2">
-                        {MOCK_CATALOGS.length > 0 ? (
+                        {catalogLoading.isLoading ? (
+                          <div className="p-6 flex flex-col items-center justify-center gap-2">
+                            <Loader2 size={20} className="animate-spin text-primary-500/70" />
+                            <p className="text-xs font-medium text-gray-400 animate-pulse">Loading catalogs...</p>
+                          </div>
+                        ) : MOCK_CATALOGS.length > 0 ? (
                           MOCK_CATALOGS.map(c => (
                             <div key={c.id} onClick={() => { setSelectedCatalog(c); setCatalogDropdownOpen(false); }} className="flex items-center justify-between px-6 py-4 hover:bg-gray-50 cursor-pointer transition-colors group">
                               <div>
@@ -946,12 +962,19 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
                     </div>
                     {setDropdownOpen && (
                       <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-100 rounded-base shadow-xl z-[100] overflow-hidden animate-in fade-in slide-in-from-top-2">
-                        {['All Products', 'Best Sellers', 'New Arrivals'].map(s => (
-                          <div key={s} onClick={() => { setSelectedProductSet(s); setSetDropdownOpen(false); }} className="flex items-center justify-between px-6 py-4 hover:bg-gray-50 cursor-pointer transition-colors group">
-                            <p className="text-xs font-medium text-gray-800 group-hover:text-primary-500 transition-colors">{s}</p>
-                            {selectedProductSet === s && <Check size={16} className="text-primary-500" />}
+                        {productSetLoading.isLoading ? (
+                          <div className="p-6 flex flex-col items-center justify-center gap-2">
+                            <Loader2 size={20} className="animate-spin text-primary-500/70" />
+                            <p className="text-xs font-medium text-gray-400 animate-pulse">Loading product sets...</p>
                           </div>
-                        ))}
+                        ) : (
+                          ['All Products', 'Best Sellers', 'New Arrivals'].map(s => (
+                            <div key={s} onClick={() => { setSelectedProductSet(s); setSetDropdownOpen(false); }} className="flex items-center justify-between px-6 py-4 hover:bg-gray-50 cursor-pointer transition-colors group">
+                              <p className="text-xs font-medium text-gray-800 group-hover:text-primary-500 transition-colors">{s}</p>
+                              {selectedProductSet === s && <Check size={16} className="text-primary-500" />}
+                            </div>
+                          ))
+                        )}
                       </div>
                     )}
                   </div>
@@ -1343,18 +1366,25 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
               <button onClick={() => setActiveModal(null)} className="p-2 hover:bg-gray-50 rounded-full text-gray-300"><X size={24} /></button>
             </div>
             <div className="space-y-3">
-              {MOCK_ACCOUNTS.map(acc => (
-                <button key={acc.id} onClick={() => { onSelectAccount(acc); setActiveModal(null); }} className={`w-full p-6 rounded-full border-2 flex items-center justify-between transition-all ${selectedAccount?.id === acc.id ? 'border-primary-500 bg-primary-50 shadow-lg shadow-primary-500/10' : 'border-gray-100 bg-white hover:border-gray-200'}`}>
-                  <div className="flex items-center gap-4 text-left">
-                    <div className={`p-2 rounded-lg ${selectedAccount?.id === acc.id ? 'bg-primary-500 text-white' : 'bg-gray-50 text-gray-400'}`}><Briefcase size={16} /></div>
-                    <div>
-                      <p className={`text-sm font-medium ${selectedAccount?.id === acc.id ? 'text-primary-700' : 'text-gray-600'}`}>{acc.name}</p>
-                      <p className="text-xs text-gray-400 font-bold">id: {acc.id}</p>
+              {accountLoading.isLoading ? (
+                <div className="p-8 flex flex-col items-center justify-center gap-3">
+                  <Loader2 size={24} className="animate-spin text-primary-500/70" />
+                  <p className="text-xs font-medium text-gray-400 animate-pulse">Loading accounts...</p>
+                </div>
+              ) : (
+                MOCK_ACCOUNTS.map(acc => (
+                  <button key={acc.id} onClick={() => { onSelectAccount(acc); setActiveModal(null); }} className={`w-full p-6 rounded-full border-2 flex items-center justify-between transition-all ${selectedAccount?.id === acc.id ? 'border-primary-500 bg-primary-50 shadow-lg shadow-primary-500/10' : 'border-gray-100 bg-white hover:border-gray-200'}`}>
+                    <div className="flex items-center gap-4 text-left">
+                      <div className={`p-2 rounded-lg ${selectedAccount?.id === acc.id ? 'bg-primary-500 text-white' : 'bg-gray-50 text-gray-400'}`}><Briefcase size={16} /></div>
+                      <div>
+                        <p className={`text-sm font-medium ${selectedAccount?.id === acc.id ? 'text-primary-700' : 'text-gray-600'}`}>{acc.name}</p>
+                        <p className="text-xs text-gray-400 font-bold">id: {acc.id}</p>
+                      </div>
                     </div>
-                  </div>
-                  {selectedAccount?.id === acc.id && <Check size={20} className="text-primary-500" />}
-                </button>
-              ))}
+                    {selectedAccount?.id === acc.id && <Check size={20} className="text-primary-500" />}
+                  </button>
+                ))
+              )}
             </div>
           </div>
         </ModalWrapper>
@@ -1365,7 +1395,7 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
           onClose={() => setShowReportFor(null)} 
         />
       )}
-      {isAddModalOpen && <AddProductModal onClose={closeAddModal} authStatus={authStatus} handleAuthorize={handleAuthorize} isAuthLoading={isAuthLoading} shopifyStoreName={shopifyStoreName} setAuthStatus={setAuthStatus} setIsShopifyConnected={setIsShopifyConnected} isShopifyConnected={isShopifyConnected} syncStates={syncStates} handleSyncConnect={handleSyncConnect} handleSyncDisconnect={handleSyncDisconnect} addStep={addStep} setAddStep={setAddStep} productUrl={productUrl} setProductUrl={setProductUrl} urlError={urlError} handleImportAnalyzeUrl={handleImportAnalyzeUrl} isImportAnalyzing={isImportAnalyzing} productForm={productForm} handleCreateProduct={handleCreateProduct} />}
+      {isAddModalOpen && <AddProductModal onClose={closeAddModal} authStatus={authStatus} handleAuthorize={handleAuthorize} isAuthLoading={isAuthLoading} shopifyStoreName={shopifyStoreName} onAuthStatusChange={onAuthStatusChange} setIsShopifyConnected={setIsShopifyConnected} isShopifyConnected={isShopifyConnected} syncStates={syncStates} handleSyncConnect={handleSyncConnect} handleSyncDisconnect={handleSyncDisconnect} addStep={addStep} setAddStep={setAddStep} productUrl={productUrl} setProductUrl={setProductUrl} urlError={urlError} handleImportAnalyzeUrl={handleImportAnalyzeUrl} isImportAnalyzing={isImportAnalyzing} productForm={productForm} handleCreateProduct={handleCreateProduct} />}
     </div>
   );
 };
@@ -1382,7 +1412,7 @@ const ModalWrapper = ({ children }) => {
   );
 };
 
-const AddProductModal = ({ onClose, authStatus, handleAuthorize, isAuthLoading, shopifyStoreName, setAuthStatus, setIsShopifyConnected, isShopifyConnected, syncStates, handleSyncConnect, handleSyncDisconnect, addStep, setAddStep, productUrl, setProductUrl, urlError, handleImportAnalyzeUrl, isImportAnalyzing, productForm, handleCreateProduct }) => {
+const AddProductModal = ({ onClose, authStatus, handleAuthorize, isAuthLoading, shopifyStoreName, onAuthStatusChange, setIsShopifyConnected, isShopifyConnected, syncStates, handleSyncConnect, handleSyncDisconnect, addStep, setAddStep, productUrl, setProductUrl, urlError, handleImportAnalyzeUrl, isImportAnalyzing, productForm, handleCreateProduct }) => {
   const zIndex = useZIndex(true);
   return (
     <div 
@@ -1485,7 +1515,7 @@ const AddProductModal = ({ onClose, authStatus, handleAuthorize, isAuthLoading, 
                     <div className="flex items-center justify-center gap-2"><span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" /><p className="text-xs text-green-600 font-bold font-sans">Connected</p></div>
                   </div>
                   <div className="w-full pt-6">
-                    <button onClick={() => { setIsShopifyConnected(false); setAuthStatus(p => ({ ...p, shopify: false })); }} className="px-8 py-3 bg-gray-50 border border-gray-100 rounded-full text-gray-400 hover:text-rose-500 hover:bg-rose-50 hover:border-rose-100 font-bold text-sm transition-all flex items-center gap-2 mx-auto shadow-sm font-sans"><Link2Off size={18} />Disconnect store</button>
+                    <button onClick={() => { setIsShopifyConnected(false); onAuthStatusChange(p => ({ ...p, shopify: false })); }} className="px-8 py-3 bg-gray-50 border border-gray-100 rounded-full text-gray-400 hover:text-rose-500 hover:bg-rose-50 hover:border-rose-100 font-bold text-sm transition-all flex items-center gap-2 mx-auto shadow-sm font-sans"><Link2Off size={18} />Disconnect store</button>
                   </div>
                 </>
               )}

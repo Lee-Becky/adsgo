@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { Users, Info, Sparkles, DollarSign, ChevronDown, Briefcase, Target, Layers, Lock, Edit3, Check, LayoutGrid, Facebook, Search, X, Loader2, Send, ChevronUp, MessageSquare, RefreshCw } from 'lucide-react';
 import { Z_INDEX } from '../../../constants/zIndex';
+import useDropdownLoading from '../../../hooks/useDropdownLoading';
 
 const AUDIENCE_SHORT_LABELS = {
   LAL: 'LAL',
@@ -558,6 +559,9 @@ const CampaignPlanView = ({
   onApplyAiStrategy
 }) => {
   const [showLalDropdown, setShowLalDropdown] = useState(false);
+  const [isMetaConnecting, setIsMetaConnecting] = useState(false);
+  const lalLoading = useDropdownLoading('lalAudiences', authStatus?.meta);
+  useEffect(() => { if (showLalDropdown && selectedAccount) lalLoading.triggerLoad(); }, [showLalDropdown]);
   const [showNumAdsetsDropdown, setShowNumAdsetsDropdown] = useState(false);
   const [aiStrategyApplied, setAiStrategyApplied] = useState(false);
 
@@ -899,10 +903,18 @@ const CampaignPlanView = ({
                           {!authStatus?.meta ? (
                             <div className="p-4">
                               <button
-                                onClick={() => { handleAuthorize('meta'); setShowLalDropdown(false); }}
-                                className="w-full py-3 bg-primary-500 text-white rounded-base text-sm font-medium hover:bg-primary-600 active:bg-primary-700 transition-all duration-200 focus:outline-none focus:shadow-primary-focus flex items-center justify-center gap-2"
+                                onClick={() => {
+                                  setIsMetaConnecting(true);
+                                  setTimeout(() => {
+                                    setIsMetaConnecting(false);
+                                    handleAuthorize('meta');
+                                    setShowLalDropdown(false);
+                                  }, 3000);
+                                }}
+                                disabled={isMetaConnecting}
+                                className="w-full py-3 bg-primary-500 text-white rounded-base text-sm font-medium hover:bg-primary-600 active:bg-primary-700 transition-all duration-200 focus:outline-none focus:shadow-primary-focus flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
                               >
-                                <Facebook size={14} /> 立即连接 Meta
+                                {isMetaConnecting ? <><Loader2 size={14} className="animate-spin" /> Connecting...</> : <><Facebook size={14} /> 立即连接 Meta</>}
                               </button>
                             </div>
                           ) : !selectedAccount ? (
@@ -913,6 +925,11 @@ const CampaignPlanView = ({
                               >
                                 <Briefcase size={14} /> 选择广告账户
                               </button>
+                            </div>
+                          ) : lalLoading.isLoading ? (
+                            <div className="p-6 flex flex-col items-center justify-center gap-2">
+                              <Loader2 size={20} className="animate-spin text-purple-500/70" />
+                              <p className="text-xs font-medium text-gray-400 animate-pulse">Loading audiences...</p>
                             </div>
                           ) : (
                             ['US Purchase 1%', 'US add to cart 5%', 'US register last30days 1%~3%'].map((opt) => {

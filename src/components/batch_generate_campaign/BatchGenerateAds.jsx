@@ -13,6 +13,7 @@ import CampaignPlanView from './components/CampaignPlanView';
 import CampaignPreviewView from './components/CampaignPreviewView';
 import ObjectiveSection from '../brand/optimizeGoals/ObjectiveSection';
 import BudgetKPISection from '../brand/optimizeGoals/BudgetKPISection';
+import useDropdownLoading from '../../hooks/useDropdownLoading';
 
 const MOCK_EXISTING_CAMPAIGNS = [
   { id: '1202058341', name: 'US-Summer-Sales-CBO-001', budgetType: 'CBO', budget: 200 },
@@ -361,8 +362,14 @@ const TargetingChannelCard = ({
 const BatchGenerateAds = () => {
   const [selectedProducts, setSelectedProducts] = useState([]);
   const [productCreativesMap, setProductCreativesMap] = useState({});
-  const [selectedAccount, setSelectedAccount] = useState(null);
-  const [authStatus, setAuthStatus] = useState({ shopify: false, meta: false, google: false });
+  const [selectedAccount, setSelectedAccount] = useState(() =>
+    _hasGeneratedOnce ? MOCK_ACCOUNTS[0] : null
+  );
+  const [authStatus, setAuthStatus] = useState(() =>
+    _hasGeneratedOnce
+      ? { shopify: false, meta: true, google: false }
+      : { shopify: false, meta: false, google: false }
+  );
   const [productReportsMap, setProductReportsMap] = useState({});
   const [productAnalyses, setProductAnalyses] = useState({});
 
@@ -415,6 +422,13 @@ const BatchGenerateAds = () => {
   const [selectedCampaignId, setSelectedCampaignId] = useState(null);
   const [showCampaignModal, setShowCampaignModal] = useState(false);
   const [showAccountSelector, setShowAccountSelector] = useState(false);
+  const [showMetaAccountPicker, setShowMetaAccountPicker] = useState(false);
+  const campaignListLoading = useDropdownLoading('campaigns', authStatus?.meta);
+  const accountSwitchLoading = useDropdownLoading('accountSwitch', authStatus?.meta);
+  const accountPickLoading = useDropdownLoading('accountPick', authStatus?.meta);
+  useEffect(() => { if (showCampaignModal && selectedAccount) campaignListLoading.triggerLoad(); }, [showCampaignModal]);
+  useEffect(() => { if (showAccountSelector) accountSwitchLoading.triggerLoad(); }, [showAccountSelector]);
+  useEffect(() => { if (showMetaAccountPicker) accountPickLoading.triggerLoad(); }, [showMetaAccountPicker]);
 
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisFinished, setAnalysisFinished] = useState(false);
@@ -661,10 +675,15 @@ const BatchGenerateAds = () => {
                     <Briefcase size={18} /> 选择广告账户
                   </button>
                 </div>
+              ) : campaignListLoading.isLoading ? (
+                <div className="p-6 flex flex-col items-center justify-center gap-2">
+                  <Loader2 size={20} className="animate-spin text-primary-500/70" />
+                  <p className="text-xs font-medium text-gray-400 animate-pulse">Loading campaigns...</p>
+                </div>
               ) : (
                 filtered.map(c => (
-                  <div 
-                    key={c.id} 
+                  <div
+                    key={c.id}
                     onClick={() => { setSelectedCampaignId(c.id); setShowCampaignModal(false); }}
                     className="p-4 rounded-base hover:bg-primary-50 cursor-pointer flex items-center justify-between group transition-colors"
                   >
@@ -695,15 +714,17 @@ const BatchGenerateAds = () => {
     const [selectedAccountType, setSelectedAccountType] = useState('own');
     const [showAdsgoReminder, setShowAdsgoReminder] = useState(false);
     const [hideMainModal, setHideMainModal] = useState(false);
-    const [connectedPlatform, setConnectedPlatform] = useState(null);
+    const [connectedPlatform, setConnectedPlatform] = useState(
+      authStatus?.meta ? 'meta' : authStatus?.google ? 'google' : null
+    );
     const [isConnecting, setIsConnecting] = useState(false);
     const [platforms, setPlatforms] = useState({
-      meta: { connected: false, email: 'alex.designer@meta.com' },
-      google: { connected: false, email: 'alex.growth@google.com' }
+      meta: { connected: !!authStatus?.meta, email: 'alex.designer@meta.com' },
+      google: { connected: !!authStatus?.google, email: 'alex.growth@google.com' }
     });
 
     const [selections, setSelections] = useState({
-      adAccount: selectedAccount?.id || '',
+      adAccount: selectedAccount ? '1' : '',
       fbPage: '',
       pixel: '',
       event: '',
@@ -711,6 +732,16 @@ const BatchGenerateAds = () => {
     });
 
     const [activeDropdown, setActiveDropdown] = useState(null);
+
+    const pubAdAccountLoading = useDropdownLoading('pub_adAccount', !!connectedPlatform);
+    const pubFbPageLoading = useDropdownLoading('pub_fbPage', !!connectedPlatform);
+    const pubPixelLoading = useDropdownLoading('pub_pixel', !!connectedPlatform);
+    const pubEventLoading = useDropdownLoading('pub_event', !!connectedPlatform);
+
+    useEffect(() => { if (activeDropdown === 'adAccount') pubAdAccountLoading.triggerLoad(); }, [activeDropdown]);
+    useEffect(() => { if (activeDropdown === 'fbPage') pubFbPageLoading.triggerLoad(); }, [activeDropdown]);
+    useEffect(() => { if (activeDropdown === 'pixel') pubPixelLoading.triggerLoad(); }, [activeDropdown]);
+    useEffect(() => { if (activeDropdown === 'metaEvent' || activeDropdown === 'googleEvent') pubEventLoading.triggerLoad(); }, [activeDropdown]);
 
     const [publishProgress, setPublishProgress] = useState([
       { id: 1, name: 'Campaign #1 - US Market', status: 'Publishing' },
@@ -772,15 +803,22 @@ const BatchGenerateAds = () => {
         setPlatforms(prev => ({ ...prev, [platform]: { ...prev[platform], connected: true } }));
         setIsConnecting(false);
         setConnectedPlatform(platform);
+        // 同步到父组件
+        setAuthStatus(prev => ({ ...prev, [platform]: true }));
+        if (platform === 'meta' && !selectedAccount) {
+          setShowMetaAccountPicker(true);
+        }
       }, 2000);
     };
 
     const handleDisconnect = (platform) => {
       setPlatforms(prev => ({ ...prev, [platform]: { ...prev[platform], connected: false } }));
       if (connectedPlatform === platform) setConnectedPlatform(null);
+      // 同步到父组件
+      setAuthStatus(prev => ({ ...prev, [platform]: false }));
     };
 
-    const CustomDropdown = ({ label, options, value, onChange, placeholder, isOpen, onToggle }) => {
+    const CustomDropdown = ({ label, options, value, onChange, placeholder, isOpen, onToggle, isLoading }) => {
       const selectedOption = options.find(opt => opt.value === value);
       return (
         <div className="space-y-2 relative">
@@ -791,9 +829,16 @@ const BatchGenerateAds = () => {
           </div>
           {isOpen && (
             <div className="absolute z-[150] top-full left-0 right-0 mt-2 bg-white border border-gray-100 rounded-base shadow-xl py-2 animate-in fade-in zoom-in-95 duration-200">
-              {options.map((opt) => (
-                <div key={opt.value} onClick={() => { onChange(opt.value); onToggle(); }} className={`rounded-base px-3 py-2 text-sm font-bold cursor-pointer transition-colors ${value === opt.value ? 'bg-primary-50 text-primary-500' : 'hover:bg-gray-50 text-gray-600'}`}>{opt.label}</div>
-              ))}
+              {isLoading ? (
+                <div className="p-6 flex flex-col items-center justify-center gap-2">
+                  <Loader2 size={18} className="animate-spin text-primary-500/70" />
+                  <p className="text-xs font-medium text-gray-400 animate-pulse">Loading...</p>
+                </div>
+              ) : (
+                options.map((opt) => (
+                  <div key={opt.value} onClick={() => { onChange(opt.value); onToggle(); }} className={`rounded-base px-3 py-2 text-sm font-bold cursor-pointer transition-colors ${value === opt.value ? 'bg-primary-50 text-primary-500' : 'hover:bg-gray-50 text-gray-600'}`}>{opt.label}</div>
+                ))
+              )}
             </div>
           )}
         </div>
@@ -860,11 +905,11 @@ const BatchGenerateAds = () => {
       return (
         <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
           <div className="bg-gray-50 rounded-inner p-6 space-y-6">
-            <CustomDropdown label="Select ad account" options={options.adAccount} value={selections.adAccount} onChange={(val) => setSelections({...selections, adAccount: val})} placeholder="Select an account..." isOpen={activeDropdown === 'adAccount'} onToggle={() => handleToggle('adAccount')} />
+            <CustomDropdown label="Select ad account" options={options.adAccount} value={selections.adAccount} onChange={(val) => setSelections({...selections, adAccount: val})} placeholder="Select an account..." isOpen={activeDropdown === 'adAccount'} onToggle={() => handleToggle('adAccount')} isLoading={pubAdAccountLoading.isLoading} />
             {isMeta ? (
-              <>{selections.adAccount && (<div className="animate-in fade-in slide-in-from-top-2 duration-300"><CustomDropdown label="Facebook page" options={options.fbPage} value={selections.fbPage} onChange={(val) => setSelections({...selections, fbPage: val})} placeholder="Select a page..." isOpen={activeDropdown === 'fbPage'} onToggle={() => handleToggle('fbPage')} /></div>)}{selections.fbPage && (<div className="animate-in fade-in slide-in-from-top-2 duration-300"><CustomDropdown label="Tracking pixel" options={options.pixel} value={selections.pixel} onChange={(val) => setSelections({...selections, pixel: val})} placeholder="Select a pixel..." isOpen={activeDropdown === 'pixel'} onToggle={() => handleToggle('pixel')} /></div>)}{selections.pixel && (<div className="animate-in fade-in slide-in-from-top-2 duration-300"><CustomDropdown label="Event" options={options.metaEvent} value={selections.event} onChange={(val) => setSelections({...selections, event: val})} placeholder="Select an event..." isOpen={activeDropdown === 'metaEvent'} onToggle={() => handleToggle('metaEvent')} /></div>)}</>
+              <>{selections.adAccount && (<div className="animate-in fade-in slide-in-from-top-2 duration-300"><CustomDropdown label="Facebook page" options={options.fbPage} value={selections.fbPage} onChange={(val) => setSelections({...selections, fbPage: val})} placeholder="Select a page..." isOpen={activeDropdown === 'fbPage'} onToggle={() => handleToggle('fbPage')} isLoading={pubFbPageLoading.isLoading} /></div>)}{selections.fbPage && (<div className="animate-in fade-in slide-in-from-top-2 duration-300"><CustomDropdown label="Tracking pixel" options={options.pixel} value={selections.pixel} onChange={(val) => setSelections({...selections, pixel: val})} placeholder="Select a pixel..." isOpen={activeDropdown === 'pixel'} onToggle={() => handleToggle('pixel')} isLoading={pubPixelLoading.isLoading} /></div>)}{selections.pixel && (<div className="animate-in fade-in slide-in-from-top-2 duration-300"><CustomDropdown label="Event" options={options.metaEvent} value={selections.event} onChange={(val) => setSelections({...selections, event: val})} placeholder="Select an event..." isOpen={activeDropdown === 'metaEvent'} onToggle={() => handleToggle('metaEvent')} isLoading={pubEventLoading.isLoading} /></div>)}</>
             ) : (
-              <>{selections.adAccount && (<div className="animate-in fade-in slide-in-from-top-2 duration-300"><CustomDropdown label="Conversion dataset" options={options.conversionDataset} value={selections.conversionDataset} onChange={(val) => setSelections({...selections, conversionDataset: val})} placeholder="Select a dataset..." isOpen={activeDropdown === 'conversionDataset'} onToggle={() => handleToggle('conversionDataset')} /></div>)}{selections.conversionDataset && (<div className="animate-in fade-in slide-in-from-top-2 duration-300"><CustomDropdown label="Optimization event" options={options.googleEvent} value={selections.event} onChange={(val) => setSelections({...selections, event: val})} placeholder="Select an event..." isOpen={activeDropdown === 'googleEvent'} onToggle={() => handleToggle('googleEvent')} /></div>)}</>
+              <>{selections.adAccount && (<div className="animate-in fade-in slide-in-from-top-2 duration-300"><CustomDropdown label="Conversion dataset" options={options.conversionDataset} value={selections.conversionDataset} onChange={(val) => setSelections({...selections, conversionDataset: val})} placeholder="Select a dataset..." isOpen={activeDropdown === 'conversionDataset'} onToggle={() => handleToggle('conversionDataset')} isLoading={pubFbPageLoading.isLoading} /></div>)}{selections.conversionDataset && (<div className="animate-in fade-in slide-in-from-top-2 duration-300"><CustomDropdown label="Optimization event" options={options.googleEvent} value={selections.event} onChange={(val) => setSelections({...selections, event: val})} placeholder="Select an event..." isOpen={activeDropdown === 'googleEvent'} onToggle={() => handleToggle('googleEvent')} isLoading={pubEventLoading.isLoading} /></div>)}</>
             )}
             {!canPublish && selections.adAccount && (<div className="flex items-center gap-2 p-3 bg-primary-50 text-primary-500 rounded-base text-xs font-medium animate-pulse"><AlertCircle size={14} />Please complete all required selections to proceed</div>)}
           </div>
@@ -1049,6 +1094,7 @@ const BatchGenerateAds = () => {
                   onSelectAccount={setSelectedAccount}
                   productAnalyses={productAnalyses}
                   onProductAnalysesChange={setProductAnalyses}
+                  onMetaAccountPick={() => setShowMetaAccountPicker(true)}
                 />
               </div>
 
@@ -1105,12 +1151,12 @@ const BatchGenerateAds = () => {
                       selectedCampaign={selectedCampaign}
                       onSelectCampaign={() => setShowCampaignModal(true)}
                       selectedAccount={selectedAccount}
-                      onSelectAccount={() => setShowAccountSelector(true)}
+                      onSelectAccount={() => setShowMetaAccountPicker(true)}
                       authStatus={authStatus}
-                      handleAuthorize={(platformId) => { 
+                      handleAuthorize={(platformId) => {
                         setAuthStatus(prev => ({ ...prev, [platformId]: true }));
-                        if (platformId === 'meta') {
-                          setShowAccountSelector(true);
+                        if (platformId === 'meta' && !selectedAccount) {
+                          setShowMetaAccountPicker(true);
                         }
                       }}
                     />
@@ -1430,7 +1476,7 @@ const BatchGenerateAds = () => {
                   authStatus={authStatus}
                   selectedAccount={selectedAccount}
                   onAuthStatusChange={setAuthStatus}
-                  onSelectAccount={() => setShowAccountSelector(true)}
+                  onSelectAccount={() => setShowMetaAccountPicker(true)}
                 />
               </div>
             </div>
@@ -1442,7 +1488,9 @@ const BatchGenerateAds = () => {
       {showCampaignModal && <CampaignSearchModal />}
       {showPublishModal && <PublishModal />}
       
-      {showAccountSelector && <AccountSelectorModal selectedAccount={selectedAccount} onSelect={setSelectedAccount} onClose={() => setShowAccountSelector(false)} />}
+      {showAccountSelector && <AccountSelectorModal selectedAccount={selectedAccount} onSelect={setSelectedAccount} onClose={() => setShowAccountSelector(false)} isLoading={accountSwitchLoading.isLoading} />}
+
+      {showMetaAccountPicker && <MetaAccountPickerModal selectedAccount={selectedAccount} onSelect={(acc) => { setSelectedAccount(acc); setShowMetaAccountPicker(false); }} onClose={() => setShowMetaAccountPicker(false)} isLoading={accountPickLoading.isLoading} />}
 
     </div>
   );
@@ -1503,9 +1551,6 @@ const AccountChoiceModal = ({ onSelect, onClose, selectedAccountType, setSelecte
                 <div className="space-y-3">
                   <p className="text-sm font-bold text-emerald-600/80 tracking-wide">Let AdsGo manage your advertising setup</p>
                 </div>
-                <div className="flex gap-1.5 pt-2">
-                  {[1, 2, 3].map(i => <div key={i} className="w-1.5 h-1.5 rounded-full bg-emerald-200 animate-bounce" style={{ animationDelay: `${i * 0.2}s` }} />)}
-                </div>
               </div>
             </div>
           )}
@@ -1540,10 +1585,10 @@ const AdsGoReminderModal = ({ onClose, setShowPublishModal }) => {
   );
 };
 
-const AccountSelectorModal = ({ selectedAccount, onSelect, onClose }) => {
+const AccountSelectorModal = ({ selectedAccount, onSelect, onClose, isLoading }) => {
   const zIndex = useZIndex(true);
   return (
-    <div 
+    <div
       className="fixed inset-0 flex items-center justify-center p-4 bg-black/40 backdrop-blur-md animate-in fade-in"
       style={{ zIndex }}
     >
@@ -1559,27 +1604,84 @@ const AccountSelectorModal = ({ selectedAccount, onSelect, onClose }) => {
           <button onClick={onClose} className="p-2 hover:bg-gray-50 rounded-full text-gray-300 transition-colors"><X size={24} /></button>
         </div>
         <div className="space-y-3">
-          {MOCK_ACCOUNTS.map(acc => (
-            <button
-              key={acc.id}
-              onClick={() => {
-                onSelect(acc);
-                onClose();
-              }}
-              className={`w-full p-6 rounded-inner border-2 flex items-center justify-between transition-all ${
-                selectedAccount?.id === acc.id ? 'border-primary-500 bg-primary-50 shadow-primary-focus' : 'border-gray-100 bg-white hover:border-gray-200'
-              }`}
-            >
-              <div className="flex items-center gap-4 text-left">
-                <div className={`p-2 rounded-lg ${selectedAccount?.id === acc.id ? 'bg-primary-500 text-white' : 'bg-gray-50 text-gray-400'}`}><Briefcase size={16} /></div>
-                <div>
-                  <p className={`text-sm font-semibold ${selectedAccount?.id === acc.id ? 'text-primary-700' : 'text-gray-600'}`}>{acc.name}</p>
-                  <p className="text-xs text-gray-400 font-bold">ID: {acc.id}</p>
+          {isLoading ? (
+            <div className="p-8 flex flex-col items-center justify-center gap-3">
+              <Loader2 size={24} className="animate-spin text-primary-500/70" />
+              <p className="text-xs font-medium text-gray-400 animate-pulse">Loading accounts...</p>
+            </div>
+          ) : (
+            MOCK_ACCOUNTS.map(acc => (
+              <button
+                key={acc.id}
+                onClick={() => {
+                  onSelect(acc);
+                  onClose();
+                }}
+                className={`w-full p-6 rounded-inner border-2 flex items-center justify-between transition-all ${
+                  selectedAccount?.id === acc.id ? 'border-primary-500 bg-primary-50 shadow-primary-focus' : 'border-gray-100 bg-white hover:border-gray-200'
+                }`}
+              >
+                <div className="flex items-center gap-4 text-left">
+                  <div className={`p-2 rounded-lg ${selectedAccount?.id === acc.id ? 'bg-primary-500 text-white' : 'bg-gray-50 text-gray-400'}`}><Briefcase size={16} /></div>
+                  <div>
+                    <p className={`text-sm font-semibold ${selectedAccount?.id === acc.id ? 'text-primary-700' : 'text-gray-600'}`}>{acc.name}</p>
+                    <p className="text-xs text-gray-400 font-bold">ID: {acc.id}</p>
+                  </div>
                 </div>
-              </div>
-              {selectedAccount?.id === acc.id && <Check size={20} className="text-primary-500" />}
-            </button>
-          ))}
+                {selectedAccount?.id === acc.id && <Check size={20} className="text-primary-500" />}
+              </button>
+            ))
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const MetaAccountPickerModal = ({ selectedAccount, onSelect, onClose, isLoading }) => {
+  const zIndex = useZIndex(true);
+  return (
+    <div
+      className="fixed inset-0 flex items-center justify-center p-4 bg-black/40 backdrop-blur-md animate-in fade-in"
+      style={{ zIndex }}
+    >
+      <div className="bg-white w-full max-w-xl rounded-section shadow-xl p-10 space-y-8 animate-in slide-in-from-bottom-8">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 bg-primary-500 rounded-xl flex items-center justify-center text-white shadow-lg"><Facebook size={24} /></div>
+            <div>
+              <h4 className="text-xl font-semibold text-gray-900">选择 Meta 广告账户</h4>
+              <p className="text-gray-400 text-xs font-bold mt-1">Select a Meta ad account to continue</p>
+            </div>
+          </div>
+          <button onClick={onClose} className="p-2 hover:bg-gray-50 rounded-full text-gray-300 transition-colors"><X size={24} /></button>
+        </div>
+        <div className="space-y-3">
+          {isLoading ? (
+            <div className="p-8 flex flex-col items-center justify-center gap-3">
+              <Loader2 size={24} className="animate-spin text-primary-500/70" />
+              <p className="text-xs font-medium text-gray-400 animate-pulse">Loading accounts...</p>
+            </div>
+          ) : (
+            MOCK_ACCOUNTS.map(acc => (
+              <button
+                key={acc.id}
+                onClick={() => onSelect(acc)}
+                className={`w-full p-6 rounded-inner border-2 flex items-center justify-between transition-all ${
+                  selectedAccount?.id === acc.id ? 'border-primary-500 bg-primary-50 shadow-primary-focus' : 'border-gray-100 bg-white hover:border-gray-200'
+                }`}
+              >
+                <div className="flex items-center gap-4 text-left">
+                  <div className={`p-2 rounded-lg ${selectedAccount?.id === acc.id ? 'bg-primary-500 text-white' : 'bg-gray-50 text-gray-400'}`}><Briefcase size={16} /></div>
+                  <div>
+                    <p className={`text-sm font-semibold ${selectedAccount?.id === acc.id ? 'text-primary-700' : 'text-gray-600'}`}>{acc.name}</p>
+                    <p className="text-xs text-gray-400 font-bold">ID: {acc.id}</p>
+                  </div>
+                </div>
+                {selectedAccount?.id === acc.id && <Check size={20} className="text-primary-500" />}
+              </button>
+            ))
+          )}
         </div>
       </div>
     </div>

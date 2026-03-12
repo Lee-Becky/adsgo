@@ -1,11 +1,12 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
-import { 
-  Briefcase, Sparkles, ChevronLeft, 
-  Rocket, Edit3, DollarSign, X, Check, Globe, 
+import {
+  Briefcase, Sparkles, ChevronLeft,
+  Rocket, Edit3, DollarSign, X, Check, Globe,
   Layers, Target, Box, Plus, Tag, Link as LinkIcon, Megaphone,
   ChevronDown, Search, Languages, Users, UserPlus, UserMinus,
-  ShoppingBag, Monitor, Smartphone, Layout, Facebook
+  ShoppingBag, Monitor, Smartphone, Layout, Facebook, Loader2
 } from 'lucide-react';
+import useDropdownLoading from '../../../hooks/useDropdownLoading';
 
 const AUDIENCE_NAMES = {
   LAL: 'LAL 1% US Purchase',
@@ -144,6 +145,27 @@ const EditAdSetModal = ({ isOpen, adSet, onUpdateField, onToggleItem, onClose, a
   const [showLalIncDropdown, setShowLalIncDropdown] = useState(false);
   const [showCustomExcDropdown, setShowCustomExcDropdown] = useState(false);
   const [showLalExcDropdown, setShowLalExcDropdown] = useState(false);
+
+  const [isMetaConnecting, setIsMetaConnecting] = useState(false);
+
+  const customIncLoading = useDropdownLoading('customAudienceInc', authStatus?.meta);
+  const lalIncLoading = useDropdownLoading('lalAudienceInc', authStatus?.meta);
+  const customExcLoading = useDropdownLoading('customAudienceExc', authStatus?.meta);
+  const lalExcLoading = useDropdownLoading('lalAudienceExc', authStatus?.meta);
+
+  useEffect(() => { if (showCustomIncDropdown && selectedAccount) customIncLoading.triggerLoad(); }, [showCustomIncDropdown]);
+  useEffect(() => { if (showLalIncDropdown && selectedAccount) lalIncLoading.triggerLoad(); }, [showLalIncDropdown]);
+  useEffect(() => { if (showCustomExcDropdown && selectedAccount) customExcLoading.triggerLoad(); }, [showCustomExcDropdown]);
+  useEffect(() => { if (showLalExcDropdown && selectedAccount) lalExcLoading.triggerLoad(); }, [showLalExcDropdown]);
+
+  const handleConnectMeta = () => {
+    setIsMetaConnecting(true);
+    setTimeout(() => {
+      setIsMetaConnecting(false);
+      onAuthStatusChange?.(prev => ({ ...prev, meta: true }));
+      if (!selectedAccount) onSelectAccount?.();
+    }, 3000);
+  };
 
   if (!isOpen || !adSet) return null;
 
@@ -487,11 +509,12 @@ const EditAdSetModal = ({ isOpen, adSet, onUpdateField, onToggleItem, onClose, a
                         {!authStatus?.meta ? (
                           <div className="p-4 text-center">
                             <p className="text-xs font-medium text-gray-500 mb-3">需要连接 Meta 以加载受众</p>
-                            <button 
-                              onClick={() => onAuthStatusChange?.(prev => ({ ...prev, meta: true }))}
-                              className="w-full py-2 bg-primary-500 text-white rounded-base text-sm font-medium hover:bg-primary-600 active:bg-primary-700 transition-all duration-200 focus:outline-none focus:shadow-primary-focus flex items-center justify-center gap-2"
+                            <button
+                              onClick={handleConnectMeta}
+                              disabled={isMetaConnecting}
+                              className="w-full py-2 bg-primary-500 text-white rounded-base text-sm font-medium hover:bg-primary-600 active:bg-primary-700 transition-all duration-200 focus:outline-none focus:shadow-primary-focus flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
                             >
-                              <Facebook size={12} /> 连接 Meta
+                              {isMetaConnecting ? <><Loader2 size={12} className="animate-spin" /> Connecting...</> : <><Facebook size={12} /> 连接 Meta</>}
                             </button>
                           </div>
                         ) : !selectedAccount ? (
@@ -503,6 +526,11 @@ const EditAdSetModal = ({ isOpen, adSet, onUpdateField, onToggleItem, onClose, a
                             >
                               <Briefcase size={12} /> 选择账户
                             </button>
+                          </div>
+                        ) : customIncLoading.isLoading ? (
+                          <div className="p-6 flex flex-col items-center justify-center gap-2">
+                            <Loader2 size={18} className="animate-spin text-primary-500/70" />
+                            <p className="text-xs font-medium text-gray-400 animate-pulse">Loading audiences...</p>
                           </div>
                         ) : (
                           CUSTOM_AUDIENCES.map(ca => {
@@ -537,11 +565,12 @@ const EditAdSetModal = ({ isOpen, adSet, onUpdateField, onToggleItem, onClose, a
                         {!authStatus?.meta ? (
                           <div className="p-4 text-center">
                             <p className="text-xs font-medium text-gray-500 mb-3">需要连接 Meta 以加载受众</p>
-                            <button 
-                              onClick={() => onAuthStatusChange?.(prev => ({ ...prev, meta: true }))}
-                              className="w-full py-2 bg-primary-500 text-white rounded-base text-sm font-medium hover:bg-primary-600 active:bg-primary-700 transition-all duration-200 focus:outline-none focus:shadow-primary-focus flex items-center justify-center gap-2"
+                            <button
+                              onClick={handleConnectMeta}
+                              disabled={isMetaConnecting}
+                              className="w-full py-2 bg-primary-500 text-white rounded-base text-sm font-medium hover:bg-primary-600 active:bg-primary-700 transition-all duration-200 focus:outline-none focus:shadow-primary-focus flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
                             >
-                              <Facebook size={12} /> 连接 Meta
+                              {isMetaConnecting ? <><Loader2 size={12} className="animate-spin" /> Connecting...</> : <><Facebook size={12} /> 连接 Meta</>}
                             </button>
                           </div>
                         ) : !selectedAccount ? (
@@ -553,6 +582,11 @@ const EditAdSetModal = ({ isOpen, adSet, onUpdateField, onToggleItem, onClose, a
                             >
                               <Briefcase size={12} /> 选择账户
                             </button>
+                          </div>
+                        ) : lalIncLoading.isLoading ? (
+                          <div className="p-6 flex flex-col items-center justify-center gap-2">
+                            <Loader2 size={18} className="animate-spin text-purple-500/70" />
+                            <p className="text-xs font-medium text-gray-400 animate-pulse">Loading audiences...</p>
                           </div>
                         ) : (
                           LAL_AUDIENCES.map(la => {
@@ -597,11 +631,12 @@ const EditAdSetModal = ({ isOpen, adSet, onUpdateField, onToggleItem, onClose, a
                         {!authStatus?.meta ? (
                           <div className="p-4 text-center">
                             <p className="text-xs font-medium text-gray-500 mb-3">需要连接 Meta 以加载受众</p>
-                            <button 
-                              onClick={() => onAuthStatusChange?.(prev => ({ ...prev, meta: true }))}
-                              className="w-full py-2 bg-primary-500 text-white rounded-base text-sm font-medium hover:bg-primary-600 active:bg-primary-700 transition-all duration-200 focus:outline-none focus:shadow-primary-focus flex items-center justify-center gap-2"
+                            <button
+                              onClick={handleConnectMeta}
+                              disabled={isMetaConnecting}
+                              className="w-full py-2 bg-primary-500 text-white rounded-base text-sm font-medium hover:bg-primary-600 active:bg-primary-700 transition-all duration-200 focus:outline-none focus:shadow-primary-focus flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
                             >
-                              <Facebook size={12} /> 连接 Meta
+                              {isMetaConnecting ? <><Loader2 size={12} className="animate-spin" /> Connecting...</> : <><Facebook size={12} /> 连接 Meta</>}
                             </button>
                           </div>
                         ) : !selectedAccount ? (
@@ -613,6 +648,11 @@ const EditAdSetModal = ({ isOpen, adSet, onUpdateField, onToggleItem, onClose, a
                             >
                               <Briefcase size={12} /> 选择账户
                             </button>
+                          </div>
+                        ) : customExcLoading.isLoading ? (
+                          <div className="p-6 flex flex-col items-center justify-center gap-2">
+                            <Loader2 size={18} className="animate-spin text-primary-500/70" />
+                            <p className="text-xs font-medium text-gray-400 animate-pulse">Loading audiences...</p>
                           </div>
                         ) : (
                           CUSTOM_AUDIENCES.map(ca => {
@@ -647,11 +687,12 @@ const EditAdSetModal = ({ isOpen, adSet, onUpdateField, onToggleItem, onClose, a
                         {!authStatus?.meta ? (
                           <div className="p-4 text-center">
                             <p className="text-xs font-medium text-gray-500 mb-3">需要连接 Meta 以加载受众</p>
-                            <button 
-                              onClick={() => onAuthStatusChange?.(prev => ({ ...prev, meta: true }))}
-                              className="w-full py-2 bg-primary-500 text-white rounded-base text-sm font-medium hover:bg-primary-600 active:bg-primary-700 transition-all duration-200 focus:outline-none focus:shadow-primary-focus flex items-center justify-center gap-2"
+                            <button
+                              onClick={handleConnectMeta}
+                              disabled={isMetaConnecting}
+                              className="w-full py-2 bg-primary-500 text-white rounded-base text-sm font-medium hover:bg-primary-600 active:bg-primary-700 transition-all duration-200 focus:outline-none focus:shadow-primary-focus flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
                             >
-                              <Facebook size={12} /> 连接 Meta
+                              {isMetaConnecting ? <><Loader2 size={12} className="animate-spin" /> Connecting...</> : <><Facebook size={12} /> 连接 Meta</>}
                             </button>
                           </div>
                         ) : !selectedAccount ? (
@@ -663,6 +704,11 @@ const EditAdSetModal = ({ isOpen, adSet, onUpdateField, onToggleItem, onClose, a
                             >
                               <Briefcase size={12} /> 选择账户
                             </button>
+                          </div>
+                        ) : lalExcLoading.isLoading ? (
+                          <div className="p-6 flex flex-col items-center justify-center gap-2">
+                            <Loader2 size={18} className="animate-spin text-purple-500/70" />
+                            <p className="text-xs font-medium text-gray-400 animate-pulse">Loading audiences...</p>
                           </div>
                         ) : (
                           LAL_AUDIENCES.map(la => {
