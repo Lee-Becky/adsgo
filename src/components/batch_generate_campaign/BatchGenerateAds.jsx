@@ -1007,7 +1007,7 @@ const BatchGenerateAds = () => {
                   <p className="text-sm text-gray-700 leading-relaxed">
                     Meta ads严格要求投放leads广告的主页必须同意《潜在客户广告条款》，请前往{' '}
                     <a href="https://www.facebook.com/legal/leadgen/tos/" target="_blank" rel="noopener noreferrer" className="text-primary-500 font-semibold hover:underline">meta ads tos</a>
-                    {' '}确认同意后，回到本页面继续发布；
+                    {' '}确认同意后，回到本页面继续发布；【给开发的备注说明：仅目标为leads广告时出现，】
                   </p>
                 </div>
                 <div className="flex gap-3 p-4 bg-amber-50 border border-amber-100 rounded-xl">
@@ -1015,7 +1015,7 @@ const BatchGenerateAds = () => {
                   <p className="text-sm text-gray-700 leading-relaxed">
                     Meta ads严格要求特殊行业广告投放必须同意《无歧视政策》，请前往{' '}
                     <a href="https://www.facebook.com/certification/nondiscrimination" target="_blank" rel="noopener noreferrer" className="text-primary-500 font-semibold hover:underline">meta ads nondiscrimination</a>
-                    {' '}同意后，回到本页面继续发布
+                    {' '}同意后，回到本页面继续发布；【给开发的备注说明：仅目标为特殊行业广告时出现】
                   </p>
                 </div>
               </div>
