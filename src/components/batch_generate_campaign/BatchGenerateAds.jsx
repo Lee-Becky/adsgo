@@ -732,6 +732,8 @@ const BatchGenerateAds = () => {
     });
 
     const [activeDropdown, setActiveDropdown] = useState(null);
+    const [showTosModal, setShowTosModal] = useState(false);
+    const tosZIndex = useZIndex(showTosModal);
 
     const pubAdAccountLoading = useDropdownLoading('pub_adAccount', !!connectedPlatform);
     const pubFbPageLoading = useDropdownLoading('pub_fbPage', !!connectedPlatform);
@@ -907,7 +909,7 @@ const BatchGenerateAds = () => {
           <div className="bg-gray-50 rounded-inner p-6 space-y-6">
             <CustomDropdown label="Select ad account" options={options.adAccount} value={selections.adAccount} onChange={(val) => setSelections({...selections, adAccount: val})} placeholder="Select an account..." isOpen={activeDropdown === 'adAccount'} onToggle={() => handleToggle('adAccount')} isLoading={pubAdAccountLoading.isLoading} />
             {isMeta ? (
-              <>{selections.adAccount && (<div className="animate-in fade-in slide-in-from-top-2 duration-300"><CustomDropdown label="Facebook page" options={options.fbPage} value={selections.fbPage} onChange={(val) => setSelections({...selections, fbPage: val})} placeholder="Select a page..." isOpen={activeDropdown === 'fbPage'} onToggle={() => handleToggle('fbPage')} isLoading={pubFbPageLoading.isLoading} /></div>)}{selections.fbPage && (<div className="animate-in fade-in slide-in-from-top-2 duration-300"><CustomDropdown label="Tracking pixel" options={options.pixel} value={selections.pixel} onChange={(val) => setSelections({...selections, pixel: val})} placeholder="Select a pixel..." isOpen={activeDropdown === 'pixel'} onToggle={() => handleToggle('pixel')} isLoading={pubPixelLoading.isLoading} /></div>)}{selections.pixel && (<div className="animate-in fade-in slide-in-from-top-2 duration-300"><CustomDropdown label="Event" options={options.metaEvent} value={selections.event} onChange={(val) => setSelections({...selections, event: val})} placeholder="Select an event..." isOpen={activeDropdown === 'metaEvent'} onToggle={() => handleToggle('metaEvent')} isLoading={pubEventLoading.isLoading} /></div>)}</>
+              <>{selections.adAccount && (<div className="animate-in fade-in slide-in-from-top-2 duration-300"><CustomDropdown label="Facebook page" options={options.fbPage} value={selections.fbPage} onChange={(val) => { setSelections({...selections, fbPage: val}); setShowTosModal(true); }} placeholder="Select a page..." isOpen={activeDropdown === 'fbPage'} onToggle={() => handleToggle('fbPage')} isLoading={pubFbPageLoading.isLoading} /></div>)}{selections.fbPage && (<div className="animate-in fade-in slide-in-from-top-2 duration-300"><CustomDropdown label="Tracking pixel" options={options.pixel} value={selections.pixel} onChange={(val) => setSelections({...selections, pixel: val})} placeholder="Select a pixel..." isOpen={activeDropdown === 'pixel'} onToggle={() => handleToggle('pixel')} isLoading={pubPixelLoading.isLoading} /></div>)}{selections.pixel && (<div className="animate-in fade-in slide-in-from-top-2 duration-300"><CustomDropdown label="Event" options={options.metaEvent} value={selections.event} onChange={(val) => setSelections({...selections, event: val})} placeholder="Select an event..." isOpen={activeDropdown === 'metaEvent'} onToggle={() => handleToggle('metaEvent')} isLoading={pubEventLoading.isLoading} /></div>)}</>
             ) : (
               <>{selections.adAccount && (<div className="animate-in fade-in slide-in-from-top-2 duration-300"><CustomDropdown label="Conversion dataset" options={options.conversionDataset} value={selections.conversionDataset} onChange={(val) => setSelections({...selections, conversionDataset: val})} placeholder="Select a dataset..." isOpen={activeDropdown === 'conversionDataset'} onToggle={() => handleToggle('conversionDataset')} isLoading={pubFbPageLoading.isLoading} /></div>)}{selections.conversionDataset && (<div className="animate-in fade-in slide-in-from-top-2 duration-300"><CustomDropdown label="Optimization event" options={options.googleEvent} value={selections.event} onChange={(val) => setSelections({...selections, event: val})} placeholder="Select an event..." isOpen={activeDropdown === 'googleEvent'} onToggle={() => handleToggle('googleEvent')} isLoading={pubEventLoading.isLoading} /></div>)}</>
             )}
@@ -992,6 +994,40 @@ const BatchGenerateAds = () => {
           }
         }} onClose={() => { setShowAccountChoice(false); setShowPublishModal(false); }} selectedAccountType={selectedAccountType} setSelectedAccountType={setSelectedAccountType} renderAccountChoiceStep={renderAccountChoiceStep} renderStep1={renderStep1} renderStep2={renderStep2} connectedPlatform={connectedPlatform} selections={selections} />}
         {showAdsgoReminder && <AdsGoReminderModal onClose={() => { setShowAdsgoReminder(false); setShowPublishModal(false); }} setShowPublishModal={setShowPublishModal} />}
+
+        {showTosModal && (
+          <div className="fixed inset-0 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in" style={{ zIndex: tosZIndex }}>
+            <div className="bg-white w-full max-w-lg rounded-section shadow-2xl p-10 space-y-8 animate-in zoom-in-95 duration-300">
+              <div className="space-y-2">
+                <h4 className="text-lg font-semibold text-gray-900 leading-snug">请确认您的账户已同意Meta ads的广告条款或政策</h4>
+              </div>
+              <div className="space-y-5">
+                <div className="flex gap-3 p-4 bg-amber-50 border border-amber-100 rounded-xl">
+                  <AlertCircle size={18} className="text-amber-500 shrink-0 mt-0.5" />
+                  <p className="text-sm text-gray-700 leading-relaxed">
+                    Meta ads严格要求投放leads广告的主页必须同意《潜在客户广告条款》，请前往{' '}
+                    <a href="https://www.facebook.com/legal/leadgen/tos/" target="_blank" rel="noopener noreferrer" className="text-primary-500 font-semibold hover:underline">meta ads tos</a>
+                    {' '}确认同意后，回到本页面继续发布；
+                  </p>
+                </div>
+                <div className="flex gap-3 p-4 bg-amber-50 border border-amber-100 rounded-xl">
+                  <AlertCircle size={18} className="text-amber-500 shrink-0 mt-0.5" />
+                  <p className="text-sm text-gray-700 leading-relaxed">
+                    Meta ads严格要求特殊行业广告投放必须同意《无歧视政策》，请前往{' '}
+                    <a href="https://www.facebook.com/certification/nondiscrimination" target="_blank" rel="noopener noreferrer" className="text-primary-500 font-semibold hover:underline">meta ads nondiscrimination</a>
+                    {' '}同意后，回到本页面继续发布
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowTosModal(false)}
+                className="w-full py-3.5 bg-primary-500 text-white rounded-base text-sm font-semibold hover:bg-primary-600 active:bg-primary-700 transition-all duration-200 focus:outline-none focus:shadow-primary-focus shadow-lg shadow-primary-500/20"
+              >
+                Confirmed to have been checked
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     );
   };
