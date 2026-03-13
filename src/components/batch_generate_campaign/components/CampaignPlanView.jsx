@@ -679,7 +679,7 @@ const CampaignPlanView = ({
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-[65fr_35fr] gap-8">
-      <div className="space-y-4">
+      <div className="space-y-4 min-w-0">
         <div className="flex items-center gap-2 px-2">
           <h4 className="text-xl font-semibold text-gray-900">Campaign 架构策略</h4>
           <div className="w-5 h-5 bg-primary-50 text-primary-500 rounded-full flex items-center justify-center cursor-help shadow-sm">

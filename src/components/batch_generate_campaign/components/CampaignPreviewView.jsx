@@ -802,13 +802,16 @@ const AdSkeleton = () => (
 
 const CampaignPreviewView = ({
   structure, budgetType, dailyBudget, initialAdsetAudiences, productCreativesMap, selectedProducts, brand, onBack, onPublish, campaignName, optimizationEvent, landingPageType, landingPageTemplate, productUtm, copyStrategy, unifiedHeadline, unifiedBody, campaignType,
-  estimatedTotalDaily, adSetGroupsCount, authStatus, selectedAccount, onAuthStatusChange, onSelectAccount
+  estimatedTotalDaily, adSetGroupsCount, authStatus, selectedAccount, onAuthStatusChange, onSelectAccount,
+  isExistingCampaign
 }) => {
-  
+
   const [localAdSets, setLocalAdSets] = useState([]);
   const [editingAdSetIndex, setEditingAdSetIndex] = useState(null);
   const [editingAdInfo, setEditingAdInfo] = useState(null);
   const [loadedAdsCount, setLoadedAdsCount] = useState(0);
+  const [isEditingCampaignName, setIsEditingCampaignName] = useState(false);
+  const [localCampaignName, setLocalCampaignName] = useState(campaignName);
 
   const totalAdsCount = useMemo(() => {
     return localAdSets.reduce((acc, as) => acc + (as.ads?.length || 0), 0);
@@ -1133,7 +1136,7 @@ const CampaignPreviewView = ({
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-xl font-semibold text-gray-900">发布方案预览</h2>
-          <p className="text-sm text-gray-400 font-medium mt-1 tracking-widest">{campaignName} • {campaignType === 'CATALOG' ? '目录广告' : '落地页广告'} 架构</p>
+          <p className="text-sm text-gray-400 font-medium mt-1 tracking-widest">{localCampaignName} • {campaignType === 'CATALOG' ? '目录广告' : '落地页广告'} 架构</p>
         </div>
         <button onClick={onBack} className="border border-primary-500 text-primary-500 rounded-base text-sm font-medium hover:bg-primary-50 active:bg-primary-100 transition-all duration-200 px-6 py-3 flex items-center gap-2">
           <ChevronLeft size={16} /> 返回修改配置
@@ -1148,7 +1151,30 @@ const CampaignPreviewView = ({
               <div className="w-11 h-11 bg-primary-500 rounded-inner flex items-center justify-center shadow-lg border-2 border-white/10"><Briefcase size={22} /></div>
               <div>
                 <p className="text-xs font-medium text-gray-500">Campaign Overview</p>
-                <h3 className="text-xl font-semibold">{campaignName}</h3>
+                {!isExistingCampaign ? (
+                  isEditingCampaignName ? (
+                    <div className="flex items-center gap-2">
+                      <input
+                        autoFocus
+                        className="text-xl font-semibold bg-white/10 border border-white/20 rounded px-2 py-0.5 text-white outline-none focus:border-primary-400 w-64"
+                        value={localCampaignName}
+                        onChange={e => setLocalCampaignName(e.target.value)}
+                        onKeyDown={e => { if (e.key === 'Enter') setIsEditingCampaignName(false); if (e.key === 'Escape') { setLocalCampaignName(campaignName); setIsEditingCampaignName(false); } }}
+                      />
+                      <button onClick={() => setIsEditingCampaignName(false)} className="text-emerald-400 hover:text-emerald-300"><Check size={16} /></button>
+                      <button onClick={() => { setLocalCampaignName(campaignName); setIsEditingCampaignName(false); }} className="text-gray-400 hover:text-gray-300"><X size={16} /></button>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2 group/name">
+                      <h3 className="text-xl font-semibold">{localCampaignName}</h3>
+                      <button onClick={() => setIsEditingCampaignName(true)} className="opacity-0 group-hover/name:opacity-100 transition-opacity text-gray-400 hover:text-white">
+                        <Edit3 size={15} />
+                      </button>
+                    </div>
+                  )
+                ) : (
+                  <h3 className="text-xl font-semibold">{localCampaignName}</h3>
+                )}
               </div>
             </div>
             <div className="text-right">

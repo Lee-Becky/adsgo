@@ -12,18 +12,18 @@ export const MENU_ITEMS = [
   },
   {
     key: 'campaignGenerator',
-    label: 'Campaign Generator',
-    shortLabel: 'Gen',
+    label: 'New Campaign（旧）',
+    shortLabel: '旧',
     icon: 'Wand2',
-    title: 'Campaign Generator',
+    title: 'New Campaign（旧）',
     subtitle: 'Generate and publish campaigns'
   },
   {
     key: 'batchGenerateAds',
-    label: 'Batch Generate Ads',
-    shortLabel: 'Batch',
+    label: 'Campaign Generator',
+    shortLabel: 'Gen',
     icon: 'Layers',
-    title: 'Batch Generate Ads',
+    title: 'Campaign Generator',
     subtitle: 'High-performance multi-product campaign architecture orchestration'
   },
   {

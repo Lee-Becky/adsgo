@@ -428,7 +428,6 @@ const BatchGenerateAds = () => {
   const accountPickLoading = useDropdownLoading('accountPick', authStatus?.meta);
   useEffect(() => { if (showCampaignModal && selectedAccount) campaignListLoading.triggerLoad(); }, [showCampaignModal]);
   useEffect(() => { if (showAccountSelector) accountSwitchLoading.triggerLoad(); }, [showAccountSelector]);
-  useEffect(() => { if (showMetaAccountPicker) accountPickLoading.triggerLoad(); }, [showMetaAccountPicker]);
 
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisFinished, setAnalysisFinished] = useState(false);
@@ -610,7 +609,8 @@ const BatchGenerateAds = () => {
   const CampaignSearchModal = () => {
     const zIndex = useZIndex(true);
     const [search, setSearch] = useState('');
-    const filtered = MOCK_EXISTING_CAMPAIGNS.filter(c => 
+    const [isMetaConnecting, setIsMetaConnecting] = useState(false);
+    const filtered = MOCK_EXISTING_CAMPAIGNS.filter(c =>
       c.name.toLowerCase().includes(search.toLowerCase()) || c.id.includes(search)
     );
 
@@ -652,22 +652,27 @@ const BatchGenerateAds = () => {
             <div className="mt-4 pt-4 border-t border-gray-50 space-y-2">
               {!isMetaConnected ? (
                 <div className="p-4">
-                  <button 
+                  <button
                     onClick={() => {
-                      // 触发 Meta 授权逻辑，并立即联动触发账号选择，不关闭当前弹窗
-                      setAuthStatus(prev => ({ ...prev, meta: true }));
-                      setShowAccountSelector(true);
+                      setIsMetaConnecting(true);
+                      setTimeout(() => {
+                        setIsMetaConnecting(false);
+                        setAuthStatus(prev => ({ ...prev, meta: true }));
+                        accountPickLoading.triggerLoad();
+                        setShowMetaAccountPicker(true);
+                      }, 3000);
                     }}
-                    className="w-full inline-flex items-center justify-center bg-primary-500 text-white py-4 rounded-base text-sm font-medium hover:bg-primary-600 active:bg-primary-700 transition-all duration-200 focus:outline-none focus:shadow-primary-focus disabled:opacity-50 disabled:cursor-not-allowed gap-3"
+                    disabled={isMetaConnecting}
+                    className="w-full inline-flex items-center justify-center bg-primary-500 text-white py-4 rounded-base text-sm font-medium hover:bg-primary-600 active:bg-primary-700 transition-all duration-200 focus:outline-none focus:shadow-primary-focus disabled:opacity-70 disabled:cursor-not-allowed gap-3"
                   >
-                    <Facebook size={18} /> 立即连接 Meta 以加载系列
+                    {isMetaConnecting ? <><Loader2 size={18} className="animate-spin" /> Connecting...</> : <><Facebook size={18} /> 立即连接 Meta 以加载系列</>}
                   </button>
                 </div>
               ) : !selectedAccount ? (
                 <div className="p-4">
                   <button 
                     onClick={() => {
-                      setShowAccountSelector(true);
+                      setShowMetaAccountPicker(true);
                       setShowCampaignModal(false);
                     }}
                     className="w-full inline-flex items-center justify-center bg-primary-500 text-white py-4 rounded-base text-sm font-medium hover:bg-primary-600 active:bg-primary-700 transition-all duration-200 focus:outline-none focus:shadow-primary-focus disabled:opacity-50 disabled:cursor-not-allowed gap-3"
@@ -808,6 +813,7 @@ const BatchGenerateAds = () => {
         // 同步到父组件
         setAuthStatus(prev => ({ ...prev, [platform]: true }));
         if (platform === 'meta' && !selectedAccount) {
+          accountPickLoading.triggerLoad();
           setShowMetaAccountPicker(true);
         }
       }, 2000);
@@ -1130,7 +1136,7 @@ const BatchGenerateAds = () => {
                   onSelectAccount={setSelectedAccount}
                   productAnalyses={productAnalyses}
                   onProductAnalysesChange={setProductAnalyses}
-                  onMetaAccountPick={() => setShowMetaAccountPicker(true)}
+                  onMetaAccountPick={() => { accountPickLoading.triggerLoad(); setShowMetaAccountPicker(true); }}
                 />
               </div>
 
@@ -1192,6 +1198,7 @@ const BatchGenerateAds = () => {
                       handleAuthorize={(platformId) => {
                         setAuthStatus(prev => ({ ...prev, [platformId]: true }));
                         if (platformId === 'meta' && !selectedAccount) {
+                          accountPickLoading.triggerLoad();
                           setShowMetaAccountPicker(true);
                         }
                       }}
@@ -1499,6 +1506,7 @@ const BatchGenerateAds = () => {
                   onBack={() => setView('config')}
                   onPublish={() => setShowPublishModal(true)}
                   campaignName={selectedCampaign?.name || 'NEW-AI-CAMPAIGN-001'}
+                  isExistingCampaign={!!selectedCampaignId}
                   optimizationEvent={event}
                   landingPageType={lpType}
                   landingPageTemplate={lpTemplateUrl}
