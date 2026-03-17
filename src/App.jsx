@@ -210,7 +210,7 @@ function App() {
           />
         )
       case 'batchGenerateAds':
-        return <BatchGenerateAds />
+        return <BatchGenerateAds onPageChange={handlePageChange} />
       case 'aiGenerate':
         return <AIGenerate />
       case 'creativeLibrary':

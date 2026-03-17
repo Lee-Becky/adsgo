@@ -359,7 +359,7 @@ const TargetingChannelCard = ({
   );
 };
 
-const BatchGenerateAds = () => {
+const BatchGenerateAds = ({ onPageChange }) => {
   const [selectedProducts, setSelectedProducts] = useState([]);
   const [productCreativesMap, setProductCreativesMap] = useState({});
   const [selectedAccount, setSelectedAccount] = useState(() =>
@@ -602,8 +602,9 @@ const BatchGenerateAds = () => {
 
   const handlePublishComplete = () => {
     setShowPublishModal(false);
-    console.log('Publish complete, redirecting to Ad Manager');
-    window.location.hash = '#/ad-manager-v3';
+    if (onPageChange) {
+      onPageChange('adManagerV3');
+    }
   };
 
   const CampaignSearchModal = () => {
@@ -750,12 +751,12 @@ const BatchGenerateAds = () => {
     useEffect(() => { if (activeDropdown === 'pixel') pubPixelLoading.triggerLoad(); }, [activeDropdown]);
     useEffect(() => { if (activeDropdown === 'metaEvent' || activeDropdown === 'googleEvent') pubEventLoading.triggerLoad(); }, [activeDropdown]);
 
-    const [publishProgress, setPublishProgress] = useState([
-      { id: 1, name: 'Campaign #1 - US Market', status: 'Publishing' },
-      { id: 2, name: 'Campaign #2 - EU Market', status: 'Waiting' },
-      { id: 3, name: 'Campaign #3 - Retargeting', status: 'Waiting' },
-      { id: 4, name: 'Campaign #4 - Lookalike', status: 'Waiting' },
-      { id: 5, name: 'Campaign #5 - Brand Awareness', status: 'Waiting' },
+    const publishCampaignName = selectedCampaign?.name || 'NEW-AI-CAMPAIGN-001';
+    const [campaignStatus, setCampaignStatus] = useState('Publishing');
+    const [adsetProgress, setAdsetProgress] = useState([
+      { id: 1, name: 'Adset name 1', totalAds: 3, completedAds: 0, status: 'Publishing' },
+      { id: 2, name: 'Adset name 2', totalAds: 2, completedAds: 0, status: 'Waiting' },
+      { id: 3, name: 'Adset name 3', totalAds: 4, completedAds: 0, status: 'Waiting' },
     ]);
 
     const initialBrandGoalData = useMemo(() => {
@@ -787,19 +788,32 @@ const BatchGenerateAds = () => {
 
     useEffect(() => {
       if (step === 3) {
-        let currentIdx = 0;
         const interval = setInterval(() => {
-          setPublishProgress(prev => prev.map((item, idx) => {
-            if (idx === currentIdx) return { ...item, status: Math.random() > 0.1 ? 'Success' : 'Failure' };
-            if (idx === currentIdx + 1) return { ...item, status: 'Publishing' };
-            return item;
-          }));
-          currentIdx++;
-          if (currentIdx === 5) {
-            clearInterval(interval);
-            setTimeout(() => setStep(4), 1500);
-          }
-        }, 1000);
+          setAdsetProgress(prev => {
+            const next = prev.map(item => ({ ...item }));
+            const publishingIdx = next.findIndex(a => a.status === 'Publishing');
+            if (publishingIdx === -1) return prev;
+
+            const current = next[publishingIdx];
+            if (current.completedAds < current.totalAds) {
+              current.completedAds += 1;
+            }
+            if (current.completedAds >= current.totalAds) {
+              current.status = Math.random() > 0.1 ? 'Success' : 'Failure';
+              const nextWaiting = next.findIndex(a => a.status === 'Waiting');
+              if (nextWaiting !== -1) {
+                next[nextWaiting].status = 'Publishing';
+              }
+            }
+
+            const allDone = next.every(a => a.status === 'Success' || a.status === 'Failure');
+            if (allDone) {
+              setCampaignStatus(next.every(a => a.status === 'Success') ? 'Success' : 'Partial');
+              setTimeout(() => setStep(4), 2500);
+            }
+            return next;
+          });
+        }, 600);
         return () => clearInterval(interval);
       }
     }, [step]);
@@ -812,10 +826,6 @@ const BatchGenerateAds = () => {
         setConnectedPlatform(platform);
         // 同步到父组件
         setAuthStatus(prev => ({ ...prev, [platform]: true }));
-        if (platform === 'meta' && !selectedAccount) {
-          accountPickLoading.triggerLoad();
-          setShowMetaAccountPicker(true);
-        }
       }, 2000);
     };
 
@@ -927,19 +937,45 @@ const BatchGenerateAds = () => {
 
     const renderStep3 = () => (
       <div className="space-y-6 animate-in fade-in duration-500">
+        <div className="flex items-start gap-2 bg-gray-100 rounded-base p-3">
+          <Info size={14} className="text-gray-400 shrink-0 mt-0.5" />
+          <p className="text-xs text-gray-500">开发说明：当后面两步弹窗流程未满足没有出现时，发布成功后，自动跳转至 ad manager 页面</p>
+        </div>
         <div className="bg-gray-50 rounded-section p-8 border border-gray-100">
-          <div className="flex items-center justify-between mb-8">
-            <div><h3 className="text-xl font-semibold text-gray-900 tracking-tight">Pushing campaigns</h3><p className="text-xs font-bold text-gray-400 mt-1">Status: {publishProgress.filter(p => p.status === 'Success').length}/5 Completed</p></div>
-            <div className="w-12 h-12 rounded-xl bg-white shadow-sm flex items-center justify-center"><Loader2 size={24} className="text-primary-500 animate-spin" /></div>
+          {/* Campaign Header */}
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-3">
+              <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${campaignStatus === 'Success' ? 'bg-emerald-50 text-emerald-600' : campaignStatus === 'Partial' ? 'bg-amber-50 text-amber-600' : 'bg-primary-50 text-primary-500'}`}>
+                {campaignStatus === 'Publishing' ? <Loader2 size={20} className="animate-spin" /> : campaignStatus === 'Success' ? <Check size={20} /> : <AlertCircle size={20} />}
+              </div>
+              <div>
+                <h3 className="text-base font-semibold text-gray-900 tracking-tight">{publishCampaignName}</h3>
+                <p className="text-[11px] font-bold text-gray-400 mt-0.5">
+                  {adsetProgress.filter(a => a.status === 'Success').length}/{adsetProgress.length} Adsets · {adsetProgress.reduce((s, a) => s + a.completedAds, 0)}/{adsetProgress.reduce((s, a) => s + a.totalAds, 0)} Ads
+                </p>
+              </div>
+            </div>
           </div>
-          <div className="space-y-3">
-            {publishProgress.map((p) => (
-              <div key={p.id} className="bg-white rounded-inner p-4 border border-gray-100 flex items-center justify-between group">
-                <div className="flex items-center gap-4">
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${p.status === 'Success' ? 'bg-emerald-50 text-emerald-600' : p.status === 'Failure' ? 'bg-red-50 text-red-600' : p.status === 'Publishing' ? 'bg-primary-50 text-primary-500' : 'bg-gray-50 text-gray-300'}`}>{p.status === 'Success' ? <Check size={20} /> : p.status === 'Failure' ? <AlertCircle size={20} /> : p.status === 'Publishing' ? <Loader2 size={20} className="animate-spin" /> : <Layout size={18} />}</div>
-                  <div><h4 className="text-sm font-bold text-gray-800">{p.name}</h4><p className={`text-xs font-medium ${p.status === 'Success' ? 'text-emerald-500' : p.status === 'Failure' ? 'text-red-500' : p.status === 'Publishing' ? 'text-primary-500' : 'text-gray-400'}`}>{p.status}</p></div>
+
+          {/* Adset Progress List */}
+          <div className="space-y-2.5 mt-5">
+            {adsetProgress.map((a) => (
+              <div key={a.id} className="bg-white rounded-inner p-3.5 border border-gray-100 flex items-center justify-between group transition-all duration-300">
+                <div className="flex items-center gap-3">
+                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${a.status === 'Success' ? 'bg-emerald-50 text-emerald-600' : a.status === 'Failure' ? 'bg-red-50 text-red-600' : a.status === 'Publishing' ? 'bg-primary-50 text-primary-500' : 'bg-gray-50 text-gray-300'}`}>
+                    {a.status === 'Success' ? <Check size={16} /> : a.status === 'Failure' ? <AlertCircle size={16} /> : a.status === 'Publishing' ? <Loader2 size={16} className="animate-spin" /> : <Layout size={14} />}
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-bold text-gray-800">{a.name}</h4>
+                    <p className={`text-[11px] font-medium ${a.status === 'Success' ? 'text-emerald-500' : a.status === 'Failure' ? 'text-red-500' : a.status === 'Publishing' ? 'text-primary-500' : 'text-gray-400'}`}>{a.status}</p>
+                  </div>
                 </div>
-                {p.status === 'Failure' && (<button className="p-2 hover:bg-red-50 text-red-400 rounded-lg transition-colors"><RefreshCw size={14} /></button>)}
+                <div className="flex items-center gap-2">
+                  <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${a.status === 'Success' ? 'bg-emerald-50 text-emerald-600' : a.status === 'Publishing' ? 'bg-primary-50 text-primary-500' : a.status === 'Failure' ? 'bg-red-50 text-red-500' : 'bg-gray-100 text-gray-400'}`}>
+                    {a.completedAds}/{a.totalAds} Ads
+                  </span>
+                  {a.status === 'Failure' && (<button className="p-1.5 hover:bg-red-50 text-red-400 rounded-lg transition-colors"><RefreshCw size={12} /></button>)}
+                </div>
               </div>
             ))}
           </div>
@@ -949,6 +985,10 @@ const BatchGenerateAds = () => {
 
     const renderStep4 = () => (
       <div className="space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-700">
+        <div className="flex items-start gap-2 bg-gray-100 rounded-base p-3">
+          <Info size={14} className="text-gray-400 shrink-0 mt-0.5" />
+          <p className="text-xs text-gray-500">开发说明：与 brand 中的 optimize goal 中配置对比，仅本次发布的 location 出现新增、本次预算+活跃预算超出总预算、投放了新的优化事件时，本弹窗步骤就出现</p>
+        </div>
         <div className="flex flex-col items-center text-center space-y-2 mb-4">
           <div className="w-16 h-16 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center mb-2 animate-bounce"><Check size={32} /></div>
           <h3 className="text-2xl font-semibold text-gray-900 tracking-tight">Publish successful!</h3>
@@ -957,6 +997,28 @@ const BatchGenerateAds = () => {
         <div className="space-y-8 pr-2 pb-32">
           <div className="transform transition-all hover:shadow-md relative z-[100]"><BudgetKPISection formData={brandGoalData} updateFormData={(key, val) => setBrandGoalData(p => ({...p, [key]: val}))} updateFormDataDeep={(updates) => setBrandGoalData(p => ({...p, ...updates}))} validation={validation} setValidation={setValidation} /></div>
         </div>
+      </div>
+    );
+
+    const renderStep5 = () => (
+      <div className="space-y-6 animate-in fade-in slide-in-from-bottom-8 duration-700">
+        <div className="flex items-start gap-2 bg-gray-100 rounded-base p-3">
+          <Info size={14} className="text-gray-400 shrink-0 mt-0.5" />
+          <p className="text-xs text-gray-500">开发说明：此 brand 使用新的账号投放后，本弹窗步骤就出现</p>
+        </div>
+        <div className="flex flex-col items-center text-center space-y-2 mb-4">
+          <div className="w-16 h-16 bg-amber-50 text-amber-600 rounded-full flex items-center justify-center mb-2">
+            <AlertCircle size={32} />
+          </div>
+          <p className="text-sm font-medium text-gray-500 leading-relaxed max-w-md">
+            AdsGo.ai will analyze the audience performance data of active campaigns based on optimization goals 24 hours after the first campaign of the current brand is published, and build custom audiences to generate new campaign recommendations. Therefore, you need to go to{' '}
+            <a href="https://business.facebook.com/customaudiences/app/tos/?act=1272540464603881&business_id=608445961679028" target="_blank" rel="noopener noreferrer" className="text-primary-500 font-semibold underline hover:text-primary-600 transition-colors">
+              custom audiences tos
+            </a>{' '}
+            to agree to Meta Ads' custom audience terms, otherwise AdsGo may fail to generate recommendations.
+          </p>
+        </div>
+        <div className="pb-32" />
       </div>
     );
 
@@ -974,17 +1036,22 @@ const BatchGenerateAds = () => {
             <div className="px-10 pt-10 pb-6 flex items-start justify-between shrink-0">
               <div>
                 <div className="flex items-center gap-3 mb-2">
-                  <span className={`px-3 py-1 rounded-tag text-xs font-medium ${step === 3 ? 'bg-amber-50 text-amber-600' : 'bg-emerald-50 text-emerald-600'}`}>Step {step === 3 ? 1 : 2} of 2</span>
-                  <div className="flex gap-1">{[3, 4].map((i) => (<div key={i} className={`h-1 rounded-full transition-all duration-500 ${i < step ? 'w-4 bg-emerald-500' : i === step ? 'w-8 bg-gray-900' : 'w-2 bg-gray-200'}`} />))}</div>
+                  <span className={`px-3 py-1 rounded-tag text-xs font-medium ${step === 3 ? 'bg-amber-50 text-amber-600' : 'bg-emerald-50 text-emerald-600'}`}>Step {step === 3 ? 1 : step === 4 ? 2 : 3} of 3</span>
+                  <div className="flex gap-1">{[3, 4, 5].map((i) => (<div key={i} className={`h-1 rounded-full transition-all duration-500 ${i < step ? 'w-4 bg-emerald-500' : i === step ? 'w-8 bg-gray-900' : 'w-2 bg-gray-200'}`} />))}</div>
                 </div>
-                <h2 className="text-2xl font-semibold text-gray-900 tracking-tight">{step === 3 && 'Publishing status'}{step === 4 && 'Confirm brand optimize goal'}</h2>
+                <h2 className="text-2xl font-semibold text-gray-900 tracking-tight">{step === 3 && 'Publishing status'}{step === 4 && 'Confirm brand optimize goal'}{step === 5 && 'Please check Meta Ads Custom Audiences Agreement'}</h2>
               </div>
               <button onClick={() => setShowPublishModal(false)} className="p-2 hover:bg-gray-100 rounded-base text-gray-400 transition-colors"><X size={20} /></button>
             </div>
-            <div className="flex-1 overflow-y-auto px-10 pb-10 custom-scrollbar">{step === 3 && renderStep3()}{step === 4 && renderStep4()}</div>
+            <div className="flex-1 overflow-y-auto px-10 pb-10 custom-scrollbar">{step === 3 && renderStep3()}{step === 4 && renderStep4()}{step === 5 && renderStep5()}</div>
             {step === 4 && (
               <div className="absolute bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-white via-white to-white/0 pt-16 z-[200]">
-                <button onClick={handlePublishComplete} className="w-full py-5 bg-gradient-to-r from-emerald-600 to-teal-700 text-white rounded-full text-base font-bold flex items-center justify-center gap-3 hover:scale-[1.02] active:scale-98 transition-all shadow-xl shadow-emerald-200/50">Confirm strategy & finish <ArrowRight size={20} /></button>
+                <button onClick={() => setStep(5)} className="w-full py-5 bg-gradient-to-r from-emerald-600 to-teal-700 text-white rounded-full text-base font-bold flex items-center justify-center gap-3 hover:scale-[1.02] active:scale-98 transition-all shadow-xl shadow-emerald-200/50">Confirm strategy & finish <ArrowRight size={20} /></button>
+              </div>
+            )}
+            {step === 5 && (
+              <div className="absolute bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-white via-white to-white/0 pt-16 z-[200]">
+                <button onClick={handlePublishComplete} className="w-full py-5 bg-gradient-to-r from-emerald-600 to-teal-700 text-white rounded-full text-base font-bold flex items-center justify-center gap-3 hover:scale-[1.02] active:scale-98 transition-all shadow-xl shadow-emerald-200/50">Confirmed to have been accepted <ArrowRight size={20} /></button>
               </div>
             )}
           </div>
