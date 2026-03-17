@@ -31,7 +31,9 @@ const OptimizeGoals = () => {
     ],
     adScopeAccounts: [],
     assetLoading: false,
-    optimizePreferences: []
+    optimizePreferences: [
+      { text: 'If ROAS is below 1.5 in the last 3 days, then reduce budget by 50% for the adset or campaign.', type: 'Rule' }
+    ]
   })
 
   const [validation, setValidation] = useState({

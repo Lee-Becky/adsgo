@@ -1,71 +1,80 @@
 import { useState } from 'react'
-import { X, Minus, Plus, Lightbulb, ShieldCheck, AlertCircle, Info } from 'lucide-react'
+import { X, Plus, Lightbulb, AlertCircle, Info, Trash2, Loader2 } from 'lucide-react'
+
+// Mock LLM validation - simulates API call to classify rule text
+const mockValidateRule = async (text) => {
+  await new Promise(r => setTimeout(r, 1500))
+  const hasTimeRange = /\d+\s*(day|week|hour|month|d\b)/i.test(text)
+  const hasCondition = /(below|above|less|more|under|over|<|>|exceed|if\b)/i.test(text)
+  const hasAction = /(reduce|increase|pause|stop|close|cut|boost|raise|double|half)/i.test(text)
+  const hasObject = /(campaign|ad\s*set|budget|bid|spend|adset|ad\b)/i.test(text)
+  return (hasTimeRange && hasCondition && hasAction && hasObject) ? 'Rule' : 'Preference'
+}
 
 const RuleConfigModal = ({ isOpen, onClose, onSave }) => {
   const MAX_RULES = 10
   const MAX_RULE_LENGTH = 100
-  
+
   const [rules, setRules] = useState([])
   const [newRule, setNewRule] = useState('')
-  const [editingRules, setEditingRules] = useState([])
+  // editingRules: [{ text: string, type: 'Rule' | 'Preference' | null }]
+  const [editingRules, setEditingRules] = useState([
+    {
+      text: 'If ROAS is below 1.5 in the last 3 days, then reduce budget by 50% for the adset or campaign.',
+      type: 'Rule'
+    }
+  ])
   const [errorMessage, setErrorMessage] = useState('')
 
-  const handleAddRule = () => {
+  const handleAddRule = async () => {
     setErrorMessage('')
-    
-    // Check if maximum rules reached
+
     if (editingRules.length >= MAX_RULES) {
       setErrorMessage(`Maximum ${MAX_RULES} rules allowed`)
       return
     }
-    
-    // Check if rule is empty
     if (!newRule.trim()) {
       setErrorMessage('Please enter a rule')
       return
     }
-    
-    // Check rule length
     if (newRule.trim().length > MAX_RULE_LENGTH) {
       setErrorMessage(`Rule must be ${MAX_RULE_LENGTH} characters or less`)
       return
     }
-    
-    const updatedRules = [...editingRules, newRule.trim()]
-    setEditingRules(updatedRules)
+
+    const ruleText = newRule.trim()
+    const newIndex = editingRules.length
+    // Add with type=null (validating)
+    setEditingRules(prev => [...prev, { text: ruleText, type: null }])
     setNewRule('')
+
+    // Mock LLM validation
+    const type = await mockValidateRule(ruleText)
+    setEditingRules(prev =>
+      prev.map((r, i) => i === newIndex ? { ...r, type } : r)
+    )
   }
 
   const handleDeleteRule = (index) => {
-    const updatedRules = editingRules.filter((_, i) => i !== index)
-    setEditingRules(updatedRules)
+    setEditingRules(prev => prev.filter((_, i) => i !== index))
     setErrorMessage('')
   }
 
-  const handleUpdateRule = (index, value) => {
-    // Check rule length
-    if (value.length > MAX_RULE_LENGTH) {
-      setErrorMessage(`Rule must be ${MAX_RULE_LENGTH} characters or less`)
-      return
-    }
-    
-    const updatedRules = [...editingRules]
-    updatedRules[index] = value
-    setEditingRules(updatedRules)
-    setErrorMessage('')
-  }
-
-  const handleSave = () => {
+  const handleSave = async () => {
     let finalRules = [...editingRules]
-    if (newRule.trim()) {
-      finalRules = [...finalRules, newRule.trim()]
+    if (newRule.trim() && newRule.trim().length <= MAX_RULE_LENGTH && finalRules.length < MAX_RULES) {
+      const ruleText = newRule.trim()
+      finalRules = [...finalRules, { text: ruleText, type: null }]
+      setEditingRules(finalRules)
+      setNewRule('')
+      // Run LLM validation for the pending rule
+      const type = await mockValidateRule(ruleText)
+      finalRules = finalRules.map((r, i) => i === finalRules.length - 1 ? { ...r, type } : r)
+      setEditingRules(finalRules)
     }
-    
     setRules(finalRules)
     setNewRule('')
-    if (onSave) {
-      onSave(finalRules)
-    }
+    if (onSave) onSave(finalRules)
     onClose()
   }
 
@@ -73,214 +82,127 @@ const RuleConfigModal = ({ isOpen, onClose, onSave }) => {
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
-      {/* Backdrop with premium blur */}
-      <div
-        className="absolute inset-0 bg-slate-900/60 backdrop-blur-md transition-opacity duration-300"
-        onClick={onClose}
-      />
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity duration-300" onClick={onClose} />
 
-      {/* Modal with refined styling */}
-      <div className="relative bg-white rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.2)] w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col border border-slate-100 animate-in fade-in zoom-in duration-300">
-        {/* Header - More premium feel */}
-        <div className="px-6 py-4 border-b border-slate-50 flex items-center justify-between shrink-0 bg-gradient-to-r from-white to-slate-50/50">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-200">
-              <ShieldCheck size={22} className="text-white" />
-            </div>
-            <div>
-              <h2 className="text-lg font-black text-slate-900 tracking-tight leading-none mb-1">
-                Rule Library
-              </h2>
-              <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Optimization Intelligence</p>
-            </div>
+      <div className="relative bg-white rounded-section shadow-xl w-full max-w-lg max-h-[85vh] overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-300">
+        {/* Header */}
+        <div className="px-6 py-5 flex items-center justify-between shrink-0">
+          <div className="flex items-center gap-2">
+            <h2 className="text-lg font-bold text-gray-900">Optimize Rules</h2>
+            <Info size={16} className="text-gray-400" />
           </div>
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-slate-100 rounded-xl transition-all text-slate-400 hover:text-slate-600 active:scale-95"
-          >
+          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-base text-gray-400 hover:text-gray-600 transition-colors">
             <X size={20} />
           </button>
         </div>
 
         {/* Content */}
-        <div className="px-6 py-5 overflow-y-auto flex-grow space-y-6 scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent">
-          {/* Example Rules - Refined Card Style - More Compact */}
-          <div className="bg-slate-50/80 border border-slate-100 rounded-2xl p-4 relative overflow-hidden group">
-            <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
-              <Lightbulb size={60} className="text-blue-600" />
-            </div>
-            
-            <h3 className="text-[10px] font-black text-blue-600 mb-3 flex items-center gap-2 uppercase tracking-widest">
-              <Lightbulb size={12} />
-              Optimization Templates
-            </h3>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-2 relative z-10">
-              <div className="flex flex-col gap-2 bg-white/60 hover:bg-white transition-colors rounded-xl p-3 border border-blue-100 shadow-sm group/item">
-                <div className="shrink-0 w-6 h-6 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center text-[10px] font-black border border-blue-100 group-hover/item:bg-blue-600 group-hover/item:text-white transition-all">1</div>
-                <p className="text-[10px] text-slate-600 leading-tight font-medium">
-                  <span className="font-bold text-slate-900">ROAS {'<'} 1.5</span> (3d), reduce <span className="font-bold text-blue-600">budget by 50%</span>
-                </p>
-              </div>
-              
-              <div className="flex flex-col gap-2 bg-white/60 hover:bg-white transition-colors rounded-xl p-3 border border-blue-100 shadow-sm group/item">
-                <div className="shrink-0 w-6 h-6 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center text-[10px] font-black border border-blue-100 group-hover/item:bg-blue-600 group-hover/item:text-white transition-all">2</div>
-                <p className="text-[10px] text-slate-600 leading-tight font-medium">
-                  <span className="font-bold text-slate-900">$100 spent</span> no <span className="font-bold text-slate-900 italic">ATC</span>, <span className="font-bold text-rose-600">close</span> campaign
-                </p>
-              </div>
-              
-              <div className="flex flex-col gap-2 bg-white/60 hover:bg-white transition-colors rounded-xl p-3 border border-blue-100 shadow-sm group/item">
-                <div className="shrink-0 w-6 h-6 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center text-[10px] font-black border border-blue-100 group-hover/item:bg-blue-600 group-hover/item:text-white transition-all">3</div>
-                <p className="text-[10px] text-slate-600 leading-tight font-medium">
-                  <span className="font-bold text-slate-900">CPL {'<'} $5.2</span> & low avg, increase <span className="font-bold text-emerald-600">+$10</span>
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Your Rules Section */}
+        <div className="px-6 pb-6 overflow-y-auto flex-grow space-y-6">
+          {/* Active Rules */}
           <div className="space-y-3">
-            <div className="flex items-center justify-between px-1">
-              <div className="flex items-center gap-2">
-                <h3 className="text-sm font-black text-slate-800 uppercase tracking-tight">Active Rules</h3>
-                <div className="px-2 py-0.5 bg-slate-100 rounded-md text-[10px] font-black text-slate-500">
-                  {editingRules.length} / {MAX_RULES}
-                </div>
-              </div>
-              {editingRules.length > 0 && (
-                <span className="text-[10px] font-bold text-slate-400 italic">Drag to reorder rules (coming soon)</span>
-              )}
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-semibold text-gray-900">Active Rules</h3>
+              <span className="px-2.5 py-0.5 bg-emerald-50 text-emerald-600 text-xs font-bold rounded-full">
+                {editingRules.length}/{MAX_RULES}
+              </span>
             </div>
 
             {editingRules.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-8 bg-slate-50/50 rounded-2xl border border-dashed border-slate-200 text-slate-400 group hover:border-blue-100 transition-colors">
-                <Info size={20} className="text-slate-300 group-hover:text-blue-400 transition-colors mb-2" />
-                <p className="text-[10px] font-black uppercase tracking-wider">No custom rules yet</p>
+              <div className="flex flex-col items-center justify-center py-8 bg-gray-50 rounded-inner border border-dashed border-gray-200 text-gray-400">
+                <Info size={20} className="text-gray-300 mb-2" />
+                <p className="text-xs font-medium">No rules yet</p>
               </div>
             ) : (
-              <div className="space-y-2">
+              <div className="space-y-4 max-h-[280px] overflow-y-auto pl-3 pt-3 pr-1">
                 {editingRules.map((rule, index) => (
-                  <div key={index} className="group relative flex items-center gap-3 bg-white border border-slate-100 hover:border-blue-200 hover:shadow-sm rounded-xl p-3 transition-all animate-in slide-in-from-left-2 duration-300">
-                    <div className="shrink-0 text-slate-300 group-hover:text-blue-300 transition-colors cursor-grab">
-                      <div className="grid grid-cols-2 gap-0.5">
-                        {[...Array(6)].map((_, i) => (
-                          <div key={i} className="w-0.5 h-0.5 rounded-full bg-current" />
-                        ))}
-                      </div>
-                    </div>
-                    
-                    <div className="flex-grow relative">
-                      <input
-                        type="text"
-                        value={rule}
-                        onChange={(e) => handleUpdateRule(index, e.target.value)}
-                        className={`w-full bg-transparent border-none p-0 focus:ring-0 text-[13px] font-semibold text-slate-700 placeholder:text-slate-300 pr-16 ${
-                          rule.length > MAX_RULE_LENGTH ? 'text-rose-600' : ''
-                        }`}
-                      />
-                      <div className={`absolute right-0 top-1/2 -translate-y-1/2 flex items-center gap-2 pointer-events-none transition-opacity ${rule.length > 0 ? 'opacity-100' : 'opacity-0'}`}>
-                        <span className={`text-[9px] font-black tracking-tighter ${
-                          rule.length > MAX_RULE_LENGTH ? 'text-rose-500' : 'text-slate-300'
-                        }`}>
-                          {rule.length}/{MAX_RULE_LENGTH}
-                        </span>
-                      </div>
-                    </div>
-
+                  <div key={index} className="relative bg-gray-50 border border-gray-100 rounded-inner p-4 pr-10 group transition-all duration-200 hover:border-gray-200 overflow-visible">
+                    {/* Type tag — absolute top-left corner */}
+                    {rule.type === null ? (
+                      <span className="absolute -top-2 -left-2 flex items-center gap-1 px-2 py-0.5 bg-gray-100 border border-gray-200 rounded-full shadow-sm">
+                        <Loader2 size={10} className="animate-spin text-gray-400" />
+                        <span className="text-[9px] font-medium text-gray-400">Checking</span>
+                      </span>
+                    ) : rule.type === 'Rule' ? (
+                      <span className="absolute -top-2.5 -left-2.5 px-2.5 py-0.5 bg-blue-500 text-white text-[10px] font-bold rounded-full shadow-sm">Rule</span>
+                    ) : (
+                      <span className="absolute -top-2.5 -left-2.5 px-2.5 py-0.5 bg-amber-500 text-white text-[10px] font-bold rounded-full shadow-sm">Preference</span>
+                    )}
+                    {/* Delete button */}
                     <button
                       onClick={() => handleDeleteRule(index)}
-                      className="shrink-0 p-1.5 text-slate-300 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition-all active:scale-90"
-                      title="Delete rule"
+                      className="absolute top-3 right-3 p-1 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-base transition-all opacity-0 group-hover:opacity-100"
                     >
-                      <Minus size={14} />
+                      <Trash2 size={13} />
                     </button>
+                    <p className="text-sm text-gray-700 leading-relaxed">{rule.text}</p>
                   </div>
                 ))}
               </div>
             )}
           </div>
 
-          {/* Add New Rule Section - Compact */}
-          <div className="pt-4 border-t border-slate-50">
-            {errorMessage && (
-              <div className="mb-3 p-2 bg-rose-50 border border-rose-100 rounded-xl flex items-center gap-2 animate-in fade-in slide-in-from-top-2 duration-200">
-                <AlertCircle size={14} className="text-rose-500 shrink-0" />
-                <p className="text-[10px] text-rose-600 font-bold">{errorMessage}</p>
-              </div>
-            )}
-            
-            <div className={`relative flex items-center gap-2 bg-slate-50 border transition-all duration-300 p-1.5 pl-4 rounded-xl ${
-              editingRules.length >= MAX_RULES 
-                ? 'opacity-50 grayscale' 
-                : 'hover:bg-white hover:shadow-md focus-within:bg-white focus-within:shadow-md focus-within:border-blue-200 border-transparent'
-            }`}>
-              <Plus size={16} className="text-slate-400 shrink-0" />
-              <input
-                type="text"
-                value={newRule}
-                onChange={(e) => setNewRule(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleAddRule()}
-                placeholder={editingRules.length >= MAX_RULES ? "Capacity reached" : "Add optimization logic..."}
-                disabled={editingRules.length >= MAX_RULES}
-                className="flex-grow bg-transparent border-none p-1.5 focus:ring-0 text-[13px] font-bold text-slate-700 placeholder:text-slate-400 placeholder:font-medium disabled:cursor-not-allowed"
-              />
-              <div className="flex items-center gap-2 pr-1">
-                {newRule.length > 0 && (
-                  <span className={`text-[9px] font-black tabular-nums ${
-                    newRule.length > MAX_RULE_LENGTH ? 'text-rose-500' : 'text-slate-300'
-                  }`}>
-                    {newRule.length}/{MAX_RULE_LENGTH}
-                  </span>
-                )}
-                <button
-                  onClick={handleAddRule}
-                  disabled={editingRules.length >= MAX_RULES || !newRule.trim()}
-                  className={`px-3 py-1.5 rounded-lg text-[10px] font-black transition-all active:scale-95 shadow-sm ${
-                    editingRules.length >= MAX_RULES || !newRule.trim()
-                      ? 'bg-slate-200 text-slate-400'
-                      : 'bg-blue-600 text-white hover:bg-blue-700'
-                  }`}
-                >
-                  ADD
-                </button>
-              </div>
+          {/* Add Rules */}
+          <div className="space-y-2">
+            <div className="flex items-center gap-1.5">
+              <h3 className="text-sm font-semibold text-gray-900">Add Rules</h3>
+              <Lightbulb size={14} className="text-amber-400" />
             </div>
 
-            {/* Visual Capacity Bar - Thinner */}
-            <div className="mt-4 space-y-1.5">
-              <div className="flex justify-between items-center text-[9px] font-black uppercase tracking-widest text-slate-400 px-1">
-                <span>Usage Efficiency</span>
-                <span className={editingRules.length >= MAX_RULES ? 'text-rose-500' : 'text-blue-600'}>
-                  {editingRules.length} / {MAX_RULES}
-                </span>
+            {errorMessage && (
+              <div className="p-2.5 bg-red-50 border border-red-100 rounded-base flex items-center gap-2 animate-in fade-in duration-200">
+                <AlertCircle size={14} className="text-red-500 shrink-0" />
+                <p className="text-xs text-red-600 font-medium">{errorMessage}</p>
               </div>
-              <div className="h-1 w-full bg-slate-100 rounded-full overflow-hidden flex">
-                {[...Array(MAX_RULES)].map((_, i) => (
-                  <div 
-                    key={i}
-                    className={`flex-1 mx-0.5 rounded-full transition-all duration-500 ${
-                      i < editingRules.length 
-                        ? (editingRules.length >= MAX_RULES ? 'bg-rose-500' : 'bg-blue-600')
-                        : 'bg-slate-200'
-                    }`}
-                  />
-                ))}
+            )}
+
+            <div className={`relative border rounded-inner transition-all duration-200 ${
+              editingRules.length >= MAX_RULES
+                ? 'opacity-50 border-gray-200'
+                : 'border-gray-200 focus-within:border-primary-500 focus-within:shadow-primary-focus'
+            }`}>
+              <textarea
+                value={newRule}
+                onChange={(e) => setNewRule(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleAddRule(); } }}
+                placeholder={editingRules.length >= MAX_RULES ? 'Maximum rules reached' : 'Add new optimization rules that you want...'}
+                disabled={editingRules.length >= MAX_RULES}
+                rows={4}
+                className="w-full bg-transparent border-none p-4 pr-12 pb-8 resize-none focus:ring-0 focus:outline-none text-sm text-gray-700 placeholder:text-gray-400 disabled:cursor-not-allowed"
+              />
+              {/* + button */}
+              <button
+                onClick={handleAddRule}
+                disabled={editingRules.length >= MAX_RULES || !newRule.trim()}
+                className={`absolute top-3 right-3 w-8 h-8 rounded-base border flex items-center justify-center transition-all duration-200 ${
+                  editingRules.length >= MAX_RULES || !newRule.trim()
+                    ? 'border-gray-200 text-gray-300 cursor-not-allowed'
+                    : 'border-gray-300 text-gray-500 hover:border-primary-500 hover:text-primary-500 hover:bg-primary-50 active:scale-95'
+                }`}
+              >
+                <Plus size={16} />
+              </button>
+              {/* Character count */}
+              <div className="absolute bottom-2.5 right-3.5 text-[11px] text-gray-400 font-medium">
+                {newRule.length}/{MAX_RULE_LENGTH}
               </div>
             </div>
           </div>
         </div>
 
-        {/* Footer - Compact */}
-        <div className="px-6 py-4 border-t border-slate-50 bg-white shrink-0">
+        {/* Footer */}
+        <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-center gap-3 shrink-0">
+          <button
+            onClick={onClose}
+            className="px-8 py-2.5 border border-gray-200 text-gray-700 rounded-base text-sm font-semibold hover:bg-gray-50 transition-all duration-200"
+          >
+            Cancel
+          </button>
           <button
             onClick={handleSave}
-            className="group relative w-full overflow-hidden py-3 rounded-xl font-black text-xs text-white bg-slate-900 hover:bg-black transition-all shadow-lg hover:-translate-y-0.5 active:translate-y-0"
+            className="px-8 py-2.5 bg-primary-500 hover:bg-primary-600 active:bg-primary-700 text-white rounded-base text-sm font-semibold transition-all duration-200 focus:shadow-primary-focus"
           >
-            <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-            <span className="relative z-10 tracking-widest uppercase">Save Changes</span>
+            Save Changes
           </button>
-          <p className="text-center mt-3 text-[10px] text-slate-400 font-bold uppercase tracking-tight">Changes will take effect immediately upon saving</p>
         </div>
       </div>
     </div>
