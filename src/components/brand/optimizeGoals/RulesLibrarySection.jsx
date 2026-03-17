@@ -46,7 +46,6 @@ const RulesLibrarySection = ({ formData, updateFormData }) => {
     setRecommend(null)
 
     const ruleText = newRule.trim()
-    setNewRule('')
     setIsValidating(true)
 
     const result = await mockValidateRule(ruleText)
@@ -54,16 +53,13 @@ const RulesLibrarySection = ({ formData, updateFormData }) => {
 
     if (result.type === 'Rule') {
       updateFormData('optimizePreferences', [...rules, { text: ruleText, type: 'Rule' }])
+      setNewRule('')
+      setRecommend(null)
     } else if (result.type === 'SemiRule') {
       setRecommend({ original: ruleText, improved: result.improved })
     } else {
       updateFormData('optimizePreferences', [...rules, { text: ruleText, type: 'Preference' }])
-    }
-  }
-
-  const handleAcceptRecommend = () => {
-    if (recommend && rules.length < MAX_RULES) {
-      updateFormData('optimizePreferences', [...rules, { text: recommend.improved, type: 'Rule' }])
+      setNewRule('')
       setRecommend(null)
     }
   }
@@ -140,7 +136,7 @@ const RulesLibrarySection = ({ formData, updateFormData }) => {
           }`}>
             <textarea
               value={newRule}
-              onChange={(e) => { setNewRule(e.target.value); setRecommend(null) }}
+              onChange={(e) => setNewRule(e.target.value)}
               onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleAddRule(); } }}
               placeholder={rules.length >= MAX_RULES ? 'Maximum rules reached' : 'Add new optimization rules that you want...'}
               disabled={rules.length >= MAX_RULES || isValidating}
@@ -178,8 +174,7 @@ const RulesLibrarySection = ({ formData, updateFormData }) => {
           {/* Recommend card */}
           {recommend && (
             <div
-              onClick={handleAcceptRecommend}
-              className="bg-primary-50/50 border-l-4 border-primary-500 rounded-inner p-4 cursor-pointer hover:bg-primary-50 transition-all duration-200 animate-in fade-in slide-in-from-bottom-2 duration-300"
+              className="bg-primary-50/50 border-l-4 border-primary-500 rounded-inner p-4 transition-all duration-200 animate-in fade-in slide-in-from-bottom-2 duration-300"
             >
               <div className="flex items-center gap-1.5 mb-2">
                 <span className="text-xs font-bold text-primary-600">Recommend</span>
