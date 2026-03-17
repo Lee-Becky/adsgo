@@ -7,6 +7,7 @@ import CampaignTable from './CampaignTable'
 import BudgetEditModal from './BudgetEditModal'
 import BudgetReasonModal from './BudgetReasonModal'
 import BrandDataOverlay from './BrandDataOverlay'
+import RunSettingModal from './RunSettingModal'
 import { MOCK_GOALS } from './mockData'
 
 const AdManagerV3 = ({ onEditBrandConfig, selectedBrand, onPageChange }) => {
@@ -25,6 +26,7 @@ const AdManagerV3 = ({ onEditBrandConfig, selectedBrand, onPageChange }) => {
   const [goals] = useState(MOCK_GOALS)
   const [campaigns, setCampaigns] = useState([])
   const [activeTab, setActiveTab] = useState('meta')
+  const [showRunSetting, setShowRunSetting] = useState(false)
 
   const handleCampaignClick = (campaign) => {
     setSelectedCampaign(campaign)
@@ -108,13 +110,11 @@ const AdManagerV3 = ({ onEditBrandConfig, selectedBrand, onPageChange }) => {
     <div className="p-6">
       {/* Dashboard Insights Header - Independent Component */}
       <DashboardInsightsHeader
-        onRuleLibraryClick={() => setShowConfigModal(true)}
-        onEditBrandConfig={onEditBrandConfig}
         onCollapseToggle={() => setIsSummaryCollapsed(!isSummaryCollapsed)}
         isCollapsed={isSummaryCollapsed}
         onActiveTabChange={setActiveTab}
         activeTab={activeTab}
-        onPageChange={onPageChange}
+        onRunSettingClick={() => setShowRunSetting(true)}
       />
 
       {/* Cross-Channel AI Summary - with margin - Show when activeTab is 'all' or 'meta' */}
@@ -137,6 +137,7 @@ const AdManagerV3 = ({ onEditBrandConfig, selectedBrand, onPageChange }) => {
             onUpdateLastUpdated={setLastUpdated}
             isCollapsed={isSummaryCollapsed}
             activeTab={activeTab}
+            onPageChange={onPageChange}
           />
         </div>
       )}
@@ -163,6 +164,13 @@ const AdManagerV3 = ({ onEditBrandConfig, selectedBrand, onPageChange }) => {
         onClose={() => setShowBudgetReason(false)}
         campaign={selectedCampaign}
         reason={budgetReasonData}
+      />
+
+      {/* Run Setting Modal */}
+      <RunSettingModal
+        isOpen={showRunSetting}
+        onClose={() => setShowRunSetting(false)}
+        onSave={(settings) => console.log('Run settings saved:', settings)}
       />
 
       {/* Filter and Data Section - Connected visually - Add margin when CrossChannelAISummary is hidden */}

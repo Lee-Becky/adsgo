@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Eye, Target, Zap, Edit2, ChevronDown, ChevronUp, X, Check, TrendingUp, DollarSign, Globe } from 'lucide-react';
+import { Eye, ChevronDown, ChevronUp, Settings } from 'lucide-react';
 import { createPortal } from 'react-dom';
 
 // Platform icon URLs
@@ -43,19 +43,15 @@ const Tooltip = ({ accounts, title, platform, buttonRef }) => {
   );
 };
 
-const DashboardInsightsHeader = ({ 
-  onRuleLibraryClick,
-  onEditBrandConfig,
+const DashboardInsightsHeader = ({
   onCollapseToggle,
   isCollapsed,
   onActiveTabChange,
   activeTab: propActiveTab,
-  onPageChange
+  onRunSettingClick
 }) => {
   const [hoveredPlatform, setHoveredPlatform] = useState(null);
   const [activeTab, setActiveTab] = useState(propActiveTab || 'meta');
-  const [showBudgetModal, setShowBudgetModal] = useState(false);
-  const buttonRef = useRef(null);
   const metaButtonRef = useRef(null);
   const googleButtonRef = useRef(null);
 
@@ -172,30 +168,15 @@ const DashboardInsightsHeader = ({
             </div>
           </div>
 
-          {/* Right: Budget Info + Rules Library + Collapse Button */}
+          {/* Right: Run Setting + Collapse Button */}
           <div className="flex items-center gap-3">
-            {/* Budget Info with Modal */}
-            <div>
-              <button 
-                ref={buttonRef}
-                onClick={() => setShowBudgetModal(true)}
-                className="flex items-center gap-2 px-3 py-1.5 bg-blue-50 border border-blue-100 rounded-full shadow-sm hover:bg-blue-100 transition-colors"
-              >
-                <Target size={12} className="text-blue-600" />
-                <span className="text-[10px] font-bold text-slate-600">
-                  US,UK; Budget500$; ROAS{'>'}5
-                </span>
-                <Edit2 size={10} className="text-slate-400" />
-              </button>
-            </div>
-
-            {/* Rules Library Button */}
-            <button 
-              onClick={onRuleLibraryClick}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-all shadow-sm border bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
+            {/* Run Setting Button */}
+            <button
+              onClick={onRunSettingClick}
+              className="flex items-center gap-1.5 px-4 py-1.5 bg-gradient-to-r from-violet-500 to-purple-600 rounded-full shadow-sm hover:from-violet-600 hover:to-purple-700 transition-all hover:shadow-md hover:shadow-purple-200/50"
             >
-              <Zap size={10} className="text-blue-500" />
-              <span className="text-[10px] font-black tracking-tight">Rules Library</span>
+              <Settings size={11} className="text-white/90" />
+              <span className="text-[10px] font-black tracking-tight text-white">Run Setting</span>
             </button>
 
             {/* Collapse/Expand Button - Hide when activeTab is 'google' */}
@@ -216,104 +197,6 @@ const DashboardInsightsHeader = ({
         </div>
       </div>
 
-      {/* Budget Goal Modal */}
-      {showBudgetModal && createPortal(
-        <div className="fixed inset-0 z-[9999999] flex items-center justify-center">
-          {/* Backdrop */}
-          <div 
-            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-            onClick={() => setShowBudgetModal(false)}
-          />
-          
-          {/* Modal Content */}
-          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden">
-            {/* Header */}
-            <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-5">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-white/20 rounded-lg backdrop-blur-sm">
-                    <Target size={24} className="text-white" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-bold text-white">Optimization Goal</h3>
-                    <p className="text-sm text-blue-100">Configure your budget strategy</p>
-                  </div>
-                </div>
-                <button 
-                  onClick={() => setShowBudgetModal(false)}
-                  className="p-2 hover:bg-white/20 rounded-lg transition-colors"
-                >
-                  <X size={20} className="text-white" />
-                </button>
-              </div>
-            </div>
-
-            {/* Body */}
-            <div className="p-6 space-y-4">
-              {/* First Goal Card - US,UK */}
-              <div className="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 rounded-2xl border border-indigo-100 shadow-sm overflow-hidden">
-                <div className="p-5">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Target size={16} className="text-indigo-600" />
-                    <h4 className="text-sm font-bold text-indigo-900">US,UK</h4>
-                  </div>
-                  
-                  {/* Core Info: Locations, Budget, Target KPI */}
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-semibold text-indigo-700">Budget</span>
-                      <span className="text-sm font-bold text-indigo-900">$500/day</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-semibold text-indigo-700">Target KPI</span>
-                      <span className="text-sm font-bold text-green-600">ROAS {'>'} 5</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Second Goal Card - Global */}
-              <div className="bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 rounded-2xl border border-emerald-100 shadow-sm overflow-hidden">
-                <div className="p-5">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Globe size={16} className="text-emerald-600" />
-                    <h4 className="text-sm font-bold text-emerald-900">Global</h4>
-                  </div>
-                  
-                  {/* Core Info: Locations, Budget, Target KPI */}
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-semibold text-emerald-700">Budget</span>
-                      <span className="text-sm font-bold text-emerald-900">$1000/day</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-semibold text-emerald-700">Target KPI</span>
-                      <span className="text-sm font-bold text-green-600">Cost Per AddToCart {'<='} $20</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Footer */}
-            <div className="px-6 py-4 bg-slate-50 border-t border-slate-200">
-              <button 
-                onClick={() => {
-                  setShowBudgetModal(false);
-                  // 跳转到 brand center -> optimize goal 菜单
-                  if (onPageChange) {
-                    onPageChange('optimizeGoals');
-                  }
-                }}
-                className="w-full px-4 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl text-sm font-bold text-white hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg shadow-blue-500/25 flex items-center justify-center gap-2"
-              >
-                Go to modify
-              </button>
-            </div>
-          </div>
-        </div>,
-        document.body
-      )}
     </div>
   );
 };

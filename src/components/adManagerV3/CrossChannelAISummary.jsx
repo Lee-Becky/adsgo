@@ -1,9 +1,10 @@
 import React, { useState, useMemo } from 'react';
-import { 
-  Sparkles, Zap, Cpu, BrainCircuit, ShieldCheck, AlertTriangle, Bot, Edit2, Target, 
+import {
+  Sparkles, Zap, Cpu, BrainCircuit, ShieldCheck, AlertTriangle, Bot, Edit2, Target,
   TrendingUp, TrendingDown, Minus, ArrowRight, Clock, RefreshCw, Coins, Infinity,
-  User, Radar, Plus, ChevronDown, ChevronUp
+  User, Radar, Plus, ChevronDown, ChevronUp, X, Globe
 } from 'lucide-react';
+import { createPortal } from 'react-dom';
 
 // Platform icon URLs
 const META_ICON_URL = 'https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://meta.com&size=256';
@@ -60,8 +61,10 @@ const CrossChannelAISummary = ({
   lastUpdated,
   onUpdateLastUpdated,
   isCollapsed = false,
-  activeTab = 'meta'
+  activeTab = 'meta',
+  onPageChange
 }) => {
+  const [showBudgetModal, setShowBudgetModal] = useState(false);
   const [hoveredPlatform, setHoveredPlatform] = useState(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisCooldown, setAnalysisCooldown] = useState(null);
@@ -283,23 +286,45 @@ const CrossChannelAISummary = ({
         {/* Left Column: AI Summary (2/3 Width) */}
       <div className="xl:col-span-2 bg-slate-50/50 border border-blue-100 rounded-2xl p-4 shadow-sm flex flex-col h-full min-w-0">
         <div className="flex items-center justify-between border-b border-slate-200 pb-1.5 mb-5 shrink-0">
-          <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <Sparkles size={16} className="text-blue-500" />
-                <div className="flex items-baseline gap-3">
-                  <h3 className="text-base font-black text-slate-800 tracking-wide">Meta Ads Insights Brief</h3>
-                  <div className="flex items-center gap-1.5 px-2 py-0.5 bg-blue-100/50 rounded-full text-[11px] font-black text-blue-600 border border-blue-200">
-                    <Clock size={10} />
-                    <span>{lastUpdated}</span>
-                  </div>
-                </div>
-              </div>
-            {/* Meta and Google platform tags removed - logic preserved */}
+          <div className="flex items-center gap-2">
+            <Sparkles size={16} className="text-blue-500" />
+            <h3 className="text-base font-black text-slate-800 tracking-wide">Meta Ads Insights Brief</h3>
           </div>
-          
-          <div className="flex items-center gap-3">
-            {/* Edit Goal button completely removed from UI - logic preserved */}
-            {/* Rule Library button removed - logic preserved */}
+
+          <div className="flex items-center gap-2.5">
+            {/* Time Tag - moved from title */}
+            <div className="flex items-center gap-1.5 px-2 py-0.5 bg-blue-100/50 rounded-full text-[11px] font-black text-blue-600 border border-blue-200">
+              <Clock size={10} />
+              <span>{lastUpdated}</span>
+            </div>
+            {/* Manual Analysis - moved from Optimize Control Center */}
+            <div className="relative group/tooltip">
+              <button
+                onClick={handleManualAnalysis}
+                disabled={isAnalyzing || analysisCooldown}
+                className={`flex items-center gap-1.5 px-3 py-1 border border-slate-200 rounded-full bg-white hover:bg-slate-50 transition-all shadow-sm group relative overflow-hidden ${isAnalyzing ? 'opacity-70 cursor-wait' : ''} ${analysisCooldown ? 'opacity-50 cursor-not-allowed' : ''}`}
+              >
+                {isAnalyzing ? (
+                  <>
+                    <RefreshCw size={11} className="text-blue-500 animate-spin" />
+                    <span className="text-[10px] font-bold text-slate-600">Analyzing...</span>
+                  </>
+                ) : analysisCooldown ? (
+                  <>
+                    <Clock size={11} className="text-blue-500" />
+                    <span className="text-[10px] font-bold text-slate-600">{formatCooldownTime(analysisCooldown)}</span>
+                  </>
+                ) : (
+                  <>
+                    <RefreshCw size={11} className="text-blue-500 group-hover:scale-110 transition-transform" />
+                    <span className="text-[10px] font-bold text-slate-600">Manual Analysis</span>
+                  </>
+                )}
+              </button>
+              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-slate-800 text-white text-[9px] rounded opacity-0 group-hover/tooltip:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
+                {isAnalyzing ? 'AI is analyzing your data...' : analysisCooldown ? 'Cooldown period' : 'It will take about 3 minutes.'}
+              </div>
+            </div>
           </div>
         </div>
 
@@ -419,38 +444,14 @@ const CrossChannelAISummary = ({
                 </div>
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              <div className="relative group/tooltip">
-                <button 
-                  onClick={handleManualAnalysis}
-                  disabled={isAnalyzing || analysisCooldown}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 border border-slate-200 rounded-lg bg-white hover:bg-slate-50 transition-all shadow-sm group relative overflow-hidden ${isAnalyzing ? 'opacity-70 cursor-wait' : ''} ${analysisCooldown ? 'opacity-50 cursor-not-allowed' : ''}`}
-                >
-                  {isAnalyzing ? (
-                    // Analyzing state: spinning refresh icon
-                    <>
-                      <RefreshCw size={12} className="text-blue-500 animate-spin" />
-                      <span className="text-[11px] font-bold text-slate-600">Analyzing...</span>
-                    </>
-                  ) : analysisCooldown ? (
-                    // Cooldown state: show countdown
-                    <>
-                      <Clock size={12} className="text-blue-500" />
-                      <span className="text-[11px] font-bold text-slate-600">{formatCooldownTime(analysisCooldown)}</span>
-                    </>
-                  ) : (
-                    // Normal state
-                    <>
-                      <RefreshCw size={12} className="text-blue-500 group-hover:scale-110 transition-transform" />
-                      <span className="text-[11px] font-bold text-slate-600">Manual Analysis</span>
-                    </>
-                  )}
-                </button>
-                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-slate-800 text-white text-[9px] rounded opacity-0 group-hover/tooltip:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
-                  {isAnalyzing ? 'AI is analyzing your data...' : analysisCooldown ? 'Cooldown period' : 'It will take about 3 minutes.'}
-                </div>
-              </div>
-            </div>
+            {/* Rules Library - moved from Header */}
+            <button
+              onClick={onRuleLibraryClick}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-all shadow-sm border bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
+            >
+              <Zap size={10} className="text-blue-500" />
+              <span className="text-[10px] font-black tracking-tight">Rules Library</span>
+            </button>
           </div>
           
           {/* KPI Recommendation Stats */}
@@ -478,6 +479,22 @@ const CrossChannelAISummary = ({
               <p className="text-xl font-black text-slate-600 leading-none mb-1">{budgetStats.maintain}</p>
               <p className="text-[9px] font-bold text-slate-700/70 tracking-tight whitespace-nowrap">Maintain</p>
             </div>
+          </div>
+
+          {/* Budget Info - moved from Header */}
+          <div className="mb-4">
+            <button
+              onClick={() => setShowBudgetModal(true)}
+              className="w-full flex items-center justify-between gap-2 px-3.5 py-2 bg-blue-50 border border-blue-100 rounded-xl shadow-sm hover:bg-blue-100 transition-colors group"
+            >
+              <div className="flex items-center gap-2">
+                <Target size={13} className="text-blue-600" />
+                <span className="text-[11px] font-bold text-slate-700">
+                  US,UK; Budget500$; ROAS{'>'}5
+                </span>
+              </div>
+              <Edit2 size={11} className="text-slate-400 group-hover:text-blue-500 transition-colors" />
+            </button>
           </div>
 
           {/* Budget Allocation Section */}
@@ -637,6 +654,89 @@ const CrossChannelAISummary = ({
       </div>
 
       </div>
+
+      {/* Budget Goal Modal - moved from Header */}
+      {showBudgetModal && createPortal(
+        <div className="fixed inset-0 z-[9999999] flex items-center justify-center">
+          <div
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            onClick={() => setShowBudgetModal(false)}
+          />
+          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden">
+            <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-5">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-white/20 rounded-lg backdrop-blur-sm">
+                    <Target size={24} className="text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold text-white">Optimization Goal</h3>
+                    <p className="text-sm text-blue-100">Configure your budget strategy</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowBudgetModal(false)}
+                  className="p-2 hover:bg-white/20 rounded-lg transition-colors"
+                >
+                  <X size={20} className="text-white" />
+                </button>
+              </div>
+            </div>
+            <div className="p-6 space-y-4">
+              <div className="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 rounded-2xl border border-indigo-100 shadow-sm overflow-hidden">
+                <div className="p-5">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Target size={16} className="text-indigo-600" />
+                    <h4 className="text-sm font-bold text-indigo-900">US,UK</h4>
+                  </div>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-semibold text-indigo-700">Budget</span>
+                      <span className="text-sm font-bold text-indigo-900">$500/day</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-semibold text-indigo-700">Target KPI</span>
+                      <span className="text-sm font-bold text-green-600">ROAS {'>'} 5</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 rounded-2xl border border-emerald-100 shadow-sm overflow-hidden">
+                <div className="p-5">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Globe size={16} className="text-emerald-600" />
+                    <h4 className="text-sm font-bold text-emerald-900">Global</h4>
+                  </div>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-semibold text-emerald-700">Budget</span>
+                      <span className="text-sm font-bold text-emerald-900">$1000/day</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-semibold text-emerald-700">Target KPI</span>
+                      <span className="text-sm font-bold text-green-600">Cost Per AddToCart {'<='} $20</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="px-6 py-4 bg-slate-50 border-t border-slate-200">
+              <button
+                onClick={() => {
+                  setShowBudgetModal(false);
+                  if (onPageChange) {
+                    onPageChange('optimizeGoals');
+                  }
+                }}
+                className="w-full px-4 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl text-sm font-bold text-white hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg shadow-blue-500/25 flex items-center justify-center gap-2"
+              >
+                Go to modify
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
     </div>
   );
 };
