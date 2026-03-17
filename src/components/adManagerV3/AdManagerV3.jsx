@@ -27,6 +27,7 @@ const AdManagerV3 = ({ onEditBrandConfig, selectedBrand, onPageChange }) => {
   const [campaigns, setCampaigns] = useState([])
   const [activeTab, setActiveTab] = useState('meta')
   const [showRunSetting, setShowRunSetting] = useState(false)
+  const [runSettings, setRunSettings] = useState(null)
 
   const handleCampaignClick = (campaign) => {
     setSelectedCampaign(campaign)
@@ -138,6 +139,8 @@ const AdManagerV3 = ({ onEditBrandConfig, selectedBrand, onPageChange }) => {
             isCollapsed={isSummaryCollapsed}
             activeTab={activeTab}
             onPageChange={onPageChange}
+            runSettings={runSettings}
+            onRunSettingClick={() => setShowRunSetting(true)}
           />
         </div>
       )}
@@ -170,7 +173,7 @@ const AdManagerV3 = ({ onEditBrandConfig, selectedBrand, onPageChange }) => {
       <RunSettingModal
         isOpen={showRunSetting}
         onClose={() => setShowRunSetting(false)}
-        onSave={(settings) => console.log('Run settings saved:', settings)}
+        onSave={(settings) => setRunSettings(settings)}
       />
 
       {/* Filter and Data Section - Connected visually - Add margin when CrossChannelAISummary is hidden */}

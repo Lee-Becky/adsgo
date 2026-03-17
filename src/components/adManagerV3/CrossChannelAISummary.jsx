@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import {
   Sparkles, Zap, Cpu, BrainCircuit, ShieldCheck, AlertTriangle, Bot, Edit2, Target,
   TrendingUp, TrendingDown, Minus, ArrowRight, Clock, RefreshCw, Coins, Infinity,
-  User, Radar, Plus, ChevronDown, ChevronUp, X, Globe
+  User, Radar, Plus, ChevronDown, ChevronUp, X, Globe, Settings
 } from 'lucide-react';
 import { createPortal } from 'react-dom';
 
@@ -62,7 +62,9 @@ const CrossChannelAISummary = ({
   onUpdateLastUpdated,
   isCollapsed = false,
   activeTab = 'meta',
-  onPageChange
+  onPageChange,
+  runSettings,
+  onRunSettingClick
 }) => {
   const [showBudgetModal, setShowBudgetModal] = useState(false);
   const [hoveredPlatform, setHoveredPlatform] = useState(null);
@@ -531,20 +533,20 @@ const CrossChannelAISummary = ({
           <div className="grid grid-cols-2 gap-3 mt-auto relative">
             {/* Daily Analysis Card */}
             <div 
-              className={`group border-2 rounded-2xl p-3.5 flex flex-col items-center text-center transition-all duration-300 cursor-pointer ${!autoApply ? 'bg-blue-50 border-blue-500 shadow-[0_10px_20px_rgba(59,130,246,0.1)] scale-[1.02]' : 'bg-white border-slate-100 hover:border-blue-200'}`}
+              className={`group border-2 rounded-2xl p-2.5 flex flex-col items-center text-center transition-all duration-300 cursor-pointer ${!autoApply ? 'bg-blue-50 border-blue-500 shadow-[0_10px_20px_rgba(59,130,246,0.1)] scale-[1.02]' : 'bg-white border-slate-100 hover:border-blue-200'}`}
               onClick={() => autoApply && onAutoApplyToggle()}
               onMouseEnter={() => setHoveredCard('daily')}
               onMouseLeave={() => setHoveredCard(null)}
             >
               {/* Custom Animated Logo for Daily Analysis */}
-              <div className={`mb-3 transition-all duration-300 relative z-10`}>
-                <div className={`relative w-16 h-16 rounded-2xl flex items-center justify-center ${!autoApply ? 'bg-white shadow-lg shadow-blue-200/50' : 'bg-blue-50'}`}>
+              <div className={`mb-2 transition-all duration-300 relative z-10`}>
+                <div className={`relative w-11 h-11 rounded-xl flex items-center justify-center ${!autoApply ? 'bg-white shadow-lg shadow-blue-200/50' : 'bg-blue-50'}`}>
                   {/* Animated Calendar Icon */}
                   <div className={`absolute ${!autoApply ? 'animate-pulse' : ''}`}>
-                    <svg 
-                      viewBox="0 0 24 24" 
-                      fill="none" 
-                      className={`w-8 h-8 ${!autoApply ? 'text-blue-600' : 'text-blue-400'}`}
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      className={`w-6 h-6 ${!autoApply ? 'text-blue-600' : 'text-blue-400'}`}
                       style={{ animation: !autoApply ? 'scalePulse 2s ease-in-out infinite' : 'none' }}
                     >
                       <rect x="3" y="4" width="18" height="18" rx="2" strokeWidth="2" stroke="currentColor" fill="none"/>
@@ -555,12 +557,12 @@ const CrossChannelAISummary = ({
                   </div>
                   {/* Pulse Ring Effect */}
                   {!autoApply && (
-                    <div className="absolute inset-0 rounded-2xl border-2 border-blue-400 animate-ping opacity-20" />
+                    <div className="absolute inset-0 rounded-xl border-2 border-blue-400 animate-ping opacity-20" />
                   )}
                 </div>
               </div>
               
-              <p className={`text-[13px] font-black mb-1.5 tracking-tight ${!autoApply ? 'text-blue-700' : 'text-slate-800'}`}>Daily Analysis</p>
+              <p className={`text-[13px] font-black mb-1 tracking-tight ${!autoApply ? 'text-blue-700' : 'text-slate-800'}`}>Daily Analysis</p>
               
               <div className={`mt-auto flex items-center gap-1.5 px-3 py-1 rounded-full border transition-all duration-300 ${!autoApply ? 'bg-blue-600 border-blue-600 text-white shadow-md' : 'bg-slate-50 border-slate-100 text-slate-300'}`}>
                 <div className={`w-1.5 h-1.5 rounded-full ${!autoApply ? 'bg-white animate-pulse shadow-[0_0_8px_rgba(255,255,255,0.8)]' : 'bg-slate-300'}`} />
@@ -570,7 +572,7 @@ const CrossChannelAISummary = ({
 
             {/* AI Autopilot Card */}
             <div 
-              className={`group border-2 rounded-2xl p-3.5 flex flex-col items-center text-center transition-all duration-300 cursor-pointer ${autoApply ? 'bg-slate-900 border-slate-800 shadow-[0_15px_30px_rgba(0,0,0,0.3)] scale-[1.05] z-10' : 'bg-white border-slate-100 hover:border-indigo-200 opacity-90'}`}
+              className={`group border-2 rounded-2xl p-2.5 flex flex-col items-center text-center transition-all duration-300 cursor-pointer ${autoApply ? 'bg-slate-900 border-slate-800 shadow-[0_15px_30px_rgba(0,0,0,0.3)] scale-[1.05] z-10' : 'bg-white border-slate-100 hover:border-indigo-200 opacity-90'}`}
               onClick={() => !autoApply && onAutoApplyToggle()}
               onMouseEnter={() => setHoveredCard('autopilot')}
               onMouseLeave={() => setHoveredCard(null)}
@@ -606,30 +608,75 @@ const CrossChannelAISummary = ({
                 </div>
               )}
               
-              <div className="mb-3 transition-all duration-300 relative z-10">
+              <div className="mb-2 transition-all duration-300 relative z-10">
                 {/* Infinity Icon Logo for AI Autopilot */}
-                <div className={`relative w-16 h-16 rounded-2xl flex items-center justify-center ${autoApply ? 'bg-slate-800 shadow-lg shadow-indigo-500/30' : 'bg-white shadow-lg shadow-indigo-200/50'}`}>
+                <div className={`relative w-11 h-11 rounded-xl flex items-center justify-center ${autoApply ? 'bg-slate-800 shadow-lg shadow-indigo-500/30' : 'bg-white shadow-lg shadow-indigo-200/50'}`}>
                   {/* Infinity Icon - Static when inactive, rotating when active */}
                   <div className={`relative ${autoApply ? 'animate-[spin_3s_linear_infinite]' : ''}`}>
-                    <Infinity 
-                      size={36} 
+                    <Infinity
+                      size={24}
                       className={`${autoApply ? 'text-indigo-400' : 'text-indigo-600'}`}
                     />
                   </div>
                   {/* Glow Effect when active */}
                   {autoApply && (
-                    <div className="absolute inset-0 rounded-2xl bg-indigo-500/10 animate-pulse" />
+                    <div className="absolute inset-0 rounded-xl bg-indigo-500/10 animate-pulse" />
                   )}
                 </div>
               </div>
               
-              <p className={`text-[13px] font-black mb-1.5 tracking-tight ${autoApply ? 'text-white' : 'text-slate-800'}`}>AI Autopilot</p>
+              <p className={`text-[13px] font-black mb-1 tracking-tight ${autoApply ? 'text-white' : 'text-slate-800'}`}>AI Autopilot</p>
               
               <div className={`mt-auto flex items-center gap-1.5 px-3 py-1 rounded-full border transition-all duration-300 ${autoApply ? 'bg-indigo-600 border-indigo-500 text-white shadow-[0_0_10px_rgba(79,70,229,0.5)]' : 'bg-slate-50 border-slate-100 text-slate-300'}`}>
                 <div className={`w-1.5 h-1.5 rounded-full ${autoApply ? 'bg-green-400 animate-ping shadow-[0_0_8px_rgba(74,222,128,0.8)]' : 'bg-slate-300'}`} />
                 <span className="text-[10px] font-black tracking-widest">{autoApply ? 'RUNNING' : 'STANDBY'}</span>
               </div>
             </div>
+          </div>
+
+          {/* Schedule Summary Strip */}
+          <div
+            onClick={onRunSettingClick}
+            className={`mt-3 flex items-center justify-between px-3.5 py-2.5 rounded-xl cursor-pointer transition-all duration-200 ${
+              runSettings
+                ? 'bg-[#f3f0ff] border border-[#e5dbff] hover:bg-[#e5dbff]'
+                : 'bg-amber-50 border border-amber-200 hover:bg-amber-100'
+            }`}
+          >
+            <div className="flex items-center gap-2 min-w-0">
+              <Clock size={12} className={runSettings ? 'text-[#7033F5] shrink-0' : 'text-amber-500 shrink-0'} />
+              <span className={`text-[11px] font-semibold truncate ${runSettings ? 'text-[#7033F5]' : 'text-amber-600'}`}>
+                {(() => {
+                  if (!runSettings) return 'Running Schedule not set up.';
+                  const DAY_NAMES = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+                  const { frequency, weekDays = [], monthDays = [], customDays, timeSlot } = runSettings;
+                  let label = '';
+                  if (frequency === 'daily') {
+                    label = 'Daily';
+                  } else if (frequency === 'weekly') {
+                    if (weekDays.length === 0) {
+                      label = 'Weekly';
+                    } else if (weekDays.length <= 3) {
+                      label = `Weekly · ${weekDays.map(k => DAY_NAMES[k]).join(', ')}`;
+                    } else {
+                      label = `Weekly · ${weekDays.slice(0, 3).map(k => DAY_NAMES[k]).join(', ')} +${weekDays.length - 3}`;
+                    }
+                  } else if (frequency === 'monthly') {
+                    if (monthDays.length === 0) {
+                      label = 'Monthly';
+                    } else if (monthDays.length <= 3) {
+                      label = `Monthly · Day ${monthDays.join(', ')}`;
+                    } else {
+                      label = `Monthly · Day ${monthDays.slice(0, 3).join(', ')} +${monthDays.length - 3}`;
+                    }
+                  } else if (frequency === 'custom') {
+                    label = `Every ${customDays} days`;
+                  }
+                  return `${label} · ${timeSlot}`;
+                })()}
+              </span>
+            </div>
+            <Settings size={12} className={`shrink-0 ${runSettings ? 'text-[#7033F5]' : 'text-amber-500'}`} />
           </div>
 
           {/* Floating Tooltips - Outside cards, above the grid */}
