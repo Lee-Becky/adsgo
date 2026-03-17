@@ -115,7 +115,6 @@ const AdManagerV3 = ({ onEditBrandConfig, selectedBrand, onPageChange }) => {
         isCollapsed={isSummaryCollapsed}
         onActiveTabChange={setActiveTab}
         activeTab={activeTab}
-        onRunSettingClick={() => setShowRunSetting(true)}
       />
 
       {/* Cross-Channel AI Summary - with margin - Show when activeTab is 'all' or 'meta' */}

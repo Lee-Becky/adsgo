@@ -529,8 +529,53 @@ const CrossChannelAISummary = ({
             </div>
           </div>
 
+          {/* Schedule Summary Strip */}
+          <div
+            onClick={onRunSettingClick}
+            className={`mb-3 mt-auto flex items-center justify-between px-3.5 py-2.5 rounded-xl cursor-pointer transition-all duration-200 ${
+              runSettings
+                ? 'bg-[#f3f0ff] border border-[#e5dbff] hover:bg-[#e5dbff]'
+                : 'bg-amber-50 border border-amber-200 hover:bg-amber-100'
+            }`}
+          >
+            <div className="flex items-center gap-2 min-w-0">
+              <Clock size={12} className={runSettings ? 'text-[#7033F5] shrink-0' : 'text-amber-500 shrink-0'} />
+              <span className={`text-[11px] font-semibold truncate ${runSettings ? 'text-[#7033F5]' : 'text-amber-600'}`}>
+                {(() => {
+                  if (!runSettings) return 'Running Schedule not set up.';
+                  const DAY_NAMES = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+                  const { frequency, weekDays = [], monthDays = [], customDays, timeSlot } = runSettings;
+                  let label = '';
+                  if (frequency === 'daily') {
+                    label = 'Daily';
+                  } else if (frequency === 'weekly') {
+                    if (weekDays.length === 0) {
+                      label = 'Weekly';
+                    } else if (weekDays.length <= 3) {
+                      label = `Weekly · ${weekDays.map(k => DAY_NAMES[k]).join(', ')}`;
+                    } else {
+                      label = `Weekly · ${weekDays.slice(0, 3).map(k => DAY_NAMES[k]).join(', ')} +${weekDays.length - 3}`;
+                    }
+                  } else if (frequency === 'monthly') {
+                    if (monthDays.length === 0) {
+                      label = 'Monthly';
+                    } else if (monthDays.length <= 3) {
+                      label = `Monthly · Day ${monthDays.join(', ')}`;
+                    } else {
+                      label = `Monthly · Day ${monthDays.slice(0, 3).join(', ')} +${monthDays.length - 3}`;
+                    }
+                  } else if (frequency === 'custom') {
+                    label = `Every ${customDays} days`;
+                  }
+                  return `${label} · ${timeSlot}`;
+                })()}
+              </span>
+            </div>
+            <Settings size={12} className={`shrink-0 ${runSettings ? 'text-[#7033F5]' : 'text-amber-500'}`} />
+          </div>
+
           {/* Bottom Functional Grid */}
-          <div className="grid grid-cols-2 gap-3 mt-auto relative">
+          <div className="grid grid-cols-2 gap-3 relative">
             {/* Daily Analysis Card */}
             <div 
               className={`group border-2 rounded-2xl p-2.5 flex flex-col items-center text-center transition-all duration-300 cursor-pointer ${!autoApply ? 'bg-blue-50 border-blue-500 shadow-[0_10px_20px_rgba(59,130,246,0.1)] scale-[1.02]' : 'bg-white border-slate-100 hover:border-blue-200'}`}
@@ -632,51 +677,6 @@ const CrossChannelAISummary = ({
                 <span className="text-[10px] font-black tracking-widest">{autoApply ? 'RUNNING' : 'STANDBY'}</span>
               </div>
             </div>
-          </div>
-
-          {/* Schedule Summary Strip */}
-          <div
-            onClick={onRunSettingClick}
-            className={`mt-3 flex items-center justify-between px-3.5 py-2.5 rounded-xl cursor-pointer transition-all duration-200 ${
-              runSettings
-                ? 'bg-[#f3f0ff] border border-[#e5dbff] hover:bg-[#e5dbff]'
-                : 'bg-amber-50 border border-amber-200 hover:bg-amber-100'
-            }`}
-          >
-            <div className="flex items-center gap-2 min-w-0">
-              <Clock size={12} className={runSettings ? 'text-[#7033F5] shrink-0' : 'text-amber-500 shrink-0'} />
-              <span className={`text-[11px] font-semibold truncate ${runSettings ? 'text-[#7033F5]' : 'text-amber-600'}`}>
-                {(() => {
-                  if (!runSettings) return 'Running Schedule not set up.';
-                  const DAY_NAMES = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-                  const { frequency, weekDays = [], monthDays = [], customDays, timeSlot } = runSettings;
-                  let label = '';
-                  if (frequency === 'daily') {
-                    label = 'Daily';
-                  } else if (frequency === 'weekly') {
-                    if (weekDays.length === 0) {
-                      label = 'Weekly';
-                    } else if (weekDays.length <= 3) {
-                      label = `Weekly · ${weekDays.map(k => DAY_NAMES[k]).join(', ')}`;
-                    } else {
-                      label = `Weekly · ${weekDays.slice(0, 3).map(k => DAY_NAMES[k]).join(', ')} +${weekDays.length - 3}`;
-                    }
-                  } else if (frequency === 'monthly') {
-                    if (monthDays.length === 0) {
-                      label = 'Monthly';
-                    } else if (monthDays.length <= 3) {
-                      label = `Monthly · Day ${monthDays.join(', ')}`;
-                    } else {
-                      label = `Monthly · Day ${monthDays.slice(0, 3).join(', ')} +${monthDays.length - 3}`;
-                    }
-                  } else if (frequency === 'custom') {
-                    label = `Every ${customDays} days`;
-                  }
-                  return `${label} · ${timeSlot}`;
-                })()}
-              </span>
-            </div>
-            <Settings size={12} className={`shrink-0 ${runSettings ? 'text-[#7033F5]' : 'text-amber-500'}`} />
           </div>
 
           {/* Floating Tooltips - Outside cards, above the grid */}

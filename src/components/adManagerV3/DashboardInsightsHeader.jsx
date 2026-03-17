@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Eye, ChevronDown, ChevronUp, Settings } from 'lucide-react';
+import { Eye, ChevronDown, ChevronUp } from 'lucide-react';
 import { createPortal } from 'react-dom';
 
 // Platform icon URLs
@@ -47,8 +47,7 @@ const DashboardInsightsHeader = ({
   onCollapseToggle,
   isCollapsed,
   onActiveTabChange,
-  activeTab: propActiveTab,
-  onRunSettingClick
+  activeTab: propActiveTab
 }) => {
   const [hoveredPlatform, setHoveredPlatform] = useState(null);
   const [activeTab, setActiveTab] = useState(propActiveTab || 'meta');
@@ -168,17 +167,8 @@ const DashboardInsightsHeader = ({
             </div>
           </div>
 
-          {/* Right: Run Setting + Collapse Button */}
+          {/* Right: Collapse Button */}
           <div className="flex items-center gap-3">
-            {/* Run Setting Button */}
-            <button
-              onClick={onRunSettingClick}
-              className="flex items-center gap-1.5 px-4 py-1.5 bg-gradient-to-r from-violet-500 to-purple-600 rounded-full shadow-sm hover:from-violet-600 hover:to-purple-700 transition-all hover:shadow-md hover:shadow-purple-200/50"
-            >
-              <Settings size={11} className="text-white/90" />
-              <span className="text-[10px] font-black tracking-tight text-white">Run Setting</span>
-            </button>
-
             {/* Collapse/Expand Button - Hide when activeTab is 'google' */}
             {activeTab !== 'google' && (
               <button
