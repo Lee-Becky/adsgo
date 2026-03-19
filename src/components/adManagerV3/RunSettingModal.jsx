@@ -1,16 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Settings, X, Clock, ChevronDown } from 'lucide-react';
+import { Settings, X, Clock, ChevronDown, Plus } from 'lucide-react';
 import { createPortal } from 'react-dom';
-
-const WEEK_DAYS = [
-  { key: 0, label: 'Mon', full: 'Monday' },
-  { key: 1, label: 'Tue', full: 'Tuesday' },
-  { key: 2, label: 'Wed', full: 'Wednesday' },
-  { key: 3, label: 'Thu', full: 'Thursday' },
-  { key: 4, label: 'Fri', full: 'Friday' },
-  { key: 5, label: 'Sat', full: 'Saturday' },
-  { key: 6, label: 'Sun', full: 'Sunday' },
-];
 
 const TIME_SLOTS = Array.from({ length: 24 }, (_, i) => {
   const startHour = i;
@@ -23,87 +13,64 @@ const TIME_SLOTS = Array.from({ length: 24 }, (_, i) => {
   return `${fmt(startHour)} – ${fmt(endHour)}`;
 });
 
+const MAX_TIME_SLOTS = 6;
+
 const RunSettingModal = ({ isOpen, onClose, onSave }) => {
   const [frequency, setFrequency] = useState('daily');
-  const [weekDays, setWeekDays] = useState([]);
-  const [monthDays, setMonthDays] = useState([]);
-  const [timeSlot, setTimeSlot] = useState('12:00 PM – 1:00 PM');
+  const [timeSlots, setTimeSlots] = useState(['11:00 PM – 12:00 AM']);
+  const [selectedTime, setSelectedTime] = useState('');
   const [customDays, setCustomDays] = useState(3);
   const [showTimeDropdown, setShowTimeDropdown] = useState(false);
-  const [showWeekDropdown, setShowWeekDropdown] = useState(false);
-  const [showMonthDropdown, setShowMonthDropdown] = useState(false);
+  const [timeError, setTimeError] = useState(false);
 
-  const weekDropdownRef = useRef(null);
-  const monthDropdownRef = useRef(null);
   const timeDropdownRef = useRef(null);
 
-  const closeAllDropdowns = () => {
-    setShowTimeDropdown(false);
-    setShowWeekDropdown(false);
-    setShowMonthDropdown(false);
-  };
-
-  // Click outside to close dropdowns
   useEffect(() => {
-    if (!showWeekDropdown && !showMonthDropdown && !showTimeDropdown) return;
-
+    if (!showTimeDropdown) return;
     const handleClickOutside = (e) => {
-      if (
-        showWeekDropdown && weekDropdownRef.current && !weekDropdownRef.current.contains(e.target)
-      ) setShowWeekDropdown(false);
-      if (
-        showMonthDropdown && monthDropdownRef.current && !monthDropdownRef.current.contains(e.target)
-      ) setShowMonthDropdown(false);
-      if (
-        showTimeDropdown && timeDropdownRef.current && !timeDropdownRef.current.contains(e.target)
-      ) setShowTimeDropdown(false);
+      if (timeDropdownRef.current && !timeDropdownRef.current.contains(e.target)) {
+        setShowTimeDropdown(false);
+      }
     };
-
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [showWeekDropdown, showMonthDropdown, showTimeDropdown]);
+  }, [showTimeDropdown]);
 
   if (!isOpen) return null;
 
-  const handleFrequencyChange = (newFreq) => {
-    setFrequency(newFreq);
-    if (newFreq === 'weekly') {
-      setMonthDays([]);
-    } else if (newFreq === 'monthly') {
-      setWeekDays([]);
-    } else {
-      setWeekDays([]);
-      setMonthDays([]);
-    }
-  };
-
-  const toggleWeekDay = (dayKey) => {
-    setWeekDays(prev =>
-      prev.includes(dayKey) ? prev.filter(d => d !== dayKey) : [...prev, dayKey].sort()
-    );
-  };
-
-  const toggleMonthDay = (day) => {
-    setMonthDays(prev =>
-      prev.includes(day) ? prev.filter(d => d !== day) : [...prev, day].sort((a, b) => a - b)
-    );
-  };
-
   const handleSave = () => {
+    let finalSlots = frequency === 'daily' ? [...timeSlots] : [selectedTime || timeSlots[0] || TIME_SLOTS[0]];
+    if (frequency === 'daily' && selectedTime && !timeSlots.includes(selectedTime)) {
+      finalSlots = [...timeSlots, selectedTime];
+      setTimeSlots(finalSlots);
+      setSelectedTime('');
+    }
     onSave?.({
       frequency,
-      weekDays: frequency === 'weekly' ? weekDays : [],
-      monthDays: frequency === 'monthly' ? monthDays : [],
       customDays: frequency === 'custom' ? customDays : null,
-      timeSlot,
+      timeSlots: finalSlots,
     });
     onClose();
   };
 
+  const handleAddTime = () => {
+    if (!selectedTime) {
+      setTimeError(true);
+      return;
+    }
+    setTimeError(false);
+    if (timeSlots.length >= MAX_TIME_SLOTS || timeSlots.includes(selectedTime)) return;
+    setTimeSlots(prev => [...prev, selectedTime]);
+    setSelectedTime('');
+  };
+
+  const handleRemoveTime = (slot) => {
+    if (timeSlots.length <= 1) return;
+    setTimeSlots(prev => prev.filter(s => s !== slot));
+  };
+
   const frequencies = [
     { key: 'daily', label: 'Daily' },
-    { key: 'weekly', label: 'Weekly' },
-    { key: 'monthly', label: 'Monthly' },
     { key: 'custom', label: 'Custom' },
   ];
 
@@ -134,7 +101,7 @@ const RunSettingModal = ({ isOpen, onClose, onSave }) => {
 
         {/* Body */}
         <div className="px-6 py-5 space-y-4">
-          {/* Frequency Selector - Radio Group */}
+          {/* Frequency Selector */}
           <div className="bg-gray-50/80 border border-gray-100 rounded-xl p-4">
             <label className="text-xs font-semibold text-gray-400 tracking-wide mb-3 flex items-center gap-2">
               <span className="w-1 h-4 rounded-full bg-[#7033F5] shrink-0"></span>
@@ -147,7 +114,7 @@ const RunSettingModal = ({ isOpen, onClose, onSave }) => {
                     type="radio"
                     name="frequency"
                     checked={frequency === key}
-                    onChange={() => handleFrequencyChange(key)}
+                    onChange={() => setFrequency(key)}
                     className="w-4 h-4 border-2 border-gray-200 text-[#7033F5] accent-[#7033F5] focus:ring-0 transition-all duration-200 cursor-pointer"
                   />
                   <span className={`text-sm transition-all duration-200 ${frequency === key ? 'font-semibold text-[#7033F5]' : 'font-medium text-gray-500'}`}>{label}</span>
@@ -155,115 +122,6 @@ const RunSettingModal = ({ isOpen, onClose, onSave }) => {
               ))}
             </div>
           </div>
-
-          {/* Weekly: Days of Week Dropdown */}
-          {frequency === 'weekly' && (
-            <div className="animate-in fade-in slide-in-from-top-2 duration-200 bg-gray-50/80 border border-gray-100 rounded-xl p-4">
-              <label className="text-xs font-semibold text-gray-400 tracking-wide mb-3 flex items-center gap-2">
-                <span className="w-1 h-4 rounded-full bg-[#7033F5] shrink-0"></span>
-                Days of Week
-              </label>
-              <div className="relative" ref={weekDropdownRef}>
-                <button
-                  onClick={() => {
-                    setShowWeekDropdown(!showWeekDropdown);
-                    setShowMonthDropdown(false);
-                    setShowTimeDropdown(false);
-                  }}
-                  className={`w-full flex items-center justify-between px-3 py-2.5 border rounded-lg text-sm bg-white transition-all duration-200 ${
-                    showWeekDropdown
-                      ? 'border-[#7033F5] shadow-[0_4px_14px_0_rgba(112,51,245,0.2)]'
-                      : 'border-gray-200 hover:border-gray-300'
-                  }`}
-                >
-                  <span className={`font-medium ${weekDays.length > 0 ? 'text-gray-700' : 'text-gray-400'}`}>
-                    {weekDays.length > 0
-                      ? weekDays.map(k => WEEK_DAYS.find(d => d.key === k)?.full).join(', ')
-                      : 'Select days'}
-                  </span>
-                  <ChevronDown size={14} className={`text-gray-400 transition-transform duration-200 ${showWeekDropdown ? 'rotate-180' : ''}`} />
-                </button>
-
-                {showWeekDropdown && (
-                  <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-10 overflow-hidden">
-                    {WEEK_DAYS.map(({ key, full }) => (
-                      <button
-                        key={key}
-                        onClick={() => toggleWeekDay(key)}
-                        className={`w-full px-3 py-2.5 flex items-center gap-3 text-left text-sm transition-colors duration-150 ${
-                          weekDays.includes(key)
-                            ? 'bg-[#f3f0ff] text-[#7033F5]'
-                            : 'text-gray-700 hover:bg-gray-50'
-                        }`}
-                      >
-                        <div className={`w-4 h-4 rounded border-2 flex items-center justify-center transition-all duration-200 ${
-                          weekDays.includes(key)
-                            ? 'bg-[#7033F5] border-[#7033F5]'
-                            : 'border-gray-300'
-                        }`}>
-                          {weekDays.includes(key) && (
-                            <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
-                              <path d="M1 4L3.5 6.5L9 1" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                            </svg>
-                          )}
-                        </div>
-                        <span className="font-medium">{full}</span>
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* Monthly: Days of Month Dropdown with Calendar Grid */}
-          {frequency === 'monthly' && (
-            <div className="animate-in fade-in slide-in-from-top-2 duration-200 bg-gray-50/80 border border-gray-100 rounded-xl p-4">
-              <label className="text-xs font-semibold text-gray-400 tracking-wide mb-3 flex items-center gap-2">
-                <span className="w-1 h-4 rounded-full bg-[#7033F5] shrink-0"></span>
-                Days of Month
-              </label>
-              <div className="relative" ref={monthDropdownRef}>
-                <button
-                  onClick={() => {
-                    setShowMonthDropdown(!showMonthDropdown);
-                    setShowWeekDropdown(false);
-                    setShowTimeDropdown(false);
-                  }}
-                  className={`w-full flex items-center justify-between px-3 py-2.5 border rounded-lg text-sm bg-white transition-all duration-200 ${
-                    showMonthDropdown
-                      ? 'border-[#7033F5] shadow-[0_4px_14px_0_rgba(112,51,245,0.2)]'
-                      : 'border-gray-200 hover:border-gray-300'
-                  }`}
-                >
-                  <span className={`font-medium ${monthDays.length > 0 ? 'text-gray-700' : 'text-gray-400'}`}>
-                    {monthDays.length > 0 ? monthDays.join(', ') : 'Select days'}
-                  </span>
-                  <ChevronDown size={14} className={`text-gray-400 transition-transform duration-200 ${showMonthDropdown ? 'rotate-180' : ''}`} />
-                </button>
-
-                {showMonthDropdown && (
-                  <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-10 p-3">
-                    <div className="grid grid-cols-7 gap-1.5">
-                      {Array.from({ length: 31 }, (_, i) => i + 1).map(day => (
-                        <button
-                          key={day}
-                          onClick={() => toggleMonthDay(day)}
-                          className={`w-full aspect-square flex items-center justify-center text-xs font-semibold rounded-lg border transition-all duration-200 ${
-                            monthDays.includes(day)
-                              ? 'bg-[#7033F5] text-white border-[#7033F5] shadow-sm'
-                              : 'border-gray-100 text-gray-600 hover:border-[#b197fc] hover:text-[#7033F5] hover:bg-[#f3f0ff]'
-                          }`}
-                        >
-                          {day}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
 
           {/* Custom: Every X days */}
           {frequency === 'custom' && (
@@ -294,55 +152,108 @@ const RunSettingModal = ({ isOpen, onClose, onSave }) => {
             </div>
           )}
 
-          {/* Time Selector */}
+          {/* Execution Time */}
           <div className="bg-gray-50/80 border border-gray-100 rounded-xl p-4">
             <label className="text-xs font-semibold text-gray-400 tracking-wide mb-3 flex items-center gap-2">
               <span className="w-1 h-4 rounded-full bg-[#7033F5] shrink-0"></span>
-              Time
+              Execution Time
             </label>
-            <div className="pl-3">
-              <div className="relative" ref={timeDropdownRef}>
-                <button
-                  onClick={() => {
-                    setShowTimeDropdown(!showTimeDropdown);
-                    setShowWeekDropdown(false);
-                    setShowMonthDropdown(false);
-                  }}
-                  className={`w-full flex items-center justify-between px-3 py-2.5 border rounded-lg text-sm text-gray-700 bg-white transition-all duration-200 ${
-                    showTimeDropdown
-                      ? 'border-[#7033F5] shadow-[0_4px_14px_0_rgba(112,51,245,0.2)]'
-                      : 'border-gray-200 hover:border-gray-300'
-                  }`}
-                >
-                  <div className="flex items-center gap-2">
-                    <Clock size={14} className="text-gray-400" />
-                    <span className="font-medium">{timeSlot}</span>
-                  </div>
-                  <ChevronDown size={14} className={`text-gray-400 transition-transform duration-200 ${showTimeDropdown ? 'rotate-180' : ''}`} />
-                </button>
+            <div className="pl-3 space-y-2.5">
+              {/* Time chips - only in daily mode when multiple times */}
+              {frequency === 'daily' && timeSlots.length > 0 && (
+                <div className="flex flex-col gap-1.5">
+                  {timeSlots.map((slot) => (
+                    <div
+                      key={slot}
+                      className="flex items-center justify-between bg-[#f3f0ff] border border-[#e5dbff] rounded-lg px-3 py-2 group transition-all duration-200"
+                    >
+                      <div className="flex items-center gap-2">
+                        <Clock size={13} className="text-[#7033F5]" />
+                        <span className="text-sm font-medium text-[#7033F5]">{slot}</span>
+                      </div>
+                      {timeSlots.length > 1 && (
+                        <button
+                          onClick={() => handleRemoveTime(slot)}
+                          className="p-0.5 rounded-md text-[#7033F5]/40 hover:text-[#7033F5] hover:bg-[#e5dbff] transition-all duration-200"
+                        >
+                          <X size={14} />
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
 
-                {showTimeDropdown && (
-                  <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-10 max-h-48 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent">
-                    {TIME_SLOTS.map(slot => (
+              {/* Time dropdown + Add button */}
+              <div className="flex items-center gap-2">
+                <div className="relative flex-1" ref={timeDropdownRef}>
+                  <button
+                    onClick={() => setShowTimeDropdown(!showTimeDropdown)}
+                    className={`w-full flex items-center justify-between px-3 py-2.5 border rounded-lg text-sm text-gray-700 bg-white transition-all duration-200 ${
+                      timeError
+                        ? 'border-red-500 shadow-[0_4px_14px_0_rgba(239,68,68,0.15)]'
+                        : showTimeDropdown
+                          ? 'border-[#7033F5] shadow-[0_4px_14px_0_rgba(112,51,245,0.2)]'
+                          : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <Clock size={14} className="text-gray-400" />
+                      <span className={`font-medium ${selectedTime ? '' : 'text-gray-400'}`}>
+                        {selectedTime || 'Select execution time'}
+                      </span>
+                    </div>
+                    {selectedTime ? (
                       <button
-                        key={slot}
-                        onClick={() => {
-                          setTimeSlot(slot);
-                          setShowTimeDropdown(false);
-                        }}
-                        className={`w-full px-3 py-2 text-left text-sm transition-colors duration-150 ${
-                          timeSlot === slot
-                            ? 'bg-[#f3f0ff] text-[#7033F5] font-semibold'
-                            : 'text-gray-700 hover:bg-gray-50'
-                        }`}
+                        onClick={(e) => { e.stopPropagation(); setSelectedTime(''); setTimeError(false); }}
+                        className="p-0.5 rounded-md text-gray-400 hover:text-gray-600 transition-colors"
                       >
-                        {slot}
+                        <X size={14} />
                       </button>
-                    ))}
-                  </div>
+                    ) : (
+                      <ChevronDown size={14} className={`text-gray-400 transition-transform duration-200 ${showTimeDropdown ? 'rotate-180' : ''}`} />
+                    )}
+                  </button>
+
+                  {showTimeDropdown && (
+                    <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-10 max-h-48 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent">
+                      {TIME_SLOTS.map(slot => {
+                        const isAdded = frequency === 'daily' && timeSlots.includes(slot);
+                        return (
+                          <button
+                            key={slot}
+                            disabled={isAdded}
+                            onClick={() => { if (!isAdded) { setSelectedTime(slot); setShowTimeDropdown(false); setTimeError(false); } }}
+                            className={`w-full px-3 py-2 text-left text-sm flex items-center justify-between transition-colors duration-150 ${
+                              isAdded
+                                ? 'text-gray-300 cursor-not-allowed'
+                                : selectedTime === slot
+                                  ? 'bg-[#f3f0ff] text-[#7033F5] font-semibold'
+                                  : 'text-gray-700 hover:bg-gray-50'
+                            }`}
+                          >
+                            <span>{slot}</span>
+                            {isAdded && <span className="text-[10px] font-semibold text-gray-300">Added</span>}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+
+                {/* Add Time button - daily mode only */}
+                {frequency === 'daily' && (
+                  <button
+                    onClick={handleAddTime}
+                    className="flex items-center gap-1.5 px-4 py-2.5 rounded-lg text-sm font-semibold whitespace-nowrap transition-all duration-200 border border-[#7033F5] text-[#7033F5] hover:bg-[#f3f0ff]"
+                  >
+                    <Plus size={14} />
+                    <span>Add Time</span>
+                  </button>
                 )}
               </div>
-              <span className="text-[11px] font-medium text-gray-400 mt-2 block">(UTC+08:00) Brand Time Zone</span>
+
+              <span className="text-[11px] font-medium text-gray-400 block">(UTC+08:00) Brand Time Zone</span>
             </div>
           </div>
         </div>

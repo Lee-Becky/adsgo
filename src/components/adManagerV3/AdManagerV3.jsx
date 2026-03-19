@@ -27,7 +27,11 @@ const AdManagerV3 = ({ onEditBrandConfig, selectedBrand, onPageChange }) => {
   const [campaigns, setCampaigns] = useState([])
   const [activeTab, setActiveTab] = useState('meta')
   const [showRunSetting, setShowRunSetting] = useState(false)
-  const [runSettings, setRunSettings] = useState(null)
+  const [runSettings, setRunSettings] = useState({
+    frequency: 'daily',
+    customDays: null,
+    timeSlots: ['11:00 PM – 12:00 AM'],
+  })
 
   const handleCampaignClick = (campaign) => {
     setSelectedCampaign(campaign)

@@ -543,31 +543,28 @@ const CrossChannelAISummary = ({
               <span className={`text-[11px] font-semibold truncate ${runSettings ? 'text-[#7033F5]' : 'text-amber-600'}`}>
                 {(() => {
                   if (!runSettings) return 'Running Schedule not set up.';
-                  const DAY_NAMES = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-                  const { frequency, weekDays = [], monthDays = [], customDays, timeSlot } = runSettings;
+                  const { frequency, customDays, timeSlots, timeSlot } = runSettings;
+                  const slots = timeSlots || (timeSlot ? [timeSlot] : []);
+                  let timeDisplay = '';
+                  if (slots.length === 1) {
+                    timeDisplay = slots[0];
+                  } else {
+                    let shown = slots[0];
+                    let i = 1;
+                    for (; i < slots.length; i++) {
+                      const next = `${shown}; ${slots[i]}`;
+                      if (next.length > 45) break;
+                      shown = next;
+                    }
+                    timeDisplay = i < slots.length ? `${shown} +${slots.length - i}` : shown;
+                  }
                   let label = '';
                   if (frequency === 'daily') {
                     label = 'Daily';
-                  } else if (frequency === 'weekly') {
-                    if (weekDays.length === 0) {
-                      label = 'Weekly';
-                    } else if (weekDays.length <= 3) {
-                      label = `Weekly · ${weekDays.map(k => DAY_NAMES[k]).join(', ')}`;
-                    } else {
-                      label = `Weekly · ${weekDays.slice(0, 3).map(k => DAY_NAMES[k]).join(', ')} +${weekDays.length - 3}`;
-                    }
-                  } else if (frequency === 'monthly') {
-                    if (monthDays.length === 0) {
-                      label = 'Monthly';
-                    } else if (monthDays.length <= 3) {
-                      label = `Monthly · Day ${monthDays.join(', ')}`;
-                    } else {
-                      label = `Monthly · Day ${monthDays.slice(0, 3).join(', ')} +${monthDays.length - 3}`;
-                    }
                   } else if (frequency === 'custom') {
                     label = `Every ${customDays} days`;
                   }
-                  return `${label} · ${timeSlot}`;
+                  return `${label} · ${timeDisplay}`;
                 })()}
               </span>
             </div>
