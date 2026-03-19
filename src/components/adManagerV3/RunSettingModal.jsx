@@ -40,7 +40,7 @@ const RunSettingModal = ({ isOpen, onClose, onSave }) => {
 
   const handleSave = () => {
     let finalSlots = frequency === 'daily' ? [...timeSlots] : [selectedTime || timeSlots[0] || TIME_SLOTS[0]];
-    if (frequency === 'daily' && selectedTime && !timeSlots.includes(selectedTime)) {
+    if (frequency === 'daily' && selectedTime && !timeSlots.includes(selectedTime) && timeSlots.length < MAX_TIME_SLOTS) {
       finalSlots = [...timeSlots, selectedTime];
       setTimeSlots(finalSlots);
       setSelectedTime('');
@@ -185,7 +185,7 @@ const RunSettingModal = ({ isOpen, onClose, onSave }) => {
               )}
 
               {/* Time dropdown + Add button */}
-              <div className="flex items-center gap-2">
+              {frequency !== 'daily' || timeSlots.length < MAX_TIME_SLOTS ? (<div className="flex items-center gap-2">
                 <div className="relative flex-1" ref={timeDropdownRef}>
                   <button
                     onClick={() => setShowTimeDropdown(!showTimeDropdown)}
@@ -252,6 +252,9 @@ const RunSettingModal = ({ isOpen, onClose, onSave }) => {
                   </button>
                 )}
               </div>
+              ) : (
+                <span className="text-xs text-gray-400">Maximum 6 execution times reached</span>
+              )}
 
               <span className="text-[11px] font-medium text-gray-400 block">(UTC+08:00) Brand Time Zone</span>
             </div>
