@@ -222,3 +222,45 @@ body {
     transform: scale(1.1);
   }
 }
+
+/* ─── AI Creative Generator Animations ─── */
+@keyframes msgIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.msg-in { animation: msgIn 0.3s ease-out forwards; }
+
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 10px rgba(112,51,245,0.2), 0 0 30px rgba(112,51,245,0.1); }
+  50% { box-shadow: 0 0 20px rgba(112,51,245,0.4), 0 0 60px rgba(112,51,245,0.2); }
+}
+.glow-pulse { animation: glowPulse 2s ease-in-out infinite; }
+
+@keyframes floatY {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+.float-anim { animation: floatY 2s ease-in-out infinite; }
+
+@keyframes particleFlow {
+  0% { left: -5%; opacity: 0; }
+  20% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { left: 105%; opacity: 0; }
+}
+.particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #7033F5;
+  animation: particleFlow 2s linear infinite;
+}
+
+.card-shadow {
+  box-shadow: -2px 2px 16px rgba(14, 0, 45, 0.06);
+}
+
+.fade-in-up {
+  animation: fadeInUp 0.4s ease-out forwards;
+}
