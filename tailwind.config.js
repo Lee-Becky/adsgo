@@ -60,6 +60,9 @@ export default {
         'primary-focus': '0 4px 14px 0 rgba(112,51,245,0.2)',
         'error-focus': '0 4px 14px 0 rgba(245,63,63,0.2)',
         'adsgo-card': '0 1px 3px 0 rgba(0,0,0,0.05)',
+        'adsgo-depth': '0 4px 24px rgba(0,0,0,0.04)',
+        'adsgo-card-hover': '0 8px 30px -4px rgba(112,51,245,0.12), 0 4px 12px -2px rgba(0,0,0,0.06)',
+        'adsgo-card-selected': '0 0 0 2px rgba(112,51,245,0.15), 0 8px 24px -4px rgba(112,51,245,0.12)',
       },
       fontWeight: {
         regular: '400',
@@ -69,6 +72,26 @@ export default {
       },
       fontFamily: {
         sans: ['Outfit', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+      },
+      animation: {
+        'step-enter': 'stepEnter 0.35s ease-out',
+        'progress-indeterminate': 'progressIndeterminate 1.8s ease-in-out infinite',
+        'pulse-subtle': 'pulseSubtle 2s ease-in-out infinite',
+      },
+      keyframes: {
+        stepEnter: {
+          '0%': { opacity: '0', transform: 'translateY(12px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        progressIndeterminate: {
+          '0%': { width: '0%', marginLeft: '0%' },
+          '50%': { width: '60%', marginLeft: '20%' },
+          '100%': { width: '0%', marginLeft: '100%' },
+        },
+        pulseSubtle: {
+          '0%, 100%': { boxShadow: '0 0 0 0 rgba(112,51,245,0.2)' },
+          '50%': { boxShadow: '0 0 0 6px rgba(112,51,245,0)' },
+        },
       },
     },
   },

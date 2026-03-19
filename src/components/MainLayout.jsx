@@ -72,11 +72,12 @@ const MainLayout = ({ children, showDemoOverlay, onDemoConnect, onDemoCreate, se
       </aside>
 
       {/* Main Content Wrapper */}
-      <div 
+      <div
         className={`
           flex-1 flex flex-col h-full relative min-w-0 transition-all duration-300
           ${!isMobile ? (isPinned ? 'ml-64' : 'ml-[72px]') : ''}
         `}
+        style={{ '--sidebar-w': !isMobile ? (isPinned ? '256px' : '72px') : '0px' }}
       >
         {/* Header */}
         <Header toggleSidebar={toggleSidebar} isMobile={isMobile} />

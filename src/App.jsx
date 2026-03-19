@@ -21,6 +21,7 @@ import BatchGenerateAds from './components/batch_generate_campaign/BatchGenerate
 import { Analysis360, AIAnalysis } from './components/analysis'
 import AdManagerV3 from './components/adManagerV3/AdManagerV3'
 import AIGenerate from './components/creativeHub/AIGenerate'
+import GenerateVideo from './components/creativeHub/generateVideo'
 import CreativeLibrary from './components/creativeHub/CreativeLibrary'
 import { ProductList, ProductDetails } from './components/brand/products'
 import { Competitors } from './components/brand/competitors'
@@ -213,6 +214,8 @@ function App() {
         return <BatchGenerateAds onPageChange={handlePageChange} />
       case 'aiGenerate':
         return <AIGenerate />
+      case 'generateVideo':
+        return <GenerateVideo />
       case 'creativeLibrary':
         return <CreativeLibrary />
       case 'insights':

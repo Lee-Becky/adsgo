@@ -65,6 +65,14 @@ export const MENU_ITEMS = [
         subtitle: 'Generate ad creatives using AI'
       },
       {
+        key: 'generateVideo',
+        label: 'Generate Video',
+        shortLabel: 'Video',
+        icon: 'Video',
+        title: 'Generate Video',
+        subtitle: 'Generate AI marketing videos from product info and scripts'
+      },
+      {
         key: 'creativeLibrary',
         label: 'Creative Library',
         shortLabel: 'Lib',
