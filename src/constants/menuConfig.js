@@ -103,6 +103,14 @@ export const MENU_ITEMS = [
         icon: 'BrainCircuit',
         title: 'AI Analysis',
         subtitle: 'AI-powered campaign analysis and recommendations'
+      },
+      {
+        key: 'audit360',
+        label: '360° Audit',
+        shortLabel: 'Audit',
+        icon: 'PieChart',
+        title: '360° Audit',
+        subtitle: '360° Meta Audit — funnel metrics and insight tabs'
       }
     ]
   },

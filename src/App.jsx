@@ -18,7 +18,7 @@ import AdInsights from './components/AdInsights'
 import { AutoRegeneration } from './components/autoRegeneration'
 import { CampaignGenerator } from './components/campaignGenerator'
 import BatchGenerateAds from './components/batch_generate_campaign/BatchGenerateAds'
-import { Analysis360, AIAnalysis } from './components/analysis'
+import { Analysis360, AIAnalysis, Audit360 } from './components/analysis'
 import AdManagerV3 from './components/adManagerV3/AdManagerV3'
 import AIGenerate from './components/creativeHub/AIGenerate'
 import GenerateVideo from './components/creativeHub/generateVideo'
@@ -235,6 +235,8 @@ function App() {
             }}
           />
         )
+      case 'audit360':
+        return <Audit360 />
       case 'drafts':
         return <Drafts />
       case 'settings':
