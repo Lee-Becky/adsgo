@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Compass, Megaphone, TrendingUp, Sparkles, ChevronRight, X, Check, PartyPopper, CircleCheck } from 'lucide-react'
+import { Compass, Megaphone, TrendingUp, Sparkles, ChevronRight, ChevronDown, ChevronUp, X, Check, CircleCheck, ExternalLink } from 'lucide-react'
 import { useOnboardingState } from './useOnboardingState'
 
 const STEPS = [
@@ -12,31 +12,36 @@ const STEPS = [
       '一键生成多平台Campaign，节省90%时间',
       '智能匹配目标受众，精准触达潜在客户',
     ],
+    type: 'cta',
     ctaText: '立即创建Campaign',
     route: '/batchGenerateAds',
     icon: Megaphone,
   },
   {
     title: '开启7×24h智能预算优化',
-    description: 'AI实时监控广告表现，全天候自动调整预算分配，让每一分钱花在刀刃上',
+    description: '开启后AI将7×24h自动执行预算调整，及时止损低效广告，放大高效投放效果',
     highlights: [
-      '实时监控ROAS，自动暂停低效广告',
-      '智能预算再分配，提升整体投放ROI',
-      '7×24h无人值守，告别手动盯盘',
+      '自动暂停低效广告，避免预算浪费',
+      '实时放大高ROI广告的预算投入',
+      '7×24h自动执行，无需人工干预',
     ],
-    ctaText: '开启智能优化',
+    type: 'toggle',
+    toggleLabel: 'Auto-Apply',
+    linkText: '可在 Ad Manager 查看预算优化',
     route: '/aiOptimize/adManagerV3',
     icon: TrendingUp,
   },
   {
     title: '开启自动化发布推荐Campaigns',
-    description: 'AI持续学习你的投放数据，自动生成并推荐高潜力Campaign方案',
+    description: '开启后AI将在最佳时间自动发布新Campaign，持续保持广告效果，规避创意衰退',
     highlights: [
-      'AI基于历史数据，推荐最优Campaign组合',
-      '自动草拟新Campaign，一键审核发布',
-      '持续迭代优化，广告效果越投越好',
+      'AI选择最佳时机自动发布新Campaign',
+      '持续补充新创意，规避广告效果衰退',
+      '全自动执行，始终保持投放竞争力',
     ],
-    ctaText: '开启自动推荐',
+    type: 'toggle',
+    toggleLabel: 'Auto-Publish',
+    linkText: '可在 Draft & AI Recs 查看推荐Campaigns',
     route: '/aiOptimize/autoRegeneration',
     icon: Sparkles,
   },
@@ -46,17 +51,46 @@ export default function OnboardingWidget({ selectedBrand }) {
   const navigate = useNavigate()
   const [isExpanded, setIsExpanded] = useState(true)
   const [isClosing, setIsClosing] = useState(false)
-  const { completedSteps, currentStepIndex, markStepCompleted, allDone, showCongrats } = useOnboardingState(selectedBrand)
+  const [expandedStep, setExpandedStep] = useState(0)
+  const [autoApplyEnabled, setAutoApplyEnabled] = useState(false)
+  const [autoPublishEnabled, setAutoPublishEnabled] = useState(false)
+  const { completedSteps, markStepCompleted, allDone, dismissed, dismiss } = useOnboardingState(selectedBrand)
 
-  if (allDone && !showCongrats) return null
+  // Auto-expand the first incomplete step
+  useEffect(() => {
+    for (let i = 0; i < 3; i++) {
+      if (!completedSteps.includes(i)) {
+        setExpandedStep(i)
+        return
+      }
+    }
+  }, [completedSteps])
+
+  // Reset toggles on brand change
+  useEffect(() => {
+    setAutoApplyEnabled(false)
+    setAutoPublishEnabled(false)
+  }, [selectedBrand])
+
+  if (dismissed) return null
 
   const completedCount = completedSteps.length
-  const currentStep = currentStepIndex !== null ? STEPS[currentStepIndex] : null
 
-  const handleCTAClick = () => {
-    if (currentStepIndex === null) return
-    markStepCompleted(currentStepIndex)
-    navigate(STEPS[currentStepIndex].route)
+  const handleStep1CTA = () => {
+    markStepCompleted(0)
+    navigate('/batchGenerateAds')
+  }
+
+  const handleToggleAutoApply = () => {
+    if (autoApplyEnabled) return
+    setAutoApplyEnabled(true)
+    markStepCompleted(1)
+  }
+
+  const handleToggleAutoPublish = () => {
+    if (autoPublishEnabled) return
+    setAutoPublishEnabled(true)
+    markStepCompleted(2)
   }
 
   const handleClose = () => {
@@ -67,24 +101,131 @@ export default function OnboardingWidget({ selectedBrand }) {
     }, 250)
   }
 
+  const handleComplete = () => {
+    setIsClosing(true)
+    setTimeout(() => {
+      setIsClosing(false)
+      setIsExpanded(false)
+      dismiss()
+    }, 250)
+  }
+
+  const toggleStepExpand = (index) => {
+    setExpandedStep(prev => prev === index ? -1 : index)
+  }
+
+  const isStepCompleted = (index) => completedSteps.includes(index)
+
+  const renderStepIndicator = (index) => {
+    if (isStepCompleted(index)) {
+      return (
+        <div className="w-6 h-6 rounded-full bg-success flex items-center justify-center flex-shrink-0">
+          <Check className="w-3.5 h-3.5 text-white" />
+        </div>
+      )
+    }
+    const isActive = expandedStep === index && !isStepCompleted(index)
+    return (
+      <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold ${
+        isActive ? 'bg-primary text-white' : 'bg-gray-200 text-gray-500'
+      }`}>
+        {index + 1}
+      </div>
+    )
+  }
+
+  const renderStepContent = (step, index) => {
+    if (expandedStep !== index) return null
+
+    return (
+      <div className="mt-2.5 ml-9 animate-step-enter">
+        <p className="text-xs text-gray-500 leading-relaxed mb-2">{step.description}</p>
+
+        {/* Highlights */}
+        <div className="mb-3 space-y-1.5">
+          {step.highlights.map((text, i) => (
+            <div key={i} className="flex items-start gap-1.5">
+              <CircleCheck className="w-3 h-3 text-success mt-0.5 flex-shrink-0" />
+              <span className="text-[11px] text-gray-600 leading-relaxed">{text}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* Step 1: CTA button */}
+        {step.type === 'cta' && !isStepCompleted(index) && (
+          <button
+            onClick={handleStep1CTA}
+            className="w-full flex items-center justify-center gap-1.5 px-3 py-2 bg-gradient-to-r from-primary to-purple-600 text-white text-xs font-medium rounded-lg hover:shadow-primary-focus transition-shadow"
+          >
+            {step.ctaText}
+            <ChevronRight className="w-3.5 h-3.5" />
+          </button>
+        )}
+
+        {/* Step 2 & 3: Enable button + link */}
+        {step.type === 'toggle' && (
+          <div className="space-y-2.5">
+            {!(index === 1 ? autoApplyEnabled : autoPublishEnabled) ? (
+              <button
+                onClick={index === 1 ? handleToggleAutoApply : handleToggleAutoPublish}
+                className="w-full flex items-center justify-between bg-gray-50 hover:bg-primary-50 border border-gray-200 hover:border-primary-200 rounded-lg px-3 py-2.5 transition-all group"
+              >
+                <div className="flex items-center gap-2">
+                  <step.icon className="w-4 h-4 text-gray-500 group-hover:text-primary transition-colors" />
+                  <span className="text-xs font-medium text-gray-700">{step.toggleLabel}</span>
+                </div>
+                <span className="px-3 py-1 text-[11px] font-semibold rounded-md bg-gradient-to-r from-primary to-purple-600 text-white shadow-sm">
+                  Enable
+                </span>
+              </button>
+            ) : (
+              <div className="flex items-center justify-between bg-success-50 rounded-lg px-3 py-2.5 border border-success/20">
+                <div className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-success" />
+                  <span className="text-xs font-medium text-gray-700">{step.toggleLabel}</span>
+                </div>
+                <span className="text-[11px] font-semibold text-success">Enabled</span>
+              </div>
+            )}
+            <button
+              onClick={() => navigate(step.route)}
+              className="flex items-center gap-1 text-[11px] text-primary hover:text-primary-700 transition-colors"
+            >
+              <ExternalLink className="w-3 h-3" />
+              {step.linkText}
+            </button>
+          </div>
+        )}
+
+        {/* Completed badge for CTA step */}
+        {step.type === 'cta' && isStepCompleted(index) && (
+          <div className="flex items-center gap-1.5 text-xs text-success font-medium">
+            <Check className="w-3.5 h-3.5" />
+            已完成
+          </div>
+        )}
+      </div>
+    )
+  }
+
   return (
     <>
-      {/* Expanded card or closing animation */}
-      {(isExpanded || isClosing) && !allDone && currentStep && (
+      {/* Expanded card */}
+      {(isExpanded || isClosing) && (
         <div
           className={`fixed bottom-6 right-6 z-[850] w-80 sm:w-[22rem] origin-bottom-right ${
             isClosing ? 'animate-bubble-collapse' : 'animate-bubble-expand'
           }`}
         >
-          <div className="rounded-xl shadow-2xl border border-border bg-white overflow-hidden">
+          <div className="rounded-xl shadow-2xl border border-border bg-white overflow-hidden max-h-[80vh] flex flex-col">
             {/* Header */}
-            <div className="px-4 py-3 bg-gradient-to-r from-primary-50 to-purple-50 border-b border-border flex items-center justify-between">
+            <div className="px-4 py-3 bg-gradient-to-r from-primary-50 to-purple-50 border-b border-border flex items-center justify-between flex-shrink-0">
               <div className="flex items-center gap-2">
                 <Compass className="w-4 h-4 text-primary" />
-                <span className="text-sm font-semibold text-gray-900">快速入门</span>
+                <span className="text-sm font-semibold text-gray-900">Getting Started</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-xs text-gray-500">Step {currentStepIndex + 1}/3</span>
+                <span className="text-xs text-gray-500">{completedCount}/3</span>
                 <button
                   onClick={handleClose}
                   className="p-0.5 rounded hover:bg-white/60 text-gray-400 hover:text-gray-600 transition-colors"
@@ -95,7 +236,7 @@ export default function OnboardingWidget({ selectedBrand }) {
             </div>
 
             {/* Progress bar */}
-            <div className="px-4 pt-3">
+            <div className="px-4 pt-3 flex-shrink-0">
               <div className="flex gap-1">
                 {[0, 1, 2].map(i => (
                   <div
@@ -108,86 +249,65 @@ export default function OnboardingWidget({ selectedBrand }) {
               </div>
             </div>
 
-            {/* Current step content */}
-            <div className="p-4">
-              <div className="flex items-start gap-3 mb-3">
-                <div className="w-9 h-9 rounded-lg bg-primary-50 flex items-center justify-center flex-shrink-0">
-                  <currentStep.icon className="w-4.5 h-4.5 text-primary" />
-                </div>
-                <div className="min-w-0">
-                  <h4 className="text-sm font-semibold text-gray-900 leading-snug">{currentStep.title}</h4>
-                  <p className="text-xs text-gray-500 mt-0.5 leading-relaxed">{currentStep.description}</p>
-                </div>
-              </div>
+            {/* Steps accordion */}
+            <div className="px-4 py-3 space-y-1 overflow-y-auto flex-1">
+              {STEPS.map((step, index) => (
+                <div key={index} className="group">
+                  {/* Step header row */}
+                  <button
+                    onClick={() => toggleStepExpand(index)}
+                    className="w-full flex items-center gap-2.5 py-2 text-left hover:bg-gray-50 rounded-lg px-1 transition-colors"
+                  >
+                    {renderStepIndicator(index)}
+                    <span className={`text-xs font-medium flex-1 ${
+                      isStepCompleted(index) ? 'text-gray-900' : expandedStep === index ? 'text-gray-900' : 'text-gray-400'
+                    }`}>
+                      {step.title}
+                    </span>
+                    {expandedStep === index ? (
+                      <ChevronUp className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
+                    ) : (
+                      <ChevronDown className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
+                    )}
+                  </button>
 
-              {/* Highlights */}
-              <div className="mb-4 space-y-1.5 pl-1">
-                {currentStep.highlights.map((text, i) => (
-                  <div key={i} className="flex items-start gap-2">
-                    <CircleCheck className="w-3.5 h-3.5 text-success mt-0.5 flex-shrink-0" />
-                    <span className="text-xs text-gray-600 leading-relaxed">{text}</span>
-                  </div>
-                ))}
-              </div>
+                  {/* Step expanded content */}
+                  {renderStepContent(step, index)}
 
-              <button
-                onClick={handleCTAClick}
-                className="w-full flex items-center justify-center gap-1.5 px-4 py-2.5 bg-gradient-to-r from-primary to-purple-600 text-white text-sm font-medium rounded-lg hover:shadow-primary-focus transition-shadow"
-              >
-                {currentStep.ctaText}
-                <ChevronRight className="w-4 h-4" />
-              </button>
+                  {/* Separator */}
+                  {index < 2 && <div className="border-b border-gray-100 mx-1 mt-1" />}
+                </div>
+              ))}
             </div>
 
-            {/* Completed count */}
-            {completedCount > 0 && (
-              <div className="px-4 pb-3 flex items-center gap-1.5 text-xs text-gray-400">
-                <Check className="w-3 h-3 text-success" />
-                <span>已完成 {completedCount}/3 步</span>
+            {/* Complete button — only when all done */}
+            {allDone && (
+              <div className="px-4 pb-4 flex-shrink-0">
+                <button
+                  onClick={handleComplete}
+                  className="w-full flex items-center justify-center gap-1.5 px-3 py-2.5 bg-gradient-to-r from-primary to-purple-600 text-white text-sm font-medium rounded-lg hover:shadow-primary-focus transition-shadow"
+                >
+                  Complete Onboarding
+                  <Check className="w-4 h-4" />
+                </button>
               </div>
             )}
           </div>
         </div>
       )}
 
-      {/* Congrats card */}
-      {showCongrats && (
-        <div className="fixed bottom-6 right-6 z-[850] w-80 sm:w-[22rem] animate-bubble-expand origin-bottom-right">
-          <div className="rounded-xl shadow-2xl border border-border bg-white overflow-hidden p-6 text-center relative">
-            <div className="w-14 h-14 mx-auto mb-3 rounded-full bg-gradient-to-br from-primary-50 to-purple-100 flex items-center justify-center">
-              <PartyPopper className="w-7 h-7 text-primary" />
-            </div>
-            <h4 className="text-base font-semibold text-gray-900 mb-1">恭喜完成所有步骤!</h4>
-            <p className="text-xs text-gray-500">你已掌握 AdsGo 核心功能</p>
-            {/* Decorative confetti dots */}
-            <div className="absolute inset-0 pointer-events-none overflow-hidden">
-              {[...Array(6)].map((_, i) => (
-                <span
-                  key={i}
-                  className="absolute w-2 h-2 rounded-full opacity-0 animate-[confettiFall_1.5s_ease-in_forwards]"
-                  style={{
-                    left: `${15 + i * 14}%`,
-                    top: '-8px',
-                    animationDelay: `${i * 0.15}s`,
-                    backgroundColor: ['#7033F5', '#9775fa', '#d0bfff', '#00b42a', '#ff7d00', '#f53f3f'][i],
-                  }}
-                />
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Floating bubble button — only when collapsed */}
-      {!isExpanded && !isClosing && !allDone && (
+      {!isExpanded && !isClosing && !dismissed && (
         <button
           onClick={() => setIsExpanded(true)}
           className="fixed bottom-6 right-6 z-[850] w-14 h-14 rounded-full bg-gradient-to-r from-primary to-purple-600 text-white shadow-lg hover:shadow-primary-focus flex items-center justify-center transition-all duration-200 animate-pulse-subtle"
         >
           <Compass className="w-5 h-5" />
-          <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-white text-primary text-[10px] font-bold flex items-center justify-center shadow-sm border border-primary-100">
-            {Math.min(completedCount + 1, 3)}
-          </span>
+          {!allDone && (
+            <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-white text-primary text-[10px] font-bold flex items-center justify-center shadow-sm border border-primary-100">
+              {Math.min(completedCount + 1, 3)}
+            </span>
+          )}
         </button>
       )}
     </>
