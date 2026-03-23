@@ -77,6 +77,8 @@ export default {
         'step-enter': 'stepEnter 0.35s ease-out',
         'progress-indeterminate': 'progressIndeterminate 1.8s ease-in-out infinite',
         'pulse-subtle': 'pulseSubtle 2s ease-in-out infinite',
+        'bubble-expand': 'bubbleExpand 0.3s ease-out',
+        'bubble-collapse': 'bubbleCollapse 0.25s ease-in forwards',
       },
       keyframes: {
         stepEnter: {
@@ -91,6 +93,18 @@ export default {
         pulseSubtle: {
           '0%, 100%': { boxShadow: '0 0 0 0 rgba(112,51,245,0.2)' },
           '50%': { boxShadow: '0 0 0 6px rgba(112,51,245,0)' },
+        },
+        bubbleExpand: {
+          '0%': { opacity: '0', transform: 'scale(0.8) translateY(10px)' },
+          '100%': { opacity: '1', transform: 'scale(1) translateY(0)' },
+        },
+        bubbleCollapse: {
+          '0%': { opacity: '1', transform: 'scale(1) translateY(0)' },
+          '100%': { opacity: '0', transform: 'scale(0.3) translateY(10px)' },
+        },
+        confettiFall: {
+          '0%': { transform: 'translateY(-20px) rotate(0deg)', opacity: '1' },
+          '100%': { transform: 'translateY(40px) rotate(360deg)', opacity: '0' },
         },
       },
     },

@@ -3,6 +3,7 @@ import { Menu, X } from 'lucide-react'
 import Sidebar from './Sidebar'
 import Header from './Header'
 import GlobalDemoOverlay from './GlobalDemoOverlay'
+import OnboardingWidget from './onboarding/OnboardingWidget'
 
 const MainLayout = ({ children, showDemoOverlay, onDemoConnect, onDemoCreate, selectedBrand, onBrandChange, onCreateBrand, brands = [] }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
@@ -97,6 +98,9 @@ const MainLayout = ({ children, showDemoOverlay, onDemoConnect, onDemoCreate, se
             />
           )}
         </div>
+
+        {/* Onboarding Widget */}
+        <OnboardingWidget selectedBrand={selectedBrand} />
       </div>
     </div>
   )
