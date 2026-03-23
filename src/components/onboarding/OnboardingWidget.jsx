@@ -1,26 +1,44 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Rocket, Zap, RefreshCw, ChevronRight, X, Check, PartyPopper } from 'lucide-react'
+import { Compass, Megaphone, TrendingUp, Sparkles, ChevronRight, X, Check, PartyPopper, CircleCheck } from 'lucide-react'
 import { useOnboardingState } from './useOnboardingState'
 
 const STEPS = [
   {
     title: '发布你的第一条Campaign',
-    description: '使用AI一键生成并发布你的首个广告Campaign',
-    route: '/campaignGenerator',
-    icon: Rocket,
+    description: '通过AI智能分析你的产品页面，自动生成高转化广告素材与投放策略',
+    highlights: [
+      'AI自动分析产品卖点，生成广告文案',
+      '一键生成多平台Campaign，节省90%时间',
+      '智能匹配目标受众，精准触达潜在客户',
+    ],
+    ctaText: '立即创建Campaign',
+    route: '/batchGenerateAds',
+    icon: Megaphone,
   },
   {
-    title: '开启7×24h的自动化智能预算优化',
-    description: '让AI全天候帮你优化广告预算分配',
+    title: '开启7×24h智能预算优化',
+    description: 'AI实时监控广告表现，全天候自动调整预算分配，让每一分钱花在刀刃上',
+    highlights: [
+      '实时监控ROAS，自动暂停低效广告',
+      '智能预算再分配，提升整体投放ROI',
+      '7×24h无人值守，告别手动盯盘',
+    ],
+    ctaText: '开启智能优化',
     route: '/aiOptimize/adManagerV3',
-    icon: Zap,
+    icon: TrendingUp,
   },
   {
-    title: '开启7×24h的自动化发布推荐Campaigns',
-    description: '自动生成并发布AI推荐的高效Campaigns',
+    title: '开启自动化发布推荐Campaigns',
+    description: 'AI持续学习你的投放数据，自动生成并推荐高潜力Campaign方案',
+    highlights: [
+      'AI基于历史数据，推荐最优Campaign组合',
+      '自动草拟新Campaign，一键审核发布',
+      '持续迭代优化，广告效果越投越好',
+    ],
+    ctaText: '开启自动推荐',
     route: '/aiOptimize/autoRegeneration',
-    icon: RefreshCw,
+    icon: Sparkles,
   },
 ]
 
@@ -54,7 +72,7 @@ export default function OnboardingWidget({ selectedBrand }) {
       {/* Expanded card or closing animation */}
       {(isExpanded || isClosing) && !allDone && currentStep && (
         <div
-          className={`fixed bottom-6 right-6 z-[850] w-72 sm:w-80 origin-bottom-right ${
+          className={`fixed bottom-6 right-6 z-[850] w-80 sm:w-[22rem] origin-bottom-right ${
             isClosing ? 'animate-bubble-collapse' : 'animate-bubble-expand'
           }`}
         >
@@ -62,7 +80,7 @@ export default function OnboardingWidget({ selectedBrand }) {
             {/* Header */}
             <div className="px-4 py-3 bg-gradient-to-r from-primary-50 to-purple-50 border-b border-border flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Rocket className="w-4 h-4 text-primary" />
+                <Compass className="w-4 h-4 text-primary" />
                 <span className="text-sm font-semibold text-gray-900">快速入门</span>
               </div>
               <div className="flex items-center gap-2">
@@ -92,7 +110,7 @@ export default function OnboardingWidget({ selectedBrand }) {
 
             {/* Current step content */}
             <div className="p-4">
-              <div className="flex items-start gap-3 mb-4">
+              <div className="flex items-start gap-3 mb-3">
                 <div className="w-9 h-9 rounded-lg bg-primary-50 flex items-center justify-center flex-shrink-0">
                   <currentStep.icon className="w-4.5 h-4.5 text-primary" />
                 </div>
@@ -102,11 +120,21 @@ export default function OnboardingWidget({ selectedBrand }) {
                 </div>
               </div>
 
+              {/* Highlights */}
+              <div className="mb-4 space-y-1.5 pl-1">
+                {currentStep.highlights.map((text, i) => (
+                  <div key={i} className="flex items-start gap-2">
+                    <CircleCheck className="w-3.5 h-3.5 text-success mt-0.5 flex-shrink-0" />
+                    <span className="text-xs text-gray-600 leading-relaxed">{text}</span>
+                  </div>
+                ))}
+              </div>
+
               <button
                 onClick={handleCTAClick}
                 className="w-full flex items-center justify-center gap-1.5 px-4 py-2.5 bg-gradient-to-r from-primary to-purple-600 text-white text-sm font-medium rounded-lg hover:shadow-primary-focus transition-shadow"
               >
-                {currentStepIndex === 0 ? '去发布' : '去开启'}
+                {currentStep.ctaText}
                 <ChevronRight className="w-4 h-4" />
               </button>
             </div>
@@ -124,7 +152,7 @@ export default function OnboardingWidget({ selectedBrand }) {
 
       {/* Congrats card */}
       {showCongrats && (
-        <div className="fixed bottom-6 right-6 z-[850] w-72 sm:w-80 animate-bubble-expand origin-bottom-right">
+        <div className="fixed bottom-6 right-6 z-[850] w-80 sm:w-[22rem] animate-bubble-expand origin-bottom-right">
           <div className="rounded-xl shadow-2xl border border-border bg-white overflow-hidden p-6 text-center relative">
             <div className="w-14 h-14 mx-auto mb-3 rounded-full bg-gradient-to-br from-primary-50 to-purple-100 flex items-center justify-center">
               <PartyPopper className="w-7 h-7 text-primary" />
@@ -156,7 +184,7 @@ export default function OnboardingWidget({ selectedBrand }) {
           onClick={() => setIsExpanded(true)}
           className="fixed bottom-6 right-6 z-[850] w-14 h-14 rounded-full bg-gradient-to-r from-primary to-purple-600 text-white shadow-lg hover:shadow-primary-focus flex items-center justify-center transition-all duration-200 animate-pulse-subtle"
         >
-          <Rocket className="w-5 h-5" />
+          <Compass className="w-5 h-5" />
           <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-white text-primary text-[10px] font-bold flex items-center justify-center shadow-sm border border-primary-100">
             {Math.min(completedCount + 1, 3)}
           </span>

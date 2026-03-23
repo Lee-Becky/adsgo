@@ -1,34 +1,14 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
 
-const getStorageKey = (brand) => `onboarding_completed_${brand}`
-
 export function useOnboardingState(selectedBrand) {
-  const [completedSteps, setCompletedSteps] = useState(() => {
-    try {
-      const saved = localStorage.getItem(getStorageKey(selectedBrand))
-      return saved ? JSON.parse(saved) : []
-    } catch {
-      return []
-    }
-  })
-
+  const [completedSteps, setCompletedSteps] = useState([])
   const [showCongrats, setShowCongrats] = useState(false)
 
-  // Reload state when brand changes
+  // Reset when brand changes
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem(getStorageKey(selectedBrand))
-      setCompletedSteps(saved ? JSON.parse(saved) : [])
-    } catch {
-      setCompletedSteps([])
-    }
+    setCompletedSteps([])
     setShowCongrats(false)
   }, [selectedBrand])
-
-  // Persist to localStorage
-  useEffect(() => {
-    localStorage.setItem(getStorageKey(selectedBrand), JSON.stringify(completedSteps))
-  }, [completedSteps, selectedBrand])
 
   const allDone = completedSteps.length >= 3
 
