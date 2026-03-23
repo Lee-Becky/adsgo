@@ -24,6 +24,7 @@ import AIGenerate from './components/creativeHub/AIGenerate'
 import GenerateVideo from './components/creativeHub/generateVideo'
 import CreativeLibrary from './components/creativeHub/CreativeLibrary'
 import { ProductList, ProductDetails } from './components/brand/products'
+import { HomeNew } from './components/launchCenter'
 import { Competitors } from './components/brand/competitors'
 import BrandProfile from './components/brand/BrandProfile'
 import CreateBrandModal from './components/brand/CreateBrandModal'
@@ -180,6 +181,8 @@ function App() {
     const pageInfo = getPageInfo(currentPage)
 
     switch (currentPage) {
+      case 'homeNew':
+        return <HomeNew selectedBrand={selectedBrand} onPageChange={handlePageChange} />
       case 'overview':
         return (
           <Dashboard

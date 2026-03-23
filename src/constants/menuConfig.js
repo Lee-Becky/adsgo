@@ -11,6 +11,14 @@ export const MENU_ITEMS = [
     subtitle: 'Ad campaign overview and real-time optimization'
   },
   {
+    key: 'homeNew',
+    label: 'Home (New)',
+    shortLabel: 'New',
+    icon: 'Compass',
+    title: 'Home (New)',
+    subtitle: 'AI-powered campaign briefing and action center'
+  },
+  {
     key: 'campaignGenerator',
     label: 'New Campaign（旧）',
     shortLabel: '旧',
