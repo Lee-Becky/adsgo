@@ -203,10 +203,11 @@ const RecommendationCard = ({ card, isExpanded, onToggle, onEdit, onPublish, sta
 
 // --- Main Component ---
 
-const AutoRegeneration = ({ onPageChange }) => {
+const AutoRegeneration = ({ onPageChange, autoRegenEnabled, onAutoRegenChange }) => {
   const [selectedPlatform, setSelectedPlatform] = useState('Meta');
   const [draftPlatformFilter, setDraftPlatformFilter] = useState('');
-  const [autoRegen, setAutoRegen] = useState(false);
+  const autoRegen = autoRegenEnabled;
+  const setAutoRegen = onAutoRegenChange;
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
   const [expandedTags, setExpandedTags] = useState({});

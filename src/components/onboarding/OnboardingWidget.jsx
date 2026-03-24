@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Compass, Megaphone, TrendingUp, Sparkles, ChevronRight, ChevronDown, ChevronUp, X, Check, CircleCheck, ExternalLink } from 'lucide-react'
+import { Compass, Megaphone, TrendingUp, Sparkles, ChevronRight, ChevronDown, ChevronUp, X, Check, CircleCheck } from 'lucide-react'
 import { useOnboardingState } from './useOnboardingState'
 
 const STEPS = [
@@ -12,7 +12,6 @@ const STEPS = [
       '一键生成多平台Campaign，节省90%时间',
       '智能匹配目标受众，精准触达潜在客户',
     ],
-    type: 'cta',
     ctaText: '立即创建Campaign',
     route: '/batchGenerateAds',
     icon: Megaphone,
@@ -25,9 +24,7 @@ const STEPS = [
       '实时放大高ROI广告的预算投入',
       '7×24h自动执行，无需人工干预',
     ],
-    type: 'toggle',
-    toggleLabel: 'Auto-Apply',
-    linkText: '可在 Ad Manager 查看预算优化',
+    ctaText: '去开启自动优化',
     route: '/aiOptimize/adManagerV3',
     icon: TrendingUp,
   },
@@ -39,22 +36,28 @@ const STEPS = [
       '持续补充新创意，规避广告效果衰退',
       '全自动执行，始终保持投放竞争力',
     ],
-    type: 'toggle',
-    toggleLabel: 'Auto-Publish',
-    linkText: '可在 Draft & AI Recs 查看推荐Campaigns',
+    ctaText: '去开启自动发布',
     route: '/aiOptimize/autoRegeneration',
     icon: Sparkles,
   },
 ]
 
-export default function OnboardingWidget({ selectedBrand }) {
+export default function OnboardingWidget({ selectedBrand, isAutopilotEnabled, isAutoPublishEnabled }) {
   const navigate = useNavigate()
   const [isExpanded, setIsExpanded] = useState(true)
   const [isClosing, setIsClosing] = useState(false)
   const [expandedStep, setExpandedStep] = useState(0)
-  const [autoApplyEnabled, setAutoApplyEnabled] = useState(false)
-  const [autoPublishEnabled, setAutoPublishEnabled] = useState(false)
   const { completedSteps, markStepCompleted, allDone, dismissed, dismiss } = useOnboardingState(selectedBrand)
+
+  // Reactively complete Step 2 when AI Autopilot is enabled
+  useEffect(() => {
+    if (isAutopilotEnabled) markStepCompleted(1)
+  }, [isAutopilotEnabled, markStepCompleted])
+
+  // Reactively complete Step 3 when Auto Publish is enabled
+  useEffect(() => {
+    if (isAutoPublishEnabled) markStepCompleted(2)
+  }, [isAutoPublishEnabled, markStepCompleted])
 
   // Auto-expand the first incomplete step
   useEffect(() => {
@@ -66,31 +69,14 @@ export default function OnboardingWidget({ selectedBrand }) {
     }
   }, [completedSteps])
 
-  // Reset toggles on brand change
-  useEffect(() => {
-    setAutoApplyEnabled(false)
-    setAutoPublishEnabled(false)
-  }, [selectedBrand])
-
   if (dismissed) return null
 
   const completedCount = completedSteps.length
 
-  const handleStep1CTA = () => {
-    markStepCompleted(0)
-    navigate('/batchGenerateAds')
-  }
-
-  const handleToggleAutoApply = () => {
-    if (autoApplyEnabled) return
-    setAutoApplyEnabled(true)
-    markStepCompleted(1)
-  }
-
-  const handleToggleAutoPublish = () => {
-    if (autoPublishEnabled) return
-    setAutoPublishEnabled(true)
-    markStepCompleted(2)
+  const handleCTAClick = (index) => {
+    // Step 1: mark completed on CTA click; Step 2/3: only navigate, completion is reactive
+    if (index === 0) markStepCompleted(index)
+    navigate(STEPS[index].route)
   }
 
   const handleClose = () => {
@@ -124,7 +110,7 @@ export default function OnboardingWidget({ selectedBrand }) {
         </div>
       )
     }
-    const isActive = expandedStep === index && !isStepCompleted(index)
+    const isActive = expandedStep === index
     return (
       <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold ${
         isActive ? 'bg-primary text-white' : 'bg-gray-200 text-gray-500'
@@ -151,10 +137,10 @@ export default function OnboardingWidget({ selectedBrand }) {
           ))}
         </div>
 
-        {/* Step 1: CTA button */}
-        {step.type === 'cta' && !isStepCompleted(index) && (
+        {/* CTA button */}
+        {!isStepCompleted(index) && (
           <button
-            onClick={handleStep1CTA}
+            onClick={() => handleCTAClick(index)}
             className="w-full flex items-center justify-center gap-1.5 px-3 py-2 bg-gradient-to-r from-primary to-purple-600 text-white text-xs font-medium rounded-lg hover:shadow-primary-focus transition-shadow"
           >
             {step.ctaText}
@@ -162,43 +148,8 @@ export default function OnboardingWidget({ selectedBrand }) {
           </button>
         )}
 
-        {/* Step 2 & 3: Enable button + link */}
-        {step.type === 'toggle' && (
-          <div className="space-y-2.5">
-            {!(index === 1 ? autoApplyEnabled : autoPublishEnabled) ? (
-              <button
-                onClick={index === 1 ? handleToggleAutoApply : handleToggleAutoPublish}
-                className="w-full flex items-center justify-between bg-gray-50 hover:bg-primary-50 border border-gray-200 hover:border-primary-200 rounded-lg px-3 py-2.5 transition-all group"
-              >
-                <div className="flex items-center gap-2">
-                  <step.icon className="w-4 h-4 text-gray-500 group-hover:text-primary transition-colors" />
-                  <span className="text-xs font-medium text-gray-700">{step.toggleLabel}</span>
-                </div>
-                <span className="px-3 py-1 text-[11px] font-semibold rounded-md bg-gradient-to-r from-primary to-purple-600 text-white shadow-sm">
-                  Enable
-                </span>
-              </button>
-            ) : (
-              <div className="flex items-center justify-between bg-success-50 rounded-lg px-3 py-2.5 border border-success/20">
-                <div className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-success" />
-                  <span className="text-xs font-medium text-gray-700">{step.toggleLabel}</span>
-                </div>
-                <span className="text-[11px] font-semibold text-success">Enabled</span>
-              </div>
-            )}
-            <button
-              onClick={() => navigate(step.route)}
-              className="flex items-center gap-1 text-[11px] text-primary hover:text-primary-700 transition-colors"
-            >
-              <ExternalLink className="w-3 h-3" />
-              {step.linkText}
-            </button>
-          </div>
-        )}
-
-        {/* Completed badge for CTA step */}
-        {step.type === 'cta' && isStepCompleted(index) && (
+        {/* Completed badge */}
+        {isStepCompleted(index) && (
           <div className="flex items-center gap-1.5 text-xs text-success font-medium">
             <Check className="w-3.5 h-3.5" />
             已完成

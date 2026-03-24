@@ -56,7 +56,8 @@ function App() {
   const [budgetReasonData, setBudgetReasonData] = useState(null)
   const [showBudgetEdit, setShowBudgetEdit] = useState(false)
   const [budgetStatus, setBudgetStatus] = useState({})
-  const [autoExecuteRecommendations, setAutoExecuteRecommendations] = useState(false)
+  const [autoExecuteRecommendations, setAutoExecuteRecommendations] = useState(false) // lifted for onboarding
+  const [autoRegenEnabled, setAutoRegenEnabled] = useState(false) // lifted for onboarding
   const [isOverviewConnected, setIsOverviewConnected] = useState(false) // Home page connection state
   const [isOverviewDataFetching, setIsOverviewDataFetching] = useState(false) // Home page data fetching state
   const [isDashboardConnected, setIsDashboardConnected] = useState(false) // Ad Manager page connection state
@@ -197,10 +198,18 @@ function App() {
             onEditBrandConfig={handleEditBrandConfig}
             selectedBrand={selectedBrand}
             onPageChange={handlePageChange}
+            autoExecuteRecommendations={autoExecuteRecommendations}
+            onAutoExecuteChange={setAutoExecuteRecommendations}
           />
         )
       case 'autoRegeneration':
-        return <AutoRegeneration onPageChange={handlePageChange} />
+        return (
+          <AutoRegeneration
+            onPageChange={handlePageChange}
+            autoRegenEnabled={autoRegenEnabled}
+            onAutoRegenChange={setAutoRegenEnabled}
+          />
+        )
       case 'campaignGenerator':
         return (
           <CampaignGenerator 
@@ -320,6 +329,8 @@ function App() {
             onBrandChange={handleBrandChange}
             onCreateBrand={() => setIsCreateBrandModalOpen(true)}
             brands={brands}
+            autoExecuteRecommendations={autoExecuteRecommendations}
+            autoRegenEnabled={autoRegenEnabled}
           >
             {/* Main Content Area - Scrollable */}
             {renderContent()}

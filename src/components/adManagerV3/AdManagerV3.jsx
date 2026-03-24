@@ -10,12 +10,11 @@ import BrandDataOverlay from './BrandDataOverlay'
 import RunSettingModal from './RunSettingModal'
 import { MOCK_GOALS } from './mockData'
 
-const AdManagerV3 = ({ onEditBrandConfig, selectedBrand, onPageChange }) => {
+const AdManagerV3 = ({ onEditBrandConfig, selectedBrand, onPageChange, autoExecuteRecommendations, onAutoExecuteChange }) => {
   // Brand data status: 'no-accounts' | 'fetching' | 'no-data' | 'success'
   const [brandDataStatus, setBrandDataStatus] = useState('no-accounts')
   const [budgetStatus, setBudgetStatus] = useState({})
   const [lastUpdated, setLastUpdated] = useState('2026-01-15 13:29')
-  const [autoExecuteRecommendations, setAutoExecuteRecommendations] = useState(false)
   const [isSummaryCollapsed, setIsSummaryCollapsed] = useState(false)
   const [selectedCampaign, setSelectedCampaign] = useState(null)
   const [showCampaignAnalysis, setShowCampaignAnalysis] = useState(false)
@@ -131,7 +130,7 @@ const AdManagerV3 = ({ onEditBrandConfig, selectedBrand, onPageChange }) => {
             avgRoas={3.8}
             onRuleLibraryClick={() => setShowConfigModal(true)}
             autoApply={autoExecuteRecommendations}
-            onAutoApplyToggle={() => setAutoExecuteRecommendations(!autoExecuteRecommendations)}
+            onAutoApplyToggle={() => onAutoExecuteChange(!autoExecuteRecommendations)}
             goals={goals}
             onEditBrandConfig={onEditBrandConfig}
             brandName={selectedBrand}
