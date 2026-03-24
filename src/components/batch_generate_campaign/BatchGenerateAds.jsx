@@ -93,6 +93,41 @@ const ALL_COUNTRIES = [
   { code: 'IN', name: 'India' }
 ];
 
+const ALL_LANGUAGES = [
+  { code: 'en', name: 'English' },
+  { code: 'fr', name: 'French' },
+  { code: 'de', name: 'German' },
+  { code: 'ja', name: 'Japanese' },
+  { code: 'zh', name: 'Chinese (Simplified)' },
+  { code: 'pt', name: 'Portuguese' },
+  { code: 'hi', name: 'Hindi' },
+  { code: 'es', name: 'Spanish' },
+  { code: 'it', name: 'Italian' },
+  { code: 'ko', name: 'Korean' },
+  { code: 'ar', name: 'Arabic' },
+  { code: 'ru', name: 'Russian' },
+  { code: 'nl', name: 'Dutch' },
+  { code: 'sv', name: 'Swedish' },
+  { code: 'th', name: 'Thai' },
+  { code: 'vi', name: 'Vietnamese' },
+  { code: 'ms', name: 'Malay' },
+  { code: 'pl', name: 'Polish' },
+  { code: 'tr', name: 'Turkish' }
+];
+
+const COUNTRY_LANGUAGE_MAPPING = {
+  US: ['en'],
+  GB: ['en'],
+  CA: ['en', 'fr'],
+  AU: ['en'],
+  DE: ['de'],
+  FR: ['fr'],
+  JP: ['ja'],
+  SG: ['en', 'zh'],
+  BR: ['pt'],
+  IN: ['en', 'hi']
+};
+
 // AI Recommendation mock values
 const AI_RECOMMENDED = {
   platform: PLATFORMS[0], // Meta
@@ -100,6 +135,33 @@ const AI_RECOMMENDED = {
   adsetGoal: 'in_web_actions',
   event: 'Purchase',
   locations: [{ code: 'US', name: 'United States' }]
+};
+
+const PHONE_COUNTRY_CODES = [
+  { code: '+1', country: 'United States', iso: 'us', digits: 10 },
+  { code: '+86', country: 'China', iso: 'cn', digits: 11 },
+  { code: '+44', country: 'United Kingdom', iso: 'uk', digits: 10 },
+  { code: '+49', country: 'Germany', iso: 'de', digits: 11 },
+  { code: '+33', country: 'France', iso: 'fr', digits: 9 },
+  { code: '+81', country: 'Japan', iso: 'jp', digits: 10 },
+  { code: '+82', country: 'South Korea', iso: 'kr', digits: 10 },
+  { code: '+61', country: 'Australia', iso: 'au', digits: 9 },
+  { code: '+65', country: 'Singapore', iso: 'sg', digits: 8 },
+  { code: '+91', country: 'India', iso: 'in', digits: 10 },
+  { code: '+55', country: 'Brazil', iso: 'br', digits: 11 },
+  { code: '+52', country: 'Mexico', iso: 'mx', digits: 10 },
+  { code: '+971', country: 'United Arab Emirates', iso: 'ae', digits: 9 }
+];
+
+const validatePhone = (phone, countryCode) => {
+  if (!phone) return '';
+  const digitsOnly = phone.replace(/\D/g, '');
+  if (digitsOnly.length < 7 || digitsOnly.length > 15) return '请输入有效的电话号码（7-15位数字）';
+  const country = PHONE_COUNTRY_CODES.find(c => c.code === countryCode);
+  if (country && digitsOnly.length !== country.digits) {
+    return `${country.country} 号码需要 ${country.digits} 位数字`;
+  }
+  return '';
 };
 
 // Module-level flag: survives SPA navigation, resets on browser refresh
@@ -111,7 +173,8 @@ const TargetingChannelCard = ({
   selectedLocations, setSelectedLocations, openDropdown, setOpenDropdown, dropdownRef,
   locationSearch, setLocationSearch, eventSearch, setEventSearch, objectiveStage, setObjectiveStage,
   filteredCountries, filteredEvents, toggleLocation, currentObjectiveObj, currentGoalObj, availableGoals,
-  showAiRecommendation, allAnalysesComplete
+  showAiRecommendation, allAnalysesComplete,
+  selectedLanguage, setSelectedLanguage, languageSearch, setLanguageSearch, filteredLanguages
 }) => {
   const AiLabel = ({ field, recommendedLabel, onApply }) => {
     if (!showAiRecommendation) return null;
@@ -144,7 +207,8 @@ const TargetingChannelCard = ({
           </span>
         )}
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 relative z-[10]">
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 relative z-[10]">
         {/* Location Selector */}
         <div>
           <div className="relative" ref={openDropdown === 'location' ? dropdownRef : null}>
@@ -201,6 +265,46 @@ const TargetingChannelCard = ({
           <AiLabel field="location" recommendedLabel="United States" onApply={() => setSelectedLocations(AI_RECOMMENDED.locations)} />
         </div>
 
+        {/* Language Selector (single-select) */}
+        <div>
+          <div className="relative" ref={openDropdown === 'language' ? dropdownRef : null}>
+            <div onClick={() => setOpenDropdown(openDropdown === 'language' ? null : 'language')}
+              className="bg-white rounded-inner p-4 border border-gray-100 shadow-sm flex flex-col gap-2 group cursor-pointer hover:border-primary-500/20 transition-all h-full">
+              <span className="text-xs font-medium text-gray-500">Language</span>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <Globe size={16} className="text-primary-500 shrink-0" />
+                  <span className="text-sm font-bold text-gray-700 truncate">
+                    {selectedLanguage ? selectedLanguage.name : <span className="text-gray-300">Auto...</span>}
+                  </span>
+                </div>
+                <ChevronDown size={14} className={`text-gray-300 transition-transform ${openDropdown === 'language' ? 'rotate-180' : ''}`} />
+              </div>
+            </div>
+            {openDropdown === 'language' && (
+              <div className="absolute top-full left-0 mt-2 w-[260px] bg-white rounded-base shadow-xl border border-gray-100 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                <div className="p-3 border-b border-gray-50">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300 w-3.5 h-3.5" />
+                    <input className="w-full pl-9 pr-3 py-2 bg-gray-50 border-none rounded-base text-xs font-bold text-gray-900 focus:ring-2 focus:ring-primary-500/10"
+                      placeholder="Search languages..." value={languageSearch} onChange={(e) => setLanguageSearch(e.target.value)} autoFocus />
+                  </div>
+                </div>
+                <div className="max-h-[280px] overflow-y-auto custom-scrollbar p-2 space-y-0.5">
+                  {filteredLanguages.map(lang => (
+                    <button key={lang.code} onClick={() => { setSelectedLanguage(lang); setOpenDropdown(null); }}
+                      className={`w-full text-left px-3 py-2 rounded-base text-xs font-bold transition-all flex items-center justify-between ${
+                        selectedLanguage?.code === lang.code ? 'bg-primary-50 text-primary-500' : 'text-gray-600 hover:bg-gray-50'}`}>
+                      {lang.name}
+                      {selectedLanguage?.code === lang.code && <Check size={12} />}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
         {/* Platform Selector */}
         <div>
           <div className="relative" ref={openDropdown === 'platform' ? dropdownRef : null}>
@@ -211,7 +315,7 @@ const TargetingChannelCard = ({
                 <div className="flex items-center gap-2.5 min-w-0">
                   {platform ? (
                     <><img src={platform.logo} className="w-5 h-5 rounded object-contain shrink-0" alt="" /><span className="text-sm font-bold text-gray-700 truncate">{platform.name}</span></>
-                  ) : <span className="text-sm font-bold text-gray-300">待选择...</span>}
+                  ) : (<><Monitor size={16} className="text-primary-500 shrink-0" /><span className="text-sm font-bold text-gray-300">待选择...</span></>)}
                 </div>
                 <ChevronDown size={14} className={`text-gray-300 transition-transform ${openDropdown === 'platform' ? 'rotate-180' : ''}`} />
               </div>
@@ -241,106 +345,90 @@ const TargetingChannelCard = ({
           <AiLabel field="platform" recommendedLabel="Meta" onApply={() => setPlatform(AI_RECOMMENDED.platform)} />
         </div>
 
-        {/* Objective Selector */}
+        {/* Promote Objective (3-level cascading dropdown) */}
         <div>
           <div className="relative" ref={openDropdown === 'objective' ? dropdownRef : null}>
-            <div onClick={() => { setOpenDropdown(openDropdown === 'objective' ? null : 'objective'); setObjectiveStage('goal'); }}
+            <div onClick={() => { setOpenDropdown(openDropdown === 'objective' ? null : 'objective'); setObjectiveStage('objective'); }}
               className="bg-white rounded-inner p-4 border border-gray-100 shadow-sm flex flex-col gap-2 group cursor-pointer hover:border-primary-500/20 transition-all h-full">
-              <span className="text-xs font-medium text-gray-500">核心投放目标</span>
+              <span className="text-xs font-medium text-gray-500">Promote Objective</span>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2.5 min-w-0">
                   <Target size={16} className="text-primary-500 shrink-0" />
-                  <span className="text-sm font-bold text-gray-700 truncate">{currentObjectiveObj?.label || <span className="text-gray-300">待选择...</span>}</span>
+                  <span className="text-sm font-bold text-gray-700 truncate">
+                    {event || currentGoalObj?.label || <span className="text-gray-300">Select...</span>}
+                  </span>
                 </div>
-                <ChevronDown size={14} className={`text-gray-300 transition-transform ${openDropdown === 'objective' ? 'rotate-180' : ''}`} />
+                <ChevronDown size={14} className={`text-gray-300 transition-transform shrink-0 ${openDropdown === 'objective' ? 'rotate-180' : ''}`} />
               </div>
             </div>
             {openDropdown === 'objective' && (
-              <div className="absolute top-full left-0 mt-2 w-[320px] bg-white rounded-base shadow-xl border border-gray-100 p-4 space-y-3 animate-in fade-in zoom-in-95 duration-200">
-                <p className="text-xs font-medium text-gray-500 px-2">Select objective</p>
-                <div className="space-y-1.5">
-                  {CAMPAIGN_OBJECTIVES.map(obj => {
-                    const Icon = obj.icon;
-                    return (
-                      <button key={obj.value} onClick={() => {
-                        const firstGoal = ADSET_GOALS_MAPPING[obj.value][0];
-                        setObjective(obj.value); setAdsetGoal(firstGoal.value); setEvent(firstGoal.needsEvent ? 'Purchase' : ''); setOpenDropdown(null);
-                      }} className={`w-full text-left p-3 rounded-base transition-all flex items-center gap-3 ${
-                        objective === obj.value ? 'bg-primary-50 text-primary-500 ring-1 ring-primary-500/20 shadow-sm' : 'hover:bg-gray-50 text-gray-600'}`}>
-                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${objective === obj.value ? 'bg-primary-500 text-white' : obj.bg + ' ' + obj.color}`}>
-                          <Icon size={18} />
-                        </div>
-                        <div className="min-w-0">
-                          <p className="text-xs font-bold leading-none mb-1">{obj.label}</p>
-                          <p className="text-xs font-medium opacity-60 truncate">{obj.description}</p>
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-          </div>
-          <AiLabel field="objective" recommendedLabel="Sales & Conversions" onApply={() => {
-            setObjective(AI_RECOMMENDED.objective);
-            setAdsetGoal(AI_RECOMMENDED.adsetGoal);
-            setEvent(AI_RECOMMENDED.event);
-          }} />
-        </div>
-
-        {/* Event Selector */}
-        <div>
-          <div className="relative" ref={openDropdown === 'event' ? dropdownRef : null}>
-            <div onClick={() => { setOpenDropdown(openDropdown === 'event' ? null : 'event'); setObjectiveStage('goal'); }}
-              className="bg-white rounded-inner p-4 border border-gray-100 shadow-sm flex flex-col gap-2 group cursor-pointer hover:border-primary-500/20 transition-all h-full">
-              <span className="text-xs font-medium text-gray-500">转化优化事件</span>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <Zap size={16} className="text-primary-500 shrink-0" />
-                  <div className="flex items-center gap-1 min-w-0">
-                    <span className="text-sm font-bold text-gray-700 truncate">{currentGoalObj?.label || <span className="text-gray-300">待选择...</span>}</span>
-                    {event && <><ChevronRight size={10} className="text-gray-300 shrink-0" /><span className="text-sm font-bold text-primary-500 truncate">{event}</span></>}
+              <div className="absolute top-full right-0 mt-2 w-[320px] bg-white rounded-base shadow-xl border border-gray-100 p-3 animate-in fade-in zoom-in-95 duration-200 z-[20]">
+                {objectiveStage === 'objective' && (
+                  <div className="space-y-1">
+                    <p className="text-[10px] font-bold text-gray-400 tracking-widest mb-2 px-2">1. Campaign Objective</p>
+                    <div className="grid grid-cols-1 gap-1">
+                      {CAMPAIGN_OBJECTIVES.map(obj => {
+                        const Icon = obj.icon;
+                        return (
+                          <button key={obj.value} onClick={() => {
+                            const firstGoal = ADSET_GOALS_MAPPING[obj.value][0];
+                            setObjective(obj.value);
+                            setAdsetGoal(firstGoal?.value || '');
+                            setEvent(firstGoal?.needsEvent ? 'Purchase' : '');
+                            setObjectiveStage('goal');
+                          }} className={`w-full text-left px-3 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-3 ${
+                            objective === obj.value ? 'bg-gray-900 text-white shadow-md' : 'hover:bg-gray-50 text-gray-600'
+                          }`}>
+                            <div className={`w-6 h-6 rounded-lg flex items-center justify-center ${objective === obj.value ? 'bg-primary-500 text-white' : `${obj.bg} ${obj.color}`}`}>
+                              <Icon size={14} />
+                            </div>
+                            <span>{obj.label}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
-                </div>
-                <ChevronDown size={14} className={`text-gray-300 transition-transform ${openDropdown === 'event' ? 'rotate-180' : ''}`} />
-              </div>
-            </div>
-            {openDropdown === 'event' && (
-              <div className="absolute top-full right-0 mt-2 w-[340px] bg-white rounded-base shadow-xl border border-gray-100 p-4 animate-in fade-in zoom-in-95 duration-200">
-                {objectiveStage === 'goal' ? (
-                  <div className="space-y-3">
-                    <p className="text-xs font-medium text-gray-500 px-2">Select conversion event</p>
-                    <div className="space-y-1">
+                )}
+                {objectiveStage === 'goal' && (
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2 mb-2 px-1">
+                      <button onClick={() => setObjectiveStage('objective')} className="p-1 hover:bg-gray-100 rounded-md transition-colors text-gray-400"><ChevronLeft size={14} /></button>
+                      <p className="text-[10px] font-bold text-gray-400 tracking-widest">2. Conversion Goal</p>
+                    </div>
+                    <div className="grid grid-cols-1 gap-1">
                       {availableGoals.map(goal => (
                         <button key={goal.value} onClick={() => {
                           setAdsetGoal(goal.value);
                           if (goal.needsEvent) { setObjectiveStage('event'); } else { setEvent(''); setOpenDropdown(null); }
-                        }} className={`w-full text-left px-4 py-3 rounded-base text-xs font-bold transition-all flex items-center justify-between group ${
-                          adsetGoal === goal.value ? 'bg-primary-500 text-white shadow-lg' : 'hover:bg-gray-50 text-gray-600'}`}>
-                          {goal.label}
-                          {goal.needsEvent ? <ArrowRight size={12} className="opacity-40 group-hover:translate-x-1 transition-all" /> : (adsetGoal === goal.value && <CheckCircle2 size={12} />)}
+                        }} className={`w-full text-left px-3 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-between group ${
+                          adsetGoal === goal.value ? 'bg-gray-900 text-white shadow-md' : 'hover:bg-gray-50 text-gray-600'
+                        }`}>
+                          <span>{goal.label}</span>
+                          {goal.needsEvent ? <ArrowRight size={12} className="opacity-30 group-hover:opacity-100" /> : (adsetGoal === goal.value && <CheckCircle2 size={12} />)}
                         </button>
                       ))}
                     </div>
                   </div>
-                ) : (
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-2">
-                      <button onClick={() => setObjectiveStage('goal')} className="p-1.5 hover:bg-gray-50 rounded-lg transition-colors text-gray-400"><ChevronLeft size={16} /></button>
-                      <p className="text-xs font-medium text-gray-500">BACK</p>
+                )}
+                {objectiveStage === 'event' && (
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 px-1">
+                      <button onClick={() => setObjectiveStage('goal')} className="p-1 hover:bg-gray-100 rounded-md transition-colors text-gray-400"><ChevronLeft size={14} /></button>
+                      <p className="text-[10px] font-bold text-gray-400 tracking-widest">3. Pixel Event</p>
                     </div>
                     <div className="relative px-1">
-                      <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 w-3.5 h-3.5" />
-                      <input className="w-full pl-9 pr-3 py-2.5 bg-gray-50 border-none rounded-base text-xs font-bold text-gray-900 focus:ring-2 focus:ring-primary-500/10"
+                      <Search size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300" />
+                      <input className="w-full pl-9 pr-3 py-2 bg-gray-50 border-none rounded-base text-xs font-bold text-gray-900 focus:ring-2 focus:ring-primary-500/20"
                         placeholder="Search events..." value={eventSearch} onChange={(e) => setEventSearch(e.target.value)} autoFocus />
                     </div>
-                    <div className="max-h-[240px] overflow-y-auto custom-scrollbar px-1 space-y-1">
+                    <div className="max-h-48 overflow-y-auto custom-scrollbar space-y-0.5 pr-1">
                       {filteredEvents.map(ev => (
                         <button key={ev} onClick={() => { setEvent(ev); setOpenDropdown(null); }}
-                          className={`w-full text-left px-4 py-2.5 rounded-base text-xs font-bold transition-all flex items-center justify-between ${
-                            event === ev ? 'bg-primary-500 text-white shadow-primary-focus' : 'hover:bg-gray-50 text-gray-600'}`}>
+                          className={`w-full text-left px-3 py-2 rounded-base text-xs font-bold transition-all flex items-center justify-between ${
+                            event === ev ? 'bg-primary-500 text-white shadow-md' : 'hover:bg-gray-50 text-gray-600'
+                          }`}>
                           {ev}
-                          {event === ev && <Check size={12} />}
+                          {event === ev && <CheckCircle2 size={12} />}
                         </button>
                       ))}
                     </div>
@@ -349,7 +437,8 @@ const TargetingChannelCard = ({
               </div>
             )}
           </div>
-          <AiLabel field="event" recommendedLabel="In-web actions → Purchase" onApply={() => {
+          <AiLabel field="objective" recommendedLabel="In-web actions → Purchase" onApply={() => {
+            setObjective(AI_RECOMMENDED.objective);
             setAdsetGoal(AI_RECOMMENDED.adsetGoal);
             setEvent(AI_RECOMMENDED.event);
           }} />
@@ -403,10 +492,15 @@ const BatchGenerateAds = ({ onPageChange }) => {
     _hasGeneratedOnce ? 'Purchase' : ''
   );
 
-  const [openDropdown, setOpenDropdown] = useState(null); // 'location', 'platform', 'objective', 'event'
+  const [selectedLanguage, setSelectedLanguage] = useState(() =>
+    _hasGeneratedOnce ? { code: 'en', name: 'English' } : null
+  );
+  const [languageSearch, setLanguageSearch] = useState('');
+
+  const [openDropdown, setOpenDropdown] = useState(null);
   const [locationSearch, setLocationSearch] = useState('');
   const [eventSearch, setEventSearch] = useState('');
-  const [objectiveStage, setObjectiveStage] = useState('goal'); // 'goal' or 'event'
+  const [objectiveStage, setObjectiveStage] = useState('objective');
 
   const dropdownRef = useRef(null);
   useEffect(() => {
@@ -591,9 +685,27 @@ const BatchGenerateAds = ({ onPageChange }) => {
     }
   };
 
+  useEffect(() => {
+    const langCodes = new Set();
+    selectedLocations.forEach(loc => {
+      const codes = COUNTRY_LANGUAGE_MAPPING[loc.code] || [];
+      codes.forEach(c => langCodes.add(c));
+    });
+    const firstCode = [...langCodes][0];
+    if (firstCode) {
+      const lang = ALL_LANGUAGES.find(l => l.code === firstCode);
+      if (lang) setSelectedLanguage(lang);
+    }
+  }, [selectedLocations]);
+
   const filteredCountries = ALL_COUNTRIES.filter(c => 
     c.name.toLowerCase().includes(locationSearch.toLowerCase()) || 
     c.code.toLowerCase().includes(locationSearch.toLowerCase())
+  );
+
+  const filteredLanguages = ALL_LANGUAGES.filter(l =>
+    l.name.toLowerCase().includes(languageSearch.toLowerCase()) ||
+    l.code.toLowerCase().includes(languageSearch.toLowerCase())
   );
 
   const filteredEvents = STANDARD_EVENTS.filter(ev => 
@@ -734,8 +846,12 @@ const BatchGenerateAds = ({ onPageChange }) => {
       fbPage: '',
       pixel: '',
       event: '',
-      conversionDataset: ''
+      conversionDataset: '',
+      contactPhone: '',
+      phoneCountryCode: '+1'
     });
+    const [phoneError, setPhoneError] = useState('');
+    const [isPhoneCodeOpen, setIsPhoneCodeOpen] = useState(false);
 
     const [activeDropdown, setActiveDropdown] = useState(null);
     const [showTosModal, setShowTosModal] = useState(false);
@@ -917,9 +1033,12 @@ const BatchGenerateAds = ({ onPageChange }) => {
 
     const renderStep2 = () => {
       const isMeta = connectedPlatform === 'meta';
-      const canPublish = isMeta ? (selections.adAccount && selections.fbPage && selections.pixel && selections.event) : (selections.adAccount && selections.conversionDataset && selections.event);
+      const hasBaseSelections = isMeta ? (selections.adAccount && selections.fbPage && selections.pixel && selections.event) : (selections.adAccount && selections.conversionDataset && selections.event);
+      const isPhoneValid = selections.contactPhone && !validatePhone(selections.contactPhone, selections.phoneCountryCode);
+      const canPublish = hasBaseSelections && isPhoneValid;
       const options = { adAccount: [{ value: '1', label: 'Main Business Account (129-382-991)' }, { value: '2', label: 'Backup Marketing (442-110-872)' }], fbPage: [{ value: '1', label: 'Eco-Friendly Brand' }, { value: '2', label: 'Daily Lifestyle Store' }], pixel: [{ value: '1', label: 'Primary Web Pixel (Active)' }], metaEvent: [{ value: 'purchase', label: 'Purchase' }, { value: 'add_to_cart', label: 'Add to Cart' }, { value: 'lead', label: 'Lead' }], conversionDataset: [{ value: '1', label: 'Primary Conversions' }, { value: '2', label: 'Secondary Goals' }], googleEvent: [{ value: 'sales', label: 'Sales' }, { value: 'signup', label: 'Signup' }] };
       const handleToggle = (key) => setActiveDropdown(activeDropdown === key ? null : key);
+      const showPhone = isMeta ? !!selections.event : !!selections.event;
       return (
         <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
           <div className="bg-gray-50 rounded-inner p-6 space-y-6">
@@ -928,6 +1047,62 @@ const BatchGenerateAds = ({ onPageChange }) => {
               <>{selections.adAccount && (<div className="animate-in fade-in slide-in-from-top-2 duration-300"><CustomDropdown label="Facebook page" options={options.fbPage} value={selections.fbPage} onChange={(val) => { setSelections({...selections, fbPage: val}); setShowTosModal(true); }} placeholder="Select a page..." isOpen={activeDropdown === 'fbPage'} onToggle={() => handleToggle('fbPage')} isLoading={pubFbPageLoading.isLoading} /></div>)}{selections.fbPage && (<div className="animate-in fade-in slide-in-from-top-2 duration-300"><CustomDropdown label="Tracking pixel" options={options.pixel} value={selections.pixel} onChange={(val) => setSelections({...selections, pixel: val})} placeholder="Select a pixel..." isOpen={activeDropdown === 'pixel'} onToggle={() => handleToggle('pixel')} isLoading={pubPixelLoading.isLoading} /></div>)}{selections.pixel && (<div className="animate-in fade-in slide-in-from-top-2 duration-300"><CustomDropdown label="Event" options={options.metaEvent} value={selections.event} onChange={(val) => setSelections({...selections, event: val})} placeholder="Select an event..." isOpen={activeDropdown === 'metaEvent'} onToggle={() => handleToggle('metaEvent')} isLoading={pubEventLoading.isLoading} /></div>)}</>
             ) : (
               <>{selections.adAccount && (<div className="animate-in fade-in slide-in-from-top-2 duration-300"><CustomDropdown label="Conversion dataset" options={options.conversionDataset} value={selections.conversionDataset} onChange={(val) => setSelections({...selections, conversionDataset: val})} placeholder="Select a dataset..." isOpen={activeDropdown === 'conversionDataset'} onToggle={() => handleToggle('conversionDataset')} isLoading={pubFbPageLoading.isLoading} /></div>)}{selections.conversionDataset && (<div className="animate-in fade-in slide-in-from-top-2 duration-300"><CustomDropdown label="Optimization event" options={options.googleEvent} value={selections.event} onChange={(val) => setSelections({...selections, event: val})} placeholder="Select an event..." isOpen={activeDropdown === 'googleEvent'} onToggle={() => handleToggle('googleEvent')} isLoading={pubEventLoading.isLoading} /></div>)}</>
+            )}
+            {showPhone && (
+              <div className="animate-in fade-in slide-in-from-top-2 duration-300">
+                <div className="space-y-2">
+                  <label className="text-xs font-semibold text-gray-700">Contact Phone</label>
+                  <div className="flex gap-2">
+                    <div className="relative shrink-0">
+                      <button
+                        onClick={() => setIsPhoneCodeOpen(!isPhoneCodeOpen)}
+                        className={`h-12 px-3 flex items-center gap-2 bg-white border rounded-base text-sm font-medium transition-all min-w-[100px] ${isPhoneCodeOpen ? 'border-primary-500 shadow-sm' : 'border-gray-200 hover:border-gray-300'}`}
+                      >
+                        <span className="text-gray-900">{selections.phoneCountryCode}</span>
+                        <ChevronDown size={14} className={`text-gray-300 transition-transform ${isPhoneCodeOpen ? 'rotate-180' : ''}`} />
+                      </button>
+                      {isPhoneCodeOpen && (
+                        <div className="absolute top-full left-0 mt-1 w-64 bg-white border border-gray-100 rounded-base shadow-xl max-h-48 overflow-y-auto custom-scrollbar z-[120] animate-in fade-in zoom-in-95 duration-200">
+                          {PHONE_COUNTRY_CODES.map(cc => (
+                            <button
+                              key={cc.code}
+                              onClick={() => { setSelections({...selections, phoneCountryCode: cc.code}); setIsPhoneCodeOpen(false); setPhoneError(''); }}
+                              className={`w-full text-left px-4 py-2.5 text-xs font-medium transition-all flex items-center justify-between ${
+                                selections.phoneCountryCode === cc.code ? 'bg-primary-50 text-primary-500' : 'text-gray-600 hover:bg-gray-50'
+                              }`}
+                            >
+                              <span>{cc.country}</span>
+                              <span className="text-gray-400 font-bold">{cc.code}</span>
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                    <input
+                      type="tel"
+                      value={selections.contactPhone}
+                      onChange={(e) => {
+                        const val = e.target.value.replace(/[^\d]/g, '');
+                        setSelections({...selections, contactPhone: val});
+                        if (val) {
+                          setPhoneError(validatePhone(val, selections.phoneCountryCode));
+                        } else {
+                          setPhoneError('');
+                        }
+                      }}
+                      placeholder="Enter phone number..."
+                      className={`flex-1 h-12 px-4 bg-white border rounded-base text-sm font-medium outline-none transition-all ${
+                        phoneError ? 'border-rose-400 focus:border-rose-500 focus:ring-2 focus:ring-rose-500/10' : 'border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/10'
+                      }`}
+                    />
+                  </div>
+                  {phoneError && (
+                    <p className="text-xs font-medium text-rose-500 flex items-center gap-1.5 px-1 animate-in fade-in slide-in-from-top-1">
+                      <AlertCircle size={12} />{phoneError}
+                    </p>
+                  )}
+                </div>
+              </div>
             )}
             {!canPublish && selections.adAccount && (<div className="flex items-center gap-2 p-3 bg-primary-50 text-primary-500 rounded-base text-xs font-medium animate-pulse"><AlertCircle size={14} />Please complete all required selections to proceed</div>)}
           </div>
@@ -1158,6 +1333,9 @@ const BatchGenerateAds = ({ onPageChange }) => {
                   filteredCountries={filteredCountries} filteredEvents={filteredEvents} toggleLocation={toggleLocation}
                   currentObjectiveObj={currentObjectiveObj} currentGoalObj={currentGoalObj} availableGoals={availableGoals}
                   showAiRecommendation={false} allAnalysesComplete={false}
+                  selectedLanguage={selectedLanguage} setSelectedLanguage={setSelectedLanguage}
+                  languageSearch={languageSearch} setLanguageSearch={setLanguageSearch}
+                  filteredLanguages={filteredLanguages}
                 />
               )}
 
@@ -1233,6 +1411,9 @@ const BatchGenerateAds = ({ onPageChange }) => {
                   filteredCountries={filteredCountries} filteredEvents={filteredEvents} toggleLocation={toggleLocation}
                   currentObjectiveObj={currentObjectiveObj} currentGoalObj={currentGoalObj} availableGoals={availableGoals}
                   showAiRecommendation={true} allAnalysesComplete={allAnalysesComplete}
+                  selectedLanguage={selectedLanguage} setSelectedLanguage={setSelectedLanguage}
+                  languageSearch={languageSearch} setLanguageSearch={setLanguageSearch}
+                  filteredLanguages={filteredLanguages}
                 />
               )}
 
@@ -1574,7 +1755,8 @@ const BatchGenerateAds = ({ onPageChange }) => {
                   onPublish={() => setShowPublishModal(true)}
                   campaignName={selectedCampaign?.name || 'NEW-AI-CAMPAIGN-001'}
                   isExistingCampaign={!!selectedCampaignId}
-                  optimizationEvent={event}
+                  campaignObjective={objective}
+                  optimizationEvent={event || currentGoalObj?.label || currentObjectiveObj?.label || ''}
                   landingPageType={lpType}
                   landingPageTemplate={lpTemplateUrl}
                   productUtm={productLpUtm}
@@ -1588,6 +1770,8 @@ const BatchGenerateAds = ({ onPageChange }) => {
                   selectedAccount={selectedAccount}
                   onAuthStatusChange={setAuthStatus}
                   onSelectAccount={() => setShowMetaAccountPicker(true)}
+                  onBudgetChange={setDailyBudget}
+                  onBudgetTypeChange={setBudgetType}
                 />
               </div>
             </div>
@@ -1610,9 +1794,10 @@ const BatchGenerateAds = ({ onPageChange }) => {
 const AccountChoiceModal = ({ onSelect, onClose, selectedAccountType, setSelectedAccountType, renderStep1, renderStep2, connectedPlatform, selections }) => {
   const zIndex = useZIndex(true);
   const isMeta = connectedPlatform === 'meta';
-  const canProceed = isMeta 
+  const hasBaseSelections = isMeta
     ? (selections.adAccount && selections.fbPage && selections.pixel && selections.event)
     : (selections.adAccount && selections.conversionDataset && selections.event);
+  const canProceed = hasBaseSelections && selections.contactPhone && !validatePhone(selections.contactPhone, selections.phoneCountryCode);
 
   return (
     <div className="fixed inset-0 flex items-center justify-center px-4 animate-in fade-in duration-300" style={{ zIndex }}>

@@ -336,6 +336,33 @@ const SelectionModal = ({
             </div>
           ) : filtered.length === 0 ? (
             <div className="absolute inset-0 flex flex-col items-center justify-center p-12 text-center opacity-40"><AlertCircle size={48} className="mb-4" /><p className="text-sm font-bold">未找到符合条件的产品</p></div>
+          ) : type === 'history' ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {filtered.map((item) => {
+                const isSel = localSelected.has(item.id);
+                return (
+                  <div key={item.id} onClick={() => toggleItem(item.id)} className={`flex items-center gap-4 p-4 bg-white border-2 rounded-section transition-all cursor-pointer group ${isSel ? 'border-primary-500 shadow-lg shadow-primary-50' : 'border-gray-100 hover:border-gray-300 hover:shadow-md'}`}>
+                    <div className="w-12 h-12 rounded-xl overflow-hidden border border-gray-100 shrink-0 shadow-sm bg-gray-50">
+                      {item.imageUrl ? (
+                        <img src={item.imageUrl} className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-gray-300"><PackageCheck size={20} /></div>
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-gray-800 truncate">{item.name || '未命名产品'}</p>
+                      <div className="flex items-center gap-1.5 mt-0.5 opacity-60 group-hover:opacity-100 transition-opacity">
+                        <Link2 size={10} className="shrink-0" />
+                        <p className="text-xs text-gray-400 truncate">{item.url}</p>
+                      </div>
+                    </div>
+                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 ${isSel ? 'bg-primary-500 border-primary-500' : 'border-gray-200'}`}>
+                      {isSel && <Check size={14} className="text-white" />}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           ) : (
             <div className="grid grid-cols-3 sm:grid-cols-4 gap-4">
               {filtered.map((item) => {
@@ -378,7 +405,7 @@ const SelectionModal = ({
                 id: `${c.id}-${Date.now()}-${randomSuffix()}`, 
                 productId: modalContext 
               }));
-              onUpdateCreatives(modalContext, prev => [...prev, ...newCreatives]);
+              onUpdateCreatives(modalContext, prev => [...newCreatives, ...prev]);
             } else {
               const pool = getItems();
               const toAdd = pool.filter(i => localSelected.has(i.id) && !selectedProducts.some(p => p.id === i.id))
@@ -515,9 +542,11 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
     onSelectProducts(selectedProducts.filter(p => p.id !== id));
   };
 
-  const analysisEndRef = useRef(null);
+  const analysisContainerRef = useRef(null);
   const scrollToBottom = () => {
-    analysisEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (analysisContainerRef.current) {
+      analysisContainerRef.current.scrollTop = analysisContainerRef.current.scrollHeight;
+    }
   };
 
   // Mock interest keywords per product category for AI recommendations
@@ -779,7 +808,7 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
           const url = await generateAIGCCreative(`Batch generation ${i} for ${p.name}`);
           const newCreative = { id: `aigc-batch-${Date.now()}-${i}-${p.id}-${Math.random()}`, url, productId: p.id };
           // 逐个更新，使用函数式更新确保不丢失前一个创意
-          onUpdateCreatives(p.id, prev => [...prev, newCreative]);
+          onUpdateCreatives(p.id, prev => [newCreative, ...prev]);
         } finally {
           // 生成完成后减少骨架屏数量
           setGeneratingCounts(prev => ({ ...prev, [p.id]: Math.max(0, (prev[p.id] || 1) - 1) }));
@@ -805,7 +834,7 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
     try {
       const url = await generateAIGCCreative("Advertising product photography");
       const newCreative = { id: `aigc-${Date.now()}-${Math.random()}`, url, productId: id };
-      onUpdateCreatives(id, prev => [...prev, newCreative]);
+      onUpdateCreatives(id, prev => [newCreative, ...prev]);
     } finally {
       setGeneratingCounts(prev => ({ ...prev, [id]: Math.max(0, (prev[id] || 1) - 1) }));
     }
@@ -820,7 +849,7 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
       if (file) {
         const url = URL.createObjectURL(file);
         const newCreative = { id: `upload-${Date.now()}-${Math.random()}`, url, productId: id };
-        onUpdateCreatives(id, [...(productCreatives[id] || []), newCreative]);
+        onUpdateCreatives(id, [newCreative, ...(productCreatives[id] || [])]);
       }
     };
     input.click();
@@ -1122,45 +1151,38 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
                             )}
                           </div>
                         </div>
-                        <div className="flex-1 flex flex-col justify-center min-w-0">
-                          {(!showAnalysisResult && isAnalyzing) ? (
-                            <div className="w-full flex justify-end">
-                              <button onClick={() => setExpandedAnalysisId(isExpanded ? null : p.id)} className="flex items-center gap-2 px-3 py-1.5 bg-primary-50 text-primary-500 rounded-lg text-xs font-medium hover:bg-primary-50 transition-colors">
-                                <Loader2 size={12} className="animate-spin" />Analyzing...{isExpanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+                        <div className="flex-1 flex items-center gap-3 min-w-0">
+                          <div className="flex-1 flex items-center gap-3 overflow-x-auto no-scrollbar py-1 min-w-0">
+                            {[...Array(generatingCount)].map((_, i) => (
+                              <NanoBananaSkeleton key={`gen-${i}`} />
+                            ))}
+                            {creatives.map(c => (
+                              <div key={c.id} className="relative w-14 h-20 rounded-lg overflow-hidden shrink-0 border border-gray-100 group/item shadow-sm">
+                                <img src={c.url} className="w-full h-full object-cover" />
+                                <button onClick={() => onUpdateCreatives(p.id, creatives.filter(prev => prev.id !== c.id))} className="absolute top-1 right-1 w-5 h-5 bg-white/90 rounded-full flex items-center justify-center opacity-0 group-hover/item:opacity-100 transition-all text-rose-500 shadow-md">
+                                  <X size={10} />
+                                </button>
+                              </div>
+                            ))}
+                            <div className="sticky right-0 flex gap-2 shrink-0 bg-white pl-2 z-[1]">
+                              <button onClick={() => { setModalContext(p.id); setActiveModal('creative_lib'); }} className="w-14 h-20 rounded-lg border-2 border-dashed border-gray-100 flex flex-col items-center justify-center text-gray-300 hover:border-primary-500 hover:text-primary-500/70 hover:bg-primary-50 transition-all gap-1" title="从素材库选择">
+                                <Database size={16} />
+                                <span className="text-xs font-medium">库</span>
+                              </button>
+                              <button onClick={() => handleAIGCForProduct(p.id)} className="w-14 h-20 rounded-lg border-2 border-dashed border-purple-100 flex flex-col items-center justify-center text-purple-400 hover:border-purple-400 hover:bg-purple-50 transition-all gap-1" title="AI 生成">
+                                <Sparkles size={16} />
+                                <span className="text-xs font-medium">AI</span>
+                              </button>
+                              <button onClick={() => handleUploadForProduct(p.id)} className="w-14 h-20 rounded-lg border-2 border-dashed border-gray-100 flex flex-col items-center justify-center text-gray-300 hover:border-gray-400 hover:bg-gray-50 transition-all gap-1" title="本地上传">
+                                <Upload size={16} />
+                                <span className="text-xs font-medium">传</span>
                               </button>
                             </div>
-                          ) : (
-                            <div className="flex flex-col md:flex-row items-center gap-6 overflow-hidden min-w-0">
-                              <div className="flex-1 flex items-center gap-3 overflow-x-auto no-scrollbar py-1 pr-4">
-                                {creatives.map(c => (
-                                  <div key={c.id} className="relative w-14 h-20 rounded-lg overflow-hidden shrink-0 border border-gray-100 group/item shadow-sm">
-                                    <img src={c.url} className="w-full h-full object-cover" />
-                                    <button onClick={() => onUpdateCreatives(p.id, creatives.filter(prev => prev.id !== c.id))} className="absolute top-1 right-1 w-5 h-5 bg-white/90 rounded-full flex items-center justify-center opacity-0 group-hover/item:opacity-100 transition-all text-rose-500 shadow-md">
-                                      <X size={10} />
-                                    </button>
-                                  </div>
-                                ))}
-                                
-                                {[...Array(generatingCount)].map((_, i) => (
-                                  <NanoBananaSkeleton key={`gen-${i}`} />
-                                ))}
-
-                                <div className="flex gap-2 shrink-0 ml-2">
-                                    <button onClick={() => { setModalContext(p.id); setActiveModal('creative_lib'); }} className="w-14 h-20 rounded-lg border-2 border-dashed border-gray-100 flex flex-col items-center justify-center text-gray-300 hover:border-primary-500 hover:text-primary-500/70 hover:bg-primary-50 transition-all gap-1" title="从素材库选择">
-                                      <Database size={16} />
-                                      <span className="text-xs font-medium">库</span>
-                                    </button>
-                                    <button onClick={() => handleAIGCForProduct(p.id)} className="w-14 h-20 rounded-lg border-2 border-dashed border-purple-100 flex flex-col items-center justify-center text-purple-400 hover:border-purple-400 hover:bg-purple-50 transition-all gap-1" title="AI 生成">
-                                      <Sparkles size={16} />
-                                      <span className="text-xs font-medium">AI</span>
-                                    </button>
-                                    <button onClick={() => handleUploadForProduct(p.id)} className="w-14 h-20 rounded-lg border-2 border-dashed border-gray-100 flex flex-col items-center justify-center text-gray-300 hover:border-gray-400 hover:bg-gray-50 transition-all gap-1" title="本地上传">
-                                      <Upload size={16} />
-                                      <span className="text-xs font-medium">传</span>
-                                    </button>
-                                  </div>
-                              </div>
-                            </div>
+                          </div>
+                          {(!showAnalysisResult && isAnalyzing && !p.isFromHistory) && (
+                            <button onClick={() => setExpandedAnalysisId(isExpanded ? null : p.id)} className="shrink-0 flex items-center gap-2 px-3 py-1.5 bg-primary-50 text-primary-500 rounded-lg text-xs font-medium hover:bg-primary-100 transition-colors">
+                              <Loader2 size={12} className="animate-spin" />Analyzing...{isExpanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+                            </button>
                           )}
                         </div>
                         {(!isAnalyzing || p.isFromHistory) && (
@@ -1174,7 +1196,7 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
                     </div>
                     {isAnalyzing && isExpanded && !p.isFromHistory && (
                       <div className="bg-white rounded-xl p-10 border border-gray-100 mx-4 animate-in slide-in-from-top-2 shadow-xl overflow-hidden">
-                        <div className="h-[500px] overflow-y-auto custom-scrollbar pr-4 space-y-6">
+                        <div ref={analysisContainerRef} className="h-[500px] overflow-y-auto custom-scrollbar pr-4 space-y-6">
                           {ANALYSIS_STEPS.slice(0, currentStep + 1).map((step, stepIdx) => {
                             let listIdx = 0;
                             if (step.type === 'ordered') {
@@ -1252,7 +1274,7 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
                               </div>
                             );
                           })}
-                          <div ref={analysisEndRef} />
+                          <div />
                         </div>
                       </div>
                     )}

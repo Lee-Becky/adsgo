@@ -4,7 +4,7 @@ import {
   Rocket, Edit3, DollarSign, X, Check, Globe,
   Layers, Target, Box, Plus, Tag, Link as LinkIcon, Megaphone,
   ChevronDown, Search, Languages, Users, UserPlus, UserMinus,
-  ShoppingBag, Monitor, Smartphone, Layout, Facebook, Loader2
+  ShoppingBag, Monitor, Smartphone, Layout, Facebook, Loader2, Trash2
 } from 'lucide-react';
 import useDropdownLoading from '../../../hooks/useDropdownLoading';
 
@@ -211,18 +211,6 @@ const EditAdSetModal = ({ isOpen, adSet, onUpdateField, onToggleItem, onClose, a
                 <h4 className="text-sm font-semibold text-gray-900">Audience 受众设置</h4>
               </div>
               
-              <div className="flex items-center gap-3 bg-primary-50/50 px-3 py-1.5 rounded-full border border-primary-500/15">
-                <div className="flex items-center gap-1.5">
-                  <Sparkles size={12} className="text-primary-500" />
-                  <span className="text-xs font-medium text-primary-700">Advantage+</span>
-                </div>
-                <button 
-                  onClick={() => onUpdateField('audienceType', adSet.audienceType === 'ADV' ? 'INT' : 'ADV')}
-                  className={`w-10 h-5 rounded-full transition-all relative ${adSet.audienceType === 'ADV' ? 'bg-primary-500' : 'bg-gray-200'}`}
-                >
-                  <div className={`absolute top-1 w-3 h-3 bg-white rounded-full transition-all shadow-sm ${adSet.audienceType === 'ADV' ? 'left-6' : 'left-1'}`} />
-                </button>
-              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -800,10 +788,18 @@ const AdSkeleton = () => (
   </div>
 );
 
+const OBJECTIVE_CTA_MAPPING = {
+  sales_conversions: 'Shop Now',
+  traffic: 'Learn More',
+  awareness_engagement: 'Learn More',
+  leads: 'Sign Up',
+  app_promotion: 'Download'
+};
+
 const CampaignPreviewView = ({
   structure, budgetType, dailyBudget, initialAdsetAudiences, productCreativesMap, selectedProducts, brand, onBack, onPublish, campaignName, optimizationEvent, landingPageType, landingPageTemplate, productUtm, copyStrategy, unifiedHeadline, unifiedBody, campaignType,
   estimatedTotalDaily, adSetGroupsCount, authStatus, selectedAccount, onAuthStatusChange, onSelectAccount,
-  isExistingCampaign
+  isExistingCampaign, campaignObjective, onBudgetChange, onBudgetTypeChange
 }) => {
 
   const [localAdSets, setLocalAdSets] = useState([]);
@@ -812,6 +808,9 @@ const CampaignPreviewView = ({
   const [loadedAdsCount, setLoadedAdsCount] = useState(0);
   const [isEditingCampaignName, setIsEditingCampaignName] = useState(false);
   const [localCampaignName, setLocalCampaignName] = useState(campaignName);
+  const [selectedCta, setSelectedCta] = useState(OBJECTIVE_CTA_MAPPING[campaignObjective] || 'Shop Now');
+  const [isCtaOpen, setIsCtaOpen] = useState(false);
+  const [localBudget, setLocalBudget] = useState(dailyBudget);
 
   const totalAdsCount = useMemo(() => {
     return localAdSets.reduce((acc, as) => acc + (as.ads?.length || 0), 0);
@@ -1144,8 +1143,8 @@ const CampaignPreviewView = ({
       </div>
 
       <div className="space-y-16">
-        <div className="bg-gray-900 p-6 rounded-section shadow-xl text-white relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-80 h-80 bg-primary-500/10 rounded-full blur-[100px] -translate-y-40 translate-x-40"></div>
+        <div className="bg-gray-900 p-6 rounded-section shadow-xl text-white relative overflow-visible">
+          <div className="absolute top-0 right-0 w-80 h-80 bg-primary-500/10 rounded-full blur-[100px] -translate-y-40 translate-x-40 pointer-events-none"></div>
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
               <div className="w-11 h-11 bg-primary-500 rounded-inner flex items-center justify-center shadow-lg border-2 border-white/10"><Briefcase size={22} /></div>
@@ -1178,8 +1177,8 @@ const CampaignPreviewView = ({
               </div>
             </div>
             <div className="text-right">
-              <p className="text-xs font-medium text-gray-500 tracking-widest">总日消耗</p>
-              <p className="text-xl font-semibold text-emerald-400">${totalDailyBudget}</p>
+              <p className="text-xs font-medium text-gray-500 tracking-widest">规模概览</p>
+              <p className="text-xl font-semibold text-emerald-400">{adSetGroupsCount || localAdSets.length} Adsets · {localAdSets.reduce((s, as) => s + (as.ads?.length || 0), 0)} Ads</p>
             </div>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -1189,15 +1188,50 @@ const CampaignPreviewView = ({
             </div>
             <div className="bg-white/5 rounded-inner p-3 border border-white/5">
               <p className="text-xs font-medium text-gray-500 mb-0.5">优化目标</p>
-              <p className="text-sm font-medium truncate">{optimizationEvent.split(' ')[0]}</p>
+              <p className="text-sm font-medium truncate">{optimizationEvent || '—'}</p>
             </div>
             <div className="bg-white/5 rounded-inner p-3 border border-white/5">
-              <p className="text-xs font-medium text-gray-500 mb-0.5">AdSets 数量</p>
-              <p className="text-sm font-medium">{adSetGroupsCount || localAdSets.length}</p>
+              <p className="text-xs font-medium text-gray-500 mb-0.5">Daily Budget</p>
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1 shrink-0">
+                  {['CBO', 'ABO'].map(mode => (
+                    <button key={mode} disabled={isExistingCampaign}
+                      onClick={() => { if (!isExistingCampaign && onBudgetTypeChange) onBudgetTypeChange(mode); }}
+                      className={`px-1.5 py-0.5 rounded text-[10px] font-bold transition-all ${
+                        budgetType === mode ? 'bg-primary-500 text-white' : 'bg-white/10 text-gray-400 hover:bg-white/20'
+                      } ${isExistingCampaign ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>
+                      {mode}
+                    </button>
+                  ))}
+                </div>
+                <div className="flex items-center gap-1">
+                  <span className="text-sm font-medium text-white">$</span>
+                  <input type="number" value={localBudget}
+                    onChange={e => { const v = Number(e.target.value); setLocalBudget(v); if (onBudgetChange) onBudgetChange(v); }}
+                    className="w-16 bg-white/10 border border-white/20 rounded px-2 py-0.5 text-sm font-medium text-white outline-none focus:border-primary-400 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  />
+                </div>
+              </div>
             </div>
-            <div className="bg-white/5 rounded-inner p-3 border border-white/5">
-              <p className="text-xs font-medium text-gray-500 mb-0.5">Campaign 类型</p>
-              <p className="text-sm font-medium">{campaignType}</p>
+            <div className="bg-white/5 rounded-inner p-3 border border-white/5 relative">
+              <p className="text-xs font-medium text-gray-500 mb-0.5">CTA</p>
+              <div className="flex items-center gap-1.5 cursor-pointer" onClick={() => setIsCtaOpen(!isCtaOpen)}>
+                <p className="text-sm font-medium">{selectedCta}</p>
+                <ChevronDown size={11} className={`text-gray-500 transition-transform ml-auto ${isCtaOpen ? 'rotate-180' : ''}`} />
+              </div>
+              {isCtaOpen && (
+                <div className="absolute top-full left-0 mt-2 w-44 bg-white rounded-base shadow-xl border border-gray-100 p-1.5 animate-in fade-in zoom-in-95 duration-200" style={{ zIndex: 9999 }}>
+                  {CTA_OPTIONS.map(opt => (
+                    <button key={opt} onClick={() => { setSelectedCta(opt); setIsCtaOpen(false); }}
+                      className={`w-full text-left px-3 py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-between ${
+                        selectedCta === opt ? 'bg-primary-50 text-primary-600' : 'text-gray-600 hover:bg-gray-50'
+                      }`}>
+                      {opt}
+                      {selectedCta === opt && <Check size={12} />}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -1216,19 +1250,22 @@ const CampaignPreviewView = ({
                     <h4 className="text-base font-semibold text-gray-800">{adSet.name}</h4>
                   </div>
                 </div>
-                <div className="flex items-center gap-4">
-                  {adSet.interests.length > 0 && (
-                    <div className="flex items-center gap-1.5 px-3 py-1.5 bg-primary-50/50 rounded-full border border-primary-500/15">
-                      <Tag size={12} className="text-primary-500" />
-                      <span className="text-xs font-medium text-primary-500">{adSet.interests[0]} {adSet.interests.length > 1 ? `+${adSet.interests.length - 1}` : ''}</span>
-                    </div>
-                  )}
+                <div className="flex items-center gap-3">
                   <button 
                     onClick={() => setEditingAdSetIndex(asIdx)}
                     className="border border-primary-500 text-primary-500 rounded-base text-sm font-medium hover:bg-primary-50 active:bg-primary-100 transition-all duration-200 px-4 py-2 flex items-center gap-2"
                   >
                     <Edit3 size={14} /> 编辑配置
                   </button>
+                  {localAdSets.length > 1 && (
+                    <button
+                      onClick={() => setLocalAdSets(prev => prev.filter((_, i) => i !== asIdx))}
+                      className="border border-gray-200 text-gray-400 rounded-base text-sm font-medium hover:border-rose-300 hover:text-rose-500 hover:bg-rose-50 transition-all duration-200 px-3 py-2"
+                      title="删除此广告组"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  )}
                 </div>
               </div>
 
@@ -1247,24 +1284,29 @@ const CampaignPreviewView = ({
                   return (
                     <div key={aIdx} className="group relative">
                       <div className="bg-white rounded-section border border-gray-200 overflow-hidden shadow-adsgo-card transition-all hover:shadow-xl hover:border-primary-500/20 relative animate-in fade-in zoom-in-95 duration-500">
-                        <button 
-                          onClick={() => setEditingAdInfo({ asIndex: asIdx, adIndex: aIdx })}
-                          className="absolute top-4 right-4 z-10 w-8 h-8 bg-white/90 rounded-full flex items-center justify-center text-gray-400 opacity-0 group-hover:opacity-100 transition-all hover:text-primary-500 shadow-lg"
-                        >
-                          <Edit3 size={14} />
-                        </button>
+                        <div className="absolute top-3 right-3 z-10 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-all">
+                          <button
+                            onClick={() => setEditingAdInfo({ asIndex: asIdx, adIndex: aIdx })}
+                            className="w-7 h-7 bg-white/90 rounded-full flex items-center justify-center text-gray-400 hover:text-primary-500 shadow-lg transition-colors"
+                          >
+                            <Edit3 size={12} />
+                          </button>
+                          {adSet.ads.length > 1 && (
+                            <button
+                              onClick={() => setLocalAdSets(prev => { const next = [...prev]; next[asIdx] = { ...next[asIdx], ads: next[asIdx].ads.filter((_, i) => i !== aIdx) }; return next; })}
+                              className="w-7 h-7 bg-white/90 rounded-full flex items-center justify-center text-gray-400 hover:text-rose-500 shadow-lg transition-colors"
+                              title="删除此广告"
+                            >
+                              <Trash2 size={12} />
+                            </button>
+                          )}
+                        </div>
                         <div className="p-4 bg-white border-b border-gray-50">
                           <div className="flex items-center justify-between mb-3">
                             <div className="flex items-center gap-2">
                               <div className="w-8 h-8 rounded-full bg-gray-900 flex items-center justify-center text-xs font-medium text-white">{brand.name.charAt(0)}</div>
                               <div><p className="text-xs font-medium text-gray-900">{brand.name}</p><p className="text-xs text-gray-500">Sponsored</p></div>
                             </div>
-                            {ad.promoCode && (
-                              <div className="bg-rose-50 border border-rose-100 px-2 py-0.5 rounded-md flex items-center gap-1 animate-pulse">
-                                <Sparkles size={10} className="text-rose-500" />
-                                <span className="text-xs font-medium text-rose-600 tracking-tighter">{ad.promoCode}</span>
-                              </div>
-                            )}
                           </div>
                           <p className="text-xs text-gray-700 leading-relaxed line-clamp-2">{ad.primaryText}</p>
                         </div>
@@ -1281,7 +1323,7 @@ const CampaignPreviewView = ({
                             <p className="text-xs text-gray-500 font-semibold truncate">{ad.destinationUrl.split('?')[0].split('/').slice(0,3).join('/')}</p>
                             <h6 className="text-xs font-medium text-gray-900 truncate">{ad.headline}</h6>
                           </div>
-                          <div className="px-3 py-1.5 bg-white border border-gray-200 rounded-md text-xs font-medium text-gray-800 shrink-0 tracking-tighter shadow-sm">{ad.cta}</div>
+                          <div className="px-3 py-1.5 bg-white border border-gray-200 rounded-md text-xs font-medium text-gray-800 shrink-0 tracking-tighter shadow-sm">{selectedCta}</div>
                         </div>
                         {product && (
                           <div className="p-2.5 bg-primary-50/50 border-t border-primary-500/15 flex items-center gap-2">
