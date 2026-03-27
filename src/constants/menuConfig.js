@@ -11,6 +11,14 @@ export const MENU_ITEMS = [
     subtitle: 'Ad campaign overview and real-time optimization'
   },
   {
+    key: 'mediaPlan',
+    label: 'Media Plan',
+    shortLabel: 'Plan',
+    icon: 'LayoutDashboard',
+    title: 'Media Plan',
+    subtitle: 'Your advertising command center'
+  },
+  {
     key: 'homeNew',
     label: 'Home (New)',
     shortLabel: 'New',

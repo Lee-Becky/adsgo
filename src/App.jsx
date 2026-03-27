@@ -27,6 +27,7 @@ import { ProductList, ProductDetails } from './components/brand/products'
 import { HomeNew } from './components/launchCenter'
 import { Competitors } from './components/brand/competitors'
 import BrandProfile from './components/brand/BrandProfile'
+import MediaPlan from './components/mediaPlan/MediaPlan'
 import CreateBrandModal from './components/brand/CreateBrandModal'
 import BrandSwitchLoading from './components/brand/BrandSwitchLoading'
 import ComingSoon from './components/ComingSoon'
@@ -182,6 +183,17 @@ function App() {
     const pageInfo = getPageInfo(currentPage)
 
     switch (currentPage) {
+      case 'mediaPlan':
+        return (
+          <MediaPlan
+            selectedBrand={selectedBrand}
+            onPageChange={handlePageChange}
+            autoExecuteRecommendations={autoExecuteRecommendations}
+            onAutoExecuteChange={setAutoExecuteRecommendations}
+            autoRegenEnabled={autoRegenEnabled}
+            onAutoRegenChange={setAutoRegenEnabled}
+          />
+        )
       case 'homeNew':
         return <HomeNew selectedBrand={selectedBrand} onPageChange={handlePageChange} />
       case 'overview':
