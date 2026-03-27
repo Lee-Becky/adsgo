@@ -1,5 +1,4 @@
-import React, { useMemo } from 'react'
-import { Rocket } from 'lucide-react'
+import React, { useState, useMemo } from 'react'
 import { MOCK_CAMPAIGNS } from '../adManagerV3/mockData'
 import { CAMPAIGN_CARDS } from '../autoRegeneration/mockData'
 import { STATUS_BAR_DATA, OPERATIONS_DATA } from './mockData'
@@ -11,6 +10,9 @@ import YourActionItems from './YourActionItems'
 import SafetyControl from './SafetyControl'
 import DevGuideButton from './DevGuideButton'
 import { DEV_GUIDES } from './devGuideContent'
+import DemoPhaseSwitch from './DemoPhaseSwitch'
+import PrePublishView from './PrePublishView'
+import JustLaunchedView from './JustLaunchedView'
 
 export default function MediaPlan({
   selectedBrand,
@@ -20,6 +22,7 @@ export default function MediaPlan({
   autoRegenEnabled,
   onAutoRegenChange,
 }) {
+  const [demoPhase, setDemoPhase] = useState('new_user')
   const { kpiType, kpiTarget, dailyBudget } = STATUS_BAR_DATA
   const campaigns = MOCK_CAMPAIGNS
 
@@ -85,37 +88,37 @@ export default function MediaPlan({
     }
   }, [campaigns, kpiType, kpiTarget, dailyBudget])
 
-  const hasActiveCampaigns = computed.activeCampaigns.length > 0
-
-  // ── Empty State ──
-  if (!hasActiveCampaigns) {
+  // ── Pre-publish State ──
+  if (demoPhase === 'new_user') {
     return (
       <div className="p-6">
-        <div className="bg-white rounded-[20px] shadow-[-2px_2px_16px_rgba(14,0,45,0.06)] min-h-[60vh] flex items-center justify-center">
-          <div className="text-center max-w-md px-6">
-            <div className="w-16 h-16 rounded-2xl bg-primary-50 flex items-center justify-center mx-auto mb-5">
-              <Rocket className="w-8 h-8 text-primary-500" />
-            </div>
-            <h2 className="text-xl font-bold text-gray-900 mb-2">No active campaigns yet</h2>
-            <p className="text-sm text-gray-500 mb-6 leading-relaxed">
-              Your Media Plan will come to life once your first ads are running.
-              Create a campaign to get started — AdsGo will handle the rest.
-            </p>
-            <button
-              onClick={() => onPageChange('batchGenerateAds')}
-              className="px-6 py-2.5 bg-primary-500 text-white rounded-lg text-sm font-medium shadow-sm shadow-primary-500/20 hover:bg-primary-600 active:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500/20 transition-all"
-            >
-              Create Your First Campaign
-            </button>
-          </div>
-        </div>
+        <DemoPhaseSwitch value={demoPhase} onChange={setDemoPhase} />
+        <PrePublishView onPageChange={onPageChange} />
       </div>
     )
   }
 
-  // ── Main Content ──
+  // ── Just Launched State ──
+  if (demoPhase === 'just_launched') {
+    return (
+      <div className="p-6">
+        <DemoPhaseSwitch value={demoPhase} onChange={setDemoPhase} />
+        <JustLaunchedView
+          autoExecuteRecommendations={autoExecuteRecommendations}
+          autoRegenEnabled={autoRegenEnabled}
+          onAutoExecuteChange={onAutoExecuteChange}
+          onAutoRegenChange={onAutoRegenChange}
+          onPageChange={onPageChange}
+        />
+      </div>
+    )
+  }
+
+  // ── Running State (existing dashboard) ──
   return (
     <div className="p-6 space-y-5">
+      <DemoPhaseSwitch value={demoPhase} onChange={setDemoPhase} />
+
       {/* Status Bar */}
       <div className="flex items-center gap-3">
         <div className="flex-1">

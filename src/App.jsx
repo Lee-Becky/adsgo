@@ -195,7 +195,16 @@ function App() {
           />
         )
       case 'homeNew':
-        return <HomeNew selectedBrand={selectedBrand} onPageChange={handlePageChange} />
+        return (
+          <HomeNew
+            selectedBrand={selectedBrand}
+            onPageChange={handlePageChange}
+            autoExecuteRecommendations={autoExecuteRecommendations}
+            autoRegenEnabled={autoRegenEnabled}
+            onAutoExecuteChange={setAutoExecuteRecommendations}
+            onAutoRegenChange={setAutoRegenEnabled}
+          />
+        )
       case 'overview':
         return (
           <Dashboard

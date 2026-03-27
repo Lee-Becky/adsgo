@@ -14,15 +14,59 @@ import KPIMilestonesDrawer from './KPIMilestonesDrawer'
 import JourneyPhasesDrawer from './JourneyPhasesDrawer'
 import ControlMatrixDrawer from './ControlMatrixDrawer'
 import CreativeDashboardDrawer from './CreativeDashboardDrawer'
+import DemoPhaseSwitch from '../mediaPlan/DemoPhaseSwitch'
+import PrePublishHome from './PrePublishHome'
+import JustLaunchedHome from './JustLaunchedHome'
 
-const HomeNew = ({ selectedBrand, onPageChange }) => {
+const HomeNew = ({
+  selectedBrand,
+  onPageChange,
+  autoExecuteRecommendations,
+  autoRegenEnabled,
+  onAutoExecuteChange,
+  onAutoRegenChange,
+}) => {
+  const [demoPhase, setDemoPhase] = useState('new_user')
   const [activeDrawer, setActiveDrawer] = useState(null)
 
   const openDrawer = (drawerName) => setActiveDrawer(drawerName)
   const closeDrawer = () => setActiveDrawer(null)
 
+  // ── Pre-publish State ──
+  if (demoPhase === 'new_user') {
+    return (
+      <div>
+        <div className="px-6 pt-6">
+          <DemoPhaseSwitch value={demoPhase} onChange={setDemoPhase} />
+        </div>
+        <PrePublishHome onPageChange={onPageChange} />
+      </div>
+    )
+  }
+
+  // ── Just Launched State ──
+  if (demoPhase === 'just_launched') {
+    return (
+      <div>
+        <div className="px-6 pt-6">
+          <DemoPhaseSwitch value={demoPhase} onChange={setDemoPhase} />
+        </div>
+        <JustLaunchedHome
+          autoExecuteRecommendations={autoExecuteRecommendations}
+          autoRegenEnabled={autoRegenEnabled}
+          onAutoExecuteChange={onAutoExecuteChange}
+          onAutoRegenChange={onAutoRegenChange}
+          onPageChange={onPageChange}
+        />
+      </div>
+    )
+  }
+
+  // ── Running State (existing dashboard) ──
   return (
     <div className="p-6 space-y-4">
+      <DemoPhaseSwitch value={demoPhase} onChange={setDemoPhase} />
+
       {/* Objective Overview — Independent Card */}
       <ObjectiveOverviewMini onEdit={() => onPageChange('optimizeGoals')} />
 
