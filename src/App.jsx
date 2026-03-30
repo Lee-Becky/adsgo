@@ -24,7 +24,6 @@ import AIGenerate from './components/creativeHub/AIGenerate'
 import GenerateVideo from './components/creativeHub/generateVideo'
 import CreativeLibrary from './components/creativeHub/CreativeLibrary'
 import { ProductList, ProductDetails } from './components/brand/products'
-import { HomeNew } from './components/launchCenter'
 import { Competitors } from './components/brand/competitors'
 import BrandProfile from './components/brand/BrandProfile'
 import MediaPlan from './components/mediaPlan/MediaPlan'
@@ -191,17 +190,6 @@ function App() {
             autoExecuteRecommendations={autoExecuteRecommendations}
             onAutoExecuteChange={setAutoExecuteRecommendations}
             autoRegenEnabled={autoRegenEnabled}
-            onAutoRegenChange={setAutoRegenEnabled}
-          />
-        )
-      case 'homeNew':
-        return (
-          <HomeNew
-            selectedBrand={selectedBrand}
-            onPageChange={handlePageChange}
-            autoExecuteRecommendations={autoExecuteRecommendations}
-            autoRegenEnabled={autoRegenEnabled}
-            onAutoExecuteChange={setAutoExecuteRecommendations}
             onAutoRegenChange={setAutoRegenEnabled}
           />
         )

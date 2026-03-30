@@ -1,18 +1,20 @@
 import React, { useState, useMemo } from 'react'
+import { CalendarDays, ClipboardCheck } from 'lucide-react'
 import { MOCK_CAMPAIGNS } from '../adManagerV3/mockData'
 import { CAMPAIGN_CARDS } from '../autoRegeneration/mockData'
-import { STATUS_BAR_DATA, OPERATIONS_DATA } from './mockData'
-import StatusBar, { getPhase, buildKPITrend } from './StatusBar'
-import PlanRoadmap from './PlanRoadmap'
-import Forecast from './Forecast'
+import { STATUS_BAR_DATA, KPI_TREND_DATA, SPEND_DATA, WEEKLY_PLANS, DIMENSION_SCORES, CAMPAIGN_PHASE_DATA, HIGHLIGHTS_DATA, OPERATIONS_DATA } from './mockData'
+import { getPhase, buildKPITrend } from './StatusBar'
+import SummaryCard from './SummaryCard'
+import WeeklyPlanCard from './WeeklyPlanCard'
+import ScoreCard from './ScoreCard'
 import AdsGoOperations, { aggregateBudgetSuggestions, formatBudgetSummary } from './AdsGoOperations'
-import YourActionItems from './YourActionItems'
-import SafetyControl from './SafetyControl'
+import HighlightsCard from './HighlightsCard'
 import DevGuideButton from './DevGuideButton'
 import { DEV_GUIDES } from './devGuideContent'
 import DemoPhaseSwitch from './DemoPhaseSwitch'
 import PrePublishView from './PrePublishView'
 import JustLaunchedView from './JustLaunchedView'
+import DormantView from './DormantView'
 
 export default function MediaPlan({
   selectedBrand,
@@ -114,74 +116,82 @@ export default function MediaPlan({
     )
   }
 
-  // ── Running State (existing dashboard) ──
+  // ── Dormant State ──
+  if (demoPhase === 'dormant') {
+    return (
+      <div className="p-6">
+        <DemoPhaseSwitch value={demoPhase} onChange={setDemoPhase} />
+        <DormantView onRestart={(type) => {
+          console.log('Restart type:', type)
+          setDemoPhase('running')
+        }} />
+      </div>
+    )
+  }
+
+  // ── Running State (new redesigned dashboard) ──
   return (
     <div className="p-6 space-y-5">
       <DemoPhaseSwitch value={demoPhase} onChange={setDemoPhase} />
 
-      {/* Status Bar */}
-      <div className="flex items-center gap-3">
-        <div className="flex-1">
-          <StatusBar
-            campaigns={campaigns}
-            kpiType={kpiType}
-            kpiTarget={kpiTarget}
-            dailyBudget={dailyBudget}
-          />
-        </div>
-        <DevGuideButton title="Status Bar" content={DEV_GUIDES.statusBar} />
-      </div>
-
-      {/* Section 1: The Plan */}
-      <PlanRoadmap currentPhaseId={computed.phase.id} />
-
-      {/* Section 2: Forecast */}
-      <Forecast
+      {/* Section 1: Summary */}
+      <SummaryCard
         kpiTrend={computed.kpiTrend}
         kpiType={kpiType}
         currentKPI={computed.currentKPI}
         kpiTarget={kpiTarget}
+        spendData={SPEND_DATA}
+        currentWeekPlan={WEEKLY_PLANS.find(w => w.status === 'current')}
+        topDimensions={DIMENSION_SCORES.slice().sort((a, b) => a.currentScore - b.currentScore).slice(0, 2)}
       />
 
-      {/* Section 3: Live Operations */}
+      {/* Section 2: Weekly Strategy + Multi-dimensional Monitoring */}
       <div>
-        <h3 className="text-base font-semibold text-gray-900 mb-4">Live Operations</h3>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-base font-semibold text-gray-900 flex items-center gap-2">
+            <CalendarDays className="w-4.5 h-4.5 text-primary-500" />
+            Weekly Strategy
+          </h3>
+          <DevGuideButton title="Weekly Strategy" content={DEV_GUIDES.weeklyPlan} />
+        </div>
+      <div className="bg-white rounded-xl border border-[#F0F0F0] shadow-[-2px_2px_16px_rgba(14,0,45,0.06)] p-5">
+        <WeeklyPlanCard hideTitle weeksData={WEEKLY_PLANS} onTodoToggle={(weekId, todoId) => {
+          console.log('Todo toggled:', weekId, todoId)
+        }} />
+
+        {/* Spacer for arrow overflow */}
+        <div className="pt-5" />
+
+        <ScoreCard
+          dimensionsData={DIMENSION_SCORES}
+          phaseData={CAMPAIGN_PHASE_DATA}
+          onDimensionSelect={(dimensionId) => {
+            console.log('Dimension selected:', dimensionId)
+          }}
+        />
+      </div>
+      </div>
+
+      {/* Section 4: Live Operations */}
+      <div>
+        <h3 className="text-base font-semibold text-gray-900 mb-4 flex items-center gap-2">
+          <ClipboardCheck className="w-4.5 h-4.5 text-primary-500" />
+          Optimization Review
+        </h3>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {/* Left: AdsGo Operations */}
           <div className="bg-white rounded-xl border border-[#F0F0F0] shadow-[-2px_2px_16px_rgba(14,0,45,0.06)] p-5">
             <AdsGoOperations campaigns={campaigns} />
           </div>
 
-          {/* Right: Your Actions */}
-          <div className="bg-white rounded-xl border border-[#F0F0F0] shadow-[-2px_2px_16px_rgba(14,0,45,0.06)] p-5">
-            <YourActionItems
-              autoExecuteRecommendations={autoExecuteRecommendations}
-              autoRegenEnabled={autoRegenEnabled}
-              onAutoExecuteChange={onAutoExecuteChange}
-              onAutoRegenChange={onAutoRegenChange}
-              pendingBudgetCount={computed.pendingBudgetCount}
-              budgetSummaryText={computed.budgetSummaryText}
-              draftCampaignCount={computed.draftCampaignCount}
-              daysSinceLastCreative={computed.daysSinceLastCreative}
-              kpiAchievement={computed.kpiAchievement}
-              kpiType={kpiType}
-              currentKPI={computed.currentKPI}
-              kpiTarget={kpiTarget}
-              spendPercent={computed.spendPercent}
-              activeCreativeCount={computed.activeCreativeCount}
-              onPageChange={onPageChange}
-            />
-          </div>
+          {/* Right: Highlights of the past 7 days */}
+          <HighlightsCard
+            actionBenefits={HIGHLIGHTS_DATA.actionBenefits}
+            highlights={HIGHLIGHTS_DATA.highlights}
+          />
         </div>
       </div>
 
-      {/* Section 4: Safety & Control */}
-      <SafetyControl
-        cappedSpend={computed.cappedSpend}
-        dailyBudget={dailyBudget}
-        autoExecuteRecommendations={autoExecuteRecommendations}
-        autoRegenEnabled={autoRegenEnabled}
-      />
     </div>
   )
 }

@@ -1008,4 +1008,708 @@ Campaign Auto-publish  [OFF]
 2. auto toggle state 已经是真实数据（App.jsx state → props 传入）
 3. Compliance 卡片当前为静态文案，后续可接入各 platform 广告审核状态 API，动态展示审核通过数/总数
 `,
+
+  summary: `
+## Summary — 开发指南
+
+### 核心目的
+
+Summary 是 Media Plan 页面的"顶卡"，以自然语言形式向用户提供过去 7 天的投放总结。
+核心价值：让非专业用户无需看图表就能理解——我的广告效果是好是差、为什么、接下来怎么办。
+这不是简单的数据展示，而是**AI 分析师级别的叙事**。
+
+### 输入数据
+
+| 字段 | Mock 值 | 当前来源 | 真实数据来源 |
+|------|---------|---------|-------------|
+| kpiTrend | KPI_TREND_DATA (7 天) | mediaPlan/mockData.js | 从 campaign history 聚合（同 Status Bar 步骤 4） |
+| kpiType | 'ROAS' | STATUS_BAR_DATA.kpiType | OptimizeGoals API |
+| currentKPI | 3.31 | 计算值 | 同 Status Bar 当前 KPI 计算 |
+| kpiTarget | 4.5 | STATUS_BAR_DATA.kpiTarget | OptimizeGoals API |
+| spendData | SPEND_DATA 对象 | mediaPlan/mockData.js | 从 campaign spend 聚合 |
+| currentWeekPlan | WEEKLY_PLANS 中 status='current' | mediaPlan/mockData.js | AI 每周计划 API |
+| topDimensions | DIMENSION_SCORES 按 currentScore 升序前2 | mediaPlan/mockData.js | AI 多维度分析 API |
+
+SPEND_DATA 扩展字段:
+\`\`\`javascript
+export const SPEND_DATA = {
+  totalSpend: 18500,
+  avgDailySpend: 2643,
+  efficiency: 'improving',
+  // 以下为叙事增强字段
+  dailyTrend: [
+    { date: '03-24', spend: 2400, conversions: 18, revenue: 6840 },
+    // ... 7 天数据
+  ],
+  topEvent: 'Approved budget suggestions on 03-25',  // 过去 7 天最有影响力的用户行动
+  creativeFatigueAdsets: 2,                           // 检测到创意疲劳的 adset 数量
+  daysSinceNewCreative: 3,                            // 距上次上传新创意的天数
+}
+\`\`\`
+
+### 处理逻辑
+
+**步骤 1: 计算趋势变化**
+\`\`\`javascript
+const firstValue = kpiTrend[0].kpiValue
+const lastValue = kpiTrend[n - 1].kpiValue
+const changePercent = ((lastValue - firstValue) / firstValue) * 100
+const isImproving = kpiType === 'ROAS' ? changePercent > 0 : changePercent < 0
+const isSignificant = Math.abs(changePercent) > 5
+\`\`\`
+
+**步骤 2: 因果因素分析 (identifyCausalFactors)**
+\`\`\`javascript
+function identifyCausalFactors(spendData, kpiTrend, kpiType) {
+  const factors = []
+
+  // 花费效率趋势: 对比首日 vs 末日的 CPA
+  const firstCPA = trend[0].spend / trend[0].conversions
+  const lastCPA  = trend[6].spend / trend[6].conversions
+  const cpaChange = ((lastCPA - firstCPA) / firstCPA) * 100
+  if (cpaChange < -10) factors.push({ type: 'efficiency_gain', ... })
+  if (cpaChange > 10)  factors.push({ type: 'efficiency_loss', ... })
+
+  // 创意疲劳信号
+  if (spendData.creativeFatigueAdsets > 0) factors.push({ type: 'creative_fatigue', ... })
+
+  // 关键用户行动归因
+  if (spendData.topEvent) factors.push({ type: 'event_attribution', ... })
+
+  // 创意空白期
+  if (spendData.daysSinceNewCreative > 5) factors.push({ type: 'creative_gap', ... })
+
+  return factors
+}
+\`\`\`
+
+**步骤 3: 组装叙事上下文**
+\`\`\`javascript
+// 最薄弱维度名称映射
+const weakDimLabel = {
+  budget_optimization: '预算分配',
+  creative: '创意质量',
+  media_asset: '媒体资产',
+  landing_page: '落地页表现',
+}[topDimensions[0].id]
+
+// 本周核心目标
+const weekObjective = currentWeekPlan?.coreObjective
+// 用户待办
+const firstTodo = currentWeekPlan?.youNeedToDo?.find(t => !t.completed)?.text
+\`\`\`
+
+**步骤 4: 生成自然语言总结 (4 个分支)**
+
+| 分支 | 条件 | Sentiment | 叙事要素 |
+|------|------|-----------|---------|
+| 达标 | targetAchieved | positive | 达标数据 + 关键驱动因素 + 保持策略 + 本周方向 |
+| 向好 | isImproving && isSignificant | positive | 改进百分比 + 归因事件 + 差距百分比 + 最弱维度 + 下步行动 |
+| 向差 | !isImproving && isSignificant | caution | 下降数据 + 因果分析(创意疲劳/受众饱和) + AI已采取行动 + 本周方向 + 建议行动 |
+| 稳定 | else | neutral | 稳定范围 + 最大潜力维度 + 创意空白期 + 本周计划 + 建议 |
+
+叙事示例（向好分支）:
+> Your ROAS improved +16.1% over the past 7 days, moving from 2.85x to 3.31x.
+> We're still 26% below the 4.5x target, but the trajectory is clearly positive.
+> This improvement aligns with: Approved budget suggestions on 03-25.
+> Cost-per-acquisition improved 12% as we concentrated budget on top performers.
+> The biggest opportunity for further improvement is in media assets — AdsGo is already working on this.
+> This week's focus: scale winning audiences while maintaining CPA efficiency.
+> Your next recommended action: review weekly performance summary.
+
+**步骤 5: 情感样式映射**
+\`\`\`javascript
+const SENTIMENT_STYLES = {
+  positive: { border: 'border-emerald-200', bg: 'bg-emerald-50/60', stroke: '#10b981' },
+  caution:  { border: 'border-amber-200',   bg: 'bg-amber-50/60',   stroke: '#f59e0b' },
+  neutral:  { border: 'border-gray-200',    bg: 'bg-gray-50/60',    stroke: '#6b7280' },
+}
+\`\`\`
+
+### 输出
+
+卡片结构：
+- 顶部：Icon（TrendingUp/TrendingDown/Minus）+ headline（自然语言标题）
+- 中部：body（多段自然语言叙述，包含因果分析 + 行动建议）
+- 底部：7 天趋势折线图（Recharts ResponsiveContainer + LineChart）
+
+### 边界条件
+
+| 情况 | 处理方式 |
+|------|---------|
+| kpiTrend < 2 个点 | 返回 neutral "Building performance baseline"，不渲染折线图 |
+| spendData 为空 | 跳过因果分析，仅使用 KPI 趋势数据生成基础叙事 |
+| currentWeekPlan 为空 | 跳过 "This week's focus" 段落 |
+| topDimensions 为空 | 跳过 "biggest opportunity" 段落 |
+| firstValue === 0 | changePercent 设为 0，归入 neutral 分支 |
+| KPI 类型切换 | isImproving 方向反转（CPA 下降=好，ROAS 上升=好） |
+
+### 真实数据替换步骤
+
+1. kpiTrend: 使用 buildKPITrend 函数从真实 campaign history 聚合 7 天数据
+2. currentKPI: 复用 MediaPlan.jsx 中的 computed.currentKPI 计算逻辑
+3. spendData.dailyTrend: 从广告平台 API 获取每日 spend/conversions/revenue
+4. spendData.topEvent: 从用户行动日志中提取过去 7 天影响力最大的行动（按 KPI 变化幅度排序）
+5. spendData.creativeFatigueAdsets: AI 分析 adset 级别 CTR 趋势，连续 3 天下降 + 运行 14+ 天 = 疲劳
+6. currentWeekPlan: 从 AI 周计划 API 获取 status='current' 的周数据
+7. topDimensions: 从 AI 多维度评分 API 获取，按 currentScore 升序取前 2
+8. LineChart: 替换为 ResponsiveContainer 确保在任何容器宽度下自适应
+`,
+
+  weeklyPlan: `
+## Weekly Plan — 开发指南
+
+### 核心目的
+
+5 周计划是用户粘性引擎。核心价值：
+- **管理预期**: 让用户看到本阶段核心目标、AI 的计划方向
+- **驱动配合**: 用户需要做什么、完成状态如何
+- **时间感知**: 过去做了什么 → 当前在做什么 → 未来要做什么
+- **自动更新**: 每周 AI 自动生成新的后续计划，形成持续参与闭环
+
+### 输入数据
+
+| 字段 | Mock 值 | 当前来源 | 真实数据来源 |
+|------|---------|---------|-------------|
+| weeksData | WEEKLY_PLANS (5 周) | mediaPlan/mockData.js | AI 每周自动生成新计划 API |
+| onTodoToggle | 回调函数 | 本地 console.log | 用户行动追踪 API |
+
+每周数据结构:
+\`\`\`javascript
+{
+  weekId: 'W0',           // 标识符: W-2, W-1, W0, W+1, W+2
+  weekNumber: 13,          // 年内第几周
+  label: 'This Week',
+  status: 'current',       // 'completed' | 'current' | 'upcoming'
+  dateRange: {
+    start: '2026-03-24',
+    end: '2026-03-30',
+    startStr: '3/24',      // 数字格式: M/D
+    endStr: '3/30',
+  },
+  coreObjective: 'Scale winning audiences while maintaining CPA efficiency',
+  aiPlan: [                // AI 本周将执行的计划, 最多 3 条显示
+    'Scale LAL 1% audience budget by 25% if CPA stays under target',
+    'Test new interest-based audiences (fitness, wellness)',
+    'Auto-generate 3 video variants from top static creative',
+  ],
+  youNeedToDo: [           // 用户 Todo 列表，跟随完成状态更新
+    { id: 'w0-1', text: 'Review weekly performance summary', completed: false },
+    { id: 'w0-2', text: 'Approve new audience tests', completed: false },
+  ],
+}
+\`\`\`
+
+### 处理逻辑
+
+**步骤 1: 计算每周日期范围（真实数据时使用）**
+\`\`\`javascript
+function getWeekRange(offsetWeeks) {
+  const now = new Date()
+  const currentDay = now.getDay()
+  const diffToMonday = currentDay === 0 ? 6 : currentDay - 1
+
+  const monday = new Date(now)
+  monday.setDate(now.getDate() - diffToMonday + (offsetWeeks * 7))
+  monday.setHours(0, 0, 0, 0)
+
+  const sunday = new Date(monday)
+  sunday.setDate(monday.getDate() + 6)
+
+  return {
+    start: monday,
+    end: sunday,
+    startStr: \`\${monday.getMonth() + 1}/\${monday.getDate()}\`,  // 数字格式 M/D
+    endStr: \`\${sunday.getMonth() + 1}/\${sunday.getDate()}\`,
+  }
+}
+// 例: offsetWeeks=0 → 当前周 3/24 - 3/30
+// 例: offsetWeeks=-2 → 两周前 3/10 - 3/16
+\`\`\`
+
+**步骤 2: 判断每周状态**
+\`\`\`javascript
+// Mock 阶段: 状态在 mockData 中硬编码
+// 真实数据: 基于日期动态判断
+function getWeekStatus(weekStart, weekEnd) {
+  const now = new Date()
+  if (now > weekEnd) return 'completed'
+  if (now >= weekStart && now <= weekEnd) return 'current'
+  return 'upcoming'
+}
+\`\`\`
+
+**步骤 3: 布局方案**
+\`\`\`
+桌面端 (lg+): 5 列等宽 Grid
+┌──────┬──────┬──────┬──────┬──────┐
+│ W-2  │ W-1  │ W0   │ W+1  │ W+2  │
+│ 已完  │ 已完  │ 本周  │ 下周  │ 后周  │
+│ 成    │ 成   │ ring │      │      │
+└──────┴──────┴──────┴──────┴──────┘
+
+移动端 (<lg): 横向滚动，每卡片 min-w-[220px], w-[45%]
+snap-x snap-mandatory 确保对齐
+\`\`\`
+
+\`\`\`jsx
+// 桌面端
+<div className="hidden lg:grid lg:grid-cols-5 gap-3">
+  {weeksData.map(week => <WeekCard ... />)}
+</div>
+
+// 移动端
+<div className="lg:hidden flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory">
+  {weeksData.map(week => (
+    <div className="min-w-[220px] w-[45%] flex-shrink-0 snap-start">
+      <WeekCard ... />
+    </div>
+  ))}
+</div>
+\`\`\`
+
+**步骤 4: Todo 完成状态更新**
+\`\`\`javascript
+const handleTodoToggle = (weekId, todoId) => {
+  // 1. 更新本地 UI 状态（乐观更新）
+  setWeeks(prev => prev.map(w =>
+    w.weekId === weekId
+      ? { ...w, youNeedToDo: w.youNeedToDo.map(t =>
+          t.id === todoId ? { ...t, completed: !t.completed } : t
+        )}
+      : w
+  ))
+  // 2. 调用 API 持久化
+  api.recordUserAction(weekId, todoId, true)
+}
+\`\`\`
+
+**步骤 5: 每周自动更新机制**
+\`\`\`
+周一 00:00 触发 AI 计划生成:
+1. 评估上周 KPI 变化和已完成行动
+2. 重新评估多维度状态
+3. 生成新的 W+2 周计划（核心目标 + AI Plan + 用户 Todo）
+4. 更新 W+1 为更精确的计划（基于最新数据）
+5. 将上周 W0 标记为 completed，归档 todo 完成率
+\`\`\`
+
+### 输出
+
+5 列等宽卡片:
+\`\`\`
+每卡片包含:
+┌─────────────────────┐
+│ [Completed] / [This Week] / [Upcoming]  ← 状态标签
+│ 3/24 - 3/30                             ← 日期范围（数字格式）
+│                                         │
+│ ⊕ CORE OBJECTIVE                        │
+│ Scale winning audiences...              │
+│                                         │
+│ 🤖 AI PLAN                              │
+│ • Scale LAL 1% audience...             │
+│ • Test new interest-based...           │
+│ • Auto-generate 3 video...            │
+│                                         │
+│ ☑ YOU NEED TO DO                        │
+│ [✓] Review weekly performance           │
+│ [ ] Approve new audience tests          │
+└─────────────────────┘
+\`\`\`
+
+样式规则:
+- completed: bg-emerald-50, border-emerald-200
+- current: bg-primary-50, border-primary-300, ring-2 ring-primary-100（强调当前周）
+- upcoming: bg-gray-50, border-gray-200
+- AI Plan 最多展示 3 条（line-clamp-2 截断）
+- Todo 复选框: 完成=emerald-500 + 删除线，未完成=白底灰框
+
+### 边界条件
+
+| 情况 | 处理方式 |
+|------|---------|
+| weeksData 少于 5 条 | 按实际数量渲染，grid 会自动留空 |
+| 所有 todo 已完成 | 正常显示，全部带勾 + 删除线 |
+| aiPlan 超过 3 条 | slice(0, 3) 截断 |
+| 文本溢出卡片宽度 | line-clamp-2 + text-[11px] 确保紧凑 |
+| 日期跨年 | getWeekRange 自动处理，M/D 格式不含年 |
+| 没有 current 状态的周 | 所有卡片正常渲染，无 ring 强调效果 |
+
+### 真实数据替换步骤
+
+1. weeksData: 从 AI 周计划 API 获取，每周一 00:00 自动刷新
+2. todo 状态: 从用户行动追踪 API 获取实时完成状态，支持乐观更新
+3. 日期计算: getWeekRange 函数可在前端计算，也可从 API 直接返回
+4. coreObjective: AI 基于当前 KPI 达成率、多维度评分、用户历史行动生成
+5. aiPlan: AI 基于当前广告账户状态和优化策略自动生成
+6. youNeedToDo: AI 根据优化需求生成，已完成项从行动追踪 API 同步
+7. 周状态: 可前端计算（基于日期），也可 API 返回
+`,
+
+  optimizationScore: `
+## Multi-dimensional Monitoring — 开发指南
+
+### 核心目的
+
+这个模块是广告效果的**诊断工具**，回答用户核心问题："我的广告效果不好，问题出在哪？我该做什么？"
+不是展示评分的仪表盘——用户不需要看评分，而是需要看到**诊断结果**。
+雷达图是手段，不是目的：让用户一眼看出哪个维度是短板。
+
+每个维度是一条**因果链**：
+维度有问题 → 影响了整体广告效果 → AdsGo 可以做什么 → 用户需要配合什么 → 做了之后预期提升多少
+
+### 5 个维度定义
+
+| 维度 ID | 名称 | 核心诊断问题 | 为什么影响效果 | 关键动作 |
+|---------|------|-------------|--------------|---------|
+| budget_optimization | Budget Optimization | 预算分配不合理：好 adset 花不出去、差的在烧钱 | 直接浪费预算在低效投放上 | 开启自动执行 / 手动审批 |
+| campaign_recommendation | Campaign Recommendation | AI 已生成新 campaign 但未上线 | 错过扩量和测试机会 | 开启自动发布 / 手动审批 |
+| creative | Creative Quality | 创意疲劳，CTR 持续下降 | 用户看腻了，点击率和转化率下滑 | 上传新素材让 AI remix |
+| landing_page | Landing Page | 埋点缺失、加载慢、移动端转化低 | 点击了广告但无法转化 | 修复埋点、优化加载速度 |
+| kpi | KPI Target | 目标设得过高，远超行业 benchmark | 系统为了达标被迫收窄投放 | 降低到合理区间 |
+
+### 输入数据
+
+| 字段 | Mock 值 | 当前来源 | 真实数据来源 |
+|------|---------|---------|-------------|
+| dimensionsData | DIMENSION_SCORES (5 维) | mediaPlan/mockData.js | AI 多维度诊断 API |
+| phaseData | CAMPAIGN_PHASE_DATA | mediaPlan/mockData.js | Campaign 状态聚合 API |
+| onDimensionSelect | 回调函数 | console.log | 分析事件追踪 |
+| onActionClick | 回调函数 | console.log | 用户行动追踪 API |
+
+每维度数据结构:
+\`\`\`javascript
+{
+  id: 'budget_optimization',
+  currentScore: 2.8,         // 0-5 分，AI 基于多维度数据评估
+  potentialScore: 1.8,       // 执行所有建议后的预期提升分数
+  problem: '3 adsets with ROAS below 1.5x are consuming 40% of daily budget...', // 一段完整的诊断叙述
+  adsGoWillDo: [             // AI 计划采取的自动化行动（2-3 条）
+    'Shift $480/day from underperforming adsets to top winners',
+  ],
+  yourActions: [             // 用户需要配合的行动（1-2 条）
+    { id: 'bo-1', text: 'Enable auto-execute for budget optimization' },
+  ],
+  expectedImpact: 'Unlocks $480/day reallocation — projected to improve ROAS by 0.6x within 7 days',
+}
+\`\`\`
+
+阶段数据结构:
+\`\`\`javascript
+// CAMPAIGN_PHASE_DATA
+{
+  totalActive: 6,        // 活跃 campaign 总数
+  learningCount: 2,      // 处于学习期的 campaign 数
+  learningPercent: 33,   // 学习期占比
+}
+\`\`\`
+
+### 处理逻辑
+
+**步骤 1: 统一色系**
+
+所有维度使用品牌主色，不按维度分色:
+\`\`\`javascript
+const BRAND_COLOR = '#7033F5'   // 雷达实线、选中状态、右侧 border
+const BRAND_LIGHT = '#f3f0ff'   // 选中标签背景、问题区域底色
+const BRAND_MID   = '#c4b5fd'   // 虚线（优化后预期）
+\`\`\`
+设计原则: 颜色传达"品牌一致性"，而非"维度差异"。维度差异通过内容和位置区分。
+
+**步骤 2: 雷达图 — 双层五边形**
+
+\`\`\`javascript
+// 两层 Radar:
+// 1. 虚线层 = current + potential（优化后上限），填充 BRAND_LIGHT 12% 透明度
+// 2. 实线层 = current 实际分数，填充 BRAND_COLOR 10% 透明度
+
+const chartData = dims.map(d => ({
+  subject: DIMENSION_LABELS[d.id],   // 完整维度名称
+  current: d.currentScore,
+  potential: Math.min(d.currentScore + d.potentialScore, 5),
+}))
+\`\`\`
+
+雷达图尺寸: 350×350px, outerRadius 58%
+维度标签: 可点击，选中时显示圆角药丸背景 + 品牌色文字
+选中顶点: 三层光晕（外圈 r=11 透明 → 白色中圈 r=6 → 实色内核 r=2.5）
+
+**步骤 3: 中心阶段状态**
+
+雷达图中心显示账户整体阶段，基于活跃 campaign 的学习期占比:
+\`\`\`javascript
+function getPhaseLabel(learningPercent) {
+  if (learningPercent >= 80) return { label: 'Learning', color: '#f59e0b' }   // 大部分在摸索
+  if (learningPercent >= 30) return { label: 'Optimizing', color: '#7033F5' } // 多数已过学习期
+  return { label: 'Scaling', color: '#10b981' }                               // 绝大多数已稳定
+}
+// 下方小字: "33% in learning"
+\`\`\`
+
+**步骤 4: 问题描述 (problem)**
+
+位于雷达图下方，是一段完整的自然语言诊断叙述（不是 bullet list）。
+像医生写诊断，不是列症状。每个维度的 problem 应包含:
+- 问题现象（数据支撑）
+- 根因分析
+- 当前阻塞点（如 auto-execute OFF）
+
+**步骤 5: 右侧详情面板 (50% 宽度)**
+
+从上到下:
+1. **Header**: 维度名 + 分数 + 当前→优化后对比
+2. **Score Bar**: 实线条=当前, 虚线框=潜力上限
+3. **AdsGo Will Do**: 编号列表，每条前有品牌色编号圆角方块
+4. **Your Actions**: 可勾选 checkbox，用户配合事项
+5. **Expected Impact**: 绿色底色卡片，显示分数变化 + 一句话预期收益
+
+**步骤 6: 自动轮播 + 暂停**
+\`\`\`javascript
+// 每 5 秒自动切换维度
+// 鼠标 hover 整个卡片时暂停
+// 底部 5 个进度条指示器，active 的有 5s 填充动画
+// 手动点击维度标签或底部指示器 → 立即切换
+\`\`\`
+
+### 输出布局
+
+\`\`\`
+┌──────────────────────────────────────────────────────────┐
+│  Multi-dimensional Monitoring                              [Guide] │
+│  ┌──────────── 50% ────────────┬──────── 50% ──────────┐│
+│  │                              │                        ││
+│  │     ┌──────────────┐        │  Budget Optimization   ││
+│  │     │  Radar 350px │        │  ─────────────────────  ││
+│  │     │  五边形       │        │  Score: 2.8/5          ││
+│  │     │              │        │  ████████░░░░░ +1.8     ││
+│  │     │  实线=当前    │        │                        ││
+│  │     │  虚线=潜力    │        │  ADSGO WILL DO         ││
+│  │     │              │        │  1. Shift $480/day..   ││
+│  │     │  中心:       │        │  2. Pause adsets..     ││
+│  │     │  Optimizing  │        │  3. Scale winners..    ││
+│  │     │  33% learning │        │                        ││
+│  │     └──────────────┘        │  YOUR ACTIONS          ││
+│  │                              │  [ ] Enable auto..     ││
+│  │  ─── 实线  ── ── 虚线       │  [ ] Or manually..     ││
+│  │                              │                        ││
+│  │  ┌──────────────────────┐   │  EXPECTED IMPACT       ││
+│  │  │ ● Budget Optimization │   │  Score: 2.8 → 4.6     ││
+│  │  │ 2.8/5                │   │  "Unlocks $480/day     ││
+│  │  │ 3 adsets with ROAS   │   │   reallocation to      ││
+│  │  │ below 1.5x are...   │   │   winning audiences"   ││
+│  │  └──────────────────────┘   │                        ││
+│  └──────────────────────────────┴────────────────────────┘│
+│  ═══ ━━━ ━━━ ━━━ ━━━  ← 5个进度条指示器（品牌色）        │
+└──────────────────────────────────────────────────────────┘
+\`\`\`
+
+### 边界条件
+
+| 情况 | 处理方式 |
+|------|---------|
+| dimensions 少于 5 个 | 雷达图自动适应维度数，底部指示器减少 |
+| 所有分数都是 5.0 | potentialScore 为 0，Expected Impact 显示"已达最优" |
+| phaseData 缺失 | 中心默认显示 "Optimizing"，learningPercent 显示 0% |
+| problem 为空 | 不渲染问题区域 |
+| adsGoWillDo/yourActions 为空数组 | 对应区块不渲染 |
+| 用户快速连续点击 | handleClick 直接设置 index，无节流 |
+| 移动端 (< lg) | 左右堆叠为上下，雷达图在上，详情面板在下 |
+
+### 真实数据替换步骤
+
+1. dimensionsData: 从 AI 多维度诊断 API 获取，每次页面加载时请求
+2. currentScore: AI 基于广告账户数据实时计算（0-5 分连续值）
+3. potentialScore: AI 基于建议行动的预期效果评估
+4. problem: AI 对维度当前问题的自然语言诊断（一段话，含数据支撑）
+5. adsGoWillDo: 从优化引擎获取 AI 计划采取的自动化行动
+6. yourActions: 从优化建议 API 获取需要用户配合的行动
+7. expectedImpact: AI 对执行所有建议后的预期收益评估（一句话）
+8. phaseData: 从 Campaign 状态 API 聚合，统计 learning/active 占比
+9. 维度列表: 可根据账户情况动态调整（如无落地页不显示 landing_page）
+10. 评分刷新: 建议每 6 小时重新计算，或在用户完成行动后立即更新
+`,
+
+  highlights: `
+## Highlights of the Past 7 Days — 开发指南
+
+### 核心目的
+
+Highlights 卡片与左侧 AdsGo Operations 并排展示，形成"AI 做了什么 + 效果如何"的完整闭环。
+两部分内容:
+- **Action Benefits**: 用户按照建议完成 todo 后带来的实际收益 → 激励用户继续配合
+- **Highlights**: 表现优秀的 adset/ad/creative/campaign → 展示 AdsGo 优化的实际成果
+
+### 输入数据
+
+| 字段 | Mock 值 | 当前来源 | 真实数据来源 |
+|------|---------|---------|-------------|
+| actionBenefits | 数组（4 项） | mediaPlan/mockData.js | 行动收益分析 API |
+| highlights | 数组（4 项） | mediaPlan/mockData.js | 优秀表现记录 API |
+
+Action Benefits 数据结构:
+\`\`\`javascript
+{
+  metric: 'ROAS',                                    // 指标名: ROAS | CTR | CPA | CPC | CPM | Conversions
+  change: '+18%',                                    // 变化值（含正负号）
+  attribution: 'After approving budget suggestions on 03-25'  // 归因描述
+}
+\`\`\`
+
+Highlights 数据结构:
+\`\`\`javascript
+{
+  type: 'adset',                                     // 类型: adset | ad | creative | campaign
+  name: 'LAL 1% - Purchasers',                      // 对象名称
+  achievement: 'ROAS 5.2x (target 4.5x) · $1,240 spend',  // 成就描述
+  date: '03-28',                                     // 达成日期
+}
+\`\`\`
+
+### 处理逻辑
+
+**步骤 1: Action Benefits 归因计算**
+\`\`\`javascript
+// 核心逻辑: 关联用户行动时间戳 → 行动后的 KPI 变化
+function calculateActionBenefits(userActions, kpiHistory) {
+  return userActions.map(action => {
+    // 找到行动时间点
+    const actionDate = action.completedAt
+    // 取行动前 24h 的 KPI 基线
+    const baselineKPI = getKPIAt(kpiHistory, actionDate, -24)
+    // 取行动后 48h 的 KPI
+    const afterKPI = getKPIAt(kpiHistory, actionDate, +48)
+    // 计算变化
+    const change = ((afterKPI - baselineKPI) / baselineKPI * 100)
+    return {
+      metric: action.relatedMetric,
+      change: \`\${change > 0 ? '+' : ''}\${change.toFixed(0)}%\`,
+      attribution: \`After \${action.description} on \${formatDate(actionDate)}\`,
+    }
+  })
+}
+\`\`\`
+
+**步骤 2: Highlights 筛选规则**
+\`\`\`javascript
+function filterHighlights(adObjects, kpiTarget, benchmarks) {
+  return adObjects.filter(obj => {
+    const metrics = obj.past7DaysMetrics
+    // 条件 1: 过去 7 天内任意时间点达成用户 KPI 目标
+    const hitTarget = metrics.some(m =>
+      kpiType === 'ROAS' ? m.roas >= kpiTarget : m.cpa <= kpiTarget
+    )
+    // 条件 2: 超出行业 benchmark
+    const beatBenchmark = metrics.some(m =>
+      m.ctr > benchmarks.ctr * 1.5 ||
+      m.roas > benchmarks.roas * 1.2 ||
+      m.cpa < benchmarks.cpa * 0.8
+    )
+    return hitTarget || beatBenchmark
+  })
+  .map(obj => ({
+    type: obj.level,     // 'adset' | 'ad' | 'creative' | 'campaign'
+    name: obj.name,
+    achievement: formatAchievement(obj),  // 格式化成就描述
+    date: formatDate(obj.bestPerformanceDate),
+  }))
+  .slice(0, 4)  // 最多展示 4 条
+}
+\`\`\`
+
+**步骤 3: 指标格式化规则**
+
+| 指标 | 方向 | 正面表述 | 图标 |
+|------|------|---------|------|
+| ROAS | 越高越好 | +18% | DollarSign (emerald) |
+| CTR | 越高越好 | +23% | MousePointer (blue) |
+| Conversions | 越高越好 | +31% | Zap (purple) |
+| CPA | 越低越好 | -15% (显示为正面) | Target (emerald) |
+| CPC | 越低越好 | -12% (显示为正面) | DollarSign (emerald) |
+| CPM | 越低越好 | -8% (显示为正面) | Eye (emerald) |
+
+\`\`\`javascript
+// 判断变化方向是否为正面
+const isPositive = benefit.change.includes('+') || !benefit.change.includes('-')
+// 注: CPA/CPC/CPM 的 change 是负数但实际是好事
+// 显示时统一用绿色 TrendingUp 图标，因为我们从 change 字符串判断而非语义
+\`\`\`
+
+**步骤 4: 类型样式映射**
+\`\`\`javascript
+const TYPE_STYLES = {
+  adset:    { bg: 'bg-blue-50',   border: 'border-blue-200',   iconColor: 'text-blue-500' },
+  ad:       { bg: 'bg-purple-50', border: 'border-purple-200', iconColor: 'text-purple-500' },
+  creative: { bg: 'bg-amber-50',  border: 'border-amber-200',  iconColor: 'text-amber-500' },
+  campaign: { bg: 'bg-emerald-50',border: 'border-emerald-200',iconColor: 'text-emerald-500' },
+}
+\`\`\`
+
+### 输出
+
+\`\`\`
+┌────────────────────────────────────────┐
+│  Highlights of the Past 7 Days [Guide] │
+│                                        │
+│  🟢 Action Benefits                    │
+│  Impact from completed actions         │
+│  ┌────────┬────────┬────────┬────────┐│
+│  │ ROAS   │ CTR    │ CPA    │ Conv.  ││
+│  │ +18%   │ +23%   │ -15%   │ +31%   ││
+│  │ After..│ After..│ After..│ Combi..││
+│  └────────┴────────┴────────┴────────┘│
+│                                        │
+│  ─────────── 分割线 ───────────────    │
+│                                        │
+│  🏆 Highlights                         │
+│  Top performers exceeding targets      │
+│  ┌──────────────────┬─────────────────┐│
+│  │ 🎯 LAL 1%       │ ⭐ UGC Style    ││
+│  │ ROAS 5.2x      │ CTR 3.8%       ││
+│  │ 03-28           │ 03-27           ││
+│  ├──────────────────┼─────────────────┤│
+│  │ 🏅 Hero Image   │ 🎯 Retargeting  ││
+│  │ CPC $0.42      │ CPA $12.50     ││
+│  │ 03-29           │ 03-26           ││
+│  └──────────────────┴─────────────────┘│
+└────────────────────────────────────────┘
+\`\`\`
+
+注意: 此卡片外层 wrapper (bg-white rounded-xl border shadow p-5)
+由组件自身管理，MediaPlan.jsx 中不再额外包裹。
+
+### 边界条件
+
+| 情况 | 处理方式 |
+|------|---------|
+| actionBenefits 为空 | 不渲染 Action Benefits 区块和分割线 |
+| highlights 为空 | 不渲染 Highlights 区块 |
+| 两者都为空 | 显示空状态: Award 图标 + "No highlights yet" + 鼓励文案 |
+| actionBenefits 超过 4 个 | 网格自动换行: grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 |
+| highlights 超过 4 个 | 取前 4 个, grid-cols-1 sm:grid-cols-2 |
+| 指标名未在 METRIC_ICONS 映射中 | fallback 到 TrendingUp 图标 |
+| 类型未在 TYPE_STYLES 映射中 | fallback 到 ad 样式 |
+
+### 真实数据替换步骤
+
+1. actionBenefits: 从行动收益分析 API 获取
+   - 输入: 用户过去 7 天完成的行动列表（来自用户行动追踪系统）
+   - 处理: 对每个行动，比较行动前后 48h 的 KPI 变化
+   - 输出: 按变化幅度排序，取 Top 4 指标
+   - 注意: 归因窗口为 48h，避免短期波动误归因
+
+2. highlights: 从优秀表现记录 API 获取
+   - 输入: 所有 adset/ad/creative/campaign 的过去 7 天逐日指标
+   - 筛选: KPI 达成目标 OR 超出行业 benchmark 50%+
+   - 排序: 按达成幅度降序
+   - 输出: Top 4 记录，包含名称、成就描述、达成日期
+
+3. 行业 benchmark: 从行业基准 API 获取
+   - 按用户所在行业（如 E-commerce）获取平均 CTR、CPA、ROAS
+   - 缓存周期: 每周更新一次即可
+   - 用于 Highlights 筛选的 benchmark 比较基准
+
+4. 指标变化计算: 从广告平台 API 获取逐日指标数据
+   - Meta Ads API: insights endpoint, 按 date_preset=last_7_days
+   - Google Ads API: search endpoint, 按 segments.date 分组
+`,
 }

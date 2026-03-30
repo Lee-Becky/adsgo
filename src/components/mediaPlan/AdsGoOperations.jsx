@@ -178,7 +178,7 @@ export default function AdsGoOperations({ campaigns }) {
       <div className="grid grid-cols-2 gap-4">
         {/* Left: Past 36 Hours */}
         <div>
-          <div className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-2">
+          <div className="text-[11px] font-semibold text-gray-500 tracking-wider mb-2">
             Past 36 Hours
           </div>
           {historyGroups.map(group => (
@@ -206,7 +206,7 @@ export default function AdsGoOperations({ campaigns }) {
 
         {/* Right: Next 12 Hours */}
         <div className="opacity-80">
-          <div className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-2">
+          <div className="text-[11px] font-semibold text-gray-500 tracking-wider mb-2">
             Next 12 Hours
           </div>
           <div className="text-[11px] font-medium text-gray-400 mb-1.5">Upcoming</div>

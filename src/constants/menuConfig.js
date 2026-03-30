@@ -19,14 +19,6 @@ export const MENU_ITEMS = [
     subtitle: 'Your advertising command center'
   },
   {
-    key: 'homeNew',
-    label: 'Home (New)',
-    shortLabel: 'New',
-    icon: 'Compass',
-    title: 'Home (New)',
-    subtitle: 'AI-powered campaign briefing and action center'
-  },
-  {
     key: 'campaignGenerator',
     label: 'New Campaign（旧）',
     shortLabel: '旧',

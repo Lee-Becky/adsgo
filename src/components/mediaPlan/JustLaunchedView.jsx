@@ -29,21 +29,24 @@ export default function JustLaunchedView({
         </div>
       </div>
 
-      {/* Section 1: Launch Progress */}
-      <div className="bg-white rounded-xl border border-[#F0F0F0] shadow-[-2px_2px_16px_rgba(14,0,45,0.06)] p-5">
-        <h3 className="text-sm font-semibold text-gray-900 mb-4">Launch Progress</h3>
-        <LaunchProgress />
-      </div>
+      {/* Section 1 & 2: Launch Progress + Complete Your Setup (2-column layout) */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {/* Launch Progress */}
+        <div className="bg-white rounded-xl border border-[#F0F0F0] shadow-[-2px_2px_16px_rgba(14,0,45,0.06)] p-5">
+          <h3 className="text-sm font-semibold text-gray-900 mb-4">Launch Progress</h3>
+          <LaunchProgress />
+        </div>
 
-      {/* Section 2: Complete Your Setup */}
-      <div className="bg-white rounded-xl border border-[#F0F0F0] shadow-[-2px_2px_16px_rgba(14,0,45,0.06)] p-5">
-        <SetupChecklist
-          autoExecuteRecommendations={autoExecuteRecommendations}
-          autoRegenEnabled={autoRegenEnabled}
-          onAutoExecuteChange={onAutoExecuteChange}
-          onAutoRegenChange={onAutoRegenChange}
-          onPageChange={onPageChange}
-        />
+        {/* Complete Your Setup */}
+        <div className="bg-white rounded-xl border border-[#F0F0F0] shadow-[-2px_2px_16px_rgba(14,0,45,0.06)] p-5">
+          <SetupChecklist
+            autoExecuteRecommendations={autoExecuteRecommendations}
+            autoRegenEnabled={autoRegenEnabled}
+            onAutoExecuteChange={onAutoExecuteChange}
+            onAutoRegenChange={onAutoRegenChange}
+            onPageChange={onPageChange}
+          />
+        </div>
       </div>
 
       {/* Section 3: What to Expect + Safety */}

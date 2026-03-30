@@ -3,7 +3,8 @@ import React from 'react'
 const PHASES = [
   { key: 'new_user', label: '新用户' },
   { key: 'just_launched', label: '刚发布' },
-  { key: 'running', label: '24H后' },
+  { key: 'running', label: '24H 后' },
+  { key: 'dormant', label: '休眠期（当前无活跃广告 且 24H内有广告消耗数据）' },
 ]
 
 export default function DemoPhaseSwitch({ value, onChange }) {
