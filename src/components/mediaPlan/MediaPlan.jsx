@@ -121,7 +121,7 @@ export default function MediaPlan({
     return (
       <div className="p-6">
         <DemoPhaseSwitch value={demoPhase} onChange={setDemoPhase} />
-        <DormantView onRestart={(type) => {
+        <DormantView onPageChange={onPageChange} onRestart={(type) => {
           console.log('Restart type:', type)
           setDemoPhase('running')
         }} />

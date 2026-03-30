@@ -2,7 +2,7 @@ import React from 'react'
 import { PauseCircle, TrendingUp, DollarSign, Users, Clock, ArrowRight, Zap, Target, BarChart3 } from 'lucide-react'
 import { DORMANT_DATA } from './mockData'
 
-export default function DormantView({ onRestart }) {
+export default function DormantView({ onRestart, onPageChange }) {
   const { historicalPeak, pausedInfo, opportunityCost, restartRecommendation } = DORMANT_DATA
 
   // Format date for display
@@ -158,7 +158,7 @@ export default function DormantView({ onRestart }) {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           <button
-            onClick={() => onRestart('best')}
+            onClick={() => onPageChange?.('adManagerV3')}
             className="flex flex-col items-start p-4 bg-white rounded-lg border border-blue-200 hover:border-blue-400 hover:shadow-md transition-all text-left"
           >
             <div className="flex items-center gap-2 mb-2">
@@ -169,18 +169,18 @@ export default function DormantView({ onRestart }) {
           </button>
 
           <button
-            onClick={() => onRestart('ai')}
+            onClick={() => onPageChange?.('autoRegeneration')}
             className="flex flex-col items-start p-4 bg-white rounded-lg border border-blue-200 hover:border-blue-400 hover:shadow-md transition-all text-left"
           >
             <div className="flex items-center gap-2 mb-2">
               <Zap className="w-4 h-4 text-blue-500" />
-              <span className="text-sm font-semibold text-gray-900">Start Fresh with AI</span>
+              <span className="text-sm font-semibold text-gray-900">Start Fresh</span>
             </div>
             <span className="text-xs text-gray-500">{restartRecommendation.quickStart.options[1].desc}</span>
           </button>
 
           <button
-            onClick={() => onRestart('custom')}
+            onClick={() => onPageChange?.('batchGenerateAds')}
             className="flex flex-col items-start p-4 bg-white rounded-lg border border-blue-200 hover:border-blue-400 hover:shadow-md transition-all text-left"
           >
             <div className="flex items-center gap-2 mb-2">
