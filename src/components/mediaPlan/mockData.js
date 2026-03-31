@@ -391,7 +391,7 @@ export const OPERATIONS_TIMELINE = [
     id: 'op-1',
     timestamp: new Date(Date.now() - 8 * 60 * 60 * 1000).toISOString(),
     type: 'budget_optimize',
-    title: 'Budget optimization completed',
+    title: 'Budget optimization',
     description: '5 increase · 3 decrease · 2 pause · 2 maintain',
   },
   {
@@ -412,7 +412,7 @@ export const OPERATIONS_TIMELINE = [
     id: 'op-4',
     timestamp: new Date(Date.now() - 32 * 60 * 60 * 1000).toISOString(),
     type: 'budget_optimize',
-    title: 'Budget optimization completed',
+    title: 'Budget optimization',
     description: '4 increase · 2 decrease · 1 pause · 4 maintain',
   },
 ]

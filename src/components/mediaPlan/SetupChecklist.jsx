@@ -11,6 +11,7 @@ const CHECKLIST_ITEMS = [
     enabledDescription: 'AI is now managing budgets automatically.',
     type: 'toggle',
     autoKey: 'autoExecuteRecommendations',
+    targetPage: 'adManagerV3',
     color: 'bg-amber-100 text-amber-600',
   },
   {
@@ -22,6 +23,7 @@ const CHECKLIST_ITEMS = [
     enabledDescription: 'AI will auto-publish recommended campaigns.',
     type: 'toggle',
     autoKey: 'autoRegenEnabled',
+    targetPage: 'autoRegeneration',
     color: 'bg-blue-100 text-blue-600',
   },
   {
@@ -57,9 +59,8 @@ export default function SetupChecklist({
     return false
   }
 
-  const handleToggle = (key) => {
-    if (key === 'autoExecuteRecommendations') onAutoExecuteChange(true)
-    else if (key === 'autoRegenEnabled') onAutoRegenChange(true)
+  const handleToggle = (item) => {
+    onPageChange(item.targetPage)
   }
 
   const completedCount = CHECKLIST_ITEMS.filter(
@@ -109,7 +110,7 @@ export default function SetupChecklist({
               <p className="text-xs text-gray-500 leading-relaxed mb-3">{item.description}</p>
               <button
                 onClick={() => {
-                  if (item.type === 'toggle') handleToggle(item.autoKey)
+                  if (item.type === 'toggle') handleToggle(item)
                   else onPageChange(item.targetPage)
                 }}
                 className="text-xs font-medium text-primary-500 hover:text-primary-600 flex items-center gap-0.5 transition-colors"

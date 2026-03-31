@@ -26,7 +26,7 @@ const STEPS = [
 
 export default function PrePublishView({ onPageChange }) {
   return (
-    <div className="bg-white rounded-[20px] shadow-[-2px_2px_16px_rgba(14,0,45,0.06)] min-h-[60vh] flex items-center justify-center">
+    <div className="bg-white rounded-[20px] shadow-[-2px_2px_16px_rgba(14,0,45,0.06)] py-16 flex items-center justify-center">
       <div className="text-center max-w-lg px-6">
         {/* Hero icon */}
         <div className="w-16 h-16 rounded-2xl bg-primary-50 flex items-center justify-center mx-auto mb-5">
