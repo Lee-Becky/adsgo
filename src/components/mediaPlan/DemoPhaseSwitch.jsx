@@ -2,8 +2,8 @@ import React from 'react'
 
 const PHASES = [
   { key: 'new_user', label: '新用户（当前 brand 未发布过广告）' },
-  { key: 'just_launched', label: '刚发布（当前 brand 有活跃中广告且 24H 内无消耗）' },
-  { key: 'running', label: '24H 后（当前 brand 有活跃中广告且 24H 内有消耗）' },
+  { key: 'just_launched', label: '刚发布（当前brand有活跃广告 且 预算优化及mediaplan未有内容之前）' },
+  { key: 'running', label: '24H后（当前brand有活跃广告 且 预算优化及mediaplan已有内容）' },
   { key: 'dormant', label: '休眠期（当前无活跃中广告且历史有消耗数据）' },
 ]
 

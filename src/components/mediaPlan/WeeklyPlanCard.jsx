@@ -47,7 +47,10 @@ function WeekCard({ week, isCurrentWeek, onTodoToggle }) {
           {week.status === 'completed' ? 'Completed' : week.status === 'current' ? 'This Week' : 'Upcoming'}
         </span>
         {isCurrentWeek && (
-          <span className="text-[10px] font-medium text-primary-600">Week {week.weekNumber}</span>
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary-100 text-primary-700 text-[10px] font-semibold">
+            <span style={{ display: 'inline-block', animation: 'infinityPulse 2s ease-in-out infinite', fontSize: '13px', lineHeight: 1 }}>∞</span>
+            Running
+          </span>
         )}
       </div>
 
@@ -214,6 +217,10 @@ export default function WeeklyPlanCard({ weeksData, onTodoToggle, hideTitle }) {
         @keyframes weekBreathe {
           0%, 100% { box-shadow: 0 0 20px rgba(112,51,245,0.08); }
           50%      { box-shadow: 0 0 30px rgba(112,51,245,0.18), 0 0 60px rgba(112,51,245,0.06); }
+        }
+        @keyframes infinityPulse {
+          0%, 100% { opacity: 1; transform: scale(1); }
+          50%      { opacity: 0.5; transform: scale(1.25); }
         }
       `}</style>
     </div>

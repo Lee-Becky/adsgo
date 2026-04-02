@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react'
-import { CalendarDays, ClipboardCheck } from 'lucide-react'
+import { CalendarDays, ClipboardCheck, Lightbulb } from 'lucide-react'
 import { MOCK_CAMPAIGNS } from '../adManagerV3/mockData'
 import { CAMPAIGN_CARDS } from '../autoRegeneration/mockData'
 import { STATUS_BAR_DATA, KPI_TREND_DATA, SPEND_DATA, WEEKLY_PLANS, DIMENSION_SCORES, CAMPAIGN_PHASE_DATA, HIGHLIGHTS_DATA, OPERATIONS_DATA } from './mockData'
@@ -148,10 +148,16 @@ export default function MediaPlan({
       {/* Section 2: Weekly Strategy + Multi-dimensional Monitoring */}
       <div>
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-base font-semibold text-gray-900 flex items-center gap-2">
-            <CalendarDays className="w-4.5 h-4.5 text-primary-500" />
-            Weekly Strategy
-          </h3>
+          <div>
+            <h3 className="text-base font-semibold text-gray-900 flex items-center gap-2">
+              <CalendarDays className="w-4.5 h-4.5 text-primary-500" />
+              Weekly Strategy
+            </h3>
+            <p className="text-[11px] text-gray-400 mt-0.5 ml-6 flex items-center gap-1">
+              <Lightbulb className="w-3 h-3 text-amber-400 flex-shrink-0" />
+              每周基于过去表现及当前情况更新后续每周策略
+            </p>
+          </div>
           <DevGuideButton title="Weekly Strategy" content={DEV_GUIDES.weeklyPlan} />
         </div>
       <div className="bg-white rounded-xl border border-[#F0F0F0] shadow-[-2px_2px_16px_rgba(14,0,45,0.06)] p-5">

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react'
-import { Wrench, CheckCircle2, ChevronRight } from 'lucide-react'
+import { Wrench, CheckCircle2, ChevronRight, Lightbulb } from 'lucide-react'
 import { RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, ResponsiveContainer } from 'recharts'
 import DevGuideButton from './DevGuideButton'
 import { DEV_GUIDES } from './devGuideContent'
@@ -348,7 +348,12 @@ export default function ScoreCard({ dimensionsData, phaseData, onDimensionSelect
         </div>
 
         {/* Progress indicator */}
-        <div className="flex items-center justify-center gap-1.5 mt-4 pt-3 border-t border-gray-100">
+        <div className="flex flex-col items-center gap-2 mt-4 pt-3 border-t border-gray-100">
+          <p className="text-[10px] text-gray-400 flex items-center gap-1">
+            <Lightbulb className="w-3 h-3 text-amber-400 flex-shrink-0" />
+            每日根据历史已执行的动作及现存问题重新分析评估
+          </p>
+        <div className="flex items-center justify-center gap-1.5">
           {dims.map((dim, index) => {
             const isActive = index === activeIndex
             return (
@@ -375,6 +380,7 @@ export default function ScoreCard({ dimensionsData, phaseData, onDimensionSelect
         <style>{`
           @keyframes scoreProgress { from { width: 0; } to { width: 100%; } }
         `}</style>
+        </div>
     </div>
   )
 }
