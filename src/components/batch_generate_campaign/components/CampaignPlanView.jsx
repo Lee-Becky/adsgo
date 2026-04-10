@@ -3,6 +3,19 @@ import { Users, Info, Sparkles, DollarSign, ChevronDown, Briefcase, Target, Laye
 import { Z_INDEX } from '../../../constants/zIndex';
 import useDropdownLoading from '../../../hooks/useDropdownLoading';
 
+const MOCK_CUSTOM_AUDIENCES = [
+  'VIP Members',
+  'Email List Upload',
+  'Website Visitors 180d',
+  'App Users',
+];
+
+const MOCK_SAVED_AUDIENCES = [
+  { id: 'sa1', name: 'High Value Customers',   ageMin: 25, ageMax: 55, gender: 'All',   interests: ['Shopping', 'Luxury Brands', 'Online Shopping'] },
+  { id: 'sa2', name: 'Young Female Shoppers',  ageMin: 18, ageMax: 35, gender: 'Women', interests: ['Fashion', 'Beauty', 'Lifestyle'] },
+  { id: 'sa3', name: 'Male Sports Fans',        ageMin: 20, ageMax: 45, gender: 'Men',   interests: ['Sports', 'Fitness', 'Outdoor Activities'] },
+];
+
 const AUDIENCE_SHORT_LABELS = {
   LAL: 'LAL',
   INT: 'INT',
@@ -651,10 +664,16 @@ const CampaignPlanView = ({
   onAddByCreativeAdset,
 }) => {
   const [showLalDropdown, setShowLalDropdown] = useState(false);
+  const [showCustomAudienceDropdown, setShowCustomAudienceDropdown] = useState(false);
+  const [showSavedAudienceDropdown, setShowSavedAudienceDropdown] = useState(false);
   const [editingAdsetIndex, setEditingAdsetIndex] = useState(null);
   const [isMetaConnecting, setIsMetaConnecting] = useState(false);
-  const lalLoading = useDropdownLoading('lalAudiences', authStatus?.meta);
-  useEffect(() => { if (showLalDropdown && selectedAccount) lalLoading.triggerLoad(); }, [showLalDropdown]);
+  const lalLoading            = useDropdownLoading('lalAudiences',     authStatus?.meta);
+  const customAudienceLoading = useDropdownLoading('customAudiences',  authStatus?.meta);
+  const savedAudienceLoading  = useDropdownLoading('savedAudiences',   authStatus?.meta);
+  useEffect(() => { if (showLalDropdown            && selectedAccount) lalLoading.triggerLoad();            }, [showLalDropdown]);
+  useEffect(() => { if (showCustomAudienceDropdown && selectedAccount) customAudienceLoading.triggerLoad(); }, [showCustomAudienceDropdown]);
+  useEffect(() => { if (showSavedAudienceDropdown  && selectedAccount) savedAudienceLoading.triggerLoad();  }, [showSavedAudienceDropdown]);
   const [showNumAdsetsDropdown, setShowNumAdsetsDropdown] = useState(false);
   const [showStrategyDropdown, setShowStrategyDropdown] = useState(false);
   const [structureOpen, setStructureOpen] = useState(false);
@@ -1066,86 +1085,111 @@ const CampaignPlanView = ({
                   )}
 
                   {focusedAudienceType === 'LAL' && (
-                    <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-150">
-                      <div
-                        onClick={() => setShowLalDropdown(!showLalDropdown)}
-                        className="w-full p-4 bg-white border-2 border-purple-100 rounded-base flex items-center justify-between cursor-pointer hover:border-purple-300 transition-all"
-                      >
-                        <div className="flex flex-wrap gap-1.5 overflow-hidden max-w-[90%]">
-                          {(!selectedAccount || (focusedDetails.lalOptions || []).length === 0) ? (
-                            <span className="text-xs font-bold text-gray-300">请选择 LAL 受众源...</span>
-                          ) : (
-                            (focusedDetails.lalOptions || []).map(opt => (
-                              <span key={opt} className="px-2 py-0.5 bg-purple-50 text-purple-600 rounded-tag text-xs font-medium border border-purple-100">
-                                {opt.split(' ')[1] || opt}
-                              </span>
-                            ))
-                          )}
-                        </div>
-                        <ChevronDown size={14} className={`text-purple-300 transition-transform ${showLalDropdown ? 'rotate-180' : ''}`} />
-                      </div>
-                      {showLalDropdown && (
-                        <>
-                          <div className="fixed inset-0 z-[190]" onClick={() => setShowLalDropdown(false)} />
-                          <div
-                            className="bg-white border border-purple-100 rounded-section shadow-xl overflow-hidden animate-in zoom-in-95 duration-150"
-                            style={{ zIndex: 200 }}
-                          >
-                            {!authStatus?.meta ? (
-                              <div className="p-4">
-                                <button
-                                  onClick={() => {
-                                    setIsMetaConnecting(true);
-                                    setTimeout(() => {
-                                      setIsMetaConnecting(false);
-                                      handleAuthorize('meta');
-                                      setShowLalDropdown(false);
-                                    }, 3000);
-                                  }}
-                                  disabled={isMetaConnecting}
-                                  className="w-full py-3 bg-primary-500 text-white rounded-base text-sm font-medium hover:bg-primary-600 active:bg-primary-700 transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
-                                >
-                                  {isMetaConnecting ? <><Loader2 size={14} className="animate-spin" /> Connecting...</> : <><Facebook size={14} /> 立即连接 Meta</>}
-                                </button>
-                              </div>
-                            ) : !selectedAccount ? (
-                              <div className="p-4">
-                                <button
-                                  onClick={() => { onSelectAccount(); setShowLalDropdown(false); }}
-                                  className="w-full py-3 bg-primary-500 text-white rounded-base text-sm font-medium hover:bg-primary-600 active:bg-primary-700 transition-all duration-200 flex items-center justify-center gap-2"
-                                >
-                                  <Briefcase size={14} /> 选择广告账户
-                                </button>
-                              </div>
-                            ) : lalLoading.isLoading ? (
-                              <div className="p-6 flex flex-col items-center justify-center gap-2">
-                                <Loader2 size={20} className="animate-spin text-purple-500/70" />
-                                <p className="text-xs font-medium text-gray-400 animate-pulse">Loading audiences...</p>
-                              </div>
-                            ) : (
-                              ['US Purchase 1%', 'US add to cart 5%', 'US register last30days 1%~3%'].map((opt) => {
-                                const currentLalOptions = focusedDetails.lalOptions || [];
-                                const isSel = currentLalOptions.includes(opt);
-                                return (
-                                  <div
-                                    key={opt}
-                                    onClick={() => {
-                                      const next = isSel
-                                        ? currentLalOptions.filter(o => o !== opt)
-                                        : [...currentLalOptions, opt];
-                                      onSaveAdsetAudienceDetails(effectiveFocusedIdx, { ...focusedDetails, lalOptions: next });
-                                    }}
-                                    className="flex items-center justify-between px-5 py-3 hover:bg-purple-50 cursor-pointer transition-colors"
-                                  >
-                                    <span className={`text-sm font-medium ${isSel ? 'text-purple-700' : 'text-gray-700'}`}>{opt}</span>
-                                    {isSel && <Check size={14} className="text-purple-600" />}
-                                  </div>
-                                );
-                              })
-                            )}
+                    <div className="grid grid-cols-3 gap-3 animate-in fade-in slide-in-from-top-2 duration-150">
+
+                      {/* ── Lookalike Audience ── */}
+                      <div className="space-y-1.5 relative">
+                        <p className="text-xs font-semibold text-purple-500 px-1">Lookalike Audience</p>
+                        <div onClick={() => setShowLalDropdown(!showLalDropdown)} className="w-full p-3 bg-white border-2 border-purple-100 rounded-base flex items-center justify-between cursor-pointer hover:border-purple-300 transition-all min-h-[44px]">
+                          <div className="flex flex-wrap gap-1 overflow-hidden">
+                            {(focusedDetails.lalOptions || []).length === 0
+                              ? <span className="text-xs font-bold text-gray-300">选择...</span>
+                              : (focusedDetails.lalOptions || []).map(opt => <span key={opt} className="px-1.5 py-0.5 bg-purple-50 text-purple-600 rounded text-[10px] font-medium border border-purple-100">{opt.split(' ')[1] || opt}</span>)
+                            }
                           </div>
-                        </>
-                      )}
+                          <ChevronDown size={12} className={`text-purple-300 shrink-0 transition-transform ${showLalDropdown ? 'rotate-180' : ''}`} />
+                        </div>
+                        {showLalDropdown && (
+                          <>
+                            <div className="fixed inset-0 z-[190]" onClick={() => setShowLalDropdown(false)} />
+                            <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-purple-100 rounded-section shadow-xl overflow-hidden animate-in zoom-in-95 duration-150 z-[200]">
+                              {!authStatus?.meta ? (
+                                <div className="p-4"><button onClick={() => { setIsMetaConnecting(true); setTimeout(() => { setIsMetaConnecting(false); handleAuthorize('meta'); setShowLalDropdown(false); }, 3000); }} disabled={isMetaConnecting} className="w-full py-3 bg-primary-500 text-white rounded-base text-xs font-medium hover:bg-primary-600 transition-all flex items-center justify-center gap-2 disabled:opacity-70">{isMetaConnecting ? <><Loader2 size={12} className="animate-spin" />Connecting...</> : <><Facebook size={12} />立即连接 Meta</>}</button></div>
+                              ) : !selectedAccount ? (
+                                <div className="p-4"><button onClick={() => { onSelectAccount(); setShowLalDropdown(false); }} className="w-full py-3 bg-primary-500 text-white rounded-base text-xs font-medium hover:bg-primary-600 transition-all flex items-center justify-center gap-2"><Briefcase size={12} />选择广告账户</button></div>
+                              ) : lalLoading.isLoading ? (
+                                <div className="p-5 flex flex-col items-center gap-2"><Loader2 size={18} className="animate-spin text-purple-500/70" /><p className="text-xs text-gray-400 animate-pulse">Loading...</p></div>
+                              ) : (
+                                ['US Purchase 1%', 'US add to cart 5%', 'US register last30days 1%~3%'].map(opt => {
+                                  const cur = focusedDetails.lalOptions || [];
+                                  const isSel = cur.includes(opt);
+                                  return <div key={opt} onClick={() => { const next = isSel ? cur.filter(o => o !== opt) : [...cur, opt]; onSaveAdsetAudienceDetails(effectiveFocusedIdx, { ...focusedDetails, lalOptions: next }); }} className="flex items-center justify-between px-4 py-2.5 hover:bg-purple-50 cursor-pointer transition-colors"><span className={`text-xs font-medium ${isSel ? 'text-purple-700' : 'text-gray-700'}`}>{opt}</span>{isSel && <Check size={12} className="text-purple-600" />}</div>;
+                                })
+                              )}
+                            </div>
+                          </>
+                        )}
+                      </div>
+
+                      {/* ── Custom Audience ── */}
+                      <div className="space-y-1.5 relative">
+                        <p className="text-xs font-semibold text-purple-500 px-1">Custom Audience</p>
+                        <div onClick={() => setShowCustomAudienceDropdown(!showCustomAudienceDropdown)} className="w-full p-3 bg-white border-2 border-purple-100 rounded-base flex items-center justify-between cursor-pointer hover:border-purple-300 transition-all min-h-[44px]">
+                          <div className="flex flex-wrap gap-1 overflow-hidden">
+                            {(focusedDetails.customAudienceOptions || []).length === 0
+                              ? <span className="text-xs font-bold text-gray-300">选择...</span>
+                              : (focusedDetails.customAudienceOptions || []).map(opt => <span key={opt} className="px-1.5 py-0.5 bg-purple-50 text-purple-600 rounded text-[10px] font-medium border border-purple-100">{opt}</span>)
+                            }
+                          </div>
+                          <ChevronDown size={12} className={`text-purple-300 shrink-0 transition-transform ${showCustomAudienceDropdown ? 'rotate-180' : ''}`} />
+                        </div>
+                        {showCustomAudienceDropdown && (
+                          <>
+                            <div className="fixed inset-0 z-[190]" onClick={() => setShowCustomAudienceDropdown(false)} />
+                            <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-purple-100 rounded-section shadow-xl overflow-hidden animate-in zoom-in-95 duration-150 z-[200]">
+                              {!authStatus?.meta ? (
+                                <div className="p-4"><button onClick={() => { setIsMetaConnecting(true); setTimeout(() => { setIsMetaConnecting(false); handleAuthorize('meta'); setShowCustomAudienceDropdown(false); }, 3000); }} disabled={isMetaConnecting} className="w-full py-3 bg-primary-500 text-white rounded-base text-xs font-medium hover:bg-primary-600 transition-all flex items-center justify-center gap-2 disabled:opacity-70">{isMetaConnecting ? <><Loader2 size={12} className="animate-spin" />Connecting...</> : <><Facebook size={12} />立即连接 Meta</>}</button></div>
+                              ) : !selectedAccount ? (
+                                <div className="p-4"><button onClick={() => { onSelectAccount(); setShowCustomAudienceDropdown(false); }} className="w-full py-3 bg-primary-500 text-white rounded-base text-xs font-medium hover:bg-primary-600 transition-all flex items-center justify-center gap-2"><Briefcase size={12} />选择广告账户</button></div>
+                              ) : customAudienceLoading.isLoading ? (
+                                <div className="p-5 flex flex-col items-center gap-2"><Loader2 size={18} className="animate-spin text-purple-500/70" /><p className="text-xs text-gray-400 animate-pulse">Loading...</p></div>
+                              ) : (
+                                MOCK_CUSTOM_AUDIENCES.map(opt => {
+                                  const cur = focusedDetails.customAudienceOptions || [];
+                                  const isSel = cur.includes(opt);
+                                  return <div key={opt} onClick={() => { const next = isSel ? cur.filter(o => o !== opt) : [...cur, opt]; onSaveAdsetAudienceDetails(effectiveFocusedIdx, { ...focusedDetails, customAudienceOptions: next }); }} className="flex items-center justify-between px-4 py-2.5 hover:bg-purple-50 cursor-pointer transition-colors"><span className={`text-xs font-medium ${isSel ? 'text-purple-700' : 'text-gray-700'}`}>{opt}</span>{isSel && <Check size={12} className="text-purple-600" />}</div>;
+                                })
+                              )}
+                            </div>
+                          </>
+                        )}
+                      </div>
+
+                      {/* ── Saved Audience (single-select) ── */}
+                      <div className="space-y-1.5 relative">
+                        <p className="text-xs font-semibold text-purple-500 px-1">Saved Audience</p>
+                        <div onClick={() => setShowSavedAudienceDropdown(!showSavedAudienceDropdown)} className="w-full p-3 bg-white border-2 border-purple-100 rounded-base flex items-center justify-between cursor-pointer hover:border-purple-300 transition-all min-h-[44px]">
+                          <span className={`text-[10px] font-bold truncate ${focusedDetails.savedAudience ? 'text-purple-700' : 'text-gray-300'}`}>
+                            {focusedDetails.savedAudience ? focusedDetails.savedAudience.name : '选择...'}
+                          </span>
+                          <ChevronDown size={12} className={`text-purple-300 shrink-0 transition-transform ${showSavedAudienceDropdown ? 'rotate-180' : ''}`} />
+                        </div>
+                        {showSavedAudienceDropdown && (
+                          <>
+                            <div className="fixed inset-0 z-[190]" onClick={() => setShowSavedAudienceDropdown(false)} />
+                            <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-purple-100 rounded-section shadow-xl overflow-hidden animate-in zoom-in-95 duration-150 z-[200]">
+                              {!authStatus?.meta ? (
+                                <div className="p-4"><button onClick={() => { setIsMetaConnecting(true); setTimeout(() => { setIsMetaConnecting(false); handleAuthorize('meta'); setShowSavedAudienceDropdown(false); }, 3000); }} disabled={isMetaConnecting} className="w-full py-3 bg-primary-500 text-white rounded-base text-xs font-medium hover:bg-primary-600 transition-all flex items-center justify-center gap-2 disabled:opacity-70">{isMetaConnecting ? <><Loader2 size={12} className="animate-spin" />Connecting...</> : <><Facebook size={12} />立即连接 Meta</>}</button></div>
+                              ) : !selectedAccount ? (
+                                <div className="p-4"><button onClick={() => { onSelectAccount(); setShowSavedAudienceDropdown(false); }} className="w-full py-3 bg-primary-500 text-white rounded-base text-xs font-medium hover:bg-primary-600 transition-all flex items-center justify-center gap-2"><Briefcase size={12} />选择广告账户</button></div>
+                              ) : savedAudienceLoading.isLoading ? (
+                                <div className="p-5 flex flex-col items-center gap-2"><Loader2 size={18} className="animate-spin text-purple-500/70" /><p className="text-xs text-gray-400 animate-pulse">Loading...</p></div>
+                              ) : (
+                                MOCK_SAVED_AUDIENCES.map(sa => {
+                                  const isSel = focusedDetails.savedAudience?.id === sa.id;
+                                  return (
+                                    <div key={sa.id} onClick={() => { onSaveAdsetAudienceDetails(effectiveFocusedIdx, { ...focusedDetails, savedAudience: isSel ? null : sa }); setShowSavedAudienceDropdown(false); }} className="flex items-start justify-between px-4 py-2.5 hover:bg-purple-50 cursor-pointer transition-colors">
+                                      <div><p className={`text-xs font-medium ${isSel ? 'text-purple-700' : 'text-gray-700'}`}>{sa.name}</p><p className="text-[10px] text-gray-400 mt-0.5">{sa.gender} · {sa.ageMin}–{sa.ageMax}</p></div>
+                                      {isSel && <Check size={12} className="text-purple-600 shrink-0 mt-0.5" />}
+                                    </div>
+                                  );
+                                })
+                              )}
+                            </div>
+                          </>
+                        )}
+                      </div>
+
                     </div>
                   )}
 

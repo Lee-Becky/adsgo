@@ -916,12 +916,13 @@ const CampaignPreviewView = ({
     if (campaignType === 'CATALOG') {
       for (let i = 0; i < targetAdSetCount; i++) {
         const audienceType = initialAdsetAudiences[i % initialAdsetAudiences.length] || 'ADV';
+        const _sa0 = adsetAudienceDetails[i]?.savedAudience ?? null;
         adSets.push({
           name: applyNameTemplate(adsetNameTemplate, { locations: locStr, audience_strategy: audienceType, creative_num: 1, date: today }),
           audienceType,
-          ageMin: 18, ageMax: 65, gender: 'All', 
+          ageMin: _sa0?.ageMin ?? 18, ageMax: _sa0?.ageMax ?? 65, gender: _sa0?.gender ?? 'All',
           locations: ['United States'],
-          interests: ['Broad Shopping'], 
+          interests: _sa0?.interests ?? ['Broad Shopping'],
           language: 'All languages',
           customInclude: [],
           lalInclude: [],
@@ -954,12 +955,13 @@ const CampaignPreviewView = ({
             const adSetOverallIdx = (pIdx * adsetsPerProduct) + i;
             const audienceType = initialAdsetAudiences[adSetOverallIdx % initialAdsetAudiences.length] || 'ADV';
             
+            const _sa1 = adsetAudienceDetails[adSetOverallIdx]?.savedAudience ?? null;
             adSets.push({
               name: applyNameTemplate(adsetNameTemplate, { locations: locStr, audience_strategy: audienceType, creative_num: creatives.length, date: today }),
               audienceType,
-              ageMin: 18, ageMax: 65, gender: 'All', 
+              ageMin: _sa1?.ageMin ?? 18, ageMax: _sa1?.ageMax ?? 65, gender: _sa1?.gender ?? 'All',
               locations: ['United States'],
-              interests: ['E-commerce', 'Shopping'], 
+              interests: _sa1?.interests ?? ['E-commerce', 'Shopping'],
               language: 'All languages',
               customInclude: [],
               lalInclude: [],
@@ -974,12 +976,13 @@ const CampaignPreviewView = ({
         const allCreativesPool = selectedProducts.flatMap(p => (productCreativesMap[p.id] || []).map(c => ({...c, productId: p.id})));
         for (let i = 0; i < targetAdSetCount; i++) {
           const audienceType = initialAdsetAudiences[i % initialAdsetAudiences.length] || 'ADV';
+          const _sa2 = adsetAudienceDetails[i]?.savedAudience ?? null;
           adSets.push({
             name: applyNameTemplate(adsetNameTemplate, { locations: locStr, audience_strategy: audienceType, creative_num: allCreativesPool.length, date: today }),
             audienceType,
-            ageMin: 18, ageMax: 65, gender: 'All', 
+            ageMin: _sa2?.ageMin ?? 18, ageMax: _sa2?.ageMax ?? 65, gender: _sa2?.gender ?? 'All',
             locations: ['United States'],
-            interests: ['E-commerce', 'Shopping'], 
+            interests: _sa2?.interests ?? ['E-commerce', 'Shopping'],
             language: 'All languages',
             customInclude: [],
             lalInclude: [],
@@ -1002,12 +1005,13 @@ const CampaignPreviewView = ({
             const currentGroupSize = Math.ceil(remainingAds / remainingGroups);
             const chunk = allAdsPool.slice(currentIndex, currentIndex + currentGroupSize);
             
+            const _sa3 = adsetAudienceDetails[i]?.savedAudience ?? null;
             adSets.push({
               name: applyNameTemplate(adsetNameTemplate, { locations: locStr, audience_strategy: audienceType, creative_num: chunk.length, date: today }),
               audienceType,
-              ageMin: 18, ageMax: 65, gender: 'All', 
+              ageMin: _sa3?.ageMin ?? 18, ageMax: _sa3?.ageMax ?? 65, gender: _sa3?.gender ?? 'All',
               locations: ['United States'],
-              interests: ['Fashion'], 
+              interests: _sa3?.interests ?? ['Fashion'],
               language: 'All languages',
               customInclude: [],
               lalInclude: [],
