@@ -448,6 +448,199 @@ const TargetingChannelCard = ({
   );
 };
 
+// ── Naming Strategy Section ──────────────────────────────────────────────────
+
+const ADSET_VARS = [
+  { key: 'locations',          label: 'Locations' },
+  { key: 'audience_strategy',  label: 'Audience' },
+  { key: 'creative_num',       label: 'Creative Num' },
+  { key: 'date',               label: 'Date' },
+];
+
+const AD_VARS = [
+  { key: 'product_name',  label: 'Product' },
+  { key: 'ad_format',     label: 'Ad Format' },
+  { key: 'date',          label: 'Date' },
+  { key: 'CTA',           label: 'CTA' },
+  { key: 'creative_num',  label: 'Creative Num' },
+];
+
+const insertVar = (ref, template, setTemplate, varKey) => {
+  const el = ref.current;
+  const insertion = (el ? (el.selectionStart ?? template.length) : template.length) > 0
+    ? `-{${varKey}}`
+    : `{${varKey}}`;
+  if (!el) {
+    setTemplate(template + insertion);
+    return;
+  }
+  const start = el.selectionStart ?? template.length;
+  const end   = el.selectionEnd   ?? template.length;
+  const next  = template.slice(0, start) + insertion + template.slice(end);
+  setTemplate(next);
+  requestAnimationFrame(() => {
+    el.focus();
+    const pos = start + insertion.length;
+    el.setSelectionRange(pos, pos);
+  });
+};
+
+const fmtVar = (k, v) => {
+  if (k === 'creative_num' && v !== undefined) return `${v} ${v === 1 ? 'creative' : 'creatives'}`;
+  return v;
+};
+const previewName = (template, vars) =>
+  template.replace(/\{(\w+)\}/g, (_, k) => fmtVar(k, vars[k]) ?? `{${k}}`);
+
+const ADSET_NAME_HISTORY_DEFAULTS = [
+  '{locations}-{audience_strategy}-{creative_num}-{date}',
+  '{audience_strategy}-{locations}-{date}',
+  '{locations}-{creative_num}-{date}',
+  '{audience_strategy}-{date}',
+];
+
+const AD_NAME_HISTORY_DEFAULTS = [
+  '{product_name}-{ad_format}-{CTA}-{date}',
+  '{product_name}-{CTA}-{date}',
+  '{product_name}-{ad_format}-{creative_num}',
+  '{ad_format}-{CTA}-{date}',
+];
+
+const NameField = ({
+  fieldKey, label, vars, template, setTemplate, inputRef, preview,
+  history, setHistory, openHistoryFor, setOpenHistoryFor,
+}) => {
+  const addToHistory = (val) => {
+    if (!val.trim() || history.includes(val)) return;
+    setHistory([val, ...history].slice(0, 8));
+  };
+  return (
+    <div className="flex-1 space-y-3">
+      <div className="flex items-center justify-between px-1">
+        <label className="text-xs font-medium text-gray-500">{label}</label>
+        <div className="relative">
+          <button
+            onClick={() => setOpenHistoryFor(openHistoryFor === fieldKey ? null : fieldKey)}
+            className={`flex items-center gap-1 text-[11px] font-medium transition-colors px-2 py-0.5 rounded-md border ${
+              openHistoryFor === fieldKey
+                ? 'bg-primary-50 border-primary-200 text-primary-600'
+                : 'border-gray-200 text-gray-400 hover:text-gray-600 hover:bg-gray-50'
+            }`}
+          >
+            <RefreshCw size={10} />
+            历史策略
+            <ChevronDown size={10} className={`transition-transform ${openHistoryFor === fieldKey ? 'rotate-180' : ''}`} />
+          </button>
+          {openHistoryFor === fieldKey && (
+            <div className="absolute right-0 top-full mt-1 w-72 bg-white rounded-base border border-gray-100 shadow-xl z-50 py-1 animate-in fade-in zoom-in-95 duration-150">
+              {history.map((item, i) => (
+                <button
+                  key={i}
+                  onClick={() => { setTemplate(item); setOpenHistoryFor(null); }}
+                  className={`w-full text-left px-3 py-2 text-[11px] font-mono transition-colors flex items-center gap-2 ${
+                    item === template ? 'bg-primary-50 text-primary-600' : 'text-gray-600 hover:bg-gray-50'
+                  }`}
+                >
+                  {item === template && <Check size={10} className="shrink-0" />}
+                  <span className="truncate">{item}</span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+      <input
+        ref={inputRef}
+        type="text"
+        value={template}
+        onChange={e => setTemplate(e.target.value)}
+        onBlur={() => addToHistory(template)}
+        className="w-full h-11 px-4 bg-white border border-gray-200 rounded-base outline-none text-xs text-gray-700 font-mono focus:border-primary-500 focus:shadow-primary-focus transition-all"
+      />
+      <div className="flex flex-wrap gap-1.5 px-1">
+        {vars.map(v => (
+          <button
+            key={v.key}
+            onClick={() => insertVar(inputRef, template, setTemplate, v.key)}
+            className="px-2 py-0.5 bg-primary-50 text-primary-600 text-[11px] font-semibold rounded-md border border-primary-100 hover:bg-primary-100 transition-colors"
+          >
+            {`{${v.key}}`}
+          </button>
+        ))}
+      </div>
+      <p className="text-[11px] text-gray-400 px-1 font-mono truncate" title={preview}>
+        预览: <span className="text-gray-600">{preview}</span>
+      </p>
+    </div>
+  );
+};
+
+const NamingStrategySection = ({
+  adsetNameTemplate, setAdsetNameTemplate,
+  adNameTemplate, setAdNameTemplate,
+  selectedLocations = [], selectedProducts = [],
+}) => {
+  const adsetInputRef = React.useRef(null);
+  const adInputRef    = React.useRef(null);
+
+  const [adsetHistory, setAdsetHistory] = useState(ADSET_NAME_HISTORY_DEFAULTS);
+  const [adHistory, setAdHistory]       = useState(AD_NAME_HISTORY_DEFAULTS);
+  const [openHistoryFor, setOpenHistoryFor] = useState(null);
+
+  const today = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+  const sampleProduct = selectedProducts[0]?.name || 'ProductName';
+  const locStr = selectedLocations.length > 0
+    ? selectedLocations.map(l => l.code || l.name).join('_')
+    : 'US';
+
+  const adsetPreview = previewName(adsetNameTemplate, {
+    locations: locStr, audience_strategy: 'ADV', creative_num: 6, date: today,
+  });
+  const adPreview = previewName(adNameTemplate, {
+    product_name: sampleProduct, ad_format: 'FLEXIBLE', date: today, CTA: 'Shop Now', creative_num: 3,
+  });
+
+  return (
+    <div className="space-y-6 pt-10" onClick={() => openHistoryFor && setOpenHistoryFor(null)}>
+      <div className="flex items-center gap-2 px-1">
+        <label className="text-xs font-medium text-gray-500">Adsets & Ads命名策略</label>
+        <Info size={12} className="text-gray-300" />
+      </div>
+      <div className="bg-gray-50/50 border border-gray-100 rounded-inner p-10 flex gap-10" onClick={e => e.stopPropagation()}>
+        <NameField
+          fieldKey="adset"
+          label="Adset 命名"
+          vars={ADSET_VARS}
+          template={adsetNameTemplate}
+          setTemplate={setAdsetNameTemplate}
+          inputRef={adsetInputRef}
+          preview={adsetPreview}
+          history={adsetHistory}
+          setHistory={setAdsetHistory}
+          openHistoryFor={openHistoryFor}
+          setOpenHistoryFor={setOpenHistoryFor}
+        />
+        <div className="w-px bg-gray-100 shrink-0" />
+        <NameField
+          fieldKey="ad"
+          label="Ad 命名"
+          vars={AD_VARS}
+          template={adNameTemplate}
+          setTemplate={setAdNameTemplate}
+          inputRef={adInputRef}
+          preview={adPreview}
+          history={adHistory}
+          setHistory={setAdHistory}
+          openHistoryFor={openHistoryFor}
+          setOpenHistoryFor={setOpenHistoryFor}
+        />
+      </div>
+    </div>
+  );
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+
 const BatchGenerateAds = ({ onPageChange }) => {
   const [selectedProducts, setSelectedProducts] = useState([]);
   const [productCreativesMap, setProductCreativesMap] = useState({});
@@ -468,9 +661,12 @@ const BatchGenerateAds = ({ onPageChange }) => {
   const [lpTemplateUrl, setLpTemplateUrl] = useState('https://luminaire-style.com/collections/{{product_name}}');
   const [productLpUtm, setProductLpUtm] = useState('utm_source=meta&utm_medium=paid&utm_campaign=ai_batch_{{product_id}}');
   
+  const [adsetNameTemplate, setAdsetNameTemplate] = useState('{locations}-{audience_strategy}-{creative_num}-{date}');
+  const [adNameTemplate, setAdNameTemplate] = useState('{product_name}-{ad_format}-{CTA}-{date}');
+
   const [copyStrategy, setCopyStrategy] = useState('AI_CUSTOM');
-  const [unifiedHeadline, setUnifiedHeadline] = useState('Limited Time Offer: Quality You Can Trust');
-  const [unifiedBody, setUnifiedBody] = useState('Discover the perfect blend of style and comfort. Shop our latest collection today and enjoy exclusive benefits.');
+  const [unifiedHeadline, setUnifiedHeadline] = useState(['Limited Time Offer: Quality You Can Trust']);
+  const [unifiedBody, setUnifiedBody] = useState(['Discover the perfect blend of style and comfort. Shop our latest collection today and enjoy exclusive benefits.']);
 
   const [scheduleType, setScheduleType] = useState('CONTINUOUS');
   const [startDate, setStartDate] = useState('');
@@ -1496,7 +1692,17 @@ const BatchGenerateAds = ({ onPageChange }) => {
 
                     {advancedOpen && (
                         <div className="p-10 pt-0 space-y-12 border-t border-gray-50 mt-6">
-                           
+
+                           {/* Naming Strategy */}
+                           <NamingStrategySection
+                             adsetNameTemplate={adsetNameTemplate}
+                             setAdsetNameTemplate={setAdsetNameTemplate}
+                             adNameTemplate={adNameTemplate}
+                             setAdNameTemplate={setAdNameTemplate}
+                             selectedLocations={selectedLocations}
+                             selectedProducts={selectedProducts}
+                           />
+
                            {/* Landing Page Strategy */}
                            <div className="space-y-6 pt-10">
                             <div className="flex items-center gap-2 px-1">
@@ -1635,24 +1841,82 @@ const BatchGenerateAds = ({ onPageChange }) => {
                                   </div>
                                 ) : (
                                   <div className="space-y-6 animate-in fade-in slide-in-from-left-4">
+                                    {/* Unified Headlines */}
                                     <div className="space-y-3">
-                                      <label className="text-xs font-medium text-gray-500 px-1">统一广告标题</label>
-                                      <input 
-                                        type="text"
-                                        value={unifiedHeadline}
-                                        onChange={(e) => setUnifiedHeadline(e.target.value)}
-                                        placeholder="输入统一标题..."
-                                        className="w-full h-14 px-6 bg-white border border-gray-200 rounded-base outline-none text-sm text-gray-700 focus:border-primary-500 focus:shadow-primary-focus transition-all duration-200"
-                                      />
+                                      <div className="flex items-center justify-between px-1">
+                                        <label className="text-xs font-medium text-gray-500">统一广告标题</label>
+                                        <span className="text-xs text-gray-400">{unifiedHeadline.length}/5</span>
+                                      </div>
+                                      {unifiedHeadline.map((val, i) => (
+                                        <div key={i} className="flex items-center gap-2">
+                                          <input
+                                            type="text"
+                                            value={val}
+                                            onChange={(e) => {
+                                              const next = [...unifiedHeadline];
+                                              next[i] = e.target.value;
+                                              setUnifiedHeadline(next);
+                                            }}
+                                            placeholder={`标题 ${i + 1}...`}
+                                            className="flex-1 h-14 px-6 bg-white border border-gray-200 rounded-base outline-none text-sm text-gray-700 focus:border-primary-500 focus:shadow-primary-focus transition-all duration-200"
+                                          />
+                                          {unifiedHeadline.length > 1 && (
+                                            <button
+                                              onClick={() => setUnifiedHeadline(unifiedHeadline.filter((_, j) => j !== i))}
+                                              className="w-8 h-8 flex items-center justify-center rounded-full text-gray-400 hover:text-red-400 hover:bg-red-50 transition-colors shrink-0"
+                                            >
+                                              <X size={14} />
+                                            </button>
+                                          )}
+                                        </div>
+                                      ))}
+                                      {unifiedHeadline.length < 5 && (
+                                        <button
+                                          onClick={() => setUnifiedHeadline([...unifiedHeadline, ''])}
+                                          className="flex items-center gap-2 text-xs text-primary-500 hover:text-primary-600 font-medium px-1 py-1 transition-colors"
+                                        >
+                                          <Plus size={14} />
+                                          添加标题变体
+                                        </button>
+                                      )}
                                     </div>
+                                    {/* Unified Body */}
                                     <div className="space-y-3">
-                                      <label className="text-xs font-medium text-gray-500 px-1">统一广告正文</label>
-                                      <textarea 
-                                        value={unifiedBody}
-                                        onChange={(e) => setUnifiedBody(e.target.value)}
-                                        placeholder="输入统一正文文案..."
-                                        className="w-full p-6 bg-white border border-gray-200 rounded-base outline-none text-sm text-gray-700 h-28 focus:border-primary-500 focus:shadow-primary-focus transition-all duration-200 resize-none"
-                                      />
+                                      <div className="flex items-center justify-between px-1">
+                                        <label className="text-xs font-medium text-gray-500">统一广告正文</label>
+                                        <span className="text-xs text-gray-400">{unifiedBody.length}/5</span>
+                                      </div>
+                                      {unifiedBody.map((val, i) => (
+                                        <div key={i} className="flex items-start gap-2">
+                                          <textarea
+                                            value={val}
+                                            onChange={(e) => {
+                                              const next = [...unifiedBody];
+                                              next[i] = e.target.value;
+                                              setUnifiedBody(next);
+                                            }}
+                                            placeholder={`正文 ${i + 1}...`}
+                                            className="flex-1 p-6 bg-white border border-gray-200 rounded-base outline-none text-sm text-gray-700 h-28 focus:border-primary-500 focus:shadow-primary-focus transition-all duration-200 resize-none"
+                                          />
+                                          {unifiedBody.length > 1 && (
+                                            <button
+                                              onClick={() => setUnifiedBody(unifiedBody.filter((_, j) => j !== i))}
+                                              className="w-8 h-8 mt-2 flex items-center justify-center rounded-full text-gray-400 hover:text-red-400 hover:bg-red-50 transition-colors shrink-0"
+                                            >
+                                              <X size={14} />
+                                            </button>
+                                          )}
+                                        </div>
+                                      ))}
+                                      {unifiedBody.length < 5 && (
+                                        <button
+                                          onClick={() => setUnifiedBody([...unifiedBody, ''])}
+                                          className="flex items-center gap-2 text-xs text-primary-500 hover:text-primary-600 font-medium px-1 py-1 transition-colors"
+                                        >
+                                          <Plus size={14} />
+                                          添加正文变体
+                                        </button>
+                                      )}
                                     </div>
                                   </div>
                                 )} 
@@ -1803,6 +2067,9 @@ const BatchGenerateAds = ({ onPageChange }) => {
                   onSelectAccount={() => setShowMetaAccountPicker(true)}
                   onBudgetChange={setDailyBudget}
                   onBudgetTypeChange={setBudgetType}
+                  adsetNameTemplate={adsetNameTemplate}
+                  adNameTemplate={adNameTemplate}
+                  selectedLocations={selectedLocations}
                 />
               </div>
             </div>

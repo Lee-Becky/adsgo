@@ -8,11 +8,7 @@ import {
 } from 'lucide-react';
 import useDropdownLoading from '../../../hooks/useDropdownLoading';
 
-const AUDIENCE_NAMES = {
-  LAL: 'LAL 1% US Purchase',
-  INT: 'INT Lifestyle & Design',
-  ADV: 'Advantage+ Audience'
-};
+
 
 const CTA_OPTIONS = [
   'Shop Now',
@@ -800,13 +796,31 @@ const CampaignPreviewView = ({
   structure, budgetType, dailyBudget, initialAdsetAudiences, productCreativesMap, selectedProducts, brand, onBack, onPublish, campaignName, optimizationEvent, landingPageType, landingPageTemplate, productUtm, copyStrategy, unifiedHeadline, unifiedBody, campaignType,
   estimatedTotalDaily, adSetGroupsCount, adType = 'SINGLE', adsetAudienceDetails = {},
   authStatus, selectedAccount, onAuthStatusChange, onSelectAccount,
-  isExistingCampaign, campaignObjective, onBudgetChange, onBudgetTypeChange
+  isExistingCampaign, campaignObjective, onBudgetChange, onBudgetTypeChange,
+  adsetNameTemplate = '{locations}-{audience_strategy}-{creative_num}-{date}',
+  adNameTemplate = '{product_name}-{ad_format}-{CTA}-{date}',
+  selectedLocations = [],
 }) => {
   const isFlexible = adType === 'FLEXIBLE' && (campaignObjective === 'sales_conversions' || campaignObjective === 'app_promotion');
+
+  const applyNameTemplate = (template, vars) =>
+    template.replace(/\{(\w+)\}/g, (_, k) => {
+      if (k === 'creative_num' && vars[k] !== undefined) {
+        const n = vars[k];
+        return `${n} ${n === 1 ? 'creative' : 'creatives'}`;
+      }
+      return vars[k] !== undefined && vars[k] !== null ? String(vars[k]) : `{${k}}`;
+    });
+
+  const today = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+  const locStr = selectedLocations.length > 0
+    ? selectedLocations.map(l => l.code || l.name).join('_')
+    : 'ALL';
 
   const [localAdSets, setLocalAdSets] = useState([]);
   const [editingAdSetIndex, setEditingAdSetIndex] = useState(null);
   const [editingAdInfo, setEditingAdInfo] = useState(null);
+  const [changeCreativeInfo, setChangeCreativeInfo] = useState(null);
   const [loadedAdsCount, setLoadedAdsCount] = useState(0);
   const [isEditingCampaignName, setIsEditingCampaignName] = useState(false);
   const [localCampaignName, setLocalCampaignName] = useState(campaignName);
@@ -841,7 +855,11 @@ const CampaignPreviewView = ({
   };
 
   const getAdCopy = (p) => {
-    if (copyStrategy === 'UNIFIED') return { headline: unifiedHeadline, body: unifiedBody };
+    if (copyStrategy === 'UNIFIED') {
+      const headline = Array.isArray(unifiedHeadline) ? unifiedHeadline[0] || '' : unifiedHeadline;
+      const body = Array.isArray(unifiedBody) ? unifiedBody[0] || '' : unifiedBody;
+      return { headline, body };
+    }
     return { headline: `Get your ${p.name} today!`, body: `Discover quality and style that lasts with our exclusive ${p.name}. Limited time offer.` };
   };
 
@@ -856,9 +874,9 @@ const CampaignPreviewView = ({
         const copy = p ? getAdCopy(p) : { headline: '', body: '' };
         result.push({
           id: `${adSetIdx}-flex-${Math.floor(j / 10)}`,
-          name: `${namePrefix} - Flexible #${Math.floor(j / 10) + 1} (${chunk.length} 素材)`,
-          headline: copy.headline,
-          primaryText: copy.body,
+          name: applyNameTemplate(adNameTemplate, { product_name: resolveProduct(c0)?.name || namePrefix, ad_format: 'FLEXIBLE', date: today, CTA: selectedCta, creative_num: chunk.length }),
+          headline: [copy.headline],
+          primaryText: [copy.body],
           imageUrl: c0.url,
           imageUrls: chunk.map(c => c.url),
           adFormat: 'FLEXIBLE',
@@ -877,9 +895,9 @@ const CampaignPreviewView = ({
       const copy = p ? getAdCopy(p) : { headline: '', body: '' };
       return {
         id: `${adSetIdx}-${cIdx}`,
-        name: `AD - ${p?.name || ''} - ${c.id?.slice(-4) || ''}`,
-        headline: copy.headline,
-        primaryText: copy.body,
+        name: applyNameTemplate(adNameTemplate, { product_name: p?.name || '', ad_format: 'SINGLE', date: today, CTA: selectedCta, creative_num: 1 }),
+        headline: [copy.headline],
+        primaryText: [copy.body],
         imageUrl: c.url,
         cta: 'Shop Now',
         destinationUrl: p ? getAdUrl(p) : '',
@@ -899,7 +917,7 @@ const CampaignPreviewView = ({
       for (let i = 0; i < targetAdSetCount; i++) {
         const audienceType = initialAdsetAudiences[i % initialAdsetAudiences.length] || 'ADV';
         adSets.push({
-          name: `DPA-${i + 1} - ${AUDIENCE_NAMES[audienceType]}`,
+          name: applyNameTemplate(adsetNameTemplate, { locations: locStr, audience_strategy: audienceType, creative_num: 1, date: today }),
           audienceType,
           ageMin: 18, ageMax: 65, gender: 'All', 
           locations: ['United States'],
@@ -913,8 +931,8 @@ const CampaignPreviewView = ({
           ads: [{
             id: `cat-${i}`,
             name: `Dynamic Catalog Creative`,
-            headline: '{{product.name}}',
-            primaryText: 'Check out our latest arrivals. {{product.description}}',
+            headline: ['{{product.name}}'],
+            primaryText: ['Check out our latest arrivals. {{product.description}}'],
             imageUrl: 'https://img.clipp.io/img/ad_preview_dpa.png',
             cta: 'Shop Now',
             destinationUrl: '{{product.url}}',
@@ -937,7 +955,7 @@ const CampaignPreviewView = ({
             const audienceType = initialAdsetAudiences[adSetOverallIdx % initialAdsetAudiences.length] || 'ADV';
             
             adSets.push({
-              name: adsetsPerProduct > 1 ? `${p.name} - 组 ${i + 1} - ${AUDIENCE_NAMES[audienceType]}` : `${p.name} - ${AUDIENCE_NAMES[audienceType]}`,
+              name: applyNameTemplate(adsetNameTemplate, { locations: locStr, audience_strategy: audienceType, creative_num: creatives.length, date: today }),
               audienceType,
               ageMin: 18, ageMax: 65, gender: 'All', 
               locations: ['United States'],
@@ -957,7 +975,7 @@ const CampaignPreviewView = ({
         for (let i = 0; i < targetAdSetCount; i++) {
           const audienceType = initialAdsetAudiences[i % initialAdsetAudiences.length] || 'ADV';
           adSets.push({
-            name: `混合组 ${i + 1} - ${AUDIENCE_NAMES[audienceType]}`,
+            name: applyNameTemplate(adsetNameTemplate, { locations: locStr, audience_strategy: audienceType, creative_num: allCreativesPool.length, date: today }),
             audienceType,
             ageMin: 18, ageMax: 65, gender: 'All', 
             locations: ['United States'],
@@ -985,7 +1003,7 @@ const CampaignPreviewView = ({
             const chunk = allAdsPool.slice(currentIndex, currentIndex + currentGroupSize);
             
             adSets.push({
-              name: `智能分组 ${i + 1} - ${AUDIENCE_NAMES[audienceType]}`,
+              name: applyNameTemplate(adsetNameTemplate, { locations: locStr, audience_strategy: audienceType, creative_num: chunk.length, date: today }),
               audienceType,
               ageMin: 18, ageMax: 65, gender: 'All', 
               locations: ['United States'],
@@ -1004,7 +1022,7 @@ const CampaignPreviewView = ({
       }
     }
     setLocalAdSets(adSets);
-  }, [campaignType, selectedProducts, structure, productCreativesMap, initialAdsetAudiences, landingPageType, landingPageTemplate, productUtm, copyStrategy, unifiedHeadline, unifiedBody, optimizationEvent, adSetGroupsCount, isFlexible]);
+  }, [campaignType, selectedProducts, structure, productCreativesMap, initialAdsetAudiences, landingPageType, landingPageTemplate, productUtm, copyStrategy, unifiedHeadline, unifiedBody, optimizationEvent, adSetGroupsCount, isFlexible, adsetNameTemplate, adNameTemplate, selectedLocations, selectedCta]);
 
   const totalDailyBudget = estimatedTotalDaily || (budgetType === 'CBO' ? dailyBudget : dailyBudget * localAdSets.length);
 
@@ -1039,17 +1057,121 @@ const CampaignPreviewView = ({
             <button onClick={() => setEditingAdInfo(null)} className="p-2 hover:bg-gray-50 rounded-full text-gray-300"><X size={24} /></button>
           </div>
           <div className="flex-1 overflow-y-auto p-10 space-y-8 no-scrollbar">
+            {/* Headlines */}
             <div className="space-y-3">
-              <label className="text-xs font-medium text-gray-400 px-1">广告标题 (Headline)</label>
-              <input type="text" value={ad.headline} onChange={e => {
-                const next = [...localAdSets]; next[asIndex].ads[adIndex].headline = e.target.value; setLocalAdSets(next);
-              }} className="w-full h-12 px-5 border border-gray-200 rounded-base bg-white text-sm font-medium focus:border-primary-500 outline-none transition-all" />
+              <div className="flex items-center justify-between px-1">
+                <label className="text-xs font-medium text-gray-400">广告标题 (Headline)</label>
+                <span className="text-xs text-gray-400">{(Array.isArray(ad.headline) ? ad.headline : [ad.headline]).length}/5</span>
+              </div>
+              {(Array.isArray(ad.headline) ? ad.headline : [ad.headline]).map((val, i) => {
+                const headlines = Array.isArray(ad.headline) ? ad.headline : [ad.headline];
+                return (
+                  <div key={i} className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      value={val}
+                      onChange={e => {
+                        const next = [...localAdSets];
+                        const arr = Array.isArray(next[asIndex].ads[adIndex].headline)
+                          ? [...next[asIndex].ads[adIndex].headline]
+                          : [next[asIndex].ads[adIndex].headline];
+                        arr[i] = e.target.value;
+                        next[asIndex].ads[adIndex].headline = arr;
+                        setLocalAdSets(next);
+                      }}
+                      placeholder={`标题 ${i + 1}...`}
+                      className="flex-1 h-12 px-5 border border-gray-200 rounded-base bg-white text-sm font-medium focus:border-primary-500 outline-none transition-all"
+                    />
+                    {headlines.length > 1 && (
+                      <button
+                        onClick={() => {
+                          const next = [...localAdSets];
+                          next[asIndex].ads[adIndex].headline = headlines.filter((_, j) => j !== i);
+                          setLocalAdSets(next);
+                        }}
+                        className="w-8 h-8 flex items-center justify-center rounded-full text-gray-400 hover:text-red-400 hover:bg-red-50 transition-colors shrink-0"
+                      >
+                        <X size={14} />
+                      </button>
+                    )}
+                  </div>
+                );
+              })}
+              {(Array.isArray(ad.headline) ? ad.headline : [ad.headline]).length < 5 && (
+                <button
+                  onClick={() => {
+                    const next = [...localAdSets];
+                    const arr = Array.isArray(next[asIndex].ads[adIndex].headline)
+                      ? [...next[asIndex].ads[adIndex].headline]
+                      : [next[asIndex].ads[adIndex].headline];
+                    next[asIndex].ads[adIndex].headline = [...arr, ''];
+                    setLocalAdSets(next);
+                  }}
+                  className="flex items-center gap-2 text-xs text-primary-500 hover:text-primary-600 font-medium px-1 py-1 transition-colors"
+                >
+                  <Plus size={14} />
+                  添加标题变体
+                </button>
+              )}
             </div>
+            {/* Primary Text */}
             <div className="space-y-3">
-              <label className="text-xs font-medium text-gray-400 px-1">广告正文 (Primary Text)</label>
-              <textarea value={ad.primaryText} onChange={e => {
-                const next = [...localAdSets]; next[asIndex].ads[adIndex].primaryText = e.target.value; setLocalAdSets(next);
-              }} className="w-full p-5 border border-gray-200 rounded-base bg-white text-sm font-medium h-32 resize-none focus:border-primary-500 outline-none transition-all" />
+              <div className="flex items-center justify-between px-1">
+                <label className="text-xs font-medium text-gray-400">广告正文 (Primary Text)</label>
+                <span className="text-xs text-gray-400">{(Array.isArray(ad.primaryText) ? ad.primaryText : [ad.primaryText]).length}/5</span>
+              </div>
+              {(Array.isArray(ad.primaryText) ? ad.primaryText : [ad.primaryText]).map((val, i) => {
+                const texts = Array.isArray(ad.primaryText) ? ad.primaryText : [ad.primaryText];
+                return (
+                  <div key={i} className="flex items-start gap-2">
+                    <textarea
+                      value={val}
+                      onChange={e => {
+                        const next = [...localAdSets];
+                        const arr = Array.isArray(next[asIndex].ads[adIndex].primaryText)
+                          ? [...next[asIndex].ads[adIndex].primaryText]
+                          : [next[asIndex].ads[adIndex].primaryText];
+                        arr[i] = e.target.value;
+                        next[asIndex].ads[adIndex].primaryText = arr;
+                        setLocalAdSets(next);
+                      }}
+                      placeholder={`正文 ${i + 1}...`}
+                      className="flex-1 p-5 border border-gray-200 rounded-base bg-white text-sm font-medium h-32 resize-none focus:border-primary-500 outline-none transition-all"
+                    />
+                    {(Array.isArray(ad.primaryText) ? ad.primaryText : [ad.primaryText]).length > 1 && (
+                      <button
+                        onClick={() => {
+                          const next = [...localAdSets];
+                          const texts2 = Array.isArray(next[asIndex].ads[adIndex].primaryText)
+                            ? next[asIndex].ads[adIndex].primaryText
+                            : [next[asIndex].ads[adIndex].primaryText];
+                          next[asIndex].ads[adIndex].primaryText = texts2.filter((_, j) => j !== i);
+                          setLocalAdSets(next);
+                        }}
+                        className="w-8 h-8 mt-2 flex items-center justify-center rounded-full text-gray-400 hover:text-red-400 hover:bg-red-50 transition-colors shrink-0"
+                      >
+                        <X size={14} />
+                      </button>
+                    )}
+                  </div>
+                );
+              })}
+              {(Array.isArray(ad.primaryText) ? ad.primaryText : [ad.primaryText]).length < 5 && (
+                <button
+                  onClick={() => {
+                    const next = [...localAdSets];
+                    const arr = Array.isArray(next[asIndex].ads[adIndex].primaryText)
+                      ? [...next[asIndex].ads[adIndex].primaryText]
+                      : [next[asIndex].ads[adIndex].primaryText];
+                    next[asIndex].ads[adIndex].primaryText = [...arr, ''];
+                    setLocalAdSets(next);
+                  }}
+                  className="flex items-center gap-2 text-xs text-primary-500 hover:text-primary-600 font-medium px-1 py-1 transition-colors"
+                >
+                  <Plus size={14} />
+                  添加正文变体
+                </button>
+              )}
             </div>
 
             <div className="space-y-3">
@@ -1127,6 +1249,211 @@ const CampaignPreviewView = ({
           </div>
           <div className="px-6 py-4 border-t border-gray-200 flex justify-end gap-3">
             <button onClick={() => setEditingAdInfo(null)} className="px-10 py-4 bg-primary-500 text-white rounded-base text-sm font-medium hover:bg-primary-600 active:bg-primary-700 transition-all duration-200 focus:outline-none focus:shadow-primary-focus">保存修改</button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const ChangeCreativeModal = () => {
+    if (!changeCreativeInfo) return null;
+    const { asIndex, adIndex } = changeCreativeInfo;
+    const ad = localAdSets[asIndex]?.ads[adIndex];
+    if (!ad) return null;
+
+    const isFlexibleAd = ad.adFormat === 'FLEXIBLE' || Array.isArray(ad.imageUrls);
+    const maxCount = isFlexibleAd ? 10 : 1;
+
+    // Flatten all available creatives, deduplicate by URL
+    const allCreativesRaw = Object.values(productCreativesMap || {}).flat();
+    const seenUrls = new Set();
+    const allCreatives = allCreativesRaw.filter(c => {
+      if (seenUrls.has(c.url)) return false;
+      seenUrls.add(c.url);
+      return true;
+    });
+
+    // Initial selection from current ad
+    const initSelected = isFlexibleAd
+      ? (ad.imageUrls || [ad.imageUrl]).map(url => allCreatives.find(c => c.url === url) || { id: url, url })
+      : [allCreatives.find(c => c.url === ad.imageUrl) || { id: ad.imageUrl, url: ad.imageUrl }];
+
+    const [activeTab, setActiveTab] = useState('LIBRARY');
+    const [selected, setSelected] = useState(() => initSelected.filter(Boolean));
+
+    const tabs = [
+      { id: 'AI', label: 'AI Generate', icon: <Sparkles size={13} /> },
+      { id: 'LIBRARY', label: 'Creative Library', icon: <Layout size={13} /> },
+      { id: 'ASSETS', label: 'Product Assets', icon: <ShoppingBag size={13} /> },
+      { id: 'UPLOAD', label: 'Upload', icon: <Plus size={13} /> },
+    ];
+
+    const isSelected = (c) => selected.some(s => s.url === c.url);
+
+    const toggle = (c) => {
+      if (isSelected(c)) {
+        if (selected.length === 1) return; // keep at least one
+        setSelected(selected.filter(s => s.url !== c.url));
+      } else {
+        if (maxCount === 1) {
+          setSelected([c]);
+        } else if (selected.length < maxCount) {
+          setSelected([...selected, c]);
+        }
+      }
+    };
+
+    const handleConfirm = () => {
+      const next = [...localAdSets];
+      const targetAd = { ...next[asIndex].ads[adIndex] };
+      if (isFlexibleAd) {
+        targetAd.imageUrl = selected[0]?.url || targetAd.imageUrl;
+        targetAd.imageUrls = selected.map(c => c.url);
+      } else {
+        targetAd.imageUrl = selected[0]?.url || targetAd.imageUrl;
+      }
+      next[asIndex] = { ...next[asIndex], ads: next[asIndex].ads.map((a, i) => i === adIndex ? targetAd : a) };
+      setLocalAdSets(next);
+      setChangeCreativeInfo(null);
+    };
+
+    return (
+      <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[200] p-4 animate-in fade-in">
+        <div className="bg-white w-full max-w-3xl rounded-section shadow-xl overflow-hidden flex flex-col" style={{ maxHeight: '85vh' }}>
+          {/* Header */}
+          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+            <div>
+              <h3 className="text-base font-semibold text-gray-900">Change Creative</h3>
+              <p className="text-xs text-gray-400 mt-0.5">
+                Current campaign supports up to {maxCount} creative{maxCount > 1 ? 's' : ''}
+              </p>
+            </div>
+            <button onClick={() => setChangeCreativeInfo(null)} className="p-2 hover:bg-gray-50 rounded-full text-gray-300">
+              <X size={20} />
+            </button>
+          </div>
+
+          {/* Body */}
+          <div className="flex flex-1 overflow-hidden">
+            {/* Left: tabs + grid */}
+            <div className="flex-1 flex flex-col overflow-hidden border-r border-gray-100">
+              {/* Tabs */}
+              <div className="flex items-center gap-1 px-4 pt-3 pb-0 border-b border-gray-100">
+                {tabs.map(tab => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`flex items-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-t-md border-b-2 transition-all -mb-px ${
+                      activeTab === tab.id
+                        ? 'border-primary-500 text-primary-600 bg-primary-50/50'
+                        : 'border-transparent text-gray-400 hover:text-gray-600'
+                    }`}
+                  >
+                    {tab.icon}
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
+
+              {/* Grid */}
+              <div className="flex-1 overflow-y-auto p-4">
+                {activeTab === 'LIBRARY' ? (
+                  allCreatives.length > 0 ? (
+                    <div className="grid grid-cols-4 gap-1.5">
+                      {allCreatives.map((c, i) => {
+                        const sel = isSelected(c);
+                        const selIdx = selected.findIndex(s => s.url === c.url);
+                        return (
+                          <div
+                            key={c.id || i}
+                            onClick={() => toggle(c)}
+                            className={`relative aspect-square rounded-md overflow-hidden cursor-pointer border-2 transition-all ${
+                              sel ? 'border-primary-500 shadow-md' : 'border-transparent hover:border-gray-300'
+                            }`}
+                          >
+                            <img src={c.url} className="w-full h-full object-cover" alt="" />
+                            {sel && (
+                              <div className="absolute inset-0 bg-primary-500/20" />
+                            )}
+                            {sel && (
+                              <div className="absolute top-1.5 right-1.5 w-5 h-5 bg-primary-500 rounded-full flex items-center justify-center text-white text-[10px] font-bold shadow">
+                                {selIdx + 1}
+                              </div>
+                            )}
+                            {!sel && selected.length >= maxCount && (
+                              <div className="absolute inset-0 bg-white/50" />
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center h-full text-gray-400 gap-2">
+                      <Layout size={32} className="text-gray-200" />
+                      <p className="text-sm">暂无可用创意</p>
+                    </div>
+                  )
+                ) : (
+                  <div className="flex flex-col items-center justify-center h-full text-gray-400 gap-2">
+                    <Sparkles size={32} className="text-gray-200" />
+                    <p className="text-sm font-medium text-gray-400">{tabs.find(t => t.id === activeTab)?.label}</p>
+                    <p className="text-xs text-gray-300">即将推出</p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Right: selected panel */}
+            <div className="w-52 shrink-0 flex flex-col">
+              <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+                <span className="text-xs font-semibold text-gray-600">Selected</span>
+                <span className="text-xs font-bold text-primary-500">{selected.length} / {maxCount}</span>
+              </div>
+              <div className="flex-1 overflow-y-auto p-3">
+                {selected.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center h-full gap-3 text-center px-2">
+                    <div className="w-16 h-16 border-2 border-dashed border-gray-200 rounded-xl flex items-center justify-center">
+                      <Plus size={20} className="text-gray-300" />
+                    </div>
+                    <p className="text-xs text-gray-400">No creative selected</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 gap-1.5">
+                    {selected.map((c, i) => (
+                      <div key={i} className="relative group/sel rounded-md overflow-hidden border border-gray-100">
+                        <img src={c.url} className="w-full aspect-square object-cover" alt="" />
+                        <button
+                          onClick={() => selected.length > 1 && setSelected(selected.filter((_, j) => j !== i))}
+                          className="absolute top-1 right-1 w-5 h-5 bg-black/50 rounded-full flex items-center justify-center text-white opacity-0 group-hover/sel:opacity-100 transition-opacity"
+                        >
+                          <X size={10} />
+                        </button>
+                        <div className="absolute top-1 left-1 w-5 h-5 bg-primary-500 rounded-full flex items-center justify-center text-white text-[10px] font-bold">
+                          {i + 1}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Footer */}
+          <div className="px-6 py-3 border-t border-gray-100 flex justify-end gap-3">
+            <button
+              onClick={() => setChangeCreativeInfo(null)}
+              className="px-6 py-2.5 border border-gray-200 text-gray-600 rounded-base text-sm font-medium hover:bg-gray-50 transition-all"
+            >
+              Discard
+            </button>
+            <button
+              onClick={handleConfirm}
+              disabled={selected.length === 0}
+              className="px-6 py-2.5 bg-primary-500 text-white rounded-base text-sm font-medium hover:bg-primary-600 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+            >
+              Confirm Apply
+            </button>
           </div>
         </div>
       </div>
@@ -1311,20 +1638,31 @@ const CampaignPreviewView = ({
                               <div><p className="text-xs font-medium text-gray-900">{brand.name}</p><p className="text-xs text-gray-500">Sponsored</p></div>
                             </div>
                           </div>
-                          <p className="text-xs text-gray-700 leading-relaxed line-clamp-2">{ad.primaryText}</p>
+                          <p className="text-xs text-gray-700 leading-relaxed line-clamp-2">{Array.isArray(ad.primaryText) ? ad.primaryText[0] : ad.primaryText}</p>
                         </div>
-                        <div className="aspect-square bg-gray-100 relative overflow-hidden">
+                        <div className="aspect-square bg-gray-100 relative overflow-hidden group/img">
                            {campaignType === 'CATALOG' ? (
                              <DPAPreviewCard />
                            ) : (
                              <img src={ad.imageUrl} className="w-full h-full object-cover" />
                            )}
                            {ad.isDynamic && <div className="absolute inset-0 bg-black/40 flex items-center justify-center text-white text-xs font-semibold tracking-widest">Dynamic Catalog Preview</div>}
+                           {!ad.isDynamic && (
+                             <div className="absolute inset-0 bg-black/0 group-hover/img:bg-black/30 transition-all flex items-center justify-center">
+                               <button
+                                 onClick={() => setChangeCreativeInfo({ asIndex: asIdx, adIndex: aIdx })}
+                                 className="opacity-0 group-hover/img:opacity-100 transition-all flex items-center gap-1.5 bg-white text-gray-800 text-xs font-semibold px-3 py-2 rounded-full shadow-lg hover:bg-primary-500 hover:text-white"
+                               >
+                                 <Layout size={12} />
+                                 Change Creative
+                               </button>
+                             </div>
+                           )}
                         </div>
                         <div className="p-4 bg-gray-50 flex items-center justify-between gap-4">
                           <div className="flex-1 min-w-0">
                             <p className="text-xs text-gray-500 font-semibold truncate">{ad.destinationUrl.split('?')[0].split('/').slice(0,3).join('/')}</p>
-                            <h6 className="text-xs font-medium text-gray-900 truncate">{ad.headline}</h6>
+                            <h6 className="text-xs font-medium text-gray-900 truncate">{Array.isArray(ad.headline) ? ad.headline[0] : ad.headline}</h6>
                           </div>
                           <div className="px-3 py-1.5 bg-white border border-gray-200 rounded-md text-xs font-medium text-gray-800 shrink-0 tracking-tighter shadow-sm">{selectedCta}</div>
                         </div>
@@ -1396,6 +1734,7 @@ const CampaignPreviewView = ({
         onSelectAccount={onSelectAccount}
       />
       <EditAdModal />
+      <ChangeCreativeModal />
     </div>
   );
 };
