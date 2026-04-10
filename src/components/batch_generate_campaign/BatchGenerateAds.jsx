@@ -539,8 +539,8 @@ const BatchGenerateAds = ({ onPageChange }) => {
   const [adsetCreativeSelections, setAdsetCreativeSelections] = useState({});
   const [numByCreativeAdsets, setNumByCreativeAdsets] = useState(1);
   const [adsetAudiences, setAdsetAudiences] = useState(Array(50).fill('ADV'));
-  const [lalOptions, setLalOptions] = useState([]);
-  const [intOptions, setIntOptions] = useState([]);
+  const [adType, setAdType] = useState('FLEXIBLE');
+  const [adsetAudienceDetails, setAdsetAudienceDetails] = useState({});
   const [budgetType, setBudgetType] = useState('CBO');
   const [dailyBudget, setDailyBudget] = useState(50);
   const [view, setView] = useState('config');
@@ -584,6 +584,14 @@ const BatchGenerateAds = ({ onPageChange }) => {
   const availableGoals = ADSET_GOALS_MAPPING[objective] || [];
   const currentGoalObj = availableGoals.find(g => g.value === adsetGoal);
 
+  const isTargetingComplete =
+    selectedLocations.length > 0 &&
+    selectedLanguage !== null &&
+    platform !== null &&
+    objective !== '' &&
+    adsetGoal !== '' &&
+    !(currentGoalObj?.needsEvent && !event);
+
   const detectedBrand = {
     name: 'Luminaire Vintage',
     logo: 'https://picsum.photos/seed/logo1/100/100',
@@ -615,18 +623,8 @@ const BatchGenerateAds = ({ onPageChange }) => {
     });
   };
 
-  const handleToggleLalOption = (option) => {
-    setLalOptions(prev => 
-      prev.includes(option) ? prev.filter(o => o !== option) : [...prev, option]
-    );
-  };
-
-  const handleToggleIntOption = (option) => {
-    setIntOptions(prev => {
-      const exists = prev.find(o => o.id === option.id);
-      if (exists) return prev.filter(o => o.id !== option.id);
-      return [...prev, option];
-    });
+  const handleSaveAdsetAudienceDetails = (idx, details) => {
+    setAdsetAudienceDetails(prev => ({ ...prev, [idx]: details }));
   };
 
   const handleApplyAiStrategy = (parsedConfig) => {
@@ -659,6 +657,12 @@ const BatchGenerateAds = ({ onPageChange }) => {
     setStartDate(start.toISOString().split('T')[0]);
     setEndDate(end.toISOString().split('T')[0]);
   };
+
+  useEffect(() => {
+    if (objective !== 'sales_conversions' && objective !== 'app_promotion') {
+      setAdType('SINGLE');
+    }
+  }, [objective]);
 
   const handleStructureChange = (newStructure) => {
     if (newStructure.strategy !== 'BY_CREATIVE') {
@@ -1439,7 +1443,7 @@ const BatchGenerateAds = ({ onPageChange }) => {
               )}
 
               {/* Card 3: Strategy & Budget */}
-              {allProductsReady && (!isAnyProductMissingCreatives || campaignType === 'CATALOG') && (
+              {allProductsReady && (!isAnyProductMissingCreatives || campaignType === 'CATALOG') && (hasGeneratedOnce || isTargetingComplete) && (
                  <div className="bg-white rounded-section p-10 adsgo-card-shadow animate-in fade-in slide-in-from-top-8">
                     <div className="flex items-center gap-3 mb-8">
                        <div className="w-10 h-10 bg-primary-500 rounded-xl flex items-center justify-center text-white"><Layers size={20} /></div>
@@ -1451,8 +1455,8 @@ const BatchGenerateAds = ({ onPageChange }) => {
                       budgetType={budgetType} onBudgetTypeChange={setBudgetType}
                       dailyBudget={dailyBudget} onBudgetChange={setDailyBudget}
                       adsetAudiences={adsetAudiences} onToggleAudience={handleToggleAudienceType}
-                      lalOptions={lalOptions} onToggleLalOption={handleToggleLalOption}
-                      intOptions={intOptions} onIntOptionsChange={setIntOptions} onToggleIntOption={handleToggleIntOption}
+                      adsetAudienceDetails={adsetAudienceDetails} onSaveAdsetAudienceDetails={handleSaveAdsetAudienceDetails}
+                      adType={adType} onAdTypeChange={setAdType} objective={objective}
                       selectedProducts={selectedProducts}
                       productCreativesMap={productCreativesMap}
                       productAnalyses={productAnalyses}
@@ -1480,7 +1484,7 @@ const BatchGenerateAds = ({ onPageChange }) => {
               )}
 
               {/* Card 4: Advanced Settings */}
-              {allProductsReady && (!isAnyProductMissingCreatives || campaignType === 'CATALOG') && (
+              {allProductsReady && (!isAnyProductMissingCreatives || campaignType === 'CATALOG') && (hasGeneratedOnce || isTargetingComplete) && (
                  <div className="bg-white rounded-section adsgo-card-shadow overflow-hidden animate-in fade-in slide-in-from-top-8">
                     <button onClick={() => setAdvancedOpen(!advancedOpen)} className="w-full p-10 flex items-center justify-between hover:bg-gray-50 transition-colors">
                         <div className="flex items-center gap-3">
@@ -1752,7 +1756,7 @@ const BatchGenerateAds = ({ onPageChange }) => {
               )}
 
               {/* Preview Button */}
-              {allProductsReady && (!isAnyProductMissingCreatives || campaignType === 'CATALOG') && (
+              {allProductsReady && (!isAnyProductMissingCreatives || campaignType === 'CATALOG') && (hasGeneratedOnce || isTargetingComplete) && (
                 <div className="flex flex-col items-center">
                   <button
                     onClick={() => { setView('preview'); _hasGeneratedOnce = true; setHasGeneratedOnce(true); }}
@@ -1791,6 +1795,8 @@ const BatchGenerateAds = ({ onPageChange }) => {
                   campaignType={campaignType}
                   estimatedTotalDaily={estimatedTotalDaily}
                   adSetGroupsCount={adSetGroupsCount}
+                  adType={adType}
+                  adsetAudienceDetails={adsetAudienceDetails}
                   authStatus={authStatus}
                   selectedAccount={selectedAccount}
                   onAuthStatusChange={setAuthStatus}

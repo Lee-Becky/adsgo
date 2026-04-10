@@ -798,9 +798,11 @@ const OBJECTIVE_CTA_MAPPING = {
 
 const CampaignPreviewView = ({
   structure, budgetType, dailyBudget, initialAdsetAudiences, productCreativesMap, selectedProducts, brand, onBack, onPublish, campaignName, optimizationEvent, landingPageType, landingPageTemplate, productUtm, copyStrategy, unifiedHeadline, unifiedBody, campaignType,
-  estimatedTotalDaily, adSetGroupsCount, authStatus, selectedAccount, onAuthStatusChange, onSelectAccount,
+  estimatedTotalDaily, adSetGroupsCount, adType = 'SINGLE', adsetAudienceDetails = {},
+  authStatus, selectedAccount, onAuthStatusChange, onSelectAccount,
   isExistingCampaign, campaignObjective, onBudgetChange, onBudgetTypeChange
 }) => {
+  const isFlexible = adType === 'FLEXIBLE' && (campaignObjective === 'sales_conversions' || campaignObjective === 'app_promotion');
 
   const [localAdSets, setLocalAdSets] = useState([]);
   const [editingAdSetIndex, setEditingAdSetIndex] = useState(null);
@@ -843,6 +845,52 @@ const CampaignPreviewView = ({
     return { headline: `Get your ${p.name} today!`, body: `Discover quality and style that lasts with our exclusive ${p.name}. Limited time offer.` };
   };
 
+  // Build ads array for an adset — Flexible: ceil(N/10) ads with imageUrls[]; Single: 1 creative per ad
+  const buildAds = (creatives, adSetIdx, namePrefix, resolveProduct) => {
+    if (isFlexible && creatives.length > 0) {
+      const result = [];
+      for (let j = 0; j < creatives.length; j += 10) {
+        const chunk = creatives.slice(j, j + 10);
+        const c0 = chunk[0];
+        const p = resolveProduct(c0);
+        const copy = p ? getAdCopy(p) : { headline: '', body: '' };
+        result.push({
+          id: `${adSetIdx}-flex-${Math.floor(j / 10)}`,
+          name: `${namePrefix} - Flexible #${Math.floor(j / 10) + 1} (${chunk.length} 素材)`,
+          headline: copy.headline,
+          primaryText: copy.body,
+          imageUrl: c0.url,
+          imageUrls: chunk.map(c => c.url),
+          adFormat: 'FLEXIBLE',
+          cta: 'Shop Now',
+          destinationUrl: p ? getAdUrl(p) : '',
+          utmParams: '',
+          productId: p?.id || '',
+          offerType: 'AUTO',
+          promoCode: '90%OFF'
+        });
+      }
+      return result;
+    }
+    return creatives.map((c, cIdx) => {
+      const p = resolveProduct(c);
+      const copy = p ? getAdCopy(p) : { headline: '', body: '' };
+      return {
+        id: `${adSetIdx}-${cIdx}`,
+        name: `AD - ${p?.name || ''} - ${c.id?.slice(-4) || ''}`,
+        headline: copy.headline,
+        primaryText: copy.body,
+        imageUrl: c.url,
+        cta: 'Shop Now',
+        destinationUrl: p ? getAdUrl(p) : '',
+        utmParams: '',
+        productId: p?.id || '',
+        offerType: 'AUTO',
+        promoCode: '90%OFF'
+      };
+    });
+  };
+
   useEffect(() => {
     let adSets = [];
     const targetAdSetCount = adSetGroupsCount || 0;
@@ -883,7 +931,6 @@ const CampaignPreviewView = ({
         
         activeProducts.forEach((p, pIdx) => {
           const creatives = productCreativesMap[p.id] || [];
-          const copy = getAdCopy(p);
           
           for (let i = 0; i < adsetsPerProduct; i++) {
             const adSetOverallIdx = (pIdx * adsetsPerProduct) + i;
@@ -901,19 +948,7 @@ const CampaignPreviewView = ({
               customExclude: [],
               lalExclude: [],
               placements: ['Feed', 'Stories', 'Reels'], optimizationEvent,
-              ads: creatives.map((c, cIdx) => ({
-                id: `${p.id}-${i}-${cIdx}`,
-                name: `AD - ${p.name} - ${c.id.slice(-4)}`,
-                headline: copy.headline,
-                primaryText: copy.body,
-                imageUrl: c.url,
-                cta: 'Shop Now',
-                destinationUrl: getAdUrl(p),
-                utmParams: ``,
-                productId: p.id,
-                offerType: 'AUTO',
-                promoCode: '90%OFF'
-              }))
+              ads: buildAds(creatives, adSetOverallIdx, `AD - ${p.name}`, () => p)
             });
           }
         });
@@ -933,23 +968,7 @@ const CampaignPreviewView = ({
             customExclude: [],
             lalExclude: [],
             placements: ['Feed', 'Stories'], optimizationEvent,
-            ads: allCreativesPool.map((c, cIdx) => {
-              const p = selectedProducts.find(prod => prod.id === c.productId);
-              const copy = getAdCopy(p);
-              return {
-                id: `${i}-${cIdx}`,
-                name: `AD - ${p.name} - ${c.id.slice(-4)}`,
-                headline: copy.headline,
-                primaryText: copy.body,
-                imageUrl: c.url,
-                cta: 'Shop Now',
-                destinationUrl: getAdUrl(p),
-                utmParams: ``,
-                productId: p.id,
-                offerType: 'AUTO',
-                promoCode: '90%OFF'
-              };
-            })
+            ads: buildAds(allCreativesPool, i, `AD - 混合组 ${i + 1}`, c => selectedProducts.find(prod => prod.id === c.productId))
           });
         }
       } else if (structure.strategy === 'BY_CREATIVE') {
@@ -977,23 +996,7 @@ const CampaignPreviewView = ({
               customExclude: [],
               lalExclude: [],
               placements: ['Feed'], optimizationEvent,
-              ads: chunk.map((c, cIdx) => {
-                const p = selectedProducts.find(prod => prod.id === c.productId);
-                const copy = getAdCopy(p);
-                return {
-                  id: `${i}-${cIdx}`,
-                  name: `AD - G${i + 1} - ${c.id.slice(-4)}`,
-                  headline: copy.headline,
-                  primaryText: copy.body,
-                  imageUrl: c.url,
-                  cta: 'Shop Now',
-                  destinationUrl: getAdUrl(p),
-                  utmParams: ``,
-                  productId: p.id,
-                  offerType: 'AUTO',
-                  promoCode: '90%OFF'
-                };
-              })
+              ads: buildAds(chunk, i, `AD - G${i + 1}`, c => selectedProducts.find(prod => prod.id === c.productId))
             });
             currentIndex += currentGroupSize;
           }
@@ -1001,7 +1004,7 @@ const CampaignPreviewView = ({
       }
     }
     setLocalAdSets(adSets);
-  }, [campaignType, selectedProducts, structure, productCreativesMap, initialAdsetAudiences, landingPageType, landingPageTemplate, productUtm, copyStrategy, unifiedHeadline, unifiedBody, optimizationEvent, adSetGroupsCount]);
+  }, [campaignType, selectedProducts, structure, productCreativesMap, initialAdsetAudiences, landingPageType, landingPageTemplate, productUtm, copyStrategy, unifiedHeadline, unifiedBody, optimizationEvent, adSetGroupsCount, isFlexible]);
 
   const totalDailyBudget = estimatedTotalDaily || (budgetType === 'CBO' ? dailyBudget : dailyBudget * localAdSets.length);
 

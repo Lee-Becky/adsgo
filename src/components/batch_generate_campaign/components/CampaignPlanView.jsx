@@ -628,11 +628,11 @@ const CampaignPlanView = ({
   onBudgetChange,
   adsetAudiences,
   onToggleAudience,
-  lalOptions,
-  onToggleLalOption,
-  intOptions,
-  onToggleIntOption,
-  onIntOptionsChange,
+  adsetAudienceDetails = {},
+  onSaveAdsetAudienceDetails,
+  adType = 'SINGLE',
+  onAdTypeChange,
+  objective = '',
   selectedProducts,
   productCreativesMap,
   isExistingCampaign,
@@ -656,6 +656,9 @@ const CampaignPlanView = ({
   const lalLoading = useDropdownLoading('lalAudiences', authStatus?.meta);
   useEffect(() => { if (showLalDropdown && selectedAccount) lalLoading.triggerLoad(); }, [showLalDropdown]);
   const [showNumAdsetsDropdown, setShowNumAdsetsDropdown] = useState(false);
+  const [showStrategyDropdown, setShowStrategyDropdown] = useState(false);
+  const [structureOpen, setStructureOpen] = useState(false);
+  const [focusedAdsetIdx, setFocusedAdsetIdx] = useState(0);
   const [aiStrategyApplied, setAiStrategyApplied] = useState(false);
 
   // Reset aiStrategyApplied when switching away from AI_STRATEGY
@@ -732,8 +735,16 @@ const CampaignPlanView = ({
     ? dailyBudget * adSetGroups.length
     : dailyBudget;
 
-  const hasLalAudience = adsetAudiences.slice(0, adSetGroups.length).some(a => a === 'LAL');
-  const hasIntAudience = adsetAudiences.slice(0, adSetGroups.length).some(a => a === 'INT');
+  const effectiveFocusedIdx = adSetGroups.length > 0 ? Math.min(focusedAdsetIdx, adSetGroups.length - 1) : 0;
+  const focusedAudienceType = adsetAudiences[effectiveFocusedIdx] || 'ADV';
+  const focusedDetails = adsetAudienceDetails[effectiveFocusedIdx] || {};
+  const isFlexibleObjective = objective === 'sales_conversions' || objective === 'app_promotion';
+  const strategyLabels = { PER_PRODUCT: '受众测试', ALL_PRODUCTS_PER_SET: '产品测试', BY_CREATIVE: '创意测试', AI_STRATEGY: 'AI策略' };
+  const structureSummary = [
+    strategyLabels[structure.strategy] || structure.strategy,
+    `${adSetGroups.length} Adset`,
+    isFlexibleObjective ? (adType === 'FLEXIBLE' ? 'Flexible' : 'Single') : null
+  ].filter(Boolean).join(' · ');
 
   const handleApplyAiStrategyLocal = (parsed) => {
     // Apply strategy to structure
@@ -769,115 +780,178 @@ const CampaignPlanView = ({
         </div>
 
         <div className="bg-white p-8 rounded-section adsgo-card-shadow space-y-6">
-          <div className="space-y-3">
-            <label className="text-xs font-medium text-gray-500 px-1">选择发布逻辑</label>
-            <div className={`grid ${campaignType === 'CATALOG' ? 'grid-cols-1' : 'grid-cols-4'} gap-3`}>
-              {(campaignType === 'CATALOG'
-                ? [{ id: 'ALL_PRODUCTS_PER_SET', label: '每组均投放已选目录', desc: 'Each group uses selected catalog' }]
-                : [
-                    { id: 'PER_PRODUCT', label: '受众测试', desc: 'Multiple Adsets per SKU' },
-                    { id: 'ALL_PRODUCTS_PER_SET', label: '产品测试', desc: 'All SKU in every Adset' },
-                    { id: 'BY_CREATIVE', label: '创意测试', desc: 'Assign creatives per Adset' },
-                    { id: 'AI_STRATEGY', label: 'AI个性化策略', desc: 'Describe your ad structure' },
-                  ]
-              ).map(opt => (
-                <button
-                  key={opt.id}
-                  onClick={() => onStructureChange({ ...structure, strategy: opt.id })}
-                  className={`p-4 rounded-inner border text-left transition-all ${
-                    (structure.strategy === opt.id || campaignType === 'CATALOG')
-                      ? 'border-primary-500 bg-primary-50 ring-2 ring-primary-500/10'
-                      : 'border-gray-100 hover:border-gray-200 bg-white'
-                  }`}
-                >
-                  <p className={`text-sm font-semibold ${(structure.strategy === opt.id || campaignType === 'CATALOG') ? 'text-primary-500' : 'text-gray-900'}`}>{opt.label}</p>
-                  <p className="text-xs text-gray-500 font-regular mt-1">{opt.desc}</p>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* AI Strategy Dialog */}
-          {structure.strategy === 'AI_STRATEGY' && campaignType !== 'CATALOG' && (
-            aiStrategyApplied ? (
-              <div className="animate-in fade-in duration-200 mt-2">
-                <button
-                  onClick={() => {
-                    setAiStrategyApplied(false);
-                    onStructureChange({ ...structure, _aiResolvedStrategy: undefined });
-                  }}
-                  className="flex items-center gap-2 px-5 py-3 border border-primary-500 text-primary-500 rounded-base text-sm font-medium hover:bg-primary-50 active:bg-primary-100 transition-all duration-200"
-                >
-                  <RefreshCw size={14} /> 重新生成策略
-                </button>
+          {/* ▶ Ad Structure Config — collapsible */}
+          <div className="border border-gray-100 rounded-inner">
+            <button
+              onClick={() => setStructureOpen(!structureOpen)}
+              className="w-full flex items-center justify-between px-5 py-4 bg-gray-50 hover:bg-gray-100 transition-colors"
+            >
+              <div className="flex items-center gap-2">
+                {structureOpen ? <ChevronUp size={14} className="text-gray-400" /> : <ChevronDown size={14} className="text-gray-400" />}
+                <span className="text-sm font-semibold text-gray-700">Ad Structure Config</span>
               </div>
-            ) : (
-              <AiStrategyDialog
-                onApplyStrategy={handleApplyAiStrategyLocal}
-                onApplied={() => setAiStrategyApplied(true)}
-              />
-            )
-          )}
+              <span className="text-xs text-gray-400 font-medium">{structureSummary}</span>
+            </button>
 
-          {/* Adset count selector (for non-AI strategies) */}
-          {structure.strategy !== 'AI_STRATEGY' && (structure.strategy === 'PER_PRODUCT' || structure.strategy === 'ALL_PRODUCTS_PER_SET') && (
-            <div className="animate-in slide-in-from-top-2 duration-200">
-               <label className="text-xs font-medium text-gray-500 px-1 mb-2 block">
-                 {structure.strategy === 'PER_PRODUCT' ? '每款产品对应的 Adset 组数 (1-10)' : 'Adset 组数 (1-10)'}
-               </label>
-               <div className="relative max-w-[240px]">
-                  <div
-                    onClick={() => setShowNumAdsetsDropdown(!showNumAdsetsDropdown)}
-                    className="w-full h-12 bg-white border border-gray-200 rounded-base px-5 flex items-center justify-between cursor-pointer hover:border-primary-500 transition-all duration-200 focus:shadow-primary-focus"
-                  >
-                    <div className="flex items-center gap-3">
-                      <Layers size={16} className="text-primary-500" />
-                      <span className="text-sm font-medium text-gray-700">
-                        {structure.strategy === 'PER_PRODUCT' ? (structure.numAdsetsPerProduct || 1) : (structure.numAdsets || 1)} 组
-                      </span>
+            {structureOpen && (
+              <div className="p-5 border-t border-gray-100 animate-in fade-in slide-in-from-top-2 duration-200">
+                <div className="flex gap-6 items-start">
+
+                  {/* Left: strategy dropdown + adset count + AI dialog */}
+                  <div className="flex-1 space-y-4 min-w-0 relative z-10">
+                    {/* Strategy dropdown */}
+                    <div>
+                      <label className="text-xs font-medium text-gray-500 px-1 mb-2 block">选择 Campaign 策略</label>
+                      {campaignType === 'CATALOG' ? (
+                        <div className="h-10 px-4 flex items-center bg-gray-50 rounded-base border border-gray-100 text-sm font-medium text-gray-500">
+                          每组均投放已选目录
+                        </div>
+                      ) : (
+                        <div className="relative">
+                          {showStrategyDropdown && <div className="fixed inset-0 z-[190]" onClick={() => setShowStrategyDropdown(false)} />}
+                          <div
+                            onClick={() => setShowStrategyDropdown(!showStrategyDropdown)}
+                            className="w-full h-10 bg-white border border-gray-200 rounded-base px-4 flex items-center justify-between cursor-pointer hover:border-primary-500 transition-all duration-200"
+                          >
+                            <span className="text-sm font-medium text-gray-700">{strategyLabels[structure.strategy] || structure.strategy}</span>
+                            <ChevronDown size={14} className={`text-gray-300 transition-transform duration-200 ${showStrategyDropdown ? 'rotate-180' : ''}`} />
+                          </div>
+                          {showStrategyDropdown && (
+                            <div
+                              className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-100 rounded-base shadow-xl overflow-hidden animate-in zoom-in-95 duration-150 py-1"
+                              style={{ zIndex: 200 }}
+                            >
+                              {[
+                                { id: 'PER_PRODUCT', label: '受众测试', desc: 'Multiple Adsets per SKU' },
+                                { id: 'ALL_PRODUCTS_PER_SET', label: '产品测试', desc: 'All SKU in every Adset' },
+                                { id: 'BY_CREATIVE', label: '创意测试', desc: 'Assign creatives per Adset' },
+                                { id: 'AI_STRATEGY', label: 'AI个性化策略', desc: 'Describe your ad structure' },
+                              ].map(opt => (
+                                <div
+                                  key={opt.id}
+                                  onClick={() => { onStructureChange({ ...structure, strategy: opt.id }); setShowStrategyDropdown(false); }}
+                                  className={`flex items-center justify-between px-4 py-2.5 cursor-pointer transition-colors group ${structure.strategy === opt.id ? 'bg-primary-50' : 'hover:bg-gray-50'}`}
+                                >
+                                  <div>
+                                    <p className={`text-sm font-medium ${structure.strategy === opt.id ? 'text-primary-500' : 'text-gray-700'}`}>{opt.label}</p>
+                                    <p className="text-xs text-gray-400">{opt.desc}</p>
+                                  </div>
+                                  {structure.strategy === opt.id && <Check size={13} className="text-primary-500 shrink-0 ml-2" />}
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
-                    <ChevronDown size={16} className={`text-gray-300 transition-transform duration-300 ${showNumAdsetsDropdown ? 'rotate-180' : ''}`} />
+
+                    {/* Adset count selector */}
+                    {structure.strategy !== 'AI_STRATEGY' && (structure.strategy === 'PER_PRODUCT' || structure.strategy === 'ALL_PRODUCTS_PER_SET') && (
+                      <div className="animate-in slide-in-from-top-2 duration-200">
+                        <label className="text-xs font-medium text-gray-500 px-1 mb-2 block">
+                          {structure.strategy === 'PER_PRODUCT' ? '每产品 Adset 组数' : 'Adset 组数'}
+                        </label>
+                        <div className="relative">
+                          {showNumAdsetsDropdown && <div className="fixed inset-0 z-[190]" onClick={() => setShowNumAdsetsDropdown(false)} />}
+                          <div
+                            onClick={() => setShowNumAdsetsDropdown(!showNumAdsetsDropdown)}
+                            className="w-full h-10 bg-white border border-gray-200 rounded-base px-4 flex items-center justify-between cursor-pointer hover:border-primary-500 transition-all duration-200"
+                          >
+                            <div className="flex items-center gap-2">
+                              <Layers size={14} className="text-primary-500" />
+                              <span className="text-sm font-medium text-gray-700">
+                                {structure.strategy === 'PER_PRODUCT' ? (structure.numAdsetsPerProduct || 1) : (structure.numAdsets || 1)} 组
+                              </span>
+                            </div>
+                            <ChevronDown size={14} className={`text-gray-300 transition-transform duration-200 ${showNumAdsetsDropdown ? 'rotate-180' : ''}`} />
+                          </div>
+                          {showNumAdsetsDropdown && (
+                            <div
+                              className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-100 rounded-base shadow-xl overflow-hidden animate-in zoom-in-95 duration-150 py-1"
+                              style={{ zIndex: 200 }}
+                            >
+                              {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => {
+                                const isSel = structure.strategy === 'PER_PRODUCT'
+                                  ? (structure.numAdsetsPerProduct || 1) === n
+                                  : (structure.numAdsets || 1) === n;
+                                return (
+                                  <div
+                                    key={n}
+                                    onClick={() => {
+                                      const field = structure.strategy === 'PER_PRODUCT' ? 'numAdsetsPerProduct' : 'numAdsets';
+                                      onStructureChange({ ...structure, [field]: n });
+                                      setShowNumAdsetsDropdown(false);
+                                    }}
+                                    className={`flex items-center justify-between px-4 py-2 hover:bg-primary-50 cursor-pointer transition-colors ${isSel ? 'bg-primary-50/50' : ''}`}
+                                  >
+                                    <span className={`text-sm font-medium ${isSel ? 'text-primary-500' : 'text-gray-700'}`}>{n} 组 Adsets</span>
+                                    {isSel && <Check size={13} className="text-primary-500" />}
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* AI Strategy Dialog */}
+                    {structure.strategy === 'AI_STRATEGY' && campaignType !== 'CATALOG' && (
+                      aiStrategyApplied ? (
+                        <div className="animate-in fade-in duration-200">
+                          <button
+                            onClick={() => {
+                              setAiStrategyApplied(false);
+                              onStructureChange({ ...structure, _aiResolvedStrategy: undefined });
+                            }}
+                            className="flex items-center gap-2 px-5 py-3 border border-primary-500 text-primary-500 rounded-base text-sm font-medium hover:bg-primary-50 active:bg-primary-100 transition-all duration-200"
+                          >
+                            <RefreshCw size={14} /> 重新生成策略
+                          </button>
+                        </div>
+                      ) : (
+                        <AiStrategyDialog
+                          onApplyStrategy={handleApplyAiStrategyLocal}
+                          onApplied={() => setAiStrategyApplied(true)}
+                        />
+                      )
+                    )}
                   </div>
 
-                  {showNumAdsetsDropdown && (
-                    <>
-                      <div className="fixed inset-0 z-[190]" onClick={() => setShowNumAdsetsDropdown(false)} />
-                      <div
-                        className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-100 rounded-base shadow-xl overflow-hidden animate-in zoom-in-95 duration-150 py-2"
-                        style={{ zIndex: 200 }}
-                      >
-                        {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => {
-                          const isSel = structure.strategy === 'PER_PRODUCT'
-                            ? (structure.numAdsetsPerProduct || 1) === n
-                            : (structure.numAdsets || 1) === n;
-                          return (
-                            <div
-                              key={n}
-                              onClick={() => {
-                                const field = structure.strategy === 'PER_PRODUCT' ? 'numAdsetsPerProduct' : 'numAdsets';
-
-                                onStructureChange({
-                                  ...structure,
-                                  [field]: n
-                                });
-                                setShowNumAdsetsDropdown(false);
-                              }}
-                              className={`flex items-center justify-between px-5 py-3 hover:bg-primary-50 cursor-pointer transition-colors group ${isSel ? 'bg-primary-50/50' : ''}`}
-                            >
-                              <span className={`text-sm font-medium ${isSel ? 'text-primary-500' : 'text-gray-700 group-hover:text-primary-500'}`}>{n} 组 Adsets</span>
-                              {isSel && <Check size={14} className="text-primary-500" />}
-                            </div>
-                          );
-                        })}
+                  {/* Right: Ad Format (sales_conversions / app_promotion only) */}
+                  {isFlexibleObjective && (
+                    <div className="w-48 shrink-0">
+                      <label className="text-xs font-medium text-gray-500 px-1 mb-2 block">Ad Format</label>
+                      <div className="space-y-2">
+                        {[
+                          { value: 'FLEXIBLE', label: 'Flexible 灵活广告', desc: '≤10 素材/ad · Meta 自动优化' },
+                          { value: 'SINGLE', label: 'Single 单素材', desc: '每素材 1 个 ad' },
+                        ].map(opt => (
+                          <button
+                            key={opt.value}
+                            onClick={() => onAdTypeChange(opt.value)}
+                            className={`w-full p-3 rounded-inner border text-left transition-all ${
+                              adType === opt.value
+                                ? 'border-primary-500 bg-primary-50 ring-2 ring-primary-500/10'
+                                : 'border-gray-100 hover:border-gray-200 bg-white'
+                            }`}
+                          >
+                            <p className={`text-xs font-semibold ${adType === opt.value ? 'text-primary-500' : 'text-gray-900'}`}>{opt.label}</p>
+                            <p className="text-xs text-gray-400 mt-0.5">{opt.desc}</p>
+                          </button>
+                        ))}
                       </div>
-                    </>
+                    </div>
                   )}
-               </div>
-            </div>
-          )}
 
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Architecture diagram — always visible */}
           {(structure.strategy !== 'AI_STRATEGY' || aiStrategyApplied) && (
-          <div className="bg-gray-50/50 border border-gray-100 rounded-inner p-8 mt-6">
+          <div className="bg-gray-50/50 border border-gray-100 rounded-inner p-8">
             <div className="flex flex-col items-center">
               <div className="flex flex-col items-center mb-10 relative">
                 <div className="w-14 h-14 bg-gray-900 text-white rounded-section flex items-center justify-center shadow-xl z-10 border-4 border-white">
@@ -892,14 +966,26 @@ const CampaignPlanView = ({
               <div className={`w-full flex ${adSetGroups.length > 4 ? 'justify-start' : 'justify-center'} gap-10 overflow-x-auto pb-4 no-scrollbar px-4`}>
                 {adSetGroups.map((group, idx) => {
                   const audienceType = adsetAudiences[idx % adsetAudiences.length] || 'ADV';
+                  const isFocused = idx === effectiveFocusedIdx;
                   return (
-                    <div key={idx} className="flex flex-col items-center shrink-0">
+                    <div
+                      key={idx}
+                      onClick={() => setFocusedAdsetIdx(idx)}
+                      className={`flex flex-col items-center shrink-0 rounded-xl px-3 pt-3 pb-2 border cursor-pointer transition-all ${
+                        isFocused
+                          ? audienceType === 'LAL' ? 'bg-purple-50 border-purple-200 shadow-md'
+                          : audienceType === 'INT' ? 'bg-amber-50 border-amber-200 shadow-md'
+                          : 'bg-primary-50 border-primary-200 shadow-md'
+                          : 'border-transparent hover:bg-gray-50'
+                      }`}
+                    >
                       <button
-                        onClick={() => onToggleAudience(idx)}
-                        className={`w-10 h-10 rounded-base border shadow-adsgo-card flex flex-col items-center justify-center transition-all hover:scale-110 active:scale-95 mb-2 relative group ${
-                          audienceType === 'LAL' ? 'bg-purple-50 text-purple-600 border-purple-100' :
-                          audienceType === 'INT' ? 'bg-amber-50 text-amber-600 border-amber-100' :
-                          'bg-primary-50 text-primary-500 border-primary-500/15'
+                        onClick={(e) => { e.stopPropagation(); onToggleAudience(idx); setFocusedAdsetIdx(idx); }}
+                        title="点击切换受众策略 (Adv+ / LAL / INT)"
+                        className={`w-10 h-10 rounded-base border shadow-adsgo-card flex flex-col items-center justify-center transition-all hover:scale-105 active:scale-95 mb-2 relative ${
+                          audienceType === 'LAL' ? 'bg-white text-purple-600 border-purple-100' :
+                          audienceType === 'INT' ? 'bg-white text-amber-600 border-amber-100' :
+                          'bg-white text-primary-500 border-primary-200'
                         }`}
                         title="点击切换受众策略 (Adv+ / LAL / INT)"
                       >
@@ -944,8 +1030,8 @@ const CampaignPlanView = ({
                       </div>
                       {structure.strategy === 'BY_CREATIVE' && (
                         <button
-                          onClick={() => setEditingAdsetIndex(idx)}
-                          className="mt-2 flex items-center gap-1 text-[10px] font-medium text-gray-500 hover:text-primary-500 bg-gray-50 hover:bg-primary-50 border border-gray-100 hover:border-primary-200 rounded-base px-2.5 py-1 transition-all"
+                          onClick={(e) => { e.stopPropagation(); setEditingAdsetIndex(idx); }}
+                          className="mt-2 flex items-center gap-1 text-[10px] font-medium text-gray-500 hover:text-primary-500 bg-white hover:bg-primary-50 border border-gray-100 hover:border-primary-200 rounded-base px-2.5 py-1 transition-all"
                         >
                           <Edit3 size={10} /> 修改本组创意
                         </button>
@@ -966,99 +1052,115 @@ const CampaignPlanView = ({
                 )}
               </div>
 
-              {hasLalAudience && (
-                <div className="w-full mt-8 pt-6 border-t border-gray-200/50 animate-in fade-in slide-in-from-top-2">
-                  <div className="relative">
-                    <label className="text-xs font-medium text-gray-500 px-1 mb-2 block flex items-center gap-1.5">
-                      <Sparkles size={10} className="text-purple-500" />
-                      LAL 包含受众选项 (多选)
-                    </label>
-                    <div
-                      onClick={() => setShowLalDropdown(!showLalDropdown)}
-                      className="w-full p-4 bg-white border-2 border-purple-100 rounded-base flex items-center justify-between cursor-pointer hover:border-purple-300 transition-all"
-                    >
-                      <div className="flex flex-wrap gap-1.5 overflow-hidden max-w-[90%]">
-                        {(!selectedAccount || lalOptions.length === 0) ? (
-                          <span className="text-xs font-bold text-gray-300">请选择 LAL 受众源...</span>
-                        ) : (
-                          lalOptions.map(opt => (
-                            <span key={opt} className="px-2 py-0.5 bg-purple-50 text-purple-600 rounded-tag text-xs font-medium border border-purple-100">
-                              {opt.split(' ')[1] || opt}
-                            </span>
-                          ))
-                        )}
-                      </div>
-                      <ChevronDown size={14} className={`text-purple-300 transition-transform ${showLalDropdown ? 'rotate-180' : ''}`} />
-                    </div>
+              {/* Per-adset audience config */}
+              {adSetGroups.length > 0 && (
+                <div className="w-full mt-6 pt-6 border-t border-gray-200/50 animate-in fade-in duration-200">
+                  <div className="mb-4">
+                    <span className="text-xs font-semibold text-gray-600">Adset {effectiveFocusedIdx + 1} 受众配置</span>
+                  </div>
 
-                    {showLalDropdown && (
-                      <>
-                        <div className="fixed inset-0 z-[190]" onClick={() => setShowLalDropdown(false)} />
-                        <div
-                          className="absolute top-full left-0 right-0 mt-2 bg-white border border-purple-100 rounded-section shadow-xl overflow-hidden animate-in zoom-in-95 duration-150"
-                          style={{ zIndex: 200 }}
-                        >
-                          {!authStatus?.meta ? (
-                            <div className="p-4">
-                              <button
-                                onClick={() => {
-                                  setIsMetaConnecting(true);
-                                  setTimeout(() => {
-                                    setIsMetaConnecting(false);
-                                    handleAuthorize('meta');
-                                    setShowLalDropdown(false);
-                                  }, 3000);
-                                }}
-                                disabled={isMetaConnecting}
-                                className="w-full py-3 bg-primary-500 text-white rounded-base text-sm font-medium hover:bg-primary-600 active:bg-primary-700 transition-all duration-200 focus:outline-none focus:shadow-primary-focus flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
-                              >
-                                {isMetaConnecting ? <><Loader2 size={14} className="animate-spin" /> Connecting...</> : <><Facebook size={14} /> 立即连接 Meta</>}
-                              </button>
-                            </div>
-                          ) : !selectedAccount ? (
-                            <div className="p-4">
-                              <button
-                                onClick={() => { onSelectAccount(); setShowLalDropdown(false); }}
-                                className="w-full py-3 bg-primary-500 text-white rounded-base text-sm font-medium hover:bg-primary-600 active:bg-primary-700 transition-all duration-200 focus:outline-none focus:shadow-primary-focus flex items-center justify-center gap-2"
-                              >
-                                <Briefcase size={14} /> 选择广告账户
-                              </button>
-                            </div>
-                          ) : lalLoading.isLoading ? (
-                            <div className="p-6 flex flex-col items-center justify-center gap-2">
-                              <Loader2 size={20} className="animate-spin text-purple-500/70" />
-                              <p className="text-xs font-medium text-gray-400 animate-pulse">Loading audiences...</p>
-                            </div>
+                  {focusedAudienceType === 'ADV' && (
+                    <p className="text-sm text-gray-400 font-medium px-1">
+                      Advantage+ 自动扩展，无需额外配置
+                    </p>
+                  )}
+
+                  {focusedAudienceType === 'LAL' && (
+                    <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-150">
+                      <div
+                        onClick={() => setShowLalDropdown(!showLalDropdown)}
+                        className="w-full p-4 bg-white border-2 border-purple-100 rounded-base flex items-center justify-between cursor-pointer hover:border-purple-300 transition-all"
+                      >
+                        <div className="flex flex-wrap gap-1.5 overflow-hidden max-w-[90%]">
+                          {(!selectedAccount || (focusedDetails.lalOptions || []).length === 0) ? (
+                            <span className="text-xs font-bold text-gray-300">请选择 LAL 受众源...</span>
                           ) : (
-                            ['US Purchase 1%', 'US add to cart 5%', 'US register last30days 1%~3%'].map((opt) => {
-                              const isSel = lalOptions.includes(opt);
-                              return (
-                                <div
-                                  key={opt}
-                                  onClick={() => onToggleLalOption(opt)}
-                                  className="flex items-center justify-between px-5 py-3 hover:bg-purple-50 cursor-pointer transition-colors"
-                                >
-                                  <span className={`text-sm font-medium ${isSel ? 'text-purple-700' : 'text-gray-700'}`}>{opt}</span>
-                                  {isSel && <Check size={14} className="text-purple-600" />}
-                                </div>
-                              );
-                            })
+                            (focusedDetails.lalOptions || []).map(opt => (
+                              <span key={opt} className="px-2 py-0.5 bg-purple-50 text-purple-600 rounded-tag text-xs font-medium border border-purple-100">
+                                {opt.split(' ')[1] || opt}
+                              </span>
+                            ))
                           )}
                         </div>
-                      </>
-                    )}
-                  </div>
-                </div>
-              )}
+                        <ChevronDown size={14} className={`text-purple-300 transition-transform ${showLalDropdown ? 'rotate-180' : ''}`} />
+                      </div>
+                      {showLalDropdown && (
+                        <>
+                          <div className="fixed inset-0 z-[190]" onClick={() => setShowLalDropdown(false)} />
+                          <div
+                            className="bg-white border border-purple-100 rounded-section shadow-xl overflow-hidden animate-in zoom-in-95 duration-150"
+                            style={{ zIndex: 200 }}
+                          >
+                            {!authStatus?.meta ? (
+                              <div className="p-4">
+                                <button
+                                  onClick={() => {
+                                    setIsMetaConnecting(true);
+                                    setTimeout(() => {
+                                      setIsMetaConnecting(false);
+                                      handleAuthorize('meta');
+                                      setShowLalDropdown(false);
+                                    }, 3000);
+                                  }}
+                                  disabled={isMetaConnecting}
+                                  className="w-full py-3 bg-primary-500 text-white rounded-base text-sm font-medium hover:bg-primary-600 active:bg-primary-700 transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+                                >
+                                  {isMetaConnecting ? <><Loader2 size={14} className="animate-spin" /> Connecting...</> : <><Facebook size={14} /> 立即连接 Meta</>}
+                                </button>
+                              </div>
+                            ) : !selectedAccount ? (
+                              <div className="p-4">
+                                <button
+                                  onClick={() => { onSelectAccount(); setShowLalDropdown(false); }}
+                                  className="w-full py-3 bg-primary-500 text-white rounded-base text-sm font-medium hover:bg-primary-600 active:bg-primary-700 transition-all duration-200 flex items-center justify-center gap-2"
+                                >
+                                  <Briefcase size={14} /> 选择广告账户
+                                </button>
+                              </div>
+                            ) : lalLoading.isLoading ? (
+                              <div className="p-6 flex flex-col items-center justify-center gap-2">
+                                <Loader2 size={20} className="animate-spin text-purple-500/70" />
+                                <p className="text-xs font-medium text-gray-400 animate-pulse">Loading audiences...</p>
+                              </div>
+                            ) : (
+                              ['US Purchase 1%', 'US add to cart 5%', 'US register last30days 1%~3%'].map((opt) => {
+                                const currentLalOptions = focusedDetails.lalOptions || [];
+                                const isSel = currentLalOptions.includes(opt);
+                                return (
+                                  <div
+                                    key={opt}
+                                    onClick={() => {
+                                      const next = isSel
+                                        ? currentLalOptions.filter(o => o !== opt)
+                                        : [...currentLalOptions, opt];
+                                      onSaveAdsetAudienceDetails(effectiveFocusedIdx, { ...focusedDetails, lalOptions: next });
+                                    }}
+                                    className="flex items-center justify-between px-5 py-3 hover:bg-purple-50 cursor-pointer transition-colors"
+                                  >
+                                    <span className={`text-sm font-medium ${isSel ? 'text-purple-700' : 'text-gray-700'}`}>{opt}</span>
+                                    {isSel && <Check size={14} className="text-purple-600" />}
+                                  </div>
+                                );
+                              })
+                            )}
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  )}
 
-              {hasIntAudience && (
-                <IntInterestSelector
-                  intOptions={intOptions}
-                  onIntOptionsChange={onIntOptionsChange}
-                  productAnalyses={productAnalyses}
-                  allAnalysesComplete={allAnalysesComplete}
-                  selectedProducts={selectedProducts}
-                />
+                  {focusedAudienceType === 'INT' && (
+                    <div className="animate-in fade-in slide-in-from-top-2 duration-150">
+                      <IntInterestSelector
+                        intOptions={focusedDetails.intOptions || []}
+                        onIntOptionsChange={(newOptions) => onSaveAdsetAudienceDetails(effectiveFocusedIdx, { ...focusedDetails, intOptions: newOptions })}
+                        productAnalyses={null}
+                        allAnalysesComplete={false}
+                        selectedProducts={selectedProducts}
+                      />
+                    </div>
+                  )}
+                </div>
               )}
             </div>
           </div>

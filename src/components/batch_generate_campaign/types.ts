@@ -160,4 +160,6 @@ export interface AdSettings {
   productId: string;
   offerType?: 'AUTO' | 'MANUAL';
   promoCode?: string;
+  adFormat?: 'FLEXIBLE' | 'SINGLE';
+  imageUrls?: string[];
 }
