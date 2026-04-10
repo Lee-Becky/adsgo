@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
-import { Users, Info, Sparkles, DollarSign, ChevronDown, Briefcase, Target, Layers, Lock, Edit3, Check, LayoutGrid, Facebook, Search, X, Loader2, Send, ChevronUp, MessageSquare, RefreshCw } from 'lucide-react';
+import { Users, Info, Sparkles, DollarSign, ChevronDown, Briefcase, Target, Layers, Lock, Edit3, Check, LayoutGrid, Facebook, Search, X, Loader2, Send, ChevronUp, MessageSquare, RefreshCw, Plus, Link } from 'lucide-react';
 import { Z_INDEX } from '../../../constants/zIndex';
 import useDropdownLoading from '../../../hooks/useDropdownLoading';
 
@@ -47,7 +47,7 @@ const MOCK_ALL_INTERESTS = [
 function mockParseStrategy(input) {
   const result = { strategy: 'PER_PRODUCT', numAdsetsPerProduct: 1, audienceAssignment: null };
   if (/混合|all\s*products/i.test(input)) result.strategy = 'ALL_PRODUCTS_PER_SET';
-  if (/智能拆|split|smart/i.test(input)) result.strategy = 'BY_AD_COUNT';
+  if (/智能拆|split|smart/i.test(input)) result.strategy = 'BY_CREATIVE';
   const numMatch = input.match(/(\d+)\s*组/);
   if (numMatch) result.numAdsetsPerProduct = Math.min(parseInt(numMatch[1]), 10);
   if (/LAL/i.test(input) && /INT|兴趣/i.test(input)) {
@@ -390,9 +390,9 @@ const AiStrategyDialog = ({ onApplyStrategy, onApplied }) => {
   };
 
   const strategyLabel = (s) => {
-    if (s === 'PER_PRODUCT') return '每款产品多组 (PER_PRODUCT)';
-    if (s === 'ALL_PRODUCTS_PER_SET') return '混合组包含全品 (ALL_PRODUCTS_PER_SET)';
-    if (s === 'BY_AD_COUNT') return '总素材智能拆组 (BY_AD_COUNT)';
+    if (s === 'PER_PRODUCT') return '受众测试 (PER_PRODUCT)';
+    if (s === 'ALL_PRODUCTS_PER_SET') return '产品测试 (ALL_PRODUCTS_PER_SET)';
+    if (s === 'BY_CREATIVE') return '创意测试 (BY_CREATIVE)';
     return s;
   };
 
@@ -530,6 +530,94 @@ const AiStrategyDialog = ({ onApplyStrategy, onApplied }) => {
   );
 };
 
+const CreativePickerModal = ({ adsetIndex, adsetName, allAds, currentSelection, onSave, onClose }) => {
+  const initialSelected = currentSelection
+    ? new Set(currentSelection)
+    : new Set(allAds.map(a => a.id));
+  const [selected, setSelected] = useState(initialSelected);
+
+  const toggle = (id) => {
+    setSelected(prev => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  };
+
+  return (
+    <div className="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm animate-in fade-in duration-200" style={{ zIndex: 300 }}>
+      <div className="bg-white rounded-section shadow-2xl w-full max-w-[560px] max-h-[80vh] flex flex-col overflow-hidden mx-4">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+          <div>
+            <h3 className="text-sm font-semibold text-gray-900">修改本组创意 — {adsetName}</h3>
+            <p className="text-xs text-gray-400 mt-0.5">勾选的创意将出现在此 Adset，已选创意自动回显</p>
+          </div>
+          <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-400 transition-all">
+            <X size={16} />
+          </button>
+        </div>
+
+        <div className="flex-1 overflow-y-auto p-4">
+          <div className="grid grid-cols-5 gap-2.5">
+            {allAds.map(ad => {
+              const isChecked = selected.has(ad.id);
+              return (
+                <div
+                  key={ad.id}
+                  onClick={() => toggle(ad.id)}
+                  className={`flex flex-col items-center gap-1 p-1.5 rounded-lg cursor-pointer transition-colors ${
+                    isChecked ? 'bg-primary-50' : 'hover:bg-gray-50'
+                  }`}
+                >
+                  <div className={`relative w-full aspect-[3/4] rounded-md overflow-hidden border-2 transition-all ${
+                    isChecked ? 'border-primary-500 shadow-[0_0_0_2px_#c7d2fe]' : 'border-gray-200'
+                  }`}>
+                    <img src={ad.url} className="w-full h-full object-cover" alt={ad.fileName || ad.id} />
+                    <div className={`absolute top-1 left-1 w-4 h-4 rounded flex items-center justify-center border transition-all ${
+                      isChecked
+                        ? 'bg-primary-500 border-primary-500'
+                        : 'bg-white/30 border-white/80 backdrop-blur-sm'
+                    }`}>
+                      {isChecked && <Check size={10} className="text-white" strokeWidth={3} />}
+                    </div>
+                  </div>
+                  <p className="text-[9px] font-medium text-gray-600 w-full text-center truncate">
+                    {ad.fileName || ad.id}
+                  </p>
+                  <p className="text-[8px] text-gray-400 w-full text-center truncate flex items-center justify-center gap-0.5">
+                    <Link size={7} className="shrink-0 opacity-50" />
+                    {ad.productUrl || ad.productId || '—'}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="px-6 py-3 border-t border-gray-100 flex items-center justify-between">
+          <span className="text-xs text-gray-400">
+            已选 <span className="font-semibold text-gray-700">{selected.size}</span> 个创意
+          </span>
+          <div className="flex gap-2">
+            <button
+              onClick={onClose}
+              className="px-4 py-2 text-xs font-medium text-gray-600 bg-gray-100 rounded-base hover:bg-gray-200 transition-all"
+            >
+              取消
+            </button>
+            <button
+              onClick={() => { onSave(adsetIndex, [...selected]); onClose(); }}
+              className="px-4 py-2 text-xs font-medium text-white bg-primary-500 rounded-base hover:bg-primary-600 transition-all"
+            >
+              保存
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const CampaignPlanView = ({
   structure,
   onStructureChange,
@@ -556,9 +644,14 @@ const CampaignPlanView = ({
   handleAuthorize,
   productAnalyses,
   allAnalysesComplete,
-  onApplyAiStrategy
+  onApplyAiStrategy,
+  adsetCreativeSelections = {},
+  numByCreativeAdsets = 1,
+  onSaveAdsetCreatives,
+  onAddByCreativeAdset,
 }) => {
   const [showLalDropdown, setShowLalDropdown] = useState(false);
+  const [editingAdsetIndex, setEditingAdsetIndex] = useState(null);
   const [isMetaConnecting, setIsMetaConnecting] = useState(false);
   const lalLoading = useDropdownLoading('lalAudiences', authStatus?.meta);
   useEffect(() => { if (showLalDropdown && selectedAccount) lalLoading.triggerLoad(); }, [showLalDropdown]);
@@ -600,7 +693,7 @@ const CampaignPlanView = ({
             ads: allAds
           });
         }
-      } else if (effectiveStrategy === 'BY_AD_COUNT') {
+      } else if (effectiveStrategy === 'BY_CREATIVE') {
         const allAds = selectedProducts.flatMap(p => productCreativesMap[p.id] || []);
         if (allAds.length > 0) {
           const numGroups = structure.adsPerSet || 1;
@@ -623,23 +716,12 @@ const CampaignPlanView = ({
           ads: allAds
         });
       }
-    } else if (structure.strategy === 'BY_AD_COUNT') {
+    } else if (structure.strategy === 'BY_CREATIVE') {
       const allAds = selectedProducts.flatMap(p => productCreativesMap[p.id] || []);
-      if (allAds.length > 0) {
-        const numGroups = structure.adsPerSet || 1;
-
-        let currentIndex = 0;
-        for (let i = 0; i < numGroups; i++) {
-          const remainingAds = allAds.length - currentIndex;
-          const remainingGroups = numGroups - i;
-          const currentGroupSize = Math.ceil(remainingAds / remainingGroups);
-
-          groups.push({
-            name: `智能分组 ${i + 1}`,
-            ads: allAds.slice(currentIndex, currentIndex + currentGroupSize)
-          });
-          currentIndex += currentGroupSize;
-        }
+      for (let i = 0; i < numByCreativeAdsets; i++) {
+        const selection = adsetCreativeSelections[i];
+        const ads = selection ? allAds.filter(ad => selection.has(ad.id)) : allAds;
+        groups.push({ name: `素材组 ${i + 1}`, ads });
       }
     }
     return groups;
@@ -653,8 +735,6 @@ const CampaignPlanView = ({
   const hasLalAudience = adsetAudiences.slice(0, adSetGroups.length).some(a => a === 'LAL');
   const hasIntAudience = adsetAudiences.slice(0, adSetGroups.length).some(a => a === 'INT');
 
-  const allAdsCount = selectedProducts.flatMap(p => productCreativesMap[p.id] || []).length;
-
   const handleApplyAiStrategyLocal = (parsed) => {
     // Apply strategy to structure
     const newStructure = {
@@ -666,7 +746,7 @@ const CampaignPlanView = ({
     if (parsed.strategy === 'ALL_PRODUCTS_PER_SET') {
       newStructure.numAdsets = parsed.numAdsetsPerProduct;
     }
-    if (parsed.strategy === 'BY_AD_COUNT') {
+    if (parsed.strategy === 'BY_CREATIVE') {
       newStructure.adsPerSet = parsed.numAdsetsPerProduct;
     }
     onStructureChange(newStructure);
@@ -678,6 +758,7 @@ const CampaignPlanView = ({
   };
 
   return (
+    <>
     <div className="grid grid-cols-1 lg:grid-cols-[65fr_35fr] gap-8">
       <div className="space-y-4 min-w-0">
         <div className="flex items-center gap-2 px-2">
@@ -694,9 +775,9 @@ const CampaignPlanView = ({
               {(campaignType === 'CATALOG'
                 ? [{ id: 'ALL_PRODUCTS_PER_SET', label: '每组均投放已选目录', desc: 'Each group uses selected catalog' }]
                 : [
-                    { id: 'PER_PRODUCT', label: '每款产品多组', desc: 'Multiple Adsets per SKU' },
-                    { id: 'ALL_PRODUCTS_PER_SET', label: '混合组包含全品', desc: 'All SKU in every Adset' },
-                    { id: 'BY_AD_COUNT', label: '总素材智能拆组', desc: 'Intelligently split all ads' },
+                    { id: 'PER_PRODUCT', label: '受众测试', desc: 'Multiple Adsets per SKU' },
+                    { id: 'ALL_PRODUCTS_PER_SET', label: '产品测试', desc: 'All SKU in every Adset' },
+                    { id: 'BY_CREATIVE', label: '创意测试', desc: 'Assign creatives per Adset' },
                     { id: 'AI_STRATEGY', label: 'AI个性化策略', desc: 'Describe your ad structure' },
                   ]
               ).map(opt => (
@@ -739,10 +820,10 @@ const CampaignPlanView = ({
           )}
 
           {/* Adset count selector (for non-AI strategies) */}
-          {structure.strategy !== 'AI_STRATEGY' && (structure.strategy === 'PER_PRODUCT' || structure.strategy === 'ALL_PRODUCTS_PER_SET' || structure.strategy === 'BY_AD_COUNT') && (
+          {structure.strategy !== 'AI_STRATEGY' && (structure.strategy === 'PER_PRODUCT' || structure.strategy === 'ALL_PRODUCTS_PER_SET') && (
             <div className="animate-in slide-in-from-top-2 duration-200">
                <label className="text-xs font-medium text-gray-500 px-1 mb-2 block">
-                 {structure.strategy === 'PER_PRODUCT' ? '每款产品对应的 Adset 组数 (1-10)' : `Adset 组数 (1-${structure.strategy === 'BY_AD_COUNT' ? allAdsCount : 10})`}
+                 {structure.strategy === 'PER_PRODUCT' ? '每款产品对应的 Adset 组数 (1-10)' : 'Adset 组数 (1-10)'}
                </label>
                <div className="relative max-w-[240px]">
                   <div
@@ -752,7 +833,7 @@ const CampaignPlanView = ({
                     <div className="flex items-center gap-3">
                       <Layers size={16} className="text-primary-500" />
                       <span className="text-sm font-medium text-gray-700">
-                        {structure.strategy === 'PER_PRODUCT' ? (structure.numAdsetsPerProduct || 1) : (structure.strategy === 'BY_AD_COUNT' ? (structure.adsPerSet || 1) : (structure.numAdsets || 1))} 组
+                        {structure.strategy === 'PER_PRODUCT' ? (structure.numAdsetsPerProduct || 1) : (structure.numAdsets || 1)} 组
                       </span>
                     </div>
                     <ChevronDown size={16} className={`text-gray-300 transition-transform duration-300 ${showNumAdsetsDropdown ? 'rotate-180' : ''}`} />
@@ -765,17 +846,15 @@ const CampaignPlanView = ({
                         className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-100 rounded-base shadow-xl overflow-hidden animate-in zoom-in-95 duration-150 py-2"
                         style={{ zIndex: 200 }}
                       >
-                        {Array.from({ length: structure.strategy === 'BY_AD_COUNT' ? allAdsCount : 10 }, (_, i) => i + 1).map((n) => {
+                        {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => {
                           const isSel = structure.strategy === 'PER_PRODUCT'
                             ? (structure.numAdsetsPerProduct || 1) === n
-                            : (structure.strategy === 'BY_AD_COUNT' ? (structure.adsPerSet || 1) === n : (structure.numAdsets || 1) === n);
+                            : (structure.numAdsets || 1) === n;
                           return (
                             <div
                               key={n}
                               onClick={() => {
-                                let field = 'numAdsets';
-                                if (structure.strategy === 'PER_PRODUCT') field = 'numAdsetsPerProduct';
-                                else if (structure.strategy === 'BY_AD_COUNT') field = 'adsPerSet';
+                                const field = structure.strategy === 'PER_PRODUCT' ? 'numAdsetsPerProduct' : 'numAdsets';
 
                                 onStructureChange({
                                   ...structure,
@@ -863,9 +942,28 @@ const CampaignPlanView = ({
                           </>
                         )}
                       </div>
+                      {structure.strategy === 'BY_CREATIVE' && (
+                        <button
+                          onClick={() => setEditingAdsetIndex(idx)}
+                          className="mt-2 flex items-center gap-1 text-[10px] font-medium text-gray-500 hover:text-primary-500 bg-gray-50 hover:bg-primary-50 border border-gray-100 hover:border-primary-200 rounded-base px-2.5 py-1 transition-all"
+                        >
+                          <Edit3 size={10} /> 修改本组创意
+                        </button>
+                      )}
                     </div>
                   );
                 })}
+                {structure.strategy === 'BY_CREATIVE' && (
+                  <div className="flex flex-col items-center shrink-0">
+                    <button
+                      onClick={onAddByCreativeAdset}
+                      className="w-10 h-10 rounded-base border-2 border-dashed border-gray-200 hover:border-primary-400 hover:bg-primary-50 flex items-center justify-center text-gray-300 hover:text-primary-400 transition-all"
+                    >
+                      <Plus size={18} />
+                    </button>
+                    <p className="text-[10px] text-gray-400 font-medium mt-2 whitespace-nowrap">新增 Adset</p>
+                  </div>
+                )}
               </div>
 
               {hasLalAudience && (
@@ -1054,6 +1152,17 @@ const CampaignPlanView = ({
         </div>
       </div>
     </div>
+    {editingAdsetIndex !== null && (
+      <CreativePickerModal
+        adsetIndex={editingAdsetIndex}
+        adsetName={`素材组 ${editingAdsetIndex + 1}`}
+        allAds={selectedProducts.flatMap(p => productCreativesMap[p.id] || [])}
+        currentSelection={adsetCreativeSelections[editingAdsetIndex]}
+        onSave={onSaveAdsetCreatives}
+        onClose={() => setEditingAdsetIndex(null)}
+      />
+    )}
+    </>
   );
 };
 

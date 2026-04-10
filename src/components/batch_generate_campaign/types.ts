@@ -74,7 +74,7 @@ export enum BudgetType {
 export enum StructureStrategy {
   PER_PRODUCT = 'PER_PRODUCT',
   ALL_PRODUCTS_PER_SET = 'ALL_PRODUCTS_PER_SET',
-  BY_AD_COUNT = 'BY_AD_COUNT',
+  BY_CREATIVE = 'BY_CREATIVE',
   AI_STRATEGY = 'AI_STRATEGY'
 }
 

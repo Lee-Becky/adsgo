@@ -952,7 +952,7 @@ const CampaignPreviewView = ({
             })
           });
         }
-      } else if (structure.strategy === 'BY_AD_COUNT') {
+      } else if (structure.strategy === 'BY_CREATIVE') {
         const allAdsPool = selectedProducts.flatMap(p => (productCreativesMap[p.id] || []).map(c => ({...c, productId: p.id})));
         if (allAdsPool.length > 0) {
           const numGroups = targetAdSetCount;

@@ -530,12 +530,14 @@ const BatchGenerateAds = ({ onPageChange }) => {
   
   const [hasGeneratedOnce, setHasGeneratedOnce] = useState(_hasGeneratedOnce);
 
-  const [structure, setStructure] = useState({ 
+  const [structure, setStructure] = useState({
     strategy: 'PER_PRODUCT',
     adsPerSet: 3,
     numAdsets: 3,
     numAdsetsPerProduct: 1
   });
+  const [adsetCreativeSelections, setAdsetCreativeSelections] = useState({});
+  const [numByCreativeAdsets, setNumByCreativeAdsets] = useState(1);
   const [adsetAudiences, setAdsetAudiences] = useState(Array(50).fill('ADV'));
   const [lalOptions, setLalOptions] = useState([]);
   const [intOptions, setIntOptions] = useState([]);
@@ -658,17 +660,36 @@ const BatchGenerateAds = ({ onPageChange }) => {
     setEndDate(end.toISOString().split('T')[0]);
   };
 
+  const handleStructureChange = (newStructure) => {
+    if (newStructure.strategy !== 'BY_CREATIVE') {
+      setAdsetCreativeSelections({});
+      setNumByCreativeAdsets(1);
+    }
+    setStructure(newStructure);
+  };
+
+  const handleSaveAdsetCreatives = (adsetIndex, selectedIds) => {
+    setAdsetCreativeSelections(prev => ({
+      ...prev,
+      [adsetIndex]: new Set(selectedIds)
+    }));
+  };
+
+  const handleAddByCreativeAdset = () => {
+    setNumByCreativeAdsets(n => n + 1);
+  };
+
   const adSetGroupsCount = useMemo(() => {
     if (structure.strategy === 'PER_PRODUCT') {
       const activeProducts = selectedProducts.filter(p => (productCreativesMap[p.id] || []).length > 0);
       return activeProducts.length * (structure.numAdsetsPerProduct || 1);
     } else if (structure.strategy === 'ALL_PRODUCTS_PER_SET') {
       return structure.numAdsets || 1;
-    } else if (structure.strategy === 'BY_AD_COUNT') {
-      return structure.adsPerSet || 1; // 智能拆组模式下 adsPerSet 存储的是组数
+    } else if (structure.strategy === 'BY_CREATIVE') {
+      return numByCreativeAdsets;
     }
     return 0;
-  }, [structure, selectedProducts, productCreativesMap]);
+  }, [structure, selectedProducts, productCreativesMap, numByCreativeAdsets]);
 
   const estimatedTotalDaily = useMemo(() => {
     return budgetType === 'ABO' ? dailyBudget * adSetGroupsCount : dailyBudget;
@@ -1425,7 +1446,7 @@ const BatchGenerateAds = ({ onPageChange }) => {
                        <h3 className="text-xl font-semibold text-gray-900">架构策略与预算</h3>
                     </div>
                     <CampaignPlanView
-                      structure={structure} onStructureChange={setStructure}
+                      structure={structure} onStructureChange={handleStructureChange}
                       campaignType={campaignType}
                       budgetType={budgetType} onBudgetTypeChange={setBudgetType}
                       dailyBudget={dailyBudget} onBudgetChange={setDailyBudget}
@@ -1450,6 +1471,10 @@ const BatchGenerateAds = ({ onPageChange }) => {
                           setShowMetaAccountPicker(true);
                         }
                       }}
+                      adsetCreativeSelections={adsetCreativeSelections}
+                      numByCreativeAdsets={numByCreativeAdsets}
+                      onSaveAdsetCreatives={handleSaveAdsetCreatives}
+                      onAddByCreativeAdset={handleAddByCreativeAdset}
                     />
                  </div>
               )}
