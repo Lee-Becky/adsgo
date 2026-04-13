@@ -450,25 +450,24 @@ const TargetingChannelCard = ({
 
 // ── Naming Strategy Section ──────────────────────────────────────────────────
 
-const ADSET_VARS = [
-  { key: 'locations',          label: 'Locations' },
-  { key: 'audience_strategy',  label: 'Audience' },
-  { key: 'creative_num',       label: 'Creative Num' },
-  { key: 'date',               label: 'Date' },
-];
-
-const AD_VARS = [
-  { key: 'product_name',  label: 'Product' },
-  { key: 'ad_format',     label: 'Ad Format' },
+const NAMING_VARS = [
+  { key: 'Brand',         label: 'Brand' },
+  { key: 'location',      label: 'Location' },
+  { key: 'budget',        label: 'Budget' },
+  { key: 'device',        label: 'Device' },
   { key: 'date',          label: 'Date' },
-  { key: 'CTA',           label: 'CTA' },
-  { key: 'creative_num',  label: 'Creative Num' },
+  { key: 'goal',          label: 'Goal' },
+  { key: 'audience_type', label: 'Audience type' },
+  { key: 'creative_type', label: 'Creative type' },
+  { key: 'theme',         label: 'Theme' },
+  { key: 'number',        label: '编号' },
+  { key: '__custom__',    label: '自定义(...)' },
 ];
 
-const insertVar = (ref, template, setTemplate, varKey) => {
+const insertVar = (ref, template, setTemplate, varKey, separator = '') => {
   const el = ref.current;
   const insertion = (el ? (el.selectionStart ?? template.length) : template.length) > 0
-    ? `-{${varKey}}`
+    ? `${separator}{${varKey}}`
     : `{${varKey}}`;
   if (!el) {
     setTemplate(template + insertion);
@@ -492,30 +491,96 @@ const fmtVar = (k, v) => {
 const previewName = (template, vars) =>
   template.replace(/\{(\w+)\}/g, (_, k) => fmtVar(k, vars[k]) ?? `{${k}}`);
 
+const formatHistoryLabel = (date) =>
+  date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) +
+  ', ' + date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+
+const CAMPAIGN_NAME_HISTORY_DEFAULTS = [
+  { label: 'Apr 12, 2026, 3:45 PM', template: '{Brand}-{goal}-{location}-{date}' },
+  { label: 'Apr 10, 2026, 11:20 AM', template: '{Brand}-{audience_type}-{date}' },
+  { label: 'Default', template: '{Brand}-{location}-{date}' },
+];
+
 const ADSET_NAME_HISTORY_DEFAULTS = [
-  '{locations}-{audience_strategy}-{creative_num}-{date}',
-  '{audience_strategy}-{locations}-{date}',
-  '{locations}-{creative_num}-{date}',
-  '{audience_strategy}-{date}',
+  { label: 'Apr 12, 2026, 3:45 PM', template: '{audience_type}-{location}-{date}' },
+  { label: 'Apr 10, 2026, 11:20 AM', template: '{location}-{creative_type}-{date}' },
+  { label: 'Default', template: '{location}-{audience_type}-{creative_type}-{date}' },
 ];
 
 const AD_NAME_HISTORY_DEFAULTS = [
-  '{product_name}-{ad_format}-{CTA}-{date}',
-  '{product_name}-{CTA}-{date}',
-  '{product_name}-{ad_format}-{creative_num}',
-  '{ad_format}-{CTA}-{date}',
+  { label: 'Apr 12, 2026, 3:45 PM', template: '{Brand}-{theme}-{number}-{date}' },
+  { label: 'Apr 10, 2026, 11:20 AM', template: '{creative_type}-{theme}-{date}' },
+  { label: 'Default', template: '{Brand}-{creative_type}-{number}-{date}' },
 ];
 
 const NameField = ({
   fieldKey, label, vars, template, setTemplate, inputRef, preview,
   history, setHistory, openHistoryFor, setOpenHistoryFor,
 }) => {
+  const [showCustomPopover, setShowCustomPopover] = React.useState(false);
+  const [customVarText, setCustomVarText] = React.useState('');
+  const [customSep, setCustomSep] = React.useState('-');
+  const [pendingVarKey, setPendingVarKey] = React.useState(null);
+  const [showSepPopover, setShowSepPopover] = React.useState(false);
+
+  const SEP_OPTIONS = [
+    { value: '-', label: '-' },
+    { value: '_', label: '_' },
+    { value: ' ', label: '空格' },
+    { value: '',  label: 'none' },
+  ];
+
   const addToHistory = (val) => {
-    if (!val.trim() || history.includes(val)) return;
-    setHistory([val, ...history].slice(0, 8));
+    if (!val.trim() || history.some(h => h.template === val)) return;
+    const defaultEntries = history.filter(h => h.label === 'Default');
+    const userEntries = history.filter(h => h.label !== 'Default');
+    const newEntry = { label: formatHistoryLabel(new Date()), template: val };
+    setHistory([[newEntry, ...userEntries].slice(0, 7), ...defaultEntries].flat());
   };
+
+  const handleChipClick = (v) => {
+    if (v.key === '__custom__') {
+      setCustomVarText('');
+      setCustomSep('-');
+      setShowSepPopover(false);
+      setPendingVarKey(null);
+      setShowCustomPopover(true);
+    } else {
+      const pos = inputRef.current?.selectionStart ?? template.length;
+      if (pos === 0) {
+        insertVar(inputRef, template, setTemplate, v.key, '');
+      } else {
+        setPendingVarKey(v.key);
+        setShowSepPopover(true);
+        setShowCustomPopover(false);
+      }
+    }
+  };
+
+  const handleInsertWithSep = (sep) => {
+    insertVar(inputRef, template, setTemplate, pendingVarKey, sep);
+    setShowSepPopover(false);
+    setPendingVarKey(null);
+  };
+
+  const handleInsertCustom = () => {
+    const text = customVarText.trim();
+    if (!text) return;
+    const el = inputRef.current;
+    const pos = el?.selectionStart ?? template.length;
+    const sep = pos === 0 ? '' : customSep;
+    const insertion = pos > 0 ? `${sep}{${text}}` : `{${text}}`;
+    const next = template.slice(0, pos) + insertion + template.slice(pos);
+    setTemplate(next);
+    requestAnimationFrame(() => {
+      if (el) { el.focus(); el.setSelectionRange(pos + insertion.length, pos + insertion.length); }
+    });
+    setShowCustomPopover(false);
+    setCustomVarText('');
+  };
+
   return (
-    <div className="flex-1 space-y-3">
+    <div className="space-y-3">
       <div className="flex items-center justify-between px-1">
         <label className="text-xs font-medium text-gray-500">{label}</label>
         <div className="relative">
@@ -532,17 +597,25 @@ const NameField = ({
             <ChevronDown size={10} className={`transition-transform ${openHistoryFor === fieldKey ? 'rotate-180' : ''}`} />
           </button>
           {openHistoryFor === fieldKey && (
-            <div className="absolute right-0 top-full mt-1 w-72 bg-white rounded-base border border-gray-100 shadow-xl z-50 py-1 animate-in fade-in zoom-in-95 duration-150">
+            <div className="absolute right-0 top-full mt-1 w-64 bg-white rounded-base border border-gray-100 shadow-xl z-50 py-1 animate-in fade-in zoom-in-95 duration-150">
               {history.map((item, i) => (
                 <button
                   key={i}
-                  onClick={() => { setTemplate(item); setOpenHistoryFor(null); }}
-                  className={`w-full text-left px-3 py-2 text-[11px] font-mono transition-colors flex items-center gap-2 ${
-                    item === template ? 'bg-primary-50 text-primary-600' : 'text-gray-600 hover:bg-gray-50'
+                  onClick={() => { setTemplate(item.template); setOpenHistoryFor(null); }}
+                  className={`w-full text-left px-3 py-2 transition-colors hover:bg-gray-50 ${
+                    item.template === template ? 'bg-primary-50' : ''
                   }`}
                 >
-                  {item === template && <Check size={10} className="shrink-0" />}
-                  <span className="truncate">{item}</span>
+                  <div className="flex items-center gap-1 mb-0.5">
+                    {item.template === template && <Check size={9} className="shrink-0 text-primary-500" />}
+                    <span className="text-[11px] font-medium text-gray-700">{item.label}</span>
+                  </div>
+                  <div className="relative group">
+                    <p className="text-[10px] text-gray-400 font-mono truncate">{item.template}</p>
+                    <div className="absolute bottom-full left-0 hidden group-hover:block bg-gray-800 text-white text-[10px] font-mono rounded px-2 py-1 whitespace-nowrap z-[350] shadow-lg pointer-events-none">
+                      {item.template}
+                    </div>
+                  </div>
                 </button>
               ))}
             </div>
@@ -559,13 +632,78 @@ const NameField = ({
       />
       <div className="flex flex-wrap gap-1.5 px-1">
         {vars.map(v => (
-          <button
-            key={v.key}
-            onClick={() => insertVar(inputRef, template, setTemplate, v.key)}
-            className="px-2 py-0.5 bg-primary-50 text-primary-600 text-[11px] font-semibold rounded-md border border-primary-100 hover:bg-primary-100 transition-colors"
-          >
-            {`{${v.key}}`}
-          </button>
+          <div key={v.key} className="relative">
+            <button
+              onMouseDown={e => e.preventDefault()}
+              onClick={() => handleChipClick(v)}
+              className={`px-2 py-0.5 text-[11px] font-semibold rounded-md border transition-colors ${
+                v.key === '__custom__'
+                  ? 'bg-gray-50 text-gray-500 border-gray-200 hover:bg-gray-100 hover:text-gray-700'
+                  : 'bg-primary-50 text-primary-600 border-primary-100 hover:bg-primary-100'
+              }`}
+            >
+              {v.key === '__custom__' ? v.label : `{${v.key}}`}
+            </button>
+            {/* Per-insertion separator popover */}
+            {pendingVarKey === v.key && showSepPopover && (
+              <>
+                <div className="fixed inset-0 z-[290]" onClick={() => setShowSepPopover(false)} />
+                <div className="absolute left-0 top-full mt-1 bg-white rounded-base border border-gray-200 shadow-xl z-[300] p-2.5 animate-in fade-in zoom-in-95 duration-150">
+                  <p className="text-[10px] text-gray-400 mb-1.5 font-medium">连接符</p>
+                  <div className="flex gap-1">
+                    {SEP_OPTIONS.map(opt => (
+                      <button
+                        key={opt.value}
+                        onMouseDown={e => e.preventDefault()}
+                        onClick={() => handleInsertWithSep(opt.value)}
+                        className="px-2.5 py-1 text-[11px] font-mono border border-gray-200 rounded-md hover:bg-primary-50 hover:border-primary-300 hover:text-primary-600 transition-colors text-gray-600"
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
+            {/* Custom var popover */}
+            {v.key === '__custom__' && showCustomPopover && (
+              <>
+                <div className="fixed inset-0 z-[290]" onClick={() => setShowCustomPopover(false)} />
+                <div className="absolute left-0 top-full mt-1 w-52 bg-white rounded-base border border-gray-200 shadow-xl z-[300] p-3 animate-in fade-in zoom-in-95 duration-150">
+                  <p className="text-[11px] font-medium text-gray-500 mb-2">自定义变量文本</p>
+                  <input
+                    autoFocus
+                    type="text"
+                    value={customVarText}
+                    onChange={e => setCustomVarText(e.target.value)}
+                    onKeyDown={e => { if (e.key === 'Enter') handleInsertCustom(); if (e.key === 'Escape') setShowCustomPopover(false); }}
+                    placeholder="e.g. SummerSale"
+                    className="w-full h-8 px-2 text-xs font-mono bg-gray-50 border border-gray-200 rounded-md outline-none focus:border-primary-500 mb-2.5"
+                  />
+                  <p className="text-[10px] text-gray-400 mb-1.5 font-medium">连接符</p>
+                  <div className="flex gap-1 mb-3">
+                    {SEP_OPTIONS.map(opt => (
+                      <button
+                        key={opt.value}
+                        onClick={() => setCustomSep(opt.value)}
+                        className={`px-2 py-0.5 text-[10px] font-mono border rounded transition-colors ${
+                          customSep === opt.value
+                            ? 'bg-primary-500 text-white border-primary-500'
+                            : 'border-gray-200 text-gray-500 hover:border-primary-300 hover:text-primary-600'
+                        }`}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                  <div className="flex gap-2 justify-end">
+                    <button onClick={() => setShowCustomPopover(false)} className="px-2 py-1 text-[11px] text-gray-400 hover:text-gray-600">取消</button>
+                    <button onClick={handleInsertCustom} disabled={!customVarText.trim()} className="px-3 py-1 text-[11px] bg-primary-500 text-white rounded-md disabled:opacity-40 hover:bg-primary-600 transition-colors">插入</button>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
         ))}
       </div>
       <p className="text-[11px] text-gray-400 px-1 font-mono truncate" title={preview}>
@@ -576,64 +714,66 @@ const NameField = ({
 };
 
 const NamingStrategySection = ({
+  campaignNameTemplate, setCampaignNameTemplate,
   adsetNameTemplate, setAdsetNameTemplate,
   adNameTemplate, setAdNameTemplate,
   selectedLocations = [], selectedProducts = [],
 }) => {
-  const adsetInputRef = React.useRef(null);
-  const adInputRef    = React.useRef(null);
+  const campaignInputRef = React.useRef(null);
+  const adsetInputRef    = React.useRef(null);
+  const adInputRef       = React.useRef(null);
 
-  const [adsetHistory, setAdsetHistory] = useState(ADSET_NAME_HISTORY_DEFAULTS);
-  const [adHistory, setAdHistory]       = useState(AD_NAME_HISTORY_DEFAULTS);
-  const [openHistoryFor, setOpenHistoryFor] = useState(null);
+  const [campaignHistory, setCampaignHistory] = useState(CAMPAIGN_NAME_HISTORY_DEFAULTS);
+  const [adsetHistory, setAdsetHistory]       = useState(ADSET_NAME_HISTORY_DEFAULTS);
+  const [adHistory, setAdHistory]             = useState(AD_NAME_HISTORY_DEFAULTS);
+  const [openHistoryFor, setOpenHistoryFor]   = useState(null);
 
   const today = new Date().toISOString().slice(0, 10).replace(/-/g, '');
-  const sampleProduct = selectedProducts[0]?.name || 'ProductName';
   const locStr = selectedLocations.length > 0
     ? selectedLocations.map(l => l.code || l.name).join('_')
     : 'US';
 
-  const adsetPreview = previewName(adsetNameTemplate, {
-    locations: locStr, audience_strategy: 'ADV', creative_num: 6, date: today,
-  });
-  const adPreview = previewName(adNameTemplate, {
-    product_name: sampleProduct, ad_format: 'FLEXIBLE', date: today, CTA: 'Shop Now', creative_num: 3,
-  });
+  const SAMPLE_VARS = {
+    Brand: 'MyBrand', location: locStr, budget: '$500', device: 'Mobile',
+    date: today, goal: 'Conversions', audience_type: 'LAL',
+    creative_type: 'Video', theme: 'Summer', number: '001',
+  };
+
+  const campaignPreview = previewName(campaignNameTemplate, SAMPLE_VARS);
+  const adsetPreview    = previewName(adsetNameTemplate,    SAMPLE_VARS);
+  const adPreview       = previewName(adNameTemplate,       SAMPLE_VARS);
+
+  const fields = [
+    { key: 'campaign', label: 'Campaign 命名', template: campaignNameTemplate, setTemplate: setCampaignNameTemplate, inputRef: campaignInputRef, preview: campaignPreview, history: campaignHistory, setHistory: setCampaignHistory },
+    { key: 'adset',    label: 'Adset 命名',    template: adsetNameTemplate,    setTemplate: setAdsetNameTemplate,    inputRef: adsetInputRef,    preview: adsetPreview,    history: adsetHistory,    setHistory: setAdsetHistory },
+    { key: 'ad',       label: 'Ad 命名',       template: adNameTemplate,       setTemplate: setAdNameTemplate,       inputRef: adInputRef,       preview: adPreview,       history: adHistory,       setHistory: setAdHistory },
+  ];
 
   return (
     <div className="space-y-6 pt-10" onClick={() => openHistoryFor && setOpenHistoryFor(null)}>
       <div className="flex items-center gap-2 px-1">
-        <label className="text-xs font-medium text-gray-500">Adsets & Ads命名策略</label>
+        <label className="text-xs font-medium text-gray-500">广告结构命名策略</label>
         <Info size={12} className="text-gray-300" />
       </div>
-      <div className="bg-gray-50/50 border border-gray-100 rounded-inner p-10 flex gap-10" onClick={e => e.stopPropagation()}>
-        <NameField
-          fieldKey="adset"
-          label="Adset 命名"
-          vars={ADSET_VARS}
-          template={adsetNameTemplate}
-          setTemplate={setAdsetNameTemplate}
-          inputRef={adsetInputRef}
-          preview={adsetPreview}
-          history={adsetHistory}
-          setHistory={setAdsetHistory}
-          openHistoryFor={openHistoryFor}
-          setOpenHistoryFor={setOpenHistoryFor}
-        />
-        <div className="w-px bg-gray-100 shrink-0" />
-        <NameField
-          fieldKey="ad"
-          label="Ad 命名"
-          vars={AD_VARS}
-          template={adNameTemplate}
-          setTemplate={setAdNameTemplate}
-          inputRef={adInputRef}
-          preview={adPreview}
-          history={adHistory}
-          setHistory={setAdHistory}
-          openHistoryFor={openHistoryFor}
-          setOpenHistoryFor={setOpenHistoryFor}
-        />
+      <div className="bg-gray-50/50 border border-gray-100 rounded-inner p-6 space-y-6" onClick={e => e.stopPropagation()}>
+        {/* 三层命名卡片 */}
+        {fields.map((f) => (
+          <div key={f.key} className="bg-white border border-gray-100 rounded-base p-5 shadow-sm">
+            <NameField
+              fieldKey={f.key}
+              label={f.label}
+              vars={NAMING_VARS}
+              template={f.template}
+              setTemplate={f.setTemplate}
+              inputRef={f.inputRef}
+              preview={f.preview}
+              history={f.history}
+              setHistory={f.setHistory}
+              openHistoryFor={openHistoryFor}
+              setOpenHistoryFor={setOpenHistoryFor}
+            />
+          </div>
+        ))}
       </div>
     </div>
   );
@@ -661,8 +801,9 @@ const BatchGenerateAds = ({ onPageChange }) => {
   const [lpTemplateUrl, setLpTemplateUrl] = useState('https://luminaire-style.com/collections/{{product_name}}');
   const [productLpUtm, setProductLpUtm] = useState('utm_source=meta&utm_medium=paid&utm_campaign=ai_batch_{{product_id}}');
   
-  const [adsetNameTemplate, setAdsetNameTemplate] = useState('{locations}-{audience_strategy}-{creative_num}-{date}');
-  const [adNameTemplate, setAdNameTemplate] = useState('{product_name}-{ad_format}-{CTA}-{date}');
+  const [campaignNameTemplate, setCampaignNameTemplate] = useState('{Brand}-{location}-{date}');
+  const [adsetNameTemplate, setAdsetNameTemplate] = useState('{location}-{audience_type}-{creative_type}-{date}');
+  const [adNameTemplate, setAdNameTemplate] = useState('{Brand}-{creative_type}-{number}-{date}');
 
   const [copyStrategy, setCopyStrategy] = useState('AI_CUSTOM');
   const [unifiedHeadline, setUnifiedHeadline] = useState(['Limited Time Offer: Quality You Can Trust']);
@@ -1685,7 +1826,7 @@ const BatchGenerateAds = ({ onPageChange }) => {
                     <button onClick={() => setAdvancedOpen(!advancedOpen)} className="w-full p-10 flex items-center justify-between hover:bg-gray-50 transition-colors">
                         <div className="flex items-center gap-3">
                            <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center text-gray-500"><Settings size={20} /></div>
-                           <h3 className="text-xl font-semibold text-gray-900">高级设置 (落地页 / 文案 / 排期)</h3>
+                           <h3 className="text-xl font-semibold text-gray-900">高级设置 (广告命名规则 / 落地页 / 文案 / 排期)</h3>
                         </div>
                         <ChevronDown className={`transition-transform duration-300 ${advancedOpen ? 'rotate-180' : ''}`} />
                     </button>
@@ -1695,6 +1836,8 @@ const BatchGenerateAds = ({ onPageChange }) => {
 
                            {/* Naming Strategy */}
                            <NamingStrategySection
+                             campaignNameTemplate={campaignNameTemplate}
+                             setCampaignNameTemplate={setCampaignNameTemplate}
                              adsetNameTemplate={adsetNameTemplate}
                              setAdsetNameTemplate={setAdsetNameTemplate}
                              adNameTemplate={adNameTemplate}
@@ -2067,6 +2210,7 @@ const BatchGenerateAds = ({ onPageChange }) => {
                   onSelectAccount={() => setShowMetaAccountPicker(true)}
                   onBudgetChange={setDailyBudget}
                   onBudgetTypeChange={setBudgetType}
+                  campaignNameTemplate={campaignNameTemplate}
                   adsetNameTemplate={adsetNameTemplate}
                   adNameTemplate={adNameTemplate}
                   selectedLocations={selectedLocations}

@@ -797,8 +797,9 @@ const CampaignPreviewView = ({
   estimatedTotalDaily, adSetGroupsCount, adType = 'SINGLE', adsetAudienceDetails = {},
   authStatus, selectedAccount, onAuthStatusChange, onSelectAccount,
   isExistingCampaign, campaignObjective, onBudgetChange, onBudgetTypeChange,
-  adsetNameTemplate = '{locations}-{audience_strategy}-{creative_num}-{date}',
-  adNameTemplate = '{product_name}-{ad_format}-{CTA}-{date}',
+  campaignNameTemplate = '{Brand}-{location}-{date}',
+  adsetNameTemplate = '{location}-{audience_type}-{creative_type}-{date}',
+  adNameTemplate = '{Brand}-{creative_type}-{number}-{date}',
   selectedLocations = [],
 }) => {
   const isFlexible = adType === 'FLEXIBLE' && (campaignObjective === 'sales_conversions' || campaignObjective === 'app_promotion');
@@ -823,7 +824,22 @@ const CampaignPreviewView = ({
   const [changeCreativeInfo, setChangeCreativeInfo] = useState(null);
   const [loadedAdsCount, setLoadedAdsCount] = useState(0);
   const [isEditingCampaignName, setIsEditingCampaignName] = useState(false);
-  const [localCampaignName, setLocalCampaignName] = useState(campaignName);
+  const [localCampaignName, setLocalCampaignName] = useState(() =>
+    campaignNameTemplate
+      ? applyNameTemplate(campaignNameTemplate, {
+          Brand: brand || 'MyBrand',
+          location: locStr,
+          budget: '$500',
+          device: 'Mobile',
+          date: today,
+          goal: 'Conversions',
+          audience_type: 'LAL',
+          creative_type: 'Video',
+          theme: 'Summer',
+          number: '001',
+        })
+      : campaignName
+  );
   const [selectedCta, setSelectedCta] = useState(OBJECTIVE_CTA_MAPPING[campaignObjective] || 'Shop Now');
   const [isCtaOpen, setIsCtaOpen] = useState(false);
   const [localBudget, setLocalBudget] = useState(dailyBudget);
