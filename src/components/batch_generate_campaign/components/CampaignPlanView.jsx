@@ -403,9 +403,9 @@ const AiStrategyDialog = ({ onApplyStrategy, onApplied }) => {
   };
 
   const strategyLabel = (s) => {
-    if (s === 'PER_PRODUCT') return '受众测试 (PER_PRODUCT)';
-    if (s === 'ALL_PRODUCTS_PER_SET') return '产品测试 (ALL_PRODUCTS_PER_SET)';
-    if (s === 'BY_CREATIVE') return '创意测试 (BY_CREATIVE)';
+    if (s === 'PER_PRODUCT') return 'Test by product group (PER_PRODUCT)';
+    if (s === 'ALL_PRODUCTS_PER_SET') return 'Test by audience group (ALL_PRODUCTS_PER_SET)';
+    if (s === 'BY_CREATIVE') return 'Test by creative group (BY_CREATIVE)';
     return s;
   };
 
@@ -758,7 +758,7 @@ const CampaignPlanView = ({
   const focusedAudienceType = adsetAudiences[effectiveFocusedIdx] || 'ADV';
   const focusedDetails = adsetAudienceDetails[effectiveFocusedIdx] || {};
   const isFlexibleObjective = objective === 'sales_conversions' || objective === 'app_promotion';
-  const strategyLabels = { PER_PRODUCT: '受众测试', ALL_PRODUCTS_PER_SET: '产品测试', BY_CREATIVE: '创意测试', AI_STRATEGY: 'AI策略' };
+  const strategyLabels = { PER_PRODUCT: 'Test by product group', ALL_PRODUCTS_PER_SET: 'Test by audience group', BY_CREATIVE: 'Test by creative group', AI_STRATEGY: 'AI策略' };
   const structureSummary = [
     strategyLabels[structure.strategy] || structure.strategy,
     `${adSetGroups.length} Adset`,
@@ -841,9 +841,9 @@ const CampaignPlanView = ({
                               style={{ zIndex: 200 }}
                             >
                               {[
-                                { id: 'PER_PRODUCT', label: '受众测试', desc: 'Multiple Adsets per SKU' },
-                                { id: 'ALL_PRODUCTS_PER_SET', label: '产品测试', desc: 'All SKU in every Adset' },
-                                { id: 'BY_CREATIVE', label: '创意测试', desc: 'Assign creatives per Adset' },
+                                { id: 'PER_PRODUCT', label: 'Test by product group', desc: 'Multiple Adsets per SKU' },
+                                { id: 'ALL_PRODUCTS_PER_SET', label: 'Test by audience group', desc: 'All SKU in every Adset' },
+                                { id: 'BY_CREATIVE', label: 'Test by creative group', desc: 'Assign creatives per Adset' },
                                 { id: 'AI_STRATEGY', label: 'AI个性化策略', desc: 'Describe your ad structure' },
                               ].map(opt => (
                                 <div
