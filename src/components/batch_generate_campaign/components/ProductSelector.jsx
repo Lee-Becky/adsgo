@@ -82,6 +82,9 @@ const CREATIVE_LIBRARY = [
   { id: 'lib8', name: '自然有机食品摄影', url: 'https://picsum.photos/seed/creative8/400/600' },
 ];
 
+const PRODUCT_ASSET_LABELS = ['Main Shot', 'Detail View', 'Detail Close-up', 'Lifestyle 1', 'Lifestyle 2', 'Packaging', 'Environment'];
+const PRODUCT_ASSET_SEEDS = ['prod_main', 'prod_detail1', 'prod_detail2', 'prod_ls1', 'prod_ls2', 'prod_pack', 'prod_env'];
+
 const ADD_OPTIONS = [
   {
     id: 'shopify',
@@ -257,6 +260,25 @@ const SelectionModal = ({
   const [search, setSearch] = useState('');
   const [localSelected, setLocalSelected] = useState(new Set());
   const [activePlatform, setActivePlatform] = useState('ALL');
+  const [activeCreativeTab, setActiveCreativeTab] = useState('library'); // 'library' | 'product_assets'
+
+  const handleTabSwitch = (tab) => {
+    setActiveCreativeTab(tab);
+    setLocalSelected(new Set());
+  };
+
+  const getProductAssets = () => {
+    const product = selectedProducts.find(p => p.id === modalContext);
+    const assets = PRODUCT_ASSET_SEEDS.map((seed, i) => ({
+      id: `pa-${modalContext}-${seed}`,
+      name: PRODUCT_ASSET_LABELS[i],
+      url: `https://picsum.photos/seed/${product?.id || 'default'}_${seed}/400/400`,
+    }));
+    if (product?.imageUrl) {
+      assets.unshift({ id: `pa-${modalContext}-cover`, name: 'Product Cover', url: product.imageUrl });
+    }
+    return assets;
+  };
   
   const isCurrentPlatformConnected = activePlatform === 'ALL' ? anyConnected : authStatus[activePlatform];
   const skipFetching = type === 'history' || type === 'creative_lib';
@@ -274,7 +296,11 @@ const SelectionModal = ({
   }, [activePlatform, isCurrentPlatformConnected, isAddModalOpen, skipFetching]);
 
   const getItems = () => {
-    if (type !== 'shopify') return type === 'history' ? HISTORY_PRODUCTS : CREATIVE_LIBRARY;
+    if (type !== 'shopify') {
+      if (type === 'history') return HISTORY_PRODUCTS;
+      if (type === 'creative_lib') return activeCreativeTab === 'library' ? CREATIVE_LIBRARY : getProductAssets();
+      return CREATIVE_LIBRARY;
+    }
     if (activePlatform === 'ALL') {
       let all = [];
       if (authStatus.shopify) all = [...all, ...SHOPIFY_PRODUCTS];
@@ -312,6 +338,24 @@ const SelectionModal = ({
           <h3 className="text-xl font-semibold text-gray-900">{type === 'history' ? '历史分析产品库' : type === 'shopify' ? '请选择products' : '从创意素材库选择'}</h3>
           <button onClick={onClose} className="p-2 hover:bg-gray-50 rounded-full text-gray-300 transition-colors"><X size={24} /></button>
         </div>
+        {type === 'creative_lib' && (
+          <div className="px-8 py-3 bg-gray-50 border-b border-gray-200 flex items-center gap-2 shrink-0">
+            <div className="flex bg-white p-1 rounded-xl border border-gray-200 shadow-sm">
+              {[
+                { id: 'library', label: '创意素材库' },
+                { id: 'product_assets', label: 'Product Assets' },
+              ].map(tab => (
+                <button
+                  key={tab.id}
+                  onClick={() => handleTabSwitch(tab.id)}
+                  className={`px-4 py-2 rounded-lg text-xs font-medium transition-all ${activeCreativeTab === tab.id ? 'bg-primary-500 text-white shadow-md' : 'text-gray-400 hover:bg-gray-50'}`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
         {type === 'shopify' && (
           <div className="px-8 py-4 bg-gray-50 border-b border-gray-200 flex items-center gap-4 shrink-0">
             {anyConnected && (<button onClick={() => setIsAddModalOpen(true)} className="w-10 h-10 bg-primary-500 text-white rounded-xl flex items-center justify-center shadow-lg hover:bg-primary-600 transition-all shrink-0 group" title="Connect product data source"><Plus size={20} className="group-hover:rotate-90 transition-transform" /></button>)}
@@ -399,11 +443,12 @@ const SelectionModal = ({
           <button disabled={localSelected.size === 0} onClick={() => {
             const randomSuffix = () => Math.random().toString(36).substring(2, 9);
             if (type === 'creative_lib') {
-              const selectedCreatives = CREATIVE_LIBRARY.filter(i => localSelected.has(i.id));
-              const newCreatives = selectedCreatives.map(c => ({ 
-                ...c, 
-                id: `${c.id}-${Date.now()}-${randomSuffix()}`, 
-                productId: modalContext 
+              const pool = activeCreativeTab === 'library' ? CREATIVE_LIBRARY : getProductAssets();
+              const selectedCreatives = pool.filter(i => localSelected.has(i.id));
+              const newCreatives = selectedCreatives.map(c => ({
+                ...c,
+                id: `${c.id}-${Date.now()}-${randomSuffix()}`,
+                productId: modalContext
               }));
               onUpdateCreatives(modalContext, prev => [...newCreatives, ...prev]);
             } else {
@@ -1114,29 +1159,24 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
                     <div className={`bg-white border rounded-section p-4 md:p-6 transition-all hover:shadow-xl hover:shadow-gray-200/50 group ${creatives.length === 0 && generatingCount === 0 && showAnalysisResult ? 'border-amber-100 ring-2 ring-amber-500/5' : 'border-gray-100'}`}>
                       <div className="flex flex-col lg:flex-row gap-6">
                         <div className="flex items-center gap-4 lg:w-72 shrink-0">
-                          <div className="w-12 h-12 rounded-xl overflow-hidden border border-gray-100 shrink-0 shadow-sm relative bg-gray-50">
+                          <div className="w-12 h-12 rounded-xl overflow-hidden border border-gray-100 shrink-0 shadow-sm bg-gray-50">
                             {p.imageUrl ? (
                               <img src={p.imageUrl} className="w-full h-full object-cover" />
                             ) : (
-                              <div className="w-full h-full flex flex-col items-center justify-center bg-gray-50 text-gray-300 gap-1 border border-gray-50 rounded-xl relative overflow-hidden">
-                                <div className="absolute inset-0 bg-primary-50/30" />
-                                <div className="relative">
-                                  <ImageIcon size={18} />
-                                  <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-0.5 shadow-sm">
-                                    <Link2 size={8} className="text-primary-500" />
-                                  </div>
-                                </div>
-                                <span className="text-xs font-medium text-gray-400 uppercase relative z-10">Analyzed</span>
-                              </div>
-                            )}
-                            {creatives.length === 0 && generatingCount === 0 && showAnalysisResult && (
-                              <div className="absolute inset-0 bg-amber-500/80 flex items-center justify-center">
-                                <Flame size={14} className="text-white animate-bounce" />
+                              <div className="w-full h-full flex flex-col items-center justify-center bg-gray-50 text-gray-300 gap-1">
+                                <ImageIcon size={18} />
+                                <span className="text-[9px] font-medium text-gray-300 uppercase">获取中</span>
                               </div>
                             )}
                           </div>
                           <div className="min-w-0 flex-1">
                             <h4 className="text-sm font-medium text-gray-800 truncate">{p.name}</h4>
+                            {p.url && (
+                              <div className="flex items-center gap-1 mt-0.5 max-w-[180px]">
+                                <Link2 size={9} className="text-gray-300 shrink-0" />
+                                <span className="text-[10px] text-gray-300 font-medium truncate">{p.url}</span>
+                              </div>
+                            )}
                             {(showAnalysisResult || (isMultiMode && (analysisFinished || isAnalyzing))) && (
                               <div className="flex items-center gap-2 mt-1">
                                 <span className={`text-xs font-medium px-2 py-0.5 rounded-tag ${creatives.length > 0 ? 'bg-primary-50 text-primary-500' : 'bg-amber-50 text-amber-600'}`}>{creatives.length} 素材</span>
