@@ -937,8 +937,8 @@ const CampaignPlanView = ({
                     )}
                   </div>
 
-                  {/* Right: Ad Format (sales_conversions / app_promotion only) */}
-                  {isFlexibleObjective && (
+                  {/* Right: Ad Format (sales_conversions / app_promotion only, hidden for CATALOG) */}
+                  {isFlexibleObjective && campaignType !== 'CATALOG' && (
                     <div className="w-48 shrink-0">
                       <label className="text-xs font-medium text-gray-500 px-1 mb-2 block">Ad Format</label>
                       <div className="space-y-2">
