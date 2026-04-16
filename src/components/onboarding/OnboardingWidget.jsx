@@ -1,6 +1,9 @@
-import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { Compass, Megaphone, TrendingUp, Sparkles, ChevronRight, ChevronDown, ChevronUp, X, Check, CircleCheck } from 'lucide-react'
+import { useState, useEffect, useRef } from 'react'
+import { useNavigate, useLocation } from 'react-router-dom'
+import {
+  Compass, Megaphone, Target, TrendingUp, Sparkles, Palette,
+  ChevronRight, ChevronDown, ChevronUp, X, Check, CircleCheck, Lock, PartyPopper,
+} from 'lucide-react'
 import { useOnboardingState } from './useOnboardingState'
 
 const STEPS = [
@@ -17,66 +20,124 @@ const STEPS = [
     icon: Megaphone,
   },
   {
-    title: '开启7×24h智能预算优化',
-    description: '开启后AI将7×24h自动执行预算调整，及时止损低效广告，放大高效投放效果',
+    title: '配置你的优化目标',
+    description: '设定KPI目标和每日预算上限，这是AI优化你广告投放的基础',
+    highlights: [
+      '设定ROAS/CPA目标，AI据此决策优化方向',
+      '配置每日预算上限，AI绝不超支',
+      '选择投放市场和平台，精准定位你的目标',
+    ],
+    ctaText: '去配置目标',
+    route: '/brandCenter/optimizeGoals',
+    icon: Target,
+  },
+  {
+    title: '开启自动优化（Recommend/Auto 任一）',
+    description: '开启 Recommend 或 Auto 任一功能即可让 AI 接管关键优化动作并提升效率',
     highlights: [
       '自动暂停低效广告，避免预算浪费',
       '实时放大高ROI广告的预算投入',
       '7×24h自动执行，无需人工干预',
     ],
-    ctaText: '去开启自动优化',
+    ctaText: '去开启任一自动优化',
     route: '/aiOptimize/adManagerV3',
     icon: TrendingUp,
   },
   {
-    title: '开启自动化发布推荐Campaigns',
-    description: '开启后AI将在最佳时间自动发布新Campaign，持续保持广告效果，规避创意衰退',
+    title: '了解自动发布按钮位置与作用',
+    description: '进入页面并了解自动发布按钮位置和作用，即可完成本步骤',
     highlights: [
       'AI选择最佳时机自动发布新Campaign',
       '持续补充新创意，规避广告效果衰退',
       '全自动执行，始终保持投放竞争力',
     ],
-    ctaText: '去开启自动发布',
+    ctaText: '去查看自动发布',
     route: '/aiOptimize/autoRegeneration',
     icon: Sparkles,
   },
+  {
+    title: '了解创意补充方式（上传/AI生成）',
+    description: '进入创意页面并了解上传素材或 AI 生成的路径，即可完成本步骤',
+    highlights: [
+      'AI自动生成品牌化广告素材',
+      '更多素材变体 = 更多测试机会',
+      '持续补充新素材，规避创意疲劳',
+    ],
+    ctaText: '去查看创意入口',
+    route: '/creativeHub/aiGenerate',
+    icon: Palette,
+  },
 ]
 
-export default function OnboardingWidget({ selectedBrand, isAutopilotEnabled, isAutoPublishEnabled }) {
+export default function OnboardingWidget({
+  selectedBrand,
+  publishedAt,
+  goalConfigured,
+  isAutopilotEnabled,
+  isAutoPublishEnabled,
+}) {
   const navigate = useNavigate()
+  const location = useLocation()
   const [isExpanded, setIsExpanded] = useState(true)
   const [isClosing, setIsClosing] = useState(false)
   const [expandedStep, setExpandedStep] = useState(0)
-  const { completedSteps, markStepCompleted, allDone, dismissed, dismiss } = useOnboardingState(selectedBrand)
+  const prevCompletedRef = useRef(0)
 
-  // Reactively complete Step 2 when AI Autopilot is enabled
-  useEffect(() => {
-    if (isAutopilotEnabled) markStepCompleted(1)
-  }, [isAutopilotEnabled, markStepCompleted])
+  const {
+    completedSteps,
+    markStepCompleted,
+    allDone,
+    dismissed,
+    dismiss,
+    currentStep,
+    isStep1Done,
+    totalSteps,
+  } = useOnboardingState({
+    selectedBrand,
+    publishedAt,
+    goalConfigured,
+    isAutopilotEnabled,
+    isAutoPublishEnabled,
+  })
 
-  // Reactively complete Step 3 when Auto Publish is enabled
+  // Step 4: visiting autoRegeneration page means user has learned the button location
   useEffect(() => {
-    if (isAutoPublishEnabled) markStepCompleted(2)
-  }, [isAutoPublishEnabled, markStepCompleted])
-
-  // Auto-expand the first incomplete step
-  useEffect(() => {
-    for (let i = 0; i < 3; i++) {
-      if (!completedSteps.includes(i)) {
-        setExpandedStep(i)
-        return
-      }
+    if (location.pathname.includes('/autoRegeneration')) {
+      markStepCompleted(3)
     }
-  }, [completedSteps])
+  }, [location.pathname, markStepCompleted])
+
+  // Step 5: visiting creative pages means user has learned upload/AI generation entry
+  useEffect(() => {
+    if (location.pathname.includes('/aiGenerate') || location.pathname.includes('/creativeLibrary')) {
+      markStepCompleted(4)
+    }
+  }, [location.pathname, markStepCompleted])
+
+  // Auto-expand to first incomplete step
+  useEffect(() => {
+    setExpandedStep(currentStep < totalSteps ? currentStep : totalSteps - 1)
+  }, [currentStep, totalSteps])
+
+  // Auto-expand widget when a new step is completed (the "return to Widget" moment)
+  useEffect(() => {
+    if (completedSteps.length > prevCompletedRef.current && completedSteps.length > 0) {
+      setIsExpanded(true)
+    }
+    prevCompletedRef.current = completedSteps.length
+  }, [completedSteps.length])
 
   if (dismissed) return null
 
   const completedCount = completedSteps.length
 
   const handleCTAClick = (index) => {
-    // Step 1: mark completed on CTA click; Step 2/3: only navigate, completion is reactive
-    if (index === 0) markStepCompleted(index)
     navigate(STEPS[index].route)
+    handleClose()
+  }
+
+  const handleAcknowledgeStep3 = () => {
+    markStepCompleted(2)
   }
 
   const handleClose = () => {
@@ -97,23 +158,32 @@ export default function OnboardingWidget({ selectedBrand, isAutopilotEnabled, is
   }
 
   const toggleStepExpand = (index) => {
+    if (!isStep1Done && index > 0) return
     setExpandedStep(prev => prev === index ? -1 : index)
   }
 
   const isStepCompleted = (index) => completedSteps.includes(index)
+  const isStepLocked = (index) => !isStep1Done && index > 0
 
   const renderStepIndicator = (index) => {
     if (isStepCompleted(index)) {
       return (
-        <div className="w-6 h-6 rounded-full bg-success flex items-center justify-center flex-shrink-0">
+        <div className="w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0 transition-all duration-300">
           <Check className="w-3.5 h-3.5 text-white" />
+        </div>
+      )
+    }
+    if (isStepLocked(index)) {
+      return (
+        <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
+          <Lock className="w-3 h-3 text-gray-300" />
         </div>
       )
     }
     const isActive = expandedStep === index
     return (
-      <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold ${
-        isActive ? 'bg-primary text-white' : 'bg-gray-200 text-gray-500'
+      <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold transition-all duration-200 ${
+        isActive ? 'bg-primary text-white ring-2 ring-primary/20' : 'bg-gray-200 text-gray-500'
       }`}>
         {index + 1}
       </div>
@@ -122,35 +192,43 @@ export default function OnboardingWidget({ selectedBrand, isAutopilotEnabled, is
 
   const renderStepContent = (step, index) => {
     if (expandedStep !== index) return null
+    if (isStepLocked(index)) return null
 
     return (
       <div className="mt-2.5 ml-9 animate-step-enter">
         <p className="text-xs text-gray-500 leading-relaxed mb-2">{step.description}</p>
 
-        {/* Highlights */}
         <div className="mb-3 space-y-1.5">
           {step.highlights.map((text, i) => (
             <div key={i} className="flex items-start gap-1.5">
-              <CircleCheck className="w-3 h-3 text-success mt-0.5 flex-shrink-0" />
+              <CircleCheck className="w-3 h-3 text-emerald-500 mt-0.5 flex-shrink-0" />
               <span className="text-[11px] text-gray-600 leading-relaxed">{text}</span>
             </div>
           ))}
         </div>
 
-        {/* CTA button */}
         {!isStepCompleted(index) && (
-          <button
-            onClick={() => handleCTAClick(index)}
-            className="w-full flex items-center justify-center gap-1.5 px-3 py-2 bg-gradient-to-r from-primary to-purple-600 text-white text-xs font-medium rounded-lg hover:shadow-primary-focus transition-shadow"
-          >
-            {step.ctaText}
-            <ChevronRight className="w-3.5 h-3.5" />
-          </button>
+          <div className="space-y-2">
+            <button
+              onClick={() => handleCTAClick(index)}
+              className="w-full flex items-center justify-center gap-1.5 px-3 py-2 bg-gradient-to-r from-primary to-purple-600 text-white text-xs font-medium rounded-lg hover:shadow-lg hover:shadow-primary/25 transition-all active:scale-[0.98]"
+            >
+              {step.ctaText}
+              <ChevronRight className="w-3.5 h-3.5" />
+            </button>
+            {index === 2 && (
+              <button
+                onClick={handleAcknowledgeStep3}
+                className="w-full text-xs font-medium text-gray-500 hover:text-gray-700 transition-colors"
+              >
+                已了解功能，暂不需要
+              </button>
+            )}
+          </div>
         )}
 
-        {/* Completed badge */}
         {isStepCompleted(index) && (
-          <div className="flex items-center gap-1.5 text-xs text-success font-medium">
+          <div className="flex items-center gap-1.5 text-xs text-emerald-600 font-medium">
             <Check className="w-3.5 h-3.5" />
             已完成
           </div>
@@ -176,7 +254,7 @@ export default function OnboardingWidget({ selectedBrand, isAutopilotEnabled, is
                 <span className="text-sm font-semibold text-gray-900">Getting Started</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-xs text-gray-500">{completedCount}/3</span>
+                <span className="text-xs text-gray-500">{completedCount}/{totalSteps}</span>
                 <button
                   onClick={handleClose}
                   className="p-0.5 rounded hover:bg-white/60 text-gray-400 hover:text-gray-600 transition-colors"
@@ -189,10 +267,10 @@ export default function OnboardingWidget({ selectedBrand, isAutopilotEnabled, is
             {/* Progress bar */}
             <div className="px-4 pt-3 flex-shrink-0">
               <div className="flex gap-1">
-                {[0, 1, 2].map(i => (
+                {Array.from({ length: totalSteps }, (_, i) => (
                   <div
                     key={i}
-                    className={`h-1 flex-1 rounded-full transition-colors ${
+                    className={`h-1 flex-1 rounded-full transition-all duration-500 ${
                       completedSteps.includes(i) ? 'bg-primary' : 'bg-gray-200'
                     }`}
                   />
@@ -201,42 +279,61 @@ export default function OnboardingWidget({ selectedBrand, isAutopilotEnabled, is
             </div>
 
             {/* Steps accordion */}
-            <div className="px-4 py-3 space-y-1 overflow-y-auto flex-1">
-              {STEPS.map((step, index) => (
-                <div key={index} className="group">
-                  {/* Step header row */}
-                  <button
-                    onClick={() => toggleStepExpand(index)}
-                    className="w-full flex items-center gap-2.5 py-2 text-left hover:bg-gray-50 rounded-lg px-1 transition-colors"
-                  >
-                    {renderStepIndicator(index)}
-                    <span className={`text-xs font-medium flex-1 ${
-                      isStepCompleted(index) ? 'text-gray-900' : expandedStep === index ? 'text-gray-900' : 'text-gray-400'
-                    }`}>
-                      {step.title}
-                    </span>
-                    {expandedStep === index ? (
-                      <ChevronUp className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
-                    ) : (
-                      <ChevronDown className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
-                    )}
-                  </button>
+            <div className="px-4 py-3 space-y-0.5 overflow-y-auto flex-1">
+              {STEPS.map((step, index) => {
+                const StepIcon = step.icon
+                const locked = isStepLocked(index)
 
-                  {/* Step expanded content */}
-                  {renderStepContent(step, index)}
+                return (
+                  <div key={index} className="group">
+                    <button
+                      onClick={() => toggleStepExpand(index)}
+                      disabled={locked}
+                      className={`w-full flex items-center gap-2.5 py-2 text-left rounded-lg px-1 transition-colors ${
+                        locked ? 'cursor-not-allowed opacity-50' : 'hover:bg-gray-50'
+                      }`}
+                    >
+                      {renderStepIndicator(index)}
+                      <span className={`text-xs font-medium flex-1 ${
+                        isStepCompleted(index)
+                          ? 'text-gray-900'
+                          : expandedStep === index
+                            ? 'text-gray-900'
+                            : locked
+                              ? 'text-gray-300'
+                              : 'text-gray-400'
+                      }`}>
+                        {step.title}
+                      </span>
+                      {!locked && (
+                        expandedStep === index ? (
+                          <ChevronUp className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
+                        ) : (
+                          <ChevronDown className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
+                        )
+                      )}
+                    </button>
 
-                  {/* Separator */}
-                  {index < 2 && <div className="border-b border-gray-100 mx-1 mt-1" />}
-                </div>
-              ))}
+                    {renderStepContent(step, index)}
+
+                    {index < totalSteps - 1 && <div className="border-b border-gray-100 mx-1 mt-1" />}
+                  </div>
+                )
+              })}
             </div>
 
             {/* Complete button — only when all done */}
             {allDone && (
               <div className="px-4 pb-4 flex-shrink-0">
+                <div className="flex items-center gap-2 mb-3 px-1">
+                  <PartyPopper className="w-4 h-4 text-amber-500" />
+                  <span className="text-xs font-medium text-gray-700">
+                    基础设置已完成，AdsGo 正在全力优化你的广告！
+                  </span>
+                </div>
                 <button
                   onClick={handleComplete}
-                  className="w-full flex items-center justify-center gap-1.5 px-3 py-2.5 bg-gradient-to-r from-primary to-purple-600 text-white text-sm font-medium rounded-lg hover:shadow-primary-focus transition-shadow"
+                  className="w-full flex items-center justify-center gap-1.5 px-3 py-2.5 bg-gradient-to-r from-primary to-purple-600 text-white text-sm font-medium rounded-lg hover:shadow-lg hover:shadow-primary/25 transition-all active:scale-[0.98]"
                 >
                   Complete Onboarding
                   <Check className="w-4 h-4" />
@@ -256,7 +353,12 @@ export default function OnboardingWidget({ selectedBrand, isAutopilotEnabled, is
           <Compass className="w-5 h-5" />
           {!allDone && (
             <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-white text-primary text-[10px] font-bold flex items-center justify-center shadow-sm border border-primary-100">
-              {Math.min(completedCount + 1, 3)}
+              {completedCount + 1 <= totalSteps ? completedCount + 1 : totalSteps}
+            </span>
+          )}
+          {allDone && (
+            <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center shadow-sm">
+              <Check className="w-3 h-3" />
             </span>
           )}
         </button>

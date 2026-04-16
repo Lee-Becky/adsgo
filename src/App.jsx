@@ -56,8 +56,10 @@ function App() {
   const [budgetReasonData, setBudgetReasonData] = useState(null)
   const [showBudgetEdit, setShowBudgetEdit] = useState(false)
   const [budgetStatus, setBudgetStatus] = useState({})
-  const [autoExecuteRecommendations, setAutoExecuteRecommendations] = useState(false) // lifted for onboarding
-  const [autoRegenEnabled, setAutoRegenEnabled] = useState(false) // lifted for onboarding
+  const [autoExecuteRecommendations, setAutoExecuteRecommendations] = useState(false)
+  const [autoRegenEnabled, setAutoRegenEnabled] = useState(false)
+  const [publishedAt, setPublishedAt] = useState(null)
+  const [goalConfigured, setGoalConfigured] = useState(false)
   const [isOverviewConnected, setIsOverviewConnected] = useState(false) // Home page connection state
   const [isOverviewDataFetching, setIsOverviewDataFetching] = useState(false) // Home page data fetching state
   const [isDashboardConnected, setIsDashboardConnected] = useState(false) // Ad Manager page connection state
@@ -191,6 +193,8 @@ function App() {
             onAutoExecuteChange={setAutoExecuteRecommendations}
             autoRegenEnabled={autoRegenEnabled}
             onAutoRegenChange={setAutoRegenEnabled}
+            publishedAt={publishedAt}
+            goalConfigured={goalConfigured}
           />
         )
       case 'overview':
@@ -232,7 +236,14 @@ function App() {
           />
         )
       case 'batchGenerateAds':
-        return <BatchGenerateAds onPageChange={handlePageChange} />
+        return (
+          <BatchGenerateAds
+            onPageChange={handlePageChange}
+            onPublishSuccess={() => {
+              if (!publishedAt) setPublishedAt(Date.now())
+            }}
+          />
+        )
       case 'aiGenerate':
         return <AIGenerate />
       case 'generateVideo':
@@ -268,7 +279,7 @@ function App() {
       case 'brandProfile':
         return <BrandProfile />
       case 'optimizeGoals':
-        return <OptimizeGoals />
+        return <OptimizeGoals onGoalSave={() => setGoalConfigured(true)} />
       case 'products':
         return (
           <ProductList 
@@ -340,6 +351,8 @@ function App() {
             brands={brands}
             autoExecuteRecommendations={autoExecuteRecommendations}
             autoRegenEnabled={autoRegenEnabled}
+            publishedAt={publishedAt}
+            goalConfigured={goalConfigured}
           >
             {/* Main Content Area - Scrollable */}
             {renderContent()}

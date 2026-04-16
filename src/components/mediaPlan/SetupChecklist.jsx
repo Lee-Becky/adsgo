@@ -1,5 +1,5 @@
 import React from 'react'
-import { DollarSign, Layers, Upload, Target, CheckCircle, ArrowRight } from 'lucide-react'
+import { DollarSign, Layers, Upload, CheckCircle, ArrowRight } from 'lucide-react'
 
 const CHECKLIST_ITEMS = [
   {
@@ -32,17 +32,8 @@ const CHECKLIST_ITEMS = [
     title: 'Upload More Creatives',
     description: 'More creative variants help AI find winning combinations faster.',
     type: 'navigate',
-    targetPage: 'creativeLibrary',
+    targetPage: 'creativeHub/aiGenerate',
     color: 'bg-purple-100 text-purple-600',
-  },
-  {
-    id: 'review_goals',
-    icon: Target,
-    title: 'Review Goals & Budget',
-    description: 'Make sure your KPI targets and daily budget are set correctly.',
-    type: 'navigate',
-    targetPage: 'optimizeGoals',
-    color: 'bg-emerald-100 text-emerald-600',
   },
 ]
 

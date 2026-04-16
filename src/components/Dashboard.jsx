@@ -528,8 +528,8 @@ const Dashboard = ({ selectedBrand, onPageChange, onEditBrandConfig }) => {
               })}
             </div>
 
-            {/* Chart using Recharts */}
-            <div className="flex-1 bg-white rounded-xl border border-gray-200 p-6 min-h-[320px]">
+            {/* Chart using Recharts — explicit height avoids Recharts width/height -1 in flex layout */}
+            <div className="bg-white rounded-xl border border-gray-200 p-6 h-[320px] min-h-[320px] min-w-0">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={performanceChartData}>
                   <defs>

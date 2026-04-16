@@ -7,7 +7,7 @@ import {
   ObjectiveOverview 
 } from './optimizeGoals/index'
 
-const OptimizeGoals = () => {
+const OptimizeGoals = ({ onGoalSave }) => {
   const [formData, setFormData] = useState({
     marketGroups: [
       {
@@ -51,6 +51,7 @@ const OptimizeGoals = () => {
 
   const handleSave = () => {
     console.log('Saving strategy...', formData)
+    if (onGoalSave) onGoalSave()
   }
 
   return (
