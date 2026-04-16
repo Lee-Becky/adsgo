@@ -14,7 +14,13 @@ export function useOnboardingState({
   const prevLengthRef = useRef(0)
 
   const markStepCompleted = useCallback((index) => {
-    setCompletedSteps(prev => (prev.includes(index) ? prev : [...prev, index]))
+    setCompletedSteps(prev => {
+      // 顺序完成：前置步骤未完成时不允许标记
+      for (let i = 0; i < index; i++) {
+        if (!prev.includes(i)) return prev
+      }
+      return prev.includes(index) ? prev : [...prev, index]
+    })
   }, [])
 
   const dismiss = useCallback(() => setDismissed(true), [])

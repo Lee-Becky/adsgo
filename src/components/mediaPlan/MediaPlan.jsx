@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { CalendarDays, ClipboardCheck, Lightbulb } from 'lucide-react'
 import { MOCK_CAMPAIGNS } from '../adManagerV3/mockData'
 import { CAMPAIGN_CARDS } from '../autoRegeneration/mockData'
@@ -11,23 +11,11 @@ import AdsGoOperations, { aggregateBudgetSuggestions, formatBudgetSummary } from
 import HighlightsCard from './HighlightsCard'
 import DevGuideButton from './DevGuideButton'
 import { DEV_GUIDES } from './devGuideContent'
+import DemoPhaseSwitch from './DemoPhaseSwitch'
 import PrePublishView from './PrePublishView'
 import JustLaunchedView from './JustLaunchedView'
 import DormantView from './DormantView'
 
-const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000
-
-function resolvePhase(publishedAt, hasActiveCampaigns, hasHistoricalData) {
-  if (!publishedAt) return 'new_user'
-
-  const hoursSincePublish = Date.now() - publishedAt
-
-  if (hasActiveCampaigns) {
-    return hoursSincePublish < TWENTY_FOUR_HOURS ? 'just_launched' : 'running'
-  }
-
-  return hasHistoricalData ? 'dormant' : 'new_user'
-}
 
 export default function MediaPlan({
   selectedBrand,
@@ -98,45 +86,61 @@ export default function MediaPlan({
     }
   }, [campaigns, kpiType, kpiTarget, dailyBudget])
 
-  const hasActiveCampaigns = computed.activeCampaigns.length > 0
-  const hasHistoricalData = campaigns.some(c => c.todayMetrics?.spend > 0)
-  const currentPhase = resolvePhase(publishedAt, hasActiveCampaigns, hasHistoricalData)
+  const [demoPhase, setDemoPhase] = useState('new_user')
+
+  // 数据驱动自动切换：publishedAt 被设置时从 new_user 自动推进到 just_launched
+  useEffect(() => {
+    if (publishedAt) {
+      setDemoPhase(prev => prev === 'new_user' ? 'just_launched' : prev)
+    }
+  }, [publishedAt])
 
   // ── Pre-publish State ──
-  if (currentPhase === 'new_user') {
+  if (demoPhase === 'new_user') {
     return (
-      <PrePublishView onPageChange={onPageChange} />
+      <div className="p-6">
+        <DemoPhaseSwitch value={demoPhase} onChange={setDemoPhase} />
+        <PrePublishView onPageChange={onPageChange} />
+      </div>
     )
   }
 
   // ── Just Launched State (within 24h) ──
-  if (currentPhase === 'just_launched') {
+  if (demoPhase === 'just_launched') {
     const setupAllDone = goalConfigured && autoExecuteRecommendations && autoRegenEnabled
     return (
-      <JustLaunchedView
-        autoExecuteRecommendations={autoExecuteRecommendations}
-        autoRegenEnabled={autoRegenEnabled}
-        onAutoExecuteChange={onAutoExecuteChange}
-        onAutoRegenChange={onAutoRegenChange}
-        onPageChange={onPageChange}
-        goalConfigured={goalConfigured}
-        setupAllDone={setupAllDone}
-      />
+      <div className="p-6">
+        <DemoPhaseSwitch value={demoPhase} onChange={setDemoPhase} />
+        <JustLaunchedView
+          autoExecuteRecommendations={autoExecuteRecommendations}
+          autoRegenEnabled={autoRegenEnabled}
+          onAutoExecuteChange={onAutoExecuteChange}
+          onAutoRegenChange={onAutoRegenChange}
+          onPageChange={onPageChange}
+          goalConfigured={goalConfigured}
+          setupAllDone={setupAllDone}
+        />
+      </div>
     )
   }
 
   // ── Dormant State ──
-  if (currentPhase === 'dormant') {
+  if (demoPhase === 'dormant') {
     return (
-      <DormantView onPageChange={onPageChange} onRestart={(type) => {
-        console.log('Restart type:', type)
-      }} />
+      <div className="p-6">
+        <DemoPhaseSwitch value={demoPhase} onChange={setDemoPhase} />
+        <DormantView onPageChange={onPageChange} onRestart={(type) => {
+          console.log('Restart type:', type)
+          setDemoPhase('running')
+        }} />
+      </div>
     )
   }
 
   // ── Running State (24h+ with active campaigns) ──
   return (
-    <div className="space-y-5">
+    <div className="p-6 space-y-5">
+      <DemoPhaseSwitch value={demoPhase} onChange={setDemoPhase} />
       {/* Section 1: Summary */}
       <SummaryCard
         kpiTrend={computed.kpiTrend}

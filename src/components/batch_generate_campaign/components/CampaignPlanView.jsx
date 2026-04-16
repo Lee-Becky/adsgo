@@ -1006,7 +1006,6 @@ const CampaignPlanView = ({
                           audienceType === 'INT' ? 'bg-white text-amber-600 border-amber-100' :
                           'bg-white text-primary-500 border-primary-200'
                         }`}
-                        title="点击切换受众策略 (Adv+ / LAL / INT)"
                       >
                         <Users size={18} />
                         <span className="text-xs font-medium mt-0.5">{AUDIENCE_SHORT_LABELS[audienceType]}</span>
