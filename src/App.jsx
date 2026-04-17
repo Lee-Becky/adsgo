@@ -43,6 +43,13 @@ function App() {
   useEffect(() => {
     resetModalCounter()
   }, [location.pathname])
+
+  // 默认重定向至 mediaPlan
+  useEffect(() => {
+    if (location.pathname === '/') {
+      navigate('/mediaPlan', { replace: true })
+    }
+  }, [])
   const currentPage = useMemo(() => {
     const path = location.pathname.slice(1) || 'mediaPlan'
     // 获取路径的最后一部分作为页面 key

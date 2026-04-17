@@ -6,9 +6,9 @@ import { useLocation } from 'react-router-dom'
 const Header = ({ toggleSidebar, isMobile }) => {
   const location = useLocation()
   // 获取路径的最后一部分作为页面 key
-  const path = location.pathname.slice(1) || 'overview'
+  const path = location.pathname.slice(1) || 'mediaPlan'
   const parts = path.split('/')
-  const currentPage = parts[parts.length - 1] || 'overview'
+  const currentPage = parts[parts.length - 1] || 'mediaPlan'
   const pageInfo = getPageInfo(currentPage)
   const [languageDropdownOpen, setLanguageDropdownOpen] = useState(false)
   const [selectedLanguage, setSelectedLanguage] = useState('English')
