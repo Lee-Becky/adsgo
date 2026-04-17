@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { CalendarDays, ClipboardCheck, Lightbulb } from 'lucide-react'
 import { MOCK_CAMPAIGNS } from '../adManagerV3/mockData'
 import { CAMPAIGN_CARDS } from '../autoRegeneration/mockData'
@@ -16,6 +16,7 @@ import PrePublishView from './PrePublishView'
 import JustLaunchedView from './JustLaunchedView'
 import DormantView from './DormantView'
 
+
 export default function MediaPlan({
   selectedBrand,
   onPageChange,
@@ -23,16 +24,15 @@ export default function MediaPlan({
   onAutoExecuteChange,
   autoRegenEnabled,
   onAutoRegenChange,
+  publishedAt,
+  goalConfigured,
 }) {
-  const [demoPhase, setDemoPhase] = useState('new_user')
   const { kpiType, kpiTarget, dailyBudget } = STATUS_BAR_DATA
   const campaigns = MOCK_CAMPAIGNS
 
-  // ── Core computed values (shared across modules) ──
   const computed = useMemo(() => {
     const activeCampaigns = campaigns.filter(c => c.status === 'active')
 
-    // KPI aggregation
     const todaySpend = activeCampaigns.reduce((sum, c) => sum + c.todayMetrics.spend, 0)
     const cappedSpend = Math.min(todaySpend, dailyBudget)
 
@@ -58,19 +58,15 @@ export default function MediaPlan({
     const phase = getPhase(kpiAchievement)
     const kpiTrend = buildKPITrend(activeCampaigns, kpiType)
 
-    // Budget suggestions
     const budgetCounts = aggregateBudgetSuggestions(campaigns)
     const pendingBudgetCount = budgetCounts.increase + budgetCounts.decrease + budgetCounts.pause
     const budgetSummaryText = formatBudgetSummary(budgetCounts)
 
-    // Creative timing
     const daysSinceLastCreative = Math.floor(
       (Date.now() - new Date(OPERATIONS_DATA.lastCreativeGenTime).getTime()) / (1000 * 60 * 60 * 24)
     )
 
-    // Draft campaigns
     const draftCampaignCount = CAMPAIGN_CARDS.length
-
     const spendPercent = dailyBudget > 0 ? cappedSpend / dailyBudget : 0
     const activeCreativeCount = OPERATIONS_DATA.activeCreativeCount
 
@@ -90,6 +86,15 @@ export default function MediaPlan({
     }
   }, [campaigns, kpiType, kpiTarget, dailyBudget])
 
+  const [demoPhase, setDemoPhase] = useState('new_user')
+
+  // 数据驱动自动切换：publishedAt 被设置时从 new_user 自动推进到 just_launched
+  useEffect(() => {
+    if (publishedAt) {
+      setDemoPhase(prev => prev === 'new_user' ? 'just_launched' : prev)
+    }
+  }, [publishedAt])
+
   // ── Pre-publish State ──
   if (demoPhase === 'new_user') {
     return (
@@ -100,8 +105,9 @@ export default function MediaPlan({
     )
   }
 
-  // ── Just Launched State ──
+  // ── Just Launched State (within 24h) ──
   if (demoPhase === 'just_launched') {
+    const setupAllDone = goalConfigured && autoExecuteRecommendations && autoRegenEnabled
     return (
       <div className="p-6">
         <DemoPhaseSwitch value={demoPhase} onChange={setDemoPhase} />
@@ -111,6 +117,8 @@ export default function MediaPlan({
           onAutoExecuteChange={onAutoExecuteChange}
           onAutoRegenChange={onAutoRegenChange}
           onPageChange={onPageChange}
+          goalConfigured={goalConfigured}
+          setupAllDone={setupAllDone}
         />
       </div>
     )
@@ -129,11 +137,10 @@ export default function MediaPlan({
     )
   }
 
-  // ── Running State (new redesigned dashboard) ──
+  // ── Running State (24h+ with active campaigns) ──
   return (
     <div className="p-6 space-y-5">
       <DemoPhaseSwitch value={demoPhase} onChange={setDemoPhase} />
-
       {/* Section 1: Summary */}
       <SummaryCard
         kpiTrend={computed.kpiTrend}
@@ -160,44 +167,38 @@ export default function MediaPlan({
           </div>
           <DevGuideButton title="Weekly Strategy" content={DEV_GUIDES.weeklyPlan} />
         </div>
-      <div className="bg-white rounded-xl border border-[#F0F0F0] shadow-[-2px_2px_16px_rgba(14,0,45,0.06)] p-5">
-        <WeeklyPlanCard hideTitle weeksData={WEEKLY_PLANS} onTodoToggle={(weekId, todoId) => {
-          console.log('Todo toggled:', weekId, todoId)
-        }} />
+        <div className="bg-white rounded-xl border border-[#F0F0F0] shadow-[-2px_2px_16px_rgba(14,0,45,0.06)] p-5">
+          <WeeklyPlanCard hideTitle weeksData={WEEKLY_PLANS} />
 
-        {/* Spacer for arrow overflow */}
-        <div className="pt-5" />
+          <div className="pt-5" />
 
-        <ScoreCard
-          dimensionsData={DIMENSION_SCORES}
-          phaseData={CAMPAIGN_PHASE_DATA}
-          onDimensionSelect={(dimensionId) => {
-            console.log('Dimension selected:', dimensionId)
-          }}
-        />
-      </div>
+          <ScoreCard
+            dimensionsData={DIMENSION_SCORES}
+            phaseData={CAMPAIGN_PHASE_DATA}
+            onDimensionSelect={(dimensionId) => {
+              console.log('Dimension selected:', dimensionId)
+            }}
+          />
+        </div>
       </div>
 
-      {/* Section 4: Live Operations */}
+      {/* Section 3: Live Operations */}
       <div>
         <h3 className="text-base font-semibold text-gray-900 mb-4 flex items-center gap-2">
           <ClipboardCheck className="w-4.5 h-4.5 text-primary-500" />
           Optimization Review
         </h3>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          {/* Left: AdsGo Operations */}
           <div className="bg-white rounded-xl border border-[#F0F0F0] shadow-[-2px_2px_16px_rgba(14,0,45,0.06)] p-5">
             <AdsGoOperations campaigns={campaigns} />
           </div>
 
-          {/* Right: Highlights of the past 7 days */}
           <HighlightsCard
             actionBenefits={HIGHLIGHTS_DATA.actionBenefits}
             highlights={HIGHLIGHTS_DATA.highlights}
           />
         </div>
       </div>
-
     </div>
   )
 }

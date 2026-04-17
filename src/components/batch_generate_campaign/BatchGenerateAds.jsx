@@ -837,7 +837,7 @@ const NamingStrategySection = ({
 
 // ─────────────────────────────────────────────────────────────────────────────
 
-const BatchGenerateAds = ({ onPageChange }) => {
+const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
   const [selectedProducts, setSelectedProducts] = useState([]);
   const [productCreativesMap, setProductCreativesMap] = useState({});
   const [selectedAccount, setSelectedAccount] = useState(() =>
@@ -1132,8 +1132,9 @@ const BatchGenerateAds = ({ onPageChange }) => {
 
   const handlePublishComplete = () => {
     setShowPublishModal(false);
+    if (onPublishSuccess) onPublishSuccess();
     if (onPageChange) {
-      onPageChange('adManagerV3');
+      onPageChange('mediaPlan');
     }
   };
 

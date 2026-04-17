@@ -5,7 +5,7 @@ import Header from './Header'
 import GlobalDemoOverlay from './GlobalDemoOverlay'
 import OnboardingWidget from './onboarding/OnboardingWidget'
 
-const MainLayout = ({ children, showDemoOverlay, onDemoConnect, onDemoCreate, selectedBrand, onBrandChange, onCreateBrand, brands = [], autoExecuteRecommendations, autoRegenEnabled }) => {
+const MainLayout = ({ children, showDemoOverlay, onDemoConnect, onDemoCreate, selectedBrand, onBrandChange, onCreateBrand, brands = [], autoExecuteRecommendations, autoRegenEnabled, publishedAt, goalConfigured }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [isPinned, setIsPinned] = useState(() => {
     const saved = localStorage.getItem('sidebarPinned')
@@ -102,6 +102,8 @@ const MainLayout = ({ children, showDemoOverlay, onDemoConnect, onDemoCreate, se
         {/* Onboarding Widget */}
         <OnboardingWidget
           selectedBrand={selectedBrand}
+          publishedAt={publishedAt}
+          goalConfigured={goalConfigured}
           isAutopilotEnabled={autoExecuteRecommendations}
           isAutoPublishEnabled={autoRegenEnabled}
         />

@@ -806,10 +806,6 @@ const CampaignPreviewView = ({
 
   const applyNameTemplate = (template, vars) =>
     template.replace(/\{(\w+)\}/g, (_, k) => {
-      if (k === 'creative_num' && vars[k] !== undefined) {
-        const n = vars[k];
-        return `${n} ${n === 1 ? 'creative' : 'creatives'}`;
-      }
       return vars[k] !== undefined && vars[k] !== null ? String(vars[k]) : `{${k}}`;
     });
 
@@ -890,7 +886,7 @@ const CampaignPreviewView = ({
         const copy = p ? getAdCopy(p) : { headline: '', body: '' };
         result.push({
           id: `${adSetIdx}-flex-${Math.floor(j / 10)}`,
-          name: applyNameTemplate(adNameTemplate, { product_name: resolveProduct(c0)?.name || namePrefix, ad_format: 'FLEXIBLE', date: today, CTA: selectedCta, creative_num: chunk.length }),
+          name: applyNameTemplate(adNameTemplate, { Brand: brand?.name || 'MyBrand', creative_type: 'Flexible', number: chunk.length, date: today }),
           headline: [copy.headline],
           primaryText: [copy.body],
           imageUrl: c0.url,
@@ -911,7 +907,7 @@ const CampaignPreviewView = ({
       const copy = p ? getAdCopy(p) : { headline: '', body: '' };
       return {
         id: `${adSetIdx}-${cIdx}`,
-        name: applyNameTemplate(adNameTemplate, { product_name: p?.name || '', ad_format: 'SINGLE', date: today, CTA: selectedCta, creative_num: 1 }),
+        name: applyNameTemplate(adNameTemplate, { Brand: brand?.name || 'MyBrand', creative_type: 'Single', number: 1, date: today }),
         headline: [copy.headline],
         primaryText: [copy.body],
         imageUrl: c.url,
@@ -934,7 +930,7 @@ const CampaignPreviewView = ({
         const audienceType = initialAdsetAudiences[i % initialAdsetAudiences.length] || 'ADV';
         const _sa0 = adsetAudienceDetails[i]?.savedAudience ?? null;
         adSets.push({
-          name: applyNameTemplate(adsetNameTemplate, { locations: locStr, audience_strategy: audienceType, creative_num: 1, date: today }),
+          name: applyNameTemplate(adsetNameTemplate, { location: locStr, audience_type: audienceType, creative_type: isFlexible ? 'Flexible' : 'Single', date: today }),
           audienceType,
           ageMin: _sa0?.ageMin ?? 18, ageMax: _sa0?.ageMax ?? 65, gender: _sa0?.gender ?? 'All',
           locations: ['United States'],
@@ -973,7 +969,7 @@ const CampaignPreviewView = ({
             
             const _sa1 = adsetAudienceDetails[adSetOverallIdx]?.savedAudience ?? null;
             adSets.push({
-              name: applyNameTemplate(adsetNameTemplate, { locations: locStr, audience_strategy: audienceType, creative_num: creatives.length, date: today }),
+              name: applyNameTemplate(adsetNameTemplate, { location: locStr, audience_type: audienceType, creative_type: isFlexible ? 'Flexible' : 'Single', date: today }),
               audienceType,
               ageMin: _sa1?.ageMin ?? 18, ageMax: _sa1?.ageMax ?? 65, gender: _sa1?.gender ?? 'All',
               locations: ['United States'],
@@ -994,7 +990,7 @@ const CampaignPreviewView = ({
           const audienceType = initialAdsetAudiences[i % initialAdsetAudiences.length] || 'ADV';
           const _sa2 = adsetAudienceDetails[i]?.savedAudience ?? null;
           adSets.push({
-            name: applyNameTemplate(adsetNameTemplate, { locations: locStr, audience_strategy: audienceType, creative_num: allCreativesPool.length, date: today }),
+            name: applyNameTemplate(adsetNameTemplate, { location: locStr, audience_type: audienceType, creative_type: isFlexible ? 'Flexible' : 'Single', date: today }),
             audienceType,
             ageMin: _sa2?.ageMin ?? 18, ageMax: _sa2?.ageMax ?? 65, gender: _sa2?.gender ?? 'All',
             locations: ['United States'],
@@ -1023,7 +1019,7 @@ const CampaignPreviewView = ({
             
             const _sa3 = adsetAudienceDetails[i]?.savedAudience ?? null;
             adSets.push({
-              name: applyNameTemplate(adsetNameTemplate, { locations: locStr, audience_strategy: audienceType, creative_num: chunk.length, date: today }),
+              name: applyNameTemplate(adsetNameTemplate, { location: locStr, audience_type: audienceType, creative_type: isFlexible ? 'Flexible' : 'Single', date: today }),
               audienceType,
               ageMin: _sa3?.ageMin ?? 18, ageMax: _sa3?.ageMax ?? 65, gender: _sa3?.gender ?? 'All',
               locations: ['United States'],

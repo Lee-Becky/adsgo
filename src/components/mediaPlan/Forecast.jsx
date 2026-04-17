@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react'
-import { LineChart, Line } from 'recharts'
+import { LineChart, Line, YAxis } from 'recharts'
+import { getKpiTrendYAxisMax } from './StatusBar'
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react'
 import DevGuideButton from './DevGuideButton'
 import { DEV_GUIDES } from './devGuideContent'
@@ -111,6 +112,8 @@ export default function Forecast({ kpiTrend, kpiType, currentKPI, kpiTarget }) {
     }
   }, [kpiTrend, kpiType, currentKPI, kpiTarget])
 
+  const trendYMax = useMemo(() => getKpiTrendYAxisMax(kpiTrend, kpiTarget), [kpiTrend, kpiTarget])
+
   const style = SENTIMENT_STYLES[forecast.sentiment]
   const ForecastIcon = forecast.icon
 
@@ -140,6 +143,7 @@ export default function Forecast({ kpiTrend, kpiType, currentKPI, kpiTarget }) {
         {kpiTrend.length >= 2 && (
           <div className="flex-shrink-0">
             <LineChart width={140} height={56} data={kpiTrend}>
+              <YAxis type="number" hide domain={[0, trendYMax]} />
               <Line
                 type="monotone"
                 dataKey="kpiValue"
@@ -147,6 +151,7 @@ export default function Forecast({ kpiTrend, kpiType, currentKPI, kpiTarget }) {
                 strokeWidth={2}
                 dot={false}
                 isAnimationActive={false}
+                connectNulls
               />
             </LineChart>
           </div>

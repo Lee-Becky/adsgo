@@ -1,8 +1,10 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Plus, Pencil } from 'lucide-react'
 import BrandDetailEdit from './BrandDetailEdit'
 
 const BrandManagement = ({ editingBrand: externalEditingBrand, onClearEditingBrand }) => {
+  const navigate = useNavigate()
   const [internalEditingBrand, setInternalEditingBrand] = useState(null)
   
   // Use external editingBrand if provided, otherwise use internal state
@@ -126,7 +128,10 @@ const BrandManagement = ({ editingBrand: externalEditingBrand, onClearEditingBra
                   <Pencil size={16} />
                   <span>Edit</span>
                 </button>
-                <button className="flex-1 flex items-center justify-center gap-2 text-sm text-white bg-primary hover:bg-primary/90 py-2.5 rounded-lg transition-colors">
+                <button
+                  onClick={() => navigate('/batchGenerateAds')}
+                  className="flex-1 flex items-center justify-center gap-2 text-sm text-white bg-primary hover:bg-primary/90 py-2.5 rounded-lg transition-colors"
+                >
                   <Plus size={16} />
                   <span>New campaign</span>
                 </button>

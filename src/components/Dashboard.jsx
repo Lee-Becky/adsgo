@@ -1,23 +1,10 @@
-import { useState, useEffect } from 'react'
-import { 
-  Layout, 
-  Target, 
-  TrendingUp, 
-  Globe, 
-  DollarSign, 
-  Activity, 
-  Info, 
-  Calendar, 
-  ChevronDown, 
-  Edit2,
-  AlertCircle,
+﻿import { useState, useEffect } from 'react'
+import {
+  Calendar,
   Check,
-  X,
   ChevronLeft,
   ChevronRight,
   BarChart3,
-  Sparkles,
-  Clock
 } from 'lucide-react'
 import { 
   AreaChart, 
@@ -28,21 +15,12 @@ import {
   Tooltip, 
   ResponsiveContainer 
 } from 'recharts'
-import BrandDataOverlay from './BrandDataOverlay'
-
 const Dashboard = ({ selectedBrand, onPageChange, onEditBrandConfig }) => {
-  // Brand data status: 'no-accounts' | 'fetching' | 'no-data' | 'success'
-  const [brandDataStatus, setBrandDataStatus] = useState('no-accounts')
   const [dataPeriod, setDataPeriod] = useState('Last 7 days')
   const [customStartDate, setCustomStartDate] = useState('')
   const [customEndDate, setCustomEndDate] = useState('')
   const [showCalendar, setShowCalendar] = useState(false)
   const [selectedMetrics, setSelectedMetrics] = useState(['spend', 'roas'])
-  const [autoBudgetTransfer, setAutoBudgetTransfer] = useState(false)
-  const [autoCampaignLaunch, setAutoCampaignLaunch] = useState(false)
-  const [autoBudgetEnabled, setAutoBudgetEnabled] = useState(false)
-  const [dailyBudget, setDailyBudget] = useState('200')
-  const [hoveredAccount, setHoveredAccount] = useState(null)
 
   // Initialize with Last 7 days
   useEffect(() => {
@@ -154,29 +132,6 @@ const Dashboard = ({ selectedBrand, onPageChange, onEditBrandConfig }) => {
     }
     return days
   }
-  // Account data
-  const accounts = {
-    meta: {
-      logoUrl: 'https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://meta.com&size=256',
-      accounts: [
-        { name: 'AdsGo 01', id: '12345678' },
-        { name: 'AdsGo 02', id: '34523456' },
-        { name: 'AdsGo 03', id: '56789012' },
-        { name: 'AdsGo 04', id: '78901234' }
-      ]
-    },
-    google: {
-      logoUrl: 'https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://google.com&size=256',
-      accounts: [
-        { name: 'AdsGo 01', id: '98765432' },
-        { name: 'AdsGo 02', id: '87654321' },
-        { name: 'AdsGo 03', id: '76543210' },
-        { name: 'AdsGo 04', id: '65432109' },
-        { name: 'AdsGo 05', id: '54321098' }
-      ]
-    }
-  }
-
   const metrics = [
     { key: 'spend', label: 'Spend', value: '$1,310', color: '#7033F5' },
     { key: 'cpm', label: 'CPM', value: '$8.50', color: '#D946EF' },
@@ -259,139 +214,10 @@ const Dashboard = ({ selectedBrand, onPageChange, onEditBrandConfig }) => {
     return null
   }
 
-  const optimizationItems = [
-    {
-      id: 1,
-      title: 'Brand Promotion Campaign',
-      description: 'Recommend increasing budget to $800/day',
-      type: 'increase'
-    },
-    {
-      id: 2,
-      title: 'Retargeting Campaign',
-      description: 'Recommend pausing inefficient ad sets',
-      type: 'pause'
-    },
-    {
-      id: 3,
-      title: 'New Product Launch',
-      description: 'Recommend launching new ad sets immediately',
-      type: 'launch'
-    }
-  ]
-
-  // Generate daily performance data based on selected date range
-  const generateDailyPerformanceData = () => {
-    const startDate = customStartDate ? new Date(customStartDate) : new Date()
-    const endDate = customEndDate ? new Date(customEndDate) : new Date()
-    const data = []
-    
-    const currentDate = new Date(startDate)
-    while (currentDate <= endDate) {
-      const dateLabel = currentDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
-      
-      // Generate random performance data
-      const impressions = Math.floor(30000 + Math.random() * 40000)
-      const clicks = Math.floor(impressions * (0.015 + Math.random() * 0.02))
-      const spend = Math.floor(100 + Math.random() * 400)
-      const cpm = (spend / impressions) * 1000
-      const cpc = spend / clicks
-      const ctr = (clicks / impressions) * 100
-      
-      // Event1s data
-      const event1s = Math.floor(clicks * (0.03 + Math.random() * 0.05))
-      const cpaEvent1s = event1s > 0 ? spend / event1s : 0
-      const cvrEvent1s = clicks > 0 ? (event1s / clicks) * 100 : 0
-      
-      // Event2s data
-      const event2s = Math.floor(clicks * (0.02 + Math.random() * 0.04))
-      const cpaEvent2s = event2s > 0 ? spend / event2s : 0
-      const cvrEvent2s = clicks > 0 ? (event2s / clicks) * 100 : 0
-      
-      // Event3s data
-      const event3s = Math.floor(clicks * (0.01 + Math.random() * 0.03))
-      const cpaEvent3s = event3s > 0 ? spend / event3s : 0
-      const cvrEvent3s = clicks > 0 ? (event3s / clicks) * 100 : 0
-      
-      // Purchase value and ROAS
-      const purchaseValue = Math.floor(event3s * (15 + Math.random() * 10))
-      const roas = spend > 0 ? purchaseValue / spend : 0
-      
-      data.push({
-        date: dateLabel,
-        dailyBudget: parseInt(dailyBudget),
-        spend: spend.toFixed(2),
-        impressions: impressions,
-        cpm: cpm.toFixed(2),
-        clicks: clicks,
-        cpc: cpc.toFixed(2),
-        ctr: ctr.toFixed(2),
-        event1s: event1s,
-        cpaEvent1s: cpaEvent1s.toFixed(2),
-        cvrEvent1s: cvrEvent1s.toFixed(2),
-        event2s: event2s,
-        cpaEvent2s: cpaEvent2s.toFixed(2),
-        cvrEvent2s: cvrEvent2s.toFixed(2),
-        event3s: event3s,
-        cpaEvent3s: cpaEvent3s.toFixed(2),
-        cvrEvent3s: cvrEvent3s.toFixed(2),
-        purchaseValue: purchaseValue,
-        roas: roas.toFixed(2)
-      })
-      
-      currentDate.setDate(currentDate.getDate() + 1)
-    }
-    
-    return data.reverse() // Show most recent dates first
-  }
-
-  const dailyPerformanceData = generateDailyPerformanceData()
-
-  // Handle connect account
-  const handleConnectAccount = () => {
-    // TODO: Implement connect account logic
-    console.log('Connect account clicked')
-    // For demo, simulate fetching
-    setBrandDataStatus('fetching')
-  }
-
-  // Handle create campaign
-  const handleCreateCampaign = () => {
-    // TODO: Implement create campaign logic
-    console.log('Create campaign clicked')
-    // For demo, simulate fetching
-    setBrandDataStatus('fetching')
-  }
-
-  // Handle retry data fetch
-  const handleRetry = () => {
-    console.log('Retry data fetch')
-    setBrandDataStatus('fetching')
-    // Simulate data fetch
-    setTimeout(() => {
-      setBrandDataStatus('success')
-    }, 2000)
-  }
-
-  // Handle view demo (normal state)
-  const handleViewDemo = () => {
-    console.log('View demo clicked')
-    setBrandDataStatus('success')
-  }
-
-  // Handle view error
-  const handleViewError = () => {
-    console.log('View error clicked')
-    setBrandDataStatus('no-data')
-  }
 
   return (
     <div className="space-y-6">
-      {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-        {/* AI Optimization Section - Left Column (2/3) */}
-        <div className="lg:col-span-2">
-          <div className="bg-white rounded-xl border border-border shadow-sm p-6 h-full flex flex-col">
+      <div className="bg-white rounded-2xl border border-border shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-6 flex flex-col">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-primary/10 rounded-lg">
@@ -528,8 +354,8 @@ const Dashboard = ({ selectedBrand, onPageChange, onEditBrandConfig }) => {
               })}
             </div>
 
-            {/* Chart using Recharts */}
-            <div className="flex-1 bg-white rounded-xl border border-gray-200 p-6 min-h-[320px]">
+            {/* Chart using Recharts 鈥?explicit height avoids Recharts width/height -1 in flex layout */}
+            <div className="bg-white rounded-xl border border-gray-200 p-6 h-[320px] min-h-[320px] min-w-0">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={performanceChartData}>
                   <defs>
@@ -611,202 +437,6 @@ const Dashboard = ({ selectedBrand, onPageChange, onEditBrandConfig }) => {
                 })}
               </div>
             </div>
-          </div>
-        </div>
-
-        {/* Optimization Overview - Right Column (1/3) */}
-        <div className="lg:col-span-1">
-          <div className="bg-slate-50/50 border border-blue-100 rounded-2xl p-4 shadow-sm h-full flex flex-col">
-            <div className="flex items-center justify-between border-b border-slate-200 pb-1.5 mb-4 shrink-0">
-              <div className="flex items-center gap-2">
-                <Sparkles size={16} className="text-blue-500" />
-                <div className="flex items-baseline gap-3">
-                  <h3 className="text-base font-black text-slate-800 tracking-wide">Optimization Overview</h3>
-                  <div className="flex items-center gap-1.5 px-2 py-0.5 bg-blue-100/50 rounded-full text-[11px] font-black text-blue-600 border border-blue-200">
-                    <Clock size={10} />
-                    <span>2026-01-15 13:29</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex-1 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent">
-              {/* AI Summary Section - Direct rendering without title/logo */}
-              <div className="mb-4">
-                <div className="space-y-2">
-                  <p className="text-xs text-slate-700 font-medium leading-relaxed">
-                    Overall performance improved by <span className="text-green-600 font-bold">23%</span> compared to yesterday, ROI increased from 3.2 to 4.2, and conversion cost decreased by 15%.
-                  </p>
-                  <div className="space-y-1.5">
-                    <div className="flex items-start gap-2">
-                      <span className="text-blue-600 font-bold text-xs">→</span>
-                      <p className="text-[11px] text-slate-600 font-medium leading-snug flex-1">
-                        Brand promotion Campaign ROI reached 4.2, exceeding target by 40%, recommend increasing budget for more conversions.
-                      </p>
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <span className="text-amber-600 font-bold text-xs">→</span>
-                      <p className="text-[11px] text-slate-600 font-medium leading-snug flex-1">
-                        Search ad CTR still below industry average, recommend optimizing keywords to improve click-through rate.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Key Highlights Section */}
-              <div className="mb-4">
-                <div className="bg-white border border-green-200 rounded-xl p-3 shadow-sm">
-                  <div className="flex items-center gap-1.5 mb-3 pb-2 border-b border-green-100 shrink-0">
-                    <div className="w-4 h-4 bg-green-100 rounded-lg flex items-center justify-center">
-                      <Check size={12} className="text-green-600" />
-                    </div>
-                    <span className="text-xs font-black text-green-700 tracking-wide">Key Highlights</span>
-                  </div>
-                  <div className="max-h-[120px] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-transparent">
-                    <div className="space-y-2">
-                      <div className="bg-green-50/50 border border-green-100 rounded-lg px-2.5 py-1.5 flex items-start gap-2">
-                        <div className="mt-0.5 shrink-0 w-0.5 h-0.5 rounded-full bg-green-600" />
-                        <p className="text-[10px] text-slate-700 font-semibold leading-snug flex-1">
-                          Brand promotion Campaign ROI reached 4.2, exceeding target by 40%
-                        </p>
-                      </div>
-                      <div className="bg-green-50/50 border border-green-100 rounded-lg px-2.5 py-1.5 flex items-start gap-2">
-                        <div className="mt-0.5 shrink-0 w-0.5 h-0.5 rounded-full bg-green-600" />
-                        <p className="text-[10px] text-slate-700 font-semibold leading-snug flex-1">
-                          Display ad CVR reached 3.5%, industry leading
-                        </p>
-                      </div>
-                      <div className="bg-green-50/50 border border-green-100 rounded-lg px-2.5 py-1.5 flex items-start gap-2">
-                        <div className="mt-0.5 shrink-0 w-0.5 h-0.5 rounded-full bg-green-600" />
-                        <p className="text-[10px] text-slate-700 font-semibold leading-snug flex-1">
-                          TikTok Ads CTR increased to 3.2%, young audience response positive
-                        </p>
-                      </div>
-                      <div className="bg-green-50/50 border border-green-100 rounded-lg px-2.5 py-1.5 flex items-start gap-2">
-                        <div className="mt-0.5 shrink-0 w-0.5 h-0.5 rounded-full bg-green-600" />
-                        <p className="text-[10px] text-slate-700 font-semibold leading-snug flex-1">
-                          Overall traffic quality stable, invalid click rate decreased by 8%
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Potential Risks Section */}
-              <div>
-                <div className="bg-white border border-amber-200 rounded-xl p-3 shadow-sm">
-                  <div className="flex items-center gap-1.5 mb-3 pb-2 border-b border-amber-100 shrink-0">
-                    <div className="w-4 h-4 bg-amber-100 rounded-lg flex items-center justify-center">
-                      <AlertCircle size={12} className="text-amber-600" />
-                    </div>
-                    <span className="text-xs font-black text-amber-700 tracking-wide">Potential Risks</span>
-                  </div>
-                  <div className="max-h-[120px] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-transparent">
-                    <div className="space-y-2">
-                      <div className="bg-amber-50/50 border border-amber-100 rounded-lg px-2.5 py-1.5 flex items-start gap-2">
-                        <div className="mt-0.5 shrink-0 w-0.5 h-0.5 rounded-full bg-amber-600" />
-                        <p className="text-[10px] text-slate-700 font-semibold leading-snug flex-1">
-                          Search ad CTR still below industry average (1.2% vs 2.5%), keywords need optimization
-                        </p>
-                      </div>
-                      <div className="bg-amber-50/50 border border-amber-100 rounded-lg px-2.5 py-1.5 flex items-start gap-2">
-                        <div className="mt-0.5 shrink-0 w-0.5 h-0.5 rounded-full bg-amber-600" />
-                        <p className="text-[10px] text-slate-700 font-semibold leading-snug flex-1">
-                          Facebook Ads cost is high, recommend reevaluating launch strategy
-                        </p>
-                      </div>
-                      <div className="bg-amber-50/50 border border-amber-100 rounded-lg px-2.5 py-1.5 flex items-start gap-2">
-                        <div className="mt-0.5 shrink-0 w-0.5 h-0.5 rounded-full bg-amber-600" />
-                        <p className="text-[10px] text-slate-700 font-semibold leading-snug flex-1">
-                          CPM increased by 35.6% from $1.80 to $2.44, market competition intensified
-                        </p>
-                      </div>
-                      <div className="bg-amber-50/50 border border-amber-100 rounded-lg px-2.5 py-1.5 flex items-start gap-2">
-                        <div className="mt-0.5 shrink-0 w-0.5 h-0.5 rounded-full bg-amber-600" />
-                        <p className="text-[10px] text-slate-700 font-semibold leading-snug flex-1">
-                          CPA target of $0.5031 too aggressive, historical best $0.65 still exceeds target by 29%
-                        </p>
-                      </div>
-                      <div className="bg-amber-50/50 border border-amber-100 rounded-lg px-2.5 py-1.5 flex items-start gap-2">
-                        <div className="mt-0.5 shrink-0 w-0.5 h-0.5 rounded-full bg-amber-600" />
-                        <p className="text-[10px] text-slate-700 font-semibold leading-snug flex-1">
-                          Campaign paused on 01-12, CPA=$0.70 was optimal before pause
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="space-y-2.5 mt-4 pt-3 border-t border-slate-200 shrink-0">
-              <button 
-                onClick={() => onPageChange('adManagerV3')}
-                className="w-full py-2.5 bg-gradient-to-r from-primary to-primary/80 text-white rounded-xl font-bold text-sm hover:shadow-lg hover:shadow-primary/20 transition-all"
-              >
-                View budget adjustment suggestions
-              </button>
-              <button 
-                onClick={() => onPageChange('autoRegeneration')}
-                className="w-full py-2.5 border-2 border-primary text-primary rounded-xl font-bold text-sm hover:bg-primary/5 transition-colors"
-              >
-                View new campaign suggestions
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Daily Performance Section */}
-      <div className="bg-white rounded-xl border border-border shadow-sm p-6">
-        <h2 className="text-xl font-bold text-gray-900 mb-6">Daily Performance</h2>
-
-        {/* Performance Table */}
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-border">
-                <th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">Date</th>
-                <th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">Daily Budget</th>
-                <th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">Spend</th>
-                <th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">Impressions</th>
-                <th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">CPM</th>
-                <th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">Clicks</th>
-                <th className="text-left py-3 px-4 text-sm font-bold text-blue-600">CPC<br/><span className="font-normal text-gray-500 text-xs">(CTR)</span></th>
-                <th className="text-left py-3 px-4 text-sm font-bold text-blue-600">Event1s</th>
-                <th className="text-left py-3 px-4 text-sm font-bold text-blue-600">CPA-Event1s<br/><span className="font-normal text-gray-500 text-xs">(CVR)</span></th>
-                <th className="text-left py-3 px-4 text-sm font-bold text-blue-600">Event2s</th>
-                <th className="text-left py-3 px-4 text-sm font-bold text-blue-600">CPA-Event2s<br/><span className="font-normal text-gray-500 text-xs">(CVR)</span></th>
-                <th className="text-left py-3 px-4 text-sm font-bold text-blue-600">Event3s</th>
-                <th className="text-left py-3 px-4 text-sm font-bold text-blue-600">CPA-Event3s<br/><span className="font-normal text-gray-500 text-xs">(CVR)</span></th>
-                <th className="text-left py-3 px-4 text-sm font-bold text-blue-600">Purchase value<br/><span className="font-normal text-gray-500 text-xs">(ROAS)</span></th>
-              </tr>
-            </thead>
-            <tbody>
-              {dailyPerformanceData.map((row, index) => (
-                <tr key={index} className="border-b border-border hover:bg-gray-50">
-                  <td className="py-3 px-4 text-sm font-medium text-gray-900 text-left">{row.date}</td>
-                  <td className="py-3 px-4 text-sm text-gray-900 text-left">${row.dailyBudget}</td>
-                  <td className="py-3 px-4 text-sm text-gray-900 text-left">${row.spend}</td>
-                  <td className="py-3 px-4 text-sm text-gray-900 text-left">{row.impressions.toLocaleString()}</td>
-                  <td className="py-3 px-4 text-sm text-gray-900 text-left">${row.cpm}</td>
-                  <td className="py-3 px-4 text-sm text-gray-900 text-left">{row.clicks.toLocaleString()}</td>
-                  <td className="py-3 px-4 text-sm text-gray-900 text-left">${row.cpc}<br/><span className="text-gray-500 text-xs">{row.ctr}%</span></td>
-                  <td className="py-3 px-4 text-sm text-gray-900 text-left">{row.event1s}</td>
-                  <td className="py-3 px-4 text-sm text-gray-900 text-left">${row.cpaEvent1s}<br/><span className="text-gray-500 text-xs">{row.cvrEvent1s}%</span></td>
-                  <td className="py-3 px-4 text-sm text-gray-900 text-left">{row.event2s}</td>
-                  <td className="py-3 px-4 text-sm text-gray-900 text-left">${row.cpaEvent2s}<br/><span className="text-gray-500 text-xs">{row.cvrEvent2s}%</span></td>
-                  <td className="py-3 px-4 text-sm text-gray-900 text-left">{row.event3s}</td>
-                  <td className="py-3 px-4 text-sm text-gray-900 text-left">${row.cpaEvent3s}<br/><span className="text-gray-500 text-xs">{row.cvrEvent3s}%</span></td>
-                  <td className="py-3 px-4 text-sm text-gray-900 text-left">${row.purchaseValue}<br/><span className="text-gray-500 text-xs">{row.roas}</span></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
       </div>
     </div>
   )

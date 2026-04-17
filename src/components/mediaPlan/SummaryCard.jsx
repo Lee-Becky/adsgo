@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react'
 import { TrendingUp, TrendingDown, Minus, Target, DollarSign, Zap, LayoutDashboard } from 'lucide-react'
-import { AreaChart, Area, XAxis, ReferenceLine, ResponsiveContainer } from 'recharts'
+import { AreaChart, Area, XAxis, YAxis, ReferenceLine, ResponsiveContainer } from 'recharts'
+import { getKpiTrendYAxisMax } from './StatusBar'
 import DevGuideButton from './DevGuideButton'
 import { DEV_GUIDES } from './devGuideContent'
 
@@ -172,6 +173,8 @@ export default function SummaryCard({ kpiTrend, kpiType, currentKPI, kpiTarget, 
   const style = SENTIMENT_STYLES[summary.sentiment]
   const SummaryIcon = ICON_MAP[summary.icon]
 
+  const trendYMax = useMemo(() => getKpiTrendYAxisMax(kpiTrend, kpiTarget), [kpiTrend, kpiTarget])
+
   // Split body: first sentence bold, rest normal
   const bodyParts = useMemo(() => {
     const firstDot = summary.body.indexOf('.')
@@ -238,7 +241,11 @@ export default function SummaryCard({ kpiTrend, kpiType, currentKPI, kpiTarget, 
                       tick={{ fontSize: 9, fill: '#9ca3af' }}
                       axisLine={false}
                       tickLine={false}
+                      tickFormatter={(v) =>
+                        typeof v === 'string' && /^\d{4}-\d{2}-\d{2}/.test(v) ? v.slice(5, 10) : v
+                      }
                     />
+                    <YAxis type="number" hide domain={[0, trendYMax]} />
                     <ReferenceLine
                       y={kpiTarget}
                       stroke="#d1d5db"
@@ -254,6 +261,8 @@ export default function SummaryCard({ kpiTrend, kpiType, currentKPI, kpiTarget, 
                       fill="url(#summaryGrad)"
                       dot={false}
                       isAnimationActive={false}
+                      connectNulls
+                      baseLine={0}
                     />
                   </AreaChart>
                 </ResponsiveContainer>
