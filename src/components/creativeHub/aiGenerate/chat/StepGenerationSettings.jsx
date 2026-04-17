@@ -1,139 +1,246 @@
 import { useState } from 'react';
-import { ChevronDown, Check, Sparkles } from 'lucide-react';
-import { AiMessage } from './ChatMessage';
-import { SUGGESTIONS, QTY_OPTIONS, RATIO_OPTIONS } from '../constants';
-import { getNextModalZIndex } from '../../../../constants/zIndex';
+import { ChevronDown, ChevronRight, Check, RefreshCw, ArrowUpRight, Sparkles, Lock } from 'lucide-react';
+import { CHAT_SUGGESTIONS, CHAT_IMG_RATIO_OPTIONS, CHAT_IMG_RATIO_MORE_OPTIONS, RatioBox } from '../constants';
+
+function cn(...classes) {
+  return classes.filter(Boolean).join(' ');
+}
 
 export default function StepGenerationSettings({
-  card4,
-  openDropdown,
-  onSetRequirements,
+  chatQuantity,
+  chatRatios,
+  chatRequirements,
+  chatSuggestionPage,
+  chatSelectedTemplates,
   onSetQuantity,
-  onToggleRatio,
-  onToggleDropdown,
+  onSetRatios,
+  onSetRequirements,
+  onSetSuggestionPage,
+  onGenerate,
 }) {
-  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [quantityOpen, setQuantityOpen] = useState(false);
+  const [ratioOpen, setRatioOpen] = useState(false);
+  const [ratioMoreOpen, setRatioMoreOpen] = useState(false);
+
+  const currentRatio = [...chatRatios][0] ?? '1:1';
+  const allRatioOptions = [...CHAT_IMG_RATIO_OPTIONS, ...CHAT_IMG_RATIO_MORE_OPTIONS];
+  const currentRatioTip = allRatioOptions.find(r => r.v === currentRatio)?.tip ?? '';
+
+  const handleSelectRatio = v => {
+    onSetRatios(new Set([v]));
+    setRatioOpen(false);
+    setRatioMoreOpen(false);
+  };
+
+  const isMultiTemplate = chatSelectedTemplates.size > 1;
+
+  const pageSuggestions = CHAT_SUGGESTIONS.slice(chatSuggestionPage * 3, chatSuggestionPage * 3 + 3);
 
   return (
-    <AiMessage text="Almost there! Customize your generation settings, or use the AI defaults">
-      <div className="space-y-3">
-        {/* Requirements */}
-        <div className="space-y-1.5">
-          <div className="flex items-center justify-between">
-            <label className="text-xs font-medium text-gray-700">
-              Special Requirements <span className="text-gray-400 font-normal">(optional)</span>
-            </label>
-            <button
-              onClick={() => setShowSuggestions(!showSuggestions)}
-              className="text-[10px] text-primary-500 hover:text-primary-600 font-medium transition-colors flex items-center gap-0.5"
-            >
-              <Sparkles className="w-3 h-3" />Suggestions
-            </button>
-          </div>
-          <input
-            type="text"
-            placeholder="e.g. add a discount badge, holiday feel..."
-            value={card4.requirements}
-            onChange={(e) => onSetRequirements(e.target.value)}
-            className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all"
-          />
-          {showSuggestions && (
-            <div className="flex flex-wrap gap-1.5">
-              {SUGGESTIONS.map((s, i) => (
-                <button
-                  key={i}
-                  onClick={() => {
-                    onSetRequirements(s);
-                    setShowSuggestions(false);
-                  }}
-                  className="px-2.5 py-1 rounded-full text-xs font-medium bg-primary-50 text-primary-600 border border-primary-200 hover:bg-primary-100 transition-all"
-                >
-                  {s}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-
+    <div className="w-[520px] space-y-4">
+      {/* Quantity + Ratio row */}
+      <div className="flex gap-4">
         {/* Quantity */}
-        <div className="space-y-1.5">
-          <label className="text-xs font-medium text-gray-700">Quantity</label>
-          <div className="relative" data-dropdown="qty">
-            <button
-              onClick={(e) => { e.stopPropagation(); onToggleDropdown('qty'); }}
-              className={`w-full flex items-center justify-between px-3 py-2 bg-white border rounded-lg text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all ${
-                openDropdown === 'qty' ? 'border-primary-500 ring-2 ring-primary-500/20' : 'border-gray-300 hover:border-gray-400'
-              }`}
-            >
-              <span>{card4.quantity} creative{card4.quantity > 1 ? 's' : ''}</span>
-              <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${openDropdown === 'qty' ? 'rotate-180' : ''}`} />
-            </button>
-            {openDropdown === 'qty' && (
-              <div
-                className="absolute left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden"
-                style={{ zIndex: getNextModalZIndex() }}
-              >
-                <div className="py-1">
-                  {QTY_OPTIONS.map(q => (
-                    <button
-                      key={q}
-                      onClick={(e) => { e.stopPropagation(); onSetQuantity(q); }}
-                      className={`w-full px-3 py-2 text-left text-sm transition-colors flex items-center justify-between ${
-                        card4.quantity === q ? 'bg-primary-50 text-primary-600 font-medium' : 'text-gray-700 hover:bg-gray-50'
-                      }`}
-                    >
-                      {q} creative{q > 1 ? 's' : ''}
-                      {card4.quantity === q && <Check className="w-4 h-4 text-primary-500" />}
-                    </button>
-                  ))}
+        <div className="flex-1 space-y-1.5">
+          <label className="text-sm font-medium text-gray-700 block">Quantity</label>
+          <div className="relative">
+            {isMultiTemplate ? (
+              <div className="relative group/locktip w-full flex items-center justify-between px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-400 cursor-not-allowed select-none">
+                <span>{chatSelectedTemplates.size} Image{chatSelectedTemplates.size > 1 ? 's' : ''}</span>
+                <Lock size={13} className="text-gray-300" />
+                <div className="pointer-events-none absolute bottom-full right-0 mb-2 hidden group-hover/locktip:block w-max max-w-[220px] bg-gray-900/90 text-white text-xs rounded-lg px-2.5 py-1.5 shadow-lg leading-relaxed z-10">
+                  <div className="absolute top-full right-3 border-4 border-transparent border-t-gray-900/90" />
+                  As you chose {chatSelectedTemplates.size} templates, one image will be generated for each.
                 </div>
               </div>
+            ) : (
+              <>
+                <button
+                  type="button"
+                  onClick={() => { setQuantityOpen(v => !v); setRatioOpen(false); }}
+                  className={cn(
+                    'w-full flex items-center justify-between px-3 py-2 bg-white border rounded-lg text-sm text-gray-700 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all',
+                    quantityOpen ? 'border-primary-500 ring-2 ring-primary-500/20' : 'border-gray-300'
+                  )}
+                >
+                  <span>{chatQuantity} Image{chatQuantity > 1 ? 's' : ''}</span>
+                  <ChevronDown size={14} className={cn('text-gray-400 transition-transform duration-200', quantityOpen && 'rotate-180')} />
+                </button>
+                {quantityOpen && (
+                  <>
+                    <div className="fixed inset-0" style={{ zIndex: 49 }} onClick={() => setQuantityOpen(false)} />
+                    <div className="absolute left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg py-1" style={{ zIndex: 50 }}>
+                      {[1, 2, 3, 4].map(val => (
+                        <button
+                          key={val}
+                          onClick={() => { onSetQuantity(val); setQuantityOpen(false); }}
+                          className={cn(
+                            'w-full px-3 py-2 text-left text-sm transition-colors flex items-center justify-between',
+                            chatQuantity === val ? 'bg-primary-50 text-primary-600 font-medium' : 'text-gray-700 hover:bg-gray-50'
+                          )}
+                        >
+                          {val} Image{val > 1 ? 's' : ''}
+                          {chatQuantity === val && <Check size={13} className="text-primary-500 shrink-0" />}
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </>
             )}
           </div>
         </div>
 
-        {/* Aspect Ratio */}
-        <div className="space-y-1.5">
-          <label className="text-xs font-medium text-gray-700">
-            Aspect Ratio <span className="text-gray-400 font-normal">(multi-select)</span>
-          </label>
-          <div className="relative" data-dropdown="ratio">
+        {/* Ratio */}
+        <div className="flex-1 space-y-1.5">
+          <label className="text-sm font-medium text-gray-700 block">Ratio</label>
+          <div className="relative">
             <button
-              onClick={(e) => { e.stopPropagation(); onToggleDropdown('ratio'); }}
-              className={`w-full flex items-center justify-between px-3 py-2 bg-white border rounded-lg text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all ${
-                openDropdown === 'ratio' ? 'border-primary-500 ring-2 ring-primary-500/20' : 'border-gray-300 hover:border-gray-400'
-              }`}
+              type="button"
+              onClick={() => { setRatioOpen(v => !v); setQuantityOpen(false); }}
+              className={cn(
+                'w-full flex items-center justify-between px-3 py-2 bg-white border rounded-lg text-sm text-gray-700 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all',
+                ratioOpen ? 'border-primary-500 ring-2 ring-primary-500/20' : 'border-gray-300'
+              )}
             >
-              <span className="truncate">{[...card4.ratios].join(', ')}</span>
-              <ChevronDown className={`w-4 h-4 text-gray-400 flex-shrink-0 transition-transform duration-200 ${openDropdown === 'ratio' ? 'rotate-180' : ''}`} />
+              <span className="flex items-center gap-2">
+                <RatioBox v={currentRatio} />
+                <span className="font-medium">{currentRatio}</span>
+                <span className="text-gray-400 text-xs">{currentRatioTip}</span>
+              </span>
+              <ChevronDown size={14} className={cn('text-gray-400 transition-transform duration-200', ratioOpen && 'rotate-180')} />
             </button>
-            {openDropdown === 'ratio' && (
-              <div
-                className="absolute left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden"
-                style={{ zIndex: getNextModalZIndex() }}
-              >
-                <div className="py-1">
-                  {RATIO_OPTIONS.map(r => {
-                    const active = card4.ratios.has(r.v);
+
+            {ratioOpen && (
+              <>
+                <div
+                  className="fixed inset-0"
+                  style={{ zIndex: 49 }}
+                  onClick={() => { setRatioOpen(false); setRatioMoreOpen(false); }}
+                />
+                <div className="absolute left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg py-1" style={{ zIndex: 50 }}>
+                  <div className="px-3 pt-1.5 pb-1">
+                    <span className="text-xs font-medium text-gray-400">Commonly Used</span>
+                  </div>
+                  {CHAT_IMG_RATIO_OPTIONS.map(r => {
+                    const isSelected = currentRatio === r.v;
                     return (
                       <button
                         key={r.v}
-                        onClick={(e) => { e.stopPropagation(); onToggleRatio(r.v); }}
-                        className={`w-full px-3 py-2 text-left text-sm transition-colors flex items-center justify-between ${
-                          active ? 'bg-primary-50 text-primary-600 font-medium' : 'text-gray-700 hover:bg-gray-50'
-                        }`}
+                        onClick={() => handleSelectRatio(r.v)}
+                        className={cn(
+                          'w-full px-3 py-2 text-left text-sm transition-colors flex items-center gap-2',
+                          isSelected ? 'bg-primary-50 text-primary-600 font-medium' : 'text-gray-700 hover:bg-gray-50'
+                        )}
                       >
-                        <span>{r.label} <span className={`text-xs ${active ? 'text-primary-400' : 'text-gray-400'}`}>{r.tip}</span></span>
-                        {active && <Check className="w-4 h-4 text-primary-500 flex-shrink-0" />}
+                        <RatioBox v={r.v} />
+                        <span className="font-medium w-12 shrink-0">{r.v}</span>
+                        <span className={cn('flex-1 text-xs', isSelected ? 'text-primary-400' : 'text-gray-400')}>{r.tip}</span>
+                        {isSelected && <Check size={13} className="text-primary-500 shrink-0" />}
                       </button>
                     );
                   })}
+
+                  <div className="mx-2 my-1 border-t border-gray-100" />
+
+                  {/* More Ratios flyout */}
+                  <div className="relative">
+                    <button
+                      onClick={e => { e.stopPropagation(); setRatioMoreOpen(v => !v); }}
+                      className={cn(
+                        'w-full px-3 py-2 text-left text-sm transition-colors flex items-center justify-between',
+                        ratioMoreOpen ? 'bg-primary-50 text-primary-600' : 'text-gray-700 hover:bg-gray-50'
+                      )}
+                    >
+                      <span className="font-medium">More Ratios</span>
+                      <ChevronRight size={13} className={cn('transition-colors', ratioMoreOpen ? 'text-primary-400' : 'text-gray-400')} />
+                    </button>
+                    {ratioMoreOpen && (
+                      <div
+                        className="absolute bottom-0 left-full ml-1.5 w-52 bg-white border border-gray-200 rounded-lg shadow-lg py-1"
+                        style={{ zIndex: 51 }}
+                      >
+                        <div className="px-3 pt-1.5 pb-1">
+                          <span className="text-xs font-medium text-gray-400">More Ratios</span>
+                        </div>
+                        {CHAT_IMG_RATIO_MORE_OPTIONS.map(r => {
+                          const isSelected = currentRatio === r.v;
+                          return (
+                            <button
+                              key={r.v}
+                              onClick={() => handleSelectRatio(r.v)}
+                              className={cn(
+                                'w-full px-3 py-2 text-left text-sm transition-colors flex items-center gap-2 whitespace-nowrap',
+                                isSelected ? 'bg-primary-50 text-primary-600 font-medium' : 'text-gray-700 hover:bg-gray-50'
+                              )}
+                            >
+                              <RatioBox v={r.v} />
+                              <span className="font-medium w-12 shrink-0">{r.v}</span>
+                              <span className={cn('flex-1 text-xs', isSelected ? 'text-primary-400' : 'text-gray-400')}>{r.tip}</span>
+                              {isSelected && <Check size={13} className="text-primary-500 shrink-0" />}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
+              </>
             )}
           </div>
         </div>
       </div>
-    </AiMessage>
+
+      {/* Additional requirements */}
+      <div className="space-y-1.5">
+        <div className="flex items-center justify-between">
+          <label className="text-sm font-medium text-gray-700">
+            Additional Requirements <span className="text-xs text-gray-400 font-normal">(Optional)</span>
+          </label>
+        </div>
+        <textarea
+          placeholder="e.g. add a discount badge, holiday feel..."
+          value={chatRequirements}
+          onChange={e => onSetRequirements(e.target.value)}
+          rows={4}
+          className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all resize-none"
+        />
+
+        {/* Suggestion chips */}
+        <div className="flex items-center gap-2 pt-0.5">
+          <span className="text-xs text-gray-400">Suggested</span>
+          <button
+            onClick={() => onSetSuggestionPage(p => (p + 1) % Math.ceil(CHAT_SUGGESTIONS.length / 3))}
+            className="p-1 rounded-full text-gray-400 hover:text-primary-500 hover:bg-primary-50 transition-colors"
+            title="Refresh suggestions"
+          >
+            <RefreshCw size={12} />
+          </button>
+        </div>
+        <div className="flex flex-wrap gap-1.5">
+          {pageSuggestions.map(s => (
+            <button
+              key={s}
+              onClick={() => onSetRequirements(s)}
+              className="group px-2.5 py-1 rounded-full text-sm font-normal bg-white border border-gray-200 text-gray-600 hover:border-primary-300 hover:text-primary-600 hover:bg-primary-50 transition-all inline-flex items-center gap-1.5"
+            >
+              <span>{s}</span>
+              <ArrowUpRight size={12} className="text-gray-400 group-hover:text-primary-500 transition-colors" />
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Generate button */}
+      <div className="flex justify-end pt-1">
+        <button
+          onClick={onGenerate}
+          className="flex items-center gap-2 px-6 h-10 bg-primary-500 text-white text-sm font-semibold rounded-full hover:bg-primary-600 active:bg-primary-700 shadow-sm shadow-primary-500/20 whitespace-nowrap transition-all focus:outline-none focus:ring-2 focus:ring-primary-500/20"
+        >
+          <Sparkles size={14} />
+          Start Generation
+        </button>
+      </div>
+    </div>
   );
 }

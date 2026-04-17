@@ -1,177 +1,338 @@
 import { useRef, useEffect } from 'react';
-import { PlusCircle, Sparkles } from 'lucide-react';
-import { AiMessage, UserBubble } from './chat/ChatMessage';
+import { Undo2, Link as LinkIcon, Globe, Sparkles } from 'lucide-react';
 import StepSourceSelect from './chat/StepSourceSelect';
 import StepConfirmImage from './chat/StepConfirmImage';
 import StepConfirmTemplate from './chat/StepConfirmTemplate';
 import StepGenerationSettings from './chat/StepGenerationSettings';
-import {
-  SOURCES, PRODUCTS, PRODUCT_IMAGES, STYLES,
-  productImg, templateImg, SOURCE_ICONS,
-} from './constants';
+import { AiAvatar, CHAT_PRODUCTS, CHAT_TEMPLATES } from './constants';
+
+function cn(...classes) {
+  return classes.filter(Boolean).join(' ');
+}
+
+// A message bubble from the AI
+function AiMessage({ text }) {
+  return (
+    <div className="flex items-start gap-3">
+      <div className="shrink-0 mt-0.5"><AiAvatar uid="msg" /></div>
+      <p className="text-[16px] text-[#141414] mt-2">{text}</p>
+    </div>
+  );
+}
+
+// A user reply bubble with optional "undo" button
+function UserBubble({ onUndo, children }) {
+  return (
+    <div className="flex justify-end">
+      <div className="group/bubble relative flex items-center gap-2.5 bg-primary-50 rounded-xl rounded-tr-sm px-3.5 py-2.5">
+        {children}
+        {onUndo && (
+          <button
+            onClick={onUndo}
+            className="absolute -bottom-8 right-0 w-6 h-6 flex items-center justify-center bg-white border border-gray-200 rounded-full shadow-sm text-gray-400 hover:text-primary-500 hover:border-primary-300 transition-colors opacity-0 group-hover/bubble:opacity-100"
+          >
+            <Undo2 size={12} />
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
 
 export default function ChatPanel({
-  activeStep, card1, card2, card3, card4,
-  sources, openDropdown, generating,
-  onSelectSource, onSelectProduct, onConfirmStep, onChangeStep,
-  onChangePhase, onSelectImage, onSetBrowsing, onSelectTemplate,
-  onSetRequirements, onSetQuantity, onToggleRatio, onToggleDropdown,
-  onNewTask, onGenerate,
+  // State
+  chatStep,
+  chatPhase,
+  chatSource,
+  chatThirdPartyPlatform,
+  chatProductIdx,
+  chatProductCategoryFilter,
+  chatSearchQuery,
+  chatUrlValue,
+  chatUrlError,
+  chatIsSyncing,
+  chatImportPhase,
+  chatSelectedImages,
+  chatProductTitle,
+  chatTargetAudience,
+  chatSellingPoints,
+  chatOriginalPrice,
+  chatPromoPrice,
+  chatPromoText,
+  chatBrandColors,
+  chatHasLogo,
+  chatEditingColorIdx,
+  chatTemplateCategory,
+  chatSelectedTemplates,
+  chatQuantity,
+  chatRatios,
+  chatRequirements,
+  chatSuggestionPage,
+  // Callbacks
+  onSetPhase,
+  onSetSource,
+  onSetThirdPartyPlatform,
+  onSetProductIdx,
+  onSetProductCategoryFilter,
+  onSetSearchQuery,
+  onSetUrlValue,
+  onSetUrlError,
+  onToggleImage,
+  onSetProductTitle,
+  onSetTargetAudience,
+  onSetSellingPoint,
+  onSetOriginalPrice,
+  onSetPromoPrice,
+  onSetPromoText,
+  onSetBrandColor,
+  onSetHasLogo,
+  onSetEditingColorIdx,
+  onSetTemplateCategory,
+  onToggleTemplate,
+  onSetQuantity,
+  onSetRatios,
+  onSetRequirements,
+  onSetSuggestionPage,
+  onConfirmStep,
+  onChangeStep,
+  onOpenConnectModal,
+  onGenerate,
 }) {
-  const chatFlowRef = useRef(null);
+  const chatEndRef = useRef(null);
 
+  // Auto-scroll to bottom when step or phase changes
   useEffect(() => {
-    if (chatFlowRef.current) {
-      setTimeout(() => {
-        chatFlowRef.current.scrollTo({ top: chatFlowRef.current.scrollHeight, behavior: 'smooth' });
-      }, 50);
-    }
-  }, [activeStep, card1, card2, card3]);
+    const timer = setTimeout(() => {
+      chatEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 80);
+    return () => clearTimeout(timer);
+  }, [chatStep, chatPhase, chatImportPhase, chatTemplateCategory]);
 
-  const isReady = activeStep >= 4;
-  const style = STYLES.find(s => s.id === card3.selectedStyle) || STYLES[0];
-  const buttonText = isReady
-    ? `Generate ${card4.quantity} creatives \u00b7 ${card4.ratios.size} sizes \u00b7 ${style.name}`
-    : 'Complete all steps to generate';
-
-  // Step 1 user bubble content
-  const renderStep1UserBubble = () => {
-    const src = (sources || SOURCES).find(s => s.id === card1.source);
-    if (card1.source === 'url') {
-      return (
-        <UserBubble onChangeStep={() => onChangeStep(1)}>
-          <div className="w-6 h-6 rounded bg-primary-50 flex items-center justify-center flex-shrink-0 text-primary-500">
-            {SOURCE_ICONS.globe}
-          </div>
-          <span className="text-gray-900 font-medium truncate">{card1.url || 'Product URL'}</span>
-        </UserBubble>
-      );
-    }
-    const p = card1.product !== null ? PRODUCTS[card1.product] : null;
+  // ── Step 1 user bubble ─────────────────────────────────
+  const renderStep1Bubble = () => {
+    const product = chatProductIdx !== null ? CHAT_PRODUCTS[chatProductIdx] : null;
     return (
-      <UserBubble onChangeStep={() => onChangeStep(1)}>
-        {p && <img src={p.pic} className="w-6 h-6 rounded object-cover flex-shrink-0" alt="" />}
-        <span className="text-gray-900 font-medium truncate">{p ? p.name : src?.name || ''}</span>
-        <span className="text-xs text-gray-400">{src?.name || ''}</span>
+      <UserBubble onUndo={() => onChangeStep(1)}>
+        {chatSource === 'url' ? (
+          <>
+            <div className="w-9 h-9 rounded-md bg-primary-100 flex items-center justify-center shrink-0">
+              <LinkIcon size={16} className="text-primary-500" />
+            </div>
+            <p className="text-[16px] text-primary-700">{chatUrlValue || 'URL Import'}</p>
+          </>
+        ) : product ? (
+          <>
+            <img src={product.pic} alt="" className="w-9 h-9 rounded-md object-cover shrink-0" />
+            <p className="text-[16px] text-primary-700">{product.name}</p>
+          </>
+        ) : (
+          <>
+            <div className="w-9 h-9 rounded-md bg-primary-100 flex items-center justify-center shrink-0">
+              <Globe size={16} className="text-primary-500" />
+            </div>
+            <p className="text-[16px] text-primary-700">Uploaded</p>
+          </>
+        )}
       </UserBubble>
     );
   };
 
-  // Step 2 user bubble
-  const renderStep2UserBubble = () => {
-    const pIdx = card1.product || 0;
-    const img = PRODUCT_IMAGES[card2.selectedIdx];
+  // ── Step 2 user bubble ─────────────────────────────────
+  const renderStep2Bubble = () => {
+    const imgUrl = chatSelectedImages.size > 0
+      ? `https://images.unsplash.com/photo-1556228720-195a672e8a03?w=40&h=40&fit=crop`
+      : null;
     return (
-      <UserBubble onChangeStep={() => onChangeStep(2)}>
-        <img src={productImg(pIdx, card2.selectedIdx)} className="w-6 h-6 rounded object-cover flex-shrink-0" alt="" />
-        <span className="text-gray-900 font-medium">{img.label}</span>
-        <span className="text-[10px] text-primary-500 bg-primary-50 px-1.5 py-0.5 rounded-full">AI Pick</span>
+      <UserBubble onUndo={() => onChangeStep(2)}>
+        {imgUrl && <img src={imgUrl} alt="" className="w-9 h-9 rounded-md object-cover shrink-0" />}
+        <p className="text-[16px] text-primary-700">{chatProductTitle || 'Product Image Selected'}</p>
+        <span className="text-[10px] text-primary-500 bg-primary-100 px-1.5 py-0.5 rounded-full shrink-0">AI Pick</span>
       </UserBubble>
     );
   };
 
-  // Step 3 user bubble
-  const renderStep3UserBubble = () => {
-    const styleObj = STYLES.find(s => s.id === card3.selectedStyle) || STYLES[0];
-    const sIdx = STYLES.indexOf(styleObj);
+  // ── Step 3 user bubble ─────────────────────────────────
+  const renderStep3Bubble = () => {
+    const selectedList = [...chatSelectedTemplates];
+    const firstTemplate = selectedList.length > 0
+      ? CHAT_TEMPLATES.find((_, i) => `${CHAT_TEMPLATES[i]?.style}-${i}-${CHAT_TEMPLATES[i]?.url}` === selectedList[0])
+      : null;
+
     return (
-      <UserBubble onChangeStep={() => onChangeStep(3)}>
-        <img src={templateImg(sIdx >= 0 ? sIdx : 0)} className="w-6 h-6 rounded object-cover flex-shrink-0" alt="" />
-        <span className="text-gray-900 font-medium">{styleObj.name}</span>
+      <UserBubble onUndo={() => onChangeStep(3)}>
+        {selectedList.length > 0 ? (
+          <>
+            {firstTemplate && (
+              <img src={firstTemplate.url} alt="" className="w-9 h-9 rounded-md object-cover shrink-0" />
+            )}
+            <p className="text-[16px] text-primary-700">
+              {selectedList.length === 1 ? `${firstTemplate?.style ?? 'Template'} Style` : `${selectedList.length} Templates`}
+            </p>
+          </>
+        ) : (
+          <>
+            <div className="w-7 h-7 rounded-md bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center shrink-0">
+              <Sparkles size={13} className="text-white" />
+            </div>
+            <p className="text-[16px] text-primary-700">AI Auto-Generate</p>
+          </>
+        )}
       </UserBubble>
     );
   };
 
   return (
-    <div className="w-[400px] flex-shrink-0 bg-white rounded-[20px] border border-[#F0F0F0] card-shadow flex flex-col overflow-hidden">
-      {/* Toolbar */}
-      <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between flex-shrink-0">
-        <button
-          onClick={onNewTask}
-          className="flex items-center gap-1.5 text-xs font-medium text-primary-600 hover:text-primary-700 transition-colors"
-        >
-          <PlusCircle className="w-4 h-4" />
-          New Task
-        </button>
+    <main className="flex-1 min-h-0 bg-white rounded-[20px] border border-[#F0F0F0] card-shadow overflow-hidden flex flex-col relative">
+      {/* Header */}
+      <div className="flex items-center justify-between px-5 py-4 border-b border-[#F5F5F5] bg-gray-50/50 shrink-0 z-10">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="shrink-0">
+            <AiAvatar uid="hdr" />
+          </div>
+          <div>
+            <h3 className="text-[16px] font-semibold text-gray-900">AdsGo Creative Expert</h3>
+            <div className="flex items-center gap-1.5 text-[14px] text-gray-400 font-normal mt-0.5">
+              <span>New AI Creative</span>
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* Chat flow */}
-      <div ref={chatFlowRef} className="flex-1 overflow-y-auto px-5 py-5 space-y-4">
-        {/* Step 1 */}
-        {activeStep === 1 ? (
-          <StepSourceSelect
-            card1={card1}
-            sources={sources}
-            onSelectSource={onSelectSource}
-            onSelectProduct={onSelectProduct}
-            onConfirmStep={onConfirmStep}
-            onChangePhase={onChangePhase}
-          />
-        ) : (
-          <AiMessage text="What product would you like to promote?" />
-        )}
+      {/* Chat area */}
+      <div className="flex-1 min-h-0 overflow-y-auto p-5 space-y-5 custom-scrollbar">
 
-        {/* Step 1 → 2 transition */}
-        {activeStep > 1 && (
-          <>
-            {renderStep1UserBubble()}
-            {activeStep === 2 ? (
-              <StepConfirmImage
-                card1={card1}
-                card2={card2}
-                onSelectImage={onSelectImage}
+        {/* ══ STEP 1 ══ */}
+        <div className="flex items-start gap-3">
+          <div className="shrink-0 mt-0.5"><AiAvatar uid="s1" /></div>
+          <div className="flex-1 pt-0.5">
+            <p className="text-[16px] text-[#141414] mt-2 mb-3">
+              Which product would you like to create ad creatives for?
+            </p>
+            {chatStep === 1 && (
+              <StepSourceSelect
+                chatPhase={chatPhase}
+                chatSource={chatSource}
+                chatThirdPartyPlatform={chatThirdPartyPlatform}
+                chatProductIdx={chatProductIdx}
+                chatProductCategoryFilter={chatProductCategoryFilter}
+                chatSearchQuery={chatSearchQuery}
+                chatUrlValue={chatUrlValue}
+                chatUrlError={chatUrlError}
+                chatIsSyncing={chatIsSyncing}
+                onSetPhase={onSetPhase}
+                onSetSource={onSetSource}
+                onSetThirdPartyPlatform={onSetThirdPartyPlatform}
+                onSetProductIdx={onSetProductIdx}
+                onSetProductCategoryFilter={onSetProductCategoryFilter}
+                onSetSearchQuery={onSetSearchQuery}
+                onSetUrlValue={onSetUrlValue}
+                onSetUrlError={onSetUrlError}
                 onConfirmStep={onConfirmStep}
+                onOpenConnectModal={onOpenConnectModal}
               />
-            ) : (
-              <AiMessage text="I found the best image for your product" />
             )}
-          </>
-        )}
+          </div>
+        </div>
 
-        {/* Step 2 → 3 transition */}
-        {activeStep > 2 && (
+        {/* ══ STEP 1 → 2 ══ */}
+        {chatStep > 1 && (
           <>
-            {renderStep2UserBubble()}
-            {activeStep === 3 ? (
-              <StepConfirmTemplate
-                card3={card3}
-                onSetBrowsing={onSetBrowsing}
-                onSelectTemplate={onSelectTemplate}
-                onConfirmStep={onConfirmStep}
-              />
-            ) : (
-              <AiMessage text="I recommend this creative template for your product" />
-            )}
+            <div className="pb-4">{renderStep1Bubble()}</div>
+
+            <div className="flex items-start gap-3">
+              <div className="shrink-0 mt-0.5"><AiAvatar uid="s2" /></div>
+              <div className="flex-1 pt-0.5">
+                <p className="text-[16px] text-[#141414] mt-2 mb-3">
+                  Great! Let me confirm the product details and pick the best image.
+                </p>
+                {chatStep === 2 && (
+                  <StepConfirmImage
+                    chatImportPhase={chatImportPhase}
+                    chatProductIdx={chatProductIdx}
+                    chatSelectedImages={chatSelectedImages}
+                    chatProductTitle={chatProductTitle}
+                    chatTargetAudience={chatTargetAudience}
+                    chatSellingPoints={chatSellingPoints}
+                    chatOriginalPrice={chatOriginalPrice}
+                    chatPromoPrice={chatPromoPrice}
+                    chatPromoText={chatPromoText}
+                    chatBrandColors={chatBrandColors}
+                    chatHasLogo={chatHasLogo}
+                    chatEditingColorIdx={chatEditingColorIdx}
+                    onToggleImage={onToggleImage}
+                    onSetProductTitle={onSetProductTitle}
+                    onSetTargetAudience={onSetTargetAudience}
+                    onSetSellingPoint={onSetSellingPoint}
+                    onSetOriginalPrice={onSetOriginalPrice}
+                    onSetPromoPrice={onSetPromoPrice}
+                    onSetPromoText={onSetPromoText}
+                    onSetBrandColor={onSetBrandColor}
+                    onSetHasLogo={onSetHasLogo}
+                    onSetEditingColorIdx={onSetEditingColorIdx}
+                    onConfirmStep={onConfirmStep}
+                  />
+                )}
+              </div>
+            </div>
           </>
         )}
 
-        {/* Step 3 → 4 transition */}
-        {activeStep > 3 && (
+        {/* ══ STEP 2 → 3 ══ */}
+        {chatStep > 2 && (
           <>
-            {renderStep3UserBubble()}
-            <StepGenerationSettings
-              card4={card4}
-              openDropdown={openDropdown}
-              onSetRequirements={onSetRequirements}
-              onSetQuantity={onSetQuantity}
-              onToggleRatio={onToggleRatio}
-              onToggleDropdown={onToggleDropdown}
-            />
+            <div className="pb-4">{renderStep2Bubble()}</div>
+
+            <div className="flex items-start gap-3">
+              <div className="shrink-0 mt-0.5"><AiAvatar uid="s3" /></div>
+              <div className="flex-1 pt-0.5">
+                <p className="text-[16px] text-[#141414] mt-2 mb-3">
+                  Now select a creative template style, or let AI choose automatically.
+                </p>
+                {chatStep === 3 && (
+                  <StepConfirmTemplate
+                    chatTemplateCategory={chatTemplateCategory}
+                    chatSelectedTemplates={chatSelectedTemplates}
+                    onSetTemplateCategory={onSetTemplateCategory}
+                    onToggleTemplate={onToggleTemplate}
+                    onConfirmStep={onConfirmStep}
+                    onChangeStep={onChangeStep}
+                  />
+                )}
+              </div>
+            </div>
           </>
         )}
-      </div>
 
-      {/* Sticky bottom: Generate */}
-      <div className="px-5 py-4 border-t border-gray-100">
-        <button
-          onClick={onGenerate}
-          disabled={!isReady || generating}
-          className="w-full px-4 py-3 bg-primary-500 text-white rounded-lg text-sm font-medium shadow-sm shadow-primary-500/20 hover:bg-primary-600 active:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500/20 transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-primary-500"
-        >
-          <Sparkles className="w-4 h-4 inline mr-1.5 -mt-0.5" />
-          <span>{buttonText}</span>
-        </button>
+        {/* ══ STEP 3 → 4 ══ */}
+        {chatStep > 3 && (
+          <>
+            <div className="pb-4">{renderStep3Bubble()}</div>
+
+            <div className="flex items-start gap-3">
+              <div className="shrink-0 mt-0.5"><AiAvatar uid="s4" /></div>
+              <div className="flex-1 pt-0.5">
+                <p className="text-[16px] text-[#141414] mt-2 mb-3">
+                  Almost there! Customize your generation settings.
+                </p>
+                <StepGenerationSettings
+                  chatQuantity={chatQuantity}
+                  chatRatios={chatRatios}
+                  chatRequirements={chatRequirements}
+                  chatSuggestionPage={chatSuggestionPage}
+                  chatSelectedTemplates={chatSelectedTemplates}
+                  onSetQuantity={onSetQuantity}
+                  onSetRatios={onSetRatios}
+                  onSetRequirements={onSetRequirements}
+                  onSetSuggestionPage={onSetSuggestionPage}
+                  onGenerate={onGenerate}
+                />
+              </div>
+            </div>
+          </>
+        )}
+
+        <div ref={chatEndRef} />
       </div>
-    </div>
+    </main>
   );
 }

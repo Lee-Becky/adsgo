@@ -79,6 +79,13 @@ export default {
         'pulse-subtle': 'pulseSubtle 2s ease-in-out infinite',
         'bubble-expand': 'bubbleExpand 0.3s ease-out',
         'bubble-collapse': 'bubbleCollapse 0.25s ease-in forwards',
+        'shimmer': 'shimmer 2.5s ease-in-out infinite',
+        'gen-float': 'genFloat 2.5s ease-in-out infinite',
+        'gen-ring': 'genRing 3s ease-out infinite',
+        'gen-dot': 'genDot 1s ease-in-out infinite',
+        'gen-fade-in-left': 'genFadeInLeft 0.8s ease-out both',
+        'gen-fade-in-right': 'genFadeInRight 0.8s ease-out both',
+        'gen-text-in': 'genTextIn 0.5s ease-out both',
       },
       keyframes: {
         stepEnter: {
@@ -105,6 +112,34 @@ export default {
         confettiFall: {
           '0%': { transform: 'translateY(-20px) rotate(0deg)', opacity: '1' },
           '100%': { transform: 'translateY(40px) rotate(360deg)', opacity: '0' },
+        },
+        shimmer: {
+          '0%,100%': { backgroundPosition: '200% center' },
+          '50%': { backgroundPosition: '0% center' },
+        },
+        genFloat: {
+          '0%,100%': { transform: 'translateY(0px)' },
+          '50%': { transform: 'translateY(-8px)' },
+        },
+        genRing: {
+          '0%': { transform: 'scale(0.8)', opacity: '0.6' },
+          '100%': { transform: 'scale(2.2)', opacity: '0' },
+        },
+        genDot: {
+          '0%,100%': { transform: 'translateY(0)', opacity: '0.4' },
+          '50%': { transform: 'translateY(-6px)', opacity: '1' },
+        },
+        genFadeInLeft: {
+          from: { opacity: '0', transform: 'translateX(-20px)' },
+          to: { opacity: '1', transform: 'translateX(0)' },
+        },
+        genFadeInRight: {
+          from: { opacity: '0', transform: 'translateX(20px)' },
+          to: { opacity: '1', transform: 'translateX(0)' },
+        },
+        genTextIn: {
+          from: { opacity: '0', transform: 'translateY(15px)', filter: 'blur(4px)' },
+          to: { opacity: '1', transform: 'translateY(0)', filter: 'blur(0px)' },
         },
       },
     },
