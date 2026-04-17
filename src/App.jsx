@@ -44,10 +44,10 @@ function App() {
     resetModalCounter()
   }, [location.pathname])
   const currentPage = useMemo(() => {
-    const path = location.pathname.slice(1) || 'overview'
+    const path = location.pathname.slice(1) || 'mediaPlan'
     // 获取路径的最后一部分作为页面 key
     const parts = path.split('/')
-    return parts[parts.length - 1] || 'overview'
+    return parts[parts.length - 1] || 'mediaPlan'
   }, [location.pathname])
 
   const [selectedCampaign, setSelectedCampaign] = useState(null)
@@ -126,7 +126,7 @@ function App() {
   const handleBrandChange = (brand) => {
     setIsBrandSwitching(true)
     setSelectedBrand(brand)
-    navigate('/overview')
+    navigate('/mediaPlan')
     
     // Simulate loading/syncing time
     setTimeout(() => {
@@ -275,7 +275,7 @@ function App() {
         return <BrandManagement editingBrand={editingBrand} onClearEditingBrand={handleClearEditingBrand} />
       case 'basicInfo':
         console.log('Rendering BasicInfo component')
-        return <BasicInfo onSave={() => {}} onCancel={() => handlePageChange('overview')} />
+        return <BasicInfo onSave={() => {}} onCancel={() => handlePageChange('mediaPlan')} />
       case 'brandProfile':
         return <BrandProfile />
       case 'optimizeGoals':

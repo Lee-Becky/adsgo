@@ -168,9 +168,7 @@ export default function MediaPlan({
           <DevGuideButton title="Weekly Strategy" content={DEV_GUIDES.weeklyPlan} />
         </div>
         <div className="bg-white rounded-xl border border-[#F0F0F0] shadow-[-2px_2px_16px_rgba(14,0,45,0.06)] p-5">
-          <WeeklyPlanCard hideTitle weeksData={WEEKLY_PLANS} onTodoToggle={(weekId, todoId) => {
-            console.log('Todo toggled:', weekId, todoId)
-          }} />
+          <WeeklyPlanCard hideTitle weeksData={WEEKLY_PLANS} />
 
           <div className="pt-5" />
 

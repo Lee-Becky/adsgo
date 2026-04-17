@@ -8,7 +8,8 @@ export const MENU_ITEMS = [
     shortLabel: 'Home',
     icon: 'Layout',
     title: 'Home',
-    subtitle: 'Ad campaign overview and real-time optimization'
+    subtitle: 'Ad campaign overview and real-time optimization',
+    hidden: true
   },
   {
     key: 'mediaPlan',
@@ -24,7 +25,8 @@ export const MENU_ITEMS = [
     shortLabel: '旧',
     icon: 'Wand2',
     title: 'New Campaign（旧）',
-    subtitle: 'Generate and publish campaigns'
+    subtitle: 'Generate and publish campaigns',
+    hidden: true
   },
   {
     key: 'batchGenerateAds',
@@ -78,7 +80,8 @@ export const MENU_ITEMS = [
         shortLabel: 'Video',
         icon: 'Video',
         title: 'Generate Video',
-        subtitle: 'Generate AI marketing videos from product info and scripts'
+        subtitle: 'Generate AI marketing videos from product info and scripts',
+        hidden: true
       },
       {
         key: 'creativeLibrary',
@@ -98,10 +101,10 @@ export const MENU_ITEMS = [
     children: [
       {
         key: 'insights360',
-        label: '360° Insights',
-        shortLabel: '360',
+        label: 'Ad insights',
+        shortLabel: 'Ads',
         icon: 'PieChart',
-        title: '360° Insights',
+        title: 'Ad insights',
         subtitle: 'Comprehensive 360-degree view of campaign insights'
       },
       {
@@ -118,7 +121,8 @@ export const MENU_ITEMS = [
         shortLabel: 'Audit',
         icon: 'PieChart',
         title: '360° Audit',
-        subtitle: '360° Meta Audit — funnel metrics and insight tabs'
+        subtitle: '360° Meta Audit — funnel metrics and insight tabs',
+        hidden: true
       }
     ]
   },

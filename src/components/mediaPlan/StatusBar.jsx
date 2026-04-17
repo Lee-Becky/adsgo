@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react'
-import { LineChart, Line } from 'recharts'
+import { LineChart, Line, YAxis } from 'recharts'
 import { Search, Settings, TrendingUp } from 'lucide-react'
 
 const PHASE_ICONS = { exploring: Search, optimizing: Settings, scaling: TrendingUp }
@@ -8,6 +8,21 @@ function getPhase(kpiAchievement) {
   if (kpiAchievement < 0.4) return { id: 'exploring', label: 'Exploring' }
   if (kpiAchievement < 0.8) return { id: 'optimizing', label: 'Optimizing' }
   return { id: 'scaling', label: 'Scaling' }
+}
+
+function addCalendarDays(isoDate, deltaDays) {
+  const [y, mo, d] = isoDate.split('-').map(Number)
+  const dt = new Date(Date.UTC(y, mo - 1, d + deltaDays))
+  return dt.toISOString().slice(0, 10)
+}
+
+/** Y 轴上限：必须包含 0，否则 kpiValue=0 会落在可视区域外，曲线看起来像断开 */
+function getKpiTrendYAxisMax(kpiTrend, kpiTarget) {
+  const vals = kpiTrend.map(p => Number(p.kpiValue))
+  const dataMax = vals.length ? Math.max(0, ...vals) : 0
+  const t = Number(kpiTarget)
+  const base = Math.max(dataMax, t, 0)
+  return base <= 0 ? 1 : base * 1.12
 }
 
 function buildKPITrend(activeCampaigns, kpiType) {
@@ -25,15 +40,19 @@ function buildKPITrend(activeCampaigns, kpiType) {
     })
   })
 
-  return Object.entries(dailyMap)
-    .map(([date, data]) => ({
-      date,
-      kpiValue: kpiType === 'ROAS'
-        ? (data.spend > 0 ? data.revenue / data.spend : 0)
-        : (data.conversions > 0 ? data.spend / data.conversions : 0),
-    }))
-    .sort((a, b) => a.date.localeCompare(b.date))
-    .slice(-7)
+  const dates = Object.keys(dailyMap).sort()
+  const maxIso = dates.length ? dates[dates.length - 1] : new Date().toISOString().slice(0, 10)
+
+  const series = []
+  for (let o = -6; o <= 0; o++) {
+    const iso = addCalendarDays(maxIso, o)
+    const data = dailyMap[iso] || { revenue: 0, spend: 0, conversions: 0 }
+    const kpiValue = kpiType === 'ROAS'
+      ? (data.spend > 0 ? data.revenue / data.spend : 0)
+      : (data.conversions > 0 ? data.spend / data.conversions : 0)
+    series.push({ date: iso, kpiValue })
+  }
+  return series
 }
 
 export default function StatusBar({ campaigns, kpiType, kpiTarget, dailyBudget }) {
@@ -122,6 +141,7 @@ export default function StatusBar({ campaigns, kpiType, kpiTarget, dailyBudget }
       {kpiTrend.length >= 2 && (
         <div className="ml-auto flex-shrink-0">
           <LineChart width={100} height={28} data={kpiTrend}>
+            <YAxis type="number" hide domain={[0, getKpiTrendYAxisMax(kpiTrend, kpiTarget)]} />
             <Line
               type="monotone"
               dataKey="kpiValue"
@@ -129,6 +149,7 @@ export default function StatusBar({ campaigns, kpiType, kpiTarget, dailyBudget }
               strokeWidth={2}
               dot={false}
               isAnimationActive={false}
+              connectNulls
             />
           </LineChart>
         </div>
@@ -138,4 +159,4 @@ export default function StatusBar({ campaigns, kpiType, kpiTarget, dailyBudget }
 }
 
 // Export helpers for use by other modules
-export { getPhase, buildKPITrend }
+export { getPhase, buildKPITrend, getKpiTrendYAxisMax }

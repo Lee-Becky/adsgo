@@ -109,7 +109,9 @@ const Sidebar = ({ isMobile, isPinned, onTogglePinned, onClose, selectedBrand, o
   }
 
   const renderNavSection = (item) => {
+    if (item.hidden) return null
     if (item.children) {
+      const visibleChildren = item.children.filter(child => !child.hidden)
       return (
         <div key={item.key} className={`space-y-0.5 transition-all duration-300 ${isCollapsed ? 'mb-0.5' : 'mb-2'}`}>
           {!isCollapsed && (
@@ -118,7 +120,7 @@ const Sidebar = ({ isMobile, isPinned, onTogglePinned, onClose, selectedBrand, o
             </p>
           )}
           <div className={`border-slate-100 space-y-0.5 transition-all duration-300 ${isCollapsed ? 'border-l-0 ml-0' : 'border-l-2 ml-4'}`}>
-            {item.children.map(child => renderMenuItem(child, item.key))}
+            {visibleChildren.map(child => renderMenuItem(child, item.key))}
           </div>
         </div>
       )

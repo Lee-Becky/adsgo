@@ -1,5 +1,5 @@
 import React, { useState, useRef, useMemo } from 'react'
-import { Target, Bot, CheckSquare, ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react'
+import { Target, Bot, ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react'
 import DevGuideButton from './DevGuideButton'
 import { DEV_GUIDES } from './devGuideContent'
 
@@ -23,7 +23,7 @@ function getWeekRange(offsetWeeks) {
   }
 }
 
-function WeekCard({ week, isCurrentWeek, onTodoToggle }) {
+function WeekCard({ week, isCurrentWeek }) {
   const statusStyles = {
     completed: 'bg-emerald-50/50 border-emerald-200/60 opacity-65 saturate-[0.6]',
     current: 'bg-gradient-to-br from-primary-50 via-white to-primary-50/30 border-primary-300 ring-2 ring-primary-200',
@@ -86,32 +86,16 @@ function WeekCard({ week, isCurrentWeek, onTodoToggle }) {
 
       {/* You Need To Do */}
       <div className="mt-auto">
-        <div className="flex items-center gap-1 mb-1">
-          <CheckSquare className="w-3 h-3 text-amber-500" />
+        <div className="mb-1">
           <span className="text-[9px] font-semibold text-amber-600 tracking-wide">You Need To Do</span>
         </div>
-        <ul className="space-y-1">
+        <ul className="list-disc list-outside pl-4 space-y-1 marker:text-amber-500/70">
           {week.youNeedToDo.map((todo) => (
-            <li key={todo.id} className="flex items-start gap-1.5">
-              <button
-                onClick={() => onTodoToggle(week.weekId, todo.id)}
-                className={`w-3.5 h-3.5 rounded border flex items-center justify-center flex-shrink-0 mt-0.5 transition-colors ${
-                  todo.completed
-                    ? 'bg-emerald-500 border-emerald-500'
-                    : 'bg-white border-gray-300 hover:border-primary-400'
-                }`}
-              >
-                {todo.completed && (
-                  <svg className="w-2 h-2 text-white" viewBox="0 0 12 12" fill="none">
-                    <path d="M2.5 6L5 8.5L9.5 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                )}
-              </button>
-              <span className={`text-[11px] leading-snug ${
-                todo.completed ? 'text-gray-400 line-through' : 'text-gray-700'
-              }`}>
-                {todo.text}
-              </span>
+            <li
+              key={todo.id}
+              className={`text-[11px] leading-snug ${todo.completed ? 'text-gray-400 line-through' : 'text-gray-700'}`}
+            >
+              {todo.text}
             </li>
           ))}
         </ul>
@@ -129,7 +113,7 @@ function WeekCard({ week, isCurrentWeek, onTodoToggle }) {
   )
 }
 
-export default function WeeklyPlanCard({ weeksData, onTodoToggle, hideTitle }) {
+export default function WeeklyPlanCard({ weeksData, hideTitle }) {
   const scrollRef = useRef(null)
   const [canScrollLeft, setCanScrollLeft] = useState(false)
   const [canScrollRight, setCanScrollRight] = useState(false)
@@ -191,7 +175,6 @@ export default function WeeklyPlanCard({ weeksData, onTodoToggle, hideTitle }) {
             key={week.weekId}
             week={week}
             isCurrentWeek={week.status === 'current'}
-            onTodoToggle={onTodoToggle}
           />
         ))}
       </div>
@@ -207,7 +190,6 @@ export default function WeeklyPlanCard({ weeksData, onTodoToggle, hideTitle }) {
             <WeekCard
               week={week}
               isCurrentWeek={week.status === 'current'}
-              onTodoToggle={onTodoToggle}
             />
           </div>
         ))}

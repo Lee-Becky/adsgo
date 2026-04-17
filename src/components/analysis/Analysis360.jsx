@@ -10,6 +10,8 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip as RechartsTooltip,
+  AreaChart,
+  Area,
 } from 'recharts';
 import {
   AUDIENCE_INSIGHTS,
@@ -18,7 +20,7 @@ import {
   SCATTER_DATA,
 } from '../../constants/adInsightsData';
 import { Icon, SvgIcons } from '../AdInsightsIcons';
-import { Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Calendar, ChevronLeft, ChevronRight, BarChart3, Check } from 'lucide-react';
 
 // --- Sub Components ---
 
@@ -86,14 +88,14 @@ const PageListItem = ({ item, i }) => (
   <div key={i} className="flex flex-col gap-2 pb-5 border-b border-dashed border-[#d9d9d9] last:border-none last:pb-0">
     <div className="text-[#141414] text-sm font-medium truncate">{item.url}</div>
     <div className="flex items-center gap-2.5 text-sm">
-      <span className="text-[#5969f7] font-medium">{item.cvr} CVR</span>
-      <span className="text-[#8c8c8c]">${item.spend} spend · {item.campaigns} campaigns</span>
+      <span className="text-[#7033f5] font-medium">{item.cvr} CVR</span>
+      <span className="text-[#8c8c8c]">${item.spend} spend</span>
     </div>
   </div>
 );
 
-const CreativeAdCard = ({ ad, index }) => (
-  <div key={ad.id} className="flex-1 min-w-[320px] max-w-[360px] relative first:before:hidden before:content-[''] before:block before:w-px before:h-[90%] before:border-l before:border-dashed before:border-[#d9d9d9] before:absolute before:top-1/2 before:left-[-24px] before:-translate-y-1/2">
+const CreativeAdCard = ({ ad }) => (
+  <div className="flex-1 min-w-[320px] max-w-[360px] relative first:before:hidden before:content-[''] before:block before:w-px before:h-[90%] before:border-l before:border-dashed before:border-[#d9d9d9] before:absolute before:top-1/2 before:left-[-24px] before:-translate-y-1/2">
     <div className="flex items-center justify-center gap-2 mb-3 text-gray-500 text-sm">
       <span className="text-[#78a100] font-medium">{ad.ctr} CTR</span>
       <span></span>
@@ -147,19 +149,20 @@ const CreativeAdCard = ({ ad, index }) => (
 
 const Analysis360 = () => {
   const [selectedPlatform, setSelectedPlatform] = useState('Meta');
-  const [dataPeriod, setDataPeriod] = useState('Last 3 days');
+  const [dataPeriod, setDataPeriod] = useState('Last 7 days');
   const [customStartDate, setCustomStartDate] = useState('');
   const [customEndDate, setCustomEndDate] = useState('');
   const [showCalendar, setShowCalendar] = useState(false);
+  const [activeTab, setActiveTab] = useState('分析');
+  const [selectedMetrics, setSelectedMetrics] = useState(['spend', 'roas']);
 
-  // Initialize with Last 3 days dates
+  // Initialize with Last 7 days
   useEffect(() => {
     const today = new Date();
     const todayStr = today.toISOString().split('T')[0];
-    const last3 = new Date(today);
-    last3.setDate(last3.getDate() - 2);
-    const last3Str = last3.toISOString().split('T')[0];
-    setCustomStartDate(last3Str);
+    const last7 = new Date(today);
+    last7.setDate(last7.getDate() - 6);
+    setCustomStartDate(last7.toISOString().split('T')[0]);
     setCustomEndDate(todayStr);
   }, []);
 
@@ -168,34 +171,19 @@ const Analysis360 = () => {
     { label: 'Last 3 days', value: 'Last 3 days' },
     { label: 'Last 7 days', value: 'Last 7 days' },
     { label: 'Last 14 days', value: 'Last 14 days' },
-    { label: 'Last 30 days', value: 'Last 30 days' }
+    { label: 'Last 30 days', value: 'Last 30 days' },
   ];
 
   const getPeriodDates = (period) => {
     const today = new Date();
     const todayStr = today.toISOString().split('T')[0];
-    
     switch (period) {
-      case 'Today':
-        return { start: todayStr, end: todayStr };
-      case 'Last 3 days':
-        const last3 = new Date(today);
-        last3.setDate(last3.getDate() - 2);
-        return { start: last3.toISOString().split('T')[0], end: todayStr };
-      case 'Last 7 days':
-        const last7 = new Date(today);
-        last7.setDate(last7.getDate() - 6);
-        return { start: last7.toISOString().split('T')[0], end: todayStr };
-      case 'Last 14 days':
-        const last14 = new Date(today);
-        last14.setDate(last14.getDate() - 13);
-        return { start: last14.toISOString().split('T')[0], end: todayStr };
-      case 'Last 30 days':
-        const last30 = new Date(today);
-        last30.setDate(last30.getDate() - 29);
-        return { start: last30.toISOString().split('T')[0], end: todayStr };
-      default:
-        return { start: '', end: '' };
+      case 'Today': return { start: todayStr, end: todayStr };
+      case 'Last 3 days': { const d = new Date(today); d.setDate(d.getDate() - 2); return { start: d.toISOString().split('T')[0], end: todayStr }; }
+      case 'Last 7 days': { const d = new Date(today); d.setDate(d.getDate() - 6); return { start: d.toISOString().split('T')[0], end: todayStr }; }
+      case 'Last 14 days': { const d = new Date(today); d.setDate(d.getDate() - 13); return { start: d.toISOString().split('T')[0], end: todayStr }; }
+      case 'Last 30 days': { const d = new Date(today); d.setDate(d.getDate() - 29); return { start: d.toISOString().split('T')[0], end: todayStr }; }
+      default: return { start: '', end: '' };
     }
   };
 
@@ -208,13 +196,10 @@ const Analysis360 = () => {
 
   const formatDate = (date) => {
     if (!date) return 'Select date';
-    const d = new Date(date);
-    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    return new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   };
 
-  const getDaysInMonth = (year, month) => {
-    return new Date(year, month + 1, 0).getDate();
-  };
+  const getDaysInMonth = (year, month) => new Date(year, month + 1, 0).getDate();
 
   const generateCalendar = () => {
     const today = new Date();
@@ -222,41 +207,28 @@ const Analysis360 = () => {
     const month = today.getMonth();
     const daysInMonth = getDaysInMonth(year, month);
     const firstDay = new Date(year, month, 1).getDay();
-    
     const days = [];
-    for (let i = 0; i < firstDay; i++) {
-      days.push(<div key={`empty-${i}`} className="p-1"></div>);
-    }
+    for (let i = 0; i < firstDay; i++) days.push(<div key={`e-${i}`} className="p-1" />);
     for (let day = 1; day <= daysInMonth; day++) {
       const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
       const isStart = dateStr === customStartDate;
       const isEnd = dateStr === customEndDate;
       const isInRange = customStartDate && customEndDate && dateStr > customStartDate && dateStr < customEndDate;
-      
       days.push(
         <button
           key={day}
           onClick={() => {
-            if (!customStartDate) {
-              setCustomStartDate(dateStr);
-              setDataPeriod('Custom');
-            } else if (!customEndDate && dateStr >= customStartDate) {
-              setCustomEndDate(dateStr);
-              setDataPeriod('Custom');
-            } else {
-              setCustomStartDate(dateStr);
-              setCustomEndDate('');
-              setDataPeriod('Custom');
-            }
+            if (!customStartDate) { setCustomStartDate(dateStr); setDataPeriod('Custom'); }
+            else if (!customEndDate && dateStr >= customStartDate) { setCustomEndDate(dateStr); setDataPeriod('Custom'); }
+            else { setCustomStartDate(dateStr); setCustomEndDate(''); setDataPeriod('Custom'); }
           }}
           className="relative p-1 text-sm rounded hover:bg-primary/10 transition-colors"
         >
           {day}
-          {isStart && <span className="absolute bottom-0 left-1/2 -translate-x-1/2 text-[8px] text-primary font-bold">START</span>}
-          {isEnd && <span className="absolute bottom-0 left-1/2 -translate-x-1/2 text-[8px] text-primary font-bold">END</span>}
-          {isStart && !isEnd && <div className="absolute inset-0 bg-primary/20 rounded"></div>}
-          {isEnd && <div className="absolute inset-0 bg-primary/20 rounded"></div>}
-          {isInRange && <div className="absolute inset-0 bg-primary/5 rounded"></div>}
+          {isStart && <span className="absolute bottom-0 left-1/2 -translate-x-1/2 text-[8px] text-primary font-bold">S</span>}
+          {isEnd && <span className="absolute bottom-0 left-1/2 -translate-x-1/2 text-[8px] text-primary font-bold">E</span>}
+          {(isStart || isEnd) && <div className="absolute inset-0 bg-primary/20 rounded" />}
+          {isInRange && <div className="absolute inset-0 bg-primary/5 rounded" />}
         </button>
       );
     }
@@ -294,12 +266,114 @@ const Analysis360 = () => {
     }
   };
 
+  // --- Ad Performance logic ---
+  const metrics = [
+    { key: 'spend',     label: 'Spend',      value: '$1,310', color: '#7033F5' },
+    { key: 'cpm',       label: 'CPM',        value: '$8.50',  color: '#D946EF' },
+    { key: 'ctr',       label: 'CTR',        value: '2.1%',   color: '#10B981' },
+    { key: 'cost_conv', label: 'Cost/conv.', value: '$4.20',  color: '#F59E0B' },
+    { key: 'roas',      label: 'ROAS',       value: '4.2',    color: '#3B82F6' },
+  ];
+
+  const handleMetricToggle = (key) => {
+    setSelectedMetrics(prev => {
+      if (prev.includes(key)) return prev.length === 1 ? prev : prev.filter(k => k !== key);
+      return prev.length >= 5 ? prev : [...prev, key];
+    });
+  };
+
+  const generateChartData = () => {
+    const today = new Date();
+    return Array.from({ length: 7 }, (_, i) => {
+      const d = new Date(today);
+      d.setDate(d.getDate() - (6 - i));
+      return {
+        date: d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+        spend: Math.floor(150 + Math.random() * 100),
+        cpm: parseFloat((7 + Math.random() * 3).toFixed(2)),
+        ctr: parseFloat((1.5 + Math.random() * 1.5).toFixed(1)),
+        cost_conv: parseFloat((3 + Math.random() * 3).toFixed(2)),
+        roas: parseFloat((3 + Math.random() * 3).toFixed(1)),
+      };
+    });
+  };
+
+  const [chartData] = useState(generateChartData);
+
+  const CustomTooltip = ({ active, payload, label }) => {
+    if (!active || !payload?.length) return null;
+    return (
+      <div className="bg-white rounded-xl shadow-xl border border-gray-100 p-4 min-w-[140px]">
+        <p className="text-xs font-semibold text-gray-500 mb-2 pb-2 border-b border-gray-100">{label}</p>
+        <div className="space-y-1.5">
+          {payload.map((entry, i) => (
+            <div key={i} className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: entry.color }} />
+              <span className="text-xs text-gray-600">{entry.name}:</span>
+              <span className="text-xs font-bold text-gray-900 ml-auto">
+                {entry.name === 'Spend' || entry.name === 'CPM' || entry.name === 'Cost/conv.'
+                  ? `$${entry.value}`
+                  : entry.name === 'CTR' ? `${entry.value}%` : entry.value}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
+  // --- Daily Performance data ---
+  const generateDailyPerformanceData = () => {
+    const startDate = customStartDate ? new Date(customStartDate) : new Date();
+    const endDate = customEndDate ? new Date(customEndDate) : new Date();
+    const data = [];
+    const cur = new Date(startDate);
+    while (cur <= endDate) {
+      const impressions = Math.floor(30000 + Math.random() * 40000);
+      const clicks = Math.floor(impressions * (0.015 + Math.random() * 0.02));
+      const spend = Math.floor(100 + Math.random() * 400);
+      const cpm = (spend / impressions) * 1000;
+      const cpc = spend / clicks;
+      const ctr = (clicks / impressions) * 100;
+      const event1s = Math.floor(clicks * (0.03 + Math.random() * 0.05));
+      const event2s = Math.floor(clicks * (0.02 + Math.random() * 0.04));
+      const event3s = Math.floor(clicks * (0.01 + Math.random() * 0.03));
+      const purchaseValue = Math.floor(event3s * (15 + Math.random() * 10));
+      data.push({
+        date: cur.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+        dailyBudget: 200,
+        spend: spend.toFixed(2),
+        impressions,
+        cpm: cpm.toFixed(2),
+        clicks,
+        cpc: cpc.toFixed(2),
+        ctr: ctr.toFixed(2),
+        event1s,
+        cpaEvent1s: event1s > 0 ? (spend / event1s).toFixed(2) : '0.00',
+        cvrEvent1s: clicks > 0 ? ((event1s / clicks) * 100).toFixed(2) : '0.00',
+        event2s,
+        cpaEvent2s: event2s > 0 ? (spend / event2s).toFixed(2) : '0.00',
+        cvrEvent2s: clicks > 0 ? ((event2s / clicks) * 100).toFixed(2) : '0.00',
+        event3s,
+        cpaEvent3s: event3s > 0 ? (spend / event3s).toFixed(2) : '0.00',
+        cvrEvent3s: clicks > 0 ? ((event3s / clicks) * 100).toFixed(2) : '0.00',
+        purchaseValue,
+        roas: spend > 0 ? (purchaseValue / spend).toFixed(2) : '0.00',
+      });
+      cur.setDate(cur.getDate() + 1);
+    }
+    return data.reverse();
+  };
+
+  const dailyData = generateDailyPerformanceData();
+
   return (
     <div className="min-h-screen bg-background p-4 md:p-6 font-sans">
       <SvgIcons />
-      
+
       <div className="flex-1 flex flex-col gap-4">
-        {/* Platform Selector Card */}
+
+        {/* ── Platform / Date Header ── */}
         <div className="bg-white rounded-2xl border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-4 transition-all">
           <div className="flex items-center justify-between gap-4">
             {/* Platform Selector */}
@@ -307,108 +381,77 @@ const Analysis360 = () => {
               {['Meta', 'Google', 'TikTok', 'Bing'].map(p => (
                 <div key={p} className="relative group">
                   <button
-                    onClick={() => (p === 'Meta' || p === 'TikTok' || p === 'Bing') && setSelectedPlatform(p)}
+                    onClick={() => p === 'Meta' && setSelectedPlatform(p)}
                     className={`
                       relative px-7 py-2 rounded-[16px] text-sm font-black transition-all duration-300 flex items-center gap-3
-                      ${selectedPlatform === p 
-                        ? 'bg-white shadow-[0_4px_12px_rgba(0,0,0,0.08)] text-gray-900 scale-[1.02] translate-y-[-1px]' 
+                      ${selectedPlatform === p
+                        ? 'bg-white shadow-[0_4px_12px_rgba(0,0,0,0.08)] text-gray-900 scale-[1.02] translate-y-[-1px]'
                         : 'text-gray-400 opacity-60 grayscale hover:grayscale-0 hover:opacity-100 hover:bg-white/60 hover:translate-y-[-1px]'
                       }
-                      ${(p === 'Google' || p === 'TikTok' || p === 'Bing') ? 'cursor-not-allowed' : 'cursor-pointer active:scale-95'}
+                      ${p !== 'Meta' ? 'cursor-not-allowed' : 'cursor-pointer active:scale-95'}
                     `}
                   >
                     {getPlatformLogo(p)}
                     <span className="tracking-tight">{p}</span>
                     {selectedPlatform === p && (
-                      <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-primary rounded-full animate-pulse"></div>
+                      <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-primary rounded-full animate-pulse" />
                     )}
                   </button>
-                  
-                  {(p === 'Google' || p === 'TikTok' || p === 'Bing') && (
+                  {p !== 'Meta' && (
                     <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-3 px-3 py-2 bg-gray-900 text-white text-[10px] font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0 whitespace-nowrap z-10 shadow-xl pointer-events-none">
                       Coming soon
-                      <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1.5 w-3 h-3 bg-gray-900 rotate-45 rounded-sm"></div>
+                      <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1.5 w-3 h-3 bg-gray-900 rotate-45 rounded-sm" />
                     </div>
                   )}
                 </div>
               ))}
             </div>
 
-            {/* Data Period Filter */}
+            {/* Date Period Filter */}
             <div className="relative">
               <button
                 onClick={() => setShowCalendar(!showCalendar)}
-                className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors flex items-center gap-2"
+                className="px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors flex items-center gap-2 min-w-[220px] justify-between"
               >
-                <Calendar size={16} className="text-gray-500" />
-                <span>{customStartDate && customEndDate ? `${formatDate(customStartDate)} - ${formatDate(customEndDate)}` : dataPeriod}</span>
+                <div className="flex items-center gap-2">
+                  <Calendar size={15} className="text-gray-400" />
+                  <span>{customStartDate && customEndDate ? `${formatDate(customStartDate)} – ${formatDate(customEndDate)}` : dataPeriod}</span>
+                </div>
               </button>
 
               {showCalendar && (
-                <div className="absolute top-full right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-lg p-4 z-10 w-96">
+                <div className="absolute top-full right-0 mt-2 bg-white border border-gray-200 rounded-2xl shadow-xl p-4 z-20 w-96">
                   <div className="flex gap-4">
-                    {/* Left: Quick Select Buttons */}
-                    <div className="w-1/3 flex flex-col gap-2">
-                      {periodOptions.map((option) => (
+                    <div className="w-1/3 flex flex-col gap-1.5">
+                      {periodOptions.map(opt => (
                         <button
-                          key={option.value}
-                          onClick={() => handlePeriodClick(option.value)}
-                          className={`px-3 py-2 text-xs rounded-lg text-left transition-colors ${
-                            dataPeriod === option.value
-                              ? 'bg-primary text-white'
-                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                          key={opt.value}
+                          onClick={() => handlePeriodClick(opt.value)}
+                          className={`px-3 py-2 text-xs rounded-lg text-left transition-colors font-semibold ${
+                            dataPeriod === opt.value ? 'bg-primary text-white' : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
                           }`}
                         >
-                          {option.label}
+                          {opt.label}
                         </button>
                       ))}
                     </div>
-
-                    {/* Right: Calendar */}
                     <div className="flex-1">
-                      {/* Calendar Grid */}
-                      <div>
-                        <div className="flex items-center justify-between mb-2">
-                          <button className="p-1 hover:bg-gray-100 rounded">
-                            <ChevronLeft size={16} />
-                          </button>
-                          <span className="font-medium text-sm">
-                            {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
-                          </span>
-                          <button className="p-1 hover:bg-gray-100 rounded">
-                            <ChevronRight size={16} />
-                          </button>
-                        </div>
-                        <div className="grid grid-cols-7 gap-1 text-center text-xs text-gray-500 mb-1">
-                          <div>Su</div>
-                          <div>Mo</div>
-                          <div>Tu</div>
-                          <div>We</div>
-                          <div>Th</div>
-                          <div>Fr</div>
-                          <div>Sa</div>
-                        </div>
-                        <div className="grid grid-cols-7 gap-1">
-                          {generateCalendar()}
-                        </div>
+                      <div className="flex items-center justify-between mb-2">
+                        <button className="p-1 hover:bg-gray-100 rounded-lg"><ChevronLeft size={16} /></button>
+                        <span className="font-semibold text-sm">
+                          {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                        </span>
+                        <button className="p-1 hover:bg-gray-100 rounded-lg"><ChevronRight size={16} /></button>
                       </div>
+                      <div className="grid grid-cols-7 gap-1 text-center text-xs text-gray-400 mb-1 font-medium">
+                        {['Su','Mo','Tu','We','Th','Fr','Sa'].map(d => <div key={d}>{d}</div>)}
+                      </div>
+                      <div className="grid grid-cols-7 gap-1">{generateCalendar()}</div>
                     </div>
                   </div>
-
-                  {/* Confirm Button */}
-                  <div className="flex gap-2 mt-4 pt-4 border-t border-gray-200">
-                    <button
-                      onClick={() => setShowCalendar(false)}
-                      className="flex-1 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      onClick={() => setShowCalendar(false)}
-                      className="flex-1 px-4 py-2 text-sm font-medium text-white bg-primary rounded-lg hover:bg-primary-hover transition-colors"
-                    >
-                      Confirm
-                    </button>
+                  <div className="flex gap-2 mt-4 pt-3 border-t border-gray-100">
+                    <button onClick={() => setShowCalendar(false)} className="flex-1 px-4 py-2 text-sm font-medium text-gray-600 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">Cancel</button>
+                    <button onClick={() => setShowCalendar(false)} className="flex-1 px-4 py-2 text-sm font-medium text-white bg-primary rounded-xl hover:bg-primary/90 transition-colors">Confirm</button>
                   </div>
                 </div>
               )}
@@ -416,55 +459,231 @@ const Analysis360 = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl border border-border shadow-sm p-4 md:p-6">
-          
-
-          {/* Audience & Page Insights */}
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-4 md:gap-6 py-4 md:py-6 px-2">
-            <InsightBlock
-              title="Audience Insight"
-              data={AUDIENCE_INSIGHTS}
-              renderListItem={(item, i) => <AudienceListItem key={i} item={item} i={i} />}
-              chartColors={['#7033f5', '#c3a2fe', '#ead9ff']}
-            />
-            <InsightBlock
-              title="Page Insight"
-              data={PAGE_INSIGHTS}
-              renderListItem={(item, i) => <PageListItem key={i} item={item} i={i} />}
-              chartColors={['#7033f5', '#c3a2fe']}
-            />
+        {/* ── Ad Performance Card ── */}
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-6 flex flex-col transition-all">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="p-2 bg-primary/10 rounded-xl">
+              <BarChart3 className="text-primary" size={22} />
+            </div>
+            <h2 className="text-xl font-bold text-gray-900">Ad Performance</h2>
           </div>
 
-          {/* Creative Insight */}
-          <div className="py-4 md:py-6 px-2">
-            <SectionTitle>Creative Insight</SectionTitle>
-            <div className="flex flex-col p-2 gap-2 bg-gray-50 border border-border rounded-2xl">
-              <div className="w-full bg-white p-3 md:p-4 rounded-xl">
-                <div className="text-gray-900 text-base font-bold mb-3">Creative Performance</div>
-                <div className="w-full h-[280px] md:h-[320px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
-                      <XAxis type="number" dataKey="x" name="CTR" unit="%" axisLine={false} tickLine={false} tick={{ fill: '#8c8c8c', fontSize: 12 }} />
-                      <YAxis type="number" dataKey="y" name="CPA" unit="$" axisLine={false} tickLine={false} tick={{ fill: '#8c8c8c', fontSize: 12 }} />
-                      <RechartsTooltip cursor={{ strokeDasharray: '3 3' }} />
-                      <Scatter name="Ads" data={SCATTER_DATA} fill="#7033f5" />
-                    </ScatterChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
+          {/* Metric Cards */}
+          <div className="grid grid-cols-5 gap-3 mb-6">
+            {metrics.map(metric => {
+              const isSelected = selectedMetrics.includes(metric.key);
+              return (
+                <button
+                  key={metric.key}
+                  onClick={() => handleMetricToggle(metric.key)}
+                  className={`p-4 rounded-xl border-2 transition-all relative overflow-hidden text-left ${
+                    isSelected ? 'shadow-lg' : 'border-border bg-white hover:border-gray-300 hover:shadow-md'
+                  }`}
+                  style={isSelected ? {
+                    borderColor: metric.color,
+                    backgroundColor: `${metric.color}0d`,
+                    boxShadow: `0 4px 16px ${metric.color}25`,
+                  } : {}}
+                >
+                  <div className="flex items-start justify-between mb-2">
+                    <p className={`text-xs font-semibold uppercase tracking-wide ${isSelected ? 'text-gray-700' : 'text-gray-400'}`}>
+                      {metric.label}
+                    </p>
+                    <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: metric.color }} />
+                  </div>
+                  <p className="text-2xl font-bold text-gray-900 leading-tight">{metric.value}</p>
+                  {isSelected && (
+                    <div
+                      className="absolute top-3 right-3 w-5 h-5 rounded-full flex items-center justify-center shadow-md"
+                      style={{ backgroundColor: metric.color }}
+                    >
+                      <Check size={11} className="text-white" />
+                    </div>
+                  )}
+                </button>
+              );
+            })}
+          </div>
 
-              <div className="flex flex-col w-full p-3 md:p-4 gap-4 bg-white rounded-xl">
-                <div className="text-gray-900 text-base font-bold">Top Ads</div>
-                <div className="flex gap-6 md:gap-12 overflow-x-auto pb-4 no-scrollbar">
-                  {TOP_ADS.map((ad, index) => (
-                    <CreativeAdCard key={ad.id} ad={ad} index={index} />
-                  ))}
-                </div>
-              </div>
+          {/* Chart */}
+          <div className="bg-gray-50/60 rounded-xl border border-gray-100 p-5 h-[290px] min-h-[290px] min-w-0">
+            <ResponsiveContainer width="100%" height="85%">
+              <AreaChart data={chartData} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
+                <defs>
+                  {selectedMetrics.map(key => {
+                    const m = metrics.find(x => x.key === key);
+                    return (
+                      <linearGradient key={key} id={`g360-${key}`} x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor={m.color} stopOpacity="0.18" />
+                        <stop offset="95%" stopColor={m.color} stopOpacity="0" />
+                      </linearGradient>
+                    );
+                  })}
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+                <XAxis dataKey="date" tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false} />
+                {selectedMetrics.length <= 2 && selectedMetrics.map((key, idx) => (
+                  <YAxis
+                    key={key} yAxisId={key}
+                    orientation={idx % 2 === 0 ? 'left' : 'right'}
+                    tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false}
+                    tickFormatter={v => key === 'spend' || key === 'cpm' || key === 'cost_conv' ? `$${v}` : key === 'ctr' ? `${v}%` : v}
+                  />
+                ))}
+                <RechartsTooltip content={<CustomTooltip />} />
+                {selectedMetrics.map(key => {
+                  const m = metrics.find(x => x.key === key);
+                  return (
+                    <Area
+                      key={key} type="monotone" dataKey={key}
+                      stroke={m.color} strokeWidth={2.5}
+                      fillOpacity={1} fill={`url(#g360-${key})`}
+                      yAxisId={key} name={m.label}
+                      dot={false} activeDot={{ r: 5, stroke: 'white', strokeWidth: 2 }}
+                    />
+                  );
+                })}
+              </AreaChart>
+            </ResponsiveContainer>
+            <div className="flex flex-wrap gap-4 mt-3 justify-center">
+              {selectedMetrics.map(key => {
+                const m = metrics.find(x => x.key === key);
+                return (
+                  <div key={key} className="flex items-center gap-1.5">
+                    <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: m.color }} />
+                    <span className="text-xs font-semibold text-gray-500">{m.label}</span>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>
+
+        {/* ── Tab Section ── */}
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all">
+
+          {/* Tab Header */}
+          <div className="border-b border-gray-100 px-6 pt-1 flex">
+            {['分析', '日报'].map(tab => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`relative px-5 py-4 text-sm font-bold transition-all mr-1 ${
+                  activeTab === tab ? 'text-gray-900' : 'text-gray-400 hover:text-gray-600'
+                }`}
+              >
+                {tab}
+                {activeTab === tab && (
+                  <span className="absolute bottom-0 left-2 right-2 h-[2.5px] bg-gradient-to-r from-[#7033f5] to-[#c3a2fe] rounded-full" />
+                )}
+              </button>
+            ))}
+          </div>
+
+          {/* Tab Content */}
+          <div className="p-4 md:p-6">
+
+            {/* ── 分析 Tab ── */}
+            {activeTab === '分析' && (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 py-4 px-2">
+                  <InsightBlock
+                    title="Audience Insight"
+                    data={AUDIENCE_INSIGHTS}
+                    renderListItem={(item, i) => <AudienceListItem key={i} item={item} i={i} />}
+                    chartColors={['#7033f5', '#c3a2fe', '#ead9ff']}
+                  />
+                  <InsightBlock
+                    title="Page Insight"
+                    data={PAGE_INSIGHTS}
+                    renderListItem={(item, i) => <PageListItem key={i} item={item} i={i} />}
+                    chartColors={['#7033f5', '#c3a2fe']}
+                  />
+                </div>
+
+                <div className="py-4 px-2">
+                  <SectionTitle>Creative Insight</SectionTitle>
+                  <div className="flex flex-col p-2 gap-2 bg-gray-50 border border-border rounded-2xl">
+                    <div className="w-full bg-white p-4 rounded-xl">
+                      <div className="text-gray-900 text-base font-bold mb-3">Creative Performance</div>
+                      <div className="w-full h-[280px] md:h-[320px]">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
+                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+                            <XAxis type="number" dataKey="x" name="CTR" unit="%" axisLine={false} tickLine={false} tick={{ fill: '#8c8c8c', fontSize: 12 }} />
+                            <YAxis type="number" dataKey="y" name="CPA" unit="$" axisLine={false} tickLine={false} tick={{ fill: '#8c8c8c', fontSize: 12 }} />
+                            <RechartsTooltip cursor={{ strokeDasharray: '3 3' }} />
+                            <Scatter name="Ads" data={SCATTER_DATA} fill="#7033f5" />
+                          </ScatterChart>
+                        </ResponsiveContainer>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col w-full p-4 gap-4 bg-white rounded-xl">
+                      <div className="text-gray-900 text-base font-bold">Top Ads</div>
+                      <div className="flex gap-6 overflow-x-auto pb-4 no-scrollbar">
+                        {TOP_ADS.map(ad => (
+                          <CreativeAdCard key={ad.id} ad={ad} />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
+
+            {/* ── 日报 Tab ── */}
+            {activeTab === '日报' && (
+              <div>
+                <h2 className="text-lg font-bold text-gray-900 mb-5">Daily Performance</h2>
+                <div className="overflow-x-auto rounded-xl border border-border">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="bg-gray-50 border-b border-border">
+                        <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 sticky top-0 bg-gray-50 whitespace-nowrap">Date</th>
+                        <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 sticky top-0 bg-gray-50 whitespace-nowrap">Daily Budget</th>
+                        <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 sticky top-0 bg-gray-50 whitespace-nowrap">Spend</th>
+                        <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 sticky top-0 bg-gray-50 whitespace-nowrap">Impressions</th>
+                        <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 sticky top-0 bg-gray-50 whitespace-nowrap">CPM</th>
+                        <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 sticky top-0 bg-gray-50 whitespace-nowrap">Clicks</th>
+                        <th className="text-left py-3 px-4 text-xs font-bold text-blue-500 sticky top-0 bg-gray-50 whitespace-nowrap">CPC <span className="font-normal text-gray-400 text-[10px]">(CTR)</span></th>
+                        <th className="text-left py-3 px-4 text-xs font-bold text-blue-500 sticky top-0 bg-gray-50 whitespace-nowrap">Event1s</th>
+                        <th className="text-left py-3 px-4 text-xs font-bold text-blue-500 sticky top-0 bg-gray-50 whitespace-nowrap">CPA-E1 <span className="font-normal text-gray-400 text-[10px]">(CVR)</span></th>
+                        <th className="text-left py-3 px-4 text-xs font-bold text-blue-500 sticky top-0 bg-gray-50 whitespace-nowrap">Event2s</th>
+                        <th className="text-left py-3 px-4 text-xs font-bold text-blue-500 sticky top-0 bg-gray-50 whitespace-nowrap">CPA-E2 <span className="font-normal text-gray-400 text-[10px]">(CVR)</span></th>
+                        <th className="text-left py-3 px-4 text-xs font-bold text-blue-500 sticky top-0 bg-gray-50 whitespace-nowrap">Event3s</th>
+                        <th className="text-left py-3 px-4 text-xs font-bold text-blue-500 sticky top-0 bg-gray-50 whitespace-nowrap">CPA-E3 <span className="font-normal text-gray-400 text-[10px]">(CVR)</span></th>
+                        <th className="text-left py-3 px-4 text-xs font-bold text-blue-500 sticky top-0 bg-gray-50 whitespace-nowrap">Purchase <span className="font-normal text-gray-400 text-[10px]">(ROAS)</span></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {dailyData.map((row, idx) => (
+                        <tr key={idx} className="border-b border-border hover:bg-gray-50/60 transition-colors">
+                          <td className="py-3 px-4 font-medium text-gray-900 whitespace-nowrap">{row.date}</td>
+                          <td className="py-3 px-4 text-gray-700">${row.dailyBudget}</td>
+                          <td className="py-3 px-4 text-gray-700">${row.spend}</td>
+                          <td className="py-3 px-4 text-gray-700">{row.impressions.toLocaleString()}</td>
+                          <td className="py-3 px-4 text-gray-700">${row.cpm}</td>
+                          <td className="py-3 px-4 text-gray-700">{row.clicks.toLocaleString()}</td>
+                          <td className="py-3 px-4 text-gray-700">${row.cpc}<br /><span className="text-gray-400 text-xs">{row.ctr}%</span></td>
+                          <td className="py-3 px-4 text-gray-700">{row.event1s}</td>
+                          <td className="py-3 px-4 text-gray-700">${row.cpaEvent1s}<br /><span className="text-gray-400 text-xs">{row.cvrEvent1s}%</span></td>
+                          <td className="py-3 px-4 text-gray-700">{row.event2s}</td>
+                          <td className="py-3 px-4 text-gray-700">${row.cpaEvent2s}<br /><span className="text-gray-400 text-xs">{row.cvrEvent2s}%</span></td>
+                          <td className="py-3 px-4 text-gray-700">{row.event3s}</td>
+                          <td className="py-3 px-4 text-gray-700">${row.cpaEvent3s}<br /><span className="text-gray-400 text-xs">{row.cvrEvent3s}%</span></td>
+                          <td className="py-3 px-4 text-gray-700">${row.purchaseValue}<br /><span className="text-gray-400 text-xs">{row.roas}</span></td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+          </div>
+        </div>
+
       </div>
 
       <style>{`
@@ -476,64 +695,6 @@ const Analysis360 = () => {
           -webkit-box-orient: vertical;
           overflow: hidden;
         }
-
-        /* Section Divider - Full-width Bar */
-        .section-divider-fullwidth {
-          position: relative;
-          margin: 40px -1rem 32px 0;
-          padding: 0;
-          height: 36px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-
-        @media (min-width: 768px) {
-          .section-divider-fullwidth {
-            margin: 40px -1.5rem 32px 0;
-          }
-        }
-
-        .section-divider-fullwidth::before {
-          content: '';
-          position: absolute;
-          left: 0;
-          right: 0;
-          top: 0;
-          height: 100%;
-          background: linear-gradient(180deg, #F5F1FF 0%, #EDE7FF 100%);
-          border-top: 1px solid #E0D5FF;
-          border-bottom: 1px solid #E0D5FF;
-        }
-
-        .divider-bar-content {
-          position: relative;
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          z-index: 1;
-        }
-
-        .divider-bar-icon {
-          width: 20px;
-          height: 20px;
-          border-radius: 4px;
-          background: linear-gradient(135deg, #F5F1FF 0%, #E0E7FF 100%);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: #7033f5;
-          font-size: 10px;
-        }
-
-        .divider-bar-text {
-          font-size: 11px;
-          font-weight: 700;
-          letter-spacing: 0.12em;
-          color: #64748B;
-          text-transform: uppercase;
-        }
-
         .ad-social {
           padding: 10px 12px;
           display: flex;
@@ -542,7 +703,6 @@ const Analysis360 = () => {
           color: #6B7280;
           overflow: hidden;
         }
-
         .social-item {
           display: flex;
           align-items: center;
