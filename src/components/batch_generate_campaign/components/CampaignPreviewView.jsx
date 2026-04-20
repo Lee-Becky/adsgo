@@ -4,9 +4,11 @@ import {
   Rocket, Edit3, DollarSign, X, Check, Globe,
   Layers, Target, Box, Plus, Tag, Link as LinkIcon, Megaphone,
   ChevronDown, Search, Languages, Users, UserPlus, UserMinus,
-  ShoppingBag, Monitor, Smartphone, Layout, Facebook, Loader2, Trash2
+  ShoppingBag, Monitor, Smartphone, Layout, Facebook, Loader2, Trash2,
+  Database, ListFilter
 } from 'lucide-react';
 import useDropdownLoading from '../../../hooks/useDropdownLoading';
+import { MOCK_CATALOGS, MOCK_PRODUCT_SETS } from './ProductSelector';
 
 
 
@@ -20,6 +22,153 @@ const CTA_OPTIONS = [
   'Download',
   'Watch More'
 ];
+
+const FEED_VARS = [
+  { key: 'product.name',              label: '标题' },
+  { key: 'product.brand',             label: '品牌' },
+  { key: 'product.retailer_id',       label: '内容编号' },
+  { key: 'product.description',       label: '简介' },
+  { key: 'product.short_description', label: '简短描述' },
+  { key: 'product.price',             label: '价格' },
+  { key: 'product.current_price',     label: '当前价格' },
+  { key: 'product.unit_price',        label: '单价' },
+  { key: 'product.custom_label_0',    label: '自定义标签 0' },
+  { key: 'product.custom_label_1',    label: '自定义标签 1' },
+  { key: 'product.custom_label_2',    label: '自定义标签 2' },
+  { key: 'product.custom_label_3',    label: '自定义标签 3' },
+  { key: 'product.custom_label_4',    label: '自定义标签 4' },
+  { key: 'product.custom_number_0',   label: '自定义数字 0' },
+  { key: 'product.custom_number_1',   label: '自定义数字 1' },
+  { key: 'product.custom_number_2',   label: '自定义数字 2' },
+  { key: 'product.custom_number_3',   label: '自定义数字 3' },
+  { key: 'product.custom_number_4',   label: '自定义数字 4' },
+  { key: 'product.url',               label: '网址' },
+];
+
+const escapeHtml = (s) => s.replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+
+const valueToHtml = (v) => {
+  if (!v) return '';
+  const parts = [];
+  let rest = v;
+  const re = /\{\{([^}]+)\}\}/g;
+  let lastIndex = 0;
+  let m;
+  while ((m = re.exec(v)) !== null) {
+    if (m.index > lastIndex) parts.push(escapeHtml(v.slice(lastIndex, m.index)));
+    parts.push(`<span contenteditable="false" data-var="${m[1]}" class="inline-flex items-center px-2 py-0.5 mx-0.5 bg-primary-50 text-primary-600 text-xs font-semibold rounded align-middle select-none">${escapeHtml(m[1])}</span>`);
+    lastIndex = m.index + m[0].length;
+  }
+  if (lastIndex < v.length) parts.push(escapeHtml(v.slice(lastIndex)));
+  return parts.join('');
+};
+
+const domToValue = (el) => {
+  let out = '';
+  el.childNodes.forEach(node => {
+    if (node.nodeType === 3) out += node.textContent;
+    else if (node.nodeType === 1 && node.dataset && node.dataset.var) out += `{{${node.dataset.var}}}`;
+    else if (node.nodeType === 1) out += node.textContent;
+  });
+  return out;
+};
+
+const VariableTextInput = ({ value, onChange, placeholder, multiline = false, vars }) => {
+  const divRef = useRef(null);
+  const lastSyncedRef = useRef(value || '');
+  const [showDropdown, setShowDropdown] = useState(false);
+
+  useEffect(() => {
+    if (!divRef.current) return;
+    if ((value || '') !== lastSyncedRef.current) {
+      divRef.current.innerHTML = valueToHtml(value || '');
+      lastSyncedRef.current = value || '';
+    }
+  }, [value]);
+
+  useEffect(() => {
+    if (divRef.current && divRef.current.innerHTML === '') {
+      divRef.current.innerHTML = valueToHtml(value || '');
+      lastSyncedRef.current = value || '';
+    }
+  }, []);
+
+  const handleInput = () => {
+    if (!divRef.current) return;
+    const v = domToValue(divRef.current);
+    lastSyncedRef.current = v;
+    onChange(v);
+  };
+
+  const insertVarAtCursor = (key) => {
+    if (!divRef.current) return;
+    divRef.current.focus();
+    const sel = window.getSelection();
+    let range;
+    if (sel && sel.rangeCount > 0 && divRef.current.contains(sel.anchorNode)) {
+      range = sel.getRangeAt(0);
+      range.deleteContents();
+    } else {
+      range = document.createRange();
+      range.selectNodeContents(divRef.current);
+      range.collapse(false);
+    }
+    const span = document.createElement('span');
+    span.setAttribute('contenteditable', 'false');
+    span.setAttribute('data-var', key);
+    span.className = 'inline-flex items-center px-2 py-0.5 mx-0.5 bg-primary-50 text-primary-600 text-xs font-semibold rounded align-middle select-none';
+    span.textContent = key;
+    range.insertNode(span);
+    const after = document.createTextNode('\u00a0');
+    span.parentNode.insertBefore(after, span.nextSibling);
+    const newRange = document.createRange();
+    newRange.setStartAfter(after);
+    newRange.collapse(true);
+    sel.removeAllRanges();
+    sel.addRange(newRange);
+    handleInput();
+  };
+
+  return (
+    <div className="relative">
+      <div
+        ref={divRef}
+        contentEditable
+        suppressContentEditableWarning
+        onInput={handleInput}
+        data-placeholder={placeholder}
+        className={`ce-input w-full ${multiline ? 'min-h-[8rem] p-5' : 'h-12 px-5 flex items-center'} pr-12 border border-gray-200 rounded-base bg-white text-sm font-medium focus:border-primary-500 outline-none transition-all whitespace-pre-wrap break-words`}
+      />
+      <button
+        type="button"
+        onMouseDown={e => e.preventDefault()}
+        onClick={() => setShowDropdown(v => !v)}
+        title="插入变量"
+        className={`absolute ${multiline ? 'right-2 top-2' : 'right-2 top-1/2 -translate-y-1/2'} w-8 h-8 flex items-center justify-center border border-gray-200 rounded text-gray-400 bg-white hover:border-primary-400 hover:text-primary-500`}
+      >
+        <Plus size={14} />
+      </button>
+      {showDropdown && (
+        <>
+          <div className="fixed inset-0 z-[290]" onClick={() => setShowDropdown(false)} />
+          <div className={`absolute right-0 ${multiline ? 'top-12' : 'top-full mt-1'} w-44 bg-white rounded-base border border-gray-200 shadow-xl z-[300] max-h-64 overflow-auto py-1`}>
+            {vars.map(v => (
+              <button
+                key={v.key}
+                type="button"
+                onMouseDown={e => e.preventDefault()}
+                onClick={() => { insertVarAtCursor(v.key); setShowDropdown(false); }}
+                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-primary-50 hover:text-primary-600"
+              >
+                {v.label}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+};
 
 const AVAILABLE_LOCATIONS = [
   { id: 'US', name: 'United States' },
@@ -129,7 +278,7 @@ const DPAPreviewCard = () => {
 };
 
 // Sub-component for Adset Editing to prevent parent re-renders and scroll resets
-const EditAdSetModal = ({ isOpen, adSet, onUpdateField, onToggleItem, onClose, authStatus, selectedAccount, onAuthStatusChange, onSelectAccount }) => {
+const EditAdSetModal = ({ isOpen, adSet, onUpdateField, onToggleItem, onClose, authStatus, selectedAccount, onAuthStatusChange, onSelectAccount, budgetType, dailyBudget }) => {
   const [locationSearch, setLocationSearch] = useState('');
   const [showLocationDropdown, setShowLocationDropdown] = useState(false);
   const [interestSearch, setInterestSearch] = useState('');
@@ -189,13 +338,52 @@ const EditAdSetModal = ({ isOpen, adSet, onUpdateField, onToggleItem, onClose, a
             <label className="text-xs font-medium text-gray-500 px-1">广告组名称</label>
             <div className="relative group">
               <Edit3 size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-primary-500 transition-colors" />
-              <input 
-                type="text" 
-                value={adSet.name} 
-                onChange={e => onUpdateField('name', e.target.value)} 
-                className="w-full h-14 pl-12 pr-5 border border-gray-200 rounded-base px-3 py-2 text-sm text-gray-700 bg-white focus:outline-none focus:border-primary-500 focus:shadow-primary-focus transition-all duration-200" 
+              <input
+                type="text"
+                value={adSet.name}
+                onChange={e => onUpdateField('name', e.target.value)}
+                className="w-full h-14 pl-12 pr-5 border border-gray-200 rounded-base px-3 py-2 text-sm text-gray-700 bg-white focus:outline-none focus:border-primary-500 focus:shadow-primary-focus transition-all duration-200"
               />
             </div>
+          </div>
+
+          {/* Daily Budget — CBO readonly, ABO editable */}
+          <div className="space-y-3">
+            <label className="text-xs font-medium text-gray-500 px-1">Daily Budget</label>
+            {budgetType === 'CBO' ? (
+              <>
+                <div className="relative">
+                  <DollarSign size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300" />
+                  <input
+                    type="text"
+                    readOnly
+                    value="Campaign Budget Optimize"
+                    className="w-full h-14 pl-12 pr-5 border border-gray-200 rounded-base text-sm font-medium text-gray-500 bg-gray-50 cursor-not-allowed outline-none"
+                  />
+                </div>
+                <p className="text-[11px] text-gray-400 px-1">
+                  当前 Campaign 采用 CBO，预算由广告系列统一分配，无法在广告组层级修改。
+                </p>
+              </>
+            ) : (
+              <>
+                <div className="relative group">
+                  <DollarSign size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-primary-500 transition-colors" />
+                  <input
+                    type="number"
+                    min="1"
+                    step="1"
+                    value={adSet.dailyBudget ?? dailyBudget}
+                    onChange={e => onUpdateField('dailyBudget', Number(e.target.value))}
+                    className="w-full h-14 pl-12 pr-16 border border-gray-200 rounded-base text-sm text-gray-700 bg-white focus:outline-none focus:border-primary-500 focus:shadow-primary-focus transition-all duration-200"
+                  />
+                  <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-medium text-gray-400 pointer-events-none">/ day</span>
+                </div>
+                <p className="text-[11px] text-gray-400 px-1">
+                  初始值取自预览页顶部 Daily Budget；可在此广告组独立覆盖。
+                </p>
+              </>
+            )}
           </div>
 
           <div className="h-px bg-gray-100" />
@@ -801,6 +989,10 @@ const CampaignPreviewView = ({
   adsetNameTemplate = '{location}-{audience_type}-{creative_type}-{date}',
   adNameTemplate = '{Brand}-{creative_type}-{number}-{date}',
   selectedLocations = [],
+  selectedCatalog = null,
+  selectedProductSet = '',
+  onSelectCatalog,
+  onSelectProductSet,
 }) => {
   const isFlexible = adType === 'FLEXIBLE' && (campaignObjective === 'sales_conversions' || campaignObjective === 'app_promotion');
 
@@ -817,6 +1009,8 @@ const CampaignPreviewView = ({
   const [localAdSets, setLocalAdSets] = useState([]);
   const [editingAdSetIndex, setEditingAdSetIndex] = useState(null);
   const [editingAdInfo, setEditingAdInfo] = useState(null);
+  const [editAdCatalogOpen, setEditAdCatalogOpen] = useState(false);
+  const [editAdSetOpen, setEditAdSetOpen] = useState(false);
   const [changeCreativeInfo, setChangeCreativeInfo] = useState(null);
   const [loadedAdsCount, setLoadedAdsCount] = useState(0);
   const [isEditingCampaignName, setIsEditingCampaignName] = useState(false);
@@ -1065,6 +1259,9 @@ const CampaignPreviewView = ({
     if (!editingAdInfo) return null;
     const { asIndex, adIndex } = editingAdInfo;
     const ad = localAdSets[asIndex].ads[adIndex];
+    const isCatalog = campaignType === 'CATALOG';
+    const maxHeadlines = isCatalog ? 1 : 5;
+    const maxPrimaryTexts = isCatalog ? 1 : 5;
     return (
       <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[200] p-4 animate-in fade-in">
         <div className="bg-white w-full max-w-xl rounded-section shadow-xl overflow-hidden flex flex-col max-h-[90vh]">
@@ -1077,28 +1274,51 @@ const CampaignPreviewView = ({
             <div className="space-y-3">
               <div className="flex items-center justify-between px-1">
                 <label className="text-xs font-medium text-gray-400">广告标题 (Headline)</label>
-                <span className="text-xs text-gray-400">{(Array.isArray(ad.headline) ? ad.headline : [ad.headline]).length}/5</span>
+                {!isCatalog && (
+                  <span className="text-xs text-gray-400">{(Array.isArray(ad.headline) ? ad.headline : [ad.headline]).length}/{maxHeadlines}</span>
+                )}
               </div>
               {(Array.isArray(ad.headline) ? ad.headline : [ad.headline]).map((val, i) => {
                 const headlines = Array.isArray(ad.headline) ? ad.headline : [ad.headline];
+                const useVarInput = isCatalog && i === 0;
                 return (
                   <div key={i} className="flex items-center gap-2">
-                    <input
-                      type="text"
-                      value={val}
-                      onChange={e => {
-                        const next = [...localAdSets];
-                        const arr = Array.isArray(next[asIndex].ads[adIndex].headline)
-                          ? [...next[asIndex].ads[adIndex].headline]
-                          : [next[asIndex].ads[adIndex].headline];
-                        arr[i] = e.target.value;
-                        next[asIndex].ads[adIndex].headline = arr;
-                        setLocalAdSets(next);
-                      }}
-                      placeholder={`标题 ${i + 1}...`}
-                      className="flex-1 h-12 px-5 border border-gray-200 rounded-base bg-white text-sm font-medium focus:border-primary-500 outline-none transition-all"
-                    />
-                    {headlines.length > 1 && (
+                    <div className="flex-1 relative">
+                      {useVarInput ? (
+                        <VariableTextInput
+                          value={val || ''}
+                          onChange={v => {
+                            const next = [...localAdSets];
+                            const arr = Array.isArray(next[asIndex].ads[adIndex].headline)
+                              ? [...next[asIndex].ads[adIndex].headline]
+                              : [next[asIndex].ads[adIndex].headline];
+                            arr[0] = v;
+                            next[asIndex].ads[adIndex].headline = arr;
+                            setLocalAdSets(next);
+                          }}
+                          placeholder={`标题 ${i + 1}...`}
+                          multiline={false}
+                          vars={FEED_VARS}
+                        />
+                      ) : (
+                        <input
+                          type="text"
+                          value={val}
+                          onChange={e => {
+                            const next = [...localAdSets];
+                            const arr = Array.isArray(next[asIndex].ads[adIndex].headline)
+                              ? [...next[asIndex].ads[adIndex].headline]
+                              : [next[asIndex].ads[adIndex].headline];
+                            arr[i] = e.target.value;
+                            next[asIndex].ads[adIndex].headline = arr;
+                            setLocalAdSets(next);
+                          }}
+                          placeholder={`标题 ${i + 1}...`}
+                          className="w-full h-12 px-5 border border-gray-200 rounded-base bg-white text-sm font-medium focus:border-primary-500 outline-none transition-all"
+                        />
+                      )}
+                    </div>
+                    {!isCatalog && headlines.length > 1 && (
                       <button
                         onClick={() => {
                           const next = [...localAdSets];
@@ -1113,7 +1333,7 @@ const CampaignPreviewView = ({
                   </div>
                 );
               })}
-              {(Array.isArray(ad.headline) ? ad.headline : [ad.headline]).length < 5 && (
+              {(Array.isArray(ad.headline) ? ad.headline : [ad.headline]).length < maxHeadlines && (
                 <button
                   onClick={() => {
                     const next = [...localAdSets];
@@ -1134,27 +1354,50 @@ const CampaignPreviewView = ({
             <div className="space-y-3">
               <div className="flex items-center justify-between px-1">
                 <label className="text-xs font-medium text-gray-400">广告正文 (Primary Text)</label>
-                <span className="text-xs text-gray-400">{(Array.isArray(ad.primaryText) ? ad.primaryText : [ad.primaryText]).length}/5</span>
+                {!isCatalog && (
+                  <span className="text-xs text-gray-400">{(Array.isArray(ad.primaryText) ? ad.primaryText : [ad.primaryText]).length}/{maxPrimaryTexts}</span>
+                )}
               </div>
               {(Array.isArray(ad.primaryText) ? ad.primaryText : [ad.primaryText]).map((val, i) => {
                 const texts = Array.isArray(ad.primaryText) ? ad.primaryText : [ad.primaryText];
+                const useVarInput = isCatalog && i === 0;
                 return (
                   <div key={i} className="flex items-start gap-2">
-                    <textarea
-                      value={val}
-                      onChange={e => {
-                        const next = [...localAdSets];
-                        const arr = Array.isArray(next[asIndex].ads[adIndex].primaryText)
-                          ? [...next[asIndex].ads[adIndex].primaryText]
-                          : [next[asIndex].ads[adIndex].primaryText];
-                        arr[i] = e.target.value;
-                        next[asIndex].ads[adIndex].primaryText = arr;
-                        setLocalAdSets(next);
-                      }}
-                      placeholder={`正文 ${i + 1}...`}
-                      className="flex-1 p-5 border border-gray-200 rounded-base bg-white text-sm font-medium h-32 resize-none focus:border-primary-500 outline-none transition-all"
-                    />
-                    {(Array.isArray(ad.primaryText) ? ad.primaryText : [ad.primaryText]).length > 1 && (
+                    <div className="flex-1 relative">
+                      {useVarInput ? (
+                        <VariableTextInput
+                          value={val || ''}
+                          onChange={v => {
+                            const next = [...localAdSets];
+                            const arr = Array.isArray(next[asIndex].ads[adIndex].primaryText)
+                              ? [...next[asIndex].ads[adIndex].primaryText]
+                              : [next[asIndex].ads[adIndex].primaryText];
+                            arr[0] = v;
+                            next[asIndex].ads[adIndex].primaryText = arr;
+                            setLocalAdSets(next);
+                          }}
+                          placeholder={`正文 ${i + 1}...`}
+                          multiline={true}
+                          vars={FEED_VARS}
+                        />
+                      ) : (
+                        <textarea
+                          value={val}
+                          onChange={e => {
+                            const next = [...localAdSets];
+                            const arr = Array.isArray(next[asIndex].ads[adIndex].primaryText)
+                              ? [...next[asIndex].ads[adIndex].primaryText]
+                              : [next[asIndex].ads[adIndex].primaryText];
+                            arr[i] = e.target.value;
+                            next[asIndex].ads[adIndex].primaryText = arr;
+                            setLocalAdSets(next);
+                          }}
+                          placeholder={`正文 ${i + 1}...`}
+                          className="w-full p-5 border border-gray-200 rounded-base bg-white text-sm font-medium h-32 resize-none focus:border-primary-500 outline-none transition-all"
+                        />
+                      )}
+                    </div>
+                    {!isCatalog && texts.length > 1 && (
                       <button
                         onClick={() => {
                           const next = [...localAdSets];
@@ -1172,7 +1415,7 @@ const CampaignPreviewView = ({
                   </div>
                 );
               })}
-              {(Array.isArray(ad.primaryText) ? ad.primaryText : [ad.primaryText]).length < 5 && (
+              {(Array.isArray(ad.primaryText) ? ad.primaryText : [ad.primaryText]).length < maxPrimaryTexts && (
                 <button
                   onClick={() => {
                     const next = [...localAdSets];
@@ -1206,33 +1449,101 @@ const CampaignPreviewView = ({
               </div>
             </div>
 
-            {campaignType !== 'CATALOG' && (
+            {isCatalog ? (
               <>
                 <div className="space-y-3">
-                  <label className="text-xs font-medium text-gray-400 px-1 flex items-center gap-2"><LinkIcon size={12} className="text-primary-500"/> 落地页 URL</label>
-                  <input 
-                    type="text" 
-                    value={ad.destinationUrl} 
-                    onChange={e => {
-                      const next = [...localAdSets]; next[asIndex].ads[adIndex].destinationUrl = e.target.value; setLocalAdSets(next);
-                    }} 
-                    className="w-full h-12 px-5 border border-gray-200 rounded-base bg-white text-sm font-medium focus:border-primary-500 outline-none transition-all" 
-                  />
+                  <label className="text-xs font-medium text-gray-400 px-1 flex items-center gap-2"><Database size={12} className="text-primary-500"/> 目录</label>
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={() => { setEditAdCatalogOpen(v => !v); setEditAdSetOpen(false); }}
+                      className="w-full h-12 px-5 flex items-center justify-between border border-gray-200 rounded-base bg-white text-sm font-medium hover:border-primary-300 focus:border-primary-500 outline-none transition-all"
+                    >
+                      <span className={selectedCatalog ? 'text-gray-800' : 'text-gray-400'}>
+                        {selectedCatalog?.name || '请选择目录'}
+                      </span>
+                      <ChevronDown size={14} className={`text-gray-400 transition-transform ${editAdCatalogOpen ? 'rotate-180' : ''}`} />
+                    </button>
+                    {editAdCatalogOpen && (
+                      <>
+                        <div className="fixed inset-0 z-[290]" onClick={() => setEditAdCatalogOpen(false)} />
+                        <div className="absolute left-0 right-0 top-full mt-1 bg-white rounded-base border border-gray-200 shadow-xl z-[300] max-h-56 overflow-auto py-1">
+                          {MOCK_CATALOGS.map(c => (
+                            <button
+                              key={c.id}
+                              type="button"
+                              onClick={() => { onSelectCatalog?.(c); setEditAdCatalogOpen(false); }}
+                              className={`w-full text-left px-4 py-2 text-sm hover:bg-primary-50 ${selectedCatalog?.id === c.id ? 'bg-primary-50 text-primary-600' : 'text-gray-700'}`}
+                            >
+                              <div className="font-medium truncate">{c.name}</div>
+                              <div className="text-[11px] text-gray-400 mt-0.5">id: {c.id}</div>
+                            </button>
+                          ))}
+                        </div>
+                      </>
+                    )}
+                  </div>
                 </div>
+
                 <div className="space-y-3">
-                  <label className="text-xs font-medium text-gray-400 px-1 flex items-center gap-2"><Globe size={12} className="text-primary-500"/> UTM 参数 (Tracking)</label>
-                  <input 
-                    type="text" 
-                    placeholder="utm_source=meta&utm_medium=paid..."
-                    value={ad.utmParams || ''} 
-                    onChange={e => {
-                      const next = [...localAdSets]; next[asIndex].ads[adIndex].utmParams = e.target.value; setLocalAdSets(next);
-                    }} 
-                    className="w-full h-12 px-5 border border-gray-200 rounded-base bg-white text-sm font-medium focus:border-primary-500 outline-none transition-all" 
-                  />
+                  <label className="text-xs font-medium text-gray-400 px-1 flex items-center gap-2"><ListFilter size={12} className="text-primary-500"/> 产品系列</label>
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={() => { setEditAdSetOpen(v => !v); setEditAdCatalogOpen(false); }}
+                      className="w-full h-12 px-5 flex items-center justify-between border border-gray-200 rounded-base bg-white text-sm font-medium hover:border-primary-300 focus:border-primary-500 outline-none transition-all"
+                    >
+                      <span className={selectedProductSet ? 'text-gray-800' : 'text-gray-400'}>
+                        {selectedProductSet || '请选择产品系列'}
+                      </span>
+                      <ChevronDown size={14} className={`text-gray-400 transition-transform ${editAdSetOpen ? 'rotate-180' : ''}`} />
+                    </button>
+                    {editAdSetOpen && (
+                      <>
+                        <div className="fixed inset-0 z-[290]" onClick={() => setEditAdSetOpen(false)} />
+                        <div className="absolute left-0 right-0 top-full mt-1 bg-white rounded-base border border-gray-200 shadow-xl z-[300] max-h-56 overflow-auto py-1">
+                          {MOCK_PRODUCT_SETS.map(s => (
+                            <button
+                              key={s}
+                              type="button"
+                              onClick={() => { onSelectProductSet?.(s); setEditAdSetOpen(false); }}
+                              className={`w-full text-left px-4 py-2 text-sm hover:bg-primary-50 ${selectedProductSet === s ? 'bg-primary-50 text-primary-600' : 'text-gray-700'}`}
+                            >
+                              {s}
+                            </button>
+                          ))}
+                        </div>
+                      </>
+                    )}
+                  </div>
                 </div>
               </>
+            ) : (
+              <div className="space-y-3">
+                <label className="text-xs font-medium text-gray-400 px-1 flex items-center gap-2"><LinkIcon size={12} className="text-primary-500"/> 落地页 URL</label>
+                <input
+                  type="text"
+                  value={ad.destinationUrl}
+                  onChange={e => {
+                    const next = [...localAdSets]; next[asIndex].ads[adIndex].destinationUrl = e.target.value; setLocalAdSets(next);
+                  }}
+                  className="w-full h-12 px-5 border border-gray-200 rounded-base bg-white text-sm font-medium focus:border-primary-500 outline-none transition-all"
+                />
+              </div>
             )}
+
+            <div className="space-y-3">
+              <label className="text-xs font-medium text-gray-400 px-1 flex items-center gap-2"><Globe size={12} className="text-primary-500"/> UTM 参数 (Tracking)</label>
+              <input
+                type="text"
+                placeholder="utm_source=meta&utm_medium=paid..."
+                value={ad.utmParams || ''}
+                onChange={e => {
+                  const next = [...localAdSets]; next[asIndex].ads[adIndex].utmParams = e.target.value; setLocalAdSets(next);
+                }}
+                className="w-full h-12 px-5 border border-gray-200 rounded-base bg-white text-sm font-medium focus:border-primary-500 outline-none transition-all"
+              />
+            </div>
 
             <div className="space-y-3">
               <label className="text-xs font-medium text-gray-400 px-1 flex items-center gap-2"><Tag size={12} className="text-primary-500"/> 突显优惠 (Promo Offer)</label>
@@ -1738,7 +2049,7 @@ const CampaignPreviewView = ({
           </button>
         </div>
       </div>
-      <EditAdSetModal 
+      <EditAdSetModal
         isOpen={editingAdSetIndex !== null}
         adSet={editingAdSetIndex !== null ? localAdSets[editingAdSetIndex] : null}
         onUpdateField={handleUpdateField}
@@ -1748,8 +2059,10 @@ const CampaignPreviewView = ({
         selectedAccount={selectedAccount}
         onAuthStatusChange={onAuthStatusChange}
         onSelectAccount={onSelectAccount}
+        budgetType={budgetType}
+        dailyBudget={localBudget}
       />
-      <EditAdModal />
+      {EditAdModal()}
       <ChangeCreativeModal />
     </div>
   );

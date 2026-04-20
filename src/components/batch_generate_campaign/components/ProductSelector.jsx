@@ -16,11 +16,13 @@ import { generateAIGCCreative } from '../services/mockAiService';
 import { authorizePlatform, MOCK_ACCOUNTS } from '../services/authService';
 import useDropdownLoading from '../../../hooks/useDropdownLoading';
 
-const MOCK_CATALOGS = [
+export const MOCK_CATALOGS = [
   { id: 'cat_8820192', name: 'Luminaire official catalog 2024' },
   { id: 'cat_1192837', name: 'Seasonal accessories feed' },
   { id: 'cat_5543210', name: 'Best sellers - global' },
 ];
+
+export const MOCK_PRODUCT_SETS = ['All Products', 'Best Sellers', 'New Arrivals'];
 
 const ANALYSIS_STEPS = [
   { text: "Task received: Analyzing https://www.cupshe.com with comprehensive product and audience analysis.", type: 'system' },
@@ -473,7 +475,7 @@ const SelectionModal = ({
 
 // --- ProductSelector component ---
 
-const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives, onUpdateCreatives, onAnalysisStart, onAnalysisComplete, onReset, hasGeneratedOnce, analysisFinished, isAnalyzing, campaignType, onCampaignTypeChange, selectedAccount, onSelectAccount, productAnalyses, onProductAnalysesChange, authStatus, onAuthStatusChange, onMetaAccountPick }) => {
+const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives, onUpdateCreatives, onAnalysisStart, onAnalysisComplete, onReset, hasGeneratedOnce, analysisFinished, isAnalyzing, campaignType, onCampaignTypeChange, selectedAccount, onSelectAccount, productAnalyses, onProductAnalysesChange, authStatus, onAuthStatusChange, onMetaAccountPick, selectedCatalog: selectedCatalogProp, onSelectCatalog, selectedProductSet: selectedProductSetProp, onSelectProductSet }) => {
   const [urlInput, setUrlInput] = useState('');
   const [isAuthLoading, setIsAuthLoading] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
@@ -482,8 +484,12 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
   const [activeModal, setActiveModal] = useState(null);
   const [modalContext, setModalContext] = useState(null);
   const [expandedAnalysisId, setExpandedAnalysisId] = useState(null);
-  const [selectedCatalog, setSelectedCatalog] = useState(null);
-  const [selectedProductSet, setSelectedProductSet] = useState('All Products');
+  const [selectedCatalogLocal, setSelectedCatalogLocal] = useState(null);
+  const [selectedProductSetLocal, setSelectedProductSetLocal] = useState('All Products');
+  const selectedCatalog = selectedCatalogProp !== undefined ? selectedCatalogProp : selectedCatalogLocal;
+  const setSelectedCatalog = onSelectCatalog || setSelectedCatalogLocal;
+  const selectedProductSet = selectedProductSetProp !== undefined ? selectedProductSetProp : selectedProductSetLocal;
+  const setSelectedProductSet = onSelectProductSet || setSelectedProductSetLocal;
   const [catalogDropdownOpen, setCatalogDropdownOpen] = useState(false);
   const [setDropdownOpen, setSetDropdownOpen] = useState(false);
   const accountLoading = useDropdownLoading('accounts', authStatus?.meta);
@@ -1042,7 +1048,7 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
                             <p className="text-xs font-medium text-gray-400 animate-pulse">Loading product sets...</p>
                           </div>
                         ) : (
-                          ['All Products', 'Best Sellers', 'New Arrivals'].map(s => (
+                          MOCK_PRODUCT_SETS.map(s => (
                             <div key={s} onClick={() => { setSelectedProductSet(s); setSetDropdownOpen(false); }} className="flex items-center justify-between px-6 py-4 hover:bg-gray-50 cursor-pointer transition-colors group">
                               <p className="text-xs font-medium text-gray-800 group-hover:text-primary-500 transition-colors">{s}</p>
                               {selectedProductSet === s && <Check size={16} className="text-primary-500" />}

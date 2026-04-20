@@ -461,7 +461,6 @@ const NAMING_VARS = [
   { key: 'creative_type', label: 'Creative type' },
   { key: 'theme',         label: 'Theme' },
   { key: 'number',        label: '编号' },
-  { key: '__custom__',    label: '自定义(...)' },
 ];
 
 const insertVar = (ref, template, setTemplate, varKey, separator = '') => {
@@ -599,13 +598,15 @@ const NamingStrategySection = ({
   const [adHistory, setAdHistory]             = useState(AD_NAME_HISTORY_DEFAULTS);
   const [openHistoryFor, setOpenHistoryFor]   = useState(null);
 
-  // 共享变量库状态
-  const [activeFieldKey, setActiveFieldKey]       = useState(null);
-  const [showSepPopover, setShowSepPopover]       = useState(false);
-  const [showCustomPopover, setShowCustomPopover] = useState(false);
-  const [pendingVarKey, setPendingVarKey]         = useState(null);
-  const [customVarText, setCustomVarText]         = useState('');
-  const [customSep, setCustomSep]                 = useState('-');
+  // 共享状态
+  const [activeFieldKey, setActiveFieldKey] = useState(null);
+
+  // 全局分隔符（统一选择，所有插入共用）
+  const [separator, setSeparator] = useState('-');
+
+  // 自定义分隔符 popover 控制
+  const [showCustomSepPopover, setShowCustomSepPopover] = useState(false);
+  const [customSepDraft, setCustomSepDraft] = useState('');
 
   const SEP_OPTIONS = [
     { value: '-', label: '-' },
@@ -618,8 +619,7 @@ const NamingStrategySection = ({
   React.useEffect(() => {
     const handler = () => {
       setActiveFieldKey(null);
-      setShowSepPopover(false);
-      setShowCustomPopover(false);
+      setShowCustomSepPopover(false);
     };
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
@@ -650,47 +650,19 @@ const NamingStrategySection = ({
 
   const handleChipClick = (v) => {
     if (!activeField) return;
-    if (v.key === '__custom__') {
-      setCustomVarText('');
-      setCustomSep('-');
-      setShowSepPopover(false);
-      setPendingVarKey(null);
-      setShowCustomPopover(true);
-    } else {
-      const pos = activeField.inputRef.current?.selectionStart ?? activeField.template.length;
-      if (pos === 0) {
-        insertVar(activeField.inputRef, activeField.template, activeField.setTemplate, v.key, '');
-      } else {
-        setPendingVarKey(v.key);
-        setShowSepPopover(true);
-        setShowCustomPopover(false);
-      }
-    }
+    const pos = activeField.inputRef.current?.selectionStart ?? activeField.template.length;
+    const sep = pos === 0 ? '' : separator;
+    insertVar(activeField.inputRef, activeField.template, activeField.setTemplate, v.key, sep);
   };
 
-  const handleInsertWithSep = (sep) => {
-    if (!activeField) return;
-    insertVar(activeField.inputRef, activeField.template, activeField.setTemplate, pendingVarKey, sep);
-    setShowSepPopover(false);
-    setPendingVarKey(null);
+  const handleConfirmCustomSep = () => {
+    const val = customSepDraft;
+    if (!val) return;
+    setSeparator(val);
+    setShowCustomSepPopover(false);
   };
 
-  const handleInsertCustom = () => {
-    if (!activeField) return;
-    const text = customVarText.trim();
-    if (!text) return;
-    const el = activeField.inputRef.current;
-    const pos = el?.selectionStart ?? activeField.template.length;
-    const sep = pos === 0 ? '' : customSep;
-    const insertion = pos > 0 ? `${sep}{${text}}` : `{${text}}`;
-    const next = activeField.template.slice(0, pos) + insertion + activeField.template.slice(pos);
-    activeField.setTemplate(next);
-    requestAnimationFrame(() => {
-      if (el) { el.focus(); el.setSelectionRange(pos + insertion.length, pos + insertion.length); }
-    });
-    setShowCustomPopover(false);
-    setCustomVarText('');
-  };
+  const isCustomSep = !SEP_OPTIONS.some(o => o.value === separator);
 
   return (
     <div className="space-y-6 pt-10" onClick={() => openHistoryFor && setOpenHistoryFor(null)}>
@@ -745,85 +717,98 @@ const NamingStrategySection = ({
               )}
             </div>
 
+            {/* 分隔符模块 */}
+            <div className={`px-3 pt-2.5 pb-2.5 border-b border-dashed border-gray-200 ${activeField === null ? 'pointer-events-none' : ''}`}>
+              <p className="text-[10px] text-gray-400 mb-1.5 font-medium">分隔符</p>
+              <div className="flex flex-wrap gap-1 relative">
+                {SEP_OPTIONS.map(opt => {
+                  const isSelected = separator === opt.value && !isCustomSep;
+                  return (
+                    <button
+                      key={opt.value}
+                      onMouseDown={e => e.preventDefault()}
+                      onClick={() => { setSeparator(opt.value); setShowCustomSepPopover(false); }}
+                      disabled={activeField === null}
+                      className={`px-2 py-0.5 text-[10px] font-mono border rounded transition-colors ${
+                        isSelected
+                          ? 'bg-primary-500 text-white border-primary-500'
+                          : activeField === null
+                            ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
+                            : 'border-gray-200 text-gray-500 hover:border-primary-300 hover:text-primary-600'
+                      }`}
+                    >
+                      {opt.label}
+                    </button>
+                  );
+                })}
+                <button
+                  onMouseDown={e => e.preventDefault()}
+                  onClick={() => { setCustomSepDraft(isCustomSep ? separator : ''); setShowCustomSepPopover(v => !v); }}
+                  disabled={activeField === null}
+                  className={`px-2 py-0.5 text-[10px] font-mono border rounded transition-colors ${
+                    isCustomSep
+                      ? 'bg-primary-500 text-white border-primary-500'
+                      : activeField === null
+                        ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
+                        : 'border-gray-200 text-gray-500 hover:border-primary-300 hover:text-primary-600'
+                  }`}
+                >
+                  {isCustomSep ? `自定义(${separator})` : '自定义'}
+                </button>
+
+                {showCustomSepPopover && (
+                  <>
+                    <div className="fixed inset-0 z-[290]" onClick={() => setShowCustomSepPopover(false)} />
+                    <div
+                      className="absolute right-full top-0 mr-1 w-52 bg-white rounded-base border border-gray-200 shadow-xl z-[300] p-3 animate-in fade-in zoom-in-95 duration-150"
+                      onMouseDown={e => e.stopPropagation()}
+                    >
+                      <p className="text-[11px] font-medium text-gray-500 mb-2">输入分隔符</p>
+                      <input
+                        autoFocus
+                        type="text"
+                        maxLength={5}
+                        value={customSepDraft}
+                        onChange={e => setCustomSepDraft(e.target.value)}
+                        onKeyDown={e => {
+                          if (e.key === 'Enter') handleConfirmCustomSep();
+                          if (e.key === 'Escape') setShowCustomSepPopover(false);
+                        }}
+                        placeholder="如 :: 或 |"
+                        className="w-full h-8 px-2 text-xs font-mono bg-gray-50 border border-gray-200 rounded-md outline-none focus:border-primary-500 mb-3"
+                      />
+                      <div className="flex gap-2 justify-end">
+                        <button onClick={() => setShowCustomSepPopover(false)} className="px-2 py-1 text-[11px] text-gray-400 hover:text-gray-600">取消</button>
+                        <button
+                          onClick={handleConfirmCustomSep}
+                          disabled={!customSepDraft}
+                          className="px-3 py-1 text-[11px] bg-primary-500 text-white rounded-md disabled:opacity-40 hover:bg-primary-600 transition-colors"
+                        >
+                          确定
+                        </button>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+
             {/* 变量标签列表 */}
             <div className={`flex flex-col gap-1.5 p-3 flex-1 ${activeField === null ? 'pointer-events-none' : ''}`}>
               {NAMING_VARS.map(v => (
-                <div key={v.key} className="relative">
+                <div key={v.key}>
                   {activeField === null ? (
                     <span className="block w-full px-2 py-1 text-[11px] font-semibold rounded-md border text-center bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed">
-                      {v.key === '__custom__' ? v.label : `{${v.key}}`}
+                      {`{${v.key}}`}
                     </span>
                   ) : (
                     <button
                       onMouseDown={e => e.preventDefault()}
                       onClick={() => handleChipClick(v)}
-                      className={`block w-full px-2 py-1 text-[11px] font-semibold rounded-md border text-center transition-colors ${
-                        v.key === '__custom__'
-                          ? 'bg-gray-50 text-gray-500 border-gray-200 hover:bg-gray-100 hover:text-gray-700'
-                          : 'bg-primary-50 text-primary-600 border-primary-100 hover:bg-primary-100'
-                      }`}
+                      className="block w-full px-2 py-1 text-[11px] font-semibold rounded-md border text-center transition-colors bg-primary-50 text-primary-600 border-primary-100 hover:bg-primary-100"
                     >
-                      {v.key === '__custom__' ? v.label : `{${v.key}}`}
+                      {`{${v.key}}`}
                     </button>
-                  )}
-                  {/* 分隔符 Popover */}
-                  {pendingVarKey === v.key && showSepPopover && (
-                    <>
-                      <div className="fixed inset-0 z-[290]" onClick={() => setShowSepPopover(false)} />
-                      <div className="absolute right-full top-0 mr-1 bg-white rounded-base border border-gray-200 shadow-xl z-[300] p-2.5 animate-in fade-in zoom-in-95 duration-150">
-                        <p className="text-[10px] text-gray-400 mb-1.5 font-medium">连接符</p>
-                        <div className="flex gap-1">
-                          {SEP_OPTIONS.map(opt => (
-                            <button
-                              key={opt.value}
-                              onMouseDown={e => e.preventDefault()}
-                              onClick={() => handleInsertWithSep(opt.value)}
-                              className="px-2.5 py-1 text-[11px] font-mono border border-gray-200 rounded-md hover:bg-primary-50 hover:border-primary-300 hover:text-primary-600 transition-colors text-gray-600"
-                            >
-                              {opt.label}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    </>
-                  )}
-                  {/* 自定义变量 Popover */}
-                  {v.key === '__custom__' && showCustomPopover && (
-                    <>
-                      <div className="fixed inset-0 z-[290]" onClick={() => setShowCustomPopover(false)} />
-                      <div className="absolute right-full top-0 mr-1 w-52 bg-white rounded-base border border-gray-200 shadow-xl z-[300] p-3 animate-in fade-in zoom-in-95 duration-150">
-                        <p className="text-[11px] font-medium text-gray-500 mb-2">自定义变量文本</p>
-                        <input
-                          autoFocus
-                          type="text"
-                          value={customVarText}
-                          onChange={e => setCustomVarText(e.target.value)}
-                          onKeyDown={e => { if (e.key === 'Enter') handleInsertCustom(); if (e.key === 'Escape') setShowCustomPopover(false); }}
-                          placeholder="e.g. SummerSale"
-                          className="w-full h-8 px-2 text-xs font-mono bg-gray-50 border border-gray-200 rounded-md outline-none focus:border-primary-500 mb-2.5"
-                        />
-                        <p className="text-[10px] text-gray-400 mb-1.5 font-medium">连接符</p>
-                        <div className="flex gap-1 mb-3">
-                          {SEP_OPTIONS.map(opt => (
-                            <button
-                              key={opt.value}
-                              onClick={() => setCustomSep(opt.value)}
-                              className={`px-2 py-0.5 text-[10px] font-mono border rounded transition-colors ${
-                                customSep === opt.value
-                                  ? 'bg-primary-500 text-white border-primary-500'
-                                  : 'border-gray-200 text-gray-500 hover:border-primary-300 hover:text-primary-600'
-                              }`}
-                            >
-                              {opt.label}
-                            </button>
-                          ))}
-                        </div>
-                        <div className="flex gap-2 justify-end">
-                          <button onClick={() => setShowCustomPopover(false)} className="px-2 py-1 text-[11px] text-gray-400 hover:text-gray-600">取消</button>
-                          <button onClick={handleInsertCustom} disabled={!customVarText.trim()} className="px-3 py-1 text-[11px] bg-primary-500 text-white rounded-md disabled:opacity-40 hover:bg-primary-600 transition-colors">插入</button>
-                        </div>
-                      </div>
-                    </>
                   )}
                 </div>
               ))}
@@ -840,6 +825,8 @@ const NamingStrategySection = ({
 const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
   const [selectedProducts, setSelectedProducts] = useState([]);
   const [productCreativesMap, setProductCreativesMap] = useState({});
+  const [selectedCatalog, setSelectedCatalog] = useState(null);
+  const [selectedProductSet, setSelectedProductSet] = useState('All Products');
   const [selectedAccount, setSelectedAccount] = useState(() =>
     _hasGeneratedOnce ? MOCK_ACCOUNTS[0] : null
   );
@@ -1801,6 +1788,10 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
                   productAnalyses={productAnalyses}
                   onProductAnalysesChange={setProductAnalyses}
                   onMetaAccountPick={() => { accountPickLoading.triggerLoad(); setShowMetaAccountPicker(true); }}
+                  selectedCatalog={selectedCatalog}
+                  onSelectCatalog={setSelectedCatalog}
+                  selectedProductSet={selectedProductSet}
+                  onSelectProductSet={setSelectedProductSet}
                 />
               </div>
 
@@ -2271,6 +2262,10 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
                   adsetNameTemplate={adsetNameTemplate}
                   adNameTemplate={adNameTemplate}
                   selectedLocations={selectedLocations}
+                  selectedCatalog={selectedCatalog}
+                  selectedProductSet={selectedProductSet}
+                  onSelectCatalog={setSelectedCatalog}
+                  onSelectProductSet={setSelectedProductSet}
                 />
               </div>
             </div>
