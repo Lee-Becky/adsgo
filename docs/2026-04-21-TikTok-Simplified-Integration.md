@@ -163,21 +163,29 @@ const STANDARD_EVENTS = {
 
 ## 完整的后端映射表
 
-### Objective + Goal → TikTok API 参数
+### Objective + Goal → TikTok API 参数（基于 SDK CampaignCreateBody + AdgroupCreateBody 字段核实）
 
-| 我们的 Objective | 我们的 Goal | TikTok API objective_type | optimization_goal | billing_event | 需要的资产 |
-|---|---|---|---|---|---|
-| awareness_engagement | reach | REACH | REACH | CPM | Identity |
-| awareness_engagement | video_views | VIDEO_VIEWS | VIDEO_VIEW | CPV | Identity |
-| awareness_engagement | community_interaction | ENGAGEMENT | ENGAGEMENT | CPM | Identity |
-| traffic | clicks | TRAFFIC | CLICK | CPC | — |
-| traffic | landing_page_views | TRAFFIC | LANDING_PAGE_VIEW | OCPM | — |
-| leads | website_leads | LEAD_GENERATION | LEAD | OCPM | Pixel |
-| leads | instant_form_leads | LEAD_GENERATION | LEAD_GENERATION | OCPM | Instant Form |
-| sales_conversions | web_conversions | WEB_CONVERSIONS | CONVERSIONS | OCPM | Pixel |
-| sales_conversions | shop_purchases | PRODUCT_SALES | VALUE | OCPM | TikTok Shop |
-| app_promotion | app_installs | APP_PROMOTION | APP_INSTALL | OCPM | App ID |
-| app_promotion | in_app_events | APP_PROMOTION | IN_APP_EVENT | OCPM | App ID |
+| 我们的 Objective | 我们的 Goal | Campaign: objective_type | Campaign: sales_destination | AdGroup: optimization_goal | AdGroup: billing_event | AdGroup: pacing | 需要的资产 |
+|---|---|---|---|---|---|---|---|
+| awareness_engagement | reach | REACH | — | REACH | CPM | PACING_MODE_SMOOTH | Identity |
+| awareness_engagement | video_views | VIDEO_VIEWS | — | VIDEO_VIEW | CPV | PACING_MODE_SMOOTH | Identity |
+| awareness_engagement | community_interaction | ENGAGEMENT | — | ENGAGEMENT | CPM | PACING_MODE_SMOOTH | Identity |
+| traffic | clicks | TRAFFIC | — | CLICK | CPC | PACING_MODE_SMOOTH | — |
+| traffic | landing_page_views | TRAFFIC | — | LANDING_PAGE_VIEW | OCPM | PACING_MODE_SMOOTH | — |
+| leads | website_leads | LEAD_GENERATION | — | LEAD | OCPM | PACING_MODE_SMOOTH | Pixel |
+| leads | instant_form_leads | LEAD_GENERATION | — | LEAD_GENERATION | OCPM | PACING_MODE_SMOOTH | Instant Form |
+| sales_conversions | web_conversions | WEB_CONVERSIONS | WEBSITE | CONVERSIONS | OCPM | PACING_MODE_SMOOTH | Pixel |
+| sales_conversions | shop_purchases | PRODUCT_SALES | TIKTOK_SHOP | VALUE | OCPM | PACING_MODE_SMOOTH | TikTok Shop (store_id) |
+| app_promotion | app_installs | APP_PROMOTION | — | APP_INSTALL | OCPM | PACING_MODE_SMOOTH | App ID |
+| app_promotion | in_app_events | APP_PROMOTION | — | IN_APP_EVENT | OCPM | PACING_MODE_SMOOTH | App ID |
+
+**SDK 事实依据**：
+- `sales_destination` 是 **Campaign 级参数**（存在于 `CampaignCreateBody` 中），不是 Ad Group 级
+- `optimization_goal` 在 **Ad Group 级 required**（存在于 `AdgroupCreateBody` 中）
+- `billing_event` 在 **Ad Group 级 required**
+- `pacing` 在 **Ad Group 级 required**（SDK 中标注 required，必须传）
+- `schedule_type` 在 **Ad Group 级 required**
+- `schedule_start_time` 在 **Ad Group 级 required**
 
 ### 后端默认的参数（前端不外露）
 
@@ -187,11 +195,20 @@ const STANDARD_EVENTS = {
 | `bid_type` | `BID_TYPE_COST_CAP` | 默认成本上限竞价 |
 | `billing_event` | 由 goal 决定（见上表） | CPC / CPM / CPV / OCPM |
 | `campaign_type` | `REGULAR_CAMPAIGN` | 默认普通竞价（不是 R&F） |
-| `smart_plus` | `false` | **P0 默认关闭，后端写死 Manual 模式** |
-| `smart_targeting_enabled` | `true` | 在手动受众基础上允许系统扩展，默认开启，不外露 |
-| `auto_targeting_enabled` | 不传 | **Manual Campaign 下不可用**，仅 Smart+ Campaign 可用 |
+| **Campaign 级** | | |
+| `campaign_type` | 不传（默认普通竞价） | SDK 中 optional，不传 = 普通 Auction |
+| `is_search_campaign` | `false` | P0 不支持 Search |
+| `is_advanced_dedicated_campaign` | `false` | P0 不支持 |
+| `sales_destination` | 由 goal 映射 | **SDK 确认此字段在 Campaign 级**（见下方映射表） |
+| **Ad Group 级** | | |
+| `placement_type` | `PLACEMENT_TYPE_NORMAL` | SDK 默认值，自动版位 |
+| `billing_event` | 由 goal 映射（见映射表） | required 字段，后端自动填入 |
+| `bid_type` | 由 goal 映射 | 默认 COST_CAP |
 | `identity_type` | `TT_ACCOUNT` | 默认使用 TikTok 账号身份 |
-| `schedule_type` | `SCHEDULE_FROM_NOW` | 默认立即开始 |
+| `schedule_type` | `SCHEDULE_FROM_NOW` 或 `SCHEDULE_START_END` | 根据用户排期设置 |
+| `pacing` | `PACING_MODE_SMOOTH` | required 字段，后端默认匀速投放 |
+| `smart_audience_enabled` | `true` | 允许系统在手动受众基础上做扩展，不外露 |
+| `smart_interest_behavior_enabled` | `true` | 允许系统扩展兴趣行为定向，不外露 |
 
 ### Smart+ 的设计说明（P0 不支持，后续迭代）
 
@@ -260,10 +277,26 @@ const STANDARD_EVENTS = {
 | Ad Format 条件化 | ~15 | TikTok 下 FLEXIBLE→CAROUSEL/SINGLE |
 | 受众选项按平台条件化 | ~10 | TikTok Manual Campaign 下**没有 ADV/Auto 选项** |
 
-**关键事实（已通过 API 文档确认）**：
+**关键事实（基于 TikTok 官方 SDK 源码 `AdgroupCreateBody` 逐字段核实）**：
 
-TikTok 的 `auto_targeting_enabled` 在非 Smart+ 的 Manual Campaign 下**不可用**（API 文档明确标注"未启用"）。
-因此 TikTok 下的受众选项**不能有 `ADV`/`Auto`**。
+SDK 中 Ad Group Create 的受众相关字段：
+- `audience_type` — optional string（受众类型）
+- `audience_ids` — optional list（自定义受众 ID 列表）
+- `excluded_audience_ids` — optional list（排除受众）
+- `interest_category_ids` — optional list（兴趣分类 ID）
+- `interest_keyword_ids` — optional list（兴趣关键词）
+- `age_groups` — optional list
+- `gender` — optional string
+- `location_ids` — optional list
+- `languages` — optional list
+- `smart_audience_enabled` — **optional bool**（智能受众扩展）
+- `smart_interest_behavior_enabled` — **optional bool**（智能兴趣行为扩展）
+- **没有 `auto_targeting_enabled` 字段**（确认您截图所说，SDK 中不存在此字段）
+
+**因此**：
+1. Manual Campaign 下**没有全自动定向**的选项（no ADV/Auto）
+2. 但有 `smart_audience_enabled` 和 `smart_interest_behavior_enabled`，允许系统在手动受众基础上做扩展
+3. 用户必须至少设定基础受众（LAL/INT/CUSTOM 之一）
 
 ```javascript
 // 受众选项按平台区分
@@ -272,22 +305,20 @@ const AUDIENCE_OPTIONS = {
   //       ↑ Meta Advantage+ Audience 允许 Adset 级别自动定向
 
   tiktok: ['LAL', 'INT', 'CUSTOM']
-  //       ↑ 没有 ADV！Manual Campaign 下必须手动设定受众
-  //       系统可通过 Smart Targeting 在手动受众基础上做扩展（后端参数，不外露）
+  //       ↑ 没有 ADV！必须手动设定受众
+  //       后端默认开启 smart_audience_enabled=true（允许系统在此基础上做扩展）
 };
 
-// 对应的标签
 const AUDIENCE_SHORT_LABELS = {
   meta: { ADV: 'Adv+', LAL: 'LAL', INT: 'INT', CUSTOM: 'SA' },
   tiktok: { LAL: 'LAL', INT: 'INT', CUSTOM: 'Custom' }
 };
 ```
 
-**TikTok 的 Smart Targeting（与 auto_targeting_enabled 完全不同）**：
-- Smart Targeting 是在**用户手动设的受众基础上**，允许系统向外扩展找更多人
-- 等价于 Meta 的"Detailed Targeting Expansion"
-- 后端可默认开启（`smart_targeting_enabled: true`），前端不外露
-- **不等于 Auto targeting**——用户仍然必须选 LAL/INT/CUSTOM 之一
+**后端默认处理**：
+- `smart_audience_enabled: true` — 允许系统在手动受众基础上扩展找人
+- `smart_interest_behavior_enabled: true` — 允许系统扩展兴趣行为定向
+- 这两个字段**不外露给用户**，后端默认开启
 
 ### Step 4 — 高级设置（~10 行）
 
