@@ -81,31 +81,49 @@ const platformObjectives = CAMPAIGN_OBJECTIVES[platform?.id] || CAMPAIGN_OBJECTI
 const currentObjectiveObj = platformObjectives.find(o => o.value === objective);
 ```
 
-#### 调整 4：objectiveStage 从 3 级扩展为 4 级（~30 行）
+#### 调整 4：objectiveStage 扩展——但只加真正属于目标层的配置
 
-现有的三级选择 `objective → goal → event` 不够。TikTok 截图显示：
-选完 objective 后，先要处理**二级配置**（Campaign setup / Campaign type / Sales destination / Promotion type / Lead source），然后才是 goal 和 event。
+TikTok 截图中每个目标选中后右侧展开的配置，看起来很多，但**不能硬搬**。
+需要分析这些配置**实际归属哪个层级**，放到我们流程的正确位置：
+
+**TikTok Ads Manager 右侧配置的归属分析**：
+
+| TikTok 截图中的配置 | 影响什么参数 | 归属层级 | **应放在我们流程的哪一步** |
+|---|---|---|---|
+| Sales destination（TikTok Shop/Website/App） | 决定 API objective_type | **Campaign 级** | **Step 2 Objective 选择**（属于目标的一部分） |
+| Lead source（Website/Instant form/DM/Messaging） | 决定 lead 收集方式和所需资产 | **Campaign 级** | **Step 2 Objective 选择**（属于目标的一部分） |
+| Promotion type（App install/Retargeting） | 决定 App 推广方向 | **Campaign 级** | **Step 2 Objective 选择**（属于目标的一部分） |
+| Campaign type（Auction/R&F） | 决定投放模式 | **Campaign 级** | **Step 2 Objective 选择**（属于目标的一部分） |
+| **Smart+ campaign** | 受众自动化、版位自动化、出价自动化、创意自动轮播 | **Ad Group + Ad 级** | **Step 3 受众分配**（等同于现有的 Adv+） |
+| **Search campaign** | 需要关键词输入 | **Ad Group 级** | **Step 3 或 Step 4 高级设置**（增加关键词输入） |
+| Use catalog toggle | 是否使用商品目录 | **Campaign 级** | **Step 1 PRODUCT/CATALOG 选择**（已有） |
+
+**结论**：
+- **Sales destination / Lead source / Promotion type / Campaign type** → 这些确实属于目标层，放在 Step 2 的 objectiveStage 中
+- **Smart+** → 不放在 Step 2！它等同于 Meta 的 Advantage+，**放在 Step 3 的受众分配中**
+- **Search** → 不放在 Step 2！它需要关键词，**放在 Step 3 或 Step 4**
+
+所以 objectiveStage 只需要在**部分目标**下增加一级选择：
 
 ```javascript
 // 现有
 objectiveStage: 'objective' | 'goal' | 'event'
 
-// 改造后
+// 改造后（只为需要 destination/source/type 的目标增加一级）
 objectiveStage: 'objective' | 'sub_config' | 'goal' | 'event'
-//                               ↑ 新增：二级配置阶段
 ```
 
-**sub_config 阶段要渲染什么？取决于当前目标**：
+**哪些目标需要 sub_config？**
 
-| 当选了 | sub_config 显示 | 然后进入 |
+| 目标 | 需要 sub_config？ | 内容 |
 |---|---|---|
-| Reach | Campaign type（Auction / R&F） | goal |
-| Traffic | Campaign setup（Manual / Smart+ / Search） | goal |
-| Video views | 跳过 sub_config | goal |
-| Community interaction | 跳过 sub_config | goal |
-| App promotion | Promotion type（Install / Retargeting）→ Install 下嵌 Campaign setup | goal |
-| Lead generation | Lead source tab（Website / Instant form / DM / Messaging）+ Campaign setup + Use catalog | goal |
-| Sales | Sales destination（TikTok Shop / Website / App / Website+App） | goal |
+| Reach | ✅ | Campaign type: Auction / R&F |
+| Traffic | ❌ | 无（Smart+/Search 不在这里） |
+| Video views | ❌ | 无 |
+| Community interaction | ❌ | 无 |
+| App promotion | ✅ | Promotion type: Install / Retargeting |
+| Lead generation | ✅ | Lead source: Website / Instant form / DM / Messaging |
+| Sales | ✅ | Sales destination: TikTok Shop / Website / App / Website+App |
 
 #### 调整 5：ADSET_GOALS_MAPPING 按平台索引（~50 行）
 
@@ -131,15 +149,16 @@ const eventList = getEventListByContext(platform?.id, objective, salesDestinatio
 const filteredEvents = eventList.filter(e => ...);
 ```
 
-#### 调整 7：新增状态变量（~8 行）
+#### 调整 7：新增状态变量（~6 行）
 
 ```javascript
-const [campaignSetupMode, setCampaignSetupMode] = useState('manual');
-const [reachCampaignType, setReachCampaignType] = useState('auction');
-const [appPromotionType, setAppPromotionType] = useState('app_install');
-const [leadSource, setLeadSource] = useState('website');
-const [salesDestination, setSalesDestination] = useState('');
-const [useCatalog, setUseCatalog] = useState(false);
+// 只增加真正属于目标层（Step 2）的状态
+const [reachCampaignType, setReachCampaignType] = useState('auction');   // Reach: Auction / R&F
+const [appPromotionType, setAppPromotionType] = useState('app_install'); // App: Install / Retargeting
+const [leadSource, setLeadSource] = useState('website');                 // Lead: Website / Form / DM / Messaging
+const [salesDestination, setSalesDestination] = useState('');            // Sales: TikTok Shop / Website / App / W+A
+const [searchKeywords, setSearchKeywords] = useState([]);                // Search 关键词（Step 4）
+// 注意：没有 campaignSetupMode —— Smart+ 通过 Step 3 的受众选择 SMART 来激活
 ```
 
 ### Step 2 总改动量：约 220 行
@@ -215,14 +234,77 @@ const showAdFormatSelector = platform?.id === 'tiktok'
   : (objective === 'sales_conversions' || objective === 'app_promotion');
 ```
 
-#### 调整 4：Smart+ 模式下锁定部分配置（~15 行）
+#### 调整 4：Smart+ / Search 放在受众分配区域 ★（~40 行）
+
+**核心认知**：TikTok 的 Smart+ 等同于 Meta 的 Advantage+。
+现有代码中，Advantage+ 已经在受众分配中用 `ADV` / `Adv+` 表示。
+TikTok Smart+ 应该沿用同样的位置和模式。
 
 ```javascript
-// 当 campaignSetupMode === 'smart_plus' 时：
-const isSmartPlus = campaignSetupMode === 'smart_plus';
-// - BY_CREATIVE 策略不可用（系统接管素材分配）
-// - 受众默认 AUTO（隐藏 LAL/INT/CUSTOM 选择）
-// - 出价策略默认 UNLIMITED
+// 现有的受众类型
+const AUDIENCE_SHORT_LABELS = {
+  LAL: 'LAL',
+  INT: 'INT',
+  ADV: 'Adv+'     // Meta Advantage+ 就在这里
+};
+
+// 改造后：按平台显示受众选项
+const AUDIENCE_OPTIONS = {
+  meta: {
+    ADV: { label: 'Adv+', description: 'Advantage+ 自动扩展，无需额外配置' },
+    LAL: { label: 'LAL', description: 'Lookalike Audience' },
+    INT: { label: 'INT', description: 'Interest & Behavior' },
+    CUSTOM: { label: 'SA', description: 'Saved Audience' }
+  },
+  tiktok: {
+    SMART: { label: 'Smart+', description: 'Smart+ 自动优化受众、版位、出价、创意轮播', 
+      // Smart+ 选中后的副作用：
+      effects: {
+        placement: 'auto',        // 版位强制自动
+        bidType: 'auto',          // 出价策略强制自动
+        budgetMode: 'CBO',        // 预算强制 CBO
+        creativeRotation: 'auto'  // 创意自动轮播
+      }
+    },
+    AUTO: { label: 'Auto', description: '自动定向（类似 Adv+，但不含创意/出价自动化）' },
+    LAL: { label: 'LAL', description: 'Lookalike Audience' },
+    INT: { label: 'INT', description: 'Interest & Behavior' },
+    CUSTOM: { label: 'Custom', description: 'Custom Audience' }
+  }
+};
+```
+
+**Smart+ 选中后的联动效果**：
+
+```javascript
+// 当某个 Adset 的受众被设为 SMART 时
+useEffect(() => {
+  const hasSmartAdset = adsetAudiences.some(a => a === 'SMART');
+  if (hasSmartAdset) {
+    // 1. 预算强制 CBO（Smart+ 下由系统分配预算到各 Ad Group）
+    setBudgetType('CBO');
+    // 2. BY_CREATIVE 策略不可用（系统接管素材分配）
+    if (structure.strategy === 'BY_CREATIVE') {
+      setStructure({ ...structure, strategy: 'PER_PRODUCT' });
+    }
+  }
+}, [adsetAudiences]);
+```
+
+这样 Smart+ 就和 Meta 的 Advantage+ 一样，**通过点击 Adset 的受众标签来切换**，
+而不是在 Objective 选择阶段硬搬一个 "Campaign setup" 面板。
+
+**Search campaign 的处理**：同理，Search 不是一个独立的"Campaign setup 选项"，
+而是需要**关键词输入**的功能。放在 Step 4 高级设置中：
+
+```javascript
+// Step 4 高级设置：当 platform === 'tiktok' 且 objective 为 traffic 或 sales-website 时
+{platform?.id === 'tiktok' && showSearchKeywords && (
+  <div>
+    <label>Search Keywords（可选，启用后投放到搜索结果页）</label>
+    <textarea placeholder="输入关键词，每行一个..." />
+  </div>
+)}
 ```
 
 #### 调整 5：预算 CBO/ABO — 不改
@@ -493,7 +575,7 @@ const [selections, setSelections] = useState({
 |---|---|---|---|
 | **Step 1** | ProductSelector | **0 行** | 不改 |
 | **Step 2** | TargetingChannelCard | **~220 行** | Objectives/Goals/Events 按平台索引 + objectiveStage 扩展为 4 级 + 新增 6 个状态变量 |
-| **Step 3** | CampaignPlanView | **~45 行** | Ad Format 条件化（FLEXIBLE→CAROUSEL）+ Smart+ 锁定 |
+| **Step 3** | CampaignPlanView | **~85 行** | Ad Format 条件化 + Smart+ 作为受众选项（等同 Adv+）+ 联动锁定 |
 | **Step 4** | 高级设置 | **~20 行** | Carousel 逐卡落地页选项 |
 | **Step 5** | CampaignPreviewView | **~43 行** | buildAds() 支持 CAROUSEL + isFlexible 排除 TikTok |
 | **Step 6** | PublishModal | **~155 行** | TikTok 连接 + 资产链路（Identity/Pixel/Event/Form/Shop/App） |
@@ -526,13 +608,13 @@ const [selections, setSelections] = useState({
 |---|---|---|---|
 | **P0-第1天** | 启用 TikTok 平台 + 平台切换重置 | BatchGenerateAds.jsx | ~11 行 |
 | **P0-第2天** | CAMPAIGN_OBJECTIVES 按平台索引 | BatchGenerateAds.jsx | ~80 行 |
-| **P0-第3天** | objectiveStage 扩展 4 级 + 二级配置渲染 | BatchGenerateAds.jsx | ~80 行 |
+| **P0-第3天** | objectiveStage sub_config（仅 Sales/Lead/App/Reach 需要） | BatchGenerateAds.jsx | ~60 行 |
 | **P0-第4天** | ADSET_GOALS_MAPPING + STANDARD_EVENTS | BatchGenerateAds.jsx | ~90 行 |
-| **P0-第5天** | Ad Format 条件化 + isFlexible 修正 | CampaignPlanView + CampaignPreviewView | ~28 行 |
+| **P0-第5天** | Ad Format 条件化 + Smart+ 受众选项 + 联动 | CampaignPlanView | ~85 行 |
 | **P0-第6天** | buildAds() CAROUSEL 支持 | CampaignPreviewView.jsx | ~30 行 |
 | **P0-第7天** | PublishModal TikTok 连接 | BatchGenerateAds.jsx | ~30 行 |
 | **P0-第8-9天** | PublishModal TikTok 资产链路 | BatchGenerateAds.jsx | ~120 行 |
-| **P1-第10天** | Carousel 逐卡落地页 + Smart+ 锁定 | 高级设置 + CampaignPlanView | ~35 行 |
+| **P1-第10天** | Carousel 逐卡落地页 + Search 关键词输入 | 高级设置 | ~35 行 |
 
 **总计 ~483 行代码，约 10 个工作日可完成 P0+P1。**
 
