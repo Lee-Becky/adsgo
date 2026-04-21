@@ -29,135 +29,209 @@ Objective: Sales & Conversions
 
 ---
 
-## TikTok 的同等处理方式
+## TikTok 目标树设计（平台目标动态变更）
 
-### 前端：和 Meta 完全一样的三级选择
+### 设计原则
 
-TikTok 的 objective list 只需要和 Meta 的 5 个目标**语义对齐**即可，不需要照搬 TikTok 的 7 个目标：
+1. **目标树跟随平台动态变更**——TikTok 就显示 TikTok 的目标，不强行和 Meta 对齐
+2. **组件通用**——Objective 选择器、Goal 选择器、Event 选择器的 UI 组件不变，只是数据源不同
+3. **必需参数在正确的环节收集**——每个 goal 携带的元数据驱动发布弹窗显示哪些资产选择器
+4. **后端默认大量参数**——billing_event / bid_type / placement_type 等不外露
+
+### 目标树定义
 
 ```javascript
 const CAMPAIGN_OBJECTIVES = {
   meta: [
-    { value: 'awareness_engagement', label: 'Awareness & Engagement', ... },
-    { value: 'traffic', label: 'Traffic', ... },
-    { value: 'leads', label: 'Leads', ... },
-    { value: 'sales_conversions', label: 'Sales & Conversions', ... },
-    { value: 'app_promotion', label: 'App Promotion', ... }
+    { value: 'awareness_engagement', label: 'Awareness & Engagement', icon: Megaphone, color: 'text-rose-500', bg: 'bg-rose-50', description: 'Reach more people' },
+    { value: 'traffic', label: 'Traffic', icon: MousePointer2, color: 'text-blue-500', bg: 'bg-blue-50', description: 'Drive site visits' },
+    { value: 'leads', label: 'Leads', icon: Users, color: 'text-amber-500', bg: 'bg-amber-50', description: 'Find prospects' },
+    { value: 'sales_conversions', label: 'Sales & Conversions', icon: ShoppingBag, color: 'text-emerald-500', bg: 'bg-emerald-50', description: 'Drive transactions' },
+    { value: 'app_promotion', label: 'App Promotion', icon: Smartphone, color: 'text-primary-500', bg: 'bg-primary-50', description: 'Install & usage' }
   ],
   tiktok: [
-    { value: 'awareness_engagement', label: 'Reach & Awareness', icon: Megaphone, ... },
-    { value: 'traffic', label: 'Traffic', icon: MousePointer2, ... },
-    { value: 'leads', label: 'Lead Generation', icon: Users, ... },
-    { value: 'sales_conversions', label: 'Sales & Conversions', icon: ShoppingBag, ... },
-    { value: 'app_promotion', label: 'App Promotion', icon: Smartphone, ... }
+    // TikTok 官方 7 个目标，忠实呈现
+    { value: 'reach', label: 'Reach', icon: Megaphone, color: 'text-rose-500', bg: 'bg-rose-50', description: 'Maximum ad exposure' },
+    { value: 'traffic', label: 'Traffic', icon: MousePointer2, color: 'text-blue-500', bg: 'bg-blue-50', description: 'Drive site/app visits' },
+    { value: 'video_views', label: 'Video Views', icon: Play, color: 'text-purple-500', bg: 'bg-purple-50', description: 'Maximize video plays' },
+    { value: 'community_interaction', label: 'Community Interaction', icon: Users, color: 'text-pink-500', bg: 'bg-pink-50', description: 'Followers & profile visits' },
+    { value: 'app_promotion', label: 'App Promotion', icon: Smartphone, color: 'text-primary-500', bg: 'bg-primary-50', description: 'Installs & in-app actions' },
+    { value: 'lead_generation', label: 'Lead Generation', icon: FileText, color: 'text-amber-500', bg: 'bg-amber-50', description: 'Collect leads' },
+    { value: 'sales', label: 'Sales', icon: ShoppingBag, color: 'text-emerald-500', bg: 'bg-emerald-50', description: 'Drive sales on shop/web/app' }
   ]
 };
 ```
 
-**为什么不照搬 TikTok 的 7 个目标？**
-- TikTok 的 `Video views` 和 `Community interaction` → 可以并入 `awareness_engagement` 的 Goal 中
-- TikTok 的 `Sales` → 等同于我们的 `sales_conversions`
-- 用户在我们平台上选目标时，心智模型保持统一：**"我要干什么"**，而不是"TikTok 叫什么"
+### Goal 列表（每个目标的二级选择）
 
-### Goal 列表才是差异所在
-
-差异体现在**第二级 Goal 选择**中。不同平台、不同 objective 下，可选的 goal 不同：
+Goal 定义中携带**该 goal 需要的后端参数和发布资产标记**，驱动整个下游逻辑：
 
 ```javascript
 const ADSET_GOALS_MAPPING = {
   meta: {
-    awareness_engagement: [
-      { value: 'impressions', label: 'Impressions' },
-      { value: 'post_engagement', label: 'Post engagement' },
-      { value: 'conversations', label: 'Conversations' }
-    ],
-    traffic: [
-      { value: 'impressions', label: 'Impressions' },
-      { value: 'link_clicks', label: 'Link clicks' },
-      { value: 'page_views', label: 'Page views' }
-    ],
-    leads: [
-      { value: 'leads_landing_page', label: 'Leads within landing-page', needsEvent: true },
-      { value: 'instant_form_leads', label: 'Instant form leads' },
-      { value: 'whatsapp', label: 'WhatsApp' },
-      { value: 'calls', label: 'Calls' }
-    ],
-    sales_conversions: [
-      { value: 'in_web_actions', label: 'In-web actions', needsEvent: true }
-    ],
-    app_promotion: [
-      { value: 'installs', label: 'Installs' },
-      { value: 'in_app_actions', label: 'In-app actions', needsEvent: true }
-    ]
+    // ... 保持现有不变 ...
   },
   tiktok: {
-    awareness_engagement: [
-      { value: 'reach', label: 'Reach' },
-      { value: 'video_views', label: 'Video views' },
-      { value: 'community_interaction', label: 'Community interaction' }
+    reach: [
+      { value: 'reach', label: 'Reach', 
+        api: { objective_type: 'REACH', optimization_goal: 'REACH', billing_event: 'CPM' },
+        assets: ['identity'] }
     ],
     traffic: [
-      { value: 'clicks', label: 'Clicks' },
-      { value: 'landing_page_views', label: 'Landing page views' }
+      { value: 'clicks', label: 'Clicks',
+        api: { objective_type: 'TRAFFIC', optimization_goal: 'CLICK', billing_event: 'CPC', promotion_type: 'WEBSITE' },
+        assets: ['identity'] },
+      { value: 'landing_page_views', label: 'Landing page views',
+        api: { objective_type: 'TRAFFIC', optimization_goal: 'LANDING_PAGE_VIEW', billing_event: 'OCPM', promotion_type: 'WEBSITE' },
+        assets: ['identity'] }
     ],
-    leads: [
-      { value: 'website_leads', label: 'Website leads', needsEvent: true },
-      { value: 'instant_form_leads', label: 'Instant form leads' },
-      { value: 'messaging_leads', label: 'TikTok direct messages' },
-      // instant_messaging_leads 暂不支持（需集成第三方消息渠道如 WhatsApp/Messenger）
+    video_views: [
+      { value: 'video_views', label: 'Video views',
+        api: { objective_type: 'VIDEO_VIEWS', optimization_goal: 'VIDEO_VIEW', billing_event: 'CPV' },
+        assets: ['identity'] }
     ],
-    sales_conversions: [
-      { value: 'web_conversions', label: 'Website conversions', needsEvent: true },
-      { value: 'shop_purchases', label: 'TikTok Shop purchases' }
+    community_interaction: [
+      { value: 'follows', label: 'Followers',
+        api: { objective_type: 'ENGAGEMENT', optimization_goal: 'FOLLOW', billing_event: 'CPM' },
+        assets: ['identity'] },
+      { value: 'profile_visits', label: 'Profile visits',
+        api: { objective_type: 'ENGAGEMENT', optimization_goal: 'PROFILE_VISIT', billing_event: 'CPM' },
+        assets: ['identity'] }
     ],
     app_promotion: [
-      { value: 'app_installs', label: 'App installs' },
-      { value: 'in_app_events', label: 'In-app events', needsEvent: true }
+      { value: 'app_installs', label: 'App installs',
+        api: { objective_type: 'APP_PROMOTION', optimization_goal: 'APP_INSTALL', billing_event: 'OCPM', promotion_type: 'APP' },
+        assets: ['identity', 'app'] },
+      { value: 'in_app_events', label: 'In-app events', needsEvent: true,
+        api: { objective_type: 'APP_PROMOTION', optimization_goal: 'IN_APP_EVENT', billing_event: 'OCPM', promotion_type: 'APP' },
+        assets: ['identity', 'app'],
+        eventType: 'app' }
+    ],
+    lead_generation: [
+      { value: 'website_leads', label: 'Website leads', needsEvent: true,
+        api: { objective_type: 'LEAD_GENERATION', optimization_goal: 'LEAD', billing_event: 'OCPM' },
+        assets: ['identity', 'pixel'],
+        eventType: 'web' },
+      { value: 'instant_form_leads', label: 'Instant form leads',
+        api: { objective_type: 'LEAD_GENERATION', optimization_goal: 'LEAD_GENERATION', billing_event: 'OCPM' },
+        assets: ['identity', 'instant_form'] },
+      { value: 'messaging_leads', label: 'TikTok messages',
+        api: { objective_type: 'LEAD_GENERATION', optimization_goal: 'CONVERSATIONS', billing_event: 'OCPM' },
+        assets: ['identity'] }
+      // P0 不支持 Instant messaging apps（WhatsApp/Messenger 等需第三方集成）
+    ],
+    sales: [
+      { value: 'web_conversions', label: 'Website conversions', needsEvent: true,
+        api: { objective_type: 'WEB_CONVERSIONS', optimization_goal: 'CONVERSIONS', billing_event: 'OCPM', sales_destination: 'WEBSITE' },
+        assets: ['identity', 'pixel'],
+        eventType: 'web' },
+      { value: 'web_value', label: 'Website value (ROAS)', needsEvent: true,
+        api: { objective_type: 'WEB_CONVERSIONS', optimization_goal: 'VALUE', billing_event: 'OCPM', sales_destination: 'WEBSITE' },
+        assets: ['identity', 'pixel'],
+        eventType: 'web' },
+      { value: 'shop_purchases', label: 'TikTok Shop purchases',
+        api: { objective_type: 'PRODUCT_SALES', optimization_goal: 'VALUE', billing_event: 'OCPM', sales_destination: 'TIKTOK_SHOP' },
+        assets: ['identity', 'shop'] },
+      { value: 'app_sales', label: 'App sales', needsEvent: true,
+        api: { objective_type: 'PRODUCT_SALES', optimization_goal: 'CONVERSIONS', billing_event: 'OCPM', sales_destination: 'APP' },
+        assets: ['identity', 'app', 'catalog'],
+        eventType: 'app' }
     ]
   }
 };
 ```
 
-### Event 列表按平台区分
+### 核心设计：`api` 对象 + `assets` 数组
+
+每个 goal 自带两个关键属性：
+
+1. **`api`** — 后端构建 API 请求时需要的所有参数映射，前端不关心
+2. **`assets`** — 发布弹窗需要用户选择的资产列表，驱动资产选择器的条件显示
+
+```
+assets 取值说明：
+  'identity'     → 发布弹窗显示 Identity 选择（所有 TT 广告必需）
+  'pixel'        → 发布弹窗显示 Pixel 选择
+  'app'          → 发布弹窗显示 App 选择
+  'shop'         → 发布弹窗显示 TikTok Shop 选择
+  'instant_form' → 发布弹窗显示 Instant Form 选择
+  'catalog'      → 发布弹窗显示 Catalog 选择
+```
+
+**这样做的好处**：
+- 前端不需要写 if/else 判断"当前 goal 需要什么资产"
+- 直接读 `currentGoalObj.assets` 数组，循环渲染对应选择器
+- 新增 goal 只需在配置中增加一行，不改组件代码
+
+### Event 列表按平台 + eventType 区分
 
 ```javascript
 const STANDARD_EVENTS = {
-  meta: ['Purchase', 'AddToCart', 'InitiateCheckout', 'Lead', ...],
-  tiktok: ['Purchase', 'AddToCart', 'InitiateCheckout', 'Lead',
-           'CompleteRegistration', 'SubmitForm', 'ViewContent', 
-           'Subscribe', 'Download', 'AddToWishlist', 'Search', ...]
+  meta: ['Purchase', 'AddToCart', 'InitiateCheckout', 'Lead', 
+         'CompleteRegistration', 'SubmitApplication', 'Contact',
+         'Search', 'ViewContent', 'Subscribe', 'CustomizeProduct',
+         'Donate', 'FindLocation', 'Schedule', 'StartTrial'],
+  tiktok: {
+    web: ['Purchase', 'AddToCart', 'InitiateCheckout', 'ViewContent',
+          'AddPaymentInfo', 'AddToWishlist', 'Lead', 'CompleteRegistration',
+          'SubmitForm', 'Contact', 'Subscribe', 'Download', 'Search',
+          'StartTrial', 'Schedule', 'SubmitApplication'],
+    app: ['InstallApp', 'LaunchAPP', 'CompleteTutorial', 'AchieveLevel',
+          'SpendCredits', 'Purchase', 'AddToCart', 'ViewContent',
+          'Subscribe', 'Rate', 'Login', 'CreateGroup']
+  }
+};
+
+// 获取事件列表的方式：
+const getEventList = () => {
+  if (platform?.id === 'meta') return STANDARD_EVENTS.meta;
+  const eventType = currentGoalObj?.eventType; // 'web' 或 'app'
+  return STANDARD_EVENTS.tiktok?.[eventType] || [];
 };
 ```
 
-### 用户操作流程——和 Meta 完全一致
+### 用户操作流程——组件通用，数据跟随平台
 
+**选 Meta 时**：
 ```
-用户选 TikTok：
-  Objective: Sales & Conversions
-    → Goal: Website conversions        ← 用户只选这个
-      → Event: Purchase                ← 用户只选这个
+Objective: Sales & Conversions → Goal: In-web actions → Event: Purchase
 ```
 
-**后端自动映射（用户不看不选）**：
-
+**选 TikTok 时**：
 ```
-前端传给后端的 payload:
+Objective: Sales → Goal: Website conversions → Event: Purchase
+```
+
+**组件完全不变**——同一个 Objective 选择器、同一个 Goal 选择器、同一个 Event 选择器。
+只是喂入的 `platformObjectives` 和 `platformGoals` 数据不同。
+
+### 后端映射（零前端感知）
+
+前端传给后端的 payload 只有用户选的东西：
+
+```json
 {
-  platform: 'tiktok',
-  objective: 'sales_conversions',
-  goal: 'web_conversions',
-  event: 'Purchase'
+  "platform": "tiktok",
+  "objective": "sales",
+  "goal": "web_conversions",
+  "event": "Purchase"
 }
+```
 
-后端映射为 TikTok API 参数:
+后端读取 goal 配置中的 `api` 对象，自动映射为 TikTok API 参数：
+
+```json
 {
-  objective_type: 'WEB_CONVERSIONS',           ← 从 goal='web_conversions' 映射
-  optimization_goal: 'CONVERSIONS',            ← 从 goal 映射
-  billing_event: 'OCPM',                       ← 默认，不外露
-  bid_type: 'BID_TYPE_COST_CAP',              ← 默认，不外露
-  placement_type: 'AUTOMATIC',                 ← 默认自动版位，不外露
-  pixel_id: '...',                             ← 发布弹窗选
-  conversion_event: 'Purchase'                 ← 从 event 映射
+  "objective_type": "WEB_CONVERSIONS",
+  "optimization_goal": "CONVERSIONS",
+  "billing_event": "OCPM",
+  "sales_destination": "WEBSITE",
+  "bid_type": "BID_TYPE_COST_CAP",
+  "placement_type": "PLACEMENT_TYPE_NORMAL",
+  "pacing": "PACING_MODE_SMOOTH",
+  "pixel_id": "...",
+  "optimization_event": "Purchase",
+  "smart_audience_enabled": true
 }
 ```
 
@@ -327,31 +401,25 @@ Traffic 目标的 `promotion_type` 决定流量去向：
 
 ### Step 1 — 不改（0 行）
 
-### Step 2 — 投放目标与渠道（~100 行）
+### Step 2 — 投放目标与渠道（~120 行）
 
 | 改什么 | 行数 | 说明 |
 |---|---|---|
 | PLATFORMS 启用 TikTok | 1 | `disabled: false` |
-| CAMPAIGN_OBJECTIVES 加 tiktok key | ~15 | 5 个目标，和 Meta 同构 |
-| ADSET_GOALS_MAPPING 加 tiktok key | ~25 | 每个 objective 下 2-3 个 goal |
-| STANDARD_EVENTS 加 tiktok key | ~10 | TikTok 的标准事件列表 |
+| CAMPAIGN_OBJECTIVES 加 tiktok key | ~25 | TikTok 7 个目标 |
+| ADSET_GOALS_MAPPING 加 tiktok key | ~60 | 每 goal 携带 `api` + `assets` 元数据 |
+| STANDARD_EVENTS 加 tiktok key（web/app） | ~15 | 按 eventType 拆分 |
 | 平台切换重置 | ~10 | useEffect 清空 objective/goal/event |
 | 引用修改（3 处） | ~6 | 数组查找改为字典查找 |
-| 不需要 objectiveStage 扩展 | 0 | **所有二级配置都隐藏到 goal 选择中了** |
-| 不需要 sub_config 阶段 | 0 | **Sales destination 等通过 goal 隐式处理** |
-| 不需要新增状态变量 | 0 | **不需要 salesDestination / leadSource 等** |
+| objectiveStage | 0 | **不改**，保持三级 |
+| 新增状态变量 | 0 | **不需要**——一切元数据在 goal 定义中 |
 
-**关键简化**：
-- TikTok 的 `Sales destination: Website` → 映射为 goal `web_conversions`
-- TikTok 的 `Sales destination: TikTok Shop` → 映射为 goal `TT_shop_purchases`
-- TikTok 的 `Lead source: Website` → 映射为 goal `website_leads`
-- TikTok 的 `Lead source: Instant form` → 映射为 goal `instant_form_leads`
-- TikTok 的 `Promotion type: Install` → 映射为 goal `app_installs`
-- TikTok 的 `Promotion type: Retargeting` → **P0 不支持，后续迭代**
-- TikTok 的 `Campaign type: R&F` → **P0 不支持，后续迭代**
-
-**用户根本不需要知道 TikTok 前端的 destination / source / type 概念。
-用户只需要选 goal，后端自动映射到正确的 API 参数。**
+**设计关键**：
+- TikTok 显示**自己的 7 个目标**，不强行压缩到 Meta 的 5 个
+- Sales destination / Lead source / Promotion type 打平到 **goal 层级**
+- 每个 goal 的 `assets` 数组**驱动发布弹窗**显示哪些资产选择器
+- 每个 goal 的 `api` 对象**驱动后端**构建 TikTok API 请求
+- **组件完全通用**——同一个 Objective/Goal/Event 选择器，数据源不同
 
 ### Step 3 — 架构与预算（~25 行）
 
@@ -460,12 +528,12 @@ const AUDIENCE_SHORT_LABELS = {
 | Step | 改动量 | 说明 |
 |---|---|---|
 | Step 1 产品/素材 | **0 行** | 不改 |
-| Step 2 目标与渠道 | **~100 行** | 3 个常量加 tiktok key + 3 处引用修改 |
+| Step 2 目标与渠道 | **~120 行** | TikTok 7 个目标 + goal 携带 api/assets 元数据 |
 | Step 3 架构/预算 | **~20 行** | Ad Format 条件化 + 受众标签对齐 |
 | Step 4 高级设置 | **~10 行** | Carousel 逐卡落地页 |
 | Step 5 预览树 | **~30 行** | buildAds() CAROUSEL |
 | Step 6 发布弹窗 | **~120 行** | TikTok 连接 + 资产链路 |
-| **合计** | **~280 行** | **4 个文件，1 周 P0** |
+| **合计** | **~320 行** | **4 个文件，1.5 周 P0** |
 
 ---
 
@@ -473,12 +541,12 @@ const AUDIENCE_SHORT_LABELS = {
 
 | 维度 | 上一版（硬搬 TikTok UI） | 本版（后端默认映射） |
 |---|---|---|
-| 前端改动量 | ~483 行 | **~280 行**（减少 42%） |
+| 前端改动量 | ~483 行 | **~320 行**（减少 34%） |
 | 新增状态变量 | 6 个 | **0 个** |
 | objectiveStage 修改 | 3 级→4 级 | **不改，保持 3 级** |
-| TikTok 目标数量 | 7 个（照搬 TT） | **5 个（和 Meta 同构）** |
-| Sales destination | 前端让用户选 | **隐藏到 goal 选择中** |
-| Lead source | 前端让用户选 | **隐藏到 goal 选择中** |
+| TikTok 目标数量 | 7 个（照搬 TT） | **7 个（忠实于 TT，不强行压缩）** |
+| Sales destination | 前端让用户选 | **打平到 goal 层（web_conversions / shop_purchases / app_sales）** |
+| Lead source | 前端让用户选 | **打平到 goal 层（website_leads / instant_form / messaging）** |
 | Smart+ | Step 2 的 Campaign setup | **P0 不支持，后端默认 Manual；后续在 Step 3 顶部加 Campaign 级 toggle** |
 | Search campaign | Step 2 的 Campaign setup | **P0 不支持，后续 Step 4 关键词** |
 | R&F | Step 2 的 Campaign type | **P0 不支持** |
