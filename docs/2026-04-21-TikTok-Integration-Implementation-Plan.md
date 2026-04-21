@@ -129,30 +129,62 @@ const CAMPAIGN_OBJECTIVES = {
     { value: 'sales_conversions', label: 'Sales & Conversions', icon: ShoppingBag, ... },
     { value: 'app_promotion', label: 'App Promotion', icon: Smartphone, ... }
   ],
+  // TikTok Ads Manager 官方 7 个目标（2026 年最新）
+  // 注意：API 层面的 objective_type 枚举值为：
+  //   REACH, TRAFFIC, VIDEO_VIEWS, ENGAGEMENT,
+  //   APP_PROMOTION, LEAD_GENERATION, WEB_CONVERSIONS, PRODUCT_SALES
+  // 但在 Ads Manager UI 层面，WEB_CONVERSIONS 和 PRODUCT_SALES 已合并为统一的 "Sales" 目标。
+  // 发布时需要根据用户选择的 sales destination 映射回具体的 API objective_type。
   tiktok: [
-    { value: 'traffic', label: 'Traffic', icon: MousePointer2, 
-      description: 'Drive visits to website/app',
-      subModes: ['standard', 'optimize_destination']  // 对应官方子页
+    // ─── Awareness ───
+    { value: 'reach', label: 'Reach', icon: Megaphone,
+      description: 'Show your ad to maximum people',
+      apiObjective: 'REACH'
     },
-    { value: 'web_conversions', label: 'Website Conversions', icon: ShoppingBag,
-      description: 'Drive purchases & sign-ups',
-      requiresPixel: true  // 发布时强制要求 Pixel
+    // ─── Consideration ───
+    { value: 'traffic', label: 'Traffic', icon: MousePointer2,
+      description: 'Send people to website/app',
+      apiObjective: 'TRAFFIC',
+      subModes: ['standard', 'optimize_destination']
+    },
+    { value: 'video_views', label: 'Video Views', icon: Play,
+      description: 'Get more views & engagement',
+      apiObjective: 'VIDEO_VIEWS'
     },
     { value: 'engagement', label: 'Community Interaction', icon: Users,
-      description: 'Followers & engagement',
-      requiresIdentity: true  // 发布时强制要求 Identity
+      description: 'Followers, profile visits, livestream',
+      apiObjective: 'ENGAGEMENT',
+      requiresIdentity: true
     },
+    // ─── Conversion ───
     { value: 'app_promotion', label: 'App Promotion', icon: Smartphone,
       description: 'Installs & in-app actions',
+      apiObjective: 'APP_PROMOTION',
       requiresAppId: true
     },
     { value: 'lead_generation', label: 'Lead Generation', icon: Users,
       description: 'Collect leads via website or Instant Form',
+      apiObjective: 'LEAD_GENERATION',
       subModes: ['website_lead', 'instant_form']
     },
-    { value: 'product_sales', label: 'Product Sales', icon: ShoppingBag,
-      description: 'Shopping ads via catalog/shop',
-      requiresCatalog: true
+    { value: 'sales', label: 'Sales', icon: ShoppingBag,
+      description: 'Drive sales on TikTok Shop / website / app',
+      // Sales 是 UI 层面的统一目标，发布时按 destination 映射：
+      //   TikTok Shop → GMV Max campaign（2025.7 后唯一方式）
+      //   Website → apiObjective: 'WEB_CONVERSIONS'，requiresPixel
+      //   App → apiObjective: 'PRODUCT_SALES'，requiresCatalog
+      //   Website+App → 双通道优化
+      salesDestinations: [
+        { id: 'tiktok_shop', label: 'TikTok Shop', apiObjective: 'PRODUCT_SALES',
+          campaignType: 'GMV_MAX', requiresShop: true },
+        { id: 'website', label: 'Website', apiObjective: 'WEB_CONVERSIONS',
+          requiresPixel: true,
+          subModes: ['manual', 'smart_plus', 'search'] },
+        { id: 'app', label: 'App', apiObjective: 'PRODUCT_SALES',
+          requiresCatalog: true },
+        { id: 'website_and_app', label: 'Website & App', apiObjective: 'WEB_CONVERSIONS',
+          requiresPixel: true, requiresAppId: true }
+      ]
     }
   ]
 };
