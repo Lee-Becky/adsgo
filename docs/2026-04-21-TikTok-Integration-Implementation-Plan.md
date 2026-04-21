@@ -176,16 +176,34 @@ const CAMPAIGN_OBJECTIVES = {
       //   Website → apiObjective: 'WEB_CONVERSIONS'，requiresPixel
       //   App → apiObjective: 'PRODUCT_SALES'，requiresCatalog
       //   Website+App → 双通道优化
+      // Sales Destinations（与 TikTok Ads Manager 截图完全对齐）
       salesDestinations: [
-        { id: 'tiktok_shop', label: 'TikTok Shop', apiObjective: 'PRODUCT_SALES',
-          campaignType: 'GMV_MAX', requiresShop: true },
-        { id: 'website', label: 'Website', apiObjective: 'WEB_CONVERSIONS',
-          requiresPixel: true,
-          subModes: ['manual', 'smart_plus', 'search'] },
-        { id: 'app', label: 'App', apiObjective: 'PRODUCT_SALES',
-          requiresCatalog: true },
-        { id: 'website_and_app', label: 'Website & App', apiObjective: 'WEB_CONVERSIONS',
-          requiresPixel: true, requiresAppId: true }
+        { id: 'tiktok_shop', label: 'TikTok Shop',
+          description: 'Drive sales on your TikTok Shop with Shop Ads campaign settings chosen by you.',
+          apiObjective: 'PRODUCT_SALES',
+          requiresShop: true,
+          // GMV Max 是 TikTok Shop 内部的一个 toggle 开关，不是独立 destination
+          // 2025.9 之后 custom shop ads 不再支持创建，GMV Max 将成为唯一方式
+          gmvMaxToggle: true,
+          gmvMaxDescription: 'See better results with an automated Shop Ads solution that selects the best performing ad creative for your products and leverages all shoppable ad placements.'
+        },
+        { id: 'website', label: 'Website',
+          description: 'Drive sales on your website with campaign settings chosen by you.',
+          apiObjective: 'WEB_CONVERSIONS',
+          requiresPixel: true
+          // 注意：Manual / Smart+ / Search 等模式是在选完 destination 后的下一步配置，不在此处展示
+        },
+        { id: 'app', label: 'App',
+          description: 'Drive sales on your app (product catalog required).',
+          apiObjective: 'PRODUCT_SALES',
+          requiresCatalog: true
+        },
+        { id: 'website_and_app', label: 'Website & App',
+          description: 'Drive sales across your website and mobile app within a single campaign.',
+          apiObjective: 'WEB_CONVERSIONS',
+          requiresPixel: true, requiresAppId: true
+          // 注意：此选项可能仅对部分广告主可见
+        }
       ]
     }
   ]
@@ -616,31 +634,38 @@ TikTok 在 2025-2026 年做了一个重大变更：
 - 用户选 Sales 后，需再选择 **Sales Destination**（销售渠道）
 - **自 2025 年 7 月起，TikTok Shop 广告只能通过 GMV Max 创建**
 
-### Sales 目标的交互流程
+### Sales 目标的交互流程（与 TikTok Ads Manager 截图完全对齐）
 
 ```
 用户选 Sales 目标
   │
-  ├── 选择 Sales Destination（二级选择）
-  │   ├── TikTok Shop → 强制走 GMV Max campaign
-  │   │   └─ 前置条件：TikTok Shop 授权
-  │   │   └─ 大部分配置被锁定（自动化托管）
+  ├── 显示 Sales Destination 选择（radio group，截图右侧）
+  │
+  │   ● TikTok Shop
+  │   │   "Drive sales on your TikTok Shop with Shop Ads campaign settings chosen by you."
+  │   │   ├─ ⚠️ 黄色提示："Starting September 1, custom shop ads will be unavailable..."
+  │   │   ├─ 🔘 GMV Max Campaign [New] ← toggle 开关（不是独立选项！）
+  │   │   │   "See better results with an automated Shop Ads solution..."
+  │   │   ├─ 前置条件：TikTok Shop 已授权
   │   │   └─ API objective_type = 'PRODUCT_SALES'
   │   │
-  │   ├── Website → 手动 / Smart+ / Search 三种模式
-  │   │   └─ 前置条件：Pixel 安装
-  │   │   └─ 优化目标：Conversions / Value (ROAS)
+  │   ○ Website
+  │   │   "Drive sales on your website with campaign settings chosen by you."
+  │   │   ├─ 前置条件：Pixel 安装
+  │   │   ├─ 选完后下一步才选 Manual / Smart+ / Search 模式
   │   │   └─ API objective_type = 'WEB_CONVERSIONS'
   │   │
-  │   ├── App → 需要商品目录
-  │   │   └─ 前置条件：App + Catalog
+  │   ○ App
+  │   │   "Drive sales on your app (product catalog required)."
+  │   │   ├─ 前置条件：App + Catalog
   │   │   └─ API objective_type = 'PRODUCT_SALES'
   │   │
-  │   └── Website & App → 双通道优化
-  │       └─ 前置条件：Pixel + App + Deeplink
+  │   ○ Website & App（部分广告主可见）
+  │       "Drive sales across your website and mobile app within a single campaign."
+  │       ├─ 前置条件：Pixel + App + Deeplink
   │       └─ API objective_type = 'WEB_CONVERSIONS'
   │
-  └── 选择 Conversion Goal（三级选择，取决于 destination）
+  └── Continue → 进入 Ad Group 配置（选 Conversion Goal、出价等）
 ```
 
 ### 与现有 CATALOG 的关系
