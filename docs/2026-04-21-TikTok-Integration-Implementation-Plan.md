@@ -62,29 +62,31 @@ Step 6 — 发布弹窗（PublishModal）
 
 **CATALOG 模式的具体改造**：
 
-当前 `CATALOG` 只绑定 Meta Product Catalog。TikTok 下需要区分子类型：
+当前 `CATALOG` 只绑定 Meta Product Catalog。
+
+根据 TikTok 2026 年最新的产品结构，TikTok 的 Shopping/Catalog 功能**不需要在 ProductSelector 里开子类型**。原因如下：
+
+- TikTok 的 Shopping 广告（包括 GMV Max）是通过 **Sales 目标 + destination 选择** 进入的，不是通过 campaignType 选择的
+- 用户选 Sales → Website 后，可以开启 "Use Catalog" 开关（等价于 Meta DPA）
+- 用户选 Sales → TikTok Shop 后，自动走 GMV Max 流程
+
+所以 `CATALOG` 模式的改造很简单：
 
 ```javascript
 // 现有
 campaignType: 'PRODUCT' | 'CATALOG'
+// CATALOG 模式下绑定 Meta Product Catalog
 
 // 改造后
 campaignType: 'PRODUCT' | 'CATALOG'
-// CATALOG 下新增 catalogSubtype（仅 TikTok）
-catalogSubtype: 'DPA'               // Meta 默认
-             | 'VIDEO_SHOPPING'     // TikTok - 视频购物
-             | 'PRODUCT_SHOPPING'   // TikTok - 商品购物
-             | 'GMV_MAX'            // TikTok - GMV Max（需 TikTok Shop 授权）
-             | 'LIVE_SHOPPING'      // TikTok - 直播购物（需直播资产）
+// CATALOG 模式下：
+//   Meta → 绑定 Meta Product Catalog（不变）
+//   TikTok → 绑定 TikTok Catalog（仅切换数据源）
+//   TikTok Shop / GMV Max → 在 Sales 目标的 salesDestination 中处理，不走 CATALOG 模式
 ```
 
-**GMV Max 的特殊处理**：
-- 需要在 ProductSelector 中增加「授权 TikTok Shop」的入口
-- 选择 GMV_MAX 后，系统自动锁定大部分手动配置（类似 Smart+ 的"托管"模式）
-- 商品池来源从 Meta Catalog 切换到 TikTok Shop 商品
-
 **改造文件**：`ProductSelector.jsx`  
-**改造行数**：约 50-80 行（增加子类型选择 + 条件授权入口）
+**改造行数**：约 20 行（CATALOG 模式下按平台切换目录源）
 
 ---
 
@@ -240,15 +242,19 @@ const ADSET_GOALS_MAPPING = {
       { value: 'in_app_actions', label: 'In-app actions', needsEvent: true }
     ]
   },
+  // TikTok 的 ADSET_GOALS 也要与 2026 年最新的 7 个 UI 目标对齐
+  // 注意：Sales 是统一目标，其 goals 取决于用户选择的 salesDestination
   tiktok: {
+    reach: [
+      { value: 'reach', label: 'Reach (CPM)', billingEvent: 'CPM' }
+    ],
     traffic: [
       { value: 'clicks', label: 'Clicks (CPC)', billingEvent: 'CPC' },
-      { value: 'reach', label: 'Reach (CPM)', billingEvent: 'CPM' },
       { value: 'landing_page_views', label: 'Landing Page Views', billingEvent: 'OCPM' }
     ],
-    web_conversions: [
-      { value: 'conversions', label: 'Conversions', needsEvent: true, billingEvent: 'OCPM', needsPixel: true },
-      { value: 'value', label: 'Value (ROAS)', needsEvent: true, billingEvent: 'OCPM', needsPixel: true }
+    video_views: [
+      { value: 'video_views', label: 'Video Views (2s/6s)', billingEvent: 'CPV' },
+      { value: 'reach', label: 'Reach', billingEvent: 'CPM' }
     ],
     engagement: [
       { value: 'engagement', label: 'Engagement (Likes/Comments)', billingEvent: 'CPE' },
@@ -262,9 +268,20 @@ const ADSET_GOALS_MAPPING = {
       { value: 'leads', label: 'Leads (Website)', needsEvent: true, billingEvent: 'OCPM' },
       { value: 'instant_form', label: 'Instant Form Leads', billingEvent: 'OCPM', needsForm: true }
     ],
-    product_sales: [
-      { value: 'product_conversions', label: 'Product Conversions', needsEvent: true, billingEvent: 'OCPM' },
-      { value: 'gmv', label: 'GMV Optimization', billingEvent: 'OCPM' }
+    // Sales 是统一目标，goals 按 salesDestination 动态变化：
+    //   website → conversions / value（需 Pixel）
+    //   tiktok_shop → gmv（GMV Max 托管，通常无需手选 goal）
+    //   app → app_conversions（需 Catalog）
+    //   website_and_app → conversions / value
+    sales: [
+      { value: 'conversions', label: 'Conversions', needsEvent: true, billingEvent: 'OCPM',
+        forDestination: ['website', 'website_and_app'], needsPixel: true },
+      { value: 'value', label: 'Value (ROAS)', needsEvent: true, billingEvent: 'OCPM',
+        forDestination: ['website', 'website_and_app'], needsPixel: true },
+      { value: 'gmv', label: 'GMV Optimization', billingEvent: 'OCPM',
+        forDestination: ['tiktok_shop'], autoManaged: true },
+      { value: 'product_sales', label: 'Product Sales', needsEvent: true, billingEvent: 'OCPM',
+        forDestination: ['app'], needsCatalog: true }
     ]
   }
 };
@@ -504,7 +521,7 @@ Step 2b: Select Identity（TikTok 账户身份）
   └─ 所有 TikTok 广告都需要 Identity
 
 Step 2c: Select TikTok Pixel（条件显示）
-  └─ 仅在 objective = web_conversions / lead_generation 时显示
+  └─ 在 Sales(website/website_and_app) / Lead Generation 时显示
   └─ 选择已安装的 TikTok Pixel
 
 Step 2d: Select Conversion Event（条件显示）
@@ -590,10 +607,41 @@ useEffect(() => {
 
 ---
 
-## 五、GMV Max 的处理
+## 五、Sales 统一目标与 GMV Max 的处理
 
-### 定位
-GMV Max 是 CATALOG 广告的**平行子类型**，为 TikTok 特有，需要 TikTok Shop 授权。
+### 背景（2026 年最新）
+
+TikTok 在 2025-2026 年做了一个重大变更：
+- 原先独立的 `Website Conversions` 和 `Product Sales` 两个目标 → **合并为统一的 "Sales" 目标**
+- 用户选 Sales 后，需再选择 **Sales Destination**（销售渠道）
+- **自 2025 年 7 月起，TikTok Shop 广告只能通过 GMV Max 创建**
+
+### Sales 目标的交互流程
+
+```
+用户选 Sales 目标
+  │
+  ├── 选择 Sales Destination（二级选择）
+  │   ├── TikTok Shop → 强制走 GMV Max campaign
+  │   │   └─ 前置条件：TikTok Shop 授权
+  │   │   └─ 大部分配置被锁定（自动化托管）
+  │   │   └─ API objective_type = 'PRODUCT_SALES'
+  │   │
+  │   ├── Website → 手动 / Smart+ / Search 三种模式
+  │   │   └─ 前置条件：Pixel 安装
+  │   │   └─ 优化目标：Conversions / Value (ROAS)
+  │   │   └─ API objective_type = 'WEB_CONVERSIONS'
+  │   │
+  │   ├── App → 需要商品目录
+  │   │   └─ 前置条件：App + Catalog
+  │   │   └─ API objective_type = 'PRODUCT_SALES'
+  │   │
+  │   └── Website & App → 双通道优化
+  │       └─ 前置条件：Pixel + App + Deeplink
+  │       └─ API objective_type = 'WEB_CONVERSIONS'
+  │
+  └── 选择 Conversion Goal（三级选择，取决于 destination）
+```
 
 ### 与现有 CATALOG 的关系
 
@@ -603,51 +651,69 @@ GMV Max 是 CATALOG 广告的**平行子类型**，为 TikTok 特有，需要 Ti
   │   └─ 数据源：Meta Product Catalog
   │   └─ 优化目标：ROAS / Purchase
   │
-  └── TikTok（新增）:
-      ├── Video Shopping Ads
+  └── TikTok: 通过 Sales 目标 + destination 选择进入
+      ├── Website destination + Use Catalog 开关
+      │   └─ 等价于 Meta DPA：基于目录自动推商品
       │   └─ 数据源：TikTok Catalog
-      │   └─ 优化目标：Conversions / Value
-      ├── Product Shopping Ads
-      │   └─ 数据源：TikTok Catalog
-      │   └─ 优化目标：Conversions / Value
-      ├── GMV Max ★
-      │   └─ 数据源：TikTok Shop 店铺商品
-      │   └─ 优化目标：GMV（成交额）
-      │   └─ 前置条件：TikTok Shop 授权
-      │   └─ 自动化程度：极高（系统自动选品、出价、定向）
-      └── Live Shopping Ads
-          └─ 数据源：直播资产
-          └─ 优化目标：Value
-          └─ 前置条件：直播间权限
+      │
+      └── TikTok Shop destination → GMV Max ★
+          └─ 数据源：TikTok Shop 店铺商品
+          └─ 2025.7 后 TikTok Shop 唯一方式
+          └─ 分为 Product GMV Max 和 LIVE GMV Max
+          └─ 自动化程度：极高（系统自动选品、出价、定向）
 ```
+
+### 关键设计决策
+
+TikTok 的 Shopping/Catalog 广告**不需要在 ProductSelector 里单独开一个 CATALOG 子类型**。
+正确的做法是：
+1. 用户在 Objective 里选 **Sales**
+2. 选 destination 为 **Website** 时，可以开启 "Use Catalog" 开关（等价于 Meta DPA）
+3. 选 destination 为 **TikTok Shop** 时，自动走 GMV Max 流程
+
+这样更符合 TikTok 官方 Ads Manager 的实际交互逻辑。
 
 ### 前端改造
 
+Sales 目标选择后，显示 **Sales Destination** 二级选择器：
+
 ```javascript
-// ProductSelector.jsx 中 CATALOG 模式下增加子类型选择
-{campaignType === 'CATALOG' && platform?.id === 'tiktok' && (
-  <div className="flex gap-2 mt-4">
-    {[
-      { id: 'VIDEO_SHOPPING', label: '视频购物', icon: Video },
-      { id: 'PRODUCT_SHOPPING', label: '商品购物', icon: ShoppingBag },
-      { id: 'GMV_MAX', label: 'GMV Max', icon: Zap, requiresShop: true },
-      { id: 'LIVE_SHOPPING', label: '直播购物', icon: Tv, requiresLive: true }
-    ].map(sub => (
-      <button
-        key={sub.id}
-        onClick={() => setCatalogSubtype(sub.id)}
-        disabled={sub.requiresShop && !tiktokShopAuthorized}
-        className={...}
-      >
-        <sub.icon size={16} />
-        <span>{sub.label}</span>
-        {sub.requiresShop && !tiktokShopAuthorized && (
-          <span className="text-[10px] text-amber-500">需授权店铺</span>
-        )}
-      </button>
-    ))}
+// TargetingChannelCard 中，objective === 'sales' 时显示 destination 选择
+{platform?.id === 'tiktok' && objective === 'sales' && (
+  <div className="mt-4 space-y-2">
+    <label className="text-xs font-medium text-gray-500">Sales Destination</label>
+    <div className="grid grid-cols-2 gap-2">
+      {currentObjectiveObj.salesDestinations.map(dest => (
+        <button
+          key={dest.id}
+          onClick={() => setSalesDestination(dest.id)}
+          disabled={dest.requiresShop && !tiktokShopAuthorized}
+          className={`p-3 rounded-base border text-left transition-all ${
+            salesDestination === dest.id
+              ? 'border-primary-500 bg-primary-50'
+              : 'border-gray-100 hover:border-gray-200'
+          } ${dest.requiresShop && !tiktokShopAuthorized ? 'opacity-40 cursor-not-allowed' : ''}`}
+        >
+          <p className="text-xs font-bold text-gray-700">{dest.label}</p>
+          {dest.requiresShop && !tiktokShopAuthorized && (
+            <p className="text-[10px] text-amber-500 mt-1">需先授权 TikTok Shop</p>
+          )}
+          {dest.id === 'tiktok_shop' && (
+            <p className="text-[10px] text-gray-400 mt-1">GMV Max（系统自动优化）</p>
+          )}
+        </button>
+      ))}
+    </div>
   </div>
 )}
+
+// 发布时，根据 salesDestination 映射到 API objective_type：
+const apiObjectiveType = (() => {
+  if (platform?.id !== 'tiktok') return objective; // Meta 直接用 objective
+  if (objective !== 'sales') return currentObjectiveObj.apiObjective;
+  const dest = currentObjectiveObj.salesDestinations.find(d => d.id === salesDestination);
+  return dest?.apiObjective || 'WEB_CONVERSIONS';
+})();
 ```
 
 ---
@@ -673,8 +739,9 @@ GMV Max 是 CATALOG 广告的**平行子类型**，为 TikTok 特有，需要 Ti
 | Smart+/Advantage+ toggle 开关 | TargetingChannelCard + BatchGenerateAds | ~40 行 | P1 |
 | Carousel 逐卡落地页配置 | 高级设置区域 | ~20 行 | P1 |
 | 平台切换时清空 objective/goal/event | BatchGenerateAds.jsx | ~10 行 | P0 |
-| CATALOG 子类型选择（TikTok Shopping） | ProductSelector.jsx | ~50 行 | P1 |
-| GMV Max 店铺授权入口 | ProductSelector.jsx | ~30 行 | P2 |
+| Sales destination 二级选择器 | TargetingChannelCard | ~40 行 | P0 |
+| CATALOG 按平台切换目录源 | ProductSelector.jsx | ~20 行 | P1 |
+| TikTok Shop 授权入口（GMV Max 前置） | PublishModal | ~30 行 | P2 |
 
 ### Phase 3 — 发布层改造（约 200 行代码）
 
@@ -702,7 +769,7 @@ GMV Max 是 CATALOG 广告的**平行子类型**，为 TikTok 特有，需要 Ti
 |---|---|---|
 | **架构层** | ⭐ 几乎不变 | Campaign→Adset→Ad 同构；拆分策略通用；预算通用 |
 | **数据配置层** | ⭐⭐⭐ 核心改造 | Objectives/Goals/Events/BillingEvents 按平台索引 |
-| **交互层** | ⭐⭐ 小量改造 | Ad Format 条件化 + Smart+ toggle + CATALOG 子类型 |
+| **交互层** | ⭐⭐ 小量改造 | Ad Format 条件化 + Smart+ toggle + Sales destination 选择器 |
 | **发布资产层** | ⭐⭐⭐ 重要改造 | TikTok 特有资产链路（Identity/Pixel/Form/Shop） |
 | **预览层** | ⭐ 极小 | CAROUSEL 创意生成逻辑 |
 
