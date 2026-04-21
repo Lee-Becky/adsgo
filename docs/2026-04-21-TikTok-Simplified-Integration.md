@@ -187,24 +187,27 @@ const STANDARD_EVENTS = {
 | `bid_type` | `BID_TYPE_COST_CAP` | 默认成本上限竞价 |
 | `billing_event` | 由 goal 决定（见上表） | CPC / CPM / CPV / OCPM |
 | `campaign_type` | `REGULAR_CAMPAIGN` | 默认普通竞价（不是 R&F） |
-| `smart_plus` | `false` | 默认关闭，除非受众选了 SMART |
+| `smart_plus` | `false` | **P0 默认关闭，后端写死 Manual 模式** |
 | `identity_type` | `TT_ACCOUNT` | 默认使用 TikTok 账号身份 |
 | `schedule_type` | `SCHEDULE_FROM_NOW` | 默认立即开始 |
 
-### Smart+ 的后端处理
+### Smart+ 的设计说明（P0 不支持，后续迭代）
 
-当前端某个 Adset 的受众类型 = `SMART` 时：
+**关键认知：TikTok Smart+ 与 Meta Advantage+ 的本质不同**
 
-```
-后端映射：
-{
-  smart_plus: true,                    ← 覆盖为 true
-  placement_type: 'AUTOMATIC',        ← 强制（本来就是默认）
-  bid_type: 'BID_TYPE_UNLIMITED',     ← 覆盖为无上限
-  budget_mode: 'BUDGET_MODE_DAY',     ← CBO 下系统自动分配
-  creative_auto_rotate: true           ← 开启自动轮播
-}
-```
+| 维度 | Meta Advantage+ | TikTok Smart+ |
+|---|---|---|
+| **控制粒度** | **分散式**：受众/版位/创意/预算各自独立开关 | **Campaign 级一刀切**：开 = 全部自动 |
+| **在 Ads Manager 的位置** | Adset 受众、Adset 版位、Ad 创意各自有 Advantage+ 开关 | Campaign 创建时选 "Smart+ campaign"（见截图） |
+| **API 层面** | Adset 级参数（`targeting_optimization`、`advantage_placements` 等） | Campaign 级参数（`is_smart_campaign` 或独立 API endpoint） |
+| **我们现有代码对 Meta 的处理** | Adset 受众处的 `ADV`/`Adv+` 选项 = Advantage+ Audience（只是受众层面） | — |
+
+**因此**：
+- TikTok Smart+ **不能**像 Meta Advantage+ 一样放在 Adset 受众处，因为它是 Campaign 级开关
+- P0 阶段：后端默认 `smart_plus: false`（Manual 模式），前端不做任何处理
+- 后续迭代：在 Step 3 架构配置的**顶部**增加一个 Campaign 级 toggle："启用 Smart+ 智能优化"
+  - 启用后：锁定受众为自动、版位为自动、出价为自动、创意自动轮播
+  - 这是一个 **Campaign 级开关**，影响该 Campaign 下所有 Adset 和 Ad
 
 ### R&F / Search / GMV Max 的后端处理
 
@@ -248,13 +251,17 @@ const STANDARD_EVENTS = {
 **用户根本不需要知道 TikTok 前端的 destination / source / type 概念。
 用户只需要选 goal，后端自动映射到正确的 API 参数。**
 
-### Step 3 — 架构与预算（~50 行）
+### Step 3 — 架构与预算（~20 行）
 
 | 改什么 | 行数 | 说明 |
 |---|---|---|
 | Ad Format 条件化 | ~15 | TikTok 下 FLEXIBLE→CAROUSEL/SINGLE |
-| 受众选项增加 SMART | ~25 | TikTok 下增加 Smart+ 受众类型 |
-| Smart+ 联动锁定 | ~10 | 选 SMART 后锁定 CBO、禁用 BY_CREATIVE |
+| 受众标签文案对齐 | ~5 | TikTok 下 `Adv+` 改为 `Auto`（含义相同：平台自动定向） |
+
+注意：
+- **不增加 SMART 受众类型**——TikTok Smart+ 是 Campaign 级开关，不是 Adset 受众选项
+- **P0 不支持 Smart+**——后端默认 Manual 模式
+- TikTok 下的 `ADV`（Auto targeting）等同于 Meta 的 `Adv+`（Advantage+ Audience），只是自动定向受众，不涉及版位/出价/创意的自动化
 
 ### Step 4 — 高级设置（~10 行）
 
@@ -295,11 +302,11 @@ const STANDARD_EVENTS = {
 |---|---|---|
 | Step 1 产品/素材 | **0 行** | 不改 |
 | Step 2 目标与渠道 | **~100 行** | 3 个常量加 tiktok key + 3 处引用修改 |
-| Step 3 架构/预算 | **~50 行** | Ad Format + Smart+ 受众 |
+| Step 3 架构/预算 | **~20 行** | Ad Format 条件化 + 受众标签对齐 |
 | Step 4 高级设置 | **~10 行** | Carousel 逐卡落地页 |
 | Step 5 预览树 | **~30 行** | buildAds() CAROUSEL |
 | Step 6 发布弹窗 | **~120 行** | TikTok 连接 + 资产链路 |
-| **合计** | **~310 行** | **4 个文件，1 周 P0** |
+| **合计** | **~280 行** | **4 个文件，1 周 P0** |
 
 ---
 
@@ -307,13 +314,13 @@ const STANDARD_EVENTS = {
 
 | 维度 | 上一版（硬搬 TikTok UI） | 本版（后端默认映射） |
 |---|---|---|
-| 前端改动量 | ~483 行 | **~310 行**（减少 36%） |
+| 前端改动量 | ~483 行 | **~280 行**（减少 42%） |
 | 新增状态变量 | 6 个 | **0 个** |
 | objectiveStage 修改 | 3 级→4 级 | **不改，保持 3 级** |
 | TikTok 目标数量 | 7 个（照搬 TT） | **5 个（和 Meta 同构）** |
 | Sales destination | 前端让用户选 | **隐藏到 goal 选择中** |
 | Lead source | 前端让用户选 | **隐藏到 goal 选择中** |
-| Smart+ | Step 2 的 Campaign setup | **Step 3 的受众选项** |
+| Smart+ | Step 2 的 Campaign setup | **P0 不支持，后端默认 Manual；后续在 Step 3 顶部加 Campaign 级 toggle** |
 | Search campaign | Step 2 的 Campaign setup | **P0 不支持，后续 Step 4 关键词** |
 | R&F | Step 2 的 Campaign type | **P0 不支持** |
 | 用户体验 | 选 TikTok 后流程变长 | **和 Meta 完全一致** |
