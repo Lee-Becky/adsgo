@@ -275,50 +275,66 @@ const STANDARD_EVENTS = {
 | 改什么 | 行数 | 说明 |
 |---|---|---|
 | Ad Format 条件化 | ~15 | TikTok 下 FLEXIBLE→CAROUSEL/SINGLE |
-| 受众选项按平台条件化 | ~10 | TikTok Manual Campaign 下**没有 ADV/Auto 选项** |
+| 受众选项按平台条件化 | ~10 | TikTok 下 `ADV` → `Broad`（广投，后端不传受众字段） |
 
-**关键事实（基于 TikTok 官方 SDK 源码 `AdgroupCreateBody` 逐字段核实）**：
+**受众对齐说明**：
+- Meta `ADV`/`Adv+` → Advantage+ Audience（Adset 级开关，系统自动扩展）
+- TikTok `Broad` → 广投模式（不传 audience_ids / interest_ids，系统全自动找人）
+- 两者**用户体验一致**：选了就不需要额外配置受众
+- TikTok 的 LAL / INT / CUSTOM → 与 Meta 完全一致（Lookalike / Interest / Custom Audience）
+- 后端默认 `smart_audience_enabled: true`（在 LAL/INT/CUSTOM 基础上允许系统做扩展）
+
+**关键事实（基于 TikTok 官方 SDK 源码 `AdgroupCreateBody` + API 行为调研）**：
 
 SDK 中 Ad Group Create 的受众相关字段：
-- `audience_type` — optional string（受众类型）
-- `audience_ids` — optional list（自定义受众 ID 列表）
+- `audience_ids` — optional list（自定义受众 / Lookalike 受众 ID）
 - `excluded_audience_ids` — optional list（排除受众）
-- `interest_category_ids` — optional list（兴趣分类 ID）
-- `interest_keyword_ids` — optional list（兴趣关键词）
-- `age_groups` — optional list
-- `gender` — optional string
-- `location_ids` — optional list
-- `languages` — optional list
-- `smart_audience_enabled` — **optional bool**（智能受众扩展）
-- `smart_interest_behavior_enabled` — **optional bool**（智能兴趣行为扩展）
-- **没有 `auto_targeting_enabled` 字段**（确认您截图所说，SDK 中不存在此字段）
+- `interest_category_ids` — optional list（兴趣分类定向）
+- `interest_keyword_ids` — optional list（兴趣关键词定向）
+- `age_groups`, `gender`, `location_ids`, `languages` — 人口统计
+- `smart_audience_enabled` — **optional bool**（智能受众扩展，Ad Group 级）
+- `smart_interest_behavior_enabled` — **optional bool**（智能兴趣行为扩展，Ad Group 级）
+- **没有 `auto_targeting_enabled` 字段**（SDK 中不存在）
 
-**因此**：
-1. Manual Campaign 下**没有全自动定向**的选项（no ADV/Auto）
-2. 但有 `smart_audience_enabled` 和 `smart_interest_behavior_enabled`，允许系统在手动受众基础上做扩展
-3. 用户必须至少设定基础受众（LAL/INT/CUSTOM 之一）
+**调研确认的三种定向模式**：
+
+| 模式 | 实现方式 | 等同于 Meta |
+|---|---|---|
+| **Broad / 广投** | **不传** `audience_ids` 和 `interest_category_ids`，系统全自动找人 | ≈ Adv+（无手动约束） |
+| **Smart 扩展** | 传入受众/兴趣 + `smart_audience_enabled: true` | ≈ Adv+（有手动基线+系统扩展） |
+| **精准手动** | 传入受众/兴趣 + `smart_audience_enabled: false` | ≈ 纯 LAL/INT/CUSTOM |
+
+**关键发现**：TikTok 实现"全自动定向"的方式不是通过一个 `auto_targeting_enabled` 开关，
+而是**直接不传受众和兴趣字段**——这就是 Broad Targeting（广投），TikTok 官方推荐的策略之一。
+
+因此 TikTok 下**可以有类似 ADV 的选项**，只是后端实现方式不同：
 
 ```javascript
-// 受众选项按平台区分
 const AUDIENCE_OPTIONS = {
   meta: ['ADV', 'LAL', 'INT', 'CUSTOM'],
-  //       ↑ Meta Advantage+ Audience 允许 Adset 级别自动定向
-
-  tiktok: ['LAL', 'INT', 'CUSTOM']
-  //       ↑ 没有 ADV！必须手动设定受众
-  //       后端默认开启 smart_audience_enabled=true（允许系统在此基础上做扩展）
+  tiktok: ['BROAD', 'LAL', 'INT', 'CUSTOM']
 };
 
 const AUDIENCE_SHORT_LABELS = {
-  meta: { ADV: 'Adv+', LAL: 'LAL', INT: 'INT', CUSTOM: 'SA' },
-  tiktok: { LAL: 'LAL', INT: 'INT', CUSTOM: 'Custom' }
+  meta:   { ADV: 'Adv+', LAL: 'LAL', INT: 'INT', CUSTOM: 'SA' },
+  tiktok: { BROAD: 'Broad', LAL: 'LAL', INT: 'INT', CUSTOM: 'Custom' }
 };
 ```
 
-**后端默认处理**：
-- `smart_audience_enabled: true` — 允许系统在手动受众基础上扩展找人
-- `smart_interest_behavior_enabled: true` — 允许系统扩展兴趣行为定向
-- 这两个字段**不外露给用户**，后端默认开启
+**后端映射**：
+
+| 前端受众选择 | 后端 Ad Group 参数 |
+|---|---|
+| **BROAD**（广投） | 不传 `audience_ids` / `interest_category_ids`；`smart_audience_enabled: true` |
+| **LAL** | `audience_ids: [lookalike_id]`；`smart_audience_enabled: true`（默认扩展） |
+| **INT** | `interest_category_ids: [...]`；`smart_interest_behavior_enabled: true`（默认扩展） |
+| **CUSTOM** | `audience_ids: [custom_audience_id]`；`smart_audience_enabled: true` |
+
+**TikTok Lookalike 确认可用**：
+- TikTok 有完整的 Lookalike Audience 支持
+- 通过 Audience API 提前创建（基于 Custom Audience，需 1000+ 匹配用户）
+- 创建后得到 `audience_id`，在 Ad Group 的 `audience_ids` 中引用
+- 与 Meta LAL 使用方式完全一致
 
 ### Step 4 — 高级设置（~10 行）
 
