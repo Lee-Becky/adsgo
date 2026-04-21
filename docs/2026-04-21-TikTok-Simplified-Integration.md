@@ -102,7 +102,9 @@ const ADSET_GOALS_MAPPING = {
     ],
     leads: [
       { value: 'website_leads', label: 'Website leads', needsEvent: true },
-      { value: 'instant_form_leads', label: 'Instant form leads' }
+      { value: 'instant_form_leads', label: 'Instant form leads' },
+      { value: 'messaging_leads', label: 'TikTok direct messages' },
+      // instant_messaging_leads 暂不支持（需集成第三方消息渠道如 WhatsApp/Messenger）
     ],
     sales_conversions: [
       { value: 'web_conversions', label: 'Website conversions', needsEvent: true },
@@ -172,12 +174,52 @@ const STANDARD_EVENTS = {
 | awareness_engagement | community_interaction | ENGAGEMENT | — | ENGAGEMENT | CPM | PACING_MODE_SMOOTH | Identity |
 | traffic | clicks | TRAFFIC | — | CLICK | CPC | PACING_MODE_SMOOTH | — |
 | traffic | landing_page_views | TRAFFIC | — | LANDING_PAGE_VIEW | OCPM | PACING_MODE_SMOOTH | — |
-| leads | website_leads | LEAD_GENERATION | — | LEAD | OCPM | PACING_MODE_SMOOTH | Pixel |
-| leads | instant_form_leads | LEAD_GENERATION | — | LEAD_GENERATION | OCPM | PACING_MODE_SMOOTH | Instant Form |
+| leads | website_leads | LEAD_GENERATION | — | LEAD | OCPM | PACING_MODE_SMOOTH | Pixel + Event |
+| leads | instant_form_leads | LEAD_GENERATION | — | LEAD_GENERATION | OCPM | PACING_MODE_SMOOTH | Instant Form ID |
+| leads | messaging_leads | LEAD_GENERATION | — | CONVERSATIONS | OCPM | PACING_MODE_SMOOTH | Identity（TikTok DM）|
 | sales_conversions | web_conversions | WEB_CONVERSIONS | WEBSITE | CONVERSIONS | OCPM | PACING_MODE_SMOOTH | Pixel |
 | sales_conversions | shop_purchases | PRODUCT_SALES | TIKTOK_SHOP | VALUE | OCPM | PACING_MODE_SMOOTH | TikTok Shop (store_id) |
 | app_promotion | app_installs | APP_PROMOTION | — | APP_INSTALL | OCPM | PACING_MODE_SMOOTH | App ID |
 | app_promotion | in_app_events | APP_PROMOTION | — | IN_APP_EVENT | OCPM | PACING_MODE_SMOOTH | App ID |
+
+### 每个 Goal 的发布必需参数（保障广告成功发布）
+
+**这是最关键的表——前端简化不能省掉这些参数，必须在某个环节让用户提供或后端自动获取。**
+
+| Objective | Goal | 必须在发布前获取的参数 | 获取方式 |
+|---|---|---|---|
+| awareness | reach | `identity_id` | 发布弹窗选 |
+| awareness | video_views | `identity_id` | 发布弹窗选 |
+| awareness | community_interaction | `identity_id` | 发布弹窗选 |
+| traffic | clicks | （无特殊资产） | — |
+| traffic | landing_page_views | （无特殊资产） | — |
+| **leads** | **website_leads** | `pixel_id` + `optimization_event`（如 Lead/SubmitForm） | 发布弹窗选 Pixel → 选 Event |
+| **leads** | **instant_form_leads** | `instant_form_id`（表单资产，需提前在 TT 后台创建） | 发布弹窗选已创建的 Form |
+| **leads** | **messaging_leads** | `identity_id`（TikTok DM 模式用主页身份接收消息） | 发布弹窗选 Identity |
+| sales | web_conversions | `pixel_id` + `optimization_event`（如 Purchase） | 发布弹窗选 Pixel → 选 Event |
+| sales | shop_purchases | `store_id` + `store_authorized_bc_id`（TikTok Shop 授权） | 发布弹窗选 Shop |
+| app_promotion | app_installs | `app_id` + `app_config` | 发布弹窗选 App |
+| app_promotion | in_app_events | `app_id` + `app_config` + `optimization_event` | 发布弹窗选 App → 选 Event |
+
+**重要说明**：
+- `identity_id` + `identity_type`：几乎所有 TikTok 广告都需要（用于显示投放身份），必需
+- `pixel_id`：仅 Website 类目标需要（website_leads / web_conversions）
+- `instant_form_id`：仅 Instant Form leads 需要（表单资产）
+- `store_id`：仅 TikTok Shop purchases 需要
+- `app_id`：仅 App promotion 需要
+- `optimization_event`：仅 needsEvent=true 的 goal 需要，来自 Event 三级选择
+
+### 关于 Instant Messaging Ads（WhatsApp / Messenger / Zalo）
+
+TikTok 的第四种 Lead source「Instant messaging apps」需要额外的第三方集成参数：
+
+| 参数 | 说明 | 必需性 |
+|---|---|---|
+| `messaging_app_type` | WHATSAPP / MESSENGER / ZALO / LINE | 必需 |
+| `messaging_app_account_id` | WhatsApp 号码 / FB Page ID / Zalo OA ID | 必需 |
+| `message_event_set_id` | 消息事件集 ID（用于优化对话转化） | 优化目标为 CONVERSATIONS 时必需 |
+
+**P0 建议**：暂不支持 Instant messaging apps（需要集成第三方渠道），仅支持 Website / Instant form / TikTok DM 三种 Lead source。
 
 **SDK 事实依据**：
 - `sales_destination` 是 **Campaign 级参数**（存在于 `CampaignCreateBody` 中），不是 Ad Group 级
@@ -356,16 +398,19 @@ const AUDIENCE_SHORT_LABELS = {
 | TikTok 连接 | ~30 | 复制 Meta 连接块结构 |
 | TikTok 资产链路 | ~90 | 根据 goal 条件显示：Identity(必需) → Pixel(条件) → Event(条件) → Form/Shop/App(条件) |
 
-**资产显示条件（后端映射表驱动）**：
+**资产显示条件（基于发布必需参数表驱动）**：
 
-| 资产 | 何时显示 | 判断依据 |
-|---|---|---|
-| **Identity** | 所有 TikTok 广告 | `platform === 'tiktok'` |
-| **Pixel** | web_conversions / website_leads | 后端映射表中标记 `needsPixel` |
-| **Event** | goal.needsEvent === true | 同 Meta 的逻辑 |
-| **Instant Form** | instant_form_leads | 后端映射表中标记 `needsForm` |
-| **TikTok Shop** | shop_purchases | 后端映射表中标记 `needsShop` |
-| **App ID** | app_installs / in_app_events | 后端映射表中标记 `needsApp` |
+| 资产 | 何时显示 | 判断依据 | 不选的后果 |
+|---|---|---|---|
+| **Ad Account** | 所有 TikTok 广告 | `platform === 'tiktok'` | API 报错：advertiser_id 缺失 |
+| **Identity** | 所有 TikTok 广告 | `platform === 'tiktok'` | API 报错：identity_id 缺失 |
+| **Pixel** | web_conversions / website_leads | goal 标记 `needsPixel` | API 报错：pixel_id 缺失 |
+| **Event** | goal.needsEvent === true | 同 Meta 逻辑 | API 报错：optimization_event 缺失 |
+| **Instant Form** | instant_form_leads | goal 标记 `needsForm` | API 报错：无法创建表单类广告 |
+| **TikTok Shop** | shop_purchases | goal 标记 `needsShop` | API 报错：store_id 缺失 |
+| **App** | app_installs / in_app_events | goal 标记 `needsApp` | API 报错：app_id 缺失 |
+
+**前端校验规则**：发布按钮只有在**所有必需资产都已选择**后才可点击（同 Meta 现有逻辑）。
 
 ---
 
