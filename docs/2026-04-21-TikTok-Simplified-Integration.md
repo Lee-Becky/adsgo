@@ -188,6 +188,8 @@ const STANDARD_EVENTS = {
 | `billing_event` | 由 goal 决定（见上表） | CPC / CPM / CPV / OCPM |
 | `campaign_type` | `REGULAR_CAMPAIGN` | 默认普通竞价（不是 R&F） |
 | `smart_plus` | `false` | **P0 默认关闭，后端写死 Manual 模式** |
+| `smart_targeting_enabled` | `true` | 在手动受众基础上允许系统扩展，默认开启，不外露 |
+| `auto_targeting_enabled` | 不传 | **Manual Campaign 下不可用**，仅 Smart+ Campaign 可用 |
 | `identity_type` | `TT_ACCOUNT` | 默认使用 TikTok 账号身份 |
 | `schedule_type` | `SCHEDULE_FROM_NOW` | 默认立即开始 |
 
@@ -241,7 +243,7 @@ const STANDARD_EVENTS = {
 
 **关键简化**：
 - TikTok 的 `Sales destination: Website` → 映射为 goal `web_conversions`
-- TikTok 的 `Sales destination: TikTok Shop` → 映射为 goal `shop_purchases`
+- TikTok 的 `Sales destination: TikTok Shop` → 映射为 goal `TT_shop_purchases`
 - TikTok 的 `Lead source: Website` → 映射为 goal `website_leads`
 - TikTok 的 `Lead source: Instant form` → 映射为 goal `instant_form_leads`
 - TikTok 的 `Promotion type: Install` → 映射为 goal `app_installs`
@@ -251,17 +253,41 @@ const STANDARD_EVENTS = {
 **用户根本不需要知道 TikTok 前端的 destination / source / type 概念。
 用户只需要选 goal，后端自动映射到正确的 API 参数。**
 
-### Step 3 — 架构与预算（~20 行）
+### Step 3 — 架构与预算（~25 行）
 
 | 改什么 | 行数 | 说明 |
 |---|---|---|
 | Ad Format 条件化 | ~15 | TikTok 下 FLEXIBLE→CAROUSEL/SINGLE |
-| 受众标签文案对齐 | ~5 | TikTok 下 `Adv+` 改为 `Auto`（含义相同：平台自动定向） |
+| 受众选项按平台条件化 | ~10 | TikTok Manual Campaign 下**没有 ADV/Auto 选项** |
 
-注意：
-- **不增加 SMART 受众类型**——TikTok Smart+ 是 Campaign 级开关，不是 Adset 受众选项
-- **P0 不支持 Smart+**——后端默认 Manual 模式
-- TikTok 下的 `ADV`（Auto targeting）等同于 Meta 的 `Adv+`（Advantage+ Audience），只是自动定向受众，不涉及版位/出价/创意的自动化
+**关键事实（已通过 API 文档确认）**：
+
+TikTok 的 `auto_targeting_enabled` 在非 Smart+ 的 Manual Campaign 下**不可用**（API 文档明确标注"未启用"）。
+因此 TikTok 下的受众选项**不能有 `ADV`/`Auto`**。
+
+```javascript
+// 受众选项按平台区分
+const AUDIENCE_OPTIONS = {
+  meta: ['ADV', 'LAL', 'INT', 'CUSTOM'],
+  //       ↑ Meta Advantage+ Audience 允许 Adset 级别自动定向
+
+  tiktok: ['LAL', 'INT', 'CUSTOM']
+  //       ↑ 没有 ADV！Manual Campaign 下必须手动设定受众
+  //       系统可通过 Smart Targeting 在手动受众基础上做扩展（后端参数，不外露）
+};
+
+// 对应的标签
+const AUDIENCE_SHORT_LABELS = {
+  meta: { ADV: 'Adv+', LAL: 'LAL', INT: 'INT', CUSTOM: 'SA' },
+  tiktok: { LAL: 'LAL', INT: 'INT', CUSTOM: 'Custom' }
+};
+```
+
+**TikTok 的 Smart Targeting（与 auto_targeting_enabled 完全不同）**：
+- Smart Targeting 是在**用户手动设的受众基础上**，允许系统向外扩展找更多人
+- 等价于 Meta 的"Detailed Targeting Expansion"
+- 后端可默认开启（`smart_targeting_enabled: true`），前端不外露
+- **不等于 Auto targeting**——用户仍然必须选 LAL/INT/CUSTOM 之一
 
 ### Step 4 — 高级设置（~10 行）
 
