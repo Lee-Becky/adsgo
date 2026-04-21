@@ -384,7 +384,22 @@ const platformGoals = ADSET_GOALS_MAPPING[platform?.id] || ADSET_GOALS_MAPPING.m
 const availableGoals = platformGoals[objective] || [];
 ```
 
-#### 2.4 Standard Events 按平台区分
+#### 2.4 Standard Events（转化事件）按平台 + 场景区分
+
+TikTok 的标准转化事件分为 **Web Event**（Pixel 追踪）和 **App Event**（SDK 追踪）两套。
+何时出现 Event 选择器，取决于 goal 上的 `needsEvent: true`。
+
+**Event 出现的场景全景**：
+
+| 目标 | Goal | Event 类型 | 前置条件 | 事件列表来源 |
+|---|---|---|---|---|
+| Traffic | landing_page_views | ❌ 无需 Event | — | — |
+| App promotion | in_app_events | **App Event** | App SDK | `STANDARD_EVENTS.tiktok.app` |
+| Lead generation (Website) | leads | **Web Event** | Pixel | `STANDARD_EVENTS.tiktok.web` |
+| Sales → Website | conversions / value | **Web Event** | Pixel | `STANDARD_EVENTS.tiktok.web` |
+| Sales → App | product_sales | **App Event** | App + Catalog | `STANDARD_EVENTS.tiktok.app` |
+| Sales → Website+App | conversions / value | **Web Event** | Pixel + App | `STANDARD_EVENTS.tiktok.web` |
+| Sales → TikTok Shop | gmv | ❌ 无需 Event（GMV Max 自动托管） | TikTok Shop | — |
 
 ```javascript
 // 现有（第 76-80 行）
@@ -392,7 +407,7 @@ const STANDARD_EVENTS = [
   'Purchase', 'AddToCart', 'InitiateCheckout', 'Lead', ...
 ];
 
-// 改造后
+// 改造后：按平台 + 场景区分
 const STANDARD_EVENTS = {
   meta: [
     'Purchase', 'AddToCart', 'InitiateCheckout', 'Lead',
@@ -400,15 +415,69 @@ const STANDARD_EVENTS = {
     'Search', 'ViewContent', 'Subscribe', 'CustomizeProduct',
     'Donate', 'FindLocation', 'Schedule', 'StartTrial'
   ],
-  tiktok: [
-    'Purchase', 'AddToCart', 'InitiateCheckout', 'Lead',
-    'CompleteRegistration', 'SubmitForm', 'Contact',
-    'Search', 'ViewContent', 'Subscribe', 'Download',
-    'AddToWishlist', 'AddPaymentInfo', 'Schedule', 'StartTrial',
-    'SubmitApplication', 'ApplicationApproval'
-  ]
+  tiktok: {
+    // Web 标准事件（Pixel 追踪，用于 Sales-Website / Lead-Website 等场景）
+    web: [
+      { value: 'Purchase', label: 'Purchase', objective: 'Sales' },
+      { value: 'AddToCart', label: 'Add to Cart', objective: 'Sales' },
+      { value: 'InitiateCheckout', label: 'Initiate Checkout', objective: 'Sales' },
+      { value: 'ViewContent', label: 'View Content', objective: 'Sales' },
+      { value: 'AddPaymentInfo', label: 'Add Payment Info', objective: 'Sales' },
+      { value: 'AddToWishlist', label: 'Add to Wishlist', objective: 'Sales' },
+      { value: 'Lead', label: 'Lead', objective: 'Lead' },
+      { value: 'CompleteRegistration', label: 'Complete Registration', objective: 'Lead' },
+      { value: 'SubmitForm', label: 'Submit Form', objective: 'Lead' },
+      { value: 'Contact', label: 'Contact', objective: 'Lead' },
+      { value: 'Subscribe', label: 'Subscribe', objective: 'Sales/Lead' },
+      { value: 'Download', label: 'Download', objective: 'Sales' },
+      { value: 'Search', label: 'Search', objective: 'Sales/Lead' },
+      { value: 'StartTrial', label: 'Start Trial', objective: 'Lead' },
+      { value: 'Schedule', label: 'Schedule', objective: 'Lead' },
+      { value: 'SubmitApplication', label: 'Submit Application', objective: 'Lead' },
+      { value: 'ApplicationApproval', label: 'Application Approval', objective: 'Lead' }
+    ],
+    // App 标准事件（SDK 追踪，用于 App promotion / Sales-App 等场景）
+    app: [
+      { value: 'InstallApp', label: 'Install App' },
+      { value: 'LaunchAPP', label: 'Launch App' },
+      { value: 'CompleteTutorial', label: 'Complete Tutorial' },
+      { value: 'AchieveLevel', label: 'Achieve Level' },
+      { value: 'CreateGroup', label: 'Create Group' },
+      { value: 'CreateRole', label: 'Create Role' },
+      { value: 'SpendCredits', label: 'Spend Credits' },
+      { value: 'Purchase', label: 'In-App Purchase' },
+      { value: 'AddToCart', label: 'In-App Add to Cart' },
+      { value: 'ViewContent', label: 'In-App View Content' },
+      { value: 'Subscribe', label: 'In-App Subscribe' },
+      { value: 'Rate', label: 'Rate' },
+      { value: 'Login', label: 'Login' }
+    ]
+  }
 };
 ```
+
+**使用方式**（根据场景选择正确的事件列表）：
+
+```javascript
+// 现有：直接用 STANDARD_EVENTS
+// 改造后：根据平台和场景分叉
+const getEventList = () => {
+  if (platform?.id === 'meta') return STANDARD_EVENTS.meta;
+  if (platform?.id !== 'tiktok') return [];
+
+  // TikTok: 根据目标+destination 判断用 web 还是 app 事件
+  if (objective === 'app_promotion') return STANDARD_EVENTS.tiktok.app;
+  if (objective === 'sales') {
+    if (salesDestination === 'app') return STANDARD_EVENTS.tiktok.app;
+    if (salesDestination === 'tiktok_shop') return []; // GMV Max 无需 Event
+    return STANDARD_EVENTS.tiktok.web; // website / website_and_app
+  }
+  if (objective === 'lead_generation') return STANDARD_EVENTS.tiktok.web;
+  return [];
+};
+```
+
+**这里的关键点**：现有代码中 Meta 的 Event 是一个扁平列表，用户在 `needsEvent` 的 goal 下选一个。TikTok 的逻辑完全一样，只是事件列表按 **web / app** 拆分。交互方式不变——只是数据源不同。
 
 #### 2.5 Campaign setup / Campaign type 选择器
 
