@@ -182,44 +182,85 @@ const STANDARD_EVENTS = {
 | app_promotion | app_installs | APP_PROMOTION | — | APP_INSTALL | OCPM | PACING_MODE_SMOOTH | App ID |
 | app_promotion | in_app_events | APP_PROMOTION | — | IN_APP_EVENT | OCPM | PACING_MODE_SMOOTH | App ID |
 
-### 每个 Goal 的发布必需参数（保障广告成功发布）
+### 每个 Goal 的发布必需参数全面检查（基于 SDK 三层字段逐一核实）
 
-**这是最关键的表——前端简化不能省掉这些参数，必须在某个环节让用户提供或后端自动获取。**
+**这是最关键的表。每个参数标注了它属于哪个 API 层级（Campaign / Ad Group / Ad Creative），以及从哪里获取。**
 
-| Objective | Goal | 必须在发布前获取的参数 | 获取方式 |
+> ⚠️ `identity_id` + `identity_type` 是 **Ad Creative 级参数**（不是 Ad Group 级），所有 TikTok 广告创意都必须指定。
+
+#### Campaign 级必填参数（所有目标通用）
+
+| 参数 | 必需性 | 说明 | 获取方式 |
 |---|---|---|---|
-| awareness | reach | `identity_id` | 发布弹窗选 |
-| awareness | video_views | `identity_id` | 发布弹窗选 |
-| awareness | community_interaction | `identity_id` | 发布弹窗选 |
-| traffic | clicks | （无特殊资产） | — |
-| traffic | landing_page_views | （无特殊资产） | — |
-| **leads** | **website_leads** | `pixel_id` + `optimization_event`（如 Lead/SubmitForm） | 发布弹窗选 Pixel → 选 Event |
-| **leads** | **instant_form_leads** | `instant_form_id`（表单资产，需提前在 TT 后台创建） | 发布弹窗选已创建的 Form |
-| **leads** | **messaging_leads** | `identity_id`（TikTok DM 模式用主页身份接收消息） | 发布弹窗选 Identity |
-| sales | web_conversions | `pixel_id` + `optimization_event`（如 Purchase） | 发布弹窗选 Pixel → 选 Event |
-| sales | shop_purchases | `store_id` + `store_authorized_bc_id`（TikTok Shop 授权） | 发布弹窗选 Shop |
-| app_promotion | app_installs | `app_id` + `app_config` | 发布弹窗选 App |
-| app_promotion | in_app_events | `app_id` + `app_config` + `optimization_event` | 发布弹窗选 App → 选 Event |
+| `advertiser_id` | **required** | 广告账户 ID | 发布弹窗选 Ad Account |
+| `campaign_name` | **required** | 系列名称 | 从命名模板自动生成 |
+| `objective_type` | **required** | 投放目标 | 后端从 goal 映射 |
+| `budget_mode` | optional | CBO 开关 | 从 Step 3 预算设置映射 |
+| `sales_destination` | 条件 | 仅 Sales 目标 | 后端从 goal 映射（web_conversions→WEBSITE, shop_purchases→TIKTOK_SHOP） |
 
-**重要说明**：
-- `identity_id` + `identity_type`：几乎所有 TikTok 广告都需要（用于显示投放身份），必需
-- `pixel_id`：仅 Website 类目标需要（website_leads / web_conversions）
-- `instant_form_id`：仅 Instant Form leads 需要（表单资产）
-- `store_id`：仅 TikTok Shop purchases 需要
-- `app_id`：仅 App promotion 需要
-- `optimization_event`：仅 needsEvent=true 的 goal 需要，来自 Event 三级选择
+#### Ad Group 级必填参数（所有目标通用）
+
+| 参数 | 必需性 | 说明 | 获取方式 |
+|---|---|---|---|
+| `campaign_id` | **required** | 所属系列 | 上一步创建后获得 |
+| `adgroup_name` | **required** | 组名称 | 从命名模板自动生成 |
+| `optimization_goal` | **required** | 优化目标 | 后端从 goal 映射 |
+| `billing_event` | **required** | 计费事件 | 后端从 goal 映射 |
+| `budget` | **required** | 预算 | 从 Step 3 预算设置 |
+| `budget_mode` | **required** | 预算模式 | 后端根据 CBO/ABO 映射 |
+| `pacing` | **required** | 投放节奏 | 后端默认 PACING_MODE_SMOOTH |
+| `schedule_type` | **required** | 排期类型 | 后端从 Step 4 排期映射 |
+| `schedule_start_time` | **required** | 开始时间 | 从 Step 4 排期 |
+| `location_ids` | 推荐 | 投放地区 | 从 Step 2 国家选择 |
+
+#### 各目标 + Goal 的特有必填参数
+
+| Objective | Goal | Ad Group 级特有参数 | Ad Creative 级特有参数 | 获取方式 |
+|---|---|---|---|---|
+| **awareness** | reach | — | `identity_id` + `identity_type` + `video_id`/`image_ids` | 发布弹窗选 Identity；素材从 Step 1 |
+| **awareness** | video_views | — | `identity_id` + `identity_type` + `video_id` | 同上（视频必须） |
+| **awareness** | community_interaction | — | `identity_id` + `identity_type` | 同上 |
+| **traffic** | clicks | `promotion_type`=WEBSITE | `landing_page_url` + `identity_id` + `identity_type` | 落地页从 Step 4；Identity 从发布弹窗 |
+| **traffic** | landing_page_views | `promotion_type`=WEBSITE | `landing_page_url` + `identity_id` + `identity_type` | 同上 |
+| **leads** | website_leads | `pixel_id` + `optimization_event` | `landing_page_url` + `identity_id` + `identity_type` | Pixel+Event 从发布弹窗；落地页从 Step 4 |
+| **leads** | instant_form_leads | — | `identity_id` + `identity_type` + `card_id`(Instant Form) | Form 从发布弹窗选；Identity 从发布弹窗 |
+| **leads** | messaging_leads | — | `identity_id` + `identity_type` + `auto_message_id` | Identity 从发布弹窗（TikTok DM 身份） |
+| **sales** | web_conversions | `pixel_id` + `optimization_event` | `landing_page_url` + `identity_id` + `identity_type` | Pixel+Event 从发布弹窗；落地页从 Step 4 |
+| **sales** | shop_purchases | `store_id` + `catalog_id`(可选) | `identity_id` + `identity_type` | Shop 从发布弹窗；Identity 从发布弹窗 |
+| **app** | app_installs | `app_id` + `promotion_type`=APP | `identity_id` + `identity_type` | App 从发布弹窗；Identity 从发布弹窗 |
+| **app** | in_app_events | `app_id` + `promotion_type`=APP + `optimization_event` | `identity_id` + `identity_type` | App+Event 从发布弹窗；Identity 从发布弹窗 |
+
+#### 素材/创意级通用必填参数
+
+| 参数 | 必需性 | 说明 | 获取方式 |
+|---|---|---|---|
+| `identity_id` | **所有 TikTok 广告必需** | 投放身份 ID | 发布弹窗选 |
+| `identity_type` | **所有 TikTok 广告必需** | 身份类型（CUSTOMIZED_USER / TT_USER） | 后端默认或发布弹窗选 |
+| `video_id` 或 `image_ids` | **必需之一** | 素材 ID（需先上传获得） | Step 1 产品素材 → 上传 API 获得 ID |
+| `ad_text` | 推荐 | 广告文案 | Step 4 文案策略 |
+| `call_to_action` | 推荐 | CTA 按钮 | 后端默认或 Step 4 |
+| `landing_page_url` | 条件 | 落地页 URL | Step 4 落地页策略（Traffic/Sales-Website/Leads-Website） |
 
 ### 关于 Instant Messaging Ads（WhatsApp / Messenger / Zalo）
 
 TikTok 的第四种 Lead source「Instant messaging apps」需要额外的第三方集成参数：
 
-| 参数 | 说明 | 必需性 |
-|---|---|---|
-| `messaging_app_type` | WHATSAPP / MESSENGER / ZALO / LINE | 必需 |
-| `messaging_app_account_id` | WhatsApp 号码 / FB Page ID / Zalo OA ID | 必需 |
-| `message_event_set_id` | 消息事件集 ID（用于优化对话转化） | 优化目标为 CONVERSATIONS 时必需 |
+| 参数 | 层级 | 说明 | 必需性 |
+|---|---|---|---|
+| `messaging_app_type` | Ad Group | WHATSAPP / MESSENGER / ZALO / LINE | 必需 |
+| `messaging_app_account_id` | Ad Group | WhatsApp 号码 / FB Page ID / Zalo OA ID | 必需 |
+| `message_event_set_id` | Ad Group | 消息事件集 ID | 优化目标为 CONVERSATIONS 时必需 |
 
-**P0 建议**：暂不支持 Instant messaging apps（需要集成第三方渠道），仅支持 Website / Instant form / TikTok DM 三种 Lead source。
+**P0 建议**：暂不支持 Instant messaging apps（需集成第三方渠道），仅支持 Website / Instant form / TikTok DM。
+
+### 关于 Traffic 目标的 `promotion_type`
+
+Traffic 目标的 `promotion_type` 决定流量去向：
+- `WEBSITE`：引流到网站（需 `landing_page_url`）
+- `APP`：引流到 App（需 `app_id`）
+- `TIKTOK_SHOP`：引流到 TikTok 店铺
+
+**P0 建议**：默认 `promotion_type: WEBSITE`（后端写死），因为我们的落地页策略已经覆盖了这个场景。
 
 **SDK 事实依据**：
 - `sales_destination` 是 **Campaign 级参数**（存在于 `CampaignCreateBody` 中），不是 Ad Group 级
