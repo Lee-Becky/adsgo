@@ -131,78 +131,146 @@ const CAMPAIGN_OBJECTIVES = {
     { value: 'sales_conversions', label: 'Sales & Conversions', icon: ShoppingBag, ... },
     { value: 'app_promotion', label: 'App Promotion', icon: Smartphone, ... }
   ],
-  // TikTok Ads Manager 官方 7 个目标（2026 年最新）
-  // 注意：API 层面的 objective_type 枚举值为：
+  // ══════════════════════════════════════════════════════════════
+  // TikTok 7 个目标（基于 TikTok Ads Manager 前端截图逐一核对）
+  //
+  // 核心发现：每个目标选中后，右侧展开的配置结构各不相同，
+  // 有的有二级选择（Campaign type / Promotion type / Sales destination），
+  // 有的有 Campaign setup（Manual / Smart+ / Search），
+  // 有的只有说明文字没有子选项。
+  // 这些二级结构必须在我们的 Objective 选择流程中还原。
+  //
+  // API 层面的 objective_type 枚举值：
   //   REACH, TRAFFIC, VIDEO_VIEWS, ENGAGEMENT,
   //   APP_PROMOTION, LEAD_GENERATION, WEB_CONVERSIONS, PRODUCT_SALES
-  // 但在 Ads Manager UI 层面，WEB_CONVERSIONS 和 PRODUCT_SALES 已合并为统一的 "Sales" 目标。
-  // 发布时需要根据用户选择的 sales destination 映射回具体的 API objective_type。
+  // ══════════════════════════════════════════════════════════════
   tiktok: [
-    // ─── Awareness ───
+
+    // ─── Awareness ───────────────────────────────────────────
     { value: 'reach', label: 'Reach', icon: Megaphone,
-      description: 'Show your ad to maximum people',
-      apiObjective: 'REACH'
+      description: 'Show your ad to the maximum number of people.',
+      apiObjective: 'REACH',
+      // 右侧展开：Campaign type（radio）
+      campaignTypes: [
+        { id: 'auction', label: 'Auction reach',
+          description: 'Ads with the most efficient reach.',
+          isDefault: true },
+        { id: 'reach_frequency', label: 'Reach & Frequency',
+          description: 'Reserve ads in advance with a guaranteed reach and frequency.',
+          badge: 'Reserve',
+          // R&F 不是独立目标，而是 Reach 下的子类型
+          // R&F 通常需要预算锁定、频次上限等特殊配置
+          requiresReservation: true }
+      ]
     },
-    // ─── Consideration ───
+
+    // ─── Consideration ───────────────────────────────────────
     { value: 'traffic', label: 'Traffic', icon: MousePointer2,
-      description: 'Send people to website/app',
+      description: 'Send more people to your website, app, or TikTok Shop.',
       apiObjective: 'TRAFFIC',
-      subModes: ['standard', 'optimize_destination']
+      // 右侧展开：Campaign setup（radio）
+      campaignSetup: [
+        { id: 'manual', label: 'Manual campaign',
+          description: 'Create your campaign using the standard workflow to maximize precise control for your ads settings.',
+          isDefault: true },
+        { id: 'smart_plus', label: 'Smart+ campaign',
+          description: 'Improve ad performance with automated campaign management and smart optimization (placement selection, AIGC, audience targeting, and more).',
+          badge: 'New' },
+        { id: 'search', label: 'Search campaign',
+          description: "Create your campaign with keywords and serve ads within TikTok's search result page.",
+          badge: 'New' }
+      ]
     },
-    { value: 'video_views', label: 'Video Views', icon: Play,
-      description: 'Get more views & engagement',
+
+    { value: 'video_views', label: 'Video views', icon: Play,
+      description: 'Get more views and engagement for your video ads.',
       apiObjective: 'VIDEO_VIEWS'
+      // 右侧展开：纯说明文字，无子选项
+      // - Maximize the plays of your video ads
+      // - Drive consideration by showing your ads to users who are more actively engaged
     },
-    { value: 'engagement', label: 'Community Interaction', icon: Users,
-      description: 'Followers, profile visits, livestream',
+
+    { value: 'engagement', label: 'Community interaction', icon: Users,
+      description: 'Get more followers or TikTok page visits.',
       apiObjective: 'ENGAGEMENT',
       requiresIdentity: true
+      // 右侧展开：纯说明文字，无子选项
+      // - Get more people to follow your TikTok account
+      // - Get more people to visit your TikTok profile
+      // - Promote your livestream
     },
-    // ─── Conversion ───
-    { value: 'app_promotion', label: 'App Promotion', icon: Smartphone,
-      description: 'Installs & in-app actions',
+
+    // ─── Conversion ──────────────────────────────────────────
+    { value: 'app_promotion', label: 'App promotion', icon: Smartphone,
+      description: 'The cost effective way to get more people to install and take desired actions in your app.',
       apiObjective: 'APP_PROMOTION',
-      requiresAppId: true
+      requiresAppId: true,
+      // 右侧展开：Promotion types（radio），选中 App install 后内嵌 Campaign setup
+      promotionTypes: [
+        { id: 'app_install', label: 'App install',
+          description: 'Get people to install and use your app.',
+          isDefault: true,
+          // 内嵌 Campaign setup
+          campaignSetup: [
+            { id: 'manual', label: 'Manual campaign',
+              description: 'Create your campaign using the standard workflow to maximize precise control for your ads settings.',
+              isDefault: true },
+            { id: 'smart_plus', label: 'Smart+ campaign',
+              description: 'Improve ad performance with automated campaign management and smart optimization.',
+              badge: 'New' }
+          ]
+        },
+        { id: 'app_retargeting', label: 'App retargeting',
+          description: 'Re-engage existing app users to take action in your app.' }
+      ]
     },
-    { value: 'lead_generation', label: 'Lead Generation', icon: Users,
-      description: 'Collect leads via website or Instant Form',
+
+    { value: 'lead_generation', label: 'Lead generation', icon: Users,
+      description: 'Collect leads for your business.',
       apiObjective: 'LEAD_GENERATION',
-      subModes: ['website_lead', 'instant_form']
+      // 右侧展开：顶部有 lead source tab 栏 + Campaign setup + Use catalog toggle
+      leadSources: [
+        { id: 'website', label: 'Website' },
+        { id: 'instant_form', label: 'Instant form', needsForm: true },
+        { id: 'tiktok_dm', label: 'TikTok direct messages' },
+        { id: 'instant_messaging', label: 'Instant messaging apps' }
+      ],
+      campaignSetup: [
+        { id: 'manual', label: 'Manual campaign', isDefault: true },
+        { id: 'smart_plus', label: 'Smart+ campaign', badge: 'New' }
+      ],
+      // "Use catalog" toggle 开关（用汽车目录推广库存/车型）
+      useCatalogToggle: true,
+      useCatalogDescription: 'Use your automotive catalog to promote car inventory or models.'
     },
+
     { value: 'sales', label: 'Sales', icon: ShoppingBag,
-      description: 'Drive sales on TikTok Shop / website / app',
-      // Sales 是 UI 层面的统一目标，发布时按 destination 映射：
-      //   TikTok Shop → GMV Max campaign（2025.7 后唯一方式）
-      //   Website → apiObjective: 'WEB_CONVERSIONS'，requiresPixel
-      //   App → apiObjective: 'PRODUCT_SALES'，requiresCatalog
-      //   Website+App → 双通道优化
-      // Sales Destinations（与 TikTok Ads Manager 截图完全对齐）
+      description: 'Drive sales on your TikTok Shop, website, or app.',
+      // Sales 是 UI 统一目标，发布时按 destination 映射到 API objective_type
       salesDestinations: [
         { id: 'tiktok_shop', label: 'TikTok Shop',
           description: 'Drive sales on your TikTok Shop with Shop Ads campaign settings chosen by you.',
           apiObjective: 'PRODUCT_SALES',
           requiresShop: true,
-          // GMV Max 是 TikTok Shop 内部的一个 toggle 开关，不是独立 destination
-          // 2025.9 之后 custom shop ads 不再支持创建，GMV Max 将成为唯一方式
           gmvMaxToggle: true,
+          gmvMaxWarning: 'Starting September 1, custom shop ads will be unavailable for creation, duplication, drafting, and editing. Your existing ads will run until they\'re out of budget.',
           gmvMaxDescription: 'See better results with an automated Shop Ads solution that selects the best performing ad creative for your products and leverages all shoppable ad placements.'
         },
         { id: 'website', label: 'Website',
           description: 'Drive sales on your website with campaign settings chosen by you.',
           apiObjective: 'WEB_CONVERSIONS',
           requiresPixel: true
-          // 注意：Manual / Smart+ / Search 等模式是在选完 destination 后的下一步配置，不在此处展示
+          // 选完后下一步才配置 Manual / Smart+ / Search 模式
         },
         { id: 'app', label: 'App',
           description: 'Drive sales on your app (product catalog required).',
           apiObjective: 'PRODUCT_SALES',
           requiresCatalog: true
         },
-        { id: 'website_and_app', label: 'Website & App',
-          description: 'Drive sales across your website and mobile app within a single campaign.',
+        { id: 'website_and_app', label: 'Website and app',
+          description: 'Drive sales on both your website and your app.',
           apiObjective: 'WEB_CONVERSIONS',
           requiresPixel: true, requiresAppId: true
-          // 注意：此选项可能仅对部分广告主可见
         }
       ]
     }
@@ -342,43 +410,49 @@ const STANDARD_EVENTS = {
 };
 ```
 
-#### 2.5 Smart+ / Advantage+ 开关
+#### 2.5 Campaign setup / Campaign type 选择器
 
-在 TargetingChannelCard 的 Objective 选择器下方，增加一个 toggle：
+截图揭示：**不同目标的二级配置结构各不相同**，我们需要在 Objective 选择完成后，
+根据目标类型动态渲染对应的二级选择器。
 
 ```javascript
 // 新增状态（BatchGenerateAds.jsx 主组件）
-const [smartOptEnabled, setSmartOptEnabled] = useState(false);
+const [campaignSetupMode, setCampaignSetupMode] = useState('manual');
+const [reachCampaignType, setReachCampaignType] = useState('auction');
+const [appPromotionType, setAppPromotionType] = useState('app_install');
+const [leadSource, setLeadSource] = useState('website');
+const [salesDestination, setSalesDestination] = useState('');
+const [useCatalog, setUseCatalog] = useState(false);
 
 // 条件渲染（TargetingChannelCard 中，Objective 选择后）
-{platform?.id === 'tiktok' && objective && (
-  <div className="flex items-center gap-3 mt-4 p-3 bg-gray-50 rounded-base">
-    <Toggle checked={smartOptEnabled} onChange={setSmartOptEnabled} />
-    <div>
-      <p className="text-xs font-bold text-gray-700">Smart+ 智能优化</p>
-      <p className="text-[10px] text-gray-400">系统自动优化定向、出价、版位</p>
-    </div>
-  </div>
-)}
+// 根据当前目标的数据结构，动态展示对应的二级选择器：
 
-{platform?.id === 'meta' && objective && (
-  <div className="flex items-center gap-3 mt-4 p-3 bg-gray-50 rounded-base">
-    <Toggle checked={smartOptEnabled} onChange={setSmartOptEnabled} />
-    <div>
-      <p className="text-xs font-bold text-gray-700">Advantage+ 智能优化</p>
-      <p className="text-[10px] text-gray-400">系统自动优化定向、出价、版位</p>
-    </div>
-  </div>
-)}
+// 1. Reach → 显示 Campaign type（Auction / R&F）
+// 2. Traffic → 显示 Campaign setup（Manual / Smart+ / Search）
+// 3. Video views → 无二级，直接进下一步
+// 4. Community interaction → 无二级，直接进下一步
+// 5. App promotion → 显示 Promotion type（Install / Retargeting），
+//                     Install 下嵌 Campaign setup（Manual / Smart+）
+// 6. Lead generation → 显示 Lead source tab（Website / Instant form / DM / Messaging）
+//                       + Campaign setup（Manual / Smart+）
+//                       + Use catalog toggle
+// 7. Sales → 显示 Sales destination（TikTok Shop / Website / App / Website+App）
 ```
 
-**Smart+ 启用后的影响**：
-- CampaignPlanView 中隐藏 BY_CREATIVE 策略（系统接管）
-- 受众分配默认为 AUTO（隐藏 LAL/INT/CUSTOM 选择）
-- 出价策略默认为 UNLIMITED（隐藏手动出价）
+**所有目标的二级配置全景表**：
+
+| 目标 | 二级选择名称 | 选项 | 对发布的影响 |
+|---|---|---|---|
+| Reach | Campaign type | Auction / R&F | R&F 需要频次上限、预约预算 |
+| Traffic | Campaign setup | Manual / Smart+ / Search | Smart+ 锁定定向；Search 需关键词 |
+| Video views | （无） | — | 直接进下一步 |
+| Community interaction | （无） | — | 直接进下一步 |
+| App promotion | Promotion type → Campaign setup | Install(Manual/Smart+) / Retargeting | Retargeting 需已安装用户数据 |
+| Lead generation | Lead source + Campaign setup + Use catalog | Website/Form/DM/Messaging × Manual/Smart+ | Form 需 Instant Form 资产 |
+| Sales | Sales destination | TikTok Shop(+GMV Max) / Website / App / Website+App | 映射到不同 API objective_type |
 
 **改造文件**：`TargetingChannelCard`（组件内部）、`BatchGenerateAds.jsx`（状态）  
-**改造行数**：约 80-120 行
+**改造行数**：约 120-160 行
 
 ---
 
@@ -592,35 +666,74 @@ TikTok: Campaign Create → Ad Group Create → Ad Create
 
 ---
 
-## 四、Smart+ 与 Advantage+ 的处理
+## 四、Smart+ / Campaign setup 的处理（基于截图修正）
 
-### 本质
-二者都是"将更多优化决策交给平台算法"的开关，**不是独立的 objective_type**：
+### 关键发现：Smart+ 不是独立 toggle，而是 Campaign setup 的一个选项
 
-| 参数 | Meta Advantage+ | TikTok Smart+ |
+从截图来看，TikTok 的 Smart+ **不是**在任何目标上叠加的独立开关。它的实际位置是：
+
+```
+目标选择后 → 右侧展开 Campaign setup（radio group）
+  ● Manual campaign（默认）
+  ○ Smart+ campaign [New]
+  ○ Search campaign [New]（仅 Traffic / Sales-Website 有）
+```
+
+**哪些目标有 Campaign setup？**
+
+| 目标 | 有 Campaign setup？ | 可选模式 |
 |---|---|---|
-| 触发方式 | Campaign 级别 flag | Campaign 级别 flag |
-| 影响范围 | 自动定向、自动出价、自动版位 | 自动定向、自动出价、自动版位 |
-| 前端表现 | 隐藏手动定向/出价配置 | 隐藏手动定向/出价配置 |
-| 可叠加目标 | 任何 objective | 任何 objective |
+| Reach | ❌ 没有（有 Campaign type：Auction / R&F） | — |
+| Traffic | ✅ 有 | Manual / Smart+ / Search |
+| Video views | ❌ 没有 | — |
+| Community interaction | ❌ 没有 | — |
+| App promotion | ✅ 有（嵌在 App install 内） | Manual / Smart+ |
+| Lead generation | ✅ 有 | Manual / Smart+ |
+| Sales | ✅ 有（选完 destination 后出现） | Manual / Smart+ / Search |
+
+### 与 Meta Advantage+ 的对比
+
+| 维度 | Meta Advantage+ | TikTok Smart+ |
+|---|---|---|
+| 位置 | Campaign 级别 flag（独立 toggle） | **Campaign setup 中的 radio 选项** |
+| 可选目标 | 任何 objective | 仅 Traffic / App / Lead / Sales |
+| 影响范围 | 自动定向、自动出价、自动版位 | 同左 + AIGC 素材生成 |
+| 前端表现 | 隐藏手动配置 | 隐藏手动配置 |
 
 ### 前端实现
 
 ```javascript
-// 新增状态
-const [smartOptEnabled, setSmartOptEnabled] = useState(false);
+// 不再是独立的 toggle，而是 campaignSetup 状态
+const [campaignSetupMode, setCampaignSetupMode] = useState('manual');
+// 'manual' | 'smart_plus' | 'search'
 
-// 影响点
+// 根据当前目标判断是否显示 Campaign setup 选择器
+const currentObjective = platformObjectives.find(o => o.value === objective);
+const hasCampaignSetup = !!currentObjective?.campaignSetup;
+
+// Smart+ 模式下的影响
 useEffect(() => {
-  if (smartOptEnabled) {
-    // 1. 锁定受众为 AUTO
+  if (campaignSetupMode === 'smart_plus') {
     setAdsetAudiences(Array(50).fill('AUTO'));
-    // 2. 禁用 BY_CREATIVE 策略
     if (structure.strategy === 'BY_CREATIVE') {
       setStructure({ ...structure, strategy: 'PER_PRODUCT' });
     }
   }
-}, [smartOptEnabled]);
+}, [campaignSetupMode]);
+```
+
+### Reach 的特殊处理：Campaign type（不是 Campaign setup）
+
+Reach 没有 Campaign setup，但有 **Campaign type**：
+- **Auction reach**（默认）：标准竞价
+- **Reach & Frequency**：预约制，需要提前锁定预算和频次
+
+R&F 在之前的分析中被列为独立页面 `set-up-reach-frequency-campaigns/v1.3`，
+但实际上它是 **Reach 目标下的子类型**，不需要在 Objective 层面单独处理。
+
+```javascript
+const [reachCampaignType, setReachCampaignType] = useState('auction');
+// 'auction' | 'reach_frequency'
 ```
 
 ---
@@ -761,7 +874,7 @@ const apiObjectiveType = (() => {
 | 任务 | 文件 | 行数 | 优先级 |
 |---|---|---|---|
 | Ad Format 条件化（FLEXIBLE→CAROUSEL） | CampaignPlanView.jsx | ~30 行 | P0 |
-| Smart+/Advantage+ toggle 开关 | TargetingChannelCard + BatchGenerateAds | ~40 行 | P1 |
+| 目标二级选择器（Campaign setup/type/destination/source） | TargetingChannelCard + BatchGenerateAds | ~120 行 | P0 |
 | Carousel 逐卡落地页配置 | 高级设置区域 | ~20 行 | P1 |
 | 平台切换时清空 objective/goal/event | BatchGenerateAds.jsx | ~10 行 | P0 |
 | Sales destination 二级选择器 | TargetingChannelCard | ~40 行 | P0 |
