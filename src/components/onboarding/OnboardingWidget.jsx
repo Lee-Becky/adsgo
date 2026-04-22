@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import {
-  Compass, Megaphone, Target, TrendingUp, Sparkles, Palette,
+  Compass, Megaphone, Target, TrendingUp, Sparkles, Palette, CalendarDays,
   ChevronRight, ChevronDown, ChevronUp, X, Check, CircleCheck, Lock, PartyPopper,
 } from 'lucide-react'
 import { useOnboardingState } from './useOnboardingState'
+import { useOnboardingContext } from './OnboardingContext'
 
 const STEPS = [
   {
@@ -67,6 +68,18 @@ const STEPS = [
     route: '/creativeHub/aiGenerate',
     icon: Palette,
   },
+  {
+    title: '查看你的 Media Plan',
+    description: '广告发布后24小时内，Media Plan 展示发布进度、AI设置清单和投放预期，帮助你快速进入状态',
+    highlights: [
+      '实时跟踪广告从提交到首次AI优化的5个关键节点',
+      '3项关键设置，让AI在学习期结束后立即接管优化',
+      '了解3阶段成长曲线，合理设定投放预期',
+    ],
+    ctaText: '去查看 Media Plan',
+    route: '/mediaPlan',
+    icon: CalendarDays,
+  },
 ]
 
 export default function OnboardingWidget({
@@ -75,9 +88,11 @@ export default function OnboardingWidget({
   goalConfigured,
   isAutopilotEnabled,
   isAutoPublishEnabled,
+  autoOptimizeConfirmed,
 }) {
   const navigate = useNavigate()
   const location = useLocation()
+  const { startTour, activeTourStep, endTour } = useOnboardingContext()
   const [isExpanded, setIsExpanded] = useState(true)
   const [isClosing, setIsClosing] = useState(false)
   const [expandedStep, setExpandedStep] = useState(0)
@@ -98,31 +113,43 @@ export default function OnboardingWidget({
     goalConfigured,
     isAutopilotEnabled,
     isAutoPublishEnabled,
+    autoOptimizeConfirmed,
   })
 
   // Step 4: visiting autoRegeneration page means user has learned the button location
   useEffect(() => {
+    if (activeTourStep !== null) return
     if (location.pathname.includes('/autoRegeneration')) {
       markStepCompleted(3)
     }
-  }, [location.pathname, markStepCompleted])
+  }, [location.pathname, markStepCompleted, activeTourStep])
 
   // Step 5: visiting creative pages means user has learned upload/AI generation entry
   useEffect(() => {
+    if (activeTourStep !== null) return
     if (location.pathname.includes('/aiGenerate') || location.pathname.includes('/creativeLibrary')) {
       markStepCompleted(4)
     }
-  }, [location.pathname, markStepCompleted])
+  }, [location.pathname, markStepCompleted, activeTourStep])
+
+  // Step 6: visiting mediaPlan means user has learned the media plan overview
+  useEffect(() => {
+    if (activeTourStep !== null) return
+    if (location.pathname === '/mediaPlan') {
+      markStepCompleted(5)
+    }
+  }, [location.pathname, markStepCompleted, activeTourStep])
 
   // Auto-expand to first incomplete step
   useEffect(() => {
     setExpandedStep(currentStep < totalSteps ? currentStep : totalSteps - 1)
   }, [currentStep, totalSteps])
 
-  // Auto-expand widget when a new step is completed (the "return to Widget" moment)
+  // Auto-expand widget when a new step is completed, and end any active page spotlight
   useEffect(() => {
     if (completedSteps.length > prevCompletedRef.current && completedSteps.length > 0) {
       setIsExpanded(true)
+      endTour()
     }
     prevCompletedRef.current = completedSteps.length
   }, [completedSteps.length])
@@ -132,7 +159,7 @@ export default function OnboardingWidget({
   const completedCount = completedSteps.length
 
   const handleCTAClick = (index) => {
-    navigate(STEPS[index].route)
+    startTour(index)
     handleClose()
   }
 

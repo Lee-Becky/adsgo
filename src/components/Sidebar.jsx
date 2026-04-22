@@ -1,5 +1,45 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
+import { useOnboardingContext } from './onboarding/OnboardingContext'
+import OnboardingSpotlight from './onboarding/OnboardingSpotlight'
+
+const STEP_SIDEBAR_CONFIG = {
+  0: {
+    key: 'batchGenerateAds',
+    title: '创建你的第一条 Campaign',
+    body: '点击「Campaign Generator」，通过 AI 快速生成多平台广告 Campaign，一键完成发布',
+    endOnClick: true,
+    stepLabel: null,
+  },
+  1: {
+    key: 'optimizeGoals',
+    title: '配置优化目标',
+    body: '点击「Optimize Goals」，设定 ROAS/CPA 目标和每日预算上限，AI 将以此为基准决策优化方向',
+    endOnClick: false,
+    stepLabel: '1/3',
+  },
+  2: {
+    key: 'adManagerV3',
+    title: '进入广告管理',
+    body: '点击「Ad Manager」，查看 AI 推荐并开启 Recommend 或 Auto 任一功能，让 AI 接管关键优化动作',
+    endOnClick: false,
+    stepLabel: '1/4',
+  },
+  3: {
+    key: 'autoRegeneration',
+    title: '了解自动发布功能',
+    body: '点击「Draft & Recom.」，了解 AI 如何管理广告草稿并自动选择最佳时机发布新 Campaign',
+    endOnClick: false,
+    stepLabel: '1/3',
+  },
+  5: {
+    key: 'mediaPlan',
+    title: '查看 Media Plan',
+    body: '点击「Media Plan」，查看广告发布后 24 小时内的进度追踪、AI 设置清单和投放预期',
+    endOnClick: false,
+    stepLabel: '1/4',
+  },
+}
 import { 
   Layout, Image, Sparkles, BarChart3, Settings, Users, 
   DollarSign, Search, FileText, ChevronDown, X, Plus, 
@@ -27,6 +67,24 @@ const Sidebar = ({ isMobile, isPinned, onTogglePinned, onClose, selectedBrand, o
   const [isBrandDropdownOpen, setIsBrandDropdownOpen] = useState(false)
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
   const userMenuRef = useRef(null)
+  const libraryMenuRef = useRef(null)
+  const aiGenerateMenuRef = useRef(null)
+  const batchGenerateAdsRef = useRef(null)
+  const optimizeGoalsRef = useRef(null)
+  const adManagerV3Ref = useRef(null)
+  const autoRegenerationRef = useRef(null)
+  const mediaPlanRef = useRef(null)
+  const { activeTourStep, tourSubStep, endTour, advanceTourSubStep } = useOnboardingContext()
+
+  const SIDEBAR_REFS = {
+    batchGenerateAds: batchGenerateAdsRef,
+    optimizeGoals: optimizeGoalsRef,
+    adManagerV3: adManagerV3Ref,
+    autoRegeneration: autoRegenerationRef,
+    mediaPlan: mediaPlanRef,
+    creativeLibrary: libraryMenuRef,
+    aiGenerate: aiGenerateMenuRef,
+  }
 
   // Handle click outside to close user menu
   useEffect(() => {
@@ -57,15 +115,28 @@ const Sidebar = ({ isMobile, isPinned, onTogglePinned, onClose, selectedBrand, o
     return parentKey ? `/${parentKey}/${menuItem.key}` : `/${menuItem.key}`
   }
 
-  const renderMenuItem = (menuItem, parentKey = null) => {
+  const renderMenuItem = (menuItem, parentKey = null, itemRef = null) => {
     const ItemIcon = iconMap[menuItem.icon]
-    const isItemActive = currentPage === menuItem.key
+    const isItemActive = currentPage === menuItem.key &&
+      !(activeTourStep === 4 && tourSubStep === 2 && menuItem.key === 'creativeLibrary')
     const isSubItem = !!parentKey
 
     return (
       <button
+        ref={itemRef}
         key={menuItem.key}
         onClick={() => {
+          if (activeTourStep !== null) {
+            if (activeTourStep === 4) {
+              if (menuItem.key === 'creativeLibrary' && tourSubStep === 0) advanceTourSubStep()
+              else if (menuItem.key === 'aiGenerate' && tourSubStep === 2) advanceTourSubStep()
+            } else if (tourSubStep === 0) {
+              const config = STEP_SIDEBAR_CONFIG[activeTourStep]
+              if (config && menuItem.key === config.key) {
+                config.endOnClick ? endTour() : advanceTourSubStep()
+              }
+            }
+          }
           navigate(buildPath(menuItem, parentKey))
           if (isMobile) onClose()
         }}
@@ -120,20 +191,25 @@ const Sidebar = ({ isMobile, isPinned, onTogglePinned, onClose, selectedBrand, o
             </p>
           )}
           <div className={`border-slate-100 space-y-0.5 transition-all duration-300 ${isCollapsed ? 'border-l-0 ml-0' : 'border-l-2 ml-4'}`}>
-            {visibleChildren.map(child => renderMenuItem(child, item.key))}
+            {visibleChildren.map(child => renderMenuItem(
+              child,
+              item.key,
+              SIDEBAR_REFS[child.key] || null
+            ))}
           </div>
         </div>
       )
     }
     return (
       <div key={item.key} className="mb-0.5">
-        {renderMenuItem(item)}
+        {renderMenuItem(item, null, SIDEBAR_REFS[item.key] || null)}
       </div>
     )
   }
 
   return (
-    <div 
+    <>
+    <div
       className={`h-full bg-white border-r border-slate-200 flex flex-col font-sans select-none relative transition-all duration-300 ${isCollapsed ? 'w-[72px]' : 'w-64'}`}
       onMouseEnter={() => !isMobile && setIsHovered(true)}
       onMouseLeave={() => !isMobile && setIsHovered(false)}
@@ -335,6 +411,63 @@ const Sidebar = ({ isMobile, isPinned, onTogglePinned, onClose, selectedBrand, o
         }
       `}} />
     </div>
+
+    {Object.entries(STEP_SIDEBAR_CONFIG).map(([sIdx, config]) => {
+      const stepNum = parseInt(sIdx)
+      if (activeTourStep !== stepNum || tourSubStep !== 0) return null
+      return (
+        <OnboardingSpotlight
+          key={stepNum}
+          targetRef={SIDEBAR_REFS[config.key]}
+          stepLabel={config.stepLabel}
+          title={config.title}
+          body={config.body}
+          onSkip={endTour}
+          renderActions={() => (
+            <div className="flex items-center justify-end">
+              <button onClick={endTour} className="text-xs text-gray-400 hover:text-gray-600 transition-colors">
+                跳过引导
+              </button>
+            </div>
+          )}
+        />
+      )
+    })}
+
+    {activeTourStep === 4 && tourSubStep === 0 && (
+      <OnboardingSpotlight
+        targetRef={libraryMenuRef}
+        stepLabel="1/4"
+        title="创意素材库入口"
+        body="点击左侧「Library」菜单，进入创意素材库了解如何上传广告素材"
+        onSkip={endTour}
+        renderActions={() => (
+          <div className="flex items-center justify-end">
+            <button onClick={endTour} className="text-xs text-gray-400 hover:text-gray-600 transition-colors">
+              跳过引导
+            </button>
+          </div>
+        )}
+      />
+    )}
+
+    {activeTourStep === 4 && tourSubStep === 2 && (
+      <OnboardingSpotlight
+        targetRef={aiGenerateMenuRef}
+        stepLabel="3/4"
+        title="AI 生成创意入口"
+        body="点击左侧「AI Generate」菜单，了解如何通过 AI 对话生成广告素材"
+        onSkip={endTour}
+        renderActions={() => (
+          <div className="flex items-center justify-end">
+            <button onClick={endTour} className="text-xs text-gray-400 hover:text-gray-600 transition-colors">
+              跳过引导
+            </button>
+          </div>
+        )}
+      />
+    )}
+    </>
   )
 }
 
