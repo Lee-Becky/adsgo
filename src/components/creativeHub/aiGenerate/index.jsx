@@ -1,5 +1,7 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { Sparkles } from 'lucide-react';
+import { useOnboardingTour } from '../../onboarding/useOnboardingTour';
+import OnboardingSpotlight from '../../onboarding/OnboardingSpotlight';
 import HistoryPanel from './HistoryPanel';
 import ChatPanel from './ChatPanel';
 import HistoryDetailPanel from './HistoryDetailPanel';
@@ -23,6 +25,9 @@ function formatTimeLabel() {
 }
 
 export default function AIGenerate() {
+  const { isActive, tourSubStep, endTour } = useOnboardingTour(4);
+  const aiGenerateMainRef = useRef(null);
+
   // ─── View & History ──────────────────────────────────────────────────────────
   const [viewMode, setViewMode] = useState('new'); // 'new' | 'history'
   const [items, setItems] = useState(HISTORY_SEED);
@@ -428,7 +433,8 @@ export default function AIGenerate() {
   const isCenterInRow = showRegenerateChat && selectedHistory;
 
   return (
-    <div className="h-[calc(100vh-130px)] flex gap-6 overflow-hidden">
+    <>
+    <div ref={aiGenerateMainRef} className="h-[calc(100vh-130px)] flex gap-6 overflow-hidden">
       {/* Left: History sidebar */}
       <HistoryPanel
         sortedAndGroupedHistory={sortedAndGroupedHistory}
@@ -626,5 +632,18 @@ export default function AIGenerate() {
         </div>
       )}
     </div>
+
+    {isActive && tourSubStep === 3 && (
+      <OnboardingSpotlight
+        targetRef={aiGenerateMainRef}
+        stepLabel="4/4"
+        title="AI 生成创意"
+        body="不想手动上传？在这里通过 AI 对话式流程，基于产品信息自动生成广告素材，生成结果可直接保存回创意库"
+        onSkip={endTour}
+        onNext={endTour}
+        nextText="我了解了"
+      />
+    )}
+    </>
   );
 }

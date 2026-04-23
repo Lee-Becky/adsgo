@@ -1,11 +1,13 @@
-import { useState } from 'react'
-import { Save } from 'lucide-react'
-import { 
-  BudgetKPISection, 
-  AssetSection, 
+import { useState, useEffect, useRef } from 'react'
+import { Save, CheckCircle2 } from 'lucide-react'
+import {
+  BudgetKPISection,
+  AssetSection,
   RulesLibrarySection,
-  ObjectiveOverview 
+  ObjectiveOverview
 } from './optimizeGoals/index'
+import { useOnboardingTour } from '../onboarding/useOnboardingTour'
+import OnboardingSpotlight from '../onboarding/OnboardingSpotlight'
 
 const OptimizeGoals = ({ onGoalSave }) => {
   const [formData, setFormData] = useState({
@@ -21,11 +23,11 @@ const OptimizeGoals = ({ onGoalSave }) => {
         adsetGoal: 'in_web_actions',
         event: 'Purchase',
         budgetMode: 'unified',
-        unifiedBudget: '500',
+        unifiedBudget: '',
         splitBudgets: {},
         kpiType: 'ROAS',
         kpiMode: 'unified',
-        unifiedKPI: '3.5',
+        unifiedKPI: '',
         splitKPIs: {}
       }
     ],
@@ -41,6 +43,28 @@ const OptimizeGoals = ({ onGoalSave }) => {
     assets: false
   })
 
+  const { isActive, endTour } = useOnboardingTour(1)
+  const budgetKPIRef = useRef(null)
+  const saveButtonRef = useRef(null)
+  // tourSubStep: 0 = spotlight on BudgetKPI, null = user filling freely, 1 = spotlight on Save Goal
+  const [tourSubStep, setTourSubStep] = useState(0)
+
+  const isReadyToSave = formData.marketGroups.every(g =>
+    g.unifiedBudget?.toString().trim() && g.unifiedKPI?.toString().trim()
+  )
+
+  // Reset sub-step when tour activates
+  useEffect(() => {
+    if (isActive) setTourSubStep(0)
+  }, [isActive])
+
+  // Auto-advance spotlight to Save Goal once fields are filled
+  useEffect(() => {
+    if (isActive && isReadyToSave && tourSubStep !== 1) {
+      setTourSubStep(1)
+    }
+  }, [isActive, isReadyToSave, tourSubStep])
+
   const updateFormData = (key, value) => {
     setFormData(prev => ({ ...prev, [key]: value }))
   }
@@ -50,41 +74,33 @@ const OptimizeGoals = ({ onGoalSave }) => {
   }
 
   const handleSave = () => {
+    if (!isReadyToSave) return
     console.log('Saving strategy...', formData)
     if (onGoalSave) onGoalSave()
+    if (isActive) endTour()
   }
 
   return (
-    <div className="min-h-full bg-slate-50 flex flex-col font-sans text-slate-900 selection:bg-indigo-100 relative">
-      
-      {/* Action Bar Container - Sticky with blur to prevent content overlap */}
-      <div className="sticky top-0 z-10 w-full flex justify-end px-10 py-4 pointer-events-none">
-        <button 
-          onClick={handleSave}
-          className="pointer-events-auto bg-slate-900 text-white px-8 py-3 rounded-2xl font-black text-xs tracking-wider hover:bg-black transition-all active:scale-95 shadow-2xl shadow-slate-900/20 flex items-center gap-2 border border-white/10"
-        >
-          <Save size={16} />
-          Save Goal
-        </button>
-      </div>
+    <div className="min-h-full bg-slate-50 flex flex-col font-sans text-slate-900 selection:bg-indigo-100 relative pb-24">
 
       <main className="flex-1 max-w-6xl mx-auto w-full px-10 py-12">
         <div className="space-y-10">
-          
+
           <ObjectiveOverview formData={formData} />
 
-          {/* Section 2: Market Strategy Groups (Directly listed without heavy container) */}
-          <BudgetKPISection 
-            formData={formData}
-            updateFormData={updateFormData}
-            updateFormDataDeep={updateFormDataDeep}
-            validation={validation}
-            setValidation={setValidation}
-          />
+          <div ref={budgetKPIRef}>
+            <BudgetKPISection
+              formData={formData}
+              updateFormData={updateFormData}
+              updateFormDataDeep={updateFormDataDeep}
+              validation={validation}
+              setValidation={setValidation}
+              isOnboarding={isActive}
+            />
+          </div>
 
-          {/* Section 5: Asset Scope */}
           <div className="bg-white rounded-[32px] border border-slate-200 shadow-[0_4px_24px_rgba(0,0,0,0.04)] relative">
-            <AssetSection 
+            <AssetSection
               formData={formData}
               updateFormData={updateFormData}
               validation={validation}
@@ -92,21 +108,75 @@ const OptimizeGoals = ({ onGoalSave }) => {
             />
           </div>
 
-          {/* Section 6: Rules Library */}
           <div className="bg-white rounded-[32px] border border-slate-200 shadow-[0_4px_24px_rgba(0,0,0,0.04)] relative">
-            <RulesLibrarySection 
+            <RulesLibrarySection
               formData={formData}
               updateFormData={updateFormData}
             />
           </div>
 
-          <div className="pt-8 pb-20">
+          <div className="pt-4">
             <p className="text-[11px] font-bold text-slate-400 text-center tracking-widest">
               All configurations are processed by AdsGo AI engine
             </p>
           </div>
         </div>
       </main>
+
+      {/* Sticky bottom save bar */}
+      <div
+        className="fixed bottom-0 right-0 z-10 bg-white/90 backdrop-blur-sm border-t border-slate-200 px-10 py-4 flex items-center justify-between"
+        style={{ left: 'var(--sidebar-w, 0px)' }}
+      >
+        <div className="text-xs">
+          {isReadyToSave ? (
+            <span className="flex items-center gap-1.5 text-emerald-600 font-medium">
+              <CheckCircle2 size={14} />
+              配置已完成，可以保存
+            </span>
+          ) : (
+            <span className="text-slate-400">
+              请先填写市场组的预算（Budget）和目标（KPI）
+            </span>
+          )}
+        </div>
+        <button
+          ref={saveButtonRef}
+          onClick={handleSave}
+          disabled={!isReadyToSave}
+          className={`px-8 py-3 rounded-2xl font-black text-xs tracking-wider flex items-center gap-2 transition-all duration-200 ${
+            isReadyToSave
+              ? 'bg-slate-900 text-white hover:bg-black active:scale-95 shadow-2xl shadow-slate-900/20 border border-white/10'
+              : 'bg-slate-200 text-slate-400 cursor-not-allowed'
+          }`}
+        >
+          <Save size={16} />
+          Save Goal
+        </button>
+      </div>
+
+      {isActive && tourSubStep === 0 && (
+        <OnboardingSpotlight
+          targetRef={budgetKPIRef}
+          stepLabel="2/3"
+          title="设置预算与目标"
+          body="填写每日预算上限和 ROAS/CPA 目标，AI 将据此决策优化投放方向"
+          onSkip={endTour}
+          onNext={() => setTourSubStep(null)}
+          nextText="好的，开始填写"
+        />
+      )}
+      {isActive && tourSubStep === 1 && (
+        <OnboardingSpotlight
+          targetRef={saveButtonRef}
+          stepLabel="3/3"
+          title="保存配置"
+          body="预算和目标已填写完成！点击 Save Goal 让 AI 开始使用这些参数优化投放"
+          onSkip={endTour}
+          onNext={endTour}
+          nextText="好的，我去保存"
+        />
+      )}
     </div>
   )
 }

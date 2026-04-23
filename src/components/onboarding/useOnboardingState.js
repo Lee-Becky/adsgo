@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 
-const TOTAL_STEPS = 5
+const TOTAL_STEPS = 6
 
 export function useOnboardingState({
   selectedBrand,
@@ -8,6 +8,7 @@ export function useOnboardingState({
   goalConfigured,
   isAutopilotEnabled,
   isAutoPublishEnabled,
+  autoOptimizeConfirmed,
 }) {
   const [completedSteps, setCompletedSteps] = useState([])
   const [dismissed, setDismissed] = useState(false)
@@ -40,10 +41,10 @@ export function useOnboardingState({
     if (goalConfigured) markStepCompleted(1)
   }, [goalConfigured, markStepCompleted])
 
-  // Step 2: enable recommend/auto (either one is enough)
+  // Step 2: enable recommend/auto or confirm any optimize mode
   useEffect(() => {
-    if (isAutopilotEnabled || isAutoPublishEnabled) markStepCompleted(2)
-  }, [isAutopilotEnabled, isAutoPublishEnabled, markStepCompleted])
+    if (isAutopilotEnabled || isAutoPublishEnabled || autoOptimizeConfirmed) markStepCompleted(2)
+  }, [isAutopilotEnabled, isAutoPublishEnabled, autoOptimizeConfirmed, markStepCompleted])
 
   const allDone = completedSteps.length >= TOTAL_STEPS
 

@@ -1,6 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Trash2, Check, X, Plus, Eye } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import UploadCreativesModal from './UploadCreativesModal';
+import { useOnboardingTour } from '../onboarding/useOnboardingTour';
+import OnboardingSpotlight from '../onboarding/OnboardingSpotlight';
 
 const initialCreatives = [
   { id: 1, url: '/ad-preview.jpg', name: 'Product Showcase 1' },
@@ -20,6 +23,10 @@ const CreativeLibrary = () => {
   const [selectedIds, setSelectedIds] = useState([]);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [previewCreative, setPreviewCreative] = useState(null);
+
+  const navigate = useNavigate();
+  const { isActive, tourSubStep, endTour, advanceTourSubStep } = useOnboardingTour(4);
+  const libraryHeaderRef = useRef(null);
 
   const toggleSelect = (e, id) => {
     e.stopPropagation();
@@ -45,8 +52,9 @@ const CreativeLibrary = () => {
   };
 
   return (
+    <>
     <div className="p-6 h-full flex flex-col">
-      <div className="flex justify-between items-center mb-6">
+      <div ref={libraryHeaderRef} className="flex justify-between items-center mb-6">
         <div className="flex items-center gap-4">
           <button
             onClick={() => setIsUploadModalOpen(true)}
@@ -174,6 +182,19 @@ const CreativeLibrary = () => {
         </div>
       )}
     </div>
+
+    {isActive && tourSubStep === 1 && (
+      <OnboardingSpotlight
+        targetRef={libraryHeaderRef}
+        stepLabel="2/4"
+        title="创意素材库"
+        body="所有广告素材统一存放在这里。点击「Upload Creatives」可批量上传本地图片或视频，上传后可直接用于广告投放"
+        onSkip={endTour}
+        onNext={advanceTourSubStep}
+        nextText="下一步"
+      />
+    )}
+    </>
   );
 };
 
