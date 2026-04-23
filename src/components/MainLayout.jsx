@@ -5,6 +5,7 @@ import Header from './Header'
 import GlobalDemoOverlay from './GlobalDemoOverlay'
 import OnboardingWidget from './onboarding/OnboardingWidget'
 import { OnboardingProvider } from './onboarding/OnboardingContext'
+import SupportBubble from './support/SupportBubble'
 
 const MainLayout = ({ children, showDemoOverlay, onDemoConnect, onDemoCreate, selectedBrand, onBrandChange, onCreateBrand, brands = [], autoExecuteRecommendations, autoRegenEnabled, publishedAt, goalConfigured, autoOptimizeConfirmed }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
@@ -110,6 +111,9 @@ const MainLayout = ({ children, showDemoOverlay, onDemoConnect, onDemoCreate, se
           isAutoPublishEnabled={autoRegenEnabled}
           autoOptimizeConfirmed={autoOptimizeConfirmed}
         />
+
+        {/* Support Bubble (visual placeholder — real Intercom TBD) */}
+        <SupportBubble />
       </div>
     </div>
     </OnboardingProvider>

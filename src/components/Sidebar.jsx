@@ -6,38 +6,38 @@ import OnboardingSpotlight from './onboarding/OnboardingSpotlight'
 const STEP_SIDEBAR_CONFIG = {
   0: {
     key: 'batchGenerateAds',
-    title: '创建你的第一条 Campaign',
-    body: '点击「Campaign Generator」，通过 AI 快速生成多平台广告 Campaign，一键完成发布',
+    title: '这里是 Campaign Generator',
+    body: '通过 AI 快速生成多平台广告 Campaign，一键完成发布。以后可以从左侧菜单直接进入',
     endOnClick: true,
     stepLabel: null,
   },
   1: {
     key: 'optimizeGoals',
-    title: '配置优化目标',
-    body: '点击「Optimize Goals」，设定 ROAS/CPA 目标和每日预算上限，AI 将以此为基准决策优化方向',
+    title: '这里是 Optimize Goals',
+    body: '设定 ROAS/CPA 目标和每日预算上限，AI 将以此为基准决策优化方向',
     endOnClick: false,
     stepLabel: '1/3',
   },
   2: {
     key: 'adManagerV3',
-    title: '进入广告管理',
-    body: '点击「Ad Manager」，查看 AI 推荐并开启 Recommend 或 Auto 任一功能，让 AI 接管关键优化动作',
+    title: '这里是 Ad Manager',
+    body: '查看 AI 推荐并开启 Recommend 或 Auto 任一功能，让 AI 接管关键优化动作',
     endOnClick: false,
     stepLabel: '1/4',
   },
   3: {
     key: 'autoRegeneration',
-    title: '了解自动发布功能',
-    body: '点击「Draft & Recom.」，了解 AI 如何管理广告草稿并自动选择最佳时机发布新 Campaign',
+    title: '这里是 Draft & Recom.',
+    body: '了解 AI 如何管理广告草稿并自动选择最佳时机发布新 Campaign',
     endOnClick: false,
     stepLabel: '1/3',
   },
   5: {
     key: 'mediaPlan',
-    title: '查看 Media Plan',
-    body: '点击「Media Plan」，查看广告发布后 24 小时内的进度追踪、AI 设置清单和投放预期',
-    endOnClick: false,
-    stepLabel: '1/4',
+    title: '这里是 Media Plan',
+    body: '查看广告发布后 24 小时内的进度追踪、AI 设置清单和投放预期',
+    endOnClick: true,
+    stepLabel: null,
   },
 }
 import { 
@@ -423,13 +423,8 @@ const Sidebar = ({ isMobile, isPinned, onTogglePinned, onClose, selectedBrand, o
           title={config.title}
           body={config.body}
           onSkip={endTour}
-          renderActions={() => (
-            <div className="flex items-center justify-end">
-              <button onClick={endTour} className="text-xs text-gray-400 hover:text-gray-600 transition-colors">
-                跳过引导
-              </button>
-            </div>
-          )}
+          onNext={() => config.endOnClick ? endTour() : advanceTourSubStep()}
+          nextText={config.endOnClick ? '知道了' : '下一步'}
         />
       )
     })}
@@ -438,16 +433,11 @@ const Sidebar = ({ isMobile, isPinned, onTogglePinned, onClose, selectedBrand, o
       <OnboardingSpotlight
         targetRef={libraryMenuRef}
         stepLabel="1/4"
-        title="创意素材库入口"
-        body="点击左侧「Library」菜单，进入创意素材库了解如何上传广告素材"
+        title="这里是 Library"
+        body="创意素材库入口，在这里可以上传广告素材或查看已有素材"
         onSkip={endTour}
-        renderActions={() => (
-          <div className="flex items-center justify-end">
-            <button onClick={endTour} className="text-xs text-gray-400 hover:text-gray-600 transition-colors">
-              跳过引导
-            </button>
-          </div>
-        )}
+        onNext={advanceTourSubStep}
+        nextText="下一步"
       />
     )}
 
@@ -455,16 +445,11 @@ const Sidebar = ({ isMobile, isPinned, onTogglePinned, onClose, selectedBrand, o
       <OnboardingSpotlight
         targetRef={aiGenerateMenuRef}
         stepLabel="3/4"
-        title="AI 生成创意入口"
-        body="点击左侧「AI Generate」菜单，了解如何通过 AI 对话生成广告素材"
+        title="这里是 AI Generate"
+        body="通过 AI 对话生成广告素材的入口，快速产出新的创意变体"
         onSkip={endTour}
-        renderActions={() => (
-          <div className="flex items-center justify-end">
-            <button onClick={endTour} className="text-xs text-gray-400 hover:text-gray-600 transition-colors">
-              跳过引导
-            </button>
-          </div>
-        )}
+        onNext={advanceTourSubStep}
+        nextText="下一步"
       />
     )}
     </>

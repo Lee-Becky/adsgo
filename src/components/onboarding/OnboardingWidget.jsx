@@ -6,6 +6,7 @@ import {
 } from 'lucide-react'
 import { useOnboardingState } from './useOnboardingState'
 import { useOnboardingContext } from './OnboardingContext'
+import { useTourSeen } from './useTourSeen'
 
 const STEPS = [
   {
@@ -65,7 +66,8 @@ const STEPS = [
       '持续补充新素材，规避创意疲劳',
     ],
     ctaText: '去查看创意入口',
-    route: '/creativeHub/aiGenerate',
+    route: '/creativeHub/creativeLibrary',
+    tourScope: '/creativeHub',
     icon: Palette,
   },
   {
@@ -93,8 +95,12 @@ export default function OnboardingWidget({
   const navigate = useNavigate()
   const location = useLocation()
   const { startTour, activeTourStep, endTour } = useOnboardingContext()
+  const activeTourStepRef = useRef(activeTourStep)
+  useEffect(() => { activeTourStepRef.current = activeTourStep }, [activeTourStep])
+  const { hasSeen, markSeen } = useTourSeen()
   const [isExpanded, setIsExpanded] = useState(true)
   const [isClosing, setIsClosing] = useState(false)
+  const [supportOpen, setSupportOpen] = useState(false)
   const [expandedStep, setExpandedStep] = useState(0)
   const prevCompletedRef = useRef(0)
 
@@ -115,6 +121,69 @@ export default function OnboardingWidget({
     isAutoPublishEnabled,
     autoOptimizeConfirmed,
   })
+
+  // If the user navigates away from the active tour step's target route (e.g. clicks
+  // a different sidebar menu), end the tour so the spotlight doesn't linger or
+  // re-fire on an unrelated page
+  useEffect(() => {
+    const step = activeTourStepRef.current
+    if (step === null || step === undefined) return
+    const scope = STEPS[step]?.tourScope || STEPS[step]?.route
+    if (!scope) return
+    if (!location.pathname.startsWith(scope)) {
+      endTour()
+    }
+  }, [location.pathname, endTour])
+
+  // Mutex with other floating panels (e.g. SupportBubble): when another panel opens,
+  // collapse this one; when this one expands, dispatch so the other one closes.
+  useEffect(() => {
+    const onOtherOpen = (e) => {
+      const id = e.detail?.id
+      if (!id || id === 'onboarding') return
+      if (id === 'support') setSupportOpen(true)
+      setIsExpanded(prev => {
+        if (!prev) return prev
+        setIsClosing(true)
+        setTimeout(() => setIsClosing(false), 250)
+        return false
+      })
+    }
+    const onOtherClose = (e) => {
+      if (e.detail?.id === 'support') setSupportOpen(false)
+    }
+    window.addEventListener('adsgo:floatpanel:open', onOtherOpen)
+    window.addEventListener('adsgo:floatpanel:close', onOtherClose)
+    return () => {
+      window.removeEventListener('adsgo:floatpanel:open', onOtherOpen)
+      window.removeEventListener('adsgo:floatpanel:close', onOtherClose)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (isExpanded && !isClosing) {
+      window.dispatchEvent(new CustomEvent('adsgo:floatpanel:open', { detail: { id: 'onboarding' } }))
+    } else if (!isExpanded) {
+      window.dispatchEvent(new CustomEvent('adsgo:floatpanel:close', { detail: { id: 'onboarding' } }))
+    }
+  }, [isExpanded, isClosing])
+
+  // First-visit auto-trigger: when a new user lands on an onboarding page directly
+  // (not via the Getting Started CTA), run that step's tour once. Completion state
+  // is not touched here — step progression is governed by useOnboardingState's
+  // ordering rules (the visit-based auto-completes below will only apply to the
+  // user's current step thanks to markStepCompleted's sequential guard).
+  useEffect(() => {
+    if (activeTourStep !== null) return
+    const idx = STEPS.findIndex(s => {
+      const scope = s.tourScope || s.route
+      return scope && location.pathname.startsWith(scope)
+    })
+    if (idx < 0) return
+    if (hasSeen(idx)) return
+    markSeen(idx)
+    startTour(idx)
+  }, [location.pathname, activeTourStep, hasSeen, markSeen, startTour])
 
   // Step 4: visiting autoRegeneration page means user has learned the button location
   useEffect(() => {
@@ -159,6 +228,8 @@ export default function OnboardingWidget({
   const completedCount = completedSteps.length
 
   const handleCTAClick = (index) => {
+    markSeen(index)
+    navigate(STEPS[index].route)
     startTour(index)
     handleClose()
   }
@@ -255,9 +326,17 @@ export default function OnboardingWidget({
         )}
 
         {isStepCompleted(index) && (
-          <div className="flex items-center gap-1.5 text-xs text-emerald-600 font-medium">
-            <Check className="w-3.5 h-3.5" />
-            已完成
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-1.5 text-xs text-emerald-600 font-medium">
+              <Check className="w-3.5 h-3.5" />
+              已完成
+            </div>
+            <button
+              onClick={() => handleCTAClick(index)}
+              className="text-[11px] text-gray-400 hover:text-primary transition-colors"
+            >
+              重新查看引导
+            </button>
           </div>
         )}
       </div>
@@ -269,11 +348,11 @@ export default function OnboardingWidget({
       {/* Expanded card */}
       {(isExpanded || isClosing) && (
         <div
-          className={`fixed bottom-6 right-6 z-[850] w-80 sm:w-[22rem] origin-bottom-right ${
+          className={`fixed bottom-[96px] right-6 z-[850] w-80 sm:w-[22rem] origin-bottom-right ${
             isClosing ? 'animate-bubble-collapse' : 'animate-bubble-expand'
           }`}
         >
-          <div className="rounded-xl shadow-2xl border border-border bg-white overflow-hidden max-h-[80vh] flex flex-col">
+          <div className="rounded-xl shadow-xl border border-[#F0F0F0] bg-white overflow-hidden max-h-[80vh] flex flex-col">
             {/* Header */}
             <div className="px-4 py-3 bg-gradient-to-r from-primary-50 to-purple-50 border-b border-border flex items-center justify-between flex-shrink-0">
               <div className="flex items-center gap-2">
@@ -371,11 +450,11 @@ export default function OnboardingWidget({
         </div>
       )}
 
-      {/* Floating bubble button — only when collapsed */}
-      {!isExpanded && !isClosing && !dismissed && (
+      {/* Floating bubble button — only when collapsed and support popover is not open */}
+      {!isExpanded && !isClosing && !dismissed && !supportOpen && (
         <button
           onClick={() => setIsExpanded(true)}
-          className="fixed bottom-6 right-6 z-[850] w-14 h-14 rounded-full bg-gradient-to-r from-primary to-purple-600 text-white shadow-lg hover:shadow-primary-focus flex items-center justify-center transition-all duration-200 animate-pulse-subtle"
+          className="fixed bottom-[96px] right-6 z-[850] w-14 h-14 rounded-full bg-gradient-to-r from-primary to-purple-600 text-white shadow-lg hover:shadow-primary-focus flex items-center justify-center transition-all duration-200 animate-pulse-subtle"
         >
           <Compass className="w-5 h-5" />
           {!allDone && (

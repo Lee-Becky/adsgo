@@ -206,13 +206,14 @@ const RecommendationCard = ({ card, isExpanded, onToggle, onEdit, onPublish, sta
 // --- Main Component ---
 
 const AutoRegeneration = ({ onPageChange, autoRegenEnabled, onAutoRegenChange }) => {
-  const { isActive, endTour } = useOnboardingTour(3)
+  const { isActive, tourSubStep: ctxSubStep, endTour } = useOnboardingTour(3)
   const recommendationSectionRef = useRef(null)
   const draftTableRef = useRef(null)
-  const [tourSubStep, setTourSubStep] = useState(0)
+  const [pageSubStep, setPageSubStep] = useState(0)
+  const showPageTour = isActive && ctxSubStep >= 1
 
   useEffect(() => {
-    if (isActive) setTourSubStep(0)
+    if (isActive) setPageSubStep(0)
   }, [isActive])
 
   const [selectedPlatform, setSelectedPlatform] = useState('Meta');
@@ -894,8 +895,8 @@ const AutoRegeneration = ({ onPageChange, autoRegenEnabled, onAutoRegenChange })
 
         {/* Meta Launch Recommendation Section */}
         {selectedPlatform === 'Meta' && (
-          <div ref={recommendationSectionRef} className="bg-white rounded-xl border border-border shadow-sm p-4 md:p-6">
-            <div className="flex flex-wrap items-center justify-between gap-4 mb-8 px-2">
+          <div className="bg-white rounded-xl border border-border shadow-sm p-4 md:p-6">
+            <div ref={recommendationSectionRef} className="flex flex-wrap items-center justify-between gap-4 mb-8 px-2">
               <div className="pl-4 relative">
                 <div className="absolute left-0 top-0.5 bottom-0.5 w-1.5 rounded-full bg-gradient-to-b from-[#c3a2fe] via-[#7135f4] to-[#0d031f]"></div>
                 
@@ -1077,8 +1078,8 @@ const AutoRegeneration = ({ onPageChange, autoRegenEnabled, onAutoRegenChange })
           </div>
         )}
 
-        <div ref={draftTableRef} className="mt-8">
-          <div className="mb-6 flex items-center justify-between relative">
+        <div className="mt-8">
+          <div ref={draftTableRef} className="mb-6 flex items-center justify-between relative">
             <div className="absolute left-0 top-0.5 bottom-0.5 w-1.5 rounded-full bg-gradient-to-b from-[#c3a2fe] via-[#7135f4] to-[#0d031f]"></div>
 
             <div className="pl-4 flex flex-col">
@@ -1534,21 +1535,21 @@ const AutoRegeneration = ({ onPageChange, autoRegenEnabled, onAutoRegenChange })
       `}</style>
     </div>
 
-      {isActive && tourSubStep === 0 && (
+      {showPageTour && pageSubStep === 0 && (
         <OnboardingSpotlight
           targetRef={draftTableRef}
-          stepLabel="1/2"
+          stepLabel="2/3"
           title="广告草稿管理"
           body="所有未发布的广告都保存在这里。你可以对每条草稿进行编辑、调整预算和发布优先级，或直接手动点击发布"
           onSkip={endTour}
-          onNext={() => setTourSubStep(1)}
+          onNext={() => setPageSubStep(1)}
           nextText="下一步"
         />
       )}
-      {isActive && tourSubStep === 1 && (
+      {showPageTour && pageSubStep === 1 && (
         <OnboardingSpotlight
           targetRef={recommendationSectionRef}
-          stepLabel="2/2"
+          stepLabel="3/3"
           title="AI 推荐发布候选"
           body="AI 分析广告数据后，从草稿队列中筛选出最具潜力的 Campaign 展示在此。右侧可选择执行模式：Recommendations 模式由你审批后发布，Auto Publish 模式 7×24h 全自动执行。默认不开启，了解即可"
           onSkip={endTour}

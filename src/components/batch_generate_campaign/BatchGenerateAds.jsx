@@ -820,6 +820,166 @@ const NamingStrategySection = ({
 
 // ─────────────────────────────────────────────────────────────────────────────
 
+const MinimizedPublishIndicator = ({ campaignStatus, adsetProgress, onExpand, onClose }) => {
+  const total = adsetProgress.length;
+  const done = adsetProgress.filter(a => a.status === 'Success' || a.status === 'Failure').length;
+  const successCount = adsetProgress.filter(a => a.status === 'Success').length;
+  const failureCount = adsetProgress.filter(a => a.status === 'Failure').length;
+  const currentAdset = adsetProgress.find(a => a.status === 'Publishing');
+  const percent = total > 0 ? Math.round((done / total) * 100) : 0;
+
+  const isAllDone = campaignStatus === 'Success' || campaignStatus === 'Partial';
+  const hasFailure = failureCount > 0;
+  const tone = !isAllDone ? 'publishing' : hasFailure ? 'partial' : 'success';
+
+  const toneMap = {
+    publishing: {
+      grad: 'from-primary-500 to-purple-600',
+      glow: 'shadow-primary-500/30',
+      shadow: '-2px 2px 24px rgba(112,51,245,0.18)',
+      Icon: Loader2,
+      iconCls: 'animate-spin',
+      barGrad: 'from-primary-500 via-purple-500 to-indigo-500',
+      title: '广告发布中',
+      subtitle: currentAdset ? `正在发布 ${currentAdset.name}` : '准备中…',
+      percentCls: 'text-primary-600',
+    },
+    success: {
+      grad: 'from-emerald-500 to-teal-600',
+      glow: 'shadow-emerald-500/30',
+      shadow: '-2px 2px 24px rgba(16,185,129,0.18)',
+      Icon: Check,
+      iconCls: '',
+      barGrad: 'from-emerald-500 via-emerald-400 to-teal-500',
+      title: '广告发布完成',
+      subtitle: '全部广告已成功发布',
+      percentCls: 'text-emerald-600',
+    },
+    partial: {
+      grad: 'from-amber-500 to-orange-600',
+      glow: 'shadow-amber-500/30',
+      shadow: '-2px 2px 24px rgba(245,158,11,0.2)',
+      Icon: AlertCircle,
+      iconCls: '',
+      barGrad: 'from-amber-500 via-amber-400 to-orange-500',
+      title: '发布部分完成',
+      subtitle: `${successCount} 成功 · ${failureCount} 失败`,
+      percentCls: 'text-amber-600',
+    },
+  };
+  const t = toneMap[tone];
+  const { Icon } = t;
+
+  const [isClosing, setIsClosing] = useState(false);
+
+  useEffect(() => {
+    if (!isAllDone) return;
+    const hideDelay = setTimeout(() => setIsClosing(true), 3000);
+    return () => clearTimeout(hideDelay);
+  }, [isAllDone]);
+
+  useEffect(() => {
+    if (!isClosing) return;
+    const closeDelay = setTimeout(onClose, 300);
+    return () => clearTimeout(closeDelay);
+  }, [isClosing, onClose]);
+
+  const handleManualClose = () => {
+    setIsClosing(true);
+  };
+
+  return (
+    <>
+      <style>{`
+        @keyframes adsgo-pub-shimmer {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(200%); }
+        }
+      `}</style>
+      <div
+        className={`fixed top-4 right-4 z-[860] w-[320px] bg-white rounded-2xl ring-1 ring-slate-900/5 p-4 space-y-3 ${
+          isClosing
+            ? 'animate-out fade-out slide-out-to-top-4 duration-300'
+            : 'animate-in fade-in slide-in-from-top-4 duration-400'
+        }`}
+        style={{ boxShadow: t.shadow }}
+        role="status"
+        aria-live="polite"
+      >
+        <div className="flex items-start gap-3">
+          <div className="relative shrink-0">
+            {tone === 'publishing' && (
+              <span className="absolute inset-0 rounded-xl bg-primary-500/30 animate-ping" aria-hidden />
+            )}
+            {tone === 'success' && (
+              <span
+                className="absolute inset-0 rounded-xl ring-4 ring-emerald-400/40 animate-ping [animation-iteration-count:1] [animation-duration:600ms]"
+                aria-hidden
+              />
+            )}
+            <div
+              className={`relative w-10 h-10 rounded-xl bg-gradient-to-br ${t.grad} flex items-center justify-center shadow-lg ${t.glow} ${
+                tone === 'success' ? 'animate-in zoom-in-50 duration-500' : ''
+              }`}
+            >
+              <Icon size={18} className={`text-white ${t.iconCls}`} strokeWidth={2.5} />
+            </div>
+          </div>
+
+          <div className="flex-1 min-w-0 pt-0.5">
+            <p className="text-sm font-semibold text-slate-900 tracking-tight leading-tight truncate">
+              {t.title}
+            </p>
+            <p className="text-[11px] text-slate-500 mt-0.5 truncate">{t.subtitle}</p>
+          </div>
+
+          <div className="flex items-center gap-1 shrink-0">
+            {!isAllDone && (
+              <button
+                onClick={onExpand}
+                aria-label="展开查看详情"
+                className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/40"
+              >
+                <ChevronRight size={14} />
+              </button>
+            )}
+            <button
+              onClick={handleManualClose}
+              aria-label="关闭"
+              className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/40"
+            >
+              <X size={14} />
+            </button>
+          </div>
+        </div>
+
+        <div className="space-y-1.5">
+          <div className="h-1.5 rounded-full bg-slate-100 overflow-hidden">
+            <div
+              className={`h-full rounded-full bg-gradient-to-r ${t.barGrad} transition-[width] duration-700 ease-out relative overflow-hidden`}
+              style={{ width: `${percent}%` }}
+            >
+              {tone === 'publishing' && (
+                <span
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/50 to-transparent"
+                  style={{ animation: 'adsgo-pub-shimmer 2s linear infinite' }}
+                  aria-hidden
+                />
+              )}
+            </div>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className={`text-[11px] font-semibold tabular-nums ${t.percentCls}`}>{percent}%</span>
+            <span className="text-[11px] text-slate-400 tabular-nums">
+              {done} of {total} adsets
+            </span>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+};
+
 const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
   const [selectedProducts, setSelectedProducts] = useState([]);
   const [productCreativesMap, setProductCreativesMap] = useState({});
@@ -925,7 +1085,34 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
 
   const [showPublishModal, setShowPublishModal] = useState(false);
 
-  const selectedCampaign = useMemo(() => 
+  // Publish flow state lifted out of PublishModal: PublishModal is defined inline
+  // so each parent re-render gives it a new function identity → React remounts it
+  // and would reset its local state. Keeping these here survives remounts.
+  const [step, setStep] = useState(1);
+  const [showAccountChoice, setShowAccountChoice] = useState(true);
+  const [isPublishMinimized, setIsPublishMinimized] = useState(false);
+  const [campaignStatus, setCampaignStatus] = useState('Publishing');
+  const [adsetProgress, setAdsetProgress] = useState([
+    { id: 1, name: 'Adset name 1', totalAds: 3, completedAds: 0, status: 'Publishing' },
+    { id: 2, name: 'Adset name 2', totalAds: 2, completedAds: 0, status: 'Waiting' },
+    { id: 3, name: 'Adset name 3', totalAds: 4, completedAds: 0, status: 'Waiting' },
+  ]);
+
+  // Reset the publish flow every time the user re-opens the Publish modal
+  useEffect(() => {
+    if (!showPublishModal) return;
+    setStep(1);
+    setShowAccountChoice(true);
+    setIsPublishMinimized(false);
+    setCampaignStatus('Publishing');
+    setAdsetProgress([
+      { id: 1, name: 'Adset name 1', totalAds: 3, completedAds: 0, status: 'Publishing' },
+      { id: 2, name: 'Adset name 2', totalAds: 2, completedAds: 0, status: 'Waiting' },
+      { id: 3, name: 'Adset name 3', totalAds: 4, completedAds: 0, status: 'Waiting' },
+    ]);
+  }, [showPublishModal]);
+
+  const selectedCampaign = useMemo(() =>
     MOCK_EXISTING_CAMPAIGNS.find(c => c.id === selectedCampaignId), 
   [selectedCampaignId]);
 
@@ -1227,12 +1414,9 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
       google: 'https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://google.com&size=256'
     };
 
-    const [step, setStep] = useState(1);
-    const [showAccountChoice, setShowAccountChoice] = useState(true);
     const [selectedAccountType, setSelectedAccountType] = useState('own');
     const [showAdsgoReminder, setShowAdsgoReminder] = useState(false);
     const [hideMainModal, setHideMainModal] = useState(false);
-    const [isPublishMinimized, setIsPublishMinimized] = useState(false);
     const [connectedPlatform, setConnectedPlatform] = useState(
       authStatus?.meta ? 'meta' : authStatus?.google ? 'google' : null
     );
@@ -1269,12 +1453,6 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
     useEffect(() => { if (activeDropdown === 'metaEvent' || activeDropdown === 'googleEvent') pubEventLoading.triggerLoad(); }, [activeDropdown]);
 
     const publishCampaignName = selectedCampaign?.name || 'NEW-AI-CAMPAIGN-001';
-    const [campaignStatus, setCampaignStatus] = useState('Publishing');
-    const [adsetProgress, setAdsetProgress] = useState([
-      { id: 1, name: 'Adset name 1', totalAds: 3, completedAds: 0, status: 'Publishing' },
-      { id: 2, name: 'Adset name 2', totalAds: 2, completedAds: 0, status: 'Waiting' },
-      { id: 3, name: 'Adset name 3', totalAds: 4, completedAds: 0, status: 'Waiting' },
-    ]);
 
 
 
@@ -1545,24 +1723,13 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
     );
 
     if (isPublishMinimized) {
-      const done = adsetProgress.filter(a => a.status === 'Success' || a.status === 'Failure').length;
-      const total = adsetProgress.length;
-      const isAllDone = campaignStatus === 'Success' || campaignStatus === 'Partial';
       return (
-        <div className="fixed top-4 right-4 z-[860] flex items-center gap-3 bg-white rounded-2xl shadow-xl border border-gray-100 px-4 py-3 animate-in slide-in-from-top-4 duration-300">
-          {isAllDone
-            ? <Check size={16} className="text-emerald-500 shrink-0" />
-            : <Loader2 size={16} className="animate-spin text-primary-500 shrink-0" />}
-          <div className="min-w-0">
-            <p className="text-xs font-semibold text-gray-900 whitespace-nowrap">
-              {isAllDone ? '广告发布完成' : '广告发布中'}
-            </p>
-            <p className="text-[11px] text-gray-500">{done}/{total} 已完成</p>
-          </div>
-          {isAllDone
-            ? <button onClick={handlePublishComplete} className="ml-2 text-gray-400 hover:text-gray-600"><X size={14} /></button>
-            : <button onClick={() => setIsPublishMinimized(false)} className="ml-2 text-gray-400 hover:text-gray-600"><ChevronRight size={14} /></button>}
-        </div>
+        <MinimizedPublishIndicator
+          campaignStatus={campaignStatus}
+          adsetProgress={adsetProgress}
+          onExpand={() => setIsPublishMinimized(false)}
+          onClose={handlePublishComplete}
+        />
       );
     }
 

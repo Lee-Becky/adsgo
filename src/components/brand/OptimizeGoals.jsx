@@ -43,11 +43,13 @@ const OptimizeGoals = ({ onGoalSave }) => {
     assets: false
   })
 
-  const { isActive, endTour } = useOnboardingTour(1)
+  const { isActive, tourSubStep: ctxSubStep, endTour } = useOnboardingTour(1)
   const budgetKPIRef = useRef(null)
   const saveButtonRef = useRef(null)
-  // tourSubStep: 0 = spotlight on BudgetKPI, null = user filling freely, 1 = spotlight on Save Goal
-  const [tourSubStep, setTourSubStep] = useState(0)
+  // pageSubStep: 0 = spotlight on BudgetKPI, null = user filling freely, 1 = spotlight on Save Goal
+  const [pageSubStep, setPageSubStep] = useState(0)
+  // Gate in-page spotlights: only show after user dismissed the sidebar spotlight (ctxSubStep >= 1)
+  const showPageTour = isActive && ctxSubStep >= 1
 
   const isReadyToSave = formData.marketGroups.every(g =>
     g.unifiedBudget?.toString().trim() && g.unifiedKPI?.toString().trim()
@@ -55,15 +57,15 @@ const OptimizeGoals = ({ onGoalSave }) => {
 
   // Reset sub-step when tour activates
   useEffect(() => {
-    if (isActive) setTourSubStep(0)
+    if (isActive) setPageSubStep(0)
   }, [isActive])
 
   // Auto-advance spotlight to Save Goal once fields are filled
   useEffect(() => {
-    if (isActive && isReadyToSave && tourSubStep !== 1) {
-      setTourSubStep(1)
+    if (isActive && isReadyToSave && pageSubStep !== 1) {
+      setPageSubStep(1)
     }
-  }, [isActive, isReadyToSave, tourSubStep])
+  }, [isActive, isReadyToSave, pageSubStep])
 
   const updateFormData = (key, value) => {
     setFormData(prev => ({ ...prev, [key]: value }))
@@ -155,18 +157,18 @@ const OptimizeGoals = ({ onGoalSave }) => {
         </button>
       </div>
 
-      {isActive && tourSubStep === 0 && (
+      {showPageTour && pageSubStep === 0 && (
         <OnboardingSpotlight
           targetRef={budgetKPIRef}
           stepLabel="2/3"
           title="设置预算与目标"
           body="填写每日预算上限和 ROAS/CPA 目标，AI 将据此决策优化投放方向"
           onSkip={endTour}
-          onNext={() => setTourSubStep(null)}
+          onNext={() => setPageSubStep(null)}
           nextText="好的，开始填写"
         />
       )}
-      {isActive && tourSubStep === 1 && (
+      {showPageTour && pageSubStep === 1 && (
         <OnboardingSpotlight
           targetRef={saveButtonRef}
           stepLabel="3/3"

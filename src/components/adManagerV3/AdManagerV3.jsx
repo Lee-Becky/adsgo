@@ -87,15 +87,16 @@ const AdManagerV3 = ({ onEditBrandConfig, selectedBrand, onPageChange, autoExecu
     timeSlots: ['11:00 PM – 12:00 AM'],
   })
 
-  const { isActive, endTour } = useOnboardingTour(2)
+  const { isActive, tourSubStep: ctxSubStep, endTour } = useOnboardingTour(2)
   const aiAnalysisRef = useRef(null)
   const controlCenterRef = useRef(null)
   const campaignTableRef = useRef(null)
-  const [tourSubStep, setTourSubStep] = useState(0)
+  const [pageSubStep, setPageSubStep] = useState(0)
+  const showPageTour = isActive && ctxSubStep >= 1
 
   useEffect(() => {
     if (isActive) {
-      setTourSubStep(0)
+      setPageSubStep(0)
       if (activeTab === 'google') setActiveTab('meta')
     }
   }, [isActive])
@@ -260,9 +261,9 @@ const AdManagerV3 = ({ onEditBrandConfig, selectedBrand, onPageChange, autoExecu
       />
 
       {/* Filter and Data Section - Connected visually - Add margin when CrossChannelAISummary is hidden */}
-      <div ref={campaignTableRef} className={`bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden ${activeTab === 'all' || activeTab === 'google' ? 'mt-4' : ''}`}>
+      <div className={`bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden ${activeTab === 'all' || activeTab === 'google' ? 'mt-4' : ''}`}>
         {/* Filter Section - Light background for visual differentiation */}
-        <div className="p-5 border-b border-slate-100 bg-gray-50">
+        <div ref={campaignTableRef} className="p-5 border-b border-slate-100 bg-gray-50">
           <FilterSection activeTab={activeTab} />
         </div>
 
@@ -283,32 +284,32 @@ const AdManagerV3 = ({ onEditBrandConfig, selectedBrand, onPageChange, autoExecu
       </div>
     </div>
 
-      {isActive && tourSubStep === 0 && (
+      {showPageTour && pageSubStep === 0 && (
         <OnboardingSpotlight
           targetRef={aiAnalysisRef}
-          stepLabel="1/3"
+          stepLabel="2/4"
           title="AI 分析报告"
           body="每日 AI 深度扫描账户数据，分析 ROAS/CPA 趋势和关键异常，标记机会与风险，为优化建议提供数据支撑"
           onSkip={endTour}
-          onNext={() => setTourSubStep(1)}
+          onNext={() => setPageSubStep(1)}
           nextText="下一步"
         />
       )}
-      {isActive && tourSubStep === 1 && (
+      {showPageTour && pageSubStep === 1 && (
         <OnboardingSpotlight
           targetRef={campaignTableRef}
-          stepLabel="2/3"
+          stepLabel="3/4"
           title="Campaign 推荐管理"
           body="AI 对每条 Campaign 生成预算调整建议：增加、减少、暂停或维持。Daily Analysis 模式下你可逐条审批，点击「Why」查看推荐理由"
           onSkip={endTour}
-          onNext={() => setTourSubStep(2)}
+          onNext={() => setPageSubStep(2)}
           nextText="下一步"
         />
       )}
-      {isActive && tourSubStep === 2 && (
+      {showPageTour && pageSubStep === 2 && (
         <OnboardingSpotlight
           targetRef={controlCenterRef}
-          stepLabel="3/3"
+          stepLabel="4/4"
           title="选择你的优化模式"
           body="右侧是 AI 优化控制中心：推荐统计、运行计划，以及最关键的——AI 如何执行你的广告优化"
           width={340}
