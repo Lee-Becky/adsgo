@@ -65,6 +65,7 @@ function App() {
   const [budgetStatus, setBudgetStatus] = useState({})
   const [autoExecuteRecommendations, setAutoExecuteRecommendations] = useState(false)
   const [autoRegenEnabled, setAutoRegenEnabled] = useState(false)
+  const [autoOptimizeConfirmed, setAutoOptimizeConfirmed] = useState(false)
   const [publishedAt, setPublishedAt] = useState(null)
   const [goalConfigured, setGoalConfigured] = useState(false)
   const [isOverviewConnected, setIsOverviewConnected] = useState(false) // Home page connection state
@@ -220,6 +221,7 @@ function App() {
             onPageChange={handlePageChange}
             autoExecuteRecommendations={autoExecuteRecommendations}
             onAutoExecuteChange={setAutoExecuteRecommendations}
+            onOptimizeModeConfirmed={() => setAutoOptimizeConfirmed(true)}
           />
         )
       case 'autoRegeneration':
@@ -360,6 +362,7 @@ function App() {
             autoRegenEnabled={autoRegenEnabled}
             publishedAt={publishedAt}
             goalConfigured={goalConfigured}
+            autoOptimizeConfirmed={autoOptimizeConfirmed}
           >
             {/* Main Content Area - Scrollable */}
             {renderContent()}

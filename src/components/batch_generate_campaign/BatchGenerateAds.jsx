@@ -11,8 +11,6 @@ import { useZIndex } from '../../hooks/useZIndex';
 import ProductSelector from './components/ProductSelector';
 import CampaignPlanView from './components/CampaignPlanView';
 import CampaignPreviewView from './components/CampaignPreviewView';
-import ObjectiveSection from '../brand/optimizeGoals/ObjectiveSection';
-import BudgetKPISection from '../brand/optimizeGoals/BudgetKPISection';
 import useDropdownLoading from '../../hooks/useDropdownLoading';
 
 const MOCK_EXISTING_CAMPAIGNS = [
@@ -822,6 +820,166 @@ const NamingStrategySection = ({
 
 // ─────────────────────────────────────────────────────────────────────────────
 
+const MinimizedPublishIndicator = ({ campaignStatus, adsetProgress, onExpand, onClose }) => {
+  const total = adsetProgress.length;
+  const done = adsetProgress.filter(a => a.status === 'Success' || a.status === 'Failure').length;
+  const successCount = adsetProgress.filter(a => a.status === 'Success').length;
+  const failureCount = adsetProgress.filter(a => a.status === 'Failure').length;
+  const currentAdset = adsetProgress.find(a => a.status === 'Publishing');
+  const percent = total > 0 ? Math.round((done / total) * 100) : 0;
+
+  const isAllDone = campaignStatus === 'Success' || campaignStatus === 'Partial';
+  const hasFailure = failureCount > 0;
+  const tone = !isAllDone ? 'publishing' : hasFailure ? 'partial' : 'success';
+
+  const toneMap = {
+    publishing: {
+      grad: 'from-primary-500 to-purple-600',
+      glow: 'shadow-primary-500/30',
+      shadow: '-2px 2px 24px rgba(112,51,245,0.18)',
+      Icon: Loader2,
+      iconCls: 'animate-spin',
+      barGrad: 'from-primary-500 via-purple-500 to-indigo-500',
+      title: '广告发布中',
+      subtitle: currentAdset ? `正在发布 ${currentAdset.name}` : '准备中…',
+      percentCls: 'text-primary-600',
+    },
+    success: {
+      grad: 'from-emerald-500 to-teal-600',
+      glow: 'shadow-emerald-500/30',
+      shadow: '-2px 2px 24px rgba(16,185,129,0.18)',
+      Icon: Check,
+      iconCls: '',
+      barGrad: 'from-emerald-500 via-emerald-400 to-teal-500',
+      title: '广告发布完成',
+      subtitle: '全部广告已成功发布',
+      percentCls: 'text-emerald-600',
+    },
+    partial: {
+      grad: 'from-amber-500 to-orange-600',
+      glow: 'shadow-amber-500/30',
+      shadow: '-2px 2px 24px rgba(245,158,11,0.2)',
+      Icon: AlertCircle,
+      iconCls: '',
+      barGrad: 'from-amber-500 via-amber-400 to-orange-500',
+      title: '发布部分完成',
+      subtitle: `${successCount} 成功 · ${failureCount} 失败`,
+      percentCls: 'text-amber-600',
+    },
+  };
+  const t = toneMap[tone];
+  const { Icon } = t;
+
+  const [isClosing, setIsClosing] = useState(false);
+
+  useEffect(() => {
+    if (!isAllDone) return;
+    const hideDelay = setTimeout(() => setIsClosing(true), 3000);
+    return () => clearTimeout(hideDelay);
+  }, [isAllDone]);
+
+  useEffect(() => {
+    if (!isClosing) return;
+    const closeDelay = setTimeout(onClose, 300);
+    return () => clearTimeout(closeDelay);
+  }, [isClosing, onClose]);
+
+  const handleManualClose = () => {
+    setIsClosing(true);
+  };
+
+  return (
+    <>
+      <style>{`
+        @keyframes adsgo-pub-shimmer {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(200%); }
+        }
+      `}</style>
+      <div
+        className={`fixed top-4 right-4 z-[860] w-[320px] bg-white rounded-2xl ring-1 ring-slate-900/5 p-4 space-y-3 ${
+          isClosing
+            ? 'animate-out fade-out slide-out-to-top-4 duration-300'
+            : 'animate-in fade-in slide-in-from-top-4 duration-400'
+        }`}
+        style={{ boxShadow: t.shadow }}
+        role="status"
+        aria-live="polite"
+      >
+        <div className="flex items-start gap-3">
+          <div className="relative shrink-0">
+            {tone === 'publishing' && (
+              <span className="absolute inset-0 rounded-xl bg-primary-500/30 animate-ping" aria-hidden />
+            )}
+            {tone === 'success' && (
+              <span
+                className="absolute inset-0 rounded-xl ring-4 ring-emerald-400/40 animate-ping [animation-iteration-count:1] [animation-duration:600ms]"
+                aria-hidden
+              />
+            )}
+            <div
+              className={`relative w-10 h-10 rounded-xl bg-gradient-to-br ${t.grad} flex items-center justify-center shadow-lg ${t.glow} ${
+                tone === 'success' ? 'animate-in zoom-in-50 duration-500' : ''
+              }`}
+            >
+              <Icon size={18} className={`text-white ${t.iconCls}`} strokeWidth={2.5} />
+            </div>
+          </div>
+
+          <div className="flex-1 min-w-0 pt-0.5">
+            <p className="text-sm font-semibold text-slate-900 tracking-tight leading-tight truncate">
+              {t.title}
+            </p>
+            <p className="text-[11px] text-slate-500 mt-0.5 truncate">{t.subtitle}</p>
+          </div>
+
+          <div className="flex items-center gap-1 shrink-0">
+            {!isAllDone && (
+              <button
+                onClick={onExpand}
+                aria-label="展开查看详情"
+                className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/40"
+              >
+                <ChevronRight size={14} />
+              </button>
+            )}
+            <button
+              onClick={handleManualClose}
+              aria-label="关闭"
+              className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/40"
+            >
+              <X size={14} />
+            </button>
+          </div>
+        </div>
+
+        <div className="space-y-1.5">
+          <div className="h-1.5 rounded-full bg-slate-100 overflow-hidden">
+            <div
+              className={`h-full rounded-full bg-gradient-to-r ${t.barGrad} transition-[width] duration-700 ease-out relative overflow-hidden`}
+              style={{ width: `${percent}%` }}
+            >
+              {tone === 'publishing' && (
+                <span
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/50 to-transparent"
+                  style={{ animation: 'adsgo-pub-shimmer 2s linear infinite' }}
+                  aria-hidden
+                />
+              )}
+            </div>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className={`text-[11px] font-semibold tabular-nums ${t.percentCls}`}>{percent}%</span>
+            <span className="text-[11px] text-slate-400 tabular-nums">
+              {done} of {total} adsets
+            </span>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+};
+
 const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
   const [selectedProducts, setSelectedProducts] = useState([]);
   const [productCreativesMap, setProductCreativesMap] = useState({});
@@ -927,7 +1085,34 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
 
   const [showPublishModal, setShowPublishModal] = useState(false);
 
-  const selectedCampaign = useMemo(() => 
+  // Publish flow state lifted out of PublishModal: PublishModal is defined inline
+  // so each parent re-render gives it a new function identity → React remounts it
+  // and would reset its local state. Keeping these here survives remounts.
+  const [step, setStep] = useState(1);
+  const [showAccountChoice, setShowAccountChoice] = useState(true);
+  const [isPublishMinimized, setIsPublishMinimized] = useState(false);
+  const [campaignStatus, setCampaignStatus] = useState('Publishing');
+  const [adsetProgress, setAdsetProgress] = useState([
+    { id: 1, name: 'Adset name 1', totalAds: 3, completedAds: 0, status: 'Publishing' },
+    { id: 2, name: 'Adset name 2', totalAds: 2, completedAds: 0, status: 'Waiting' },
+    { id: 3, name: 'Adset name 3', totalAds: 4, completedAds: 0, status: 'Waiting' },
+  ]);
+
+  // Reset the publish flow every time the user re-opens the Publish modal
+  useEffect(() => {
+    if (!showPublishModal) return;
+    setStep(1);
+    setShowAccountChoice(true);
+    setIsPublishMinimized(false);
+    setCampaignStatus('Publishing');
+    setAdsetProgress([
+      { id: 1, name: 'Adset name 1', totalAds: 3, completedAds: 0, status: 'Publishing' },
+      { id: 2, name: 'Adset name 2', totalAds: 2, completedAds: 0, status: 'Waiting' },
+      { id: 3, name: 'Adset name 3', totalAds: 4, completedAds: 0, status: 'Waiting' },
+    ]);
+  }, [showPublishModal]);
+
+  const selectedCampaign = useMemo(() =>
     MOCK_EXISTING_CAMPAIGNS.find(c => c.id === selectedCampaignId), 
   [selectedCampaignId]);
 
@@ -1119,10 +1304,6 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
 
   const handlePublishComplete = () => {
     setShowPublishModal(false);
-    if (onPublishSuccess) onPublishSuccess();
-    if (onPageChange) {
-      onPageChange('mediaPlan');
-    }
   };
 
   const CampaignSearchModal = () => {
@@ -1233,8 +1414,6 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
       google: 'https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://google.com&size=256'
     };
 
-    const [step, setStep] = useState(1);
-    const [showAccountChoice, setShowAccountChoice] = useState(true);
     const [selectedAccountType, setSelectedAccountType] = useState('own');
     const [showAdsgoReminder, setShowAdsgoReminder] = useState(false);
     const [hideMainModal, setHideMainModal] = useState(false);
@@ -1274,39 +1453,8 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
     useEffect(() => { if (activeDropdown === 'metaEvent' || activeDropdown === 'googleEvent') pubEventLoading.triggerLoad(); }, [activeDropdown]);
 
     const publishCampaignName = selectedCampaign?.name || 'NEW-AI-CAMPAIGN-001';
-    const [campaignStatus, setCampaignStatus] = useState('Publishing');
-    const [adsetProgress, setAdsetProgress] = useState([
-      { id: 1, name: 'Adset name 1', totalAds: 3, completedAds: 0, status: 'Publishing' },
-      { id: 2, name: 'Adset name 2', totalAds: 2, completedAds: 0, status: 'Waiting' },
-      { id: 3, name: 'Adset name 3', totalAds: 4, completedAds: 0, status: 'Waiting' },
-    ]);
 
-    const initialBrandGoalData = useMemo(() => {
-      const finalLocations = selectedLocations.map(loc => ({
-        value: loc.code.toLowerCase(),
-        label: loc.name
-      }));
 
-      return {
-        campaignObjective: objective,
-        adsetGoal: adsetGoal,
-        event: event || 'Purchase',
-        marketGroups: [
-          {
-            id: '1',
-            targetLocations: finalLocations,
-            budgetMode: 'unified',
-            unifiedBudget: dailyBudget.toString(),
-            kpiType: 'ROAS',
-            kpiMode: 'unified',
-            unifiedKPI: ''
-          }
-        ]
-      };
-    }, [selectedLocations, objective, adsetGoal, event, dailyBudget]);
-
-    const [brandGoalData, setBrandGoalData] = useState(initialBrandGoalData);
-    const [validation, setValidation] = useState({ objective: true, marketGroups: true });
 
     useEffect(() => {
       if (step === 3) {
@@ -1331,7 +1479,6 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
             const allDone = next.every(a => a.status === 'Success' || a.status === 'Failure');
             if (allDone) {
               setCampaignStatus(next.every(a => a.status === 'Success') ? 'Success' : 'Partial');
-              setTimeout(() => setStep(4), 2500);
             }
             return next;
           });
@@ -1518,10 +1665,6 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
 
     const renderStep3 = () => (
       <div className="space-y-6 animate-in fade-in duration-500">
-        <div className="flex items-start gap-2 bg-gray-100 rounded-base p-3">
-          <Info size={14} className="text-gray-400 shrink-0 mt-0.5" />
-          <p className="text-xs text-gray-500">开发说明：当后面两步弹窗流程未满足没有出现时，发布成功后，自动跳转至 ad manager 页面</p>
-        </div>
         <div className="bg-gray-50 rounded-section p-8 border border-gray-100">
           {/* Campaign Header */}
           <div className="flex items-center justify-between mb-3">
@@ -1561,45 +1704,15 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
             ))}
           </div>
         </div>
-      </div>
-    );
-
-    const renderStep4 = () => (
-      <div className="space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-700">
-        <div className="flex items-start gap-2 bg-gray-100 rounded-base p-3">
-          <Info size={14} className="text-gray-400 shrink-0 mt-0.5" />
-          <p className="text-xs text-gray-500">开发说明：与 brand 中的 optimize goal 中配置对比，仅本次发布的 location 出现新增、本次预算+活跃预算超出总预算、投放了新的优化事件时，本弹窗步骤就出现</p>
-        </div>
-        <div className="flex flex-col items-center text-center space-y-2 mb-4">
-          <div className="w-16 h-16 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center mb-2 animate-bounce"><Check size={32} /></div>
-          <h3 className="text-2xl font-semibold text-gray-900 tracking-tight">Publish successful!</h3>
-          <p className="text-sm font-medium text-gray-500">Confirm your brand's optimize goal to activate AI optimization</p>
-        </div>
-        <div className="space-y-8 pr-2 pb-32">
-          <div className="transform transition-all hover:shadow-md relative z-[100]"><BudgetKPISection formData={brandGoalData} updateFormData={(key, val) => setBrandGoalData(p => ({...p, [key]: val}))} updateFormDataDeep={(updates) => setBrandGoalData(p => ({...p, ...updates}))} validation={validation} setValidation={setValidation} /></div>
-        </div>
-      </div>
-    );
-
-    const renderStep5 = () => (
-      <div className="space-y-6 animate-in fade-in slide-in-from-bottom-8 duration-700">
-        <div className="flex items-start gap-2 bg-gray-100 rounded-base p-3">
-          <Info size={14} className="text-gray-400 shrink-0 mt-0.5" />
-          <p className="text-xs text-gray-500">开发说明：此 brand 使用新的账号投放后，本弹窗步骤就出现</p>
-        </div>
-        <div className="flex flex-col items-center text-center space-y-2 mb-4">
-          <div className="w-16 h-16 bg-amber-50 text-amber-600 rounded-full flex items-center justify-center mb-2">
-            <AlertCircle size={32} />
-          </div>
-          <p className="text-sm font-medium text-gray-500 leading-relaxed max-w-md">
-            AdsGo.ai will analyze the audience performance data of active campaigns based on optimization goals 24 hours after the first campaign of the current brand is published, and build custom audiences to generate new campaign recommendations. Therefore, you need to go to{' '}
-            <a href="https://business.facebook.com/customaudiences/app/tos/?act=1272540464603881&business_id=608445961679028" target="_blank" rel="noopener noreferrer" className="text-primary-500 font-semibold underline hover:text-primary-600 transition-colors">
-              custom audiences tos
-            </a>{' '}
-            to agree to Meta Ads' custom audience terms, otherwise AdsGo may fail to generate recommendations.
-          </p>
-        </div>
-        <div className="pb-32" />
+        <button
+          onClick={() => {
+            setIsPublishMinimized(true);
+            if (onPublishSuccess) onPublishSuccess();
+          }}
+          className="mt-2 w-full py-3 rounded-xl bg-slate-100 text-slate-700 text-sm font-semibold hover:bg-slate-200 transition-colors"
+        >
+          完成，后台继续发布
+        </button>
       </div>
     );
 
@@ -1609,32 +1722,29 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
       </div>
     );
 
+    if (isPublishMinimized) {
+      return (
+        <MinimizedPublishIndicator
+          campaignStatus={campaignStatus}
+          adsetProgress={adsetProgress}
+          onExpand={() => setIsPublishMinimized(false)}
+          onClose={handlePublishComplete}
+        />
+      );
+    }
+
     return (
       <div className="fixed inset-0 flex items-center justify-center px-4 overflow-hidden" style={{ zIndex }}>
         <div className="absolute inset-0 bg-black/40 backdrop-blur-sm animate-in fade-in duration-300" onClick={() => setShowPublishModal(false)} />
         {!hideMainModal && (
-          <div className={`relative bg-white w-full ${step === 4 ? 'max-w-4xl' : 'max-w-xl'} rounded-section shadow-xl flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-300 overflow-hidden`}>
+          <div className="relative bg-white w-full max-w-xl rounded-section shadow-xl flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-300 overflow-hidden">
             <div className="px-10 pt-10 pb-6 flex items-start justify-between shrink-0">
               <div>
-                <div className="flex items-center gap-3 mb-2">
-                  <span className={`px-3 py-1 rounded-tag text-xs font-medium ${step === 3 ? 'bg-amber-50 text-amber-600' : 'bg-emerald-50 text-emerald-600'}`}>Step {step === 3 ? 1 : step === 4 ? 2 : 3} of 3</span>
-                  <div className="flex gap-1">{[3, 4, 5].map((i) => (<div key={i} className={`h-1 rounded-full transition-all duration-500 ${i < step ? 'w-4 bg-emerald-500' : i === step ? 'w-8 bg-gray-900' : 'w-2 bg-gray-200'}`} />))}</div>
-                </div>
-                <h2 className="text-2xl font-semibold text-gray-900 tracking-tight">{step === 3 && 'Publishing status'}{step === 4 && 'Confirm brand optimize goal'}{step === 5 && 'Please check Meta Ads Custom Audiences Agreement'}</h2>
+                <h2 className="text-2xl font-semibold text-gray-900 tracking-tight">Publishing status</h2>
               </div>
               <button onClick={() => setShowPublishModal(false)} className="p-2 hover:bg-gray-100 rounded-base text-gray-400 transition-colors"><X size={20} /></button>
             </div>
-            <div className="flex-1 overflow-y-auto px-10 pb-10 custom-scrollbar">{step === 3 && renderStep3()}{step === 4 && renderStep4()}{step === 5 && renderStep5()}</div>
-            {step === 4 && (
-              <div className="absolute bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-white via-white to-white/0 pt-16 z-[200]">
-                <button onClick={() => setStep(5)} className="w-full py-5 bg-gradient-to-r from-emerald-600 to-teal-700 text-white rounded-full text-base font-bold flex items-center justify-center gap-3 hover:scale-[1.02] active:scale-98 transition-all shadow-xl shadow-emerald-200/50">Confirm strategy & finish <ArrowRight size={20} /></button>
-              </div>
-            )}
-            {step === 5 && (
-              <div className="absolute bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-white via-white to-white/0 pt-16 z-[200]">
-                <button onClick={handlePublishComplete} className="w-full py-5 bg-gradient-to-r from-emerald-600 to-teal-700 text-white rounded-full text-base font-bold flex items-center justify-center gap-3 hover:scale-[1.02] active:scale-98 transition-all shadow-xl shadow-emerald-200/50">Confirmed to have been accepted <ArrowRight size={20} /></button>
-              </div>
-            )}
+            <div className="flex-1 overflow-y-auto px-10 pb-10 custom-scrollbar">{renderStep3()}</div>
           </div>
         )}
         {showAccountChoice && <AccountChoiceModal onSelect={(type) => {

@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   CAMPAIGN_CARDS,
   IMAGE_POOL,
   PLATFORM_LOGOS
 } from './mockData';
 import { Edit, Send, X, Check, Sparkles, Trash2, ChevronDown, Infinity, Clock, RefreshCw, ShieldCheck, GripVertical, AlertCircle } from 'lucide-react';
+import { useOnboardingTour } from '../onboarding/useOnboardingTour'
+import OnboardingSpotlight from '../onboarding/OnboardingSpotlight'
 
 // --- Sub Components ---
 
@@ -204,6 +206,16 @@ const RecommendationCard = ({ card, isExpanded, onToggle, onEdit, onPublish, sta
 // --- Main Component ---
 
 const AutoRegeneration = ({ onPageChange, autoRegenEnabled, onAutoRegenChange }) => {
+  const { isActive, tourSubStep: ctxSubStep, endTour } = useOnboardingTour(3)
+  const recommendationSectionRef = useRef(null)
+  const draftTableRef = useRef(null)
+  const [pageSubStep, setPageSubStep] = useState(0)
+  const showPageTour = isActive && ctxSubStep >= 1
+
+  useEffect(() => {
+    if (isActive) setPageSubStep(0)
+  }, [isActive])
+
   const [selectedPlatform, setSelectedPlatform] = useState('Meta');
   const [draftPlatformFilter, setDraftPlatformFilter] = useState('');
   const autoRegen = autoRegenEnabled;
@@ -840,6 +852,7 @@ const AutoRegeneration = ({ onPageChange, autoRegenEnabled, onAutoRegenChange })
   };
 
   return (
+    <>
     <div className="min-h-screen bg-background font-sans p-6">
       <div className="flex-1 flex flex-col gap-4">
         {/* Platform Selector Card */}
@@ -883,7 +896,7 @@ const AutoRegeneration = ({ onPageChange, autoRegenEnabled, onAutoRegenChange })
         {/* Meta Launch Recommendation Section */}
         {selectedPlatform === 'Meta' && (
           <div className="bg-white rounded-xl border border-border shadow-sm p-4 md:p-6">
-            <div className="flex flex-wrap items-center justify-between gap-4 mb-8 px-2">
+            <div ref={recommendationSectionRef} className="flex flex-wrap items-center justify-between gap-4 mb-8 px-2">
               <div className="pl-4 relative">
                 <div className="absolute left-0 top-0.5 bottom-0.5 w-1.5 rounded-full bg-gradient-to-b from-[#c3a2fe] via-[#7135f4] to-[#0d031f]"></div>
                 
@@ -1066,12 +1079,12 @@ const AutoRegeneration = ({ onPageChange, autoRegenEnabled, onAutoRegenChange })
         )}
 
         <div className="mt-8">
-          <div className="mb-6 flex items-center justify-between relative">
+          <div ref={draftTableRef} className="mb-6 flex items-center justify-between relative">
             <div className="absolute left-0 top-0.5 bottom-0.5 w-1.5 rounded-full bg-gradient-to-b from-[#c3a2fe] via-[#7135f4] to-[#0d031f]"></div>
-            
+
             <div className="pl-4 flex flex-col">
               <h2 className="text-xl font-bold text-gray-900 leading-none">
-                More drafts awaiting publish               
+                More drafts awaiting publish
               </h2>
             </div>
           </div>
@@ -1521,6 +1534,30 @@ const AutoRegeneration = ({ onPageChange, autoRegenEnabled, onAutoRegenChange })
         }
       `}</style>
     </div>
+
+      {showPageTour && pageSubStep === 0 && (
+        <OnboardingSpotlight
+          targetRef={draftTableRef}
+          stepLabel="2/3"
+          title="广告草稿管理"
+          body="所有未发布的广告都保存在这里。你可以对每条草稿进行编辑、调整预算和发布优先级，或直接手动点击发布"
+          onSkip={endTour}
+          onNext={() => setPageSubStep(1)}
+          nextText="下一步"
+        />
+      )}
+      {showPageTour && pageSubStep === 1 && (
+        <OnboardingSpotlight
+          targetRef={recommendationSectionRef}
+          stepLabel="3/3"
+          title="AI 推荐发布候选"
+          body="AI 分析广告数据后，从草稿队列中筛选出最具潜力的 Campaign 展示在此。右侧可选择执行模式：Recommendations 模式由你审批后发布，Auto Publish 模式 7×24h 全自动执行。默认不开启，了解即可"
+          onSkip={endTour}
+          onNext={endTour}
+          nextText="我了解了"
+        />
+      )}
+    </>
   );
 };
 

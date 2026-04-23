@@ -64,7 +64,9 @@ const CrossChannelAISummary = ({
   activeTab = 'meta',
   onPageChange,
   runSettings,
-  onRunSettingClick
+  onRunSettingClick,
+  aiAnalysisRef,
+  controlCenterRef,
 }) => {
   const [showBudgetModal, setShowBudgetModal] = useState(false);
   const [hoveredPlatform, setHoveredPlatform] = useState(null);
@@ -286,7 +288,7 @@ const CrossChannelAISummary = ({
         }`}
       >
         {/* Left Column: AI Summary (2/3 Width) */}
-      <div className="xl:col-span-2 bg-slate-50/50 border border-blue-100 rounded-2xl p-4 shadow-sm flex flex-col h-full min-w-0">
+      <div ref={aiAnalysisRef} className="xl:col-span-2 bg-slate-50/50 border border-blue-100 rounded-2xl p-4 shadow-sm flex flex-col h-full min-w-0">
         <div className="flex items-center justify-between border-b border-slate-200 pb-1.5 mb-5 shrink-0">
           <div className="flex items-center gap-2">
             <Sparkles size={16} className="text-blue-500" />
@@ -431,7 +433,7 @@ const CrossChannelAISummary = ({
 
       {/* Right Column: Optimize Goal & Auto-apply (1/3 Width) */}
       <div className="xl:col-span-1 h-full">
-        <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm h-full flex flex-col">
+        <div ref={controlCenterRef} className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm h-full flex flex-col">
           {/* Header Section */}
           <div className="flex items-center justify-between mb-5 shrink-0">
             <div className="flex items-center gap-2">

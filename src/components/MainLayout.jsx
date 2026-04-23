@@ -4,8 +4,10 @@ import Sidebar from './Sidebar'
 import Header from './Header'
 import GlobalDemoOverlay from './GlobalDemoOverlay'
 import OnboardingWidget from './onboarding/OnboardingWidget'
+import { OnboardingProvider } from './onboarding/OnboardingContext'
+import SupportBubble from './support/SupportBubble'
 
-const MainLayout = ({ children, showDemoOverlay, onDemoConnect, onDemoCreate, selectedBrand, onBrandChange, onCreateBrand, brands = [], autoExecuteRecommendations, autoRegenEnabled, publishedAt, goalConfigured }) => {
+const MainLayout = ({ children, showDemoOverlay, onDemoConnect, onDemoCreate, selectedBrand, onBrandChange, onCreateBrand, brands = [], autoExecuteRecommendations, autoRegenEnabled, publishedAt, goalConfigured, autoOptimizeConfirmed }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [isPinned, setIsPinned] = useState(() => {
     const saved = localStorage.getItem('sidebarPinned')
@@ -41,6 +43,7 @@ const MainLayout = ({ children, showDemoOverlay, onDemoConnect, onDemoCreate, se
   }
 
   return (
+    <OnboardingProvider>
     <div className="flex h-screen overflow-hidden bg-background">
       {/* Mobile Sidebar Overlay */}
       {isMobile && isSidebarOpen && (
@@ -106,9 +109,14 @@ const MainLayout = ({ children, showDemoOverlay, onDemoConnect, onDemoCreate, se
           goalConfigured={goalConfigured}
           isAutopilotEnabled={autoExecuteRecommendations}
           isAutoPublishEnabled={autoRegenEnabled}
+          autoOptimizeConfirmed={autoOptimizeConfirmed}
         />
+
+        {/* Support Bubble (visual placeholder — real Intercom TBD) */}
+        <SupportBubble />
       </div>
     </div>
+    </OnboardingProvider>
   )
 }
 
