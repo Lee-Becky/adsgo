@@ -1,14 +1,14 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { 
-  Link2, Search, History, ShoppingBag, X, ChevronRight, 
-  LayoutGrid, Wand2, 
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import {
+  Link2, Search, History, ShoppingBag, X, ChevronRight,
+  LayoutGrid, Wand2,
   Loader2, Globe, Tag, Target, Sparkles, Plus,
-  Upload, Check, 
+  Upload, Check,
   Trash2, PackageCheck, FileText, Layers, Database,
   Flame, Zap, Info, ChevronDown, ListFilter, Box,
   Facebook, Chrome, ExternalLink, RefreshCw, AlertCircle, ChevronUp,
   ArrowLeft, Edit2, User, Image as ImageIcon, Link2Off, Briefcase,
-  AlertTriangle
+  AlertTriangle, Smartphone, Apple
 } from 'lucide-react';
 import { Z_INDEX } from '../../../constants/zIndex';
 import { useZIndex } from '../../../hooks/useZIndex';
@@ -23,6 +23,14 @@ export const MOCK_CATALOGS = [
 ];
 
 export const MOCK_PRODUCT_SETS = ['All Products', 'Best Sellers', 'New Arrivals'];
+
+export const MOCK_APPS = [
+  { id: 'app_1001', name: 'Luminaire Shop', bundle: 'com.luminaire.shop', platform: 'iOS', icon: 'https://picsum.photos/seed/app1/200/200' },
+  { id: 'app_1002', name: 'Luminaire Shop', bundle: 'com.luminaire.shop', platform: 'Android', icon: 'https://picsum.photos/seed/app1/200/200' },
+  { id: 'app_2001', name: 'Retro Style Hub', bundle: 'com.retrostyle.hub', platform: 'iOS', icon: 'https://picsum.photos/seed/app2/200/200' },
+  { id: 'app_3001', name: 'Vintage Daily', bundle: 'com.vintage.daily', platform: 'Android', icon: 'https://picsum.photos/seed/app3/200/200' },
+  { id: 'app_4001', name: 'Coastal Living', bundle: 'com.coastal.living', platform: 'iOS', icon: 'https://picsum.photos/seed/app4/200/200' },
+];
 
 const ANALYSIS_STEPS = [
   { text: "Task received: Analyzing https://www.cupshe.com with comprehensive product and audience analysis.", type: 'system' },
@@ -256,7 +264,7 @@ const SelectionModal = ({
   type, onClose, authStatus, anyConnected, isAddModalOpen, 
   handleAuthorize, isAuthLoading, setIsAddModalOpen,
   selectedProducts, onSelectProducts, onUpdateCreatives,
-  productCreatives, modalContext
+  productCreatives, modalContext, modalGroupId, onAddAdsToGroup
 }) => {
   const zIndex = useZIndex(true);
   const [search, setSearch] = useState('');
@@ -452,7 +460,11 @@ const SelectionModal = ({
                 id: `${c.id}-${Date.now()}-${randomSuffix()}`,
                 productId: modalContext
               }));
-              onUpdateCreatives(modalContext, prev => [...newCreatives, ...prev]);
+              if (modalGroupId && onAddAdsToGroup) {
+                onAddAdsToGroup(modalContext, modalGroupId, newCreatives);
+              } else {
+                onUpdateCreatives(modalContext, prev => [...newCreatives, ...prev]);
+              }
             } else {
               const pool = getItems();
               const toAdd = pool.filter(i => localSelected.has(i.id) && !selectedProducts.some(p => p.id === i.id))
@@ -475,7 +487,118 @@ const SelectionModal = ({
 
 // --- ProductSelector component ---
 
-const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives, onUpdateCreatives, onAnalysisStart, onAnalysisComplete, onReset, hasGeneratedOnce, analysisFinished, isAnalyzing, campaignType, onCampaignTypeChange, selectedAccount, onSelectAccount, productAnalyses, onProductAnalysesChange, authStatus, onAuthStatusChange, onMetaAccountPick, selectedCatalog: selectedCatalogProp, onSelectCatalog, selectedProductSet: selectedProductSetProp, onSelectProductSet }) => {
+// ── App Picker Section (for "投放 App 广告" tab) ──────────────────────────
+const AppPickerSection = ({ platform, authStatus, isAuthLoading, handleAuthorize, selectedProducts, onSelectProducts, selectedAccount, onPickAccount }) => {
+  const platformId = platform?.id;
+  const requiresAuth = platformId === 'meta' || platformId === 'tiktok';
+  const isAuthorized = requiresAuth ? !!authStatus?.[platformId] : false;
+
+  if (!platform) {
+    return (
+      <div className="bg-white border-2 border-dashed border-gray-200 rounded-xl p-12 flex flex-col items-center text-center space-y-4">
+        <div className="w-16 h-16 bg-amber-50 text-amber-500 rounded-base flex items-center justify-center shadow-sm"><AlertCircle size={32} /></div>
+        <div className="max-w-md space-y-2">
+          <h4 className="text-lg font-semibold text-gray-900">请先在顶部选择投放渠道</h4>
+          <p className="text-xs text-gray-400 font-bold leading-relaxed">App 广告需先在『投放目标与渠道』中选择 Meta 或 TikTok。</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (requiresAuth && !isAuthorized) {
+    const isMeta = platformId === 'meta';
+    return (
+      <div className="bg-white border-2 border-dashed border-gray-200 rounded-xl p-12 flex flex-col items-center text-center space-y-6">
+        <div className={`w-16 h-16 rounded-base flex items-center justify-center shadow-sm ${isMeta ? 'bg-blue-50 text-blue-600' : 'bg-gray-900 text-white'}`}>
+          {isMeta ? <Facebook size={32} /> : <Smartphone size={32} />}
+        </div>
+        <div className="max-w-md space-y-2">
+          <h4 className="text-lg font-semibold text-gray-900">投放 App 广告需先授权 {isMeta ? 'Meta Ads' : 'TikTok Ads'}</h4>
+          <p className="text-xs text-gray-400 font-bold leading-relaxed">
+            我们需要访问您的 {isMeta ? 'Meta' : 'TikTok'} 广告账户以读取已绑定的 App 列表与投放权限。
+          </p>
+        </div>
+        <button onClick={() => handleAuthorize(platformId)} disabled={isAuthLoading} className="px-12 py-4 bg-primary-500 text-white rounded-full font-semibold hover:bg-primary-600 transition-all shadow-xl flex items-center gap-3">
+          {isAuthLoading ? <Loader2 size={20} className="animate-spin" /> : (isMeta ? <Facebook size={20} /> : <Smartphone size={20} />)}
+          {isMeta ? 'Connect Meta Ads' : 'Connect TikTok Ads'}
+        </button>
+      </div>
+    );
+  }
+
+  if (requiresAuth && isAuthorized && !selectedAccount) {
+    const isMeta = platformId === 'meta';
+    return (
+      <div className="bg-primary-50/50 border-2 border-primary-500/15 rounded-xl p-10 flex items-center justify-between animate-in slide-in-from-top-4">
+        <div className="flex items-center gap-6">
+          <div className="w-14 h-14 bg-white rounded-base flex items-center justify-center text-primary-500 shadow-sm"><RefreshCw size={28} className="animate-spin-slow" /></div>
+          <div>
+            <h4 className="text-base font-semibold text-gray-900">{isMeta ? 'Meta' : 'TikTok'} 已授权，请选择关联广告账户</h4>
+            <p className="text-xs text-gray-400 font-bold mt-1">Found 2 available accounts</p>
+          </div>
+        </div>
+        <button onClick={onPickAccount} className="px-8 py-4 bg-primary-500 text-white rounded-xl font-semibold hover:bg-primary-600 transition-all shadow-lg shadow-primary-500/10">选择广告账户</button>
+      </div>
+    );
+  }
+
+  const selectedAppIds = new Set(selectedProducts.filter(p => p.isApp).map(p => p.id));
+  const toggleApp = (app) => {
+    if (selectedAppIds.has(app.id)) {
+      onSelectProducts(selectedProducts.filter(p => p.id !== app.id));
+    } else {
+      onSelectProducts([...selectedProducts, {
+        id: app.id,
+        name: `${app.name} · ${app.platform}`,
+        url: app.bundle,
+        imageUrl: app.icon,
+        isApp: true,
+      }]);
+    }
+  };
+
+  return (
+    <div className="space-y-4 animate-in fade-in slide-in-from-top-4">
+      <div className="flex items-center justify-between px-2">
+        <div className="flex items-center gap-2">
+          <Smartphone size={14} className="text-primary-500" />
+          <h4 className="text-sm font-semibold text-gray-900">从已绑定的 App 列表中选择</h4>
+        </div>
+        <span className="text-xs font-medium text-gray-400">已选 {selectedAppIds.size} / {MOCK_APPS.length}</span>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        {MOCK_APPS.map(app => {
+          const isSelected = selectedAppIds.has(app.id);
+          return (
+            <button
+              key={app.id}
+              onClick={() => toggleApp(app)}
+              className={`flex items-center gap-4 p-5 rounded-base border-2 transition-all text-left ${
+                isSelected ? 'bg-primary-50 border-primary-500 shadow-primary-focus' : 'bg-white border-gray-100 hover:border-primary-500/30'
+              }`}
+            >
+              <div className="w-12 h-12 rounded-xl overflow-hidden border border-gray-100 shrink-0 bg-gray-50">
+                <img src={app.icon} alt={app.name} className="w-full h-full object-cover" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-semibold text-gray-900 truncate">{app.name}</p>
+                <p className="text-xs text-gray-400 font-medium truncate mt-0.5">{app.bundle}</p>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                <span className={`text-xs font-medium px-2 py-1 rounded-tag ${app.platform === 'iOS' ? 'bg-gray-100 text-gray-700' : 'bg-emerald-50 text-emerald-600'}`}>{app.platform}</span>
+                <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-all ${isSelected ? 'bg-primary-500 text-white' : 'border-2 border-gray-200'}`}>
+                  {isSelected && <Check size={12} strokeWidth={3} />}
+                </div>
+              </div>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
+const ProductSelector = ({ selectedProducts, onSelectProducts, productCreativeGroups, onUpdateGroupAds, onAddGroup, onRemoveGroup, onRenameGroup, onAnalysisStart, onAnalysisComplete, onReset, hasGeneratedOnce, analysisFinished, isAnalyzing, campaignType, onCampaignTypeChange, selectedAccount, onSelectAccount, productAnalyses, onProductAnalysesChange, authStatus, onAuthStatusChange, onMetaAccountPick, selectedCatalog: selectedCatalogProp, onSelectCatalog, selectedProductSet: selectedProductSetProp, onSelectProductSet, platform, availableAccounts = [] }) => {
   const [urlInput, setUrlInput] = useState('');
   const [isAuthLoading, setIsAuthLoading] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
@@ -483,6 +606,8 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
   const [showReportFor, setShowReportFor] = useState(null);
   const [activeModal, setActiveModal] = useState(null);
   const [modalContext, setModalContext] = useState(null);
+  const [modalGroupId, setModalGroupId] = useState(null);
+  const [editingGroup, setEditingGroup] = useState(null); // { productId, groupId }
   const [expandedAnalysisId, setExpandedAnalysisId] = useState(null);
   const [selectedCatalogLocal, setSelectedCatalogLocal] = useState(null);
   const [selectedProductSetLocal, setSelectedProductSetLocal] = useState('All Products');
@@ -506,6 +631,37 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
   const [urlError, setUrlError] = useState('');
   const [syncStates, setSyncStates] = useState({ gmc: { isConnected: false, isConnecting: false, email: '' }, meta: { isConnected: false, isConnecting: false, email: '' } });
   const [productForm, setProductForm] = useState({ name: '', url: '', category: '', description: '', priceRange: '', type: 'Non-type', usps: [''], positioning: { valueProposition: [], features: [], usageScenarios: [], painPoints: [], buyingMotivations: [] }, audience: [{ id: Date.now(), name: 'Audience name', age: '', gender: 'All', traits: [] }], assets: { main: [], detailed: [], demo: [], testimonial: [], lifestyle: [], painpoints: [], comparison: [], result: [], others: [], problem: [], intro: [], action: [], environment: [], team: [] } });
+
+  // Compat shims: legacy code paths (AIGC, lib, upload) wrote to a flat creative list per product.
+  // We now store creatives in groups; legacy writes append to the FIRST group, legacy reads flatten.
+  const productCreatives = useMemo(() => {
+    const out = {};
+    Object.entries(productCreativeGroups || {}).forEach(([pid, groups]) => {
+      out[pid] = (groups || []).flatMap(g => g.ads || []);
+    });
+    return out;
+  }, [productCreativeGroups]);
+  const onUpdateCreatives = useCallback((productId, creativesOrUpdater) => {
+    const groups = productCreativeGroups?.[productId] || [];
+    const firstGroupId = groups[0]?.id;
+    if (!firstGroupId) return;
+    if (typeof creativesOrUpdater === 'function') {
+      onUpdateGroupAds(productId, firstGroupId, () => {
+        const flat = (productCreativeGroups?.[productId] || []).flatMap(g => g.ads || []);
+        return creativesOrUpdater(flat);
+      });
+    } else {
+      onUpdateGroupAds(productId, firstGroupId, creativesOrUpdater);
+    }
+  }, [productCreativeGroups, onUpdateGroupAds]);
+
+  // Group-aware add to a specific group (used by workbench)
+  const addAdsToGroup = useCallback((productId, groupId, newAds) => {
+    onUpdateGroupAds(productId, groupId, prev => [...newAds, ...prev]);
+  }, [onUpdateGroupAds]);
+  const removeAdFromGroup = useCallback((productId, groupId, adId) => {
+    onUpdateGroupAds(productId, groupId, prev => prev.filter(a => a.id !== adId));
+  }, [onUpdateGroupAds]);
 
   const [generatingCounts, setGeneratingCounts] = useState({});
   const [selectedMatchOptions, setSelectedMatchOptions] = useState(new Set(['24h']));
@@ -570,10 +726,13 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
       if (platform === 'shopify') setIsShopifyConnected(true);
       if (platform === 'meta' || platform === 'google') {
         setSyncStates(prev => ({ ...prev, [platform]: { isConnected: true, isConnecting: false, email: 'user@example.com' } }));
-        // 授权成功后，如果尚未选择账号，立即弹出选择账号弹窗
-        if (!selectedAccount) {
-          if (onMetaAccountPick) onMetaAccountPick();
-          else setActiveModal('select_account');
+      }
+      // 授权成功后，若尚未选择广告账号，立即弹出账户选择器（meta/tiktok/google 共用此规则）
+      if ((platform === 'meta' || platform === 'tiktok' || platform === 'google') && !selectedAccount) {
+        if (platform === 'meta' && onMetaAccountPick) {
+          onMetaAccountPick();
+        } else {
+          setActiveModal('select_account');
         }
       }
     }
@@ -845,24 +1004,28 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
   const handleBatchAIGC = async () => {
     setActiveModal(null);
     const productsToGenerate = selectedProducts.filter(p => !batchAIGCExclusions.has(p.id));
-    
+
+    // Resolve target group (first group) for each product
+    const targets = productsToGenerate.map(p => {
+      const groups = productCreativeGroups?.[p.id] || [];
+      const groupId = groups[0]?.id;
+      return { p, groupId, key: groupId ? `${p.id}::${groupId}` : null };
+    }).filter(t => t.groupId);
+
     setGeneratingCounts(prev => {
       const next = { ...prev };
-      productsToGenerate.forEach(p => { next[p.id] = (next[p.id] || 0) + batchAIGCCount; });
+      targets.forEach(t => { next[t.key] = (next[t.key] || 0) + batchAIGCCount; });
       return next;
     });
 
-    // 并行处理每个产品，但产品内部的创意逐个生成并即时显示
-    await Promise.all(productsToGenerate.map(async (p) => {
+    await Promise.all(targets.map(async ({ p, groupId, key }) => {
       for (let i = 0; i < batchAIGCCount; i++) {
         try {
           const url = await generateAIGCCreative(`Batch generation ${i} for ${p.name}`);
           const newCreative = { id: `aigc-batch-${Date.now()}-${i}-${p.id}-${Math.random()}`, url, productId: p.id };
-          // 逐个更新，使用函数式更新确保不丢失前一个创意
-          onUpdateCreatives(p.id, prev => [newCreative, ...prev]);
+          addAdsToGroup(p.id, groupId, [newCreative]);
         } finally {
-          // 生成完成后减少骨架屏数量
-          setGeneratingCounts(prev => ({ ...prev, [p.id]: Math.max(0, (prev[p.id] || 1) - 1) }));
+          setGeneratingCounts(prev => ({ ...prev, [key]: Math.max(0, (prev[key] || 1) - 1) }));
         }
       }
     }));
@@ -880,18 +1043,19 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
     });
   };
 
-  const handleAIGCForProduct = async (id) => {
-    setGeneratingCounts(prev => ({ ...prev, [id]: (prev[id] || 0) + 1 }));
+  const handleAIGCForGroup = async (productId, groupId) => {
+    const counterKey = `${productId}::${groupId}`;
+    setGeneratingCounts(prev => ({ ...prev, [counterKey]: (prev[counterKey] || 0) + 1 }));
     try {
       const url = await generateAIGCCreative("Advertising product photography");
-      const newCreative = { id: `aigc-${Date.now()}-${Math.random()}`, url, productId: id };
-      onUpdateCreatives(id, prev => [newCreative, ...prev]);
+      const newCreative = { id: `aigc-${Date.now()}-${Math.random()}`, url, productId };
+      addAdsToGroup(productId, groupId, [newCreative]);
     } finally {
-      setGeneratingCounts(prev => ({ ...prev, [id]: Math.max(0, (prev[id] || 1) - 1) }));
+      setGeneratingCounts(prev => ({ ...prev, [counterKey]: Math.max(0, (prev[counterKey] || 1) - 1) }));
     }
   };
 
-  const handleUploadForProduct = (id) => {
+  const handleUploadForGroup = (productId, groupId) => {
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = 'image/*';
@@ -899,8 +1063,8 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
       const file = e.target.files?.[0];
       if (file) {
         const url = URL.createObjectURL(file);
-        const newCreative = { id: `upload-${Date.now()}-${Math.random()}`, url, productId: id };
-        onUpdateCreatives(id, [newCreative, ...(productCreatives[id] || [])]);
+        const newCreative = { id: `upload-${Date.now()}-${Math.random()}`, url, productId };
+        addAdsToGroup(productId, groupId, [newCreative]);
       }
     };
     input.click();
@@ -932,8 +1096,15 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
         <div className={(analysisFinished || isAnalyzing) ? 'opacity-40 grayscale-[0.5] blur-[0.5px]' : ''}>
           <div className="flex justify-center mb-4">
             <div className="bg-gray-100/50 p-1 rounded-base border border-gray-100 flex items-center shadow-sm">
-              <button onClick={() => onCampaignTypeChange('PRODUCT')} className={`px-8 py-3 rounded-xl text-xs font-medium transition-all ${campaignType === 'PRODUCT' ? 'bg-white text-primary-500 shadow-md' : 'text-gray-400 hover:text-gray-600'}`}>投放产品广告</button>
-              <button onClick={() => onCampaignTypeChange('CATALOG')} className={`px-8 py-3 rounded-xl text-xs font-medium transition-all ${campaignType === 'CATALOG' ? 'bg-white text-primary-500 shadow-md' : 'text-gray-400 hover:text-gray-600'}`}>投放目录广告</button>
+              <button onClick={() => onCampaignTypeChange('PRODUCT')} className={`px-8 py-3 rounded-xl text-xs font-medium transition-all flex items-center gap-2 ${campaignType === 'PRODUCT' ? 'bg-white text-primary-500 shadow-md' : 'text-gray-400 hover:text-gray-600'}`}>
+                <Tag size={14} /> 投放产品广告
+              </button>
+              <button onClick={() => onCampaignTypeChange('CATALOG')} className={`px-8 py-3 rounded-xl text-xs font-medium transition-all flex items-center gap-2 ${campaignType === 'CATALOG' ? 'bg-white text-primary-500 shadow-md' : 'text-gray-400 hover:text-gray-600'}`}>
+                <Database size={14} /> 投放目录广告
+              </button>
+              <button onClick={() => onCampaignTypeChange('APP')} className={`px-8 py-3 rounded-xl text-xs font-medium transition-all flex items-center gap-2 ${campaignType === 'APP' ? 'bg-white text-primary-500 shadow-md' : 'text-gray-400 hover:text-gray-600'}`}>
+                <Smartphone size={14} /> 投放 App 广告
+              </button>
             </div>
           </div>
           {campaignType === 'PRODUCT' ? (
@@ -966,23 +1137,50 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
                 <button onClick={() => setActiveModal('shopify')} className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-100 rounded-xl text-xs font-medium text-gray-400 hover:text-primary-500 hover:border-primary-500/15 transition-all shadow-sm"><ShoppingBag size={14} /> 从 Shopify 选择产品</button>
               </div>
             </div>
+          ) : campaignType === 'APP' ? (
+            <AppPickerSection
+              platform={platform}
+              authStatus={authStatus}
+              isAuthLoading={isAuthLoading}
+              handleAuthorize={handleAuthorize}
+              selectedProducts={selectedProducts}
+              onSelectProducts={onSelectProducts}
+              selectedAccount={selectedAccount}
+              onPickAccount={() => {
+                if (platform?.id === 'meta' && onMetaAccountPick) onMetaAccountPick();
+                else setActiveModal('select_account');
+              }}
+            />
           ) : (
             <div className="space-y-8 animate-in fade-in slide-in-from-top-4">
-              {!authStatus.meta ? (
-                <div className="bg-white border-2 border-dashed border-gray-200 rounded-xl p-12 flex flex-col items-center text-center space-y-6">
-                  <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-base flex items-center justify-center shadow-sm"><Facebook size={32} /></div>
+              {!platform ? (
+                <div className="bg-white border-2 border-dashed border-gray-200 rounded-xl p-12 flex flex-col items-center text-center space-y-4">
+                  <div className="w-16 h-16 bg-amber-50 text-amber-500 rounded-base flex items-center justify-center shadow-sm"><AlertCircle size={32} /></div>
                   <div className="max-w-md space-y-2">
-                    <h4 className="text-lg font-semibold text-gray-900">投放目录广告需先授权 Meta feeds</h4>
-                    <p className="text-xs text-gray-400 font-bold leading-relaxed">我们需要访问您的 Meta 广告账户以获取目录（Catalog）及其关联的产品系列（Product Sets）数据。</p>
+                    <h4 className="text-lg font-semibold text-gray-900">请先在顶部选择投放渠道</h4>
+                    <p className="text-xs text-gray-400 font-bold leading-relaxed">投放目录广告需先在『投放目标与渠道』中选择 Meta 或 TikTok。</p>
                   </div>
-                  <button onClick={() => handleAuthorize('meta')} disabled={isAuthLoading} className="px-12 py-4 bg-primary-500 text-white rounded-full font-semibold hover:bg-primary-600 transition-all shadow-xl flex items-center gap-3">{isAuthLoading ? <Loader2 size={20} className="animate-spin" /> : <Facebook size={20} />}立即连接</button>
+                </div>
+              ) : !authStatus[platform.id] ? (
+                <div className="bg-white border-2 border-dashed border-gray-200 rounded-xl p-12 flex flex-col items-center text-center space-y-6">
+                  <div className={`w-16 h-16 rounded-base flex items-center justify-center shadow-sm ${platform.id === 'meta' ? 'bg-blue-50 text-blue-600' : 'bg-gray-900 text-white'}`}>
+                    {platform.id === 'meta' ? <Facebook size={32} /> : <Smartphone size={32} />}
+                  </div>
+                  <div className="max-w-md space-y-2">
+                    <h4 className="text-lg font-semibold text-gray-900">投放目录广告需先授权 {platform.name} {platform.id === 'meta' ? 'feeds' : 'Ads'}</h4>
+                    <p className="text-xs text-gray-400 font-bold leading-relaxed">我们需要访问您的 {platform.name} 广告账户以获取目录（Catalog）及其关联的产品系列（Product Sets）数据。</p>
+                  </div>
+                  <button onClick={() => handleAuthorize(platform.id)} disabled={isAuthLoading} className="px-12 py-4 bg-primary-500 text-white rounded-full font-semibold hover:bg-primary-600 transition-all shadow-xl flex items-center gap-3">
+                    {isAuthLoading ? <Loader2 size={20} className="animate-spin" /> : (platform.id === 'meta' ? <Facebook size={20} /> : <Smartphone size={20} />)}
+                    Connect {platform.name} Ads
+                  </button>
                 </div>
               ) : !selectedAccount ? (
                 <div className="bg-primary-50/50 border-2 border-primary-500/15 rounded-xl p-10 flex items-center justify-between animate-in slide-in-from-top-4">
                   <div className="flex items-center gap-6">
                     <div className="w-14 h-14 bg-white rounded-base flex items-center justify-center text-primary-500 shadow-sm"><RefreshCw size={28} className="animate-spin-slow" /></div>
                     <div>
-                      <h4 className="text-base font-semibold text-gray-900">Meta 已授权，请选择关联广告账户</h4>
+                      <h4 className="text-base font-semibold text-gray-900">{platform.name} 已授权，请选择关联广告账户</h4>
                       <p className="text-xs text-gray-400 font-bold mt-1">Found 2 available accounts</p>
                     </div>
                   </div>
@@ -1062,7 +1260,7 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
               )}
             </div>
           )}
-          {selectedProducts.length > 0 && campaignType === 'PRODUCT' && (!analysisFinished && !isAnalyzing) && (
+          {selectedProducts.length > 0 && campaignType !== 'CATALOG' && (!analysisFinished && !isAnalyzing) && (
             <div className="flex flex-col items-center pt-8 border-t border-gray-50 space-y-10 animate-in fade-in slide-in-from-bottom-6">
               <div className="w-full flex flex-col items-center space-y-8">
                 <div className="w-full max-w-4xl space-y-4">
@@ -1107,6 +1305,10 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
                 </div>
                 {!analysisFinished && !isAnalyzing && (
                   <button onClick={() => {
+                    if (!platform) {
+                      alert('请选择媒体渠道');
+                      return;
+                    }
                     onAnalysisStart();
                     if (isMultiMode) {
                       startMultiAnalysis(selectedProducts);
@@ -1129,7 +1331,7 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
           )}
         </div>
       </div>
-      {campaignType === 'PRODUCT' && (analysisFinished || isAnalyzing) && (
+      {campaignType !== 'CATALOG' && (analysisFinished || isAnalyzing) && (
         <section className="animate-in fade-in duration-700">
           <div className="bg-gray-50/80 border border-gray-200/60 rounded-section overflow-hidden shadow-inner">
             <div className="p-8 md:p-10 bg-white border-b border-gray-200 space-y-8">
@@ -1155,89 +1357,148 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
             </div>
             <div className="p-4 md:p-6 space-y-4">
               {selectedProducts.map((p, idx) => {
-                const creatives = productCreatives[p.id] || [];
+                const groups = productCreativeGroups[p.id] || [];
+                const totalCreatives = groups.reduce((sum, g) => sum + (g.ads?.length || 0), 0);
+                const totalGenerating = groups.reduce((sum, g) => sum + (generatingCounts[`${p.id}::${g.id}`] || 0), 0);
                 const isExpanded = expandedAnalysisId === p.id;
                 const showAnalysisResult = analysisFinished || (isAnalyzing && p.isFromHistory);
-                const generatingCount = generatingCounts[p.id] || 0;
-                
+                const isEditingThisProductGroup = editingGroup?.productId === p.id;
+
                 return (
                   <div key={p.id} className="space-y-3">
-                    <div className={`bg-white border rounded-section p-4 md:p-6 transition-all hover:shadow-xl hover:shadow-gray-200/50 group ${creatives.length === 0 && generatingCount === 0 && showAnalysisResult ? 'border-amber-100 ring-2 ring-amber-500/5' : 'border-gray-100'}`}>
-                      <div className="flex flex-col lg:flex-row gap-6">
-                        <div className="flex items-center gap-4 lg:w-72 shrink-0">
-                          <div className="w-12 h-12 rounded-xl overflow-hidden border border-gray-100 shrink-0 shadow-sm bg-gray-50">
-                            {p.imageUrl ? (
-                              <img src={p.imageUrl} className="w-full h-full object-cover" />
-                            ) : (
-                              <div className="w-full h-full flex flex-col items-center justify-center bg-gray-50 text-gray-300 gap-1">
-                                <ImageIcon size={18} />
-                                <span className="text-[9px] font-medium text-gray-300 uppercase">获取中</span>
-                              </div>
-                            )}
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <h4 className="text-sm font-medium text-gray-800 truncate">{p.name}</h4>
-                            {p.url && (
-                              <div className="flex items-center gap-1 mt-0.5 max-w-[180px]">
-                                <Link2 size={9} className="text-gray-300 shrink-0" />
-                                <span className="text-[10px] text-gray-300 font-medium truncate">{p.url}</span>
-                              </div>
-                            )}
-                            {(showAnalysisResult || (isMultiMode && (analysisFinished || isAnalyzing))) && (
-                              <div className="flex items-center gap-2 mt-1">
-                                <span className={`text-xs font-medium px-2 py-0.5 rounded-tag ${creatives.length > 0 ? 'bg-primary-50 text-primary-500' : 'bg-amber-50 text-amber-600'}`}>{creatives.length} 素材</span>
-                                {isMultiMode && productAnalyses[p.id]?.status === 'analyzing' ? (
-                                  <button onClick={() => setShowReportFor(p.id)} className="text-xs font-medium text-primary-500 hover:text-primary-600 flex items-center gap-1">
-                                    <Loader2 size={10} className="animate-spin" /> AI 分析产品中
-                                  </button>
-                                ) : (
-                                  <button onClick={() => setShowReportFor(p.id)} className="text-xs font-medium text-gray-400 underline hover:text-primary-500">分析报告</button>
-                                )}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                        <div className="flex-1 flex items-center gap-3 min-w-0">
-                          <div className="flex-1 flex items-center gap-3 overflow-x-auto no-scrollbar py-1 min-w-0">
-                            {[...Array(generatingCount)].map((_, i) => (
-                              <NanoBananaSkeleton key={`gen-${i}`} />
-                            ))}
-                            {creatives.map(c => (
-                              <div key={c.id} className="relative w-14 h-20 rounded-lg overflow-hidden shrink-0 border border-gray-100 group/item shadow-sm">
-                                <img src={c.url} className="w-full h-full object-cover" />
-                                <button onClick={() => onUpdateCreatives(p.id, creatives.filter(prev => prev.id !== c.id))} className="absolute top-1 right-1 w-5 h-5 bg-white/90 rounded-full flex items-center justify-center opacity-0 group-hover/item:opacity-100 transition-all text-rose-500 shadow-md">
-                                  <X size={10} />
-                                </button>
-                              </div>
-                            ))}
-                            <div className="sticky right-0 flex gap-2 shrink-0 bg-white pl-2 z-[1]">
-                              <button onClick={() => { setModalContext(p.id); setActiveModal('creative_lib'); }} className="w-14 h-20 rounded-lg border-2 border-dashed border-gray-100 flex flex-col items-center justify-center text-gray-300 hover:border-primary-500 hover:text-primary-500/70 hover:bg-primary-50 transition-all gap-1" title="从素材库选择">
-                                <Database size={16} />
-                                <span className="text-xs font-medium">库</span>
-                              </button>
-                              <button onClick={() => handleAIGCForProduct(p.id)} className="w-14 h-20 rounded-lg border-2 border-dashed border-purple-100 flex flex-col items-center justify-center text-purple-400 hover:border-purple-400 hover:bg-purple-50 transition-all gap-1" title="AI 生成">
-                                <Sparkles size={16} />
-                                <span className="text-xs font-medium">AI</span>
-                              </button>
-                              <button onClick={() => handleUploadForProduct(p.id)} className="w-14 h-20 rounded-lg border-2 border-dashed border-gray-100 flex flex-col items-center justify-center text-gray-300 hover:border-gray-400 hover:bg-gray-50 transition-all gap-1" title="本地上传">
-                                <Upload size={16} />
-                                <span className="text-xs font-medium">传</span>
-                              </button>
+                    <div className={`bg-white border rounded-section p-4 md:p-6 transition-all group ${totalCreatives === 0 && totalGenerating === 0 && showAnalysisResult ? 'border-amber-100 ring-2 ring-amber-500/5' : 'border-gray-100'}`}>
+                      {/* Product header row */}
+                      <div className="flex items-center gap-4 mb-4">
+                        <div className="w-12 h-12 rounded-xl overflow-hidden border border-gray-100 shrink-0 shadow-sm bg-gray-50">
+                          {p.imageUrl ? (
+                            <img src={p.imageUrl} className="w-full h-full object-cover" />
+                          ) : (
+                            <div className="w-full h-full flex flex-col items-center justify-center bg-gray-50 text-gray-300 gap-1">
+                              <ImageIcon size={18} />
+                              <span className="text-[9px] font-medium text-gray-300 uppercase">获取中</span>
                             </div>
-                          </div>
-                          {(!showAnalysisResult && isAnalyzing && !p.isFromHistory) && (
-                            <button onClick={() => setExpandedAnalysisId(isExpanded ? null : p.id)} className="shrink-0 flex items-center gap-2 px-3 py-1.5 bg-primary-50 text-primary-500 rounded-lg text-xs font-medium hover:bg-primary-100 transition-colors">
-                              <Loader2 size={12} className="animate-spin" />Analyzing...{isExpanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
-                            </button>
                           )}
                         </div>
-                        {(!isAnalyzing || p.isFromHistory) && (
-                          <div className="shrink-0 flex items-center">
-                            <button onClick={() => removeProduct(p.id)} className="p-3 text-gray-300 hover:text-rose-500 transition-colors rounded-xl hover:bg-rose-50">
-                              <Trash2 size={18} />
-                            </button>
-                          </div>
+                        <div className="min-w-0 flex-1">
+                          <h4 className="text-sm font-medium text-gray-800 truncate">{p.name}</h4>
+                          {p.url && (
+                            <div className="flex items-center gap-1 mt-0.5 max-w-[280px]">
+                              <Link2 size={9} className="text-gray-300 shrink-0" />
+                              <span className="text-[10px] text-gray-300 font-medium truncate">{p.url}</span>
+                            </div>
+                          )}
+                          {(showAnalysisResult || (isMultiMode && (analysisFinished || isAnalyzing))) && (
+                            <div className="flex items-center gap-2 mt-1">
+                              <span className={`text-xs font-medium px-2 py-0.5 rounded-tag ${totalCreatives > 0 ? 'bg-primary-50 text-primary-500' : 'bg-amber-50 text-amber-600'}`}>{totalCreatives} 素材 · {groups.length} 组</span>
+                              {isMultiMode && productAnalyses[p.id]?.status === 'analyzing' ? (
+                                <button onClick={() => setShowReportFor(p.id)} className="text-xs font-medium text-primary-500 hover:text-primary-600 flex items-center gap-1">
+                                  <Loader2 size={10} className="animate-spin" /> AI 分析产品中
+                                </button>
+                              ) : (
+                                <button onClick={() => setShowReportFor(p.id)} className="text-xs font-medium text-gray-400 underline hover:text-primary-500">分析报告</button>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                        {(!showAnalysisResult && isAnalyzing && !p.isFromHistory) && (
+                          <button onClick={() => setExpandedAnalysisId(isExpanded ? null : p.id)} className="shrink-0 flex items-center gap-2 px-3 py-1.5 bg-primary-50 text-primary-500 rounded-lg text-xs font-medium hover:bg-primary-100 transition-colors">
+                            <Loader2 size={12} className="animate-spin" />Analyzing...{isExpanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+                          </button>
                         )}
+                        {(!isAnalyzing || p.isFromHistory) && (
+                          <button onClick={() => removeProduct(p.id)} className="shrink-0 p-3 text-gray-300 hover:text-rose-500 transition-colors rounded-xl hover:bg-rose-50">
+                            <Trash2 size={18} />
+                          </button>
+                        )}
+                      </div>
+
+                      {/* Creative groups */}
+                      <div className="space-y-3">
+                        {groups.map((group, gIdx) => {
+                          const groupGenCount = generatingCounts[`${p.id}::${group.id}`] || 0;
+                          const groupAds = group.ads || [];
+                          const isThisGroupEditing = isEditingThisProductGroup && editingGroup?.groupId === group.id;
+                          return (
+                            <div key={group.id} className="bg-gray-50/50 border border-gray-100 rounded-inner p-4">
+                              <div className="flex items-center justify-between mb-3 gap-2">
+                                <div className="flex items-center gap-2 min-w-0 flex-1">
+                                  <Layers size={14} className="text-primary-500/70 shrink-0" />
+                                  {isThisGroupEditing ? (
+                                    <input
+                                      autoFocus
+                                      defaultValue={group.name}
+                                      maxLength={30}
+                                      onBlur={(e) => {
+                                        const v = e.target.value.trim() || group.name;
+                                        if (v !== group.name) onRenameGroup(p.id, group.id, v);
+                                        setEditingGroup(null);
+                                      }}
+                                      onKeyDown={(e) => {
+                                        if (e.key === 'Enter') { e.currentTarget.blur(); }
+                                        if (e.key === 'Escape') { setEditingGroup(null); }
+                                      }}
+                                      className="flex-1 px-2 py-1 text-sm font-semibold text-gray-900 bg-white border border-primary-500 rounded-base outline-none focus:shadow-primary-focus"
+                                    />
+                                  ) : (
+                                    <button
+                                      onClick={() => setEditingGroup({ productId: p.id, groupId: group.id })}
+                                      className="flex items-center gap-1.5 text-sm font-semibold text-gray-900 hover:text-primary-500 transition-colors group/name"
+                                      title="点击重命名"
+                                    >
+                                      <span className="truncate max-w-[200px]">{group.name}</span>
+                                      <Edit2 size={11} className="opacity-0 group-hover/name:opacity-100 transition-opacity text-gray-400" />
+                                    </button>
+                                  )}
+                                  <span className="text-xs font-medium text-gray-400 shrink-0">· {groupAds.length} 素材</span>
+                                </div>
+                                {groups.length > 1 && (
+                                  <button
+                                    onClick={() => onRemoveGroup(p.id, group.id)}
+                                    className="shrink-0 p-1.5 text-gray-300 hover:text-rose-500 hover:bg-rose-50 rounded-base transition-colors"
+                                    title="删除该素材组"
+                                  >
+                                    <Trash2 size={14} />
+                                  </button>
+                                )}
+                              </div>
+                              <div className="flex items-center gap-3 overflow-x-auto no-scrollbar py-1 min-w-0">
+                                {[...Array(groupGenCount)].map((_, i) => (
+                                  <NanoBananaSkeleton key={`gen-${group.id}-${i}`} />
+                                ))}
+                                {groupAds.map(c => (
+                                  <div key={c.id} className="relative w-14 h-20 rounded-lg overflow-hidden shrink-0 border border-gray-100 group/item shadow-sm">
+                                    <img src={c.url} className="w-full h-full object-cover" />
+                                    <button onClick={() => removeAdFromGroup(p.id, group.id, c.id)} className="absolute top-1 right-1 w-5 h-5 bg-white/90 rounded-full flex items-center justify-center opacity-0 group-hover/item:opacity-100 transition-all text-rose-500 shadow-md">
+                                      <X size={10} />
+                                    </button>
+                                  </div>
+                                ))}
+                                <div className="sticky right-0 flex gap-2 shrink-0 bg-gray-50/0 pl-2 z-[1]">
+                                  <button onClick={() => { setModalContext(p.id); setModalGroupId(group.id); setActiveModal('creative_lib'); }} className="w-14 h-20 rounded-lg border-2 border-dashed border-gray-100 flex flex-col items-center justify-center text-gray-300 hover:border-primary-500 hover:text-primary-500/70 hover:bg-primary-50 transition-all gap-1" title="从素材库选择">
+                                    <Database size={16} />
+                                    <span className="text-xs font-medium">库</span>
+                                  </button>
+                                  <button onClick={() => handleAIGCForGroup(p.id, group.id)} className="w-14 h-20 rounded-lg border-2 border-dashed border-purple-100 flex flex-col items-center justify-center text-purple-400 hover:border-purple-400 hover:bg-purple-50 transition-all gap-1" title="AI 生成">
+                                    <Sparkles size={16} />
+                                    <span className="text-xs font-medium">AI</span>
+                                  </button>
+                                  <button onClick={() => handleUploadForGroup(p.id, group.id)} className="w-14 h-20 rounded-lg border-2 border-dashed border-gray-100 flex flex-col items-center justify-center text-gray-300 hover:border-gray-400 hover:bg-gray-50 transition-all gap-1" title="本地上传">
+                                    <Upload size={16} />
+                                    <span className="text-xs font-medium">传</span>
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                        <div className="flex justify-end">
+                          <button
+                            onClick={() => onAddGroup(p.id)}
+                            className="flex items-center gap-2 px-4 py-2 text-xs font-medium text-primary-500 hover:bg-primary-50 rounded-base transition-colors"
+                          >
+                            <Plus size={14} /> 添加素材组
+                          </button>
+                        </div>
                       </div>
                     </div>
                     {isAnalyzing && isExpanded && !p.isFromHistory && (
@@ -1332,12 +1593,13 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
         </section>
       )}
       {activeModal && activeModal !== 'batch_match' && activeModal !== 'batch_aigc' && activeModal !== 'select_account' && (
-        <SelectionModal 
-          type={activeModal} onClose={() => setActiveModal(null)} 
-          authStatus={authStatus} anyConnected={anyConnected} isAddModalOpen={isAddModalOpen} 
+        <SelectionModal
+          type={activeModal} onClose={() => { setActiveModal(null); setModalGroupId(null); }}
+          authStatus={authStatus} anyConnected={anyConnected} isAddModalOpen={isAddModalOpen}
           handleAuthorize={handleAuthorize} isAuthLoading={isAuthLoading} setIsAddModalOpen={setIsAddModalOpen}
           selectedProducts={selectedProducts} onSelectProducts={onSelectProducts}
           onUpdateCreatives={onUpdateCreatives} productCreatives={productCreatives} modalContext={modalContext}
+          modalGroupId={modalGroupId} onAddAdsToGroup={addAdsToGroup}
         />
       )}
       {activeModal === 'batch_match' && (
@@ -1427,8 +1689,8 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 bg-primary-500 rounded-base flex items-center justify-center text-white shadow-lg"><Briefcase size={24} /></div>
                 <div>
-                  <h4 className="text-xl font-semibold text-gray-900">选择 Meta 广告账户</h4>
-                  <p className="text-gray-400 text-xs font-bold mt-1">关联目录并同步商品数据</p>
+                  <h4 className="text-xl font-semibold text-gray-900">选择 {platform?.name || 'Meta'} 广告账户</h4>
+                  <p className="text-gray-400 text-xs font-bold mt-1">关联广告账户并同步投放权限</p>
                 </div>
               </div>
               <button onClick={() => setActiveModal(null)} className="p-2 hover:bg-gray-50 rounded-full text-gray-300"><X size={24} /></button>
@@ -1440,7 +1702,7 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreatives,
                   <p className="text-xs font-medium text-gray-400 animate-pulse">Loading accounts...</p>
                 </div>
               ) : (
-                MOCK_ACCOUNTS.map(acc => (
+                (availableAccounts.length > 0 ? availableAccounts : MOCK_ACCOUNTS).map(acc => (
                   <button key={acc.id} onClick={() => { onSelectAccount(acc); setActiveModal(null); }} className={`w-full p-6 rounded-full border-2 flex items-center justify-between transition-all ${selectedAccount?.id === acc.id ? 'border-primary-500 bg-primary-50 shadow-lg shadow-primary-500/10' : 'border-gray-100 bg-white hover:border-gray-200'}`}>
                     <div className="flex items-center gap-4 text-left">
                       <div className={`p-2 rounded-lg ${selectedAccount?.id === acc.id ? 'bg-primary-500 text-white' : 'bg-gray-50 text-gray-400'}`}><Briefcase size={16} /></div>

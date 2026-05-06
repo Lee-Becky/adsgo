@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
-import { Users, Info, Sparkles, DollarSign, ChevronDown, Briefcase, Target, Layers, Lock, Edit3, Check, LayoutGrid, Facebook, Search, X, Loader2, Send, ChevronUp, MessageSquare, RefreshCw, Plus, Link } from 'lucide-react';
+import { Users, Info, Sparkles, DollarSign, ChevronDown, Briefcase, Target, Layers, Lock, Edit3, Check, LayoutGrid, Facebook, Search, X, Loader2, Send, ChevronUp, MessageSquare, RefreshCw, Plus, Link, Copy, Trash2, Globe, MapPin, ChevronLeft, ArrowRight, CheckCircle2, MousePointerClick } from 'lucide-react';
 import { Z_INDEX } from '../../../constants/zIndex';
 import useDropdownLoading from '../../../hooks/useDropdownLoading';
 
@@ -631,6 +631,448 @@ const CreativePickerModal = ({ adsetIndex, adsetName, allAds, currentSelection, 
   );
 };
 
+// ── Right-side detail panels ─────────────────────────────────────────────────
+
+const CampaignDetailPanel = ({ campaignIdx, config, onChange, onSelectExistingCampaign, selectedCampaign, isExistingCampaign, targetingMeta = {} }) => {
+  const { ALL_COUNTRIES = [], ALL_LANGUAGES = [], CAMPAIGN_OBJECTIVES = [], ADSET_GOALS_MAPPING = {}, STANDARD_EVENTS = [] } = targetingMeta;
+  const [openDD, setOpenDD] = useState(null);   // 'loc' | 'lang' | 'obj' | null
+  const [objStage, setObjStage] = useState('objective');
+  const [locSearch, setLocSearch] = useState('');
+  const [langSearch, setLangSearch] = useState('');
+  const [eventSearch, setEventSearch] = useState('');
+
+  const ddRef = useRef(null);
+  useEffect(() => {
+    const handler = (e) => { if (ddRef.current && !ddRef.current.contains(e.target)) setOpenDD(null); };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  const toggleLoc = (c) => {
+    const arr = config.selectedLocations || [];
+    const exists = arr.some(l => l.code === c.code);
+    onChange({ selectedLocations: exists ? arr.filter(l => l.code !== c.code) : [...arr, c] });
+  };
+
+  const filteredCountries = ALL_COUNTRIES.filter(c => c.name.toLowerCase().includes(locSearch.toLowerCase()) || c.code.toLowerCase().includes(locSearch.toLowerCase()));
+  const filteredLanguages = ALL_LANGUAGES.filter(l => l.name.toLowerCase().includes(langSearch.toLowerCase()) || l.code.toLowerCase().includes(langSearch.toLowerCase()));
+  const availableGoals = ADSET_GOALS_MAPPING[config.objective] || [];
+  const currentGoalObj = availableGoals.find(g => g.value === config.adsetGoal);
+  const currentObjectiveObj = CAMPAIGN_OBJECTIVES.find(o => o.value === config.objective);
+  const filteredEvents = STANDARD_EVENTS.filter(ev => ev.toLowerCase().includes(eventSearch.toLowerCase()));
+
+  return (
+    <div className="space-y-5">
+      <div className="flex items-baseline gap-2">
+        <span className="text-xs font-bold text-primary-500/60 tabular-nums">C{campaignIdx + 1}</span>
+        <h4 className="text-sm font-semibold text-gray-900 tracking-tight">Campaign {campaignIdx + 1} 配置</h4>
+      </div>
+
+      {/* Locations (multi) — editable */}
+      <div className="space-y-2 relative" ref={openDD === 'loc' ? ddRef : null}>
+        <label className="text-xs font-medium text-gray-500 px-1">投放国家/地区</label>
+        <div onClick={() => setOpenDD(openDD === 'loc' ? null : 'loc')}
+          className="bg-white rounded-inner p-3 border border-gray-100 shadow-sm flex items-center justify-between gap-2 cursor-pointer hover:border-primary-500/30 transition-all">
+          <div className="flex items-center gap-2 min-w-0 flex-1">
+            <MapPin size={14} className="text-primary-500 shrink-0" />
+            {(config.selectedLocations || []).length > 0
+              ? <span className="text-sm font-semibold text-gray-700 truncate">{config.selectedLocations[0].name}{config.selectedLocations.length > 1 && ` +${config.selectedLocations.length - 1}`}</span>
+              : <span className="text-sm font-semibold text-gray-300">待选择...</span>}
+          </div>
+          <ChevronDown size={12} className={`text-gray-300 shrink-0 transition-transform ${openDD === 'loc' ? 'rotate-180' : ''}`} />
+        </div>
+        {openDD === 'loc' && (
+          <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-base shadow-xl border border-gray-100 overflow-hidden z-30 animate-in fade-in zoom-in-95 duration-150">
+            <div className="p-2 border-b border-gray-50">
+              <div className="relative">
+                <Search size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-300" />
+                <input value={locSearch} onChange={e => setLocSearch(e.target.value)} placeholder="搜索国家..." className="w-full pl-7 pr-2 py-1.5 bg-gray-50 border-none rounded-base text-xs font-medium text-gray-900 focus:ring-2 focus:ring-primary-500/10" />
+              </div>
+            </div>
+            <div className="max-h-[200px] overflow-y-auto custom-scrollbar p-1">
+              {filteredCountries.map(c => {
+                const checked = (config.selectedLocations || []).some(l => l.code === c.code);
+                return (
+                  <button key={c.code} onClick={() => toggleLoc(c)} className={`w-full flex items-center justify-between px-2 py-1.5 rounded-base text-xs font-medium transition-all ${checked ? 'bg-primary-50 text-primary-500' : 'text-gray-600 hover:bg-gray-50'}`}>
+                    {c.name}
+                    {checked && <Check size={11} />}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Language — editable */}
+      <div className="space-y-2 relative" ref={openDD === 'lang' ? ddRef : null}>
+        <label className="text-xs font-medium text-gray-500 px-1">Language</label>
+        <div onClick={() => setOpenDD(openDD === 'lang' ? null : 'lang')}
+          className="bg-white rounded-inner p-3 border border-gray-100 shadow-sm flex items-center justify-between gap-2 cursor-pointer hover:border-primary-500/30 transition-all">
+          <div className="flex items-center gap-2 min-w-0 flex-1">
+            <Globe size={14} className="text-primary-500 shrink-0" />
+            <span className={`text-sm font-semibold truncate ${config.selectedLanguage ? 'text-gray-700' : 'text-gray-300'}`}>{config.selectedLanguage?.name || 'Auto...'}</span>
+          </div>
+          <ChevronDown size={12} className={`text-gray-300 shrink-0 transition-transform ${openDD === 'lang' ? 'rotate-180' : ''}`} />
+        </div>
+        {openDD === 'lang' && (
+          <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-base shadow-xl border border-gray-100 overflow-hidden z-30 animate-in fade-in zoom-in-95 duration-150">
+            <div className="p-2 border-b border-gray-50">
+              <input value={langSearch} onChange={e => setLangSearch(e.target.value)} placeholder="搜索语言..." className="w-full px-2 py-1.5 bg-gray-50 border-none rounded-base text-xs font-medium text-gray-900 focus:ring-2 focus:ring-primary-500/10" />
+            </div>
+            <div className="max-h-[200px] overflow-y-auto custom-scrollbar p-1">
+              {filteredLanguages.map(l => (
+                <button key={l.code} onClick={() => { onChange({ selectedLanguage: l }); setOpenDD(null); }}
+                  className={`w-full flex items-center justify-between px-2 py-1.5 rounded-base text-xs font-medium transition-all ${config.selectedLanguage?.code === l.code ? 'bg-primary-50 text-primary-500' : 'text-gray-600 hover:bg-gray-50'}`}>
+                  {l.name}
+                  {config.selectedLanguage?.code === l.code && <Check size={11} />}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Promote Objective — 3-stage cascade */}
+      <div className="space-y-2 relative" ref={openDD === 'obj' ? ddRef : null}>
+        <label className="text-xs font-medium text-gray-500 px-1">Promote Objective</label>
+        <div onClick={() => { setOpenDD(openDD === 'obj' ? null : 'obj'); setObjStage('objective'); }}
+          className="bg-white rounded-inner p-3 border border-gray-100 shadow-sm flex items-center justify-between gap-2 cursor-pointer hover:border-primary-500/30 transition-all">
+          <div className="flex items-center gap-2 min-w-0 flex-1">
+            <Target size={14} className="text-primary-500 shrink-0" />
+            <span className={`text-sm font-semibold truncate ${config.objective ? 'text-gray-700' : 'text-gray-300'}`}>
+              {config.event || currentGoalObj?.label || currentObjectiveObj?.label || 'Select...'}
+            </span>
+          </div>
+          <ChevronDown size={12} className={`text-gray-300 shrink-0 transition-transform ${openDD === 'obj' ? 'rotate-180' : ''}`} />
+        </div>
+        {openDD === 'obj' && (
+          <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-base shadow-xl border border-gray-100 p-2 z-30 animate-in fade-in zoom-in-95 duration-150">
+            {objStage === 'objective' && (
+              <div className="space-y-1">
+                <p className="text-[9px] font-bold text-gray-400 tracking-widest mb-1 px-1">1. Campaign Objective</p>
+                {CAMPAIGN_OBJECTIVES.map(obj => {
+                  const Icon = obj.icon;
+                  return (
+                    <button key={obj.value} onClick={() => {
+                      const firstGoal = (ADSET_GOALS_MAPPING[obj.value] || [])[0];
+                      onChange({ objective: obj.value, adsetGoal: firstGoal?.value || '', event: firstGoal?.needsEvent ? 'Purchase' : '' });
+                      setObjStage('goal');
+                    }} className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-base text-xs font-medium transition-all ${config.objective === obj.value ? 'bg-gray-900 text-white' : 'hover:bg-gray-50 text-gray-600'}`}>
+                      <div className={`w-5 h-5 rounded-base flex items-center justify-center ${config.objective === obj.value ? 'bg-primary-500 text-white' : `${obj.bg} ${obj.color}`}`}>
+                        {Icon && <Icon size={12} />}
+                      </div>
+                      <span className="truncate">{obj.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+            {objStage === 'goal' && (
+              <div className="space-y-1">
+                <button onClick={() => setObjStage('objective')} className="flex items-center gap-1 px-1 py-1 text-[9px] font-bold text-gray-400 tracking-widest hover:text-gray-600">
+                  <ChevronLeft size={10} /> 2. Conversion Goal
+                </button>
+                {availableGoals.map(g => (
+                  <button key={g.value} onClick={() => {
+                    onChange({ adsetGoal: g.value, event: g.needsEvent ? (config.event || 'Purchase') : '' });
+                    if (g.needsEvent) setObjStage('event'); else setOpenDD(null);
+                  }} className={`w-full flex items-center justify-between px-2 py-1.5 rounded-base text-xs font-medium transition-all ${config.adsetGoal === g.value ? 'bg-gray-900 text-white' : 'hover:bg-gray-50 text-gray-600'}`}>
+                    <span className="truncate">{g.label}</span>
+                    {g.needsEvent ? <ArrowRight size={10} className="opacity-30" /> : (config.adsetGoal === g.value && <CheckCircle2 size={11} />)}
+                  </button>
+                ))}
+              </div>
+            )}
+            {objStage === 'event' && (
+              <div className="space-y-1">
+                <button onClick={() => setObjStage('goal')} className="flex items-center gap-1 px-1 py-1 text-[9px] font-bold text-gray-400 tracking-widest hover:text-gray-600">
+                  <ChevronLeft size={10} /> 3. Pixel Event
+                </button>
+                <input value={eventSearch} onChange={e => setEventSearch(e.target.value)} placeholder="搜索 event..." className="w-full px-2 py-1 bg-gray-50 rounded-base text-xs font-medium text-gray-900 focus:ring-2 focus:ring-primary-500/20 mb-1" />
+                <div className="max-h-[180px] overflow-y-auto custom-scrollbar">
+                  {filteredEvents.map(ev => (
+                    <button key={ev} onClick={() => { onChange({ event: ev }); setOpenDD(null); }}
+                      className={`w-full flex items-center justify-between px-2 py-1.5 rounded-base text-xs font-medium transition-all ${config.event === ev ? 'bg-primary-500 text-white' : 'hover:bg-gray-50 text-gray-600'}`}>
+                      <span>{ev}</span>
+                      {config.event === ev && <CheckCircle2 size={11} />}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Campaign select (新建 / 选已有) — 紧跟 Promote Objective 之后 */}
+      <div className="space-y-2">
+        <div className="flex items-center justify-between px-1">
+          <label className="text-xs font-medium text-gray-500">目标投放系列</label>
+          <button onClick={onSelectExistingCampaign} className="flex items-center gap-1 text-primary-500 hover:text-primary-600 transition-colors">
+            <Edit3 size={11} />
+            <span className="text-[11px] font-medium">选已有</span>
+          </button>
+        </div>
+        <div className={`flex items-center gap-3 p-3 rounded-inner border-2 transition-all ${isExistingCampaign ? 'bg-primary-50 border-primary-500/20' : 'bg-gray-50 border-gray-100'}`}>
+          <div className={`w-8 h-8 rounded-base flex items-center justify-center ${isExistingCampaign ? 'bg-primary-500 text-white' : 'bg-white text-gray-400 shadow-adsgo-card'}`}>
+            <Briefcase size={14} />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-xs font-semibold text-gray-900 truncate">{selectedCampaign?.name || '创建全新系列'}</p>
+            {isExistingCampaign && <p className="text-[10px] text-primary-500/70 font-medium truncate">{selectedCampaign.id}</p>}
+          </div>
+        </div>
+      </div>
+
+      {/* Daily Budget — 标题右侧并列 CBO/ABO toggle */}
+      <div className="space-y-2">
+        <div className="flex items-center justify-between px-1">
+          <label className="text-xs font-medium text-gray-500">每日预算</label>
+          <div className="flex p-0.5 bg-gray-100/80 rounded-base border border-gray-100">
+            <button
+              onClick={() => onChange({ budgetType: 'CBO' })}
+              className={`px-2.5 py-0.5 rounded-base text-[10px] font-medium transition-all ${config.budgetType === 'CBO' ? 'bg-white text-primary-500 shadow-adsgo-card' : 'text-gray-500'}`}
+            >CBO</button>
+            <button
+              onClick={() => onChange({ budgetType: 'ABO' })}
+              className={`px-2.5 py-0.5 rounded-base text-[10px] font-medium transition-all ${config.budgetType === 'ABO' ? 'bg-white text-primary-500 shadow-adsgo-card' : 'text-gray-500'}`}
+            >ABO</button>
+          </div>
+        </div>
+        <div className="bg-gray-50/80 border border-gray-100 rounded-inner p-3 flex items-center gap-2">
+          <DollarSign size={14} className="text-gray-300 shrink-0" />
+          <input
+            type="number"
+            min={0}
+            value={config.dailyBudget ?? ''}
+            onChange={(e) => onChange({ dailyBudget: Number(e.target.value) })}
+            className="flex-1 min-w-0 bg-transparent border-none outline-none text-base font-bold tabular-nums text-gray-700"
+          />
+          <span className="text-[10px] font-medium text-gray-400 whitespace-nowrap">USD/day</span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const AdsetDetailPanel = ({
+  campaignIdx, adsetIdx, audienceType, onSetAudienceType,
+  details = {}, onSaveDetails,
+  authStatus, handleAuthorize, selectedAccount, onSelectAccount,
+  lalLoading, customAudienceLoading, savedAudienceLoading,
+  selectedProducts,
+}) => {
+  const [showLal, setShowLal] = useState(false);
+  const [showCustom, setShowCustom] = useState(false);
+  const [showSaved, setShowSaved] = useState(false);
+  const [isMetaConnecting, setIsMetaConnecting] = useState(false);
+
+  const connectMeta = (closeFn) => {
+    setIsMetaConnecting(true);
+    setTimeout(() => {
+      setIsMetaConnecting(false);
+      handleAuthorize?.('meta');
+      closeFn?.();
+    }, 1500);
+  };
+
+  return (
+    <div className="space-y-5">
+      <div className="flex items-baseline gap-2">
+        <span className="text-xs font-bold text-primary-500/60 tabular-nums">A{campaignIdx + 1}.{adsetIdx + 1}</span>
+        <h4 className="text-sm font-semibold text-gray-900 tracking-tight">Adset {campaignIdx + 1}.{adsetIdx + 1} 配置</h4>
+      </div>
+
+      {/* 受众类型 segment — 精确选择 */}
+      <div className="space-y-2">
+        <label className="text-xs font-medium text-gray-500 px-1">受众类型</label>
+        <div className="grid grid-cols-3 gap-2">
+          {[
+            { id: 'ADV', label: 'Advantage+', cls: 'bg-primary-50 border-primary-500 text-primary-600' },
+            { id: 'LAL', label: 'Lookalike',  cls: 'bg-purple-50 border-purple-500 text-purple-600' },
+            { id: 'INT', label: 'Interest',   cls: 'bg-amber-50 border-amber-500 text-amber-600' },
+          ].map(opt => {
+            const active = audienceType === opt.id;
+            return (
+              <button key={opt.id}
+                onClick={() => { if (!active) onSetAudienceType(opt.id); }}
+                className={`p-2 rounded-base border-2 text-xs font-semibold transition-all ${active ? opt.cls : 'bg-white border-gray-100 text-gray-500 hover:border-gray-200'}`}>
+                {opt.label}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* ADV — 不需配置 */}
+      {audienceType === 'ADV' && (
+        <p className="text-xs text-gray-400 font-medium leading-relaxed px-1">
+          Advantage+ 自动扩展，无需额外配置。
+        </p>
+      )}
+
+      {/* LAL — 三段下拉 */}
+      {audienceType === 'LAL' && (
+        <div className="space-y-3 animate-in fade-in slide-in-from-top-2 duration-150">
+          {/* Lookalike Audience */}
+          <div className="space-y-1.5 relative">
+            <p className="text-xs font-semibold text-purple-500 px-1">Lookalike Audience</p>
+            <div onClick={() => setShowLal(!showLal)} className="w-full p-3 bg-white border-2 border-purple-100 rounded-base flex items-center justify-between cursor-pointer hover:border-purple-300 transition-all min-h-[44px]">
+              <div className="flex flex-wrap gap-1 overflow-hidden">
+                {(details.lalOptions || []).length === 0
+                  ? <span className="text-xs font-bold text-gray-300">选择...</span>
+                  : (details.lalOptions || []).map(opt => <span key={opt} className="px-1.5 py-0.5 bg-purple-50 text-purple-600 rounded text-[10px] font-medium border border-purple-100">{opt.split(' ')[1] || opt}</span>)
+                }
+              </div>
+              <ChevronDown size={12} className={`text-purple-300 shrink-0 transition-transform ${showLal ? 'rotate-180' : ''}`} />
+            </div>
+            {showLal && (
+              <>
+                <div className="fixed inset-0 z-[190]" onClick={() => setShowLal(false)} />
+                <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-purple-100 rounded-section shadow-xl overflow-hidden animate-in zoom-in-95 duration-150 z-[200]">
+                  {!authStatus?.meta ? (
+                    <div className="p-4">
+                      <button onClick={() => connectMeta(() => setShowLal(false))} disabled={isMetaConnecting} className="w-full py-3 bg-primary-500 text-white rounded-base text-xs font-medium hover:bg-primary-600 transition-all flex items-center justify-center gap-2 disabled:opacity-70">
+                        {isMetaConnecting ? <><Loader2 size={12} className="animate-spin" />Connecting...</> : <><Facebook size={12} />立即连接 Meta</>}
+                      </button>
+                    </div>
+                  ) : !selectedAccount ? (
+                    <div className="p-4">
+                      <button onClick={() => { onSelectAccount?.(); setShowLal(false); }} className="w-full py-3 bg-primary-500 text-white rounded-base text-xs font-medium hover:bg-primary-600 transition-all flex items-center justify-center gap-2">
+                        <Briefcase size={12} />选择广告账户
+                      </button>
+                    </div>
+                  ) : lalLoading?.isLoading ? (
+                    <div className="p-5 flex flex-col items-center gap-2"><Loader2 size={18} className="animate-spin text-purple-500/70" /><p className="text-xs text-gray-400 animate-pulse">Loading...</p></div>
+                  ) : (
+                    ['US Purchase 1%', 'US add to cart 5%', 'US register last30days 1%~3%'].map(opt => {
+                      const cur = details.lalOptions || [];
+                      const isSel = cur.includes(opt);
+                      return (
+                        <div key={opt} onClick={() => { const next = isSel ? cur.filter(o => o !== opt) : [...cur, opt]; onSaveDetails({ lalOptions: next }); }} className="flex items-center justify-between px-4 py-2.5 hover:bg-purple-50 cursor-pointer transition-colors">
+                          <span className={`text-xs font-medium ${isSel ? 'text-purple-700' : 'text-gray-700'}`}>{opt}</span>
+                          {isSel && <Check size={12} className="text-purple-600" />}
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+              </>
+            )}
+          </div>
+
+          {/* Custom Audience */}
+          <div className="space-y-1.5 relative">
+            <p className="text-xs font-semibold text-purple-500 px-1">Custom Audience</p>
+            <div onClick={() => setShowCustom(!showCustom)} className="w-full p-3 bg-white border-2 border-purple-100 rounded-base flex items-center justify-between cursor-pointer hover:border-purple-300 transition-all min-h-[44px]">
+              <div className="flex flex-wrap gap-1 overflow-hidden">
+                {(details.customAudienceOptions || []).length === 0
+                  ? <span className="text-xs font-bold text-gray-300">选择...</span>
+                  : (details.customAudienceOptions || []).map(opt => <span key={opt} className="px-1.5 py-0.5 bg-purple-50 text-purple-600 rounded text-[10px] font-medium border border-purple-100">{opt}</span>)
+                }
+              </div>
+              <ChevronDown size={12} className={`text-purple-300 shrink-0 transition-transform ${showCustom ? 'rotate-180' : ''}`} />
+            </div>
+            {showCustom && (
+              <>
+                <div className="fixed inset-0 z-[190]" onClick={() => setShowCustom(false)} />
+                <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-purple-100 rounded-section shadow-xl overflow-hidden animate-in zoom-in-95 duration-150 z-[200]">
+                  {!authStatus?.meta ? (
+                    <div className="p-4">
+                      <button onClick={() => connectMeta(() => setShowCustom(false))} disabled={isMetaConnecting} className="w-full py-3 bg-primary-500 text-white rounded-base text-xs font-medium hover:bg-primary-600 transition-all flex items-center justify-center gap-2 disabled:opacity-70">
+                        {isMetaConnecting ? <><Loader2 size={12} className="animate-spin" />Connecting...</> : <><Facebook size={12} />立即连接 Meta</>}
+                      </button>
+                    </div>
+                  ) : !selectedAccount ? (
+                    <div className="p-4">
+                      <button onClick={() => { onSelectAccount?.(); setShowCustom(false); }} className="w-full py-3 bg-primary-500 text-white rounded-base text-xs font-medium hover:bg-primary-600 transition-all flex items-center justify-center gap-2">
+                        <Briefcase size={12} />选择广告账户
+                      </button>
+                    </div>
+                  ) : customAudienceLoading?.isLoading ? (
+                    <div className="p-5 flex flex-col items-center gap-2"><Loader2 size={18} className="animate-spin text-purple-500/70" /><p className="text-xs text-gray-400 animate-pulse">Loading...</p></div>
+                  ) : (
+                    MOCK_CUSTOM_AUDIENCES.map(opt => {
+                      const cur = details.customAudienceOptions || [];
+                      const isSel = cur.includes(opt);
+                      return (
+                        <div key={opt} onClick={() => { const next = isSel ? cur.filter(o => o !== opt) : [...cur, opt]; onSaveDetails({ customAudienceOptions: next }); }} className="flex items-center justify-between px-4 py-2.5 hover:bg-purple-50 cursor-pointer transition-colors">
+                          <span className={`text-xs font-medium ${isSel ? 'text-purple-700' : 'text-gray-700'}`}>{opt}</span>
+                          {isSel && <Check size={12} className="text-purple-600" />}
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+              </>
+            )}
+          </div>
+
+          {/* Saved Audience */}
+          <div className="space-y-1.5 relative">
+            <p className="text-xs font-semibold text-purple-500 px-1">Saved Audience</p>
+            <div onClick={() => setShowSaved(!showSaved)} className="w-full p-3 bg-white border-2 border-purple-100 rounded-base flex items-center justify-between cursor-pointer hover:border-purple-300 transition-all min-h-[44px]">
+              <span className={`text-[10px] font-bold truncate ${details.savedAudience ? 'text-purple-700' : 'text-gray-300'}`}>
+                {details.savedAudience ? details.savedAudience.name : '选择...'}
+              </span>
+              <ChevronDown size={12} className={`text-purple-300 shrink-0 transition-transform ${showSaved ? 'rotate-180' : ''}`} />
+            </div>
+            {showSaved && (
+              <>
+                <div className="fixed inset-0 z-[190]" onClick={() => setShowSaved(false)} />
+                <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-purple-100 rounded-section shadow-xl overflow-hidden animate-in zoom-in-95 duration-150 z-[200]">
+                  {!authStatus?.meta ? (
+                    <div className="p-4">
+                      <button onClick={() => connectMeta(() => setShowSaved(false))} disabled={isMetaConnecting} className="w-full py-3 bg-primary-500 text-white rounded-base text-xs font-medium hover:bg-primary-600 transition-all flex items-center justify-center gap-2 disabled:opacity-70">
+                        {isMetaConnecting ? <><Loader2 size={12} className="animate-spin" />Connecting...</> : <><Facebook size={12} />立即连接 Meta</>}
+                      </button>
+                    </div>
+                  ) : !selectedAccount ? (
+                    <div className="p-4">
+                      <button onClick={() => { onSelectAccount?.(); setShowSaved(false); }} className="w-full py-3 bg-primary-500 text-white rounded-base text-xs font-medium hover:bg-primary-600 transition-all flex items-center justify-center gap-2">
+                        <Briefcase size={12} />选择广告账户
+                      </button>
+                    </div>
+                  ) : savedAudienceLoading?.isLoading ? (
+                    <div className="p-5 flex flex-col items-center gap-2"><Loader2 size={18} className="animate-spin text-purple-500/70" /><p className="text-xs text-gray-400 animate-pulse">Loading...</p></div>
+                  ) : (
+                    MOCK_SAVED_AUDIENCES.map(sa => {
+                      const isSel = details.savedAudience?.id === sa.id;
+                      return (
+                        <div key={sa.id} onClick={() => { onSaveDetails({ savedAudience: isSel ? null : sa }); setShowSaved(false); }} className="flex items-start justify-between px-4 py-2.5 hover:bg-purple-50 cursor-pointer transition-colors">
+                          <div>
+                            <p className={`text-xs font-medium ${isSel ? 'text-purple-700' : 'text-gray-700'}`}>{sa.name}</p>
+                            <p className="text-[10px] text-gray-400 mt-0.5">{sa.gender} · {sa.ageMin}–{sa.ageMax}</p>
+                          </div>
+                          {isSel && <Check size={12} className="text-purple-600 shrink-0 mt-0.5" />}
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* INT — Interest selector */}
+      {audienceType === 'INT' && (
+        <div className="animate-in fade-in slide-in-from-top-2 duration-150">
+          <IntInterestSelector
+            intOptions={details.intOptions || []}
+            onIntOptionsChange={(next) => onSaveDetails({ intOptions: next })}
+            productAnalyses={null}
+            allAnalysesComplete={false}
+            selectedProducts={selectedProducts}
+          />
+        </div>
+      )}
+    </div>
+  );
+};
+
 const CampaignPlanView = ({
   structure,
   onStructureChange,
@@ -641,6 +1083,7 @@ const CampaignPlanView = ({
   onBudgetChange,
   adsetAudiences,
   onToggleAudience,
+  onSetAudienceType,
   adsetAudienceDetails = {},
   onSaveAdsetAudienceDetails,
   adType = 'SINGLE',
@@ -648,6 +1091,9 @@ const CampaignPlanView = ({
   objective = '',
   selectedProducts,
   productCreativesMap,
+  productCreativeGroups = {},
+  sectionDefaults = {},
+  targetingMeta = {},
   isExistingCampaign,
   selectedCampaign,
   onSelectCampaign,
@@ -675,17 +1121,53 @@ const CampaignPlanView = ({
   useEffect(() => { if (showCustomAudienceDropdown && selectedAccount) customAudienceLoading.triggerLoad(); }, [showCustomAudienceDropdown]);
   useEffect(() => { if (showSavedAudienceDropdown  && selectedAccount) savedAudienceLoading.triggerLoad();  }, [showSavedAudienceDropdown]);
   const [showNumAdsetsDropdown, setShowNumAdsetsDropdown] = useState(false);
-  const [showStrategyDropdown, setShowStrategyDropdown] = useState(false);
-  const [structureOpen, setStructureOpen] = useState(false);
   const [focusedAdsetIdx, setFocusedAdsetIdx] = useState(0);
-  const [aiStrategyApplied, setAiStrategyApplied] = useState(false);
 
-  // Reset aiStrategyApplied when switching away from AI_STRATEGY
+  // ── New state: multi-campaign tree + per-adset ad list + selected node + per-campaign config ──
+  const [adsetAds, setAdsetAds] = useState({});
+  // shape: { [`${campaignIdx}::${adsetIdx}`]: [{ id, productId, groupId, groupName, creatives: [...] }] }
+  const [hoveredAdsetKey, setHoveredAdsetKey] = useState(null);
+  const [selectedNode, setSelectedNode] = useState({ type: 'campaign', campaignIdx: 0 });
+  const [campaignConfigs, setCampaignConfigs] = useState({});
+  // shape: { [campaignIdx]: { selectedLocations, selectedLanguage, objective, adsetGoal, event, dailyBudget, selectedCampaignId, budgetType } }
+  const [campaignDropdown, setCampaignDropdown] = useState(null); // 'location' | 'language' | 'objective' | null
+  const [campaignObjectiveStage, setCampaignObjectiveStage] = useState('objective');
+
+  // Initialise / extend campaignConfigs when numCampaigns changes — copy section defaults the first time each idx appears.
   useEffect(() => {
-    if (structure.strategy !== 'AI_STRATEGY') {
-      setAiStrategyApplied(false);
-    }
-  }, [structure.strategy]);
+    setCampaignConfigs(prev => {
+      const next = { ...prev };
+      let changed = false;
+      const N = Math.max(structure.numCampaigns || 1, 1);
+      for (let i = 0; i < N; i++) {
+        if (!next[i]) {
+          next[i] = {
+            selectedLocations: [...(sectionDefaults.selectedLocations || [])],
+            selectedLanguage: sectionDefaults.selectedLanguage || null,
+            objective: sectionDefaults.objective || '',
+            adsetGoal: sectionDefaults.adsetGoal || '',
+            event: sectionDefaults.event || '',
+            dailyBudget: sectionDefaults.dailyBudget ?? 50,
+            selectedCampaignId: null,
+            budgetType: 'CBO',
+          };
+          changed = true;
+        }
+      }
+      // Drop indices >= N
+      Object.keys(next).forEach(k => {
+        if (Number(k) >= N) { delete next[k]; changed = true; }
+      });
+      return changed ? next : prev;
+    });
+  }, [structure.numCampaigns]);
+
+  const updateCampaignConfig = (campaignIdx, patch) => {
+    setCampaignConfigs(prev => ({
+      ...prev,
+      [campaignIdx]: { ...(prev[campaignIdx] || {}), ...patch },
+    }));
+  };
 
   const getAdSetGroups = () => {
     let groups = [];
@@ -754,6 +1236,188 @@ const CampaignPlanView = ({
     ? dailyBudget * adSetGroups.length
     : dailyBudget;
 
+  // ── New: build N-Campaign tree — adset 数量统一由 structure.numAdsets 控制（与上方 stepper 同源）──
+  const numCampaigns = Math.max(structure.numCampaigns || 1, 1);
+  const totalAdsetsPerCampaign = Math.max(structure.numAdsets || adSetGroups.length || 1, 1);
+  const campaignTrees = Array.from({ length: numCampaigns }, (_, cIdx) => {
+    const adsets = Array.from({ length: totalAdsetsPerCampaign }, (_, aIdx) => {
+      // 复用 strategy 派生的 adset；超出范围用占位（混合组）
+      const base = adSetGroups[aIdx] || { name: `混合组 ${aIdx + 1}`, ads: selectedProducts.flatMap(p => productCreativesMap[p.id] || []) };
+      return { ...base, campaignIdx: cIdx, adsetIdx: aIdx, key: `${cIdx}::${aIdx}` };
+    });
+    return { campaignIdx: cIdx, adsets };
+  });
+  const numAdsPerAdset = Math.max(structure.numAdsPerAdset || 1, 1);
+
+  // Drop a creative group onto an adset → 按 adType 拆分成 N 个 ad，prepend 到该 adset 的 ads 列表（左侧靠近 drop zone）
+  const handleDropGroupToAdset = (campaignIdx, adsetIdx, payload) => {
+    if (!payload?.productId || !payload?.groupId) return;
+    const groups = productCreativeGroups?.[payload.productId] || [];
+    const group = groups.find(g => g.id === payload.groupId);
+    if (!group) return;
+    const creatives = group.ads || [];
+    if (creatives.length === 0) return;
+    const baseId = `${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+    const newAds = adType === 'FLEXIBLE'
+      ? [{ id: `ad-${baseId}`, productId: payload.productId, groupId: payload.groupId, groupName: group.name, creatives }]
+      : creatives.map((c, i) => ({ id: `ad-${baseId}-${i}-${c.id}`, productId: payload.productId, groupId: payload.groupId, groupName: group.name, creatives: [c] }));
+    setAdsetAds(prev => ({
+      ...prev,
+      [`${campaignIdx}::${adsetIdx}`]: [...newAds, ...(prev[`${campaignIdx}::${adsetIdx}`] || [])],
+    }));
+  };
+  const removeAdFromAdset = (campaignIdx, adsetIdx, adId) => {
+    setAdsetAds(prev => ({
+      ...prev,
+      [`${campaignIdx}::${adsetIdx}`]: (prev[`${campaignIdx}::${adsetIdx}`] || []).filter(a => a.id !== adId),
+    }));
+  };
+  const duplicateAdInAdset = (campaignIdx, adsetIdx, adId) => {
+    setAdsetAds(prev => {
+      const list = prev[`${campaignIdx}::${adsetIdx}`] || [];
+      const src = list.find(a => a.id === adId);
+      if (!src) return prev;
+      const clone = { ...src, id: `ad-${Date.now()}-${Math.random().toString(36).slice(2, 6)}-clone`, creatives: [...src.creatives] };
+      const idx = list.findIndex(a => a.id === adId);
+      const nextList = [...list.slice(0, idx + 1), clone, ...list.slice(idx + 1)];
+      return { ...prev, [`${campaignIdx}::${adsetIdx}`]: nextList };
+    });
+  };
+  const getAdsForAdset = (campaignIdx, adsetIdx) => adsetAds[`${campaignIdx}::${adsetIdx}`] || [];
+
+  // ── CRUD handlers — adset 数量统一由 structure.numAdsets 控制 ──
+
+  const addCampaign = () => {
+    onStructureChange({ ...structure, numCampaigns: numCampaigns + 1 });
+  };
+  // 删除任意 idx 的 campaign，后续 idx 整体前移
+  const deleteCampaignAt = (delIdx) => {
+    if (numCampaigns <= 1) return;
+    setAdsetAds(prev => {
+      const next = {};
+      Object.keys(prev).forEach(k => {
+        const [c, a] = k.split('::');
+        const cn = Number(c);
+        if (cn === delIdx) return;
+        const newC = cn > delIdx ? cn - 1 : cn;
+        next[`${newC}::${a}`] = prev[k];
+      });
+      return next;
+    });
+    setCampaignConfigs(prev => {
+      const next = {};
+      Object.keys(prev).forEach(k => {
+        const idx = Number(k);
+        if (idx === delIdx) return;
+        next[idx > delIdx ? idx - 1 : idx] = prev[k];
+      });
+      return next;
+    });
+    if (selectedNode.type === 'campaign') {
+      if (selectedNode.campaignIdx === delIdx) setSelectedNode({ type: 'campaign', campaignIdx: 0 });
+      else if (selectedNode.campaignIdx > delIdx) setSelectedNode(prev => ({ ...prev, campaignIdx: prev.campaignIdx - 1 }));
+    } else if (selectedNode.type === 'adset') {
+      if (selectedNode.campaignIdx === delIdx) setSelectedNode({ type: 'campaign', campaignIdx: 0 });
+      else if (selectedNode.campaignIdx > delIdx) setSelectedNode(prev => ({ ...prev, campaignIdx: prev.campaignIdx - 1 }));
+    }
+    onStructureChange({ ...structure, numCampaigns: numCampaigns - 1 });
+  };
+  const duplicateCampaign = (srcIdx, mode /* 'full' | 'structure' */) => {
+    const newIdx = numCampaigns;
+    const srcCfg = campaignConfigs[srcIdx];
+    if (srcCfg) {
+      setCampaignConfigs(prev => ({
+        ...prev,
+        [newIdx]: {
+          ...srcCfg,
+          selectedLocations: [...(srcCfg.selectedLocations || [])],
+        },
+      }));
+    }
+    if (mode === 'full') {
+      setAdsetAds(prev => {
+        const next = { ...prev };
+        Object.keys(prev).forEach(k => {
+          if (k.startsWith(`${srcIdx}::`)) {
+            const tail = k.slice(`${srcIdx}::`.length);
+            next[`${newIdx}::${tail}`] = (prev[k] || []).map(ad => ({ ...ad, id: `${ad.id}-clone-${newIdx}`, creatives: [...ad.creatives] }));
+          }
+        });
+        return next;
+      });
+    }
+    onStructureChange({ ...structure, numCampaigns: numCampaigns + 1 });
+    setDuplicateMenuFor(null);
+  };
+
+  // 全局 +1 adset（所有 campaign 同步）— 让 stepper 与架构图严格一致
+  const addAdset = () => {
+    const next = totalAdsetsPerCampaign + 1;
+    onStructureChange({ ...structure, numAdsets: next });
+  };
+  // 删除某 campaign 内的指定 adset idx —— numAdsets - 1（同步所有 campaign）+ reindex 该 campaign 内的 ad list
+  const deleteAdsetAt = (cIdx, delAdsetIdx) => {
+    if (totalAdsetsPerCampaign <= 1) return;
+    setAdsetAds(prev => {
+      const next = {};
+      Object.keys(prev).forEach(k => {
+        const [c, a] = k.split('::');
+        const cn = Number(c), an = Number(a);
+        if (cn === cIdx && an === delAdsetIdx) return;
+        if (an >= totalAdsetsPerCampaign - 1 && cn !== cIdx) return;
+        const newA = (cn === cIdx && an > delAdsetIdx) ? an - 1 : an;
+        next[`${cn}::${newA}`] = prev[k];
+      });
+      return next;
+    });
+    if (selectedNode.type === 'adset' && selectedNode.campaignIdx === cIdx) {
+      if (selectedNode.adsetIdx === delAdsetIdx) setSelectedNode({ type: 'campaign', campaignIdx: cIdx });
+      else if (selectedNode.adsetIdx > delAdsetIdx) setSelectedNode(prev => ({ ...prev, adsetIdx: prev.adsetIdx - 1 }));
+    }
+    const next = totalAdsetsPerCampaign - 1;
+    onStructureChange({ ...structure, numAdsets: next });
+  };
+  const duplicateAdset = (cIdx, srcAdsetIdx) => {
+    const newAdsetIdx = totalAdsetsPerCampaign;
+    setAdsetAds(prev => {
+      const srcList = prev[`${cIdx}::${srcAdsetIdx}`] || [];
+      const cloned = srcList.map(ad => ({ ...ad, id: `${ad.id}-clone-${newAdsetIdx}`, creatives: [...ad.creatives] }));
+      return { ...prev, [`${cIdx}::${newAdsetIdx}`]: cloned };
+    });
+    const next = totalAdsetsPerCampaign + 1;
+    onStructureChange({ ...structure, numAdsets: next });
+  };
+  const [duplicateMenuFor, setDuplicateMenuFor] = useState(null);
+
+  // Per-adset audience now keyed by `${campaignIdx}::${adsetIdx}` — fall back to flat array for backward compat.
+  const getAudienceType = (campaignIdx, adsetIdx) => {
+    const flatIdx = campaignIdx * (adSetGroups.length || 1) + adsetIdx;
+    return adsetAudiences[flatIdx] || 'ADV';
+  };
+  const toggleAudienceFor = (campaignIdx, adsetIdx) => {
+    const flatIdx = campaignIdx * (adSetGroups.length || 1) + adsetIdx;
+    onToggleAudience(flatIdx);
+  };
+  const setAudienceTypeFor = (campaignIdx, adsetIdx, type) => {
+    const flatIdx = campaignIdx * (adSetGroups.length || 1) + adsetIdx;
+    if (onSetAudienceType) onSetAudienceType(flatIdx, type);
+  };
+  const getAudienceDetails = (campaignIdx, adsetIdx) => {
+    const flatIdx = campaignIdx * (adSetGroups.length || 1) + adsetIdx;
+    return adsetAudienceDetails[flatIdx] || {};
+  };
+  const saveAudienceDetailsFor = (campaignIdx, adsetIdx, patch) => {
+    const flatIdx = campaignIdx * (adSetGroups.length || 1) + adsetIdx;
+    onSaveAdsetAudienceDetails(flatIdx, { ...getAudienceDetails(campaignIdx, adsetIdx), ...patch });
+  };
+
+  // Flatten productCreativeGroups for the palette: [{ productId, productName, group }...]
+  const paletteGroups = [];
+  selectedProducts.forEach(p => {
+    const groups = productCreativeGroups?.[p.id] || [];
+    groups.forEach(g => paletteGroups.push({ productId: p.id, productName: p.name, group: g }));
+  });
+
   const effectiveFocusedIdx = adSetGroups.length > 0 ? Math.min(focusedAdsetIdx, adSetGroups.length - 1) : 0;
   const focusedAudienceType = adsetAudiences[effectiveFocusedIdx] || 'ADV';
   const focusedDetails = adsetAudienceDetails[effectiveFocusedIdx] || {};
@@ -789,510 +1453,271 @@ const CampaignPlanView = ({
 
   return (
     <>
-    <div className="grid grid-cols-1 lg:grid-cols-[65fr_35fr] gap-8">
+    <div className="flex flex-col gap-8">
       <div className="space-y-4 min-w-0">
-        <div className="flex items-center gap-2 px-2">
-          <h4 className="text-xl font-semibold text-gray-900">Campaign 架构策略</h4>
-          <div className="w-5 h-5 bg-primary-50 text-primary-500 rounded-full flex items-center justify-center cursor-help shadow-sm">
-            <Info size={12} />
+        {/* 顶部素材组 palette — 拖拽源 */}
+        {paletteGroups.length > 0 && (
+          <div className="bg-white border border-gray-100 rounded-inner p-4">
+            <div className="flex items-center gap-2 mb-3 px-1">
+              <Layers size={14} className="text-primary-500/70" />
+              <span className="text-xs font-semibold text-gray-700">素材组</span>
+              <span className="text-xs text-gray-400 font-medium">拖拽到下方任意 Ad slot</span>
+            </div>
+            <div className="flex gap-3 overflow-x-auto custom-scrollbar pb-1">
+              {paletteGroups.map(({ productId, productName, group }) => (
+                <div
+                  key={`${productId}::${group.id}`}
+                  draggable
+                  onDragStart={(e) => {
+                    e.dataTransfer.setData('application/x-creative-group', JSON.stringify({ productId, groupId: group.id }));
+                    e.dataTransfer.effectAllowed = 'copy';
+                  }}
+                  className="shrink-0 w-32 bg-gray-50 border border-gray-100 rounded-base p-2 cursor-grab active:cursor-grabbing hover:border-primary-500/40 hover:shadow-md transition-all"
+                  title={`${productName} · ${group.name}`}
+                >
+                  <div className="grid grid-cols-2 gap-0.5 mb-2 h-16 rounded-sm overflow-hidden bg-gray-100">
+                    {(group.ads || []).slice(0, 4).map((ad, i) => (
+                      <div key={i} className="bg-white overflow-hidden">
+                        <img src={ad.url} className="w-full h-full object-cover" alt="" />
+                      </div>
+                    ))}
+                    {(group.ads || []).length === 0 && (
+                      <div className="col-span-2 row-span-2 flex items-center justify-center text-gray-300">
+                        <Layers size={20} />
+                      </div>
+                    )}
+                  </div>
+                  <p className="text-xs font-semibold text-gray-700 truncate">{group.name}</p>
+                  <p className="text-[10px] text-gray-400 font-medium truncate mt-0.5">{productName} · {(group.ads || []).length} 素材</p>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
-        <div className="bg-white p-8 rounded-section adsgo-card-shadow space-y-6">
-          {/* ▶ Ad Structure Config — collapsible */}
-          <div className="border border-gray-100 rounded-inner">
-            <button
-              onClick={() => setStructureOpen(!structureOpen)}
-              className="w-full flex items-center justify-between px-5 py-4 bg-gray-50 hover:bg-gray-100 transition-colors"
-            >
-              <div className="flex items-center gap-2">
-                {structureOpen ? <ChevronUp size={14} className="text-gray-400" /> : <ChevronDown size={14} className="text-gray-400" />}
-                <span className="text-sm font-semibold text-gray-700">Ad Structure Config</span>
-              </div>
-              <span className="text-xs text-gray-400 font-medium">{structureSummary}</span>
-            </button>
-
-            {structureOpen && (
-              <div className="p-5 border-t border-gray-100 animate-in fade-in slide-in-from-top-2 duration-200">
-                <div className="flex gap-6 items-start">
-
-                  {/* Left: strategy dropdown + adset count + AI dialog */}
-                  <div className="flex-1 space-y-4 min-w-0 relative z-10">
-                    {/* Strategy dropdown */}
-                    <div>
-                      <label className="text-xs font-medium text-gray-500 px-1 mb-2 block">选择 Campaign 策略</label>
-                      {campaignType === 'CATALOG' ? (
-                        <div className="h-10 px-4 flex items-center bg-gray-50 rounded-base border border-gray-100 text-sm font-medium text-gray-500">
-                          每组均投放已选目录
+        {/* 横向架构图 + 右侧详情面板 */}
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-6">
+          {/* Tree pane (left) */}
+          <div className="bg-gray-50/40 border border-gray-100 rounded-inner p-6 max-h-[640px] overflow-y-auto custom-scrollbar">
+            <div className="space-y-8">
+              {campaignTrees.map(tree => {
+                const cIdx = tree.campaignIdx;
+                const isCampaignSelected = selectedNode.type === 'campaign' && selectedNode.campaignIdx === cIdx;
+                const cfg = campaignConfigs[cIdx] || {};
+                return (
+                  <div key={cIdx} className="grid grid-cols-[100px_1fr] gap-3 items-center">
+                    {/* Campaign node — column layout: icon top, label below */}
+                    <div className="relative group/cnode sticky top-0">
+                      <button
+                        onClick={() => setSelectedNode({ type: 'campaign', campaignIdx: cIdx })}
+                        className={`w-full flex flex-col items-center gap-1.5 p-2.5 rounded-base border-2 transition-all ${
+                          isCampaignSelected ? 'bg-primary-50 border-primary-500' : 'bg-white border-gray-100 hover:border-primary-500/30'
+                        }`}
+                      >
+                        <div className={`w-8 h-8 rounded-base flex items-center justify-center text-white ${isCampaignSelected ? 'bg-primary-500' : 'bg-gray-900'}`}>
+                          <Briefcase size={16} />
                         </div>
-                      ) : (
-                        <div className="relative">
-                          {showStrategyDropdown && <div className="fixed inset-0 z-[190]" onClick={() => setShowStrategyDropdown(false)} />}
-                          <div
-                            onClick={() => setShowStrategyDropdown(!showStrategyDropdown)}
-                            className="w-full h-10 bg-white border border-gray-200 rounded-base px-4 flex items-center justify-between cursor-pointer hover:border-primary-500 transition-all duration-200"
-                          >
-                            <span className="text-sm font-medium text-gray-700">{strategyLabels[structure.strategy] || structure.strategy}</span>
-                            <ChevronDown size={14} className={`text-gray-300 transition-transform duration-200 ${showStrategyDropdown ? 'rotate-180' : ''}`} />
-                          </div>
-                          {showStrategyDropdown && (
-                            <div
-                              className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-100 rounded-base shadow-xl overflow-hidden animate-in zoom-in-95 duration-150 py-1"
-                              style={{ zIndex: 200 }}
-                            >
-                              {[
-                                { id: 'PER_PRODUCT', label: 'Test by product group', desc: 'Multiple Adsets per SKU' },
-                                { id: 'ALL_PRODUCTS_PER_SET', label: 'Test by audience group', desc: 'All SKU in every Adset' },
-                                { id: 'BY_CREATIVE', label: 'Test by creative group', desc: 'Assign creatives per Adset' },
-                                { id: 'AI_STRATEGY', label: 'AI个性化策略', desc: 'Describe your ad structure' },
-                              ].map(opt => (
-                                <div
-                                  key={opt.id}
-                                  onClick={() => { onStructureChange({ ...structure, strategy: opt.id }); setShowStrategyDropdown(false); }}
-                                  className={`flex items-center justify-between px-4 py-2.5 cursor-pointer transition-colors group ${structure.strategy === opt.id ? 'bg-primary-50' : 'hover:bg-gray-50'}`}
-                                >
-                                  <div>
-                                    <p className={`text-sm font-medium ${structure.strategy === opt.id ? 'text-primary-500' : 'text-gray-700'}`}>{opt.label}</p>
-                                    <p className="text-xs text-gray-400">{opt.desc}</p>
+                        <div className="text-center min-w-0 w-full">
+                          <p className={`text-xs font-bold truncate ${isCampaignSelected ? 'text-primary-600' : 'text-gray-900'}`}>Campaign {cIdx + 1}</p>
+                          <p className="text-[10px] text-gray-400 font-medium truncate">{tree.adsets.length} adset</p>
+                        </div>
+                      </button>
+                      {/* CRUD buttons — 复制 + 删除（永久显示，确保可点） */}
+                      <div className="absolute top-1 right-1 flex gap-0.5 z-30">
+                        <button type="button" onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); setDuplicateMenuFor(duplicateMenuFor === cIdx ? null : cIdx); }} title="复制" className="w-5 h-5 bg-white border border-gray-200 rounded-full flex items-center justify-center text-gray-400 hover:text-primary-500 hover:border-primary-500 shadow-sm transition-colors">
+                          <Copy size={9} />
+                        </button>
+                        {numCampaigns > 1 && (
+                          <button type="button" onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); deleteCampaignAt(cIdx); }} title="删除此 Campaign（含其下所有 Adset / Ad）" className="w-5 h-5 bg-white border border-gray-200 rounded-full flex items-center justify-center text-gray-400 hover:text-rose-500 hover:border-rose-300 shadow-sm transition-colors">
+                            <Trash2 size={9} />
+                          </button>
+                        )}
+                      </div>
+                      {/* Duplicate-mode popover */}
+                      {duplicateMenuFor === cIdx && (
+                        <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 bg-white border border-gray-100 rounded-base shadow-xl p-2 z-30 min-w-[160px] animate-in fade-in zoom-in-95 duration-150">
+                          <button onClick={() => duplicateCampaign(cIdx, 'full')} className="w-full text-left px-3 py-2 rounded-base hover:bg-gray-50 transition-colors">
+                            <p className="text-xs font-semibold text-gray-900">完整复制</p>
+                            <p className="text-[10px] text-gray-400 font-medium mt-0.5">配置 + 受众 + 已分配素材</p>
+                          </button>
+                          <button onClick={() => duplicateCampaign(cIdx, 'structure')} className="w-full text-left px-3 py-2 rounded-base hover:bg-gray-50 transition-colors">
+                            <p className="text-xs font-semibold text-gray-900">仅复制结构</p>
+                            <p className="text-[10px] text-gray-400 font-medium mt-0.5">只拷配置，素材清空</p>
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Adsets + ads (right of campaign node) */}
+                    <div className="space-y-3 pt-2">
+                      {tree.adsets.length === 0 ? (
+                        <p className="text-xs text-gray-400 font-medium">该 Campaign 暂无 adset，请先添加产品并完成解析。</p>
+                      ) : tree.adsets.map(adset => {
+                        const aIdx = adset.adsetIdx;
+                        const audienceType = getAudienceType(cIdx, aIdx);
+                        const isAdsetSelected = selectedNode.type === 'adset' && selectedNode.campaignIdx === cIdx && selectedNode.adsetIdx === aIdx;
+                        return (
+                          <div key={adset.key} className="grid grid-cols-[100px_1fr] gap-3 items-center">
+                            {/* Adset node — 与 Campaign 同款结构：CRUD 按钮 absolute 右上角 */}
+                            <div className="relative isolate">
+                              <button
+                                onClick={() => setSelectedNode({ type: 'adset', campaignIdx: cIdx, adsetIdx: aIdx })}
+                                className={`w-full flex flex-col items-center gap-1.5 p-2.5 rounded-base border-2 transition-all ${
+                                  isAdsetSelected ? 'bg-primary-50 border-primary-500' : 'bg-white border-gray-100 hover:border-primary-500/20'
+                                }`}
+                              >
+                                <div className={`w-8 h-8 rounded-base flex items-center justify-center ${
+                                  audienceType === 'LAL' ? 'bg-purple-50 text-purple-600' :
+                                  audienceType === 'INT' ? 'bg-amber-50 text-amber-600' :
+                                  'bg-primary-50 text-primary-500'
+                                }`}>
+                                  <Users size={16} />
+                                </div>
+                                <div className="text-center min-w-0 w-full">
+                                  <p className="text-xs font-bold text-gray-900 truncate">Adset {cIdx + 1}.{aIdx + 1}</p>
+                                  <p className="text-[10px] text-gray-400 font-medium truncate">{AUDIENCE_SHORT_LABELS[audienceType] || 'Adv+'}</p>
+                                </div>
+                              </button>
+                              {/* CRUD buttons — 复制 + 删除（绝对定位，与 Campaign 同款） */}
+                              <div className="absolute top-1 right-1 flex gap-0.5 z-30">
+                                <button type="button" onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); duplicateAdset(cIdx, aIdx); }} title="复制 Adset" className="w-5 h-5 bg-white border border-gray-200 rounded-full flex items-center justify-center text-gray-400 hover:text-primary-500 hover:border-primary-500 shadow-sm transition-colors">
+                                  <Copy size={9} />
+                                </button>
+                                {tree.adsets.length > 1 && (
+                                  <button type="button" onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); deleteAdsetAt(cIdx, aIdx); }} title="删除此 Adset（含其下所有 Ad）" className="w-5 h-5 bg-white border border-gray-200 rounded-full flex items-center justify-center text-gray-400 hover:text-rose-500 hover:border-rose-300 shadow-sm transition-colors">
+                                    <Trash2 size={9} />
+                                  </button>
+                                )}
+                              </div>
+                            </div>
+
+                            {/* 固定 drop zone（左）+ 动态 ad 列表（右，新加入靠左） */}
+                            <div className="flex flex-wrap items-start gap-2">
+                              {(() => {
+                                const adsetKey = `${cIdx}::${aIdx}`;
+                                const isHovered = hoveredAdsetKey === adsetKey;
+                                return (
+                                  <div
+                                    onDragOver={(e) => { e.preventDefault(); e.dataTransfer.dropEffect = 'copy'; setHoveredAdsetKey(adsetKey); }}
+                                    onDragLeave={() => setHoveredAdsetKey(null)}
+                                    onDrop={(e) => {
+                                      e.preventDefault();
+                                      try {
+                                        const data = JSON.parse(e.dataTransfer.getData('application/x-creative-group') || '{}');
+                                        handleDropGroupToAdset(cIdx, aIdx, data);
+                                      } catch {}
+                                      setHoveredAdsetKey(null);
+                                    }}
+                                    className={`shrink-0 w-24 h-20 rounded-base border-2 border-dashed transition-all flex flex-col items-center justify-center gap-0.5 px-1.5 text-center ${
+                                      isHovered ? 'border-primary-500 bg-primary-50 scale-105 shadow-md text-primary-500' :
+                                      'border-gray-200 bg-gray-50/50 hover:border-primary-500/30 text-gray-300'
+                                    }`}
+                                  >
+                                    <MousePointerClick size={14} />
+                                    <span className="text-[9px] font-semibold leading-tight">拖入素材组后<br/>自动拆分 ad</span>
                                   </div>
-                                  {structure.strategy === opt.id && <Check size={13} className="text-primary-500 shrink-0 ml-2" />}
+                                );
+                              })()}
+                              {getAdsForAdset(cIdx, aIdx).map(ad => (
+                                <div key={ad.id} className="relative w-16 h-20 rounded-base border border-gray-100 bg-white shadow-adsgo-card overflow-hidden group/ad">
+                                  {adType === 'FLEXIBLE' && ad.creatives.length > 1 ? (
+                                    <div className="grid grid-cols-2 gap-0.5 w-full h-full bg-gray-100">
+                                      {ad.creatives.slice(0, 4).map((c, i) => (
+                                        <div key={i} className="bg-white overflow-hidden">
+                                          <img src={c.url} className="w-full h-full object-cover" alt="" />
+                                        </div>
+                                      ))}
+                                      {ad.creatives.length > 4 && (
+                                        <div className="absolute bottom-1 right-1 bg-gray-900/80 text-white text-[10px] font-bold px-1.5 py-0.5 rounded">+{ad.creatives.length - 4}</div>
+                                      )}
+                                    </div>
+                                  ) : ad.creatives[0]?.url ? (
+                                    <img src={ad.creatives[0].url} className="w-full h-full object-cover" alt="" />
+                                  ) : (
+                                    <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-300">
+                                      <Layers size={20} />
+                                    </div>
+                                  )}
+                                  <div className="absolute top-1 right-1 flex gap-0.5 opacity-0 group-hover/ad:opacity-100 transition-opacity">
+                                    <button onClick={(e) => { e.stopPropagation(); duplicateAdInAdset(cIdx, aIdx, ad.id); }} className="w-5 h-5 bg-white/90 rounded-full flex items-center justify-center text-gray-500 hover:text-primary-500 shadow" title="复制此 ad">
+                                      <Copy size={10} />
+                                    </button>
+                                    <button onClick={(e) => { e.stopPropagation(); removeAdFromAdset(cIdx, aIdx, ad.id); }} className="w-5 h-5 bg-white/90 rounded-full flex items-center justify-center text-gray-500 hover:text-rose-500 shadow" title="删除此 ad">
+                                      <X size={11} />
+                                    </button>
+                                  </div>
+                                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent text-white text-[9px] font-medium truncate px-1.5 py-0.5">
+                                    {ad.groupName}
+                                  </div>
                                 </div>
                               ))}
                             </div>
-                          )}
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Adset count selector */}
-                    {structure.strategy !== 'AI_STRATEGY' && (structure.strategy === 'PER_PRODUCT' || structure.strategy === 'ALL_PRODUCTS_PER_SET') && (
-                      <div className="animate-in slide-in-from-top-2 duration-200">
-                        <label className="text-xs font-medium text-gray-500 px-1 mb-2 block">
-                          {structure.strategy === 'PER_PRODUCT' ? '每产品 Adset 组数' : 'Adset 组数'}
-                        </label>
-                        <div className="relative">
-                          {showNumAdsetsDropdown && <div className="fixed inset-0 z-[190]" onClick={() => setShowNumAdsetsDropdown(false)} />}
-                          <div
-                            onClick={() => setShowNumAdsetsDropdown(!showNumAdsetsDropdown)}
-                            className="w-full h-10 bg-white border border-gray-200 rounded-base px-4 flex items-center justify-between cursor-pointer hover:border-primary-500 transition-all duration-200"
-                          >
-                            <div className="flex items-center gap-2">
-                              <Layers size={14} className="text-primary-500" />
-                              <span className="text-sm font-medium text-gray-700">
-                                {structure.strategy === 'PER_PRODUCT' ? (structure.numAdsetsPerProduct || 1) : (structure.numAdsets || 1)} 组
-                              </span>
-                            </div>
-                            <ChevronDown size={14} className={`text-gray-300 transition-transform duration-200 ${showNumAdsetsDropdown ? 'rotate-180' : ''}`} />
                           </div>
-                          {showNumAdsetsDropdown && (
-                            <div
-                              className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-100 rounded-base shadow-xl overflow-hidden animate-in zoom-in-95 duration-150 py-1"
-                              style={{ zIndex: 200 }}
-                            >
-                              {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => {
-                                const isSel = structure.strategy === 'PER_PRODUCT'
-                                  ? (structure.numAdsetsPerProduct || 1) === n
-                                  : (structure.numAdsets || 1) === n;
-                                return (
-                                  <div
-                                    key={n}
-                                    onClick={() => {
-                                      const field = structure.strategy === 'PER_PRODUCT' ? 'numAdsetsPerProduct' : 'numAdsets';
-                                      onStructureChange({ ...structure, [field]: n });
-                                      setShowNumAdsetsDropdown(false);
-                                    }}
-                                    className={`flex items-center justify-between px-4 py-2 hover:bg-primary-50 cursor-pointer transition-colors ${isSel ? 'bg-primary-50/50' : ''}`}
-                                  >
-                                    <span className={`text-sm font-medium ${isSel ? 'text-primary-500' : 'text-gray-700'}`}>{n} 组 Adsets</span>
-                                    {isSel && <Check size={13} className="text-primary-500" />}
-                                  </div>
-                                );
-                              })}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* AI Strategy Dialog */}
-                    {structure.strategy === 'AI_STRATEGY' && campaignType !== 'CATALOG' && (
-                      aiStrategyApplied ? (
-                        <div className="animate-in fade-in duration-200">
-                          <button
-                            onClick={() => {
-                              setAiStrategyApplied(false);
-                              onStructureChange({ ...structure, _aiResolvedStrategy: undefined });
-                            }}
-                            className="flex items-center gap-2 px-5 py-3 border border-primary-500 text-primary-500 rounded-base text-sm font-medium hover:bg-primary-50 active:bg-primary-100 transition-all duration-200"
-                          >
-                            <RefreshCw size={14} /> 重新生成策略
-                          </button>
-                        </div>
-                      ) : (
-                        <AiStrategyDialog
-                          onApplyStrategy={handleApplyAiStrategyLocal}
-                          onApplied={() => setAiStrategyApplied(true)}
-                        />
-                      )
-                    )}
-                  </div>
-
-                  {/* Right: Ad Format (sales_conversions / app_promotion only, hidden for CATALOG) */}
-                  {isFlexibleObjective && campaignType !== 'CATALOG' && (
-                    <div className="w-48 shrink-0">
-                      <label className="text-xs font-medium text-gray-500 px-1 mb-2 block">Ad Format</label>
-                      <div className="space-y-2">
-                        {[
-                          { value: 'FLEXIBLE', label: 'Flexible 灵活广告', desc: '≤10 素材/ad · Meta 自动优化' },
-                          { value: 'SINGLE', label: 'Single 单素材', desc: '每素材 1 个 ad' },
-                        ].map(opt => (
-                          <button
-                            key={opt.value}
-                            onClick={() => onAdTypeChange(opt.value)}
-                            className={`w-full p-3 rounded-inner border text-left transition-all ${
-                              adType === opt.value
-                                ? 'border-primary-500 bg-primary-50 ring-2 ring-primary-500/10'
-                                : 'border-gray-100 hover:border-gray-200 bg-white'
-                            }`}
-                          >
-                            <p className={`text-xs font-semibold ${adType === opt.value ? 'text-primary-500' : 'text-gray-900'}`}>{opt.label}</p>
-                            <p className="text-xs text-gray-400 mt-0.5">{opt.desc}</p>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Architecture diagram — always visible */}
-          {(structure.strategy !== 'AI_STRATEGY' || aiStrategyApplied) && (
-          <div className="bg-gray-50/50 border border-gray-100 rounded-inner p-8">
-            <div className="flex flex-col items-center">
-              <div className="flex flex-col items-center mb-10 relative">
-                <div className="w-14 h-14 bg-gray-900 text-white rounded-section flex items-center justify-center shadow-xl z-10 border-4 border-white">
-                  <Briefcase size={28} />
-                </div>
-                <div className="absolute -bottom-6 flex flex-col items-center">
-                  <span className="text-xs font-medium text-gray-500">Target Campaign</span>
-                  <div className="w-[1px] h-6 bg-gray-200 mt-1"></div>
-                </div>
-              </div>
-
-              <div className={`w-full flex ${adSetGroups.length > 4 ? 'justify-start' : 'justify-center'} gap-10 overflow-x-auto pb-4 no-scrollbar px-4`}>
-                {adSetGroups.map((group, idx) => {
-                  const audienceType = adsetAudiences[idx % adsetAudiences.length] || 'ADV';
-                  const isFocused = idx === effectiveFocusedIdx;
-                  return (
-                    <div
-                      key={idx}
-                      onClick={() => setFocusedAdsetIdx(idx)}
-                      className={`flex flex-col items-center shrink-0 rounded-xl px-3 pt-3 pb-2 border cursor-pointer transition-all ${
-                        isFocused
-                          ? audienceType === 'LAL' ? 'bg-purple-50 border-purple-200 shadow-md'
-                          : audienceType === 'INT' ? 'bg-amber-50 border-amber-200 shadow-md'
-                          : 'bg-primary-50 border-primary-200 shadow-md'
-                          : 'border-transparent hover:bg-gray-50'
-                      }`}
-                    >
-                      <button
-                        onClick={(e) => { e.stopPropagation(); onToggleAudience(idx); setFocusedAdsetIdx(idx); }}
-                        title="点击切换受众策略 (Adv+ / LAL / INT)"
-                        className={`w-10 h-10 rounded-base border shadow-adsgo-card flex flex-col items-center justify-center transition-all hover:scale-105 active:scale-95 mb-2 relative ${
-                          audienceType === 'LAL' ? 'bg-white text-purple-600 border-purple-100' :
-                          audienceType === 'INT' ? 'bg-white text-amber-600 border-amber-100' :
-                          'bg-white text-primary-500 border-primary-200'
-                        }`}
-                      >
-                        <Users size={18} />
-                        <span className="text-xs font-medium mt-0.5">{AUDIENCE_SHORT_LABELS[audienceType]}</span>
-                        <div className="absolute -top-1 -right-1 w-4 h-4 bg-gray-900 text-white text-xs font-medium flex items-center justify-center rounded-full border border-white">
-                          {idx + 1}
-                        </div>
-                      </button>
-
-                      <p className="text-xs font-medium text-gray-500 truncate max-w-[80px] text-center mb-3">{group.name}</p>
-
-                      <div className="flex flex-wrap gap-1 justify-center max-w-[120px]">
-                        {campaignType === 'CATALOG' ? (
-                          <div className="w-16 h-20 rounded-lg border-2 border-dashed border-primary-500/20 bg-primary-50/30 flex flex-col items-center justify-center p-2 relative overflow-hidden group/catalog">
-                            <div className="grid grid-cols-2 gap-1 opacity-40 group-hover/catalog:opacity-60 transition-opacity">
-                              {[1, 2, 3, 4].map(i => (
-                                <div key={i} className="w-4 h-4 rounded-sm bg-primary-50" />
-                              ))}
-                            </div>
-                            <div className="absolute inset-0 flex items-center justify-center">
-                              <LayoutGrid size={24} className="text-primary-500/70" />
-                            </div>
-                            <div className="absolute bottom-1 w-full flex justify-center">
-                              <span className="text-xs font-medium text-primary-500/70 uppercase">Dynamic Feed</span>
-                            </div>
-                          </div>
-                        ) : (
-                          <>
-                            {group.ads.slice(0, 4).map((ad, adIdx) => (
-                              <div key={adIdx} className="w-8 h-10 rounded-md border border-white shadow-sm overflow-hidden bg-white ring-1 ring-gray-100">
-                                <img src={ad.url} className="w-full h-full object-cover" />
-                              </div>
-                            ))}
-                            {group.ads.length > 4 && (
-                              <div className="w-8 h-10 rounded-md border border-white shadow-adsgo-card flex items-center justify-center bg-gray-50 text-xs font-medium text-gray-500">
-                                +{group.ads.length - 4}
-                              </div>
-                            )}
-                          </>
-                        )}
-                      </div>
-                      {structure.strategy === 'BY_CREATIVE' && (
+                        );
+                      })}
+                      {/* Adset 列底部占位：新增 Adset */}
+                      <div className="grid grid-cols-[100px_1fr] gap-3 items-center">
                         <button
-                          onClick={(e) => { e.stopPropagation(); setEditingAdsetIndex(idx); }}
-                          className="mt-2 flex items-center gap-1 text-[10px] font-medium text-gray-500 hover:text-primary-500 bg-white hover:bg-primary-50 border border-gray-100 hover:border-primary-200 rounded-base px-2.5 py-1 transition-all"
+                          onClick={() => addAdset()}
+                          className="w-full flex flex-col items-center gap-1 p-2 rounded-base border-2 border-dashed border-gray-200 hover:border-primary-500/40 hover:bg-primary-50/30 text-gray-400 hover:text-primary-500 transition-all"
                         >
-                          <Edit3 size={10} /> 修改本组创意
+                          <Plus size={14} />
+                          <span className="text-[10px] font-semibold">新增 Adset</span>
                         </button>
-                      )}
+                        <div></div>
+                      </div>
                     </div>
-                  );
-                })}
-                {structure.strategy === 'BY_CREATIVE' && (
-                  <div className="flex flex-col items-center shrink-0">
-                    <button
-                      onClick={onAddByCreativeAdset}
-                      className="w-10 h-10 rounded-base border-2 border-dashed border-gray-200 hover:border-primary-400 hover:bg-primary-50 flex items-center justify-center text-gray-300 hover:text-primary-400 transition-all"
-                    >
-                      <Plus size={18} />
-                    </button>
-                    <p className="text-[10px] text-gray-400 font-medium mt-2 whitespace-nowrap">新增 Adset</p>
                   </div>
-                )}
+                );
+              })}
+              {/* Campaign 列底部占位：新增 Campaign */}
+              <div className="grid grid-cols-[100px_1fr] gap-3 items-center">
+                <button
+                  onClick={() => addCampaign()}
+                  className="w-full flex flex-col items-center gap-1 p-3 rounded-base border-2 border-dashed border-gray-200 hover:border-primary-500/40 hover:bg-primary-50/30 text-gray-400 hover:text-primary-500 transition-all"
+                >
+                  <Plus size={16} />
+                  <span className="text-[11px] font-semibold">新增 Campaign</span>
+                </button>
+                <div></div>
               </div>
-
-              {/* Per-adset audience config */}
-              {adSetGroups.length > 0 && (
-                <div className="w-full mt-6 pt-6 border-t border-gray-200/50 animate-in fade-in duration-200">
-                  <div className="mb-4">
-                    <span className="text-xs font-semibold text-gray-600">Adset {effectiveFocusedIdx + 1} 受众配置</span>
-                  </div>
-
-                  {focusedAudienceType === 'ADV' && (
-                    <p className="text-sm text-gray-400 font-medium px-1">
-                      Advantage+ 自动扩展，无需额外配置
-                    </p>
-                  )}
-
-                  {focusedAudienceType === 'LAL' && (
-                    <div className="grid grid-cols-3 gap-3 animate-in fade-in slide-in-from-top-2 duration-150">
-
-                      {/* ── Lookalike Audience ── */}
-                      <div className="space-y-1.5 relative">
-                        <p className="text-xs font-semibold text-purple-500 px-1">Lookalike Audience</p>
-                        <div onClick={() => setShowLalDropdown(!showLalDropdown)} className="w-full p-3 bg-white border-2 border-purple-100 rounded-base flex items-center justify-between cursor-pointer hover:border-purple-300 transition-all min-h-[44px]">
-                          <div className="flex flex-wrap gap-1 overflow-hidden">
-                            {(focusedDetails.lalOptions || []).length === 0
-                              ? <span className="text-xs font-bold text-gray-300">选择...</span>
-                              : (focusedDetails.lalOptions || []).map(opt => <span key={opt} className="px-1.5 py-0.5 bg-purple-50 text-purple-600 rounded text-[10px] font-medium border border-purple-100">{opt.split(' ')[1] || opt}</span>)
-                            }
-                          </div>
-                          <ChevronDown size={12} className={`text-purple-300 shrink-0 transition-transform ${showLalDropdown ? 'rotate-180' : ''}`} />
-                        </div>
-                        {showLalDropdown && (
-                          <>
-                            <div className="fixed inset-0 z-[190]" onClick={() => setShowLalDropdown(false)} />
-                            <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-purple-100 rounded-section shadow-xl overflow-hidden animate-in zoom-in-95 duration-150 z-[200]">
-                              {!authStatus?.meta ? (
-                                <div className="p-4"><button onClick={() => { setIsMetaConnecting(true); setTimeout(() => { setIsMetaConnecting(false); handleAuthorize('meta'); setShowLalDropdown(false); }, 3000); }} disabled={isMetaConnecting} className="w-full py-3 bg-primary-500 text-white rounded-base text-xs font-medium hover:bg-primary-600 transition-all flex items-center justify-center gap-2 disabled:opacity-70">{isMetaConnecting ? <><Loader2 size={12} className="animate-spin" />Connecting...</> : <><Facebook size={12} />立即连接 Meta</>}</button></div>
-                              ) : !selectedAccount ? (
-                                <div className="p-4"><button onClick={() => { onSelectAccount(); setShowLalDropdown(false); }} className="w-full py-3 bg-primary-500 text-white rounded-base text-xs font-medium hover:bg-primary-600 transition-all flex items-center justify-center gap-2"><Briefcase size={12} />选择广告账户</button></div>
-                              ) : lalLoading.isLoading ? (
-                                <div className="p-5 flex flex-col items-center gap-2"><Loader2 size={18} className="animate-spin text-purple-500/70" /><p className="text-xs text-gray-400 animate-pulse">Loading...</p></div>
-                              ) : (
-                                ['US Purchase 1%', 'US add to cart 5%', 'US register last30days 1%~3%'].map(opt => {
-                                  const cur = focusedDetails.lalOptions || [];
-                                  const isSel = cur.includes(opt);
-                                  return <div key={opt} onClick={() => { const next = isSel ? cur.filter(o => o !== opt) : [...cur, opt]; onSaveAdsetAudienceDetails(effectiveFocusedIdx, { ...focusedDetails, lalOptions: next }); }} className="flex items-center justify-between px-4 py-2.5 hover:bg-purple-50 cursor-pointer transition-colors"><span className={`text-xs font-medium ${isSel ? 'text-purple-700' : 'text-gray-700'}`}>{opt}</span>{isSel && <Check size={12} className="text-purple-600" />}</div>;
-                                })
-                              )}
-                            </div>
-                          </>
-                        )}
-                      </div>
-
-                      {/* ── Custom Audience ── */}
-                      <div className="space-y-1.5 relative">
-                        <p className="text-xs font-semibold text-purple-500 px-1">Custom Audience</p>
-                        <div onClick={() => setShowCustomAudienceDropdown(!showCustomAudienceDropdown)} className="w-full p-3 bg-white border-2 border-purple-100 rounded-base flex items-center justify-between cursor-pointer hover:border-purple-300 transition-all min-h-[44px]">
-                          <div className="flex flex-wrap gap-1 overflow-hidden">
-                            {(focusedDetails.customAudienceOptions || []).length === 0
-                              ? <span className="text-xs font-bold text-gray-300">选择...</span>
-                              : (focusedDetails.customAudienceOptions || []).map(opt => <span key={opt} className="px-1.5 py-0.5 bg-purple-50 text-purple-600 rounded text-[10px] font-medium border border-purple-100">{opt}</span>)
-                            }
-                          </div>
-                          <ChevronDown size={12} className={`text-purple-300 shrink-0 transition-transform ${showCustomAudienceDropdown ? 'rotate-180' : ''}`} />
-                        </div>
-                        {showCustomAudienceDropdown && (
-                          <>
-                            <div className="fixed inset-0 z-[190]" onClick={() => setShowCustomAudienceDropdown(false)} />
-                            <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-purple-100 rounded-section shadow-xl overflow-hidden animate-in zoom-in-95 duration-150 z-[200]">
-                              {!authStatus?.meta ? (
-                                <div className="p-4"><button onClick={() => { setIsMetaConnecting(true); setTimeout(() => { setIsMetaConnecting(false); handleAuthorize('meta'); setShowCustomAudienceDropdown(false); }, 3000); }} disabled={isMetaConnecting} className="w-full py-3 bg-primary-500 text-white rounded-base text-xs font-medium hover:bg-primary-600 transition-all flex items-center justify-center gap-2 disabled:opacity-70">{isMetaConnecting ? <><Loader2 size={12} className="animate-spin" />Connecting...</> : <><Facebook size={12} />立即连接 Meta</>}</button></div>
-                              ) : !selectedAccount ? (
-                                <div className="p-4"><button onClick={() => { onSelectAccount(); setShowCustomAudienceDropdown(false); }} className="w-full py-3 bg-primary-500 text-white rounded-base text-xs font-medium hover:bg-primary-600 transition-all flex items-center justify-center gap-2"><Briefcase size={12} />选择广告账户</button></div>
-                              ) : customAudienceLoading.isLoading ? (
-                                <div className="p-5 flex flex-col items-center gap-2"><Loader2 size={18} className="animate-spin text-purple-500/70" /><p className="text-xs text-gray-400 animate-pulse">Loading...</p></div>
-                              ) : (
-                                MOCK_CUSTOM_AUDIENCES.map(opt => {
-                                  const cur = focusedDetails.customAudienceOptions || [];
-                                  const isSel = cur.includes(opt);
-                                  return <div key={opt} onClick={() => { const next = isSel ? cur.filter(o => o !== opt) : [...cur, opt]; onSaveAdsetAudienceDetails(effectiveFocusedIdx, { ...focusedDetails, customAudienceOptions: next }); }} className="flex items-center justify-between px-4 py-2.5 hover:bg-purple-50 cursor-pointer transition-colors"><span className={`text-xs font-medium ${isSel ? 'text-purple-700' : 'text-gray-700'}`}>{opt}</span>{isSel && <Check size={12} className="text-purple-600" />}</div>;
-                                })
-                              )}
-                            </div>
-                          </>
-                        )}
-                      </div>
-
-                      {/* ── Saved Audience (single-select) ── */}
-                      <div className="space-y-1.5 relative">
-                        <p className="text-xs font-semibold text-purple-500 px-1">Saved Audience</p>
-                        <div onClick={() => setShowSavedAudienceDropdown(!showSavedAudienceDropdown)} className="w-full p-3 bg-white border-2 border-purple-100 rounded-base flex items-center justify-between cursor-pointer hover:border-purple-300 transition-all min-h-[44px]">
-                          <span className={`text-[10px] font-bold truncate ${focusedDetails.savedAudience ? 'text-purple-700' : 'text-gray-300'}`}>
-                            {focusedDetails.savedAudience ? focusedDetails.savedAudience.name : '选择...'}
-                          </span>
-                          <ChevronDown size={12} className={`text-purple-300 shrink-0 transition-transform ${showSavedAudienceDropdown ? 'rotate-180' : ''}`} />
-                        </div>
-                        {showSavedAudienceDropdown && (
-                          <>
-                            <div className="fixed inset-0 z-[190]" onClick={() => setShowSavedAudienceDropdown(false)} />
-                            <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-purple-100 rounded-section shadow-xl overflow-hidden animate-in zoom-in-95 duration-150 z-[200]">
-                              {!authStatus?.meta ? (
-                                <div className="p-4"><button onClick={() => { setIsMetaConnecting(true); setTimeout(() => { setIsMetaConnecting(false); handleAuthorize('meta'); setShowSavedAudienceDropdown(false); }, 3000); }} disabled={isMetaConnecting} className="w-full py-3 bg-primary-500 text-white rounded-base text-xs font-medium hover:bg-primary-600 transition-all flex items-center justify-center gap-2 disabled:opacity-70">{isMetaConnecting ? <><Loader2 size={12} className="animate-spin" />Connecting...</> : <><Facebook size={12} />立即连接 Meta</>}</button></div>
-                              ) : !selectedAccount ? (
-                                <div className="p-4"><button onClick={() => { onSelectAccount(); setShowSavedAudienceDropdown(false); }} className="w-full py-3 bg-primary-500 text-white rounded-base text-xs font-medium hover:bg-primary-600 transition-all flex items-center justify-center gap-2"><Briefcase size={12} />选择广告账户</button></div>
-                              ) : savedAudienceLoading.isLoading ? (
-                                <div className="p-5 flex flex-col items-center gap-2"><Loader2 size={18} className="animate-spin text-purple-500/70" /><p className="text-xs text-gray-400 animate-pulse">Loading...</p></div>
-                              ) : (
-                                MOCK_SAVED_AUDIENCES.map(sa => {
-                                  const isSel = focusedDetails.savedAudience?.id === sa.id;
-                                  return (
-                                    <div key={sa.id} onClick={() => { onSaveAdsetAudienceDetails(effectiveFocusedIdx, { ...focusedDetails, savedAudience: isSel ? null : sa }); setShowSavedAudienceDropdown(false); }} className="flex items-start justify-between px-4 py-2.5 hover:bg-purple-50 cursor-pointer transition-colors">
-                                      <div><p className={`text-xs font-medium ${isSel ? 'text-purple-700' : 'text-gray-700'}`}>{sa.name}</p><p className="text-[10px] text-gray-400 mt-0.5">{sa.gender} · {sa.ageMin}–{sa.ageMax}</p></div>
-                                      {isSel && <Check size={12} className="text-purple-600 shrink-0 mt-0.5" />}
-                                    </div>
-                                  );
-                                })
-                              )}
-                            </div>
-                          </>
-                        )}
-                      </div>
-
-                    </div>
-                  )}
-
-                  {focusedAudienceType === 'INT' && (
-                    <div className="animate-in fade-in slide-in-from-top-2 duration-150">
-                      <IntInterestSelector
-                        intOptions={focusedDetails.intOptions || []}
-                        onIntOptionsChange={(newOptions) => onSaveAdsetAudienceDetails(effectiveFocusedIdx, { ...focusedDetails, intOptions: newOptions })}
-                        productAnalyses={null}
-                        allAnalysesComplete={false}
-                        selectedProducts={selectedProducts}
-                      />
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
-          )}
-        </div>
-      </div>
-
-      <div className="space-y-4">
-        <h4 className="text-xl font-semibold text-gray-900 px-2">预算配置与预估消耗</h4>
-        <div className="bg-white p-5 rounded-section adsgo-card-shadow flex flex-col gap-4 h-full">
-          <div className="space-y-3">
-            <div className="flex items-center justify-between px-1">
-              <label className="text-xs font-medium text-gray-500 px-1">目标投放系列 (Campaign)</label>
-              <button
-                onClick={onSelectCampaign}
-                className="flex items-center gap-1.5 text-primary-500 hover:text-primary-600 transition-colors"
-              >
-                <Edit3 size={12} />
-                <span className="text-xs font-medium">选择已有</span>
-              </button>
-            </div>
-            <div className={`flex items-center gap-4 p-4 rounded-inner border-2 transition-all ${isExistingCampaign ? 'bg-primary-50 border-primary-500/20' : 'bg-gray-50 border-gray-100'}`}>
-              <div className={`w-10 h-10 rounded-base flex items-center justify-center ${isExistingCampaign ? 'bg-primary-500 text-white shadow-lg shadow-primary-500/15' : 'bg-white text-gray-400 shadow-adsgo-card'}`}>
-                <Briefcase size={20} />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-base font-semibold text-gray-900 truncate">
-                  {selectedCampaign?.name || '创建全新系列 (Create New)'}
-                </p>
-                {isExistingCampaign && <p className="text-xs text-primary-500/70 font-medium mt-0.5">ID: {selectedCampaign.id}</p>}
-              </div>
-              {isExistingCampaign && <Lock size={14} className="text-primary-500/40 shrink-0" />}
             </div>
           </div>
 
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <p className="text-sm font-semibold text-gray-900">投放预算模式</p>
-              {isExistingCampaign && <Lock size={12} className="text-gray-300" />}
-            </div>
-            <div className={`flex p-1 bg-gray-100/80 rounded-base border border-gray-100 ${isExistingCampaign ? 'opacity-60 grayscale pointer-events-none' : ''}`}>
-              <button
-                onClick={() => onBudgetTypeChange('CBO')}
-                className={`px-4 py-1.5 rounded-base text-xs font-medium transition-all ${budgetType === 'CBO' ? 'bg-white text-primary-500 shadow-adsgo-card' : 'text-gray-500'}`}>
-                CBO (均衡)
-              </button>
-              <button
-                onClick={() => onBudgetTypeChange('ABO')}
-                className={`px-4 py-1.5 rounded-base text-xs font-medium transition-all ${budgetType === 'ABO' ? 'bg-white text-primary-500 shadow-adsgo-card' : 'text-gray-500'}`}>
-                ABO (单组)
-              </button>
-            </div>
-          </div>
-
-          <div className="bg-gray-50/80 border border-gray-100 rounded-inner p-4 flex flex-col items-center relative overflow-hidden group">
-            <div className="flex items-center w-full">
-              <DollarSign className="text-gray-300 absolute left-6 pointer-events-none group-focus-within:text-primary-500 transition-colors" size={24} />
-              <input
-                type="number"
-                value={dailyBudget}
-                onChange={(e) => onBudgetChange(Number(e.target.value))}
-                className="w-full bg-transparent border-none outline-none pl-12 pr-4 text-3xl font-bold text-gray-900"
+          {/* Detail pane (right) */}
+          <div className="bg-white border border-gray-100 rounded-inner p-5 self-start sticky top-4">
+            {selectedNode.type === 'campaign' ? (
+              <CampaignDetailPanel
+                campaignIdx={selectedNode.campaignIdx}
+                config={campaignConfigs[selectedNode.campaignIdx] || {}}
+                onChange={(patch) => updateCampaignConfig(selectedNode.campaignIdx, patch)}
+                openDropdown={campaignDropdown}
+                setOpenDropdown={setCampaignDropdown}
+                objectiveStage={campaignObjectiveStage}
+                setObjectiveStage={setCampaignObjectiveStage}
+                onSelectExistingCampaign={onSelectCampaign}
+                selectedCampaign={selectedCampaign}
+                isExistingCampaign={isExistingCampaign}
+                targetingMeta={targetingMeta}
               />
-              <span className="text-xs font-medium text-gray-500 mr-4">
-                {budgetType === 'ABO' ? 'Per AdSet' : 'Total Campaign'}
-              </span>
-            </div>
-          </div>
-
-          <div className="bg-gray-900 p-5 rounded-section text-white shadow-xl relative overflow-hidden">
-             <div className="flex items-center gap-2 mb-2">
-                <Sparkles size={14} className="text-primary-500/70" />
-                <p className="text-xs font-medium opacity-60">预估日均消耗</p>
-              </div>
-              <div className="flex items-end justify-between">
-                <div>
-                  <p className="text-3xl font-bold text-white">${estimatedTotalDaily}</p>
-                  <p className="text-xs text-primary-500/70 font-medium mt-1">
-                    {budgetType === 'ABO' ? `${dailyBudget} * ${adSetGroups.length} Adsets` : '系列全局消耗'}
-                  </p>
-                </div>
-                <div className="text-right">
-                  <div className="flex items-center gap-1.5 justify-end mb-1">
-                    <Layers size={14} className="text-primary-500/70" />
-                    <p className="text-xl font-bold text-white">{adSetGroups.length}</p>
-                  </div>
-                  <p className="text-xs text-gray-400 font-medium">AdSets 数量</p>
-                </div>
-              </div>
+            ) : (
+              <AdsetDetailPanel
+                campaignIdx={selectedNode.campaignIdx}
+                adsetIdx={selectedNode.adsetIdx}
+                audienceType={getAudienceType(selectedNode.campaignIdx, selectedNode.adsetIdx)}
+                onSetAudienceType={(t) => setAudienceTypeFor(selectedNode.campaignIdx, selectedNode.adsetIdx, t)}
+                details={getAudienceDetails(selectedNode.campaignIdx, selectedNode.adsetIdx)}
+                onSaveDetails={(patch) => saveAudienceDetailsFor(selectedNode.campaignIdx, selectedNode.adsetIdx, patch)}
+                authStatus={authStatus}
+                handleAuthorize={handleAuthorize}
+                selectedAccount={selectedAccount}
+                onSelectAccount={onSelectAccount}
+                lalLoading={lalLoading}
+                customAudienceLoading={customAudienceLoading}
+                savedAudienceLoading={savedAudienceLoading}
+                selectedProducts={selectedProducts}
+              />
+            )}
           </div>
         </div>
       </div>
