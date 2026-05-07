@@ -2,6 +2,7 @@ import React, { useState, useMemo, useRef, useEffect, useCallback, useImperative
 import { Users, Info, Sparkles, DollarSign, ChevronDown, Briefcase, Target, Layers, Lock, Edit3, Check, LayoutGrid, Facebook, Smartphone, Search, X, Loader2, Send, ChevronUp, MessageSquare, RefreshCw, Plus, Link, Copy, Trash2, Globe, MapPin, ChevronLeft, ArrowRight, CheckCircle2, MousePointerClick } from 'lucide-react';
 import { Z_INDEX } from '../../../constants/zIndex';
 import useDropdownLoading from '../../../hooks/useDropdownLoading';
+import { IncludeExcludeAudienceDropdown } from '../BatchGenerateAds';
 
 const MOCK_CUSTOM_AUDIENCES = [
   'VIP Members',
@@ -633,13 +634,9 @@ const CreativePickerModal = ({ adsetIndex, adsetName, allAds, currentSelection, 
 
 // ── Right-side detail panels ─────────────────────────────────────────────────
 
-const CampaignDetailPanel = ({ campaignIdx, config, onChange, onSelectExistingCampaign, selectedCampaign, isExistingCampaign, targetingMeta = {} }) => {
-  const { ALL_COUNTRIES = [], ALL_LANGUAGES = [], CAMPAIGN_OBJECTIVES = [], ADSET_GOALS_MAPPING = {}, STANDARD_EVENTS = [] } = targetingMeta;
-  const [openDD, setOpenDD] = useState(null);   // 'loc' | 'lang' | 'obj' | null
-  const [objStage, setObjStage] = useState('objective');
-  const [locSearch, setLocSearch] = useState('');
-  const [langSearch, setLangSearch] = useState('');
-  const [eventSearch, setEventSearch] = useState('');
+const CampaignDetailPanel = ({ campaignIdx, config, onChange, onSelectExistingCampaign, selectedCampaign, isExistingCampaign, targetingMeta = {}, platform, globalBidStrategy = 'highest_volume' }) => {
+  const { CAMPAIGN_OBJECTIVES = [], ADSET_GOALS_MAPPING = {}, BID_STRATEGIES: BID_STRATEGIES_META = [] } = targetingMeta;
+  const [openDD, setOpenDD] = useState(null);   // 'obj' | 'bid' | null
 
   const ddRef = useRef(null);
   useEffect(() => {
@@ -648,18 +645,11 @@ const CampaignDetailPanel = ({ campaignIdx, config, onChange, onSelectExistingCa
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
-  const toggleLoc = (c) => {
-    const arr = config.selectedLocations || [];
-    const exists = arr.some(l => l.code === c.code);
-    onChange({ selectedLocations: exists ? arr.filter(l => l.code !== c.code) : [...arr, c] });
-  };
-
-  const filteredCountries = ALL_COUNTRIES.filter(c => c.name.toLowerCase().includes(locSearch.toLowerCase()) || c.code.toLowerCase().includes(locSearch.toLowerCase()));
-  const filteredLanguages = ALL_LANGUAGES.filter(l => l.name.toLowerCase().includes(langSearch.toLowerCase()) || l.code.toLowerCase().includes(langSearch.toLowerCase()));
-  const availableGoals = ADSET_GOALS_MAPPING[config.objective] || [];
-  const currentGoalObj = availableGoals.find(g => g.value === config.adsetGoal);
   const currentObjectiveObj = CAMPAIGN_OBJECTIVES.find(o => o.value === config.objective);
-  const filteredEvents = STANDARD_EVENTS.filter(ev => ev.toLowerCase().includes(eventSearch.toLowerCase()));
+  // Bid Strategy 仅 Meta 渲染：effective = config 级 override 优先，否则全局
+  const isMetaCampaign = platform?.id !== 'tiktok';
+  const effectiveCampaignBidStrategy = config.bidStrategy !== undefined ? config.bidStrategy : globalBidStrategy;
+  const currentBidStrategyObj = BID_STRATEGIES_META.find(s => s.value === effectiveCampaignBidStrategy);
 
   const defaultCampaignName = `Campaign ${campaignIdx + 1}`;
   const campaignNameValue = config.campaignName !== undefined ? config.campaignName : defaultCampaignName;
@@ -685,34 +675,37 @@ const CampaignDetailPanel = ({ campaignIdx, config, onChange, onSelectExistingCa
         </div>
       </div>
 
-      {/* Locations (multi) — editable */}
-      <div className="space-y-2 relative" ref={openDD === 'loc' ? ddRef : null}>
-        <label className="text-xs font-medium text-gray-500 px-1">投放国家/地区</label>
-        <div onClick={() => setOpenDD(openDD === 'loc' ? null : 'loc')}
+      {/* 投放国家/地区 与 Language 已下沉到 AdsetDetailPanel（适配每个 adset 独立 targeting） */}
+
+      {/* Campaign Objective — 仅 level-1（goal/event 已下沉到 AdsetDetailPanel） */}
+      <div className="space-y-2 relative" ref={openDD === 'obj' ? ddRef : null}>
+        <label className="text-xs font-medium text-gray-500 px-1">Campaign Objective</label>
+        <div onClick={() => setOpenDD(openDD === 'obj' ? null : 'obj')}
           className="bg-white rounded-inner p-3 border border-gray-100 shadow-sm flex items-center justify-between gap-2 cursor-pointer hover:border-primary-500/30 transition-all">
           <div className="flex items-center gap-2 min-w-0 flex-1">
-            <MapPin size={14} className="text-primary-500 shrink-0" />
-            {(config.selectedLocations || []).length > 0
-              ? <span className="text-sm font-semibold text-gray-700 truncate">{config.selectedLocations[0].name}{config.selectedLocations.length > 1 && ` +${config.selectedLocations.length - 1}`}</span>
-              : <span className="text-sm font-semibold text-gray-300">待选择...</span>}
+            <Target size={14} className="text-primary-500 shrink-0" />
+            <span className={`text-sm font-semibold truncate ${config.objective ? 'text-gray-700' : 'text-gray-300'}`}>
+              {currentObjectiveObj?.label || 'Select...'}
+            </span>
           </div>
-          <ChevronDown size={12} className={`text-gray-300 shrink-0 transition-transform ${openDD === 'loc' ? 'rotate-180' : ''}`} />
+          <ChevronDown size={12} className={`text-gray-300 shrink-0 transition-transform ${openDD === 'obj' ? 'rotate-180' : ''}`} />
         </div>
-        {openDD === 'loc' && (
-          <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-base shadow-xl border border-gray-100 overflow-hidden z-30 animate-in fade-in zoom-in-95 duration-150">
-            <div className="p-2 border-b border-gray-50">
-              <div className="relative">
-                <Search size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-300" />
-                <input value={locSearch} onChange={e => setLocSearch(e.target.value)} placeholder="搜索国家..." className="w-full pl-7 pr-2 py-1.5 bg-gray-50 border-none rounded-base text-xs font-medium text-gray-900 focus:ring-2 focus:ring-primary-500/10" />
-              </div>
-            </div>
-            <div className="max-h-[200px] overflow-y-auto custom-scrollbar p-1">
-              {filteredCountries.map(c => {
-                const checked = (config.selectedLocations || []).some(l => l.code === c.code);
+        {openDD === 'obj' && (
+          <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-base shadow-xl border border-gray-100 p-2 z-30 animate-in fade-in zoom-in-95 duration-150">
+            <div className="space-y-1">
+              {CAMPAIGN_OBJECTIVES.map(obj => {
+                const Icon = obj.icon;
                 return (
-                  <button key={c.code} onClick={() => toggleLoc(c)} className={`w-full flex items-center justify-between px-2 py-1.5 rounded-base text-xs font-medium transition-all ${checked ? 'bg-primary-50 text-primary-500' : 'text-gray-600 hover:bg-gray-50'}`}>
-                    {c.name}
-                    {checked && <Check size={11} />}
+                  <button key={obj.value} onClick={() => {
+                    const firstGoal = (ADSET_GOALS_MAPPING[obj.value] || [])[0];
+                    // 一并把 campaign 的默认 goal/event 同步重置（cascade 至 adset 由父侧 onChange 路由处理）
+                    onChange({ objective: obj.value, adsetGoal: firstGoal?.value || '', event: firstGoal?.needsEvent ? 'Purchase' : '' });
+                    setOpenDD(null);
+                  }} className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-base text-xs font-medium transition-all ${config.objective === obj.value ? 'bg-gray-900 text-white' : 'hover:bg-gray-50 text-gray-600'}`}>
+                    <div className={`w-5 h-5 rounded-base flex items-center justify-center ${config.objective === obj.value ? 'bg-primary-500 text-white' : `${obj.bg} ${obj.color}`}`}>
+                      {Icon && <Icon size={12} />}
+                    </div>
+                    <span className="truncate">{obj.label}</span>
                   </button>
                 );
               })}
@@ -721,106 +714,36 @@ const CampaignDetailPanel = ({ campaignIdx, config, onChange, onSelectExistingCa
         )}
       </div>
 
-      {/* Language — editable */}
-      <div className="space-y-2 relative" ref={openDD === 'lang' ? ddRef : null}>
-        <label className="text-xs font-medium text-gray-500 px-1">Language</label>
-        <div onClick={() => setOpenDD(openDD === 'lang' ? null : 'lang')}
-          className="bg-white rounded-inner p-3 border border-gray-100 shadow-sm flex items-center justify-between gap-2 cursor-pointer hover:border-primary-500/30 transition-all">
-          <div className="flex items-center gap-2 min-w-0 flex-1">
-            <Globe size={14} className="text-primary-500 shrink-0" />
-            <span className={`text-sm font-semibold truncate ${config.selectedLanguage ? 'text-gray-700' : 'text-gray-300'}`}>{config.selectedLanguage?.name || 'Auto...'}</span>
-          </div>
-          <ChevronDown size={12} className={`text-gray-300 shrink-0 transition-transform ${openDD === 'lang' ? 'rotate-180' : ''}`} />
-        </div>
-        {openDD === 'lang' && (
-          <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-base shadow-xl border border-gray-100 overflow-hidden z-30 animate-in fade-in zoom-in-95 duration-150">
-            <div className="p-2 border-b border-gray-50">
-              <input value={langSearch} onChange={e => setLangSearch(e.target.value)} placeholder="搜索语言..." className="w-full px-2 py-1.5 bg-gray-50 border-none rounded-base text-xs font-medium text-gray-900 focus:ring-2 focus:ring-primary-500/10" />
+      {/* Bid Strategy — 仅 Meta 平台显示；选中时联动清空该 campaign 下所有 adset 的 bidAmount override */}
+      {isMetaCampaign && (
+        <div className="space-y-2 relative" ref={openDD === 'bid' ? ddRef : null}>
+          <label className="text-xs font-medium text-gray-500 px-1">竞价策略</label>
+          <div onClick={() => setOpenDD(openDD === 'bid' ? null : 'bid')}
+            className="bg-white rounded-inner p-3 border border-gray-100 shadow-sm flex items-center justify-between gap-2 cursor-pointer hover:border-primary-500/30 transition-all">
+            <div className="flex items-center gap-2 min-w-0 flex-1">
+              <Target size={14} className="text-primary-500 shrink-0" />
+              <span className={`text-sm font-semibold truncate ${currentBidStrategyObj ? 'text-gray-700' : 'text-gray-300'}`}>
+                {currentBidStrategyObj?.label || 'Select...'}
+              </span>
             </div>
-            <div className="max-h-[200px] overflow-y-auto custom-scrollbar p-1">
-              {filteredLanguages.map(l => (
-                <button key={l.code} onClick={() => { onChange({ selectedLanguage: l }); setOpenDD(null); }}
-                  className={`w-full flex items-center justify-between px-2 py-1.5 rounded-base text-xs font-medium transition-all ${config.selectedLanguage?.code === l.code ? 'bg-primary-50 text-primary-500' : 'text-gray-600 hover:bg-gray-50'}`}>
-                  {l.name}
-                  {config.selectedLanguage?.code === l.code && <Check size={11} />}
+            <ChevronDown size={12} className={`text-gray-300 shrink-0 transition-transform ${openDD === 'bid' ? 'rotate-180' : ''}`} />
+          </div>
+          {openDD === 'bid' && (
+            <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-base shadow-xl border border-gray-100 p-2 z-30 animate-in fade-in zoom-in-95 duration-150">
+              {BID_STRATEGIES_META.map(s => (
+                <button key={s.value} onClick={() => { onChange({ bidStrategy: s.value }); setOpenDD(null); }}
+                  className={`w-full flex items-center justify-between gap-2 px-2 py-1.5 rounded-base text-xs font-medium transition-all ${effectiveCampaignBidStrategy === s.value ? 'bg-gray-900 text-white' : 'hover:bg-gray-50 text-gray-600'}`}>
+                  <div className="min-w-0 text-left">
+                    <p className="text-xs font-bold truncate">{s.label}</p>
+                    <p className={`text-[10px] truncate ${effectiveCampaignBidStrategy === s.value ? 'text-gray-300' : 'text-gray-400'}`}>{s.desc}</p>
+                  </div>
+                  {effectiveCampaignBidStrategy === s.value && <CheckCircle2 size={11} className="shrink-0" />}
                 </button>
               ))}
             </div>
-          </div>
-        )}
-      </div>
-
-      {/* Promote Objective — 3-stage cascade */}
-      <div className="space-y-2 relative" ref={openDD === 'obj' ? ddRef : null}>
-        <label className="text-xs font-medium text-gray-500 px-1">Promote Objective</label>
-        <div onClick={() => { setOpenDD(openDD === 'obj' ? null : 'obj'); setObjStage('objective'); }}
-          className="bg-white rounded-inner p-3 border border-gray-100 shadow-sm flex items-center justify-between gap-2 cursor-pointer hover:border-primary-500/30 transition-all">
-          <div className="flex items-center gap-2 min-w-0 flex-1">
-            <Target size={14} className="text-primary-500 shrink-0" />
-            <span className={`text-sm font-semibold truncate ${config.objective ? 'text-gray-700' : 'text-gray-300'}`}>
-              {config.event || currentGoalObj?.label || currentObjectiveObj?.label || 'Select...'}
-            </span>
-          </div>
-          <ChevronDown size={12} className={`text-gray-300 shrink-0 transition-transform ${openDD === 'obj' ? 'rotate-180' : ''}`} />
+          )}
         </div>
-        {openDD === 'obj' && (
-          <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-base shadow-xl border border-gray-100 p-2 z-30 animate-in fade-in zoom-in-95 duration-150">
-            {objStage === 'objective' && (
-              <div className="space-y-1">
-                <p className="text-[9px] font-bold text-gray-400 tracking-widest mb-1 px-1">1. Campaign Objective</p>
-                {CAMPAIGN_OBJECTIVES.map(obj => {
-                  const Icon = obj.icon;
-                  return (
-                    <button key={obj.value} onClick={() => {
-                      const firstGoal = (ADSET_GOALS_MAPPING[obj.value] || [])[0];
-                      onChange({ objective: obj.value, adsetGoal: firstGoal?.value || '', event: firstGoal?.needsEvent ? 'Purchase' : '' });
-                      setObjStage('goal');
-                    }} className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-base text-xs font-medium transition-all ${config.objective === obj.value ? 'bg-gray-900 text-white' : 'hover:bg-gray-50 text-gray-600'}`}>
-                      <div className={`w-5 h-5 rounded-base flex items-center justify-center ${config.objective === obj.value ? 'bg-primary-500 text-white' : `${obj.bg} ${obj.color}`}`}>
-                        {Icon && <Icon size={12} />}
-                      </div>
-                      <span className="truncate">{obj.label}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-            {objStage === 'goal' && (
-              <div className="space-y-1">
-                <button onClick={() => setObjStage('objective')} className="flex items-center gap-1 px-1 py-1 text-[9px] font-bold text-gray-400 tracking-widest hover:text-gray-600">
-                  <ChevronLeft size={10} /> 2. Conversion Goal
-                </button>
-                {availableGoals.map(g => (
-                  <button key={g.value} onClick={() => {
-                    onChange({ adsetGoal: g.value, event: g.needsEvent ? (config.event || 'Purchase') : '' });
-                    if (g.needsEvent) setObjStage('event'); else setOpenDD(null);
-                  }} className={`w-full flex items-center justify-between px-2 py-1.5 rounded-base text-xs font-medium transition-all ${config.adsetGoal === g.value ? 'bg-gray-900 text-white' : 'hover:bg-gray-50 text-gray-600'}`}>
-                    <span className="truncate">{g.label}</span>
-                    {g.needsEvent ? <ArrowRight size={10} className="opacity-30" /> : (config.adsetGoal === g.value && <CheckCircle2 size={11} />)}
-                  </button>
-                ))}
-              </div>
-            )}
-            {objStage === 'event' && (
-              <div className="space-y-1">
-                <button onClick={() => setObjStage('goal')} className="flex items-center gap-1 px-1 py-1 text-[9px] font-bold text-gray-400 tracking-widest hover:text-gray-600">
-                  <ChevronLeft size={10} /> 3. Pixel Event
-                </button>
-                <input value={eventSearch} onChange={e => setEventSearch(e.target.value)} placeholder="搜索 event..." className="w-full px-2 py-1 bg-gray-50 rounded-base text-xs font-medium text-gray-900 focus:ring-2 focus:ring-primary-500/20 mb-1" />
-                <div className="max-h-[180px] overflow-y-auto custom-scrollbar">
-                  {filteredEvents.map(ev => (
-                    <button key={ev} onClick={() => { onChange({ event: ev }); setOpenDD(null); }}
-                      className={`w-full flex items-center justify-between px-2 py-1.5 rounded-base text-xs font-medium transition-all ${config.event === ev ? 'bg-primary-500 text-white' : 'hover:bg-gray-50 text-gray-600'}`}>
-                      <span>{ev}</span>
-                      {config.event === ev && <CheckCircle2 size={11} />}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-      </div>
+      )}
 
       {/* Campaign select (新建 / 选已有) — 紧跟 Promote Objective 之后 */}
       <div className="space-y-2">
@@ -869,6 +792,12 @@ const CampaignDetailPanel = ({ campaignIdx, config, onChange, onSelectExistingCa
           />
           <span className="text-[10px] font-medium text-gray-400 whitespace-nowrap">USD/day</span>
         </div>
+        {config.budgetType === 'ABO' && (
+          <p className="text-[11px] text-gray-400 font-medium leading-relaxed px-1 flex items-start gap-1">
+            <Info size={10} className="text-gray-300 shrink-0 mt-0.5" />
+            <span>ABO 模式下该预算将由 campaign 下所有 adset 均分</span>
+          </p>
+        )}
       </div>
     </div>
   );
@@ -876,22 +805,74 @@ const CampaignDetailPanel = ({ campaignIdx, config, onChange, onSelectExistingCa
 
 const AdsetDetailPanel = ({
   platform,
-  campaignIdx, adsetIdx, audienceType, onSetAudienceType,
+  campaignIdx, adsetIdx, audienceTypes = ['ADV'], onSetAudienceType, onToggleAudienceType,
   details = {}, onSaveDetails,
   authStatus, handleAuthorize, selectedAccount, onSelectAccount,
   lalLoading, customAudienceLoading, savedAudienceLoading,
   selectedProducts,
+  effectiveObjective = '',
+  targetingMeta = {},
+  globalAdsetGoal = '',
+  globalEvent = '',
+  globalLocations = [],
+  globalLanguage = null,
+  effectiveBidStrategy = 'highest_volume',
+  globalBidAmount = '',
+  globalAgeMin = '', globalAgeMax = '',
+  globalGender = 'All',
+  globalInterests = [],
+  globalLalInclude = [], globalCustomInclude = [],
+  globalLalExclude = [], globalCustomExclude = [],
 }) => {
   const [showLal, setShowLal] = useState(false);
   const [showCustom, setShowCustom] = useState(false);
   const [showSaved, setShowSaved] = useState(false);
   const [isMetaConnecting, setIsMetaConnecting] = useState(false);
+  // Conversion Event 下拉本地态
+  const [showConvDropdown, setShowConvDropdown] = useState(false);
+  const [convStage, setConvStage] = useState('goal');
+  const [convEventSearch, setConvEventSearch] = useState('');
+  // Locations / Language 下拉本地态
+  const [showLocDropdown, setShowLocDropdown] = useState(false);
+  const [locSearch, setLocSearch] = useState('');
+  const [showLangDropdown, setShowLangDropdown] = useState(false);
+  const [langSearch, setLangSearch] = useState('');
 
   const platformId = platform?.id || 'meta';
   const platformName = platform?.name || 'Meta';
   const isTikTokPlatform = platformId === 'tiktok';
   const ConnectIcon = isTikTokPlatform ? Smartphone : Facebook;
   const isPlatformAuthed = !!authStatus?.[platformId];
+
+  // Conversion Event 派生：每个 adset 自己 override（details.adsetGoal / details.event），缺省回退到全局
+  const { ADSET_GOALS_MAPPING = {}, STANDARD_EVENTS = [], ALL_COUNTRIES = [], ALL_LANGUAGES = [] } = targetingMeta;
+  const availableConvGoals = ADSET_GOALS_MAPPING[effectiveObjective] || [];
+  const effectiveAdsetGoal = details.adsetGoal !== undefined ? details.adsetGoal : globalAdsetGoal;
+  const effectiveAdsetEvent = details.event !== undefined ? details.event : globalEvent;
+  const currentConvGoalObj = availableConvGoals.find(g => g.value === effectiveAdsetGoal);
+  const filteredConvEvents = STANDARD_EVENTS.filter(ev => ev.toLowerCase().includes(convEventSearch.toLowerCase()));
+
+  // Locations / Language：每个 adset override，缺省回退到全局；toggle/select 通过 onSaveDetails 写回 details
+  const effectiveAdsetLocations = details.selectedLocations !== undefined ? details.selectedLocations : globalLocations;
+  const effectiveAdsetLanguage = details.selectedLanguage !== undefined ? details.selectedLanguage : globalLanguage;
+
+  // 竞价目标 — Meta：按 effective 策略变形（highest_volume 不渲染）；TikTok：选填，留空 = 默认最大转化量
+  const { BID_STRATEGIES: BID_STRATEGIES_META = [] } = targetingMeta;
+  const currentBidStrategyMetaObj = BID_STRATEGIES_META.find(s => s.value === effectiveBidStrategy);
+  const bidValueType = isTikTokPlatform ? 'currency' : (currentBidStrategyMetaObj?.valueType || 'none');
+  const showBidAmountField = isTikTokPlatform || bidValueType !== 'none';
+  const effectiveAdsetBidAmount = details.bidAmount !== undefined ? details.bidAmount : globalBidAmount;
+  const bidAmountLabel = isTikTokPlatform ? '竞价目标 (选填)'
+    : bidValueType === 'roas' ? '目标 ROAS'
+    : effectiveBidStrategy === 'cost_cap' ? '单次结果成本上限'
+    : '出价上限';
+  const filteredAdsetCountries = ALL_COUNTRIES.filter(c => c.name.toLowerCase().includes(locSearch.toLowerCase()) || c.code.toLowerCase().includes(locSearch.toLowerCase()));
+  const filteredAdsetLanguages = ALL_LANGUAGES.filter(l => l.name.toLowerCase().includes(langSearch.toLowerCase()) || l.code.toLowerCase().includes(langSearch.toLowerCase()));
+  const toggleAdsetLoc = (c) => {
+    const arr = effectiveAdsetLocations || [];
+    const exists = arr.some(l => l.code === c.code);
+    onSaveDetails?.({ selectedLocations: exists ? arr.filter(l => l.code !== c.code) : [...arr, c] });
+  };
 
   const connectMeta = (closeFn) => {
     setIsMetaConnecting(true);
@@ -926,39 +907,253 @@ const AdsetDetailPanel = ({
         </div>
       </div>
 
-      {/* 受众类型 segment — 精确选择；TikTok 不支持 Advantage+ */}
+      {/* Conversion Event — adset 级 override，objective 由 campaign 决定 */}
+      <div className="space-y-2 relative">
+        <label className="text-xs font-medium text-gray-500 px-1">Conversion Event</label>
+        <div
+          onClick={() => {
+            if (!effectiveObjective) return;
+            setShowConvDropdown(prev => !prev);
+            setConvStage('goal');
+          }}
+          className={`bg-white rounded-inner p-3 border border-gray-100 shadow-sm flex items-center justify-between gap-2 transition-all ${
+            effectiveObjective ? 'cursor-pointer hover:border-primary-500/30' : 'opacity-60 cursor-not-allowed'
+          }`}
+        >
+          <div className="flex items-center gap-2 min-w-0 flex-1">
+            <Target size={14} className="text-primary-500 shrink-0" />
+            <span className={`text-sm font-semibold truncate ${effectiveObjective ? 'text-gray-700' : 'text-gray-300'}`}>
+              {!effectiveObjective
+                ? '需先选择 Campaign Objective'
+                : (effectiveAdsetEvent || currentConvGoalObj?.label || 'Select...')}
+            </span>
+          </div>
+          <ChevronDown size={12} className={`text-gray-300 shrink-0 transition-transform ${showConvDropdown ? 'rotate-180' : ''}`} />
+        </div>
+        {showConvDropdown && effectiveObjective && (
+          <>
+            <div className="fixed inset-0 z-20" onClick={() => setShowConvDropdown(false)} />
+            <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-base shadow-xl border border-gray-100 p-2 z-30 animate-in fade-in zoom-in-95 duration-150">
+              {convStage === 'goal' && (
+                <div className="space-y-1">
+                  <p className="text-[9px] font-bold text-gray-400 tracking-widest mb-1 px-1">Conversion Goal</p>
+                  {availableConvGoals.map(g => (
+                    <button key={g.value} onClick={() => {
+                      const patch = { adsetGoal: g.value, event: g.needsEvent ? (effectiveAdsetEvent || 'Purchase') : '' };
+                      onSaveDetails?.(patch);
+                      if (g.needsEvent) setConvStage('event'); else setShowConvDropdown(false);
+                    }} className={`w-full flex items-center justify-between px-2 py-1.5 rounded-base text-xs font-medium transition-all ${effectiveAdsetGoal === g.value ? 'bg-gray-900 text-white' : 'hover:bg-gray-50 text-gray-600'}`}>
+                      <span className="truncate">{g.label}</span>
+                      {g.needsEvent ? <ArrowRight size={10} className="opacity-30" /> : (effectiveAdsetGoal === g.value && <CheckCircle2 size={11} />)}
+                    </button>
+                  ))}
+                </div>
+              )}
+              {convStage === 'event' && (
+                <div className="space-y-1">
+                  <button onClick={() => setConvStage('goal')} className="flex items-center gap-1 px-1 py-1 text-[9px] font-bold text-gray-400 tracking-widest hover:text-gray-600">
+                    <ChevronLeft size={10} /> Pixel Event
+                  </button>
+                  <input value={convEventSearch} onChange={e => setConvEventSearch(e.target.value)} placeholder="搜索 event..." className="w-full px-2 py-1 bg-gray-50 rounded-base text-xs font-medium text-gray-900 focus:ring-2 focus:ring-primary-500/20 mb-1" />
+                  <div className="max-h-[180px] overflow-y-auto custom-scrollbar">
+                    {filteredConvEvents.map(ev => (
+                      <button key={ev} onClick={() => { onSaveDetails?.({ event: ev }); setShowConvDropdown(false); }}
+                        className={`w-full flex items-center justify-between px-2 py-1.5 rounded-base text-xs font-medium transition-all ${effectiveAdsetEvent === ev ? 'bg-primary-500 text-white' : 'hover:bg-gray-50 text-gray-600'}`}>
+                        <span>{ev}</span>
+                        {effectiveAdsetEvent === ev && <CheckCircle2 size={11} />}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </>
+        )}
+      </div>
+
+      {/* 竞价目标 — Meta：按 effective bidStrategy 变形（highest_volume 不渲染）；TikTok：选填金额 */}
+      {showBidAmountField && (
+        <div className="space-y-2">
+          <label className="text-xs font-medium text-gray-500 px-1">{bidAmountLabel}</label>
+          <div className="bg-white rounded-inner p-3 border border-gray-100 shadow-sm flex items-center gap-2 focus-within:border-primary-500/30 transition-all">
+            {bidValueType === 'roas' ? (
+              <Target size={14} className="text-primary-500 shrink-0" />
+            ) : (
+              <DollarSign size={14} className="text-primary-500 shrink-0" />
+            )}
+            <input
+              type="number"
+              min={0}
+              step={bidValueType === 'roas' ? 0.1 : 0.01}
+              value={effectiveAdsetBidAmount ?? ''}
+              onChange={(e) => onSaveDetails?.({ bidAmount: e.target.value })}
+              placeholder={bidValueType === 'roas' ? '如 2.5' : '0.00'}
+              className="flex-1 min-w-0 bg-transparent border-none outline-none text-sm font-semibold text-gray-700 tabular-nums"
+            />
+            <span className="text-[10px] font-medium text-gray-400 whitespace-nowrap shrink-0">
+              {bidValueType === 'roas' ? '×' : 'USD'}
+            </span>
+          </div>
+          {isTikTokPlatform && (
+            <p className="text-[11px] text-gray-400 font-medium px-1">留空 = 默认最大转化量</p>
+          )}
+        </div>
+      )}
+
+      {/* 投放国家/地区 — 每个 adset 独立 override，缺省取全局值 */}
+      <div className="space-y-2 relative">
+        <label className="text-xs font-medium text-gray-500 px-1">投放国家/地区</label>
+        <div onClick={() => setShowLocDropdown(prev => !prev)}
+          className="bg-white rounded-inner p-3 border border-gray-100 shadow-sm flex items-center justify-between gap-2 cursor-pointer hover:border-primary-500/30 transition-all">
+          <div className="flex items-center gap-2 min-w-0 flex-1">
+            <MapPin size={14} className="text-primary-500 shrink-0" />
+            {(effectiveAdsetLocations || []).length > 0
+              ? <span className="text-sm font-semibold text-gray-700 truncate">{effectiveAdsetLocations[0].name}{effectiveAdsetLocations.length > 1 && ` +${effectiveAdsetLocations.length - 1}`}</span>
+              : <span className="text-sm font-semibold text-gray-300">待选择...</span>}
+          </div>
+          <ChevronDown size={12} className={`text-gray-300 shrink-0 transition-transform ${showLocDropdown ? 'rotate-180' : ''}`} />
+        </div>
+        {showLocDropdown && (
+          <>
+            <div className="fixed inset-0 z-20" onClick={() => setShowLocDropdown(false)} />
+            <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-base shadow-xl border border-gray-100 overflow-hidden z-30 animate-in fade-in zoom-in-95 duration-150">
+              <div className="p-2 border-b border-gray-50">
+                <div className="relative">
+                  <Search size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-300" />
+                  <input value={locSearch} onChange={e => setLocSearch(e.target.value)} placeholder="搜索国家..." className="w-full pl-7 pr-2 py-1.5 bg-gray-50 border-none rounded-base text-xs font-medium text-gray-900 focus:ring-2 focus:ring-primary-500/10" />
+                </div>
+              </div>
+              <div className="max-h-[200px] overflow-y-auto custom-scrollbar p-1">
+                {filteredAdsetCountries.map(c => {
+                  const checked = (effectiveAdsetLocations || []).some(l => l.code === c.code);
+                  return (
+                    <button key={c.code} onClick={() => toggleAdsetLoc(c)} className={`w-full flex items-center justify-between px-2 py-1.5 rounded-base text-xs font-medium transition-all ${checked ? 'bg-primary-50 text-primary-500' : 'text-gray-600 hover:bg-gray-50'}`}>
+                      {c.name}
+                      {checked && <Check size={11} />}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </>
+        )}
+      </div>
+
+      {/* Language — 每个 adset 独立 override */}
+      <div className="space-y-2 relative">
+        <label className="text-xs font-medium text-gray-500 px-1">Language</label>
+        <div onClick={() => setShowLangDropdown(prev => !prev)}
+          className="bg-white rounded-inner p-3 border border-gray-100 shadow-sm flex items-center justify-between gap-2 cursor-pointer hover:border-primary-500/30 transition-all">
+          <div className="flex items-center gap-2 min-w-0 flex-1">
+            <Globe size={14} className="text-primary-500 shrink-0" />
+            <span className={`text-sm font-semibold truncate ${effectiveAdsetLanguage ? 'text-gray-700' : 'text-gray-300'}`}>{effectiveAdsetLanguage?.name || 'Auto...'}</span>
+          </div>
+          <ChevronDown size={12} className={`text-gray-300 shrink-0 transition-transform ${showLangDropdown ? 'rotate-180' : ''}`} />
+        </div>
+        {showLangDropdown && (
+          <>
+            <div className="fixed inset-0 z-20" onClick={() => setShowLangDropdown(false)} />
+            <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-base shadow-xl border border-gray-100 overflow-hidden z-30 animate-in fade-in zoom-in-95 duration-150">
+              <div className="p-2 border-b border-gray-50">
+                <input value={langSearch} onChange={e => setLangSearch(e.target.value)} placeholder="搜索语言..." className="w-full px-2 py-1.5 bg-gray-50 border-none rounded-base text-xs font-medium text-gray-900 focus:ring-2 focus:ring-primary-500/10" />
+              </div>
+              <div className="max-h-[200px] overflow-y-auto custom-scrollbar p-1">
+                {filteredAdsetLanguages.map(l => (
+                  <button key={l.code} onClick={() => { onSaveDetails?.({ selectedLanguage: l }); setShowLangDropdown(false); }}
+                    className={`w-full flex items-center justify-between px-2 py-1.5 rounded-base text-xs font-medium transition-all ${effectiveAdsetLanguage?.code === l.code ? 'bg-primary-50 text-primary-500' : 'text-gray-600 hover:bg-gray-50'}`}>
+                    {l.name}
+                    {effectiveAdsetLanguage?.code === l.code && <Check size={11} />}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </>
+        )}
+      </div>
+
+      {/* 受众策略（多选）— 提到顶部，每勾选一项追加渲染对应子组件；TikTok 不支持 Advantage+ */}
       <div className="space-y-2">
-        <label className="text-xs font-medium text-gray-500 px-1">受众类型</label>
+        <label className="text-xs font-medium text-gray-500 px-1">受众策略</label>
         <div className={`grid gap-2 ${isTikTokPlatform ? 'grid-cols-2' : 'grid-cols-3'}`}>
           {[
             { id: 'ADV', label: 'Advantage+', cls: 'bg-primary-50 border-primary-500 text-primary-600' },
             { id: 'LAL', label: 'Lookalike',  cls: 'bg-purple-50 border-purple-500 text-purple-600' },
             { id: 'INT', label: 'Interest',   cls: 'bg-amber-50 border-amber-500 text-amber-600' },
           ].filter(opt => !(isTikTokPlatform && opt.id === 'ADV')).map(opt => {
-            const active = audienceType === opt.id;
+            const active = (audienceTypes || []).includes(opt.id);
             return (
               <button key={opt.id}
-                onClick={() => { if (!active) onSetAudienceType(opt.id); }}
-                className={`p-2 rounded-base border-2 text-xs font-semibold transition-all ${active ? opt.cls : 'bg-white border-gray-100 text-gray-500 hover:border-gray-200'}`}>
+                onClick={() => onToggleAudienceType?.(opt.id)}
+                className={`p-2 rounded-base border-2 text-xs font-semibold transition-all flex items-center justify-center gap-1.5 ${active ? opt.cls : 'bg-white border-gray-100 text-gray-500 hover:border-gray-200'}`}>
+                {active && <Check size={11} strokeWidth={3} className="shrink-0" />}
                 {opt.label}
               </button>
             );
           })}
         </div>
+        <p className="text-[10px] text-gray-400 px-1">可多选 · 每选 1 项将追加对应配置组件</p>
       </div>
 
       {/* ADV — 不需配置 */}
-      {audienceType === 'ADV' && (
+      {(audienceTypes || []).includes('ADV') && (
         <p className="text-xs text-gray-400 font-medium leading-relaxed px-1">
           Advantage+ 自动扩展，无需额外配置。
         </p>
       )}
 
-      {/* LAL — 三段下拉 */}
-      {audienceType === 'LAL' && (
+      {/* LAL — 包含 + 排除 + Saved Audience */}
+      {(audienceTypes || []).includes('LAL') && (
         <div className="space-y-3 animate-in fade-in slide-in-from-top-2 duration-150">
-          {/* Lookalike Audience */}
-          <div className="space-y-1.5 relative">
+          {/* 包含受众（Lookalike + Custom 合并 tab） */}
+          <IncludeExcludeAudienceDropdown
+            triggerLabel="包含受众"
+            open={showLal}
+            onToggle={() => setShowLal(!showLal)}
+            lalSelected={details.lalInclude !== undefined ? details.lalInclude : globalLalInclude}
+            customSelected={details.customInclude !== undefined ? details.customInclude : globalCustomInclude}
+            onToggleLal={(id) => {
+              const cur = details.lalInclude !== undefined ? details.lalInclude : globalLalInclude;
+              const next = cur.includes(id) ? cur.filter(x => x !== id) : [...cur, id];
+              onSaveDetails?.({ lalInclude: next });
+            }}
+            onToggleCustom={(id) => {
+              const cur = details.customInclude !== undefined ? details.customInclude : globalCustomInclude;
+              const next = cur.includes(id) ? cur.filter(x => x !== id) : [...cur, id];
+              onSaveDetails?.({ customInclude: next });
+            }}
+            authStatus={authStatus} platform={platform}
+            selectedAccount={selectedAccount}
+            onAuthorize={(pid) => handleAuthorize?.(pid)}
+            onPickAccount={onSelectAccount}
+            align="left"
+          />
+
+          {/* 排除受众（Lookalike + Custom 合并 tab） */}
+          <IncludeExcludeAudienceDropdown
+            triggerLabel="排除受众"
+            open={showCustom}
+            onToggle={() => setShowCustom(!showCustom)}
+            lalSelected={details.lalExclude !== undefined ? details.lalExclude : globalLalExclude}
+            customSelected={details.customExclude !== undefined ? details.customExclude : globalCustomExclude}
+            onToggleLal={(id) => {
+              const cur = details.lalExclude !== undefined ? details.lalExclude : globalLalExclude;
+              const next = cur.includes(id) ? cur.filter(x => x !== id) : [...cur, id];
+              onSaveDetails?.({ lalExclude: next });
+            }}
+            onToggleCustom={(id) => {
+              const cur = details.customExclude !== undefined ? details.customExclude : globalCustomExclude;
+              const next = cur.includes(id) ? cur.filter(x => x !== id) : [...cur, id];
+              onSaveDetails?.({ customExclude: next });
+            }}
+            authStatus={authStatus} platform={platform}
+            selectedAccount={selectedAccount}
+            onAuthorize={(pid) => handleAuthorize?.(pid)}
+            onPickAccount={onSelectAccount}
+            align="left"
+          />
+
+          {/* 旧 Lookalike Audience 段已被「包含受众」覆盖；以下保留 Saved Audience 不变 */}
+          <div className="hidden space-y-1.5 relative">
             <p className="text-xs font-semibold text-purple-500 px-1">Lookalike Audience</p>
             <div onClick={() => setShowLal(!showLal)} className="w-full p-3 bg-white border-2 border-purple-100 rounded-base flex items-center justify-between cursor-pointer hover:border-purple-300 transition-all min-h-[44px]">
               <div className="flex flex-wrap gap-1 overflow-hidden">
@@ -1004,8 +1199,8 @@ const AdsetDetailPanel = ({
             )}
           </div>
 
-          {/* Custom Audience */}
-          <div className="space-y-1.5 relative">
+          {/* Custom Audience — legacy 段已被「包含受众」共享组件覆盖；隐藏待清理 */}
+          <div className="hidden space-y-1.5 relative">
             <p className="text-xs font-semibold text-purple-500 px-1">Custom Audience</p>
             <div onClick={() => setShowCustom(!showCustom)} className="w-full p-3 bg-white border-2 border-purple-100 rounded-base flex items-center justify-between cursor-pointer hover:border-purple-300 transition-all min-h-[44px]">
               <div className="flex flex-wrap gap-1 overflow-hidden">
@@ -1102,7 +1297,7 @@ const AdsetDetailPanel = ({
       )}
 
       {/* INT — Interest selector */}
-      {audienceType === 'INT' && (
+      {(audienceTypes || []).includes('INT') && (
         <div className="animate-in fade-in slide-in-from-top-2 duration-150">
           <IntInterestSelector
             intOptions={details.intOptions || []}
@@ -1113,6 +1308,7 @@ const AdsetDetailPanel = ({
           />
         </div>
       )}
+
     </div>
   );
 };
@@ -1229,6 +1425,31 @@ const CampaignPlanView = forwardRef(({
       ...prev,
       [campaignIdx]: { ...(prev[campaignIdx] || buildDefaultCampaignConfig()), ...patch },
     }));
+    // Cascade：当 campaign objective 变更时，清空该 campaign 下所有 adset 的 adsetGoal / event override，
+    // 让它们 fallback 到新 objective 的 first goal / first event（依据用户决策）。
+    if (patch.objective !== undefined) {
+      const N = adSetGroups.length || 1;
+      for (let aIdx = 0; aIdx < N; aIdx++) {
+        const flatIdx = campaignIdx * N + aIdx;
+        const existing = adsetAudienceDetails[flatIdx] || {};
+        if (existing.adsetGoal !== undefined || existing.event !== undefined) {
+          const { adsetGoal: _g, event: _e, ...rest } = existing;
+          onSaveAdsetAudienceDetails?.(flatIdx, rest);
+        }
+      }
+    }
+    // Cascade：当 campaign bidStrategy 变更时，清空该 campaign 下所有 adset 的 bidAmount override
+    if (patch.bidStrategy !== undefined) {
+      const N = adSetGroups.length || 1;
+      for (let aIdx = 0; aIdx < N; aIdx++) {
+        const flatIdx = campaignIdx * N + aIdx;
+        const existing = adsetAudienceDetails[flatIdx] || {};
+        if (existing.bidAmount !== undefined) {
+          const { bidAmount: _b, ...rest } = existing;
+          onSaveAdsetAudienceDetails?.(flatIdx, rest);
+        }
+      }
+    }
   };
 
   const getAdSetGroups = () => {
@@ -1298,12 +1519,17 @@ const CampaignPlanView = forwardRef(({
     ? dailyBudget * adSetGroups.length
     : dailyBudget;
 
-  // ── New: build N-Campaign tree — adset 数量统一由 structure.numAdsets 控制（与上方 stepper 同源）──
+  // ── New: build N-Campaign tree — 每个 campaign adset 数支持 per-campaign override (campaignConfigs[c].adsetCount) ──
+  // STRIPE = 100，避免不同 campaign override 时 flatIdx 重叠
+  const STRIPE_PER_CAMPAIGN = 100;
+  const flatIdxFor = (cIdx, aIdx) => cIdx * STRIPE_PER_CAMPAIGN + aIdx;
   const numCampaigns = Math.max(structure.numCampaigns || 1, 1);
-  const totalAdsetsPerCampaign = Math.max(structure.numAdsets || adSetGroups.length || 1, 1);
+  const defaultAdsetsPerCampaign = Math.max(structure.numAdsets || adSetGroups.length || 1, 1);
+  const getAdsetsForCampaign = (cIdx) =>
+    Math.max(campaignConfigs[cIdx]?.adsetCount ?? defaultAdsetsPerCampaign, 1);
   const campaignTrees = Array.from({ length: numCampaigns }, (_, cIdx) => {
-    const adsets = Array.from({ length: totalAdsetsPerCampaign }, (_, aIdx) => {
-      // 复用 strategy 派生的 adset；超出范围用占位（混合组）
+    const count = getAdsetsForCampaign(cIdx);
+    const adsets = Array.from({ length: count }, (_, aIdx) => {
       const base = adSetGroups[aIdx] || { name: `混合组 ${aIdx + 1}`, ads: selectedProducts.flatMap(p => productCreativesMap[p.id] || []) };
       return { ...base, campaignIdx: cIdx, adsetIdx: aIdx, key: `${cIdx}::${aIdx}` };
     });
@@ -1470,23 +1696,29 @@ const CampaignPlanView = forwardRef(({
     setDuplicateMenuFor(null);
   };
 
-  // 全局 +1 adset（所有 campaign 同步）— 让 stepper 与架构图严格一致
-  const addAdset = () => {
-    const next = totalAdsetsPerCampaign + 1;
-    onStructureChange({ ...structure, numAdsets: next });
+  // 仅作用于该 campaign — 不再修改全局 structure.numAdsets（用户在某 campaign 点新增就只新增哪个）
+  const addAdset = (cIdx = selectedNode.campaignIdx ?? 0) => {
+    setCampaignConfigs(prev => {
+      const cur = prev[cIdx] || {};
+      const baseCount = cur.adsetCount ?? defaultAdsetsPerCampaign;
+      return { ...prev, [cIdx]: { ...cur, adsetCount: baseCount + 1 } };
+    });
   };
-  // 删除某 campaign 内的指定 adset idx —— numAdsets - 1（同步所有 campaign）+ reindex 该 campaign 内的 ad list
+  // 仅删该 campaign 内的指定 adset；reindex 该 campaign 内的 ad list；其他 campaign 不动。
   const deleteAdsetAt = (cIdx, delAdsetIdx) => {
-    if (totalAdsetsPerCampaign <= 1) return;
+    const curCount = getAdsetsForCampaign(cIdx);
+    if (curCount <= 1) return;
     setAdsetAds(prev => {
       const next = {};
       Object.keys(prev).forEach(k => {
         const [c, a] = k.split('::');
         const cn = Number(c), an = Number(a);
-        if (cn === cIdx && an === delAdsetIdx) return;
-        if (an >= totalAdsetsPerCampaign - 1 && cn !== cIdx) return;
-        const newA = (cn === cIdx && an > delAdsetIdx) ? an - 1 : an;
-        next[`${cn}::${newA}`] = prev[k];
+        if (cn === cIdx && an === delAdsetIdx) return; // drop deleted
+        if (cn === cIdx && an > delAdsetIdx) {
+          next[`${cn}::${an - 1}`] = prev[k]; // shift down within this campaign
+        } else {
+          next[k] = prev[k]; // other campaigns unchanged
+        }
       });
       return next;
     });
@@ -1494,40 +1726,65 @@ const CampaignPlanView = forwardRef(({
       if (selectedNode.adsetIdx === delAdsetIdx) setSelectedNode({ type: 'campaign', campaignIdx: cIdx });
       else if (selectedNode.adsetIdx > delAdsetIdx) setSelectedNode(prev => ({ ...prev, adsetIdx: prev.adsetIdx - 1 }));
     }
-    const next = totalAdsetsPerCampaign - 1;
-    onStructureChange({ ...structure, numAdsets: next });
+    setCampaignConfigs(prev => {
+      const cur = prev[cIdx] || {};
+      return { ...prev, [cIdx]: { ...cur, adsetCount: Math.max(curCount - 1, 1) } };
+    });
   };
   const duplicateAdset = (cIdx, srcAdsetIdx) => {
-    const newAdsetIdx = totalAdsetsPerCampaign;
+    const newAdsetIdx = getAdsetsForCampaign(cIdx);
     setAdsetAds(prev => {
       const srcList = prev[`${cIdx}::${srcAdsetIdx}`] || [];
       const cloned = srcList.map(ad => ({ ...ad, id: `${ad.id}-clone-${newAdsetIdx}`, creatives: [...ad.creatives] }));
       return { ...prev, [`${cIdx}::${newAdsetIdx}`]: cloned };
     });
-    const next = totalAdsetsPerCampaign + 1;
-    onStructureChange({ ...structure, numAdsets: next });
+    setCampaignConfigs(prev => {
+      const cur = prev[cIdx] || {};
+      return { ...prev, [cIdx]: { ...cur, adsetCount: newAdsetIdx + 1 } };
+    });
   };
   const [duplicateMenuFor, setDuplicateMenuFor] = useState(null);
 
-  // Per-adset audience now keyed by `${campaignIdx}::${adsetIdx}` — fall back to flat array for backward compat.
-  const getAudienceType = (campaignIdx, adsetIdx) => {
-    const flatIdx = campaignIdx * (adSetGroups.length || 1) + adsetIdx;
-    return adsetAudiences[flatIdx] || 'ADV';
+  // 受众策略多选数组；兼容旧 string 形态。
+  // 默认 fallback：当 adset 自身未设过策略时，根据平台 + 02 globals 决定初始值
+  //   - Meta + 02 包含/排除非空 → ['ADV', 'LAL']
+  //   - Meta + 02 包含/排除全空 → ['ADV']
+  //   - TikTok + 02 包含/排除非空 → ['LAL']
+  //   - TikTok + 02 包含/排除全空 → ['LAL']（TikTok 无 ADV）
+  const getDefaultAudienceTypes = () => {
+    const isTikTokP = platform?.id === 'tiktok';
+    const hasAudPreset = (sectionDefaults?.lalInclude?.length || 0) > 0
+                       || (sectionDefaults?.customInclude?.length || 0) > 0
+                       || (sectionDefaults?.lalExclude?.length || 0) > 0
+                       || (sectionDefaults?.customExclude?.length || 0) > 0;
+    if (isTikTokP) return ['LAL'];
+    return hasAudPreset ? ['ADV', 'LAL'] : ['ADV'];
+  };
+  const getAudienceTypes = (campaignIdx, adsetIdx) => {
+    const flatIdx = flatIdxFor(campaignIdx, adsetIdx);
+    const raw = adsetAudiences[flatIdx];
+    if (Array.isArray(raw)) return raw.length > 0 ? raw : getDefaultAudienceTypes();
+    if (typeof raw === 'string' && raw) return [raw];
+    return getDefaultAudienceTypes();
   };
   const toggleAudienceFor = (campaignIdx, adsetIdx) => {
-    const flatIdx = campaignIdx * (adSetGroups.length || 1) + adsetIdx;
+    const flatIdx = flatIdxFor(campaignIdx, adsetIdx);
     onToggleAudience(flatIdx);
   };
-  const setAudienceTypeFor = (campaignIdx, adsetIdx, type) => {
-    const flatIdx = campaignIdx * (adSetGroups.length || 1) + adsetIdx;
-    if (onSetAudienceType) onSetAudienceType(flatIdx, type);
+  const toggleAudienceTypeFor = (campaignIdx, adsetIdx, type) => {
+    const flatIdx = flatIdxFor(campaignIdx, adsetIdx);
+    if (onToggleAudience) onToggleAudience(flatIdx, type);
+  };
+  const setAudienceTypeFor = (campaignIdx, adsetIdx, types) => {
+    const flatIdx = flatIdxFor(campaignIdx, adsetIdx);
+    if (onSetAudienceType) onSetAudienceType(flatIdx, types);
   };
   const getAudienceDetails = (campaignIdx, adsetIdx) => {
-    const flatIdx = campaignIdx * (adSetGroups.length || 1) + adsetIdx;
+    const flatIdx = flatIdxFor(campaignIdx, adsetIdx);
     return adsetAudienceDetails[flatIdx] || {};
   };
   const saveAudienceDetailsFor = (campaignIdx, adsetIdx, patch) => {
-    const flatIdx = campaignIdx * (adSetGroups.length || 1) + adsetIdx;
+    const flatIdx = flatIdxFor(campaignIdx, adsetIdx);
     onSaveAdsetAudienceDetails(flatIdx, { ...getAudienceDetails(campaignIdx, adsetIdx), ...patch });
   };
 
@@ -1539,7 +1796,11 @@ const CampaignPlanView = forwardRef(({
   });
 
   const effectiveFocusedIdx = adSetGroups.length > 0 ? Math.min(focusedAdsetIdx, adSetGroups.length - 1) : 0;
-  const focusedAudienceType = adsetAudiences[effectiveFocusedIdx] || 'ADV';
+  const focusedAudienceType = (() => {
+    const raw = adsetAudiences[effectiveFocusedIdx];
+    if (Array.isArray(raw)) return raw[0] || 'ADV';
+    return raw || 'ADV';
+  })();
   const focusedDetails = adsetAudienceDetails[effectiveFocusedIdx] || {};
   const isFlexibleObjective = objective === 'sales_conversions' || objective === 'app_promotion';
   const strategyLabels = { PER_PRODUCT: 'Test by product group', ALL_PRODUCTS_PER_SET: 'Test by audience group', BY_CREATIVE: 'Test by creative group', AI_STRATEGY: 'AI策略' };
@@ -1674,7 +1935,9 @@ const CampaignPlanView = forwardRef(({
                         <p className="text-xs text-gray-400 font-medium">该 Campaign 暂无 adset，请先添加产品并完成解析。</p>
                       ) : tree.adsets.map(adset => {
                         const aIdx = adset.adsetIdx;
-                        const audienceType = getAudienceType(cIdx, aIdx);
+                        const audienceTypes = getAudienceTypes(cIdx, aIdx);
+                        const primaryType = audienceTypes[0] || 'ADV';
+                        const audienceLabel = audienceTypes.map(t => AUDIENCE_SHORT_LABELS[t] || t).join(' · ');
                         const isAdsetSelected = selectedNode.type === 'adset' && selectedNode.campaignIdx === cIdx && selectedNode.adsetIdx === aIdx;
                         const hasError = !!errorAdsetKeys[adset.key];
                         return (
@@ -1694,15 +1957,15 @@ const CampaignPlanView = forwardRef(({
                                 }`}
                               >
                                 <div className={`w-8 h-8 rounded-base flex items-center justify-center ${
-                                  audienceType === 'LAL' ? 'bg-purple-50 text-purple-600' :
-                                  audienceType === 'INT' ? 'bg-amber-50 text-amber-600' :
+                                  primaryType === 'LAL' ? 'bg-purple-50 text-purple-600' :
+                                  primaryType === 'INT' ? 'bg-amber-50 text-amber-600' :
                                   'bg-primary-50 text-primary-500'
                                 }`}>
                                   <Users size={16} />
                                 </div>
                                 <div className="text-center min-w-0 w-full">
                                   <p className="text-xs font-bold text-gray-900 truncate">Adset {cIdx + 1}.{aIdx + 1}</p>
-                                  <p className="text-[10px] text-gray-400 font-medium truncate">{AUDIENCE_SHORT_LABELS[audienceType] || 'Adv+'}</p>
+                                  <p className="text-[10px] text-gray-400 font-medium truncate">{audienceLabel}</p>
                                 </div>
                               </button>
                               {/* CRUD buttons — 复制 + 删除（绝对定位，与 Campaign 同款） */}
@@ -1808,10 +2071,10 @@ const CampaignPlanView = forwardRef(({
                           </div>
                         );
                       })}
-                      {/* Adset 列底部占位：新增 Adset */}
+                      {/* Adset 列底部占位：新增 Adset — 只对当前 campaign 生效 */}
                       <div className="grid grid-cols-[100px_1fr] gap-3 items-center">
                         <button
-                          onClick={() => addAdset()}
+                          onClick={() => addAdset(cIdx)}
                           className="w-full flex flex-col items-center gap-1 p-2 rounded-base border-2 border-dashed border-gray-200 hover:border-primary-500/40 hover:bg-primary-50/30 text-gray-400 hover:text-primary-500 transition-all"
                         >
                           <Plus size={14} />
@@ -1852,16 +2115,34 @@ const CampaignPlanView = forwardRef(({
                 selectedCampaign={selectedCampaign}
                 isExistingCampaign={isExistingCampaign}
                 targetingMeta={targetingMeta}
+                platform={platform}
+                globalBidStrategy={sectionDefaults?.bidStrategy || 'highest_volume'}
               />
             ) : (
               <AdsetDetailPanel
                 platform={platform}
                 campaignIdx={selectedNode.campaignIdx}
                 adsetIdx={selectedNode.adsetIdx}
-                audienceType={getAudienceType(selectedNode.campaignIdx, selectedNode.adsetIdx)}
-                onSetAudienceType={(t) => setAudienceTypeFor(selectedNode.campaignIdx, selectedNode.adsetIdx, t)}
+                audienceTypes={getAudienceTypes(selectedNode.campaignIdx, selectedNode.adsetIdx)}
+                onToggleAudienceType={(t) => toggleAudienceTypeFor(selectedNode.campaignIdx, selectedNode.adsetIdx, t)}
+                onSetAudienceType={(types) => setAudienceTypeFor(selectedNode.campaignIdx, selectedNode.adsetIdx, types)}
                 details={getAudienceDetails(selectedNode.campaignIdx, selectedNode.adsetIdx)}
                 onSaveDetails={(patch) => saveAudienceDetailsFor(selectedNode.campaignIdx, selectedNode.adsetIdx, patch)}
+                effectiveObjective={(campaignConfigs[selectedNode.campaignIdx]?.objective) || sectionDefaults?.objective || ''}
+                targetingMeta={targetingMeta}
+                globalAdsetGoal={sectionDefaults?.adsetGoal || ''}
+                globalEvent={sectionDefaults?.event || ''}
+                globalLocations={sectionDefaults?.selectedLocations || []}
+                globalLanguage={sectionDefaults?.selectedLanguage || null}
+                effectiveBidStrategy={(campaignConfigs[selectedNode.campaignIdx]?.bidStrategy) ?? sectionDefaults?.bidStrategy ?? 'highest_volume'}
+                globalBidAmount={sectionDefaults?.bidAmount ?? ''}
+                globalAgeMin={sectionDefaults?.ageMin ?? ''}
+                globalAgeMax={sectionDefaults?.ageMax ?? ''}
+                globalGender={sectionDefaults?.gender ?? 'All'}
+                globalLalInclude={sectionDefaults?.lalInclude ?? []}
+                globalCustomInclude={sectionDefaults?.customInclude ?? []}
+                globalLalExclude={sectionDefaults?.lalExclude ?? []}
+                globalCustomExclude={sectionDefaults?.customExclude ?? []}
                 authStatus={authStatus}
                 handleAuthorize={handleAuthorize}
                 selectedAccount={selectedAccount}

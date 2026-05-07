@@ -8,6 +8,7 @@ import {
   Database, ListFilter
 } from 'lucide-react';
 import useDropdownLoading from '../../../hooks/useDropdownLoading';
+import { IncludeExcludeAudienceDropdown } from '../BatchGenerateAds';
 import { MOCK_CATALOGS, MOCK_PRODUCT_SETS } from './ProductSelector';
 
 
@@ -278,7 +279,7 @@ const DPAPreviewCard = () => {
 };
 
 // Sub-component for Adset Editing to prevent parent re-renders and scroll resets
-const EditAdSetModal = ({ isOpen, adSet, onUpdateField, onToggleItem, onClose, authStatus, selectedAccount, onAuthStatusChange, onSelectAccount, budgetType, dailyBudget, platform }) => {
+const EditAdSetModal = ({ isOpen, adSet, onUpdateField, onToggleItem, onClose, authStatus, selectedAccount, onAuthStatusChange, onSelectAccount, budgetType, dailyBudget, platform, effectiveBidStrategy = 'highest_volume', globalBidAmount = '' }) => {
   const [locationSearch, setLocationSearch] = useState('');
   const [showLocationDropdown, setShowLocationDropdown] = useState(false);
   const [interestSearch, setInterestSearch] = useState('');
@@ -286,10 +287,9 @@ const EditAdSetModal = ({ isOpen, adSet, onUpdateField, onToggleItem, onClose, a
   const [languageSearch, setLanguageSearch] = useState('');
   const [showLanguageDropdown, setShowLanguageDropdown] = useState(false);
 
-  const [showCustomIncDropdown, setShowCustomIncDropdown] = useState(false);
-  const [showLalIncDropdown, setShowLalIncDropdown] = useState(false);
-  const [showCustomExcDropdown, setShowCustomExcDropdown] = useState(false);
-  const [showLalExcDropdown, setShowLalExcDropdown] = useState(false);
+  // 旧 4 个独立 dropdown 已合并为 2 个：showAudInc / showAudExc
+  const [showAudInc, setShowAudInc] = useState(false);
+  const [showAudExc, setShowAudExc] = useState(false);
 
   const [isMetaConnecting, setIsMetaConnecting] = useState(false);
 
@@ -298,24 +298,18 @@ const EditAdSetModal = ({ isOpen, adSet, onUpdateField, onToggleItem, onClose, a
   const isPlatformAuthed = !!authStatus?.[platformId];
   const ConnectIcon = platformId === 'tiktok' ? Smartphone : Facebook;
 
-  const customIncLoading = useDropdownLoading('customAudienceInc', isPlatformAuthed);
-  const lalIncLoading = useDropdownLoading('lalAudienceInc', isPlatformAuthed);
-  const customExcLoading = useDropdownLoading('customAudienceExc', isPlatformAuthed);
-  const lalExcLoading = useDropdownLoading('lalAudienceExc', isPlatformAuthed);
+  // 旧 loading hooks 不再需要 — 新共享组件内部依据 4 态自行展示
 
-  useEffect(() => { if (showCustomIncDropdown && selectedAccount) customIncLoading.triggerLoad(); }, [showCustomIncDropdown]);
-  useEffect(() => { if (showLalIncDropdown && selectedAccount) lalIncLoading.triggerLoad(); }, [showLalIncDropdown]);
-  useEffect(() => { if (showCustomExcDropdown && selectedAccount) customExcLoading.triggerLoad(); }, [showCustomExcDropdown]);
-  useEffect(() => { if (showLalExcDropdown && selectedAccount) lalExcLoading.triggerLoad(); }, [showLalExcDropdown]);
-
-  const handleConnectMeta = () => {
+  // 返回 Promise，让外层 IncludeExcludeAudienceDropdown 的 await 在授权完成后再触发选账户。
+  // 自身不再调用 onSelectAccount —— auto-pick 由外层组件根据 await 结果统一处理。
+  const handleConnectMeta = () => new Promise((resolve) => {
     setIsMetaConnecting(true);
     setTimeout(() => {
       setIsMetaConnecting(false);
       onAuthStatusChange?.(prev => ({ ...prev, [platformId]: true }));
-      if (!selectedAccount) onSelectAccount?.();
+      resolve();
     }, 3000);
-  };
+  });
 
   if (!isOpen || !adSet) return null;
 
@@ -390,6 +384,48 @@ const EditAdSetModal = ({ isOpen, adSet, onUpdateField, onToggleItem, onClose, a
               </>
             )}
           </div>
+
+          {/* 竞价目标 — Meta：按 effective bidStrategy 变形（highest_volume 隐藏）；TikTok：选填金额 */}
+          {(() => {
+            const isTikTokBid = platform?.id === 'tiktok';
+            const bidValueType = isTikTokBid ? 'currency'
+              : effectiveBidStrategy === 'cost_cap' || effectiveBidStrategy === 'bid_cap' ? 'currency'
+              : effectiveBidStrategy === 'roas' ? 'roas'
+              : 'none';
+            if (bidValueType === 'none') return null;
+            const bidLabel = isTikTokBid ? '竞价目标 (选填)'
+              : bidValueType === 'roas' ? '目标 ROAS'
+              : effectiveBidStrategy === 'cost_cap' ? '单次结果成本上限'
+              : '出价上限';
+            const effectiveAmount = adSet?.bidAmount !== undefined ? adSet.bidAmount : globalBidAmount;
+            return (
+              <div className="space-y-3">
+                <label className="text-xs font-medium text-gray-500 px-1">{bidLabel}</label>
+                <div className="relative group">
+                  {bidValueType === 'roas' ? (
+                    <Target size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-primary-500 transition-colors" />
+                  ) : (
+                    <DollarSign size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-primary-500 transition-colors" />
+                  )}
+                  <input
+                    type="number"
+                    min={0}
+                    step={bidValueType === 'roas' ? 0.1 : 0.01}
+                    value={effectiveAmount ?? ''}
+                    onChange={e => onUpdateField('bidAmount', e.target.value)}
+                    placeholder={bidValueType === 'roas' ? '如 2.5' : '0.00'}
+                    className="w-full h-14 pl-12 pr-16 border border-gray-200 rounded-base text-sm text-gray-700 bg-white focus:outline-none focus:border-primary-500 focus:shadow-primary-focus transition-all duration-200"
+                  />
+                  <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-medium text-gray-400 pointer-events-none">
+                    {bidValueType === 'roas' ? '×' : 'USD'}
+                  </span>
+                </div>
+                {isTikTokBid && (
+                  <p className="text-[11px] text-gray-400 px-1">留空 = 默认最大转化量</p>
+                )}
+              </div>
+            );
+          })()}
 
           <div className="h-px bg-gray-100" />
 
@@ -654,257 +690,46 @@ const EditAdSetModal = ({ isOpen, adSet, onUpdateField, onToggleItem, onClose, a
 
           <div className="h-px bg-gray-100" />
 
-          {/* Custom Audience Section */}
-          <div className="space-y-8">
+          {/* 自定义受众 — 包含 / 排除（每个一个共享下拉，内部 Lookalike / Custom tab） */}
+          <div className="space-y-6">
             <div className="flex items-center gap-2 px-1">
               <Sparkles size={16} className="text-purple-600" />
               <h4 className="text-sm font-semibold text-gray-900">自定义受众编辑</h4>
             </div>
-
-            {/* Includes */}
-            <div className="p-6 bg-gray-50/50 rounded-inner border border-gray-100 space-y-6">
-              <div className="flex items-center gap-2 text-xs font-medium text-gray-500">
-                <UserPlus size={12} className="text-emerald-500" />
-                Includes (包含受众)
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Custom Audience Include */}
-                <div className="space-y-3 relative">
-                  <label className="text-xs font-medium text-gray-500 px-1">Custom Audience</label>
-                  <div onClick={() => setShowCustomIncDropdown(!showCustomIncDropdown)} className="min-h-[3rem] px-4 py-2 bg-white border border-gray-200 rounded-base flex flex-wrap gap-2 items-center cursor-pointer hover:border-primary-500/30 transition-all shadow-sm">
-                    {adSet.customInclude?.length > 0 ? adSet.customInclude.map(id => (
-                      <span key={id} className="px-2 py-0.5 bg-primary-50 text-primary-500 rounded-md text-xs font-medium border border-primary-500/15">
-                        {CUSTOM_AUDIENCES.find(ca => ca.id === id)?.name}
-                      </span>
-                    )) : <span className="text-xs font-medium text-gray-300">选择自定义受众...</span>}
-                  </div>
-                  {showCustomIncDropdown && (
-                    <>
-                      <div className="fixed inset-0 z-[260]" onClick={() => setShowCustomIncDropdown(false)} />
-                      <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-100 rounded-inner shadow-xl z-[270] max-h-48 overflow-y-auto p-1 animate-in zoom-in-95 duration-150">
-                        {!isPlatformAuthed ? (
-                          <div className="p-4 text-center">
-                            <p className="text-xs font-medium text-gray-500 mb-3">需要连接 {platformName} 以加载受众</p>
-                            <button
-                              onClick={handleConnectMeta}
-                              disabled={isMetaConnecting}
-                              className="w-full py-2 bg-primary-500 text-white rounded-base text-sm font-medium hover:bg-primary-600 active:bg-primary-700 transition-all duration-200 focus:outline-none focus:shadow-primary-focus flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
-                            >
-                              {isMetaConnecting ? <><Loader2 size={12} className="animate-spin" /> Connecting...</> : <><ConnectIcon size={12} /> 连接 {platformName}</>}
-                            </button>
-                          </div>
-                        ) : !selectedAccount ? (
-                          <div className="p-4 text-center">
-                            <p className="text-xs font-medium text-gray-500 mb-3">请先选择广告账户</p>
-                            <button 
-                              onClick={onSelectAccount}
-                              className="w-full py-2 bg-primary-500 text-white rounded-base text-sm font-medium hover:bg-primary-600 active:bg-primary-700 transition-all duration-200 focus:outline-none focus:shadow-primary-focus flex items-center justify-center gap-2"
-                            >
-                              <Briefcase size={12} /> 选择账户
-                            </button>
-                          </div>
-                        ) : customIncLoading.isLoading ? (
-                          <div className="p-6 flex flex-col items-center justify-center gap-2">
-                            <Loader2 size={18} className="animate-spin text-primary-500/70" />
-                            <p className="text-xs font-medium text-gray-400 animate-pulse">Loading audiences...</p>
-                          </div>
-                        ) : (
-                          CUSTOM_AUDIENCES.map(ca => {
-                            const isSel = adSet.customInclude?.includes(ca.id);
-                            return (
-                              <div key={ca.id} onClick={() => onToggleItem('customInclude', ca.id)} className="flex items-center justify-between px-4 py-2.5 hover:bg-gray-50 rounded-lg cursor-pointer group">
-                                <span className={`text-xs font-medium ${isSel ? 'text-primary-500' : 'text-gray-600'}`}>{ca.name}</span>
-                                {isSel && <Check size={12} className="text-primary-500" />}
-                              </div>
-                            );
-                          })
-                        )}
-                      </div>
-                    </>
-                  )}
-                </div>
-
-                {/* LAL Include */}
-                <div className="space-y-3 relative">
-                  <label className="text-xs font-medium text-gray-500 px-1">Lookalike Audience</label>
-                  <div onClick={() => setShowLalIncDropdown(!showLalIncDropdown)} className="min-h-[3rem] px-4 py-2 bg-white border border-gray-200 rounded-base flex flex-wrap gap-2 items-center cursor-pointer hover:border-purple-300 transition-all shadow-sm">
-                    {adSet.lalInclude?.length > 0 ? adSet.lalInclude.map(id => (
-                      <span key={id} className="px-2 py-0.5 bg-purple-50 text-purple-600 rounded-md text-xs font-medium border border-purple-100">
-                        {LAL_AUDIENCES.find(la => la.id === id)?.name?.split(' ')[1] || 'LAL'}
-                      </span>
-                    )) : <span className="text-xs font-medium text-gray-300">选择 LAL 受众...</span>}
-                  </div>
-                  {showLalIncDropdown && (
-                    <>
-                      <div className="fixed inset-0 z-[260]" onClick={() => setShowLalIncDropdown(false)} />
-                      <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-purple-100 rounded-inner shadow-xl z-[270] max-h-48 overflow-y-auto p-1 animate-in zoom-in-95 duration-150">
-                        {!isPlatformAuthed ? (
-                          <div className="p-4 text-center">
-                            <p className="text-xs font-medium text-gray-500 mb-3">需要连接 {platformName} 以加载受众</p>
-                            <button
-                              onClick={handleConnectMeta}
-                              disabled={isMetaConnecting}
-                              className="w-full py-2 bg-primary-500 text-white rounded-base text-sm font-medium hover:bg-primary-600 active:bg-primary-700 transition-all duration-200 focus:outline-none focus:shadow-primary-focus flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
-                            >
-                              {isMetaConnecting ? <><Loader2 size={12} className="animate-spin" /> Connecting...</> : <><ConnectIcon size={12} /> 连接 {platformName}</>}
-                            </button>
-                          </div>
-                        ) : !selectedAccount ? (
-                          <div className="p-4 text-center">
-                            <p className="text-xs font-medium text-gray-500 mb-3">请先选择广告账户</p>
-                            <button 
-                              onClick={onSelectAccount}
-                              className="w-full py-2 bg-primary-500 text-white rounded-base text-sm font-medium hover:bg-primary-600 active:bg-primary-700 transition-all duration-200 focus:outline-none focus:shadow-primary-focus flex items-center justify-center gap-2"
-                            >
-                              <Briefcase size={12} /> 选择账户
-                            </button>
-                          </div>
-                        ) : lalIncLoading.isLoading ? (
-                          <div className="p-6 flex flex-col items-center justify-center gap-2">
-                            <Loader2 size={18} className="animate-spin text-purple-500/70" />
-                            <p className="text-xs font-medium text-gray-400 animate-pulse">Loading audiences...</p>
-                          </div>
-                        ) : (
-                          LAL_AUDIENCES.map(la => {
-                            const isSel = adSet.lalInclude?.includes(la.id);
-                            return (
-                              <div key={la.id} onClick={() => onToggleItem('lalInclude', la.id)} className="flex items-center justify-between px-4 py-2.5 hover:bg-purple-50 rounded-lg cursor-pointer group">
-                                <span className={`text-xs font-medium ${isSel ? 'text-purple-600' : 'text-gray-600'}`}>{la.name}</span>
-                                {isSel && <Check size={12} className="text-purple-600" />}
-                              </div>
-                            );
-                          })
-                        )}
-                      </div>
-                    </>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Exclusions */}
-            <div className="p-6 bg-gray-50/50 rounded-inner border border-gray-100 space-y-6">
-              <div className="flex items-center gap-2 text-xs font-medium text-gray-500">
-                <UserMinus size={12} className="text-rose-500" />
-                Exclusions (排除受众)
-              </div>
-              
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Custom Audience Exclude */}
-                <div className="space-y-3 relative">
-                  <label className="text-xs font-medium text-gray-500 px-1">Custom Audience</label>
-                  <div onClick={() => setShowCustomExcDropdown(!showCustomExcDropdown)} className="min-h-[3rem] px-4 py-2 bg-white border border-gray-200 rounded-base flex flex-wrap gap-2 items-center cursor-pointer hover:border-primary-500/30 transition-all shadow-sm">
-                    {adSet.customExclude?.length > 0 ? adSet.customExclude.map(id => (
-                      <span key={id} className="px-2 py-0.5 bg-gray-200 text-gray-600 rounded-md text-xs font-medium border border-gray-300">
-                        {CUSTOM_AUDIENCES.find(ca => ca.id === id)?.name}
-                      </span>
-                    )) : <span className="text-xs font-medium text-gray-300">选择排除自定义受众...</span>}
-                  </div>
-                  {showCustomExcDropdown && (
-                    <>
-                      <div className="fixed inset-0 z-[260]" onClick={() => setShowCustomExcDropdown(false)} />
-                      <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-100 rounded-inner shadow-xl z-[270] max-h-48 overflow-y-auto p-1 animate-in zoom-in-95 duration-150">
-                        {!isPlatformAuthed ? (
-                          <div className="p-4 text-center">
-                            <p className="text-xs font-medium text-gray-500 mb-3">需要连接 {platformName} 以加载受众</p>
-                            <button
-                              onClick={handleConnectMeta}
-                              disabled={isMetaConnecting}
-                              className="w-full py-2 bg-primary-500 text-white rounded-base text-sm font-medium hover:bg-primary-600 active:bg-primary-700 transition-all duration-200 focus:outline-none focus:shadow-primary-focus flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
-                            >
-                              {isMetaConnecting ? <><Loader2 size={12} className="animate-spin" /> Connecting...</> : <><ConnectIcon size={12} /> 连接 {platformName}</>}
-                            </button>
-                          </div>
-                        ) : !selectedAccount ? (
-                          <div className="p-4 text-center">
-                            <p className="text-xs font-medium text-gray-500 mb-3">请先选择广告账户</p>
-                            <button 
-                              onClick={onSelectAccount}
-                              className="w-full py-2 bg-primary-500 text-white rounded-base text-sm font-medium hover:bg-primary-600 active:bg-primary-700 transition-all duration-200 focus:outline-none focus:shadow-primary-focus flex items-center justify-center gap-2"
-                            >
-                              <Briefcase size={12} /> 选择账户
-                            </button>
-                          </div>
-                        ) : customExcLoading.isLoading ? (
-                          <div className="p-6 flex flex-col items-center justify-center gap-2">
-                            <Loader2 size={18} className="animate-spin text-primary-500/70" />
-                            <p className="text-xs font-medium text-gray-400 animate-pulse">Loading audiences...</p>
-                          </div>
-                        ) : (
-                          CUSTOM_AUDIENCES.map(ca => {
-                            const isSel = adSet.customExclude?.includes(ca.id);
-                            return (
-                              <div key={ca.id} onClick={() => onToggleItem('customExclude', ca.id)} className="flex items-center justify-between px-4 py-2.5 hover:bg-gray-50 rounded-lg cursor-pointer group">
-                                <span className={`text-xs font-medium ${isSel ? 'text-primary-500' : 'text-gray-600'}`}>{ca.name}</span>
-                                {isSel && <Check size={12} className="text-primary-500" />}
-                              </div>
-                            );
-                          })
-                        )}
-                      </div>
-                    </>
-                  )}
-                </div>
-
-                {/* LAL Exclude */}
-                <div className="space-y-3 relative">
-                  <label className="text-xs font-medium text-gray-500 px-1">Lookalike Audience</label>
-                  <div onClick={() => setShowLalExcDropdown(!showLalExcDropdown)} className="min-h-[3rem] px-4 py-2 bg-white border border-gray-200 rounded-base flex flex-wrap gap-2 items-center cursor-pointer hover:border-purple-300 transition-all shadow-sm">
-                    {adSet.lalExclude?.length > 0 ? adSet.lalExclude.map(id => (
-                      <span key={id} className="px-2 py-0.5 bg-gray-200 text-gray-600 rounded-md text-xs font-medium border border-gray-300">
-                        {LAL_AUDIENCES.find(la => la.id === id)?.name?.split(' ')[1] || 'LAL'}
-                      </span>
-                    )) : <span className="text-xs font-medium text-gray-300">选择排除 LAL 受众...</span>}
-                  </div>
-                  {showLalExcDropdown && (
-                    <>
-                      <div className="fixed inset-0 z-[260]" onClick={() => setShowLalExcDropdown(false)} />
-                      <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-purple-100 rounded-inner shadow-xl z-[270] max-h-48 overflow-y-auto p-1 animate-in zoom-in-95 duration-150">
-                        {!isPlatformAuthed ? (
-                          <div className="p-4 text-center">
-                            <p className="text-xs font-medium text-gray-500 mb-3">需要连接 {platformName} 以加载受众</p>
-                            <button
-                              onClick={handleConnectMeta}
-                              disabled={isMetaConnecting}
-                              className="w-full py-2 bg-primary-500 text-white rounded-base text-sm font-medium hover:bg-primary-600 active:bg-primary-700 transition-all duration-200 focus:outline-none focus:shadow-primary-focus flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
-                            >
-                              {isMetaConnecting ? <><Loader2 size={12} className="animate-spin" /> Connecting...</> : <><ConnectIcon size={12} /> 连接 {platformName}</>}
-                            </button>
-                          </div>
-                        ) : !selectedAccount ? (
-                          <div className="p-4 text-center">
-                            <p className="text-xs font-medium text-gray-500 mb-3">请先选择广告账户</p>
-                            <button 
-                              onClick={onSelectAccount}
-                              className="w-full py-2 bg-primary-500 text-white rounded-base text-sm font-medium hover:bg-primary-600 active:bg-primary-700 transition-all duration-200 focus:outline-none focus:shadow-primary-focus flex items-center justify-center gap-2"
-                            >
-                              <Briefcase size={12} /> 选择账户
-                            </button>
-                          </div>
-                        ) : lalExcLoading.isLoading ? (
-                          <div className="p-6 flex flex-col items-center justify-center gap-2">
-                            <Loader2 size={18} className="animate-spin text-purple-500/70" />
-                            <p className="text-xs font-medium text-gray-400 animate-pulse">Loading audiences...</p>
-                          </div>
-                        ) : (
-                          LAL_AUDIENCES.map(la => {
-                            const isSel = adSet.lalExclude?.includes(la.id);
-                            return (
-                              <div key={la.id} onClick={() => onToggleItem('lalExclude', la.id)} className="flex items-center justify-between px-4 py-2.5 hover:bg-purple-50 rounded-lg cursor-pointer group">
-                                <span className={`text-xs font-medium ${isSel ? 'text-purple-600' : 'text-gray-600'}`}>{la.name}</span>
-                                {isSel && <Check size={12} className="text-purple-600" />}
-                              </div>
-                            );
-                          })
-                        )}
-                      </div>
-                    </>
-                  )}
-                </div>
-              </div>
+              <IncludeExcludeAudienceDropdown
+                triggerLabel="包含受众"
+                open={showAudInc}
+                onToggle={() => setShowAudInc(!showAudInc)}
+                lalSelected={adSet.lalInclude || []}
+                customSelected={adSet.customInclude || []}
+                onToggleLal={(id) => onToggleItem('lalInclude', id)}
+                onToggleCustom={(id) => onToggleItem('customInclude', id)}
+                authStatus={authStatus} platform={platform}
+                selectedAccount={selectedAccount}
+                onAuthorize={handleConnectMeta}
+                isAuthLoading={isMetaConnecting}
+                onPickAccount={onSelectAccount}
+                align="left"
+              />
+              <IncludeExcludeAudienceDropdown
+                triggerLabel="排除受众"
+                open={showAudExc}
+                onToggle={() => setShowAudExc(!showAudExc)}
+                lalSelected={adSet.lalExclude || []}
+                customSelected={adSet.customExclude || []}
+                onToggleLal={(id) => onToggleItem('lalExclude', id)}
+                onToggleCustom={(id) => onToggleItem('customExclude', id)}
+                authStatus={authStatus} platform={platform}
+                selectedAccount={selectedAccount}
+                onAuthorize={handleConnectMeta}
+                isAuthLoading={isMetaConnecting}
+                onPickAccount={onSelectAccount}
+                align="left"
+              />
             </div>
           </div>
+
         </div>
 
         <div className="px-6 py-4 border-t border-gray-200 flex justify-end gap-3 shrink-0 z-[300]">
@@ -991,6 +816,11 @@ const CampaignPreviewView = ({
   authStatus, selectedAccount, onAuthStatusChange, onSelectAccount,
   platform, onAuthorizeChannel, onOpenAccountPicker, channelAuthLoading,
   isExistingCampaign, campaignObjective, onBudgetChange, onBudgetTypeChange,
+  bidStrategy = 'highest_volume', bidAmount = '',
+  globalAgeMin = '', globalAgeMax = '', globalGender = 'All',
+  globalInterests = [],
+  globalLalInclude = [], globalCustomInclude = [],
+  globalLalExclude = [], globalCustomExclude = [],
   campaignNameTemplate = '{Brand}-{location}-{date}',
   adsetNameTemplate = '{location}-{audience_type}-{creative_type}-{date}',
   adNameTemplate = '{Brand}-{creative_type}-{number}-{date}',
@@ -1001,6 +831,32 @@ const CampaignPreviewView = ({
   onSelectProductSet,
   numCampaigns = 1,
 }) => {
+  // 受众字段优先级解析：adset detail override → 02 全局预设 → savedAudience（如选） → 硬编码兜底
+  const resolveAudience = (i) => {
+    const det = adsetAudienceDetails[i] || {};
+    const _sa = det.savedAudience || null;
+    const pick = (a, b, c, d) => {
+      if (a !== undefined && a !== '' && a !== null) return a;
+      if (b !== undefined && b !== '' && b !== null) return b;
+      if (c !== undefined && c !== null) return c;
+      return d;
+    };
+    const pickArr = (a, b, c) => {
+      if (Array.isArray(a)) return a;
+      if (Array.isArray(b) && b.length > 0) return b;
+      return c || [];
+    };
+    return {
+      ageMin: pick(det.ageMin, globalAgeMin, _sa?.ageMin, 18),
+      ageMax: pick(det.ageMax, globalAgeMax, _sa?.ageMax, 65),
+      gender: pick(det.gender, globalGender, _sa?.gender, 'All'),
+      interests: pickArr(det.interests, globalInterests.length ? globalInterests : null, _sa?.interests || ['Broad Shopping']),
+      customInclude: pickArr(det.customInclude, globalCustomInclude, []),
+      lalInclude: pickArr(det.lalInclude, globalLalInclude, []),
+      customExclude: pickArr(det.customExclude, globalCustomExclude, []),
+      lalExclude: pickArr(det.lalExclude, globalLalExclude, []),
+    };
+  };
   const isFlexible = adType === 'FLEXIBLE' && (campaignObjective === 'sales_conversions' || campaignObjective === 'app_promotion');
 
   const applyNameTemplate = (template, vars) =>
@@ -1129,18 +985,18 @@ const CampaignPreviewView = ({
     if (campaignType === 'CATALOG') {
       for (let i = 0; i < targetAdSetCount; i++) {
         const audienceType = initialAdsetAudiences[i % initialAdsetAudiences.length] || 'ADV';
-        const _sa0 = adsetAudienceDetails[i]?.savedAudience ?? null;
+        const aud0 = resolveAudience(i);
         adSets.push({
           name: applyNameTemplate(adsetNameTemplate, { location: locStr, audience_type: audienceType, creative_type: isFlexible ? 'Flexible' : 'Single', date: today }),
           audienceType,
-          ageMin: _sa0?.ageMin ?? 18, ageMax: _sa0?.ageMax ?? 65, gender: _sa0?.gender ?? 'All',
+          ageMin: aud0.ageMin, ageMax: aud0.ageMax, gender: aud0.gender,
           locations: ['United States'],
-          interests: _sa0?.interests ?? ['Broad Shopping'],
+          interests: aud0.interests,
           language: 'All languages',
-          customInclude: [],
-          lalInclude: [],
-          customExclude: [],
-          lalExclude: [],
+          customInclude: aud0.customInclude,
+          lalInclude: aud0.lalInclude,
+          customExclude: aud0.customExclude,
+          lalExclude: aud0.lalExclude,
           placements: ['All'], optimizationEvent,
           ads: [{
             id: `cat-${i}`,
@@ -1168,18 +1024,18 @@ const CampaignPreviewView = ({
             const adSetOverallIdx = (pIdx * adsetsPerProduct) + i;
             const audienceType = initialAdsetAudiences[adSetOverallIdx % initialAdsetAudiences.length] || 'ADV';
             
-            const _sa1 = adsetAudienceDetails[adSetOverallIdx]?.savedAudience ?? null;
+            const aud1 = resolveAudience(adSetOverallIdx);
             adSets.push({
               name: applyNameTemplate(adsetNameTemplate, { location: locStr, audience_type: audienceType, creative_type: isFlexible ? 'Flexible' : 'Single', date: today }),
               audienceType,
-              ageMin: _sa1?.ageMin ?? 18, ageMax: _sa1?.ageMax ?? 65, gender: _sa1?.gender ?? 'All',
+              ageMin: aud1.ageMin, ageMax: aud1.ageMax, gender: aud1.gender,
               locations: ['United States'],
-              interests: _sa1?.interests ?? ['E-commerce', 'Shopping'],
+              interests: aud1.interests,
               language: 'All languages',
-              customInclude: [],
-              lalInclude: [],
-              customExclude: [],
-              lalExclude: [],
+              customInclude: aud1.customInclude,
+              lalInclude: aud1.lalInclude,
+              customExclude: aud1.customExclude,
+              lalExclude: aud1.lalExclude,
               placements: ['Feed', 'Stories', 'Reels'], optimizationEvent,
               ads: buildAds(creatives, adSetOverallIdx, `AD - ${p.name}`, () => p)
             });
@@ -1189,18 +1045,18 @@ const CampaignPreviewView = ({
         const allCreativesPool = selectedProducts.flatMap(p => (productCreativesMap[p.id] || []).map(c => ({...c, productId: p.id})));
         for (let i = 0; i < targetAdSetCount; i++) {
           const audienceType = initialAdsetAudiences[i % initialAdsetAudiences.length] || 'ADV';
-          const _sa2 = adsetAudienceDetails[i]?.savedAudience ?? null;
+          const aud2 = resolveAudience(i);
           adSets.push({
             name: applyNameTemplate(adsetNameTemplate, { location: locStr, audience_type: audienceType, creative_type: isFlexible ? 'Flexible' : 'Single', date: today }),
             audienceType,
-            ageMin: _sa2?.ageMin ?? 18, ageMax: _sa2?.ageMax ?? 65, gender: _sa2?.gender ?? 'All',
+            ageMin: aud2.ageMin, ageMax: aud2.ageMax, gender: aud2.gender,
             locations: ['United States'],
-            interests: _sa2?.interests ?? ['E-commerce', 'Shopping'],
+            interests: aud2.interests,
             language: 'All languages',
-            customInclude: [],
-            lalInclude: [],
-            customExclude: [],
-            lalExclude: [],
+            customInclude: aud2.customInclude,
+            lalInclude: aud2.lalInclude,
+            customExclude: aud2.customExclude,
+            lalExclude: aud2.lalExclude,
             placements: ['Feed', 'Stories'], optimizationEvent,
             ads: buildAds(allCreativesPool, i, `AD - 混合组 ${i + 1}`, c => selectedProducts.find(prod => prod.id === c.productId))
           });
@@ -1218,18 +1074,18 @@ const CampaignPreviewView = ({
             const currentGroupSize = Math.ceil(remainingAds / remainingGroups);
             const chunk = allAdsPool.slice(currentIndex, currentIndex + currentGroupSize);
             
-            const _sa3 = adsetAudienceDetails[i]?.savedAudience ?? null;
+            const aud3 = resolveAudience(i);
             adSets.push({
               name: applyNameTemplate(adsetNameTemplate, { location: locStr, audience_type: audienceType, creative_type: isFlexible ? 'Flexible' : 'Single', date: today }),
               audienceType,
-              ageMin: _sa3?.ageMin ?? 18, ageMax: _sa3?.ageMax ?? 65, gender: _sa3?.gender ?? 'All',
+              ageMin: aud3.ageMin, ageMax: aud3.ageMax, gender: aud3.gender,
               locations: ['United States'],
-              interests: _sa3?.interests ?? ['Fashion'],
+              interests: aud3.interests,
               language: 'All languages',
-              customInclude: [],
-              lalInclude: [],
-              customExclude: [],
-              lalExclude: [],
+              customInclude: aud3.customInclude,
+              lalInclude: aud3.lalInclude,
+              customExclude: aud3.customExclude,
+              lalExclude: aud3.lalExclude,
               placements: ['Feed'], optimizationEvent,
               ads: buildAds(chunk, i, `AD - G${i + 1}`, c => selectedProducts.find(prod => prod.id === c.productId))
             });
@@ -2168,6 +2024,8 @@ const CampaignPreviewView = ({
         budgetType={budgetType}
         dailyBudget={localBudget}
         platform={platform}
+        effectiveBidStrategy={bidStrategy}
+        globalBidAmount={bidAmount}
       />
       {EditAdModal()}
       <ChangeCreativeModal />

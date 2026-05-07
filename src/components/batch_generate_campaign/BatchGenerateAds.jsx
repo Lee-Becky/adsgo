@@ -99,6 +99,141 @@ const getAvailableObjectives = (platformId) =>
     ? CAMPAIGN_OBJECTIVES.filter(o => TIKTOK_ALLOWED_OBJECTIVES.has(o.value))
     : CAMPAIGN_OBJECTIVES;
 
+// 竞价策略（仅 Meta 适用）。valueType 决定 adset 级金额输入的形态：
+//   - 'none'     ：无需填写
+//   - 'currency' ：USD 金额（cost cap / bid cap）
+//   - 'roas'     ：ROAS 数值（非百分比，如 2.5 表示 250% ROAS）
+const BID_STRATEGIES = [
+  { value: 'highest_volume', label: 'Highest volume',       desc: '最大化转化量',   valueType: 'none' },
+  { value: 'cost_cap',       label: 'Cost per result goal', desc: '单次结果成本上限', valueType: 'currency' },
+  { value: 'roas',           label: 'ROAS goal',            desc: 'ROAS 目标',     valueType: 'roas' },
+  { value: 'bid_cap',        label: 'Bid cap',              desc: '出价上限',       valueType: 'currency' },
+];
+
+// 受众预设数据（exported 共享给 CampaignPlanView / CampaignPreviewView 复用）
+export const PRESET_LAL_AUDIENCES = [
+  { id: 'lal1', name: 'LAL (US, 1%) - Purchase' },
+  { id: 'lal2', name: 'LAL (US, 5%) - Purchase' },
+  { id: 'lal3', name: 'LAL (UK, 1%) - Add to Cart' },
+  { id: 'lal4', name: 'LAL (All, 10%) - Page View' },
+];
+export const PRESET_CUSTOM_AUDIENCES = [
+  { id: 'ca1', name: 'Website Visitors - 30d' },
+  { id: 'ca2', name: 'Purchasers - Last 180d' },
+  { id: 'ca3', name: 'Lead Form Submissions' },
+  { id: 'ca4', name: 'Video Viewers 50%' },
+];
+
+// 共享组件：包含/排除受众下拉，内部 LAL/Custom tab 切换，4 态授权 UI
+// 用于 02 受众预设 / AdsetDetailPanel LAL 分支 / EditAdSetModal 三处。
+export const IncludeExcludeAudienceDropdown = ({
+  triggerLabel,           // 触发卡片标题 (e.g. '包含受众' / '排除受众')
+  open, onToggle,         // 受控展开
+  lalSelected = [], customSelected = [],
+  onToggleLal, onToggleCustom,
+  authStatus, platform,
+  selectedAccount,
+  onAuthorize, isAuthLoading,
+  onPickAccount,
+  triggerClassName = '',
+  align = 'right',        // 'left' | 'right'
+}) => {
+  const [activeTab, setActiveTab] = useState('lal');
+  const platformId = platform?.id || 'meta';
+  const platformName = platform?.name || 'Meta';
+  const isAuthed = !!authStatus?.[platformId];
+  const ConnectIcon = platformId === 'tiktok' ? Smartphone : Facebook;
+  const total = (lalSelected?.length || 0) + (customSelected?.length || 0);
+  return (
+    <div className="relative">
+      <div onClick={onToggle}
+        className={`bg-white rounded-inner p-4 border border-gray-100 shadow-sm flex flex-col gap-2 group cursor-pointer hover:border-primary-500/20 transition-all h-full ${triggerClassName}`}>
+        <span className="text-xs font-medium text-gray-500">{triggerLabel}</span>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <Users size={16} className="text-primary-500 shrink-0" />
+            <span className={`text-sm font-bold truncate ${total > 0 ? 'text-gray-700' : 'text-gray-300'}`}>
+              {total > 0 ? `已选 ${total} 项` : '不限制'}
+            </span>
+          </div>
+          <ChevronDown size={14} className={`text-gray-300 transition-transform shrink-0 ${open ? 'rotate-180' : ''}`} />
+        </div>
+      </div>
+      {open && (
+        <div className={`absolute top-full ${align === 'left' ? 'left-0' : 'right-0'} mt-2 w-[320px] bg-white rounded-base shadow-xl border border-gray-100 animate-in fade-in zoom-in-95 duration-200 z-[20] overflow-hidden`}>
+          {!isAuthed ? (
+            <div className="p-4 space-y-3 text-center">
+              <p className="text-xs font-medium text-gray-500">需要连接 {platformName} 以加载受众</p>
+              <button
+                onClick={async (e) => {
+                  e.stopPropagation();
+                  // 1) 触发授权（父级 handleAuthorizeChannel 是 async）
+                  await onAuthorize?.(platformId);
+                  // 2) 授权完成后立刻引导用户选广告账户（省去用户再次点击的额外步骤）
+                  if (!selectedAccount) onPickAccount?.();
+                }}
+                disabled={isAuthLoading}
+                className="w-full py-2.5 bg-primary-500 text-white rounded-base text-sm font-medium hover:bg-primary-600 transition-all flex items-center justify-center gap-2 disabled:opacity-70"
+              >
+                {isAuthLoading ? <Loader2 size={14} className="animate-spin" /> : <ConnectIcon size={14} />}
+                {isAuthLoading ? '连接中...' : `连接 ${platformName}`}
+              </button>
+            </div>
+          ) : !selectedAccount ? (
+            <div className="p-4 space-y-3 text-center">
+              <p className="text-xs font-medium text-gray-500">请先选择广告账户</p>
+              <button
+                onClick={(e) => { e.stopPropagation(); onPickAccount?.(); }}
+                className="w-full py-2.5 bg-primary-500 text-white rounded-base text-sm font-medium hover:bg-primary-600 transition-all flex items-center justify-center gap-2"
+              >
+                <Briefcase size={14} /> 选择广告账户
+              </button>
+            </div>
+          ) : (
+            <>
+              <div className="flex border-b border-gray-100 bg-gray-50/50">
+                {[
+                  { id: 'lal',    label: 'Lookalike', count: lalSelected.length },
+                  { id: 'custom', label: 'Custom',    count: customSelected.length },
+                ].map(t => (
+                  <button key={t.id} onClick={() => setActiveTab(t.id)}
+                    className={`flex-1 px-3 py-2.5 text-xs font-semibold transition-colors flex items-center justify-center gap-1.5 ${activeTab === t.id ? 'text-primary-600 border-b-2 border-primary-500 bg-white' : 'text-gray-500 hover:text-gray-700'}`}>
+                    {t.label}
+                    {t.count > 0 && <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${activeTab === t.id ? 'bg-primary-50' : 'bg-gray-200/60'}`}>{t.count}</span>}
+                  </button>
+                ))}
+              </div>
+              <div className="p-2 max-h-[280px] overflow-y-auto custom-scrollbar">
+                {activeTab === 'lal'
+                  ? PRESET_LAL_AUDIENCES.map(la => {
+                      const sel = lalSelected.includes(la.id);
+                      return (
+                        <button key={la.id} onClick={() => onToggleLal?.(la.id)}
+                          className={`w-full flex items-center justify-between px-2.5 py-2 rounded-base text-xs font-medium transition-all ${sel ? 'bg-purple-50 text-purple-700' : 'text-gray-600 hover:bg-gray-50'}`}>
+                          <span className="truncate">{la.name}</span>
+                          {sel && <Check size={12} className="shrink-0" />}
+                        </button>
+                      );
+                    })
+                  : PRESET_CUSTOM_AUDIENCES.map(ca => {
+                      const sel = customSelected.includes(ca.id);
+                      return (
+                        <button key={ca.id} onClick={() => onToggleCustom?.(ca.id)}
+                          className={`w-full flex items-center justify-between px-2.5 py-2 rounded-base text-xs font-medium transition-all ${sel ? 'bg-primary-50 text-primary-600' : 'text-gray-600 hover:bg-gray-50'}`}>
+                          <span className="truncate">{ca.name}</span>
+                          {sel && <Check size={12} className="shrink-0" />}
+                        </button>
+                      );
+                    })}
+              </div>
+            </>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
 const ADSET_GOALS_MAPPING = {
   awareness_engagement: [
     { value: 'impressions', label: 'Impressions' },
@@ -259,65 +394,156 @@ const Stepper = ({ label, value, onChange, min = 1, max = 99, step = 1, hint }) 
 //   2) Account dropdown — 4-state machine driven by platform + authStatus + selectedAccount
 //   The account selection here is the GLOBAL source of truth for selectedAccount.
 
-// ChannelPickerHero — Phase 1 入场体验：未选 platform 时占据中央焦点，4 平台铺开为大卡片。
-// 选完后该组件自然 unmount，sticky ChannelHeaderCard 接管。
+// ChannelPickerHero — 入场两步走：① 选媒体 → ② 动态露出该媒体可用的 Campaign Objective 卡片平铺；
+// 二者齐全后自动 unmount，由 sticky ChannelHeaderCard 接管。
 const PLATFORM_TAGLINES = {
   meta:   'Facebook · Instagram · 全球最大社交广告',
   tiktok: '短视频 · 年轻流量主场',
   google: 'Search · YouTube · GDN',
   bing:   'Microsoft · 海外搜索补充',
 };
-const ChannelPickerHero = ({ platforms, onPick }) => (
-  <section className="px-4 md:px-8 pt-12 pb-20 flex justify-center animate-in fade-in slide-in-from-bottom-4 duration-300">
-    <div className="bg-white rounded-section shadow-xl border border-gray-100 max-w-4xl w-full p-12">
-      <div className="flex flex-col items-center text-center mb-10">
-        <div className="w-14 h-14 bg-primary-500 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-primary-500/20 mb-5">
-          <Monitor size={28} />
+const ChannelPickerHero = ({ platforms, onPick, platform, objective, onPickObjective, availableObjectives = [] }) => {
+  // 当前阶段：1 = 选媒体；2 = 选目标
+  const stage = platform ? 2 : 1;
+  return (
+    <section className="px-2 md:px-4 pt-10 pb-16 w-full animate-in fade-in slide-in-from-bottom-4 duration-300">
+      {/* 顶部：标题 + 进度提示 */}
+      <header className="flex flex-col items-center text-center mb-10">
+        <div className="w-14 h-14 bg-primary-500 rounded-xl flex items-center justify-center text-white shadow-[0_8px_24px_rgba(112,51,245,0.25)] mb-5 ring-4 ring-primary-50">
+          <Monitor className="w-7 h-7" />
         </div>
-        <h2 className="text-2xl font-semibold text-gray-900 tracking-tight mb-2">Choose your media channel</h2>
-        <p className="text-sm font-medium text-gray-400">选择投放媒体渠道开始本次 Campaign 配置</p>
-        <p className="text-xs text-gray-300 mt-2 max-w-md leading-relaxed">系统将基于此自动匹配产品规范、广告位、素材尺寸与目标账号。</p>
-      </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {platforms.map(p => {
-          const tagline = PLATFORM_TAGLINES[p.id] || '';
-          if (p.disabled) {
+        <h1 className="text-2xl font-bold text-gray-900 tracking-tight mb-2">Get your campaign started</h1>
+        <p className="text-sm text-gray-500 font-medium">先选择投放媒体，再确定 Campaign 目标 · 系统将基于此自动匹配版位与素材规范</p>
+        <div className="mt-6 inline-flex items-center gap-3">
+          <div className="flex items-center gap-2 text-xs">
+            <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold transition-all ${stage >= 1 ? 'bg-primary-500 text-white shadow-sm shadow-primary-500/30' : 'bg-gray-200 text-gray-500'}`}>{platform ? <Check className="w-3 h-3" strokeWidth={3} /> : '1'}</span>
+            <span className={`font-semibold ${stage >= 1 ? 'text-gray-900' : 'text-gray-400'}`}>媒体</span>
+          </div>
+          <span className={`block w-12 h-px ${platform ? 'bg-primary-500' : 'bg-gray-200'}`} />
+          <div className="flex items-center gap-2 text-xs">
+            <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold transition-all ${objective ? 'bg-primary-500 text-white shadow-sm shadow-primary-500/30' : stage === 2 ? 'bg-gray-900 text-white' : 'bg-gray-200 text-gray-500'}`}>{objective ? <Check className="w-3 h-3" strokeWidth={3} /> : '2'}</span>
+            <span className={`font-semibold ${objective ? 'text-gray-900' : stage === 2 ? 'text-gray-700' : 'text-gray-400'}`}>目标</span>
+          </div>
+        </div>
+      </header>
+
+      {/* Step 1 — 媒体 */}
+      <section className="space-y-4 mb-10">
+        <div className="flex items-baseline justify-between px-1">
+          <div className="flex items-baseline gap-2">
+            <h2 className="text-base font-semibold text-gray-900 tracking-tight">投放媒体</h2>
+            <span className="text-xs text-gray-400 font-medium">Media Channel</span>
+          </div>
+          <span className="text-xs text-gray-400">选择 1 个 · 决定后续可用目标与素材规范</span>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {platforms.map(p => {
+            const tagline = PLATFORM_TAGLINES[p.id] || '';
+            const isPicked = platform?.id === p.id;
+            if (p.disabled) {
+              return (
+                <div key={p.id} className="relative flex flex-col gap-3 p-5 bg-white rounded-xl border border-[#F0F0F0] opacity-50 cursor-not-allowed select-none">
+                  <div className="w-11 h-11 rounded-lg bg-gray-50 border border-[#F0F0F0] flex items-center justify-center shrink-0 overflow-hidden">
+                    <img src={p.logo} alt="" className="w-7 h-7 object-contain grayscale" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold text-gray-500 truncate">{p.name}</p>
+                    <p className="text-xs text-gray-400 truncate mt-0.5">{tagline}</p>
+                  </div>
+                  <span className="absolute top-3 right-3 bg-gray-900 text-white text-[10px] font-bold px-2 py-0.5 rounded-full tracking-wider">COMING SOON</span>
+                </div>
+              );
+            }
             return (
-              <div key={p.id} className="relative flex items-center gap-4 p-5 bg-gray-50 rounded-inner border-2 border-gray-100 opacity-50 cursor-not-allowed select-none">
-                <div className="w-12 h-12 rounded-xl bg-white border border-gray-100 flex items-center justify-center shrink-0 overflow-hidden">
-                  <img src={p.logo} alt="" className="w-8 h-8 object-contain grayscale" />
+              <button
+                key={p.id}
+                type="button"
+                onClick={() => onPick(p)}
+                className={`group relative flex flex-col gap-3 p-5 rounded-xl border-2 cursor-pointer transition-all text-left focus:outline-none focus:ring-2 focus:ring-primary-500/20 ${
+                  isPicked
+                    ? 'bg-primary-50/40 border-primary-500 shadow-[-2px_2px_16px_rgba(112,51,245,0.18)]'
+                    : platform
+                      ? 'bg-white border-[#F0F0F0] opacity-60 hover:opacity-100 hover:border-primary-500/40'
+                      : 'bg-white border-[#F0F0F0] hover:border-primary-500 hover:shadow-[-2px_2px_16px_rgba(14,0,45,0.06)] hover:-translate-y-0.5'
+                }`}
+              >
+                <div className="flex items-start justify-between">
+                  <div className={`w-11 h-11 rounded-lg flex items-center justify-center shrink-0 overflow-hidden border transition-colors ${isPicked ? 'bg-white border-primary-500/30' : 'bg-gray-50 border-[#F0F0F0] group-hover:border-primary-500/30 group-hover:bg-white'}`}>
+                    <img src={p.logo} alt="" className="w-7 h-7 object-contain" />
+                  </div>
+                  {isPicked
+                    ? <CheckCircle2 className="w-5 h-5 text-primary-500 shrink-0" strokeWidth={2.5} />
+                    : <ArrowRight className="w-4 h-4 text-gray-300 shrink-0 group-hover:text-primary-500 group-hover:translate-x-0.5 transition-all mt-1" />}
                 </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-base font-bold text-gray-500 truncate">{p.name}</p>
-                  <p className="text-xs text-gray-400 truncate mt-0.5">{tagline}</p>
+                <div className="min-w-0">
+                  <p className={`text-sm font-semibold truncate transition-colors ${isPicked ? 'text-primary-600' : 'text-gray-900 group-hover:text-primary-500'}`}>{p.name}</p>
+                  <p className="text-xs text-gray-500 truncate mt-1">{tagline}</p>
                 </div>
-                <span className="absolute top-2 right-2 bg-gray-900 text-white text-[10px] font-bold px-2 py-0.5 rounded-full tracking-wider">COMING SOON</span>
-              </div>
+              </button>
             );
-          }
-          return (
-            <button
-              key={p.id}
-              type="button"
-              onClick={() => onPick(p)}
-              className="group flex items-center gap-4 p-5 bg-white rounded-inner border-2 border-gray-100 hover:border-primary-500 hover:shadow-lg hover:-translate-y-0.5 cursor-pointer transition-all text-left"
-            >
-              <div className="w-12 h-12 rounded-xl bg-white border border-gray-100 flex items-center justify-center shrink-0 overflow-hidden group-hover:border-primary-500/30 transition-colors">
-                <img src={p.logo} alt="" className="w-8 h-8 object-contain" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="text-base font-bold text-gray-900 truncate group-hover:text-primary-500 transition-colors">{p.name}</p>
-                <p className="text-xs text-gray-400 truncate mt-0.5">{tagline}</p>
-              </div>
-              <ArrowRight size={16} className="text-gray-300 shrink-0 group-hover:text-primary-500 group-hover:translate-x-0.5 transition-all" />
-            </button>
-          );
-        })}
-      </div>
-      <p className="text-xs text-gray-300 text-center mt-8">选完渠道后可继续选择广告账号（账号选填，亦可跳过）</p>
-    </div>
-  </section>
-);
+          })}
+        </div>
+      </section>
+
+      {/* Step 2 — Campaign 目标 — 媒体选定后动态出现 */}
+      {platform && (
+        <section className="space-y-4 animate-in fade-in slide-in-from-top-4 duration-300">
+          <div className="flex items-baseline justify-between px-1">
+            <div className="flex items-baseline gap-2">
+              <h2 className="text-base font-semibold text-gray-900 tracking-tight">Campaign 目标</h2>
+              <span className="text-xs text-gray-400 font-medium">Campaign Objective</span>
+            </div>
+            <span className="text-xs text-gray-400">
+              {availableObjectives.length > 0
+                ? `${availableObjectives.length} 个可用 · 来自 ${platform.name}`
+                : '该平台暂无可用目标'}
+            </span>
+          </div>
+          <div className={`grid grid-cols-1 sm:grid-cols-2 gap-4 ${availableObjectives.length >= 5 ? 'lg:grid-cols-5' : availableObjectives.length === 4 ? 'lg:grid-cols-4' : 'lg:grid-cols-3'}`}>
+            {availableObjectives.map(obj => {
+              const Icon = obj.icon;
+              const isPicked = objective === obj.value;
+              return (
+                <button
+                  key={obj.value}
+                  type="button"
+                  onClick={() => onPickObjective?.(obj.value)}
+                  className={`group relative flex flex-col gap-3 p-5 rounded-xl border-2 cursor-pointer transition-all text-left focus:outline-none focus:ring-2 focus:ring-primary-500/20 ${
+                    isPicked
+                      ? 'bg-primary-50/40 border-primary-500 shadow-[-2px_2px_16px_rgba(112,51,245,0.18)]'
+                      : 'bg-white border-[#F0F0F0] hover:border-primary-500 hover:shadow-[-2px_2px_16px_rgba(14,0,45,0.06)] hover:-translate-y-0.5'
+                  }`}
+                >
+                  <div className="flex items-start justify-between">
+                    <div className={`w-11 h-11 rounded-lg flex items-center justify-center shrink-0 transition-all ${isPicked ? 'bg-primary-500 text-white shadow-md shadow-primary-500/25' : `${obj.bg} ${obj.color}`}`}>
+                      <Icon className="w-5 h-5" />
+                    </div>
+                    {isPicked
+                      ? <CheckCircle2 className="w-5 h-5 text-primary-500 shrink-0" strokeWidth={2.5} />
+                      : <ArrowRight className="w-4 h-4 text-gray-300 shrink-0 group-hover:text-primary-500 group-hover:translate-x-0.5 transition-all mt-1" />}
+                  </div>
+                  <div className="min-w-0">
+                    <p className={`text-sm font-semibold truncate transition-colors ${isPicked ? 'text-primary-600' : 'text-gray-900 group-hover:text-primary-500'}`}>{obj.label}</p>
+                    <p className="text-xs text-gray-500 line-clamp-2 mt-1">{obj.description}</p>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
+      {/* 底部辅助提示 — 三段渐进式文案 */}
+      <p className="text-xs text-gray-400 text-center mt-10 font-medium">
+        {!platform
+          ? '选择媒体后将解锁该平台可投放的 Campaign 目标'
+          : !objective
+            ? '选择 Campaign 目标后即可进入下一步配置 · 广告账户选填，可稍后再选'
+            : '准备就绪，即将进入 Campaign 配置…'}
+      </p>
+    </section>
+  );
+};
 
 const ChannelHeaderCard = ({
   platform, onChangePlatform,
@@ -326,12 +552,16 @@ const ChannelHeaderCard = ({
   authStatus,
   onAuthorize, isAuthLoading,
   openDropdown, setOpenDropdown, dropdownRef,
+  objective, onChangeObjective, availableObjectives = [],
 }) => {
   const accountState =
     !platform                          ? 'NO_PLATFORM' :
     !authStatus?.[platform.id]         ? 'NEED_AUTH'   :
     !selectedAccount                   ? 'NEED_PICK'   :
                                          'PICKED';
+
+  const objectiveDisabled = !platform;
+  const currentObjectiveObj = availableObjectives.find(o => o.value === objective);
 
   const triggerDisabled = accountState === 'NO_PLATFORM';
   const handleTriggerClick = () => {
@@ -394,6 +624,64 @@ const ChannelHeaderCard = ({
                 )}
               </div>
             ))}
+          </div>
+        )}
+      </div>
+
+      {/* Campaign Objective dropdown — 媒体选定后必填，置于平台与账号之间。
+          注意 dropdown key 必须与下方 TargetingChannelCard 的 Conversion Event ('objective') 错开，
+          否则共享 openDropdown 状态会触发联动 bug。 */}
+      <div className="relative shrink-0 min-w-[220px]" ref={openDropdown === 'campaignObjective' ? dropdownRef : null}>
+        <div
+          onClick={() => { if (!objectiveDisabled) setOpenDropdown(openDropdown === 'campaignObjective' ? null : 'campaignObjective'); }}
+          className={`bg-gray-800 rounded-inner px-4 py-2.5 border border-gray-700 flex items-center justify-between gap-3 transition-all ${
+            objectiveDisabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:border-primary-500/50'
+          }`}
+        >
+          <div className="flex items-center gap-2.5 min-w-0">
+            {objectiveDisabled ? (
+              <>
+                <Target size={16} className="text-gray-500 shrink-0" />
+                <span className="text-sm font-bold text-gray-500 truncate">请先选择渠道...</span>
+              </>
+            ) : currentObjectiveObj ? (
+              <>
+                <Target size={16} className="text-primary-400 shrink-0" />
+                <span className="text-sm font-bold text-white truncate">{currentObjectiveObj.label}</span>
+              </>
+            ) : (
+              <>
+                <Target size={16} className="text-primary-400 shrink-0" />
+                <span className="text-sm font-bold text-gray-400 truncate">请选择目标 <span className="text-rose-400">*</span></span>
+              </>
+            )}
+          </div>
+          <ChevronDown size={14} className={`text-gray-500 transition-transform shrink-0 ${openDropdown === 'campaignObjective' ? 'rotate-180' : ''}`} />
+        </div>
+        {openDropdown === 'campaignObjective' && !objectiveDisabled && (
+          <div className="absolute top-full right-0 mt-2 w-full min-w-[260px] bg-gray-900 rounded-base shadow-xl border border-gray-700 p-2 space-y-1 animate-in fade-in zoom-in-95 duration-200 z-[20]">
+            {availableObjectives.map(obj => {
+              const Icon = obj.icon;
+              const isActive = objective === obj.value;
+              return (
+                <button
+                  key={obj.value}
+                  onClick={() => { onChangeObjective?.(obj.value); setOpenDropdown(null); }}
+                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-base transition-all text-left ${
+                    isActive ? 'bg-primary-500/15 text-primary-300' : 'hover:bg-gray-800 text-gray-200'
+                  }`}
+                >
+                  <div className={`w-6 h-6 rounded-base flex items-center justify-center ${isActive ? 'bg-primary-500 text-white' : `${obj.bg} ${obj.color}`}`}>
+                    {Icon && <Icon size={14} />}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-xs font-bold truncate">{obj.label}</p>
+                    <p className="text-[10px] text-gray-400 truncate">{obj.description}</p>
+                  </div>
+                  {isActive && <Check size={12} className="ml-auto text-primary-300 shrink-0" />}
+                </button>
+              );
+            })}
           </div>
         )}
       </div>
@@ -485,6 +773,7 @@ const ChannelHeaderCard = ({
   );
 };
 
+
 // 广告结构初始化设置卡 — 投放目标 + 广告结构数量 + Ad Format + 版位 + 每日预算 + 高级设置 collapsible
 const TargetingChannelCard = ({
   objective, setObjective, adsetGoal, setAdsetGoal, event, setEvent,
@@ -502,6 +791,12 @@ const TargetingChannelCard = ({
   advancedOpen, setAdvancedOpen,
   productCount = 0,
   startDate, setStartDate, endDate, setEndDate, onQuickSchedule,
+  bidStrategy, onChangeBidStrategy, bidAmount, setBidAmount,
+  globalAdsetLalInclude, setGlobalAdsetLalInclude,
+  globalAdsetCustomInclude, setGlobalAdsetCustomInclude,
+  globalAdsetLalExclude, setGlobalAdsetLalExclude,
+  globalAdsetCustomExclude, setGlobalAdsetCustomExclude,
+  authStatus, onAuthorize, isAuthLoading, selectedAccount, onPickAccount,
   children,
 }) => {
   const isFlexibleObjective = objective === 'sales_conversions' || objective === 'app_promotion';
@@ -627,56 +922,39 @@ const TargetingChannelCard = ({
           </div>
         </div>
 
-        {/* Promote Objective (3-level cascading dropdown) */}
+        {/* Conversion Event — 仅承载 conversion goal + pixel event 两级（campaign objective 已上提至顶部 ChannelHeaderCard）。
+            objective 未选时禁用，并提示在顶部选择。 */}
         <div>
           <div className="relative" ref={openDropdown === 'objective' ? dropdownRef : null}>
-            <div onClick={() => { setOpenDropdown(openDropdown === 'objective' ? null : 'objective'); setObjectiveStage('objective'); }}
-              className="bg-white rounded-inner p-4 border border-gray-100 shadow-sm flex flex-col gap-2 group cursor-pointer hover:border-primary-500/20 transition-all h-full">
-              <span className="text-xs font-medium text-gray-500">Promote Objective</span>
+            <div
+              onClick={() => {
+                if (!objective) return;
+                setOpenDropdown(openDropdown === 'objective' ? null : 'objective');
+                // 始终从 goal 进入（objective 已在顶部选过）
+                setObjectiveStage('goal');
+              }}
+              className={`bg-white rounded-inner p-4 border border-gray-100 shadow-sm flex flex-col gap-2 group transition-all h-full ${
+                objective ? 'cursor-pointer hover:border-primary-500/20' : 'opacity-60 cursor-not-allowed'
+              }`}
+            >
+              <span className="text-xs font-medium text-gray-500">Conversion Event</span>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2.5 min-w-0">
                   <Target size={16} className="text-primary-500 shrink-0" />
                   <span className="text-sm font-bold text-gray-700 truncate">
-                    {event || currentGoalObj?.label || <span className="text-gray-300">Select...</span>}
+                    {!objective
+                      ? <span className="text-gray-300">请先在顶部选择 Campaign Objective</span>
+                      : (event || currentGoalObj?.label || <span className="text-gray-300">Select...</span>)}
                   </span>
                 </div>
                 <ChevronDown size={14} className={`text-gray-300 transition-transform shrink-0 ${openDropdown === 'objective' ? 'rotate-180' : ''}`} />
               </div>
             </div>
-            {openDropdown === 'objective' && (
+            {openDropdown === 'objective' && objective && (
               <div className="absolute top-full right-0 mt-2 w-[320px] bg-white rounded-base shadow-xl border border-gray-100 p-3 animate-in fade-in zoom-in-95 duration-200 z-[20]">
-                {objectiveStage === 'objective' && (
-                  <div className="space-y-1">
-                    <p className="text-[10px] font-bold text-gray-400 tracking-widest mb-2 px-2">1. Campaign Objective</p>
-                    <div className="grid grid-cols-1 gap-1">
-                      {getAvailableObjectives(platform?.id).map(obj => {
-                        const Icon = obj.icon;
-                        return (
-                          <button key={obj.value} onClick={() => {
-                            const firstGoal = ADSET_GOALS_MAPPING[obj.value][0];
-                            setObjective(obj.value);
-                            setAdsetGoal(firstGoal?.value || '');
-                            setEvent(firstGoal?.needsEvent ? 'Purchase' : '');
-                            setObjectiveStage('goal');
-                          }} className={`w-full text-left px-3 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-3 ${
-                            objective === obj.value ? 'bg-gray-900 text-white shadow-md' : 'hover:bg-gray-50 text-gray-600'
-                          }`}>
-                            <div className={`w-6 h-6 rounded-lg flex items-center justify-center ${objective === obj.value ? 'bg-primary-500 text-white' : `${obj.bg} ${obj.color}`}`}>
-                              <Icon size={14} />
-                            </div>
-                            <span>{obj.label}</span>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
                 {objectiveStage === 'goal' && (
                   <div className="space-y-1">
-                    <div className="flex items-center gap-2 mb-2 px-1">
-                      <button onClick={() => setObjectiveStage('objective')} className="p-1 hover:bg-gray-100 rounded-md transition-colors text-gray-400"><ChevronLeft size={14} /></button>
-                      <p className="text-[10px] font-bold text-gray-400 tracking-widest">2. Conversion Goal</p>
-                    </div>
+                    <p className="text-[10px] font-bold text-gray-400 tracking-widest mb-2 px-2">Conversion Goal</p>
                     <div className="grid grid-cols-1 gap-1">
                       {availableGoals.map(goal => (
                         <button key={goal.value} onClick={() => {
@@ -696,7 +974,7 @@ const TargetingChannelCard = ({
                   <div className="space-y-2">
                     <div className="flex items-center gap-2 px-1">
                       <button onClick={() => setObjectiveStage('goal')} className="p-1 hover:bg-gray-100 rounded-md transition-colors text-gray-400"><ChevronLeft size={14} /></button>
-                      <p className="text-[10px] font-bold text-gray-400 tracking-widest">3. Pixel Event</p>
+                      <p className="text-[10px] font-bold text-gray-400 tracking-widest">Pixel Event</p>
                     </div>
                     <div className="relative px-1">
                       <Search size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300" />
@@ -757,6 +1035,115 @@ const TargetingChannelCard = ({
           </div>
         </div>
       </div>
+
+      {/* 竞价 + 受众预设 — Meta: [策略 + 金额 + 包含 + 排除] 4col；TikTok: [金额 + 包含 + 排除] 3col */}
+      {(() => {
+        const isTikTok = platform?.id === 'tiktok';
+        const currentBidStrategyObj = BID_STRATEGIES.find(s => s.value === bidStrategy);
+        const valueType = currentBidStrategyObj?.valueType || 'none';
+        const amountDisabled = !isTikTok && valueType === 'none';
+        const amountLabel = isTikTok ? '竞价目标（空为最大转化量）'
+          : valueType === 'roas' ? '目标 ROAS'
+          : valueType === 'currency' ? (bidStrategy === 'cost_cap' ? '单次结果成本上限' : '出价上限')
+          : '竞价目标';
+        const amountSuffix = isTikTok ? 'USD' : valueType === 'roas' ? '×' : valueType === 'currency' ? 'USD' : '';
+        const placeholder = amountDisabled ? '无需填写' : valueType === 'roas' ? '如 2.5' : '0.00';
+        const toggleLal = (target) => target === 'inc'
+          ? (id) => setGlobalAdsetLalInclude(globalAdsetLalInclude.includes(id) ? globalAdsetLalInclude.filter(x => x !== id) : [...globalAdsetLalInclude, id])
+          : (id) => setGlobalAdsetLalExclude(globalAdsetLalExclude.includes(id) ? globalAdsetLalExclude.filter(x => x !== id) : [...globalAdsetLalExclude, id]);
+        const toggleCustom = (target) => target === 'inc'
+          ? (id) => setGlobalAdsetCustomInclude(globalAdsetCustomInclude.includes(id) ? globalAdsetCustomInclude.filter(x => x !== id) : [...globalAdsetCustomInclude, id])
+          : (id) => setGlobalAdsetCustomExclude(globalAdsetCustomExclude.includes(id) ? globalAdsetCustomExclude.filter(x => x !== id) : [...globalAdsetCustomExclude, id]);
+        return (
+          <div className={`grid gap-4 mt-4 relative z-[5] grid-cols-1 md:grid-cols-2 ${isTikTok ? 'lg:grid-cols-3' : 'lg:grid-cols-4'}`}>
+            {!isTikTok && (
+              <div className="relative" ref={openDropdown === 'bidStrategy' ? dropdownRef : null}>
+                <div onClick={() => setOpenDropdown(openDropdown === 'bidStrategy' ? null : 'bidStrategy')}
+                  className="bg-white rounded-inner p-4 border border-gray-100 shadow-sm flex flex-col gap-2 group cursor-pointer hover:border-primary-500/20 transition-all h-full">
+                  <span className="text-xs font-medium text-gray-500">竞价策略</span>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <Target size={16} className="text-primary-500 shrink-0" />
+                      <span className="text-sm font-bold text-gray-700 truncate">
+                        {currentBidStrategyObj?.label || <span className="text-gray-300">Select...</span>}
+                      </span>
+                    </div>
+                    <ChevronDown size={14} className={`text-gray-300 transition-transform shrink-0 ${openDropdown === 'bidStrategy' ? 'rotate-180' : ''}`} />
+                  </div>
+                </div>
+                {openDropdown === 'bidStrategy' && (
+                  <div className="absolute top-full right-0 mt-2 w-[300px] bg-white rounded-base shadow-xl border border-gray-100 p-2 animate-in fade-in zoom-in-95 duration-200 z-[20]">
+                    {BID_STRATEGIES.map(s => (
+                      <button key={s.value} onClick={() => { onChangeBidStrategy?.(s.value); setOpenDropdown(null); }}
+                        className={`w-full text-left px-3 py-2.5 rounded-base transition-all flex items-center justify-between gap-3 ${bidStrategy === s.value ? 'bg-gray-900 text-white' : 'hover:bg-gray-50 text-gray-600'}`}>
+                        <div className="min-w-0">
+                          <p className="text-xs font-bold truncate">{s.label}</p>
+                          <p className={`text-[10px] truncate ${bidStrategy === s.value ? 'text-gray-300' : 'text-gray-400'}`}>{s.desc}</p>
+                        </div>
+                        {bidStrategy === s.value && <Check size={12} className="shrink-0" />}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+            <div>
+              <div className={`bg-white rounded-inner p-4 border border-gray-100 shadow-sm flex flex-col gap-2 transition-all h-full ${amountDisabled ? 'opacity-60' : 'focus-within:border-primary-500/30'}`}>
+                <span className="text-xs font-medium text-gray-500">{amountLabel}</span>
+                <div className="flex items-center gap-2.5 min-w-0">
+                  {valueType !== 'roas' && !isTikTok ? (
+                    <DollarSign size={16} className="text-primary-500 shrink-0" />
+                  ) : (
+                    <Target size={16} className="text-primary-500 shrink-0" />
+                  )}
+                  <input
+                    type="number"
+                    min={0}
+                    step={valueType === 'roas' ? 0.1 : 0.01}
+                    disabled={amountDisabled}
+                    value={bidAmount ?? ''}
+                    onChange={(e) => setBidAmount?.(e.target.value)}
+                    placeholder={placeholder}
+                    className="flex-1 min-w-0 bg-transparent border-none outline-none text-sm font-bold text-gray-700 tabular-nums disabled:cursor-not-allowed"
+                  />
+                  {amountSuffix && (
+                    <span className="text-xs font-medium text-gray-400 whitespace-nowrap shrink-0">{amountSuffix}</span>
+                  )}
+                </div>
+              </div>
+            </div>
+            {/* 包含受众（选填） */}
+            <IncludeExcludeAudienceDropdown
+              triggerLabel="包含受众（选填）"
+              open={openDropdown === 'audInclude'}
+              onToggle={() => setOpenDropdown(openDropdown === 'audInclude' ? null : 'audInclude')}
+              lalSelected={globalAdsetLalInclude}
+              customSelected={globalAdsetCustomInclude}
+              onToggleLal={toggleLal('inc')}
+              onToggleCustom={toggleCustom('inc')}
+              authStatus={authStatus} platform={platform}
+              selectedAccount={selectedAccount}
+              onAuthorize={onAuthorize} isAuthLoading={isAuthLoading}
+              onPickAccount={onPickAccount}
+            />
+            {/* 排除受众（选填） */}
+            <IncludeExcludeAudienceDropdown
+              triggerLabel="排除受众（选填）"
+              open={openDropdown === 'audExclude'}
+              onToggle={() => setOpenDropdown(openDropdown === 'audExclude' ? null : 'audExclude')}
+              lalSelected={globalAdsetLalExclude}
+              customSelected={globalAdsetCustomExclude}
+              onToggleLal={toggleLal('exc')}
+              onToggleCustom={toggleCustom('exc')}
+              authStatus={authStatus} platform={platform}
+              selectedAccount={selectedAccount}
+              onAuthorize={onAuthorize} isAuthLoading={isAuthLoading}
+              onPickAccount={onPickAccount}
+            />
+          </div>
+        );
+      })()}
+
       </section>
 
       {/* Section B: Campaign 架构 — 现 01，视觉首位（CSS order 控制） */}
@@ -1499,6 +1886,22 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
     });
     return out;
   }, [productCreativeGroupsMap]);
+  // 全部素材组按产品 → 组的顺序拍平 — 用于「按素材组顺序」应用方式下逐组对应文案
+  const allCreativeGroupsForCopy = useMemo(() => {
+    const result = [];
+    selectedProducts.forEach(p => {
+      (productCreativeGroupsMap[p.id] || []).forEach(g => {
+        result.push({
+          key: `${p.id}::${g.id}`,
+          productId: p.id,
+          productName: p.name,
+          groupId: g.id,
+          groupName: g.name,
+        });
+      });
+    });
+    return result;
+  }, [selectedProducts, productCreativeGroupsMap]);
   const [selectedCatalog, setSelectedCatalog] = useState(null);
   const [selectedProductSet, setSelectedProductSet] = useState('All Products');
   const [selectedAccount, setSelectedAccount] = useState(() =>
@@ -1542,6 +1945,10 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
     bodies: ['Discover the perfect blend of style and comfort. Shop our latest collection today and enjoy exclusive benefits.'],
   }]);
   const [unifiedCopyApplyMode, setUnifiedCopyApplyMode] = useState('AI_MATCH');
+  // 「按素材组顺序」应用方式专用的 per-素材组文案覆写：key = `${productId}::${groupId}`
+  // shape: { [key]: { headlines: string[], bodies: string[] } }
+  // 与 unifiedCopyGroups 互独立，切换 AI_MATCH ↔ SEQUENTIAL 时彼此数据不丢
+  const [creativeGroupCopyOverrides, setCreativeGroupCopyOverrides] = useState({});
 
   // 排期：直接展示开始/结束时间，无需 type 切换（结束时间留空 = 不限期）
   const [startDate, setStartDate] = useState('');
@@ -1647,11 +2054,21 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
   });
   const [adsetCreativeSelections, setAdsetCreativeSelections] = useState({});
   const [numByCreativeAdsets, setNumByCreativeAdsets] = useState(1);
-  const [adsetAudiences, setAdsetAudiences] = useState(Array(50).fill('ADV'));
+  // 受众策略：稀疏数组（用户未触动则保持 undefined，由 getAudienceTypes 通过 02 globals + platform 决定 fallback）
+  // 每个 campaign 用 stripe = 100 槽位（即 flatIdx = cIdx*100 + aIdx），最多 10 campaigns × 100 adsets。
+  const [adsetAudiences, setAdsetAudiences] = useState(() => Array(1000));
   const [adType, setAdType] = useState('FLEXIBLE');
   const [adsetAudienceDetails, setAdsetAudienceDetails] = useState({});
   const [budgetType, setBudgetType] = useState('CBO');
   const [dailyBudget, setDailyBudget] = useState(50);
+  // 竞价策略 / 竞价目标：bidStrategy 仅 Meta 用；bidAmount 全平台共用（数字字符串）
+  const [bidStrategy, setBidStrategy] = useState('highest_volume');
+  const [bidAmount, setBidAmount] = useState('');
+  // 受众预设（全局选填）— 仅含包含/排除 4 个字段；非空时 adset 默认 audienceTypes 自动加入 'LAL'
+  const [globalAdsetLalInclude, setGlobalAdsetLalInclude] = useState([]);
+  const [globalAdsetCustomInclude, setGlobalAdsetCustomInclude] = useState([]);
+  const [globalAdsetLalExclude, setGlobalAdsetLalExclude] = useState([]);
+  const [globalAdsetCustomExclude, setGlobalAdsetCustomExclude] = useState([]);
   const [view, setView] = useState('config');
 
   // ref：用于点击"预览发布计划"前命令式校验架构图，未填素材组的 adset 由 CampaignPlanView 自行高亮 + 滚动定位
@@ -1665,11 +2082,11 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
 
   // === TikTok 媒体渠道差异化纠偏 ===
   // TikTok 仅支持 sales_conversions / app_promotion 两类 objective；切到 TikTok
-  // 时若顶部 objective 不在白名单，自动降级到 sales_conversions（保留用户后续
-  // 手动选择能力，因此仅在 platform.id 变化时触发一次）。
+  // 时若用户已选择了不在白名单的 objective，自动降级到 sales_conversions。
+  // 注意：onboarding 阶段 objective 为空字符串时不要自动填，否则用户会跳过 step 2 选择。
   useEffect(() => {
     if (platform?.id !== 'tiktok') return;
-    if (!TIKTOK_ALLOWED_OBJECTIVES.has(objective)) {
+    if (objective && !TIKTOK_ALLOWED_OBJECTIVES.has(objective)) {
       const nextObj = 'sales_conversions';
       const firstGoal = ADSET_GOALS_MAPPING[nextObj][0];
       setObjective(nextObj);
@@ -1685,10 +2102,15 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
     }
   }, [platform?.id]);
 
-  // TikTok 下不支持 Advantage+ 受众；把所有 ADV 自动收敛为 LAL。
+  // TikTok 下不支持 Advantage+ 受众；从每个 adset 的策略数组里移除 ADV，
+  // 移除后若变空则补 LAL。兼容旧 string 形态。
   useEffect(() => {
     if (platform?.id !== 'tiktok') return;
-    setAdsetAudiences(prev => prev.map(t => (t === 'ADV' ? 'LAL' : t)));
+    setAdsetAudiences(prev => prev.map(raw => {
+      const arr = Array.isArray(raw) ? raw : (raw ? [raw] : []);
+      const filtered = arr.filter(x => x !== 'ADV');
+      return filtered.length > 0 ? filtered : ['LAL'];
+    }));
   }, [platform?.id]);
 
   // TikTok 下同样收敛架构图各 campaign 详情中已选的 objective。
@@ -1866,26 +2288,83 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
     });
   };
 
-  const handleToggleAudienceType = (index) => {
-    const types = ['ADV', 'LAL', 'INT'];
+  // 多选 toggle：含 type 则移除（保底至少留 1 项），否则追加。
+  // 首次操作 sparse undefined 槽位时，先按当前 02 globals + platform 物化默认，再 toggle。
+  const handleToggleAudienceType = (index, type) => {
     setAdsetAudiences(prev => {
-      const currentType = prev[index] || 'ADV';
-      const nextType = types[(types.indexOf(currentType) + 1) % types.length];
       const next = [...prev];
-      next[index] = nextType;
+      const raw = next[index];
+      let cur;
+      if (Array.isArray(raw)) cur = [...raw];
+      else if (typeof raw === 'string' && raw) cur = [raw];
+      else {
+        const isTikTokP = platform?.id === 'tiktok';
+        const hasAudPreset = (globalAdsetLalInclude.length + globalAdsetCustomInclude.length
+                            + globalAdsetLalExclude.length + globalAdsetCustomExclude.length) > 0;
+        cur = isTikTokP ? ['LAL'] : (hasAudPreset ? ['ADV', 'LAL'] : ['ADV']);
+      }
+      const i = cur.indexOf(type);
+      if (i >= 0) cur.splice(i, 1);
+      else cur.push(type);
+      if (cur.length === 0) cur.push(type === 'ADV' ? 'LAL' : 'ADV'); // 兜底
+      next[index] = cur;
       return next;
     });
   };
+  // 兼容旧 single-set API（被某些 AI 策略入口调用），转化为单元素数组
   const handleSetAudienceType = (index, type) => {
     setAdsetAudiences(prev => {
       const next = [...prev];
-      next[index] = type;
+      next[index] = Array.isArray(type) ? type : [type];
       return next;
     });
   };
 
   const handleSaveAdsetAudienceDetails = (idx, details) => {
     setAdsetAudienceDetails(prev => ({ ...prev, [idx]: details }));
+  };
+
+  // 切换全局 Bid Strategy（仅 Meta 用）：清空全局 bidAmount 与所有 adset 级 bidAmount override，
+  // 让其回落到新策略下的默认空值（用户需重新填写金额）。
+  const handleChangeBidStrategy = (newStrategy) => {
+    if (!newStrategy || newStrategy === bidStrategy) return;
+    setBidStrategy(newStrategy);
+    setBidAmount('');
+    setAdsetAudienceDetails(prev => {
+      const next = {};
+      Object.entries(prev).forEach(([k, v]) => {
+        if (v && v.bidAmount !== undefined) {
+          const { bidAmount: _b, ...rest } = v;
+          next[k] = rest;
+        } else {
+          next[k] = v;
+        }
+      });
+      return next;
+    });
+  };
+
+  // 切换全局 Campaign Objective：联动重置 conversion goal / event，并清掉所有 adset 的 per-adset override
+  // （依据用户决策：objective 变更 → 所有 adset 的 conversion event 自动落到新 objective 下的第一个 goal/event）。
+  const handleChangeObjective = (newObjective) => {
+    if (!newObjective || newObjective === objective) return;
+    const firstGoal = (ADSET_GOALS_MAPPING[newObjective] || [])[0];
+    setObjective(newObjective);
+    setAdsetGoal(firstGoal?.value || '');
+    setEvent(firstGoal?.needsEvent ? 'Purchase' : '');
+    // 清空 adset 级别 conversion event override，使其回落到新全局默认
+    setAdsetAudienceDetails(prev => {
+      const next = {};
+      Object.entries(prev).forEach(([k, v]) => {
+        if (v && (v.adsetGoal !== undefined || v.event !== undefined)) {
+          const { adsetGoal: _g, event: _e, ...rest } = v;
+          next[k] = rest;
+        } else {
+          next[k] = v;
+        }
+      });
+      return next;
+    });
   };
 
   const handleApplyAiStrategy = (parsedConfig) => {
@@ -2554,8 +3033,9 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
 
   return (
     <div className="bg-gray-50/50 min-h-full">
-      {/* Sticky Channel + Account header (replaces former black banner) — 仅 Phase 2 (platform 已选) 渲染 */}
-      {view === 'config' && platform && (
+      {/* Sticky Channel + Account header — 仅 onboarding 完成（platform + objective 均已选）后渲染，
+          避免与入场两步选择卡片同屏出现导致重复操作 */}
+      {view === 'config' && platform && objective && (
         <div className="sticky top-0 w-full px-4 md:px-8 pt-4 animate-in slide-in-from-top-full duration-500" style={{ zIndex: Z_INDEX.HEADER }}>
           <div className="max-w-7xl mx-auto">
             <ChannelHeaderCard
@@ -2577,6 +3057,9 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
               onAuthorize={handleAuthorizeChannel}
               isAuthLoading={channelAuthLoading}
               openDropdown={openDropdown} setOpenDropdown={setOpenDropdown} dropdownRef={dropdownRef}
+              objective={objective}
+              onChangeObjective={handleChangeObjective}
+              availableObjectives={getAvailableObjectives(platform?.id)}
             />
           </div>
         </div>
@@ -2586,10 +3069,14 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
         <div className="w-full max-w-7xl">
 
           {view === 'config' ? (
-            !platform ? (
+            (!platform || !objective) ? (
               <ChannelPickerHero
                 platforms={PLATFORMS}
                 onPick={(p) => setPlatform(p)}
+                platform={platform}
+                objective={objective}
+                onPickObjective={handleChangeObjective}
+                availableObjectives={getAvailableObjectives(platform?.id)}
               />
             ) : (
             <div className="space-y-8 animate-fade-in pb-20">
@@ -2693,6 +3180,17 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
                   startDate={startDate} setStartDate={setStartDate}
                   endDate={endDate} setEndDate={setEndDate}
                   onQuickSchedule={handleQuickSchedule}
+                  bidStrategy={bidStrategy} onChangeBidStrategy={handleChangeBidStrategy}
+                  bidAmount={bidAmount} setBidAmount={setBidAmount}
+                  globalAdsetLalInclude={globalAdsetLalInclude} setGlobalAdsetLalInclude={setGlobalAdsetLalInclude}
+                  globalAdsetCustomInclude={globalAdsetCustomInclude} setGlobalAdsetCustomInclude={setGlobalAdsetCustomInclude}
+                  globalAdsetLalExclude={globalAdsetLalExclude} setGlobalAdsetLalExclude={setGlobalAdsetLalExclude}
+                  globalAdsetCustomExclude={globalAdsetCustomExclude} setGlobalAdsetCustomExclude={setGlobalAdsetCustomExclude}
+                  authStatus={authStatus}
+                  onAuthorize={handleAuthorizeChannel}
+                  isAuthLoading={channelAuthLoading}
+                  selectedAccount={selectedAccount}
+                  onPickAccount={() => setShowMetaAccountPicker(true)}
                 >
                   {/* Naming Strategy */}
                   <NamingStrategySection
@@ -2902,124 +3400,177 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
                                   <span className="text-xs text-gray-400 font-medium">TikTok 每组仅 1 条标题 + 1 条正文</span>
                                 )}
                               </div>
-                              {unifiedCopyGroups.map((group, i) => {
-                                const isTikTok = platform?.id === 'tiktok';
-                                const maxItemsPerGroup = isTikTok ? 1 : 5;
-                                const headlines = group.headlines || [''];
-                                const bodies = group.bodies || [''];
-                                const updateGroup = (patch) => setUnifiedCopyGroups(prev => prev.map(g => g.id === group.id ? { ...g, ...patch } : g));
+                              {(() => {
+                                const isSequentialApply = unifiedCopyApplyMode === 'SEQUENTIAL';
+                                // SEQUENTIAL：每个素材组对应一个文案组，标题用「素材组-{groupName}」，文案不可增删
+                                // AI_MATCH：用户自管理 unifiedCopyGroups
+                                const displayGroups = isSequentialApply
+                                  ? allCreativeGroupsForCopy.map(cg => {
+                                      const ov = creativeGroupCopyOverrides[cg.key] || {};
+                                      return {
+                                        id: cg.key,
+                                        displayName: `${cg.productName} · ${cg.groupName}`,
+                                        headlines: ov.headlines || [''],
+                                        bodies: ov.bodies || [''],
+                                        _onUpdate: (patch) => setCreativeGroupCopyOverrides(prev => {
+                                          const cur = prev[cg.key] || { headlines: [''], bodies: [''] };
+                                          return { ...prev, [cg.key]: { headlines: cur.headlines, bodies: cur.bodies, ...patch } };
+                                        }),
+                                        _onDelete: null,
+                                        _canDelete: false,
+                                      };
+                                    })
+                                  : unifiedCopyGroups.map((g, i) => ({
+                                      id: g.id,
+                                      displayName: `文案组 ${i + 1}`,
+                                      headlines: g.headlines || [''],
+                                      bodies: g.bodies || [''],
+                                      _onUpdate: (patch) => setUnifiedCopyGroups(prev => prev.map(x => x.id === g.id ? { ...x, ...patch } : x)),
+                                      _onDelete: () => setUnifiedCopyGroups(prev => prev.filter(x => x.id !== g.id)),
+                                      _canDelete: unifiedCopyGroups.length > 1,
+                                    }));
+
+                                if (isSequentialApply && allCreativeGroupsForCopy.length === 0) {
+                                  return (
+                                    <div className="text-center py-8 px-4 bg-gray-50 border border-dashed border-gray-200 rounded-inner">
+                                      <p className="text-xs font-medium text-gray-400 leading-relaxed">
+                                        请先在上方添加产品并配置素材组，<br/>文案组将自动按素材组数量与顺序生成。
+                                      </p>
+                                    </div>
+                                  );
+                                }
+
                                 return (
-                                  <div key={group.id} className="bg-white border border-gray-100 rounded-inner p-5 space-y-4">
-                                    <div className="flex items-center justify-between">
-                                      <div className="flex items-center gap-2">
-                                        <FileText size={14} className="text-primary-500/70" />
-                                        <span className="text-xs font-semibold text-gray-700">文案组 {i + 1}</span>
-                                      </div>
-                                      {unifiedCopyGroups.length > 1 && (
-                                        <button
-                                          onClick={() => setUnifiedCopyGroups(prev => prev.filter(g => g.id !== group.id))}
-                                          className="w-7 h-7 flex items-center justify-center rounded-full text-gray-400 hover:text-rose-500 hover:bg-rose-50 transition-colors"
-                                          title="删除该文案组"
-                                        >
-                                          <X size={14} />
-                                        </button>
-                                      )}
-                                    </div>
+                                  <>
+                                    {isSequentialApply && (
+                                      <p className="text-[11px] text-gray-400 font-medium px-1 leading-relaxed flex items-start gap-1">
+                                        <Info size={10} className="text-gray-300 shrink-0 mt-0.5" />
+                                        <span>已按素材组数量与顺序自动展开 — 每个文案组对应一个素材组，可独立定制内容</span>
+                                      </p>
+                                    )}
+                                    {displayGroups.map(entry => {
+                                      const isTikTok = platform?.id === 'tiktok';
+                                      const maxItemsPerGroup = isTikTok ? 1 : 5;
+                                      const headlines = entry.headlines;
+                                      const bodies = entry.bodies;
+                                      const updateGroup = entry._onUpdate;
+                                      return (
+                                        <div key={entry.id} className="bg-white border border-gray-100 rounded-inner p-5 space-y-4">
+                                          <div className="flex items-center justify-between">
+                                            <div className="flex items-center gap-2 min-w-0">
+                                              <FileText size={14} className="text-primary-500/70 shrink-0" />
+                                              <span className="text-xs font-semibold text-gray-700 truncate">{entry.displayName}</span>
+                                            </div>
+                                            {entry._canDelete && entry._onDelete && (
+                                              <button
+                                                onClick={entry._onDelete}
+                                                className="w-7 h-7 flex items-center justify-center rounded-full text-gray-400 hover:text-rose-500 hover:bg-rose-50 transition-colors shrink-0"
+                                                title="删除该文案组"
+                                              >
+                                                <X size={14} />
+                                              </button>
+                                            )}
+                                          </div>
 
-                                    {/* 标题列表 */}
-                                    <div className="space-y-2">
-                                      <div className="flex items-center justify-between px-1">
-                                        <label className="text-xs font-medium text-gray-400">统一广告标题</label>
-                                        {!isTikTok && (
-                                          <span className="text-xs text-gray-400">{headlines.length}/{maxItemsPerGroup}</span>
-                                        )}
-                                      </div>
-                                      {headlines.map((h, hi) => (
-                                        <div key={hi} className="flex items-center gap-2">
-                                          <input
-                                            type="text"
-                                            value={h}
-                                            onChange={(e) => {
-                                              const next = [...headlines];
-                                              next[hi] = e.target.value;
-                                              updateGroup({ headlines: next });
-                                            }}
-                                            placeholder={`请输入广告标题${headlines.length > 1 ? ` ${hi + 1}` : ''}...`}
-                                            className="flex-1 h-12 px-4 bg-gray-50 border border-gray-100 rounded-base outline-none text-sm text-gray-700 focus:border-primary-500 focus:bg-white focus:shadow-primary-focus transition-all"
-                                          />
-                                          {!isTikTok && headlines.length > 1 && (
-                                            <button
-                                              onClick={() => updateGroup({ headlines: headlines.filter((_, j) => j !== hi) })}
-                                              className="w-9 h-9 shrink-0 flex items-center justify-center rounded-full text-gray-400 hover:text-rose-500 hover:bg-rose-50 transition-colors"
-                                              title="删除该标题"
-                                            >
-                                              <X size={14} />
-                                            </button>
-                                          )}
-                                        </div>
-                                      ))}
-                                      {!isTikTok && headlines.length < maxItemsPerGroup && (
-                                        <button
-                                          onClick={() => updateGroup({ headlines: [...headlines, ''] })}
-                                          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-primary-500 hover:bg-primary-50 rounded-base transition-colors"
-                                        >
-                                          <Plus size={12} /> 添加标题
-                                        </button>
-                                      )}
-                                    </div>
+                                          {/* 标题列表 */}
+                                          <div className="space-y-2">
+                                            <div className="flex items-center justify-between px-1">
+                                              <label className="text-xs font-medium text-gray-400">统一广告标题</label>
+                                              {!isTikTok && (
+                                                <span className="text-xs text-gray-400">{headlines.length}/{maxItemsPerGroup}</span>
+                                              )}
+                                            </div>
+                                            {headlines.map((h, hi) => (
+                                              <div key={hi} className="flex items-center gap-2">
+                                                <input
+                                                  type="text"
+                                                  value={h}
+                                                  onChange={(e) => {
+                                                    const next = [...headlines];
+                                                    next[hi] = e.target.value;
+                                                    updateGroup({ headlines: next });
+                                                  }}
+                                                  placeholder={`请输入广告标题${headlines.length > 1 ? ` ${hi + 1}` : ''}...`}
+                                                  className="flex-1 h-12 px-4 bg-gray-50 border border-gray-100 rounded-base outline-none text-sm text-gray-700 focus:border-primary-500 focus:bg-white focus:shadow-primary-focus transition-all"
+                                                />
+                                                {!isTikTok && headlines.length > 1 && (
+                                                  <button
+                                                    onClick={() => updateGroup({ headlines: headlines.filter((_, j) => j !== hi) })}
+                                                    className="w-9 h-9 shrink-0 flex items-center justify-center rounded-full text-gray-400 hover:text-rose-500 hover:bg-rose-50 transition-colors"
+                                                    title="删除该标题"
+                                                  >
+                                                    <X size={14} />
+                                                  </button>
+                                                )}
+                                              </div>
+                                            ))}
+                                            {!isTikTok && headlines.length < maxItemsPerGroup && (
+                                              <button
+                                                onClick={() => updateGroup({ headlines: [...headlines, ''] })}
+                                                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-primary-500 hover:bg-primary-50 rounded-base transition-colors"
+                                              >
+                                                <Plus size={12} /> 添加标题
+                                              </button>
+                                            )}
+                                          </div>
 
-                                    {/* 正文列表 */}
-                                    <div className="space-y-2">
-                                      <div className="flex items-center justify-between px-1">
-                                        <label className="text-xs font-medium text-gray-400">统一广告正文</label>
-                                        {!isTikTok && (
-                                          <span className="text-xs text-gray-400">{bodies.length}/{maxItemsPerGroup}</span>
-                                        )}
-                                      </div>
-                                      {bodies.map((b, bi) => (
-                                        <div key={bi} className="flex items-start gap-2">
-                                          <textarea
-                                            value={b}
-                                            onChange={(e) => {
-                                              const next = [...bodies];
-                                              next[bi] = e.target.value;
-                                              updateGroup({ bodies: next });
-                                            }}
-                                            placeholder={`请输入广告正文${bodies.length > 1 ? ` ${bi + 1}` : ''}...`}
-                                            className="flex-1 p-4 bg-gray-50 border border-gray-100 rounded-base outline-none text-sm text-gray-700 h-24 focus:border-primary-500 focus:bg-white focus:shadow-primary-focus transition-all resize-none"
-                                          />
-                                          {!isTikTok && bodies.length > 1 && (
-                                            <button
-                                              onClick={() => updateGroup({ bodies: bodies.filter((_, j) => j !== bi) })}
-                                              className="w-9 h-9 shrink-0 flex items-center justify-center rounded-full text-gray-400 hover:text-rose-500 hover:bg-rose-50 transition-colors mt-1"
-                                              title="删除该正文"
-                                            >
-                                              <X size={14} />
-                                            </button>
-                                          )}
+                                          {/* 正文列表 */}
+                                          <div className="space-y-2">
+                                            <div className="flex items-center justify-between px-1">
+                                              <label className="text-xs font-medium text-gray-400">统一广告正文</label>
+                                              {!isTikTok && (
+                                                <span className="text-xs text-gray-400">{bodies.length}/{maxItemsPerGroup}</span>
+                                              )}
+                                            </div>
+                                            {bodies.map((b, bi) => (
+                                              <div key={bi} className="flex items-start gap-2">
+                                                <textarea
+                                                  value={b}
+                                                  onChange={(e) => {
+                                                    const next = [...bodies];
+                                                    next[bi] = e.target.value;
+                                                    updateGroup({ bodies: next });
+                                                  }}
+                                                  placeholder={`请输入广告正文${bodies.length > 1 ? ` ${bi + 1}` : ''}...`}
+                                                  className="flex-1 p-4 bg-gray-50 border border-gray-100 rounded-base outline-none text-sm text-gray-700 h-24 focus:border-primary-500 focus:bg-white focus:shadow-primary-focus transition-all resize-none"
+                                                />
+                                                {!isTikTok && bodies.length > 1 && (
+                                                  <button
+                                                    onClick={() => updateGroup({ bodies: bodies.filter((_, j) => j !== bi) })}
+                                                    className="w-9 h-9 shrink-0 flex items-center justify-center rounded-full text-gray-400 hover:text-rose-500 hover:bg-rose-50 transition-colors mt-1"
+                                                    title="删除该正文"
+                                                  >
+                                                    <X size={14} />
+                                                  </button>
+                                                )}
+                                              </div>
+                                            ))}
+                                            {!isTikTok && bodies.length < maxItemsPerGroup && (
+                                              <button
+                                                onClick={() => updateGroup({ bodies: [...bodies, ''] })}
+                                                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-primary-500 hover:bg-primary-50 rounded-base transition-colors"
+                                              >
+                                                <Plus size={12} /> 添加正文
+                                              </button>
+                                            )}
+                                          </div>
                                         </div>
-                                      ))}
-                                      {!isTikTok && bodies.length < maxItemsPerGroup && (
-                                        <button
-                                          onClick={() => updateGroup({ bodies: [...bodies, ''] })}
-                                          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-primary-500 hover:bg-primary-50 rounded-base transition-colors"
-                                        >
-                                          <Plus size={12} /> 添加正文
-                                        </button>
-                                      )}
-                                    </div>
-                                  </div>
+                                      );
+                                    })}
+                                    {!isSequentialApply && (
+                                      <button
+                                        onClick={() => setUnifiedCopyGroups(prev => [
+                                          ...prev,
+                                          { id: _genId(), headlines: [''], bodies: [''] },
+                                        ])}
+                                        className="flex items-center gap-2 px-4 py-2 text-xs font-medium text-primary-500 hover:bg-primary-50 rounded-base transition-colors"
+                                      >
+                                        <Plus size={14} /> 添加文案组
+                                      </button>
+                                    )}
+                                  </>
                                 );
-                              })}
-                              <button
-                                onClick={() => setUnifiedCopyGroups(prev => [
-                                  ...prev,
-                                  { id: _genId(), headlines: [''], bodies: [''] },
-                                ])}
-                                className="flex items-center gap-2 px-4 py-2 text-xs font-medium text-primary-500 hover:bg-primary-50 rounded-base transition-colors"
-                              >
-                                <Plus size={14} /> 添加文案组
-                              </button>
+                              })()}
                             </div>
                           </div>
                         )}
@@ -3064,6 +3615,12 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
                         event,
                         dailyBudget,
                         budgetType,
+                        bidStrategy,
+                        bidAmount,
+                        lalInclude: globalAdsetLalInclude,
+                        customInclude: globalAdsetCustomInclude,
+                        lalExclude: globalAdsetLalExclude,
+                        customExclude: globalAdsetCustomExclude,
                       }}
                       targetingMeta={{
                         ALL_COUNTRIES,
@@ -3072,6 +3629,7 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
                         ADSET_GOALS_MAPPING,
                         STANDARD_EVENTS,
                         COUNTRY_LANGUAGE_MAPPING,
+                        BID_STRATEGIES,
                       }}
                       productAnalyses={productAnalyses}
                       allAnalysesComplete={allAnalysesComplete}
@@ -3133,6 +3691,12 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
                   campaignName={selectedCampaign?.name || 'NEW-AI-CAMPAIGN-001'}
                   isExistingCampaign={!!selectedCampaignId}
                   campaignObjective={objective}
+                  bidStrategy={bidStrategy}
+                  bidAmount={bidAmount}
+                  globalLalInclude={globalAdsetLalInclude}
+                  globalCustomInclude={globalAdsetCustomInclude}
+                  globalLalExclude={globalAdsetLalExclude}
+                  globalCustomExclude={globalAdsetCustomExclude}
                   optimizationEvent={event || currentGoalObj?.label || currentObjectiveObj?.label || ''}
                   landingPageType={lpType}
                   landingPageTemplate={lpTemplateUrl}
