@@ -278,14 +278,14 @@ const DPAPreviewCard = () => {
 };
 
 // Sub-component for Adset Editing to prevent parent re-renders and scroll resets
-const EditAdSetModal = ({ isOpen, adSet, onUpdateField, onToggleItem, onClose, authStatus, selectedAccount, onAuthStatusChange, onSelectAccount, budgetType, dailyBudget }) => {
+const EditAdSetModal = ({ isOpen, adSet, onUpdateField, onToggleItem, onClose, authStatus, selectedAccount, onAuthStatusChange, onSelectAccount, budgetType, dailyBudget, platform }) => {
   const [locationSearch, setLocationSearch] = useState('');
   const [showLocationDropdown, setShowLocationDropdown] = useState(false);
   const [interestSearch, setInterestSearch] = useState('');
   const [showInterestDropdown, setShowInterestDropdown] = useState(false);
   const [languageSearch, setLanguageSearch] = useState('');
   const [showLanguageDropdown, setShowLanguageDropdown] = useState(false);
-  
+
   const [showCustomIncDropdown, setShowCustomIncDropdown] = useState(false);
   const [showLalIncDropdown, setShowLalIncDropdown] = useState(false);
   const [showCustomExcDropdown, setShowCustomExcDropdown] = useState(false);
@@ -293,10 +293,15 @@ const EditAdSetModal = ({ isOpen, adSet, onUpdateField, onToggleItem, onClose, a
 
   const [isMetaConnecting, setIsMetaConnecting] = useState(false);
 
-  const customIncLoading = useDropdownLoading('customAudienceInc', authStatus?.meta);
-  const lalIncLoading = useDropdownLoading('lalAudienceInc', authStatus?.meta);
-  const customExcLoading = useDropdownLoading('customAudienceExc', authStatus?.meta);
-  const lalExcLoading = useDropdownLoading('lalAudienceExc', authStatus?.meta);
+  const platformId = platform?.id || 'meta';
+  const platformName = platform?.name || 'Meta';
+  const isPlatformAuthed = !!authStatus?.[platformId];
+  const ConnectIcon = platformId === 'tiktok' ? Smartphone : Facebook;
+
+  const customIncLoading = useDropdownLoading('customAudienceInc', isPlatformAuthed);
+  const lalIncLoading = useDropdownLoading('lalAudienceInc', isPlatformAuthed);
+  const customExcLoading = useDropdownLoading('customAudienceExc', isPlatformAuthed);
+  const lalExcLoading = useDropdownLoading('lalAudienceExc', isPlatformAuthed);
 
   useEffect(() => { if (showCustomIncDropdown && selectedAccount) customIncLoading.triggerLoad(); }, [showCustomIncDropdown]);
   useEffect(() => { if (showLalIncDropdown && selectedAccount) lalIncLoading.triggerLoad(); }, [showLalIncDropdown]);
@@ -307,7 +312,7 @@ const EditAdSetModal = ({ isOpen, adSet, onUpdateField, onToggleItem, onClose, a
     setIsMetaConnecting(true);
     setTimeout(() => {
       setIsMetaConnecting(false);
-      onAuthStatusChange?.(prev => ({ ...prev, meta: true }));
+      onAuthStatusChange?.(prev => ({ ...prev, [platformId]: true }));
       if (!selectedAccount) onSelectAccount?.();
     }, 3000);
   };
@@ -678,15 +683,15 @@ const EditAdSetModal = ({ isOpen, adSet, onUpdateField, onToggleItem, onClose, a
                     <>
                       <div className="fixed inset-0 z-[260]" onClick={() => setShowCustomIncDropdown(false)} />
                       <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-100 rounded-inner shadow-xl z-[270] max-h-48 overflow-y-auto p-1 animate-in zoom-in-95 duration-150">
-                        {!authStatus?.meta ? (
+                        {!isPlatformAuthed ? (
                           <div className="p-4 text-center">
-                            <p className="text-xs font-medium text-gray-500 mb-3">需要连接 Meta 以加载受众</p>
+                            <p className="text-xs font-medium text-gray-500 mb-3">需要连接 {platformName} 以加载受众</p>
                             <button
                               onClick={handleConnectMeta}
                               disabled={isMetaConnecting}
                               className="w-full py-2 bg-primary-500 text-white rounded-base text-sm font-medium hover:bg-primary-600 active:bg-primary-700 transition-all duration-200 focus:outline-none focus:shadow-primary-focus flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
                             >
-                              {isMetaConnecting ? <><Loader2 size={12} className="animate-spin" /> Connecting...</> : <><Facebook size={12} /> 连接 Meta</>}
+                              {isMetaConnecting ? <><Loader2 size={12} className="animate-spin" /> Connecting...</> : <><ConnectIcon size={12} /> 连接 {platformName}</>}
                             </button>
                           </div>
                         ) : !selectedAccount ? (
@@ -734,15 +739,15 @@ const EditAdSetModal = ({ isOpen, adSet, onUpdateField, onToggleItem, onClose, a
                     <>
                       <div className="fixed inset-0 z-[260]" onClick={() => setShowLalIncDropdown(false)} />
                       <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-purple-100 rounded-inner shadow-xl z-[270] max-h-48 overflow-y-auto p-1 animate-in zoom-in-95 duration-150">
-                        {!authStatus?.meta ? (
+                        {!isPlatformAuthed ? (
                           <div className="p-4 text-center">
-                            <p className="text-xs font-medium text-gray-500 mb-3">需要连接 Meta 以加载受众</p>
+                            <p className="text-xs font-medium text-gray-500 mb-3">需要连接 {platformName} 以加载受众</p>
                             <button
                               onClick={handleConnectMeta}
                               disabled={isMetaConnecting}
                               className="w-full py-2 bg-primary-500 text-white rounded-base text-sm font-medium hover:bg-primary-600 active:bg-primary-700 transition-all duration-200 focus:outline-none focus:shadow-primary-focus flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
                             >
-                              {isMetaConnecting ? <><Loader2 size={12} className="animate-spin" /> Connecting...</> : <><Facebook size={12} /> 连接 Meta</>}
+                              {isMetaConnecting ? <><Loader2 size={12} className="animate-spin" /> Connecting...</> : <><ConnectIcon size={12} /> 连接 {platformName}</>}
                             </button>
                           </div>
                         ) : !selectedAccount ? (
@@ -800,15 +805,15 @@ const EditAdSetModal = ({ isOpen, adSet, onUpdateField, onToggleItem, onClose, a
                     <>
                       <div className="fixed inset-0 z-[260]" onClick={() => setShowCustomExcDropdown(false)} />
                       <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-100 rounded-inner shadow-xl z-[270] max-h-48 overflow-y-auto p-1 animate-in zoom-in-95 duration-150">
-                        {!authStatus?.meta ? (
+                        {!isPlatformAuthed ? (
                           <div className="p-4 text-center">
-                            <p className="text-xs font-medium text-gray-500 mb-3">需要连接 Meta 以加载受众</p>
+                            <p className="text-xs font-medium text-gray-500 mb-3">需要连接 {platformName} 以加载受众</p>
                             <button
                               onClick={handleConnectMeta}
                               disabled={isMetaConnecting}
                               className="w-full py-2 bg-primary-500 text-white rounded-base text-sm font-medium hover:bg-primary-600 active:bg-primary-700 transition-all duration-200 focus:outline-none focus:shadow-primary-focus flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
                             >
-                              {isMetaConnecting ? <><Loader2 size={12} className="animate-spin" /> Connecting...</> : <><Facebook size={12} /> 连接 Meta</>}
+                              {isMetaConnecting ? <><Loader2 size={12} className="animate-spin" /> Connecting...</> : <><ConnectIcon size={12} /> 连接 {platformName}</>}
                             </button>
                           </div>
                         ) : !selectedAccount ? (
@@ -856,15 +861,15 @@ const EditAdSetModal = ({ isOpen, adSet, onUpdateField, onToggleItem, onClose, a
                     <>
                       <div className="fixed inset-0 z-[260]" onClick={() => setShowLalExcDropdown(false)} />
                       <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-purple-100 rounded-inner shadow-xl z-[270] max-h-48 overflow-y-auto p-1 animate-in zoom-in-95 duration-150">
-                        {!authStatus?.meta ? (
+                        {!isPlatformAuthed ? (
                           <div className="p-4 text-center">
-                            <p className="text-xs font-medium text-gray-500 mb-3">需要连接 Meta 以加载受众</p>
+                            <p className="text-xs font-medium text-gray-500 mb-3">需要连接 {platformName} 以加载受众</p>
                             <button
                               onClick={handleConnectMeta}
                               disabled={isMetaConnecting}
                               className="w-full py-2 bg-primary-500 text-white rounded-base text-sm font-medium hover:bg-primary-600 active:bg-primary-700 transition-all duration-200 focus:outline-none focus:shadow-primary-focus flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
                             >
-                              {isMetaConnecting ? <><Loader2 size={12} className="animate-spin" /> Connecting...</> : <><Facebook size={12} /> 连接 Meta</>}
+                              {isMetaConnecting ? <><Loader2 size={12} className="animate-spin" /> Connecting...</> : <><ConnectIcon size={12} /> 连接 {platformName}</>}
                             </button>
                           </div>
                         ) : !selectedAccount ? (
@@ -1547,34 +1552,36 @@ const CampaignPreviewView = ({
               />
             </div>
 
-            <div className="space-y-3">
-              <label className="text-xs font-medium text-gray-400 px-1 flex items-center gap-2"><Tag size={12} className="text-primary-500"/> 突显优惠 (Promo Offer)</label>
-              <div className="p-5 bg-gray-50 rounded-inner border border-gray-100">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className={`w-10 h-10 rounded-inner flex items-center justify-center transition-colors ${ad.offerType === 'AUTO' ? 'bg-primary-500 text-white shadow-lg shadow-primary-500/10' : 'bg-white text-gray-300 border border-gray-100'}`}>
-                      <Sparkles size={18} />
+            {platform?.id !== 'tiktok' && (
+              <div className="space-y-3">
+                <label className="text-xs font-medium text-gray-400 px-1 flex items-center gap-2"><Tag size={12} className="text-primary-500"/> 突显优惠 (Promo Offer)</label>
+                <div className="p-5 bg-gray-50 rounded-inner border border-gray-100">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className={`w-10 h-10 rounded-inner flex items-center justify-center transition-colors ${ad.offerType === 'AUTO' ? 'bg-primary-500 text-white shadow-lg shadow-primary-500/10' : 'bg-white text-gray-300 border border-gray-100'}`}>
+                        <Sparkles size={18} />
+                      </div>
+                      <div>
+                        <p className="text-xs font-semibold text-gray-800">自动获取品牌优惠码</p>
+                        <p className="text-xs font-medium text-gray-500 mt-0.5">Auto-fetch: 90% OFF active</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-xs font-semibold text-gray-800">自动获取品牌优惠码</p>
-                      <p className="text-xs font-medium text-gray-500 mt-0.5">Auto-fetch: 90% OFF active</p>
-                    </div>
+                    <button
+                      onClick={() => {
+                        const next = [...localAdSets];
+                        const currentType = next[asIndex].ads[adIndex].offerType;
+                        next[asIndex].ads[adIndex].offerType = currentType === 'AUTO' ? 'NONE' : 'AUTO';
+                        next[asIndex].ads[adIndex].promoCode = next[asIndex].ads[adIndex].offerType === 'AUTO' ? '90%OFF' : '';
+                        setLocalAdSets(next);
+                      }}
+                      className={`w-12 h-6 rounded-full transition-all relative ${ad.offerType === 'AUTO' ? 'bg-primary-500' : 'bg-gray-200'}`}
+                    >
+                      <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${ad.offerType === 'AUTO' ? 'left-7' : 'left-1'}`} />
+                    </button>
                   </div>
-                  <button 
-                    onClick={() => {
-                      const next = [...localAdSets];
-                      const currentType = next[asIndex].ads[adIndex].offerType;
-                      next[asIndex].ads[adIndex].offerType = currentType === 'AUTO' ? 'NONE' : 'AUTO';
-                      next[asIndex].ads[adIndex].promoCode = next[asIndex].ads[adIndex].offerType === 'AUTO' ? '90%OFF' : '';
-                      setLocalAdSets(next);
-                    }}
-                    className={`w-12 h-6 rounded-full transition-all relative ${ad.offerType === 'AUTO' ? 'bg-primary-500' : 'bg-gray-200'}`}
-                  >
-                    <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${ad.offerType === 'AUTO' ? 'left-7' : 'left-1'}`} />
-                  </button>
                 </div>
               </div>
-            </div>
+            )}
           </div>
           <div className="px-6 py-4 border-t border-gray-200 flex justify-end gap-3">
             <button onClick={() => setEditingAdInfo(null)} className="px-10 py-4 bg-primary-500 text-white rounded-base text-sm font-medium hover:bg-primary-600 active:bg-primary-700 transition-all duration-200 focus:outline-none focus:shadow-primary-focus">保存修改</button>
@@ -2160,6 +2167,7 @@ const CampaignPreviewView = ({
         onSelectAccount={onSelectAccount}
         budgetType={budgetType}
         dailyBudget={localBudget}
+        platform={platform}
       />
       {EditAdModal()}
       <ChangeCreativeModal />

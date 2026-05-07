@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useRef, useEffect, useCallback, useImperativeHandle, forwardRef } from 'react';
-import { Users, Info, Sparkles, DollarSign, ChevronDown, Briefcase, Target, Layers, Lock, Edit3, Check, LayoutGrid, Facebook, Search, X, Loader2, Send, ChevronUp, MessageSquare, RefreshCw, Plus, Link, Copy, Trash2, Globe, MapPin, ChevronLeft, ArrowRight, CheckCircle2, MousePointerClick } from 'lucide-react';
+import { Users, Info, Sparkles, DollarSign, ChevronDown, Briefcase, Target, Layers, Lock, Edit3, Check, LayoutGrid, Facebook, Smartphone, Search, X, Loader2, Send, ChevronUp, MessageSquare, RefreshCw, Plus, Link, Copy, Trash2, Globe, MapPin, ChevronLeft, ArrowRight, CheckCircle2, MousePointerClick } from 'lucide-react';
 import { Z_INDEX } from '../../../constants/zIndex';
 import useDropdownLoading from '../../../hooks/useDropdownLoading';
 
@@ -875,6 +875,7 @@ const CampaignDetailPanel = ({ campaignIdx, config, onChange, onSelectExistingCa
 };
 
 const AdsetDetailPanel = ({
+  platform,
   campaignIdx, adsetIdx, audienceType, onSetAudienceType,
   details = {}, onSaveDetails,
   authStatus, handleAuthorize, selectedAccount, onSelectAccount,
@@ -886,11 +887,17 @@ const AdsetDetailPanel = ({
   const [showSaved, setShowSaved] = useState(false);
   const [isMetaConnecting, setIsMetaConnecting] = useState(false);
 
+  const platformId = platform?.id || 'meta';
+  const platformName = platform?.name || 'Meta';
+  const isTikTokPlatform = platformId === 'tiktok';
+  const ConnectIcon = isTikTokPlatform ? Smartphone : Facebook;
+  const isPlatformAuthed = !!authStatus?.[platformId];
+
   const connectMeta = (closeFn) => {
     setIsMetaConnecting(true);
     setTimeout(() => {
       setIsMetaConnecting(false);
-      handleAuthorize?.('meta');
+      handleAuthorize?.(platformId);
       closeFn?.();
     }, 1500);
   };
@@ -919,15 +926,15 @@ const AdsetDetailPanel = ({
         </div>
       </div>
 
-      {/* 受众类型 segment — 精确选择 */}
+      {/* 受众类型 segment — 精确选择；TikTok 不支持 Advantage+ */}
       <div className="space-y-2">
         <label className="text-xs font-medium text-gray-500 px-1">受众类型</label>
-        <div className="grid grid-cols-3 gap-2">
+        <div className={`grid gap-2 ${isTikTokPlatform ? 'grid-cols-2' : 'grid-cols-3'}`}>
           {[
             { id: 'ADV', label: 'Advantage+', cls: 'bg-primary-50 border-primary-500 text-primary-600' },
             { id: 'LAL', label: 'Lookalike',  cls: 'bg-purple-50 border-purple-500 text-purple-600' },
             { id: 'INT', label: 'Interest',   cls: 'bg-amber-50 border-amber-500 text-amber-600' },
-          ].map(opt => {
+          ].filter(opt => !(isTikTokPlatform && opt.id === 'ADV')).map(opt => {
             const active = audienceType === opt.id;
             return (
               <button key={opt.id}
@@ -966,10 +973,10 @@ const AdsetDetailPanel = ({
               <>
                 <div className="fixed inset-0 z-[190]" onClick={() => setShowLal(false)} />
                 <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-purple-100 rounded-section shadow-xl overflow-hidden animate-in zoom-in-95 duration-150 z-[200]">
-                  {!authStatus?.meta ? (
+                  {!isPlatformAuthed ? (
                     <div className="p-4">
                       <button onClick={() => connectMeta(() => setShowLal(false))} disabled={isMetaConnecting} className="w-full py-3 bg-primary-500 text-white rounded-base text-xs font-medium hover:bg-primary-600 transition-all flex items-center justify-center gap-2 disabled:opacity-70">
-                        {isMetaConnecting ? <><Loader2 size={12} className="animate-spin" />Connecting...</> : <><Facebook size={12} />立即连接 Meta</>}
+                        {isMetaConnecting ? <><Loader2 size={12} className="animate-spin" />Connecting...</> : <><ConnectIcon size={12} />立即连接 {platformName}</>}
                       </button>
                     </div>
                   ) : !selectedAccount ? (
@@ -1013,10 +1020,10 @@ const AdsetDetailPanel = ({
               <>
                 <div className="fixed inset-0 z-[190]" onClick={() => setShowCustom(false)} />
                 <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-purple-100 rounded-section shadow-xl overflow-hidden animate-in zoom-in-95 duration-150 z-[200]">
-                  {!authStatus?.meta ? (
+                  {!isPlatformAuthed ? (
                     <div className="p-4">
                       <button onClick={() => connectMeta(() => setShowCustom(false))} disabled={isMetaConnecting} className="w-full py-3 bg-primary-500 text-white rounded-base text-xs font-medium hover:bg-primary-600 transition-all flex items-center justify-center gap-2 disabled:opacity-70">
-                        {isMetaConnecting ? <><Loader2 size={12} className="animate-spin" />Connecting...</> : <><Facebook size={12} />立即连接 Meta</>}
+                        {isMetaConnecting ? <><Loader2 size={12} className="animate-spin" />Connecting...</> : <><ConnectIcon size={12} />立即连接 {platformName}</>}
                       </button>
                     </div>
                   ) : !selectedAccount ? (
@@ -1044,51 +1051,53 @@ const AdsetDetailPanel = ({
             )}
           </div>
 
-          {/* Saved Audience */}
-          <div className="space-y-1.5 relative">
-            <p className="text-xs font-semibold text-purple-500 px-1">Saved Audience</p>
-            <div onClick={() => setShowSaved(!showSaved)} className="w-full p-3 bg-white border-2 border-purple-100 rounded-base flex items-center justify-between cursor-pointer hover:border-purple-300 transition-all min-h-[44px]">
-              <span className={`text-[10px] font-bold truncate ${details.savedAudience ? 'text-purple-700' : 'text-gray-300'}`}>
-                {details.savedAudience ? details.savedAudience.name : '选择...'}
-              </span>
-              <ChevronDown size={12} className={`text-purple-300 shrink-0 transition-transform ${showSaved ? 'rotate-180' : ''}`} />
-            </div>
-            {showSaved && (
-              <>
-                <div className="fixed inset-0 z-[190]" onClick={() => setShowSaved(false)} />
-                <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-purple-100 rounded-section shadow-xl overflow-hidden animate-in zoom-in-95 duration-150 z-[200]">
-                  {!authStatus?.meta ? (
-                    <div className="p-4">
-                      <button onClick={() => connectMeta(() => setShowSaved(false))} disabled={isMetaConnecting} className="w-full py-3 bg-primary-500 text-white rounded-base text-xs font-medium hover:bg-primary-600 transition-all flex items-center justify-center gap-2 disabled:opacity-70">
-                        {isMetaConnecting ? <><Loader2 size={12} className="animate-spin" />Connecting...</> : <><Facebook size={12} />立即连接 Meta</>}
-                      </button>
-                    </div>
-                  ) : !selectedAccount ? (
-                    <div className="p-4">
-                      <button onClick={() => { onSelectAccount?.(); setShowSaved(false); }} className="w-full py-3 bg-primary-500 text-white rounded-base text-xs font-medium hover:bg-primary-600 transition-all flex items-center justify-center gap-2">
-                        <Briefcase size={12} />选择广告账户
-                      </button>
-                    </div>
-                  ) : savedAudienceLoading?.isLoading ? (
-                    <div className="p-5 flex flex-col items-center gap-2"><Loader2 size={18} className="animate-spin text-purple-500/70" /><p className="text-xs text-gray-400 animate-pulse">Loading...</p></div>
-                  ) : (
-                    MOCK_SAVED_AUDIENCES.map(sa => {
-                      const isSel = details.savedAudience?.id === sa.id;
-                      return (
-                        <div key={sa.id} onClick={() => { onSaveDetails({ savedAudience: isSel ? null : sa }); setShowSaved(false); }} className="flex items-start justify-between px-4 py-2.5 hover:bg-purple-50 cursor-pointer transition-colors">
-                          <div>
-                            <p className={`text-xs font-medium ${isSel ? 'text-purple-700' : 'text-gray-700'}`}>{sa.name}</p>
-                            <p className="text-[10px] text-gray-400 mt-0.5">{sa.gender} · {sa.ageMin}–{sa.ageMax}</p>
+          {/* Saved Audience —— TikTok 不支持，整段隐藏 */}
+          {!isTikTokPlatform && (
+            <div className="space-y-1.5 relative">
+              <p className="text-xs font-semibold text-purple-500 px-1">Saved Audience</p>
+              <div onClick={() => setShowSaved(!showSaved)} className="w-full p-3 bg-white border-2 border-purple-100 rounded-base flex items-center justify-between cursor-pointer hover:border-purple-300 transition-all min-h-[44px]">
+                <span className={`text-[10px] font-bold truncate ${details.savedAudience ? 'text-purple-700' : 'text-gray-300'}`}>
+                  {details.savedAudience ? details.savedAudience.name : '选择...'}
+                </span>
+                <ChevronDown size={12} className={`text-purple-300 shrink-0 transition-transform ${showSaved ? 'rotate-180' : ''}`} />
+              </div>
+              {showSaved && (
+                <>
+                  <div className="fixed inset-0 z-[190]" onClick={() => setShowSaved(false)} />
+                  <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-purple-100 rounded-section shadow-xl overflow-hidden animate-in zoom-in-95 duration-150 z-[200]">
+                    {!isPlatformAuthed ? (
+                      <div className="p-4">
+                        <button onClick={() => connectMeta(() => setShowSaved(false))} disabled={isMetaConnecting} className="w-full py-3 bg-primary-500 text-white rounded-base text-xs font-medium hover:bg-primary-600 transition-all flex items-center justify-center gap-2 disabled:opacity-70">
+                          {isMetaConnecting ? <><Loader2 size={12} className="animate-spin" />Connecting...</> : <><ConnectIcon size={12} />立即连接 {platformName}</>}
+                        </button>
+                      </div>
+                    ) : !selectedAccount ? (
+                      <div className="p-4">
+                        <button onClick={() => { onSelectAccount?.(); setShowSaved(false); }} className="w-full py-3 bg-primary-500 text-white rounded-base text-xs font-medium hover:bg-primary-600 transition-all flex items-center justify-center gap-2">
+                          <Briefcase size={12} />选择广告账户
+                        </button>
+                      </div>
+                    ) : savedAudienceLoading?.isLoading ? (
+                      <div className="p-5 flex flex-col items-center gap-2"><Loader2 size={18} className="animate-spin text-purple-500/70" /><p className="text-xs text-gray-400 animate-pulse">Loading...</p></div>
+                    ) : (
+                      MOCK_SAVED_AUDIENCES.map(sa => {
+                        const isSel = details.savedAudience?.id === sa.id;
+                        return (
+                          <div key={sa.id} onClick={() => { onSaveDetails({ savedAudience: isSel ? null : sa }); setShowSaved(false); }} className="flex items-start justify-between px-4 py-2.5 hover:bg-purple-50 cursor-pointer transition-colors">
+                            <div>
+                              <p className={`text-xs font-medium ${isSel ? 'text-purple-700' : 'text-gray-700'}`}>{sa.name}</p>
+                              <p className="text-[10px] text-gray-400 mt-0.5">{sa.gender} · {sa.ageMin}–{sa.ageMax}</p>
+                            </div>
+                            {isSel && <Check size={12} className="text-purple-600 shrink-0 mt-0.5" />}
                           </div>
-                          {isSel && <Check size={12} className="text-purple-600 shrink-0 mt-0.5" />}
-                        </div>
-                      );
-                    })
-                  )}
-                </div>
-              </>
-            )}
-          </div>
+                        );
+                      })
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
+          )}
         </div>
       )}
 
@@ -1109,6 +1118,7 @@ const AdsetDetailPanel = ({
 };
 
 const CampaignPlanView = forwardRef(({
+  platform,
   structure,
   onStructureChange,
   campaignType,
@@ -1153,9 +1163,10 @@ const CampaignPlanView = forwardRef(({
   const [showSavedAudienceDropdown, setShowSavedAudienceDropdown] = useState(false);
   const [editingAdsetIndex, setEditingAdsetIndex] = useState(null);
   const [isMetaConnecting, setIsMetaConnecting] = useState(false);
-  const lalLoading            = useDropdownLoading('lalAudiences',     authStatus?.meta);
-  const customAudienceLoading = useDropdownLoading('customAudiences',  authStatus?.meta);
-  const savedAudienceLoading  = useDropdownLoading('savedAudiences',   authStatus?.meta);
+  const planPlatformId        = platform?.id || 'meta';
+  const lalLoading            = useDropdownLoading('lalAudiences',     authStatus?.[planPlatformId]);
+  const customAudienceLoading = useDropdownLoading('customAudiences',  authStatus?.[planPlatformId]);
+  const savedAudienceLoading  = useDropdownLoading('savedAudiences',   authStatus?.[planPlatformId]);
   useEffect(() => { if (showLalDropdown            && selectedAccount) lalLoading.triggerLoad();            }, [showLalDropdown]);
   useEffect(() => { if (showCustomAudienceDropdown && selectedAccount) customAudienceLoading.triggerLoad(); }, [showCustomAudienceDropdown]);
   useEffect(() => { if (showSavedAudienceDropdown  && selectedAccount) savedAudienceLoading.triggerLoad();  }, [showSavedAudienceDropdown]);
@@ -1340,10 +1351,14 @@ const CampaignPlanView = forwardRef(({
     const newAds = adType === 'FLEXIBLE'
       ? [{ id: `ad-${baseId}`, productId: payload.productId, groupId: payload.groupId, groupName: group.name, creatives }]
       : creatives.map((c, i) => ({ id: `ad-${baseId}-${i}-${c.id}`, productId: payload.productId, groupId: payload.groupId, groupName: group.name, creatives: [c] }));
-    setAdsetAds(prev => ({
-      ...prev,
-      [`${campaignIdx}::${adsetIdx}`]: [...newAds, ...(prev[`${campaignIdx}::${adsetIdx}`] || [])],
-    }));
+    // 同 adset 内同 (productId, groupId) 重拖 = 覆盖：先清掉旧的、再 prepend 新的。
+    // 这样用户在顶部素材组追加 / 删除创意后，只需把素材组重新拖一次即可"刷新"该 adset 的 ad 列表。
+    setAdsetAds(prev => {
+      const key = `${campaignIdx}::${adsetIdx}`;
+      const oldList = prev[key] || [];
+      const filtered = oldList.filter(a => !(a.productId === payload.productId && a.groupId === payload.groupId));
+      return { ...prev, [key]: [...newAds, ...filtered] };
+    });
     // 清除该 adset 的错误高亮（如果存在）
     setErrorAdsetKeys(prev => {
       const key = `${campaignIdx}::${adsetIdx}`;
@@ -1353,24 +1368,42 @@ const CampaignPlanView = forwardRef(({
       return next;
     });
   };
+
   const removeAdFromAdset = (campaignIdx, adsetIdx, adId) => {
     setAdsetAds(prev => ({
       ...prev,
       [`${campaignIdx}::${adsetIdx}`]: (prev[`${campaignIdx}::${adsetIdx}`] || []).filter(a => a.id !== adId),
     }));
   };
-  const duplicateAdInAdset = (campaignIdx, adsetIdx, adId) => {
-    setAdsetAds(prev => {
-      const list = prev[`${campaignIdx}::${adsetIdx}`] || [];
-      const src = list.find(a => a.id === adId);
-      if (!src) return prev;
-      const clone = { ...src, id: `ad-${Date.now()}-${Math.random().toString(36).slice(2, 6)}-clone`, creatives: [...src.creatives] };
-      const idx = list.findIndex(a => a.id === adId);
-      const nextList = [...list.slice(0, idx + 1), clone, ...list.slice(idx + 1)];
-      return { ...prev, [`${campaignIdx}::${adsetIdx}`]: nextList };
-    });
+  // 一键清空一个 adset 中属于某 (productId, groupId) 的所有 ad（"清理掉这个素材组"操作）
+  const removeAllAdsOfGroup = (campaignIdx, adsetIdx, productId, groupId) => {
+    setAdsetAds(prev => ({
+      ...prev,
+      [`${campaignIdx}::${adsetIdx}`]: (prev[`${campaignIdx}::${adsetIdx}`] || []).filter(
+        a => !(a.productId === productId && a.groupId === groupId)
+      ),
+    }));
   };
+  // 注：ad 级别的"复制"按钮已下线 — 同一图片复制无意义，使用方需要"再来一份"应通过素材组层面操作。
   const getAdsForAdset = (campaignIdx, adsetIdx) => adsetAds[`${campaignIdx}::${adsetIdx}`] || [];
+  // 渲染时把 adset 内的 ads 按 (productId, groupId) 聚合，每个素材组成为一张可视卡片
+  const groupAdsByGroup = (ads) => {
+    const map = new Map();
+    (ads || []).forEach(ad => {
+      const key = `${ad.productId}::${ad.groupId}`;
+      if (!map.has(key)) {
+        map.set(key, { productId: ad.productId, groupId: ad.groupId, groupName: ad.groupName, ads: [] });
+      }
+      map.get(key).ads.push(ad);
+    });
+    return Array.from(map.values());
+  };
+  // 反查产品名（素材组卡片头部显示用）
+  const productNameById = useMemo(() => {
+    const m = {};
+    (selectedProducts || []).forEach(p => { if (p && p.id != null) m[p.id] = p.name; });
+    return m;
+  }, [selectedProducts]);
 
   // ── CRUD handlers — adset 数量统一由 structure.numAdsets 控制 ──
 
@@ -1648,15 +1681,15 @@ const CampaignPlanView = forwardRef(({
                           <div
                             key={adset.key}
                             ref={(el) => { if (el) adsetRowRefs.current[adset.key] = el; else delete adsetRowRefs.current[adset.key]; }}
-                            className={`grid grid-cols-[100px_1fr] gap-3 items-center rounded-base transition-all ${
+                            className={`grid grid-cols-[100px_1fr] gap-3 items-stretch h-24 rounded-base transition-all ${
                               hasError ? 'ring-2 ring-rose-400 ring-offset-2 ring-offset-gray-50/40 bg-rose-50/40 animate-pulse p-2 -m-2' : ''
                             }`}
                           >
                             {/* Adset node — 与 Campaign 同款结构：CRUD 按钮 absolute 右上角 */}
-                            <div className="relative isolate">
+                            <div className="relative isolate h-full">
                               <button
                                 onClick={() => setSelectedNode({ type: 'adset', campaignIdx: cIdx, adsetIdx: aIdx })}
-                                className={`w-full flex flex-col items-center gap-1.5 p-2.5 rounded-base border-2 transition-all ${
+                                className={`w-full h-full flex flex-col items-center justify-center gap-1.5 p-2.5 rounded-base border-2 transition-all ${
                                   isAdsetSelected ? 'bg-primary-50 border-primary-500' : 'bg-white border-gray-100 hover:border-primary-500/20'
                                 }`}
                               >
@@ -1685,8 +1718,10 @@ const CampaignPlanView = forwardRef(({
                               </div>
                             </div>
 
-                            {/* 固定 drop zone（左）+ 动态 ad 列表（右，新加入靠左），单行；横向溢出由外层 tree pane 滚动 */}
-                            <div className="flex flex-nowrap items-start gap-2">
+                            {/* 固定 drop zone（左）+ 动态 ad 列表（右，新加入靠左），单行；
+                                items-stretch 让 drop zone 自动跟随组卡片高度（ad 卡为手机比例，
+                                整体会比单纯 h-20 高）。 */}
+                            <div className="flex flex-nowrap items-stretch gap-2">
                               {(() => {
                                 const adsetKey = `${cIdx}::${aIdx}`;
                                 const isHovered = hoveredAdsetKey === adsetKey;
@@ -1702,7 +1737,7 @@ const CampaignPlanView = forwardRef(({
                                       } catch {}
                                       setHoveredAdsetKey(null);
                                     }}
-                                    className={`shrink-0 w-24 h-20 rounded-base border-2 border-dashed transition-all flex flex-col items-center justify-center gap-0.5 px-1.5 text-center ${
+                                    className={`shrink-0 w-24 h-full rounded-base border-2 border-dashed transition-all flex flex-col items-center justify-center gap-0.5 px-1.5 text-center ${
                                       isHovered ? 'border-primary-500 bg-primary-50 scale-105 shadow-md text-primary-500' :
                                       'border-gray-200 bg-gray-50/50 hover:border-primary-500/30 text-gray-300'
                                     }`}
@@ -1712,36 +1747,60 @@ const CampaignPlanView = forwardRef(({
                                   </div>
                                 );
                               })()}
-                              {getAdsForAdset(cIdx, aIdx).map(ad => (
-                                <div key={ad.id} className="shrink-0 relative w-16 h-20 rounded-base border border-gray-100 bg-white shadow-adsgo-card overflow-hidden group/ad">
-                                  {adType === 'FLEXIBLE' && ad.creatives.length > 1 ? (
-                                    <div className="grid grid-cols-2 gap-0.5 w-full h-full bg-gray-100">
-                                      {ad.creatives.slice(0, 4).map((c, i) => (
-                                        <div key={i} className="bg-white overflow-hidden">
-                                          <img src={c.url} className="w-full h-full object-cover" alt="" />
-                                        </div>
-                                      ))}
-                                      {ad.creatives.length > 4 && (
-                                        <div className="absolute bottom-1 right-1 bg-gray-900/80 text-white text-[10px] font-bold px-1.5 py-0.5 rounded">+{ad.creatives.length - 4}</div>
-                                      )}
-                                    </div>
-                                  ) : ad.creatives[0]?.url ? (
-                                    <img src={ad.creatives[0].url} className="w-full h-full object-cover" alt="" />
-                                  ) : (
-                                    <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-300">
-                                      <Layers size={20} />
-                                    </div>
-                                  )}
-                                  <div className="absolute top-1 right-1 flex gap-0.5 opacity-0 group-hover/ad:opacity-100 transition-opacity">
-                                    <button onClick={(e) => { e.stopPropagation(); duplicateAdInAdset(cIdx, aIdx, ad.id); }} className="w-5 h-5 bg-white/90 rounded-full flex items-center justify-center text-gray-500 hover:text-primary-500 shadow" title="复制此 ad">
-                                      <Copy size={10} />
-                                    </button>
-                                    <button onClick={(e) => { e.stopPropagation(); removeAdFromAdset(cIdx, aIdx, ad.id); }} className="w-5 h-5 bg-white/90 rounded-full flex items-center justify-center text-gray-500 hover:text-rose-500 shadow" title="删除此 ad">
-                                      <X size={11} />
+                              {/* 按 (productId, groupId) 聚合渲染 — 每个素材组一张可视卡片，
+                                  头部单行展示「产品名 · 组名」+ 清空；ad 卡片仅保留删除（不再支持复制）。
+                                  ad 卡 = 手机比例 (9:16 近似)，object-contain 保留素材原始比例不裁切。 */}
+                              {groupAdsByGroup(getAdsForAdset(cIdx, aIdx)).map(group => (
+                                <div
+                                  key={`${group.productId}::${group.groupId}`}
+                                  className="shrink-0 relative bg-gray-50/60 border border-dashed border-gray-200 rounded-base px-1.5 pt-0.5 pb-1 h-full flex flex-col group/group"
+                                >
+                                  {/* 头部单行：产品名 · 组名 + 清空（hover 显示） */}
+                                  <div className="flex items-center justify-between gap-1.5 mb-1 px-0.5 max-w-[240px] shrink-0">
+                                    <span className="text-[9px] text-gray-500 truncate leading-tight">
+                                      <span className="text-gray-400">{productNameById[group.productId] || '—'}</span>
+                                      <span className="text-gray-300 mx-1">·</span>
+                                      <span className="text-gray-600 font-semibold">{group.groupName}</span>
+                                    </span>
+                                    <button
+                                      type="button"
+                                      onClick={(e) => { e.stopPropagation(); removeAllAdsOfGroup(cIdx, aIdx, group.productId, group.groupId); }}
+                                      className="w-4 h-4 shrink-0 flex items-center justify-center rounded-full text-gray-300 hover:text-rose-500 hover:bg-rose-50 transition-all opacity-0 group-hover/group:opacity-100"
+                                      title="清空此素材组下所有 ad"
+                                    >
+                                      <Trash2 size={9} />
                                     </button>
                                   </div>
-                                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent text-white text-[9px] font-medium truncate px-1.5 py-0.5">
-                                    {ad.groupName}
+                                  {/* ads 行 — ad 卡 w-12 h-[88px] (手机竖屏 9:16 近似)；
+                                      object-contain + 灰底，保证横图 / 竖图 / 方图都不变形。 */}
+                                  <div className="flex gap-1 items-start flex-1 min-h-0">
+                                    {group.ads.map(ad => (
+                                      <div key={ad.id} className="shrink-0 relative w-10 h-[68px] rounded-base border border-gray-100 bg-gray-100 shadow-adsgo-card overflow-hidden group/ad">
+                                        {adType === 'FLEXIBLE' && ad.creatives.length > 1 ? (
+                                          <div className="grid grid-cols-2 gap-0.5 w-full h-full bg-gray-100">
+                                            {ad.creatives.slice(0, 4).map((c, i) => (
+                                              <div key={i} className="bg-gray-100 overflow-hidden flex items-center justify-center">
+                                                <img src={c.url} className="max-w-full max-h-full object-contain" alt="" />
+                                              </div>
+                                            ))}
+                                            {ad.creatives.length > 4 && (
+                                              <div className="absolute bottom-0.5 right-0.5 bg-gray-900/80 text-white text-[9px] font-bold px-1 py-0 rounded leading-none">+{ad.creatives.length - 4}</div>
+                                            )}
+                                          </div>
+                                        ) : ad.creatives[0]?.url ? (
+                                          <img src={ad.creatives[0].url} className="w-full h-full object-contain" alt="" />
+                                        ) : (
+                                          <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-300">
+                                            <Layers size={16} />
+                                          </div>
+                                        )}
+                                        <div className="absolute top-0.5 right-0.5 flex gap-0.5 opacity-0 group-hover/ad:opacity-100 transition-opacity">
+                                          <button onClick={(e) => { e.stopPropagation(); removeAdFromAdset(cIdx, aIdx, ad.id); }} className="w-4 h-4 bg-white/90 rounded-full flex items-center justify-center text-gray-500 hover:text-rose-500 shadow" title="删除此 ad">
+                                            <X size={9} />
+                                          </button>
+                                        </div>
+                                      </div>
+                                    ))}
                                   </div>
                                 </div>
                               ))}
@@ -1796,6 +1855,7 @@ const CampaignPlanView = forwardRef(({
               />
             ) : (
               <AdsetDetailPanel
+                platform={platform}
                 campaignIdx={selectedNode.campaignIdx}
                 adsetIdx={selectedNode.adsetIdx}
                 audienceType={getAudienceType(selectedNode.campaignIdx, selectedNode.adsetIdx)}

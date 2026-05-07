@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import {
   X, Globe, Monitor, Target, ShoppingBag, ChevronDown, Sparkles, Search,
   Briefcase, Check, Layout, Tag, Link2, Info, Settings, Plus, FileText,
-  Type, Calendar, Clock, Rocket, Facebook, Instagram, Hash, Loader2,
+  Type, Rocket, Facebook, Instagram, Hash, Loader2,
   CheckCircle2, Layers, RefreshCw, MapPin, Zap, ArrowRight, ChevronLeft,
   Megaphone, MousePointer2, Users, Smartphone, ChevronRight, Link2Off, AlertCircle,
   DollarSign
@@ -91,6 +91,13 @@ const CAMPAIGN_OBJECTIVES = [
   { value: 'sales_conversions', label: 'Sales & Conversions', icon: ShoppingBag, color: 'text-emerald-500', bg: 'bg-emerald-50', description: 'Drive transactions' },
   { value: 'app_promotion', label: 'App Promotion', icon: Smartphone, color: 'text-primary-500', bg: 'bg-primary-50', description: 'Install & usage' }
 ];
+
+// TikTok 仅支持 sales / app_promotion 两类目标。其他渠道沿用全集。
+const TIKTOK_ALLOWED_OBJECTIVES = new Set(['sales_conversions', 'app_promotion']);
+const getAvailableObjectives = (platformId) =>
+  platformId === 'tiktok'
+    ? CAMPAIGN_OBJECTIVES.filter(o => TIKTOK_ALLOWED_OBJECTIVES.has(o.value))
+    : CAMPAIGN_OBJECTIVES;
 
 const ADSET_GOALS_MAPPING = {
   awareness_engagement: [
@@ -494,17 +501,12 @@ const TargetingChannelCard = ({
   budgetType, setBudgetType,
   advancedOpen, setAdvancedOpen,
   productCount = 0,
+  startDate, setStartDate, endDate, setEndDate, onQuickSchedule,
   children,
 }) => {
   const isFlexibleObjective = objective === 'sales_conversions' || objective === 'app_promotion';
-  // Campaign 架构 / 高级设置只在「目标与预算」全部配置完成后才解锁
-  const isInitComplete =
-    selectedLocations.length > 0 &&
-    selectedLanguage !== null &&
-    objective !== '' &&
-    adsetGoal !== '' &&
-    !(currentGoalObj?.needsEvent && !event) &&
-    Number(dailyBudget) > 0;
+  // Campaign 架构 现已无条件展示在最前；保留早期 isInitComplete 检查的语义已迁移到父
+  // 组件层面（决定是否暴露 "预览发布计划" CTA），此处不再需要本地副本。
   const platformId = platform?.id;
   const placementOptions = platformId ? (PLATFORM_PLACEMENTS[platformId] || []) : [];
   const currentSelected = (platformId && manualPlacements[platformId]) || [];
@@ -517,16 +519,16 @@ const TargetingChannelCard = ({
   };
 
   return (
-    <div className="bg-white rounded-section p-10 adsgo-card-shadow animate-in fade-in slide-in-from-top-4 space-y-10">
-      <div className="flex items-center gap-3">
+    <div className="bg-white rounded-section p-10 adsgo-card-shadow animate-in fade-in slide-in-from-top-4 flex flex-col gap-10">
+      <div className="flex items-center gap-3" style={{ order: 0 }}>
         <div className="w-10 h-10 bg-primary-500 rounded-xl flex items-center justify-center text-white"><Target size={20} /></div>
         <h3 className="text-xl font-semibold text-gray-900">广告结构初始化设置</h3>
       </div>
 
-      {/* Section A: 优化目标与预算 (Country / Language / Conversion Event + Daily Budget) */}
-      <section>
+      {/* Section A: 优化目标与预算 — 现 02，视觉位于 Campaign 架构之下 */}
+      <section className="border-t border-gray-100 pt-10" style={{ order: 2 }}>
         <div className="flex items-baseline gap-3 mb-5 px-1">
-          <span className="text-xs font-bold text-primary-500/60 tabular-nums">01</span>
+          <span className="text-xs font-bold text-primary-500/60 tabular-nums">02</span>
           <h4 className="text-base font-semibold text-gray-900 tracking-tight">优化目标与预算</h4>
         </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 relative z-[10]">
@@ -647,7 +649,7 @@ const TargetingChannelCard = ({
                   <div className="space-y-1">
                     <p className="text-[10px] font-bold text-gray-400 tracking-widest mb-2 px-2">1. Campaign Objective</p>
                     <div className="grid grid-cols-1 gap-1">
-                      {CAMPAIGN_OBJECTIVES.map(obj => {
+                      {getAvailableObjectives(platform?.id).map(obj => {
                         const Icon = obj.icon;
                         return (
                           <button key={obj.value} onClick={() => {
@@ -757,12 +759,10 @@ const TargetingChannelCard = ({
       </div>
       </section>
 
-      {isInitComplete && (
-      <>
-      {/* Section B: Campaign 架构 */}
-      <section className="border-t border-gray-100 pt-10 space-y-6">
+      {/* Section B: Campaign 架构 — 现 01，视觉首位（CSS order 控制） */}
+      <section className="space-y-6" style={{ order: 1 }}>
         <div className="flex items-baseline gap-3 px-1">
-          <span className="text-xs font-bold text-primary-500/60 tabular-nums">02</span>
+          <span className="text-xs font-bold text-primary-500/60 tabular-nums">01</span>
           <h4 className="text-base font-semibold text-gray-900 tracking-tight">Campaign 架构</h4>
         </div>
 
@@ -831,30 +831,11 @@ const TargetingChannelCard = ({
           </div>
         </div>
 
-        {/* Ad Format — 仅在 sales_conversions / app_promotion 目标下显示 */}
-        {isFlexibleObjective && (
-          <div className="space-y-2">
-            <label className="text-xs font-medium text-gray-500 px-1">Ad Format</label>
-            <div className="flex p-1 bg-gray-100/80 rounded-base border border-gray-100 w-fit">
-              <button
-                onClick={() => onAdTypeChange('FLEXIBLE')}
-                className={`px-6 py-2.5 rounded-base text-xs font-medium transition-all ${adType === 'FLEXIBLE' ? 'bg-white text-primary-500 shadow-adsgo-card' : 'text-gray-500 hover:text-gray-700'}`}
-              >
-                Flexible Ad
-              </button>
-              <button
-                onClick={() => onAdTypeChange('SINGLE')}
-                className={`px-6 py-2.5 rounded-base text-xs font-medium transition-all ${adType === 'SINGLE' ? 'bg-white text-primary-500 shadow-adsgo-card' : 'text-gray-500 hover:text-gray-700'}`}
-              >
-                Single Ad
-              </button>
-            </div>
-          </div>
-        )}
+        {/* Ad Format 已迁移至高级设置 → Ad 策略 子模块 */}
       </section>
 
       {/* Section C: 高级设置 inline collapsible (含版位 / 命名 / 落地页 / 文案 / 排期) */}
-      <section className="border-t border-gray-100 pt-6">
+      <section className="border-t border-gray-100 pt-6" style={{ order: 3 }}>
         <button
           onClick={() => setAdvancedOpen(!advancedOpen)}
           className="w-full flex items-baseline justify-between gap-3 px-1 py-3 group hover:opacity-80 transition-opacity"
@@ -862,65 +843,110 @@ const TargetingChannelCard = ({
           <div className="flex items-baseline gap-3 min-w-0">
             <span className="text-xs font-bold text-primary-500/60 tabular-nums">03</span>
             <h4 className="text-base font-semibold text-gray-900 tracking-tight">高级设置</h4>
-            <span className="text-xs text-gray-400 font-medium truncate">版位 / 命名 / 落地页 / 文案 / 排期</span>
+            <span className="text-xs text-gray-400 font-medium truncate">版位与排期 / 命名 / 落地页 / Ad 策略</span>
           </div>
           <ChevronDown size={16} className={`text-gray-400 transition-transform shrink-0 self-center ${advancedOpen ? 'rotate-180' : ''}`} />
         </button>
         {advancedOpen && (
           <div className="pt-6 space-y-12 animate-in fade-in slide-in-from-top-2 duration-200">
-            {/* 版位 — 作为高级设置的第一个子模块 */}
-            <div className="space-y-3">
+            {/* 版位与排期 — 高级设置的第一个子模块（合并原版位 + 投放排期），两列布局 */}
+            <div className="space-y-6">
               <div className="flex items-center gap-2 px-1">
-                <label className="text-xs font-medium text-gray-500">版位</label>
+                <label className="text-xs font-medium text-gray-500">版位与排期</label>
                 <Info size={12} className="text-gray-300" />
               </div>
-              <div className="flex p-1 bg-gray-100/80 rounded-base border border-gray-100 w-fit">
-                <button
-                  onClick={() => setPlacementMode('AUTO')}
-                  className={`px-6 py-2.5 rounded-base text-xs font-medium transition-all ${placementMode === 'AUTO' ? 'bg-white text-primary-500 shadow-adsgo-card' : 'text-gray-500 hover:text-gray-700'}`}
-                >
-                  Auto Placement
-                </button>
-                <button
-                  onClick={() => setPlacementMode('MANUAL')}
-                  disabled={!platformId || !PLATFORM_PLACEMENTS[platformId]}
-                  className={`px-6 py-2.5 rounded-base text-xs font-medium transition-all ${placementMode === 'MANUAL' ? 'bg-white text-primary-500 shadow-adsgo-card' : 'text-gray-500 hover:text-gray-700 disabled:opacity-40 disabled:cursor-not-allowed'}`}
-                >
-                  Manual
-                </button>
-              </div>
-              {placementMode === 'AUTO' ? (
-                <p className="text-xs text-gray-400 leading-relaxed mt-3 px-1">
-                  系统将根据广告目标和受众智能分发到 {platform?.name || '所选平台'} 的最优版位组合。
-                </p>
-              ) : (
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-4">
-                  {placementOptions.length === 0 ? (
-                    <p className="col-span-full text-xs text-gray-400 px-1">请先在顶部选择渠道。</p>
-                  ) : placementOptions.map(p => {
-                    const checked = currentSelected.includes(p.id);
-                    return (
-                      <button
-                        key={p.id}
-                        onClick={() => togglePlacement(p.id)}
-                        className={`flex items-center gap-2 px-4 py-3 rounded-base border text-xs font-medium transition-all ${checked ? 'bg-primary-50 border-primary-500 text-primary-500' : 'bg-white border-gray-100 text-gray-600 hover:border-gray-200'}`}
-                      >
-                        <div className={`w-4 h-4 rounded-sm flex items-center justify-center transition-all ${checked ? 'bg-primary-500 text-white' : 'border border-gray-300 bg-white'}`}>
-                          {checked && <Check size={10} strokeWidth={3} />}
-                        </div>
-                        <span className="truncate">{p.label}</span>
-                      </button>
-                    );
-                  })}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* 左：版位 */}
+                <div className="bg-gray-50/50 border border-gray-100 rounded-inner p-6 space-y-4">
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400 px-1 block">版位</span>
+                  <div className="flex p-1 bg-gray-100/80 rounded-base border border-gray-100 w-fit">
+                    <button
+                      onClick={() => setPlacementMode('AUTO')}
+                      className={`px-6 py-2.5 rounded-base text-xs font-medium transition-all ${placementMode === 'AUTO' ? 'bg-white text-primary-500 shadow-adsgo-card' : 'text-gray-500 hover:text-gray-700'}`}
+                    >
+                      Auto Placement
+                    </button>
+                    <button
+                      onClick={() => setPlacementMode('MANUAL')}
+                      disabled={!platformId || !PLATFORM_PLACEMENTS[platformId]}
+                      className={`px-6 py-2.5 rounded-base text-xs font-medium transition-all ${placementMode === 'MANUAL' ? 'bg-white text-primary-500 shadow-adsgo-card' : 'text-gray-500 hover:text-gray-700 disabled:opacity-40 disabled:cursor-not-allowed'}`}
+                    >
+                      Manual
+                    </button>
+                  </div>
+                  {placementMode === 'AUTO' ? (
+                    <p className="text-xs text-gray-400 leading-relaxed px-1">
+                      系统将根据广告目标和受众智能分发到 {platform?.name || '所选平台'} 的最优版位组合。
+                    </p>
+                  ) : (
+                    <div className="grid grid-cols-2 gap-2">
+                      {placementOptions.length === 0 ? (
+                        <p className="col-span-full text-xs text-gray-400 px-1">请先在顶部选择渠道。</p>
+                      ) : placementOptions.map(p => {
+                        const checked = currentSelected.includes(p.id);
+                        return (
+                          <button
+                            key={p.id}
+                            onClick={() => togglePlacement(p.id)}
+                            className={`flex items-center gap-2 px-3 py-2.5 rounded-base border text-xs font-medium transition-all ${checked ? 'bg-primary-50 border-primary-500 text-primary-500' : 'bg-white border-gray-100 text-gray-600 hover:border-gray-200'}`}
+                          >
+                            <div className={`w-4 h-4 rounded-sm flex items-center justify-center transition-all ${checked ? 'bg-primary-500 text-white' : 'border border-gray-300 bg-white'}`}>
+                              {checked && <Check size={10} strokeWidth={3} />}
+                            </div>
+                            <span className="truncate">{p.label}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
-              )}
+
+                {/* 右：排期 */}
+                <div className="bg-gray-50/50 border border-gray-100 rounded-inner p-6 space-y-4">
+                  <div className="flex items-center justify-between px-1">
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">排期</span>
+                    <span className="text-[11px] text-gray-400">结束时间留空 = 不限期</span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-2">
+                      <label className="text-[11px] font-medium text-gray-500 px-1">开始时间</label>
+                      <input
+                        type="datetime-local"
+                        step="1"
+                        value={startDate}
+                        onChange={(e) => setStartDate(e.target.value)}
+                        className="w-full h-12 px-3 bg-white border border-gray-200 rounded-base outline-none text-xs text-gray-700 focus:border-primary-500 focus:shadow-primary-focus transition-all duration-200"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[11px] font-medium text-gray-500 px-1">结束时间</label>
+                      <input
+                        type="datetime-local"
+                        step="1"
+                        value={endDate}
+                        onChange={(e) => setEndDate(e.target.value)}
+                        className="w-full h-12 px-3 bg-white border border-gray-200 rounded-base outline-none text-xs text-gray-700 focus:border-primary-500 focus:shadow-primary-focus transition-all duration-200"
+                      />
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    {[3, 7, 14, 30].map(days => (
+                      <button
+                        key={days}
+                        onClick={() => onQuickSchedule?.(days)}
+                        className="flex-1 py-2 bg-white border border-gray-200 rounded-base text-xs font-medium text-gray-600 hover:border-primary-500 hover:text-primary-500 transition-all duration-200"
+                      >
+                        {days} 天
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
             </div>
             {children}
           </div>
         )}
       </section>
-      </>
-      )}
     </div>
   );
 };
@@ -1507,14 +1533,17 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
   const [adNameTemplate, setAdNameTemplate] = useState('{Brand}-{creative_type}-{number}-{date}');
 
   const [copyStrategy, setCopyStrategy] = useState('AI_CUSTOM');
+  // 每个文案组现在持有可选的多条标题 / 正文：
+  //   - Meta：每组最多 5 条标题 + 5 条正文，组数无上限
+  //   - TikTok：每组锁死 1 条标题 + 1 条正文（由 platform useEffect 强制裁剪），组数无上限
   const [unifiedCopyGroups, setUnifiedCopyGroups] = useState([{
     id: _genId(),
-    headline: 'Limited Time Offer: Quality You Can Trust',
-    body: 'Discover the perfect blend of style and comfort. Shop our latest collection today and enjoy exclusive benefits.',
+    headlines: ['Limited Time Offer: Quality You Can Trust'],
+    bodies: ['Discover the perfect blend of style and comfort. Shop our latest collection today and enjoy exclusive benefits.'],
   }]);
   const [unifiedCopyApplyMode, setUnifiedCopyApplyMode] = useState('AI_MATCH');
 
-  const [scheduleType, setScheduleType] = useState('CONTINUOUS');
+  // 排期：直接展示开始/结束时间，无需 type 切换（结束时间留空 = 不限期）
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
 
@@ -1555,11 +1584,18 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // TikTok 仅允许 1 组文案；切到 TikTok 时自动截断到第 1 组
+  // TikTok 下每个文案组只允许 1 条标题 + 1 条正文（组数本身不再强制裁剪）。
+  // 切到 TikTok 时把每组的 headlines / bodies 各自截断到 1 条。
   useEffect(() => {
-    if (platform?.id === 'tiktok') {
-      setUnifiedCopyGroups(prev => (prev.length > 1 ? [prev[0]] : prev));
-    }
+    if (platform?.id !== 'tiktok') return;
+    setUnifiedCopyGroups(prev => prev.map(g => {
+      const firstHeadline = (g.headlines && g.headlines[0]) ?? '';
+      const firstBody = (g.bodies && g.bodies[0]) ?? '';
+      const sameHeadlines = g.headlines && g.headlines.length === 1 && g.headlines[0] === firstHeadline;
+      const sameBodies = g.bodies && g.bodies.length === 1 && g.bodies[0] === firstBody;
+      if (sameHeadlines && sameBodies) return g;
+      return { ...g, headlines: [firstHeadline], bodies: [firstBody] };
+    }));
   }, [platform?.id]);
 
   const [selectedCampaignId, setSelectedCampaignId] = useState(null);
@@ -1626,6 +1662,59 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
   //   campaignConfigs：每 campaign 的 locations / language / objective / budget 等
   const [adsetAds, setAdsetAds] = useState({});
   const [campaignConfigs, setCampaignConfigs] = useState({});
+
+  // === TikTok 媒体渠道差异化纠偏 ===
+  // TikTok 仅支持 sales_conversions / app_promotion 两类 objective；切到 TikTok
+  // 时若顶部 objective 不在白名单，自动降级到 sales_conversions（保留用户后续
+  // 手动选择能力，因此仅在 platform.id 变化时触发一次）。
+  useEffect(() => {
+    if (platform?.id !== 'tiktok') return;
+    if (!TIKTOK_ALLOWED_OBJECTIVES.has(objective)) {
+      const nextObj = 'sales_conversions';
+      const firstGoal = ADSET_GOALS_MAPPING[nextObj][0];
+      setObjective(nextObj);
+      setAdsetGoal(firstGoal?.value || '');
+      setEvent(firstGoal?.needsEvent ? 'Purchase' : '');
+    }
+  }, [platform?.id]);
+
+  // TikTok 不支持 Flexible Ad Format，强制为 SINGLE。
+  useEffect(() => {
+    if (platform?.id === 'tiktok' && adType !== 'SINGLE') {
+      setAdType('SINGLE');
+    }
+  }, [platform?.id]);
+
+  // TikTok 下不支持 Advantage+ 受众；把所有 ADV 自动收敛为 LAL。
+  useEffect(() => {
+    if (platform?.id !== 'tiktok') return;
+    setAdsetAudiences(prev => prev.map(t => (t === 'ADV' ? 'LAL' : t)));
+  }, [platform?.id]);
+
+  // TikTok 下同样收敛架构图各 campaign 详情中已选的 objective。
+  useEffect(() => {
+    if (platform?.id !== 'tiktok') return;
+    setCampaignConfigs(prev => {
+      let mutated = false;
+      const next = {};
+      Object.entries(prev).forEach(([k, cfg]) => {
+        if (cfg?.objective && !TIKTOK_ALLOWED_OBJECTIVES.has(cfg.objective)) {
+          const nextObj = 'sales_conversions';
+          const firstGoal = ADSET_GOALS_MAPPING[nextObj][0];
+          next[k] = {
+            ...cfg,
+            objective: nextObj,
+            adsetGoal: firstGoal?.value || '',
+            event: firstGoal?.needsEvent ? 'Purchase' : '',
+          };
+          mutated = true;
+        } else {
+          next[k] = cfg;
+        }
+      });
+      return mutated ? next : prev;
+    });
+  }, [platform?.id]);
 
   const [showPublishModal, setShowPublishModal] = useState(false);
 
@@ -1823,11 +1912,14 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
   };
 
   const handleQuickSchedule = (days) => {
+    const pad = (n) => String(n).padStart(2, '0');
+    const toLocal = (d) =>
+      `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
     const start = new Date();
-    const end = new Date();
+    const end = new Date(start);
     end.setDate(start.getDate() + days);
-    setStartDate(start.toISOString().split('T')[0]);
-    setEndDate(end.toISOString().split('T')[0]);
+    setStartDate(toLocal(start));
+    setEndDate(toLocal(end));
   };
 
   useEffect(() => {
@@ -1841,7 +1933,23 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
       setAdsetCreativeSelections({});
       setNumByCreativeAdsets(1);
     }
-    setStructure(newStructure);
+    // 策略切换时一次性回填 Campaign 数量 / Adset 数量初始值（仅初始化，不维护后续关联性）：
+    //   Product 测试  → campaigns=1, adsets=已添加产品数（兜底 1）
+    //   Audience 测试 → campaigns=1, adsets=3
+    //   Creative 测试 → campaigns=1, adsets=1
+    const strategyChanged = newStructure.strategy && newStructure.strategy !== structure.strategy;
+    let nextStructure = newStructure;
+    if (strategyChanged) {
+      const productCountSafe = Math.max(selectedProducts.length, 1);
+      const STRATEGY_INIT = {
+        PER_PRODUCT:          { numCampaigns: 1, numAdsets: productCountSafe },
+        ALL_PRODUCTS_PER_SET: { numCampaigns: 1, numAdsets: 3 },
+        BY_CREATIVE:          { numCampaigns: 1, numAdsets: 1 },
+      };
+      const init = STRATEGY_INIT[newStructure.strategy];
+      if (init) nextStructure = { ...newStructure, ...init };
+    }
+    setStructure(nextStructure);
   };
 
   const handleSaveAdsetCreatives = (adsetIndex, selectedIds) => {
@@ -2018,19 +2126,28 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
     const zIndex = useZIndex(true);
     const LOGO_LINKS = {
       meta: 'https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://meta.com&size=256',
-      google: 'https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://google.com&size=256'
+      google: 'https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://google.com&size=256',
+      tiktok: 'https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://tiktok.com&size=256'
     };
+
+    // 顶部父组件已选的媒体渠道（platform）决定 publish 流程的品牌身份。
+    // 若父级是 TikTok 则优先按 TikTok 走；否则沿用旧的 meta/google 优先级。
+    const parentPlatformId = platform?.id;
+    const parentPlatformName = platform?.name || 'Meta';
 
     const [selectedAccountType, setSelectedAccountType] = useState('own');
     const [showAdsgoReminder, setShowAdsgoReminder] = useState(false);
     const [hideMainModal, setHideMainModal] = useState(false);
     const [connectedPlatform, setConnectedPlatform] = useState(
-      authStatus?.meta ? 'meta' : authStatus?.google ? 'google' : null
+      parentPlatformId === 'tiktok'
+        ? (authStatus?.tiktok ? 'tiktok' : null)
+        : authStatus?.meta ? 'meta' : authStatus?.google ? 'google' : null
     );
     const [isConnecting, setIsConnecting] = useState(false);
     const [platforms, setPlatforms] = useState({
       meta: { connected: !!authStatus?.meta, email: 'alex.designer@meta.com' },
-      google: { connected: !!authStatus?.google, email: 'alex.growth@google.com' }
+      google: { connected: !!authStatus?.google, email: 'alex.growth@google.com' },
+      tiktok: { connected: !!authStatus?.tiktok, email: 'creator@tiktok.com' }
     });
 
     const [selections, setSelections] = useState({
@@ -2139,72 +2256,104 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
       );
     };
 
-    const renderStep1 = () => (
-      <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-        <div className="space-y-4">
-          <div className="flex items-center gap-2 mb-2 px-1">
-            <div className="w-5 h-5 rounded-full bg-primary-50 flex items-center justify-center">
-              <div className="w-2 h-2 rounded-full bg-primary-500" />
-            </div>
-            <span className="text-sm font-semibold text-gray-700">Meta Connection</span>
-          </div>
-          
-          <div className="relative overflow-hidden group bg-white rounded-inner border border-gray-100 shadow-sm flex items-center transition-all h-16 hover:border-primary-500/15">
-            <div className="flex items-center gap-4 px-6 flex-1 min-w-0">
-              <div className="w-8 h-8 shrink-0 bg-gray-50 rounded-lg p-1.5 border border-gray-100"><img src={LOGO_LINKS.meta} alt="Meta" className="w-full h-full object-contain" /></div>
-              <div className="flex items-center gap-10 w-full">
-                <span className="text-sm font-semibold text-gray-800 shrink-0">Meta Ads</span>
-                {platforms.meta.connected ? (
-                  <span className="text-sm font-bold text-gray-400 truncate">{platforms.meta.email.split('@')[0]}</span>
-                ) : (
-                  <span className="text-sm font-bold text-gray-200">Not connected</span>
-                )}
+    const renderStep1 = () => {
+      // 按顶部 platform 决定要展示哪个渠道的连接卡（Meta/TikTok/Google）。
+      const stepPlatformId = parentPlatformId === 'tiktok' ? 'tiktok'
+        : parentPlatformId === 'google' ? 'google'
+        : 'meta';
+      const stepPlatformName = stepPlatformId === 'tiktok' ? 'TikTok'
+        : stepPlatformId === 'google' ? 'Google'
+        : 'Meta';
+      const stepLogo = LOGO_LINKS[stepPlatformId] || LOGO_LINKS.meta;
+      const stepConnected = !!platforms[stepPlatformId]?.connected;
+      const stepEmail = platforms[stepPlatformId]?.email || '';
+      const isStepConnecting = isConnecting === stepPlatformId;
+
+      return (
+        <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 mb-2 px-1">
+              <div className="w-5 h-5 rounded-full bg-primary-50 flex items-center justify-center">
+                <div className="w-2 h-2 rounded-full bg-primary-500" />
               </div>
-            </div>
-            
-            <div className="h-full shrink-0 flex items-center pr-4">
-              {platforms.meta.connected ? (
-                <button 
-                  onClick={() => handleDisconnect('meta')}
-                  className="px-6 py-2 text-rose-500 text-xs font-semibold hover:bg-rose-50 rounded-base transition-colors flex items-center gap-2"
-                >
-                  <Link2Off size={14} /> Disconnect
-                </button>
-              ) : (
-                <button 
-                  onClick={() => handleConnect('meta')}
-                  disabled={!!isConnecting}
-                  className="inline-flex items-center justify-center bg-primary-500 text-white px-8 py-2.5 rounded-base text-sm font-medium hover:bg-primary-600 active:bg-primary-700 transition-all duration-200 focus:outline-none focus:shadow-primary-focus disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isConnecting === 'meta' ? <Loader2 size={14} className="animate-spin" /> : 'Connect'}
-                </button>
-              )}
+              <span className="text-sm font-semibold text-gray-700">{stepPlatformName} Connection</span>
             </div>
 
-            {isConnecting === 'meta' && (
-              <div className="absolute inset-0 bg-white/60 backdrop-blur-[1px] flex items-center justify-center animate-in fade-in duration-300">
-                <p className="text-xs font-medium text-primary-500 animate-pulse">CONNECTING...</p>
+            <div className="relative overflow-hidden group bg-white rounded-inner border border-gray-100 shadow-sm flex items-center transition-all h-16 hover:border-primary-500/15">
+              <div className="flex items-center gap-4 px-6 flex-1 min-w-0">
+                <div className="w-8 h-8 shrink-0 bg-gray-50 rounded-lg p-1.5 border border-gray-100"><img src={stepLogo} alt={stepPlatformName} className="w-full h-full object-contain" /></div>
+                <div className="flex items-center gap-10 w-full">
+                  <span className="text-sm font-semibold text-gray-800 shrink-0">{stepPlatformName} Ads</span>
+                  {stepConnected ? (
+                    <span className="text-sm font-bold text-gray-400 truncate">{stepEmail.split('@')[0]}</span>
+                  ) : (
+                    <span className="text-sm font-bold text-gray-200">Not connected</span>
+                  )}
+                </div>
               </div>
-            )}
+
+              <div className="h-full shrink-0 flex items-center pr-4">
+                {stepConnected ? (
+                  <button
+                    onClick={() => handleDisconnect(stepPlatformId)}
+                    className="px-6 py-2 text-rose-500 text-xs font-semibold hover:bg-rose-50 rounded-base transition-colors flex items-center gap-2"
+                  >
+                    <Link2Off size={14} /> Disconnect
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => handleConnect(stepPlatformId)}
+                    disabled={!!isConnecting}
+                    className="inline-flex items-center justify-center bg-primary-500 text-white px-8 py-2.5 rounded-base text-sm font-medium hover:bg-primary-600 active:bg-primary-700 transition-all duration-200 focus:outline-none focus:shadow-primary-focus disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isStepConnecting ? <Loader2 size={14} className="animate-spin" /> : 'Connect'}
+                  </button>
+                )}
+              </div>
+
+              {isStepConnecting && (
+                <div className="absolute inset-0 bg-white/60 backdrop-blur-[1px] flex items-center justify-center animate-in fade-in duration-300">
+                  <p className="text-xs font-medium text-primary-500 animate-pulse">CONNECTING...</p>
+                </div>
+              )}
+            </div>
           </div>
         </div>
-      </div>
-    );
+      );
+    };
 
     const renderStep2 = () => {
       const isMeta = connectedPlatform === 'meta';
-      const hasBaseSelections = isMeta ? (selections.adAccount && selections.fbPage && selections.pixel && selections.event) : (selections.adAccount && selections.conversionDataset && selections.event);
+      const isTikTok = connectedPlatform === 'tiktok';
+      // Meta + TikTok 共用同一组身份字段（账户 → 身份 → pixel → event）；Google 走原 dataset 流。
+      const usesIdentityFlow = isMeta || isTikTok;
+      const hasBaseSelections = usesIdentityFlow
+        ? (selections.adAccount && selections.fbPage && selections.pixel && selections.event)
+        : (selections.adAccount && selections.conversionDataset && selections.event);
       const isPhoneValid = selections.contactPhone && !validatePhone(selections.contactPhone, selections.phoneCountryCode);
       const canPublish = hasBaseSelections && isPhoneValid;
-      const options = { adAccount: [{ value: '1', label: 'Main Business Account (129-382-991)' }, { value: '2', label: 'Backup Marketing (442-110-872)' }], fbPage: [{ value: '1', label: 'Eco-Friendly Brand' }, { value: '2', label: 'Daily Lifestyle Store' }], pixel: [{ value: '1', label: 'Primary Web Pixel (Active)' }], metaEvent: [{ value: 'purchase', label: 'Purchase' }, { value: 'add_to_cart', label: 'Add to Cart' }, { value: 'lead', label: 'Lead' }], conversionDataset: [{ value: '1', label: 'Primary Conversions' }, { value: '2', label: 'Secondary Goals' }], googleEvent: [{ value: 'sales', label: 'Sales' }, { value: 'signup', label: 'Signup' }] };
+      const tiktokIdentities = [
+        { value: '1', label: '@eco_friendly_brand · Verified' },
+        { value: '2', label: '@daily_lifestyle_store · Business' },
+      ];
+      const options = {
+        adAccount: [{ value: '1', label: 'Main Business Account (129-382-991)' }, { value: '2', label: 'Backup Marketing (442-110-872)' }],
+        fbPage: isTikTok ? tiktokIdentities : [{ value: '1', label: 'Eco-Friendly Brand' }, { value: '2', label: 'Daily Lifestyle Store' }],
+        pixel: [{ value: '1', label: 'Primary Web Pixel (Active)' }],
+        metaEvent: [{ value: 'purchase', label: 'Purchase' }, { value: 'add_to_cart', label: 'Add to Cart' }, { value: 'lead', label: 'Lead' }],
+        conversionDataset: [{ value: '1', label: 'Primary Conversions' }, { value: '2', label: 'Secondary Goals' }],
+        googleEvent: [{ value: 'sales', label: 'Sales' }, { value: 'signup', label: 'Signup' }],
+      };
+      const identityLabel = isTikTok ? 'TikTok 身份' : 'Facebook page';
+      const identityPlaceholder = isTikTok ? '选择身份账号...' : 'Select a page...';
       const handleToggle = (key) => setActiveDropdown(activeDropdown === key ? null : key);
-      const showPhone = isMeta ? !!selections.event : !!selections.event;
+      const showPhone = !!selections.event;
       return (
         <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
           <div className="bg-gray-50 rounded-inner p-6 space-y-6">
             <CustomDropdown label="Select ad account" options={options.adAccount} value={selections.adAccount} onChange={(val) => setSelections({...selections, adAccount: val})} placeholder="Select an account..." isOpen={activeDropdown === 'adAccount'} onToggle={() => handleToggle('adAccount')} isLoading={pubAdAccountLoading.isLoading} />
-            {isMeta ? (
-              <>{selections.adAccount && (<div className="animate-in fade-in slide-in-from-top-2 duration-300"><CustomDropdown label="Facebook page" options={options.fbPage} value={selections.fbPage} onChange={(val) => { setSelections({...selections, fbPage: val}); setShowTosModal(true); }} placeholder="Select a page..." isOpen={activeDropdown === 'fbPage'} onToggle={() => handleToggle('fbPage')} isLoading={pubFbPageLoading.isLoading} /></div>)}{selections.fbPage && (<div className="animate-in fade-in slide-in-from-top-2 duration-300"><CustomDropdown label="Tracking pixel" options={options.pixel} value={selections.pixel} onChange={(val) => setSelections({...selections, pixel: val})} placeholder="Select a pixel..." isOpen={activeDropdown === 'pixel'} onToggle={() => handleToggle('pixel')} isLoading={pubPixelLoading.isLoading} /></div>)}{selections.pixel && (<div className="animate-in fade-in slide-in-from-top-2 duration-300"><CustomDropdown label="Event" options={options.metaEvent} value={selections.event} onChange={(val) => setSelections({...selections, event: val})} placeholder="Select an event..." isOpen={activeDropdown === 'metaEvent'} onToggle={() => handleToggle('metaEvent')} isLoading={pubEventLoading.isLoading} /></div>)}</>
+            {usesIdentityFlow ? (
+              <>{selections.adAccount && (<div className="animate-in fade-in slide-in-from-top-2 duration-300"><CustomDropdown label={identityLabel} options={options.fbPage} value={selections.fbPage} onChange={(val) => { setSelections({...selections, fbPage: val}); if (!isTikTok) setShowTosModal(true); }} placeholder={identityPlaceholder} isOpen={activeDropdown === 'fbPage'} onToggle={() => handleToggle('fbPage')} isLoading={pubFbPageLoading.isLoading} /></div>)}{selections.fbPage && (<div className="animate-in fade-in slide-in-from-top-2 duration-300"><CustomDropdown label="Tracking pixel" options={options.pixel} value={selections.pixel} onChange={(val) => setSelections({...selections, pixel: val})} placeholder="Select a pixel..." isOpen={activeDropdown === 'pixel'} onToggle={() => handleToggle('pixel')} isLoading={pubPixelLoading.isLoading} /></div>)}{selections.pixel && (<div className="animate-in fade-in slide-in-from-top-2 duration-300"><CustomDropdown label="Event" options={options.metaEvent} value={selections.event} onChange={(val) => setSelections({...selections, event: val})} placeholder="Select an event..." isOpen={activeDropdown === 'metaEvent'} onToggle={() => handleToggle('metaEvent')} isLoading={pubEventLoading.isLoading} /></div>)}</>
             ) : (
               <>{selections.adAccount && (<div className="animate-in fade-in slide-in-from-top-2 duration-300"><CustomDropdown label="Conversion dataset" options={options.conversionDataset} value={selections.conversionDataset} onChange={(val) => setSelections({...selections, conversionDataset: val})} placeholder="Select a dataset..." isOpen={activeDropdown === 'conversionDataset'} onToggle={() => handleToggle('conversionDataset')} isLoading={pubFbPageLoading.isLoading} /></div>)}{selections.conversionDataset && (<div className="animate-in fade-in slide-in-from-top-2 duration-300"><CustomDropdown label="Optimization event" options={options.googleEvent} value={selections.event} onChange={(val) => setSelections({...selections, event: val})} placeholder="Select an event..." isOpen={activeDropdown === 'googleEvent'} onToggle={() => handleToggle('googleEvent')} isLoading={pubEventLoading.isLoading} /></div>)}</>
             )}
@@ -2541,6 +2690,9 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
                   budgetType={budgetType} setBudgetType={setBudgetType}
                   productCount={selectedProducts.length}
                   advancedOpen={advancedOpen} setAdvancedOpen={setAdvancedOpen}
+                  startDate={startDate} setStartDate={setStartDate}
+                  endDate={endDate} setEndDate={setEndDate}
+                  onQuickSchedule={handleQuickSchedule}
                 >
                   {/* Naming Strategy */}
                   <NamingStrategySection
@@ -2640,12 +2792,37 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
                     </div>
                   </div>
 
-                  {/* Ad Copy Strategy */}
+                  {/* Ad 策略：父级 section 标题；下辖 Ad Format + 广告文案与标题 两个 sub-field（用 eyebrow 标签压低视觉权重，建立层级） */}
                   <div className="space-y-6">
                     <div className="flex items-center gap-2 px-1">
-                      <label className="text-xs font-medium text-gray-500">广告文案标题策略</label>
+                      <label className="text-xs font-medium text-gray-500">Ad 策略</label>
                       <Info size={12} className="text-gray-300" />
                     </div>
+
+                    <div className="border-l-2 border-gray-100 pl-5 space-y-6">
+                      {/* Ad Format — 仅在 sales_conversions / app_promotion 目标下显示；TikTok 强制 SINGLE，整段隐藏 */}
+                      {(objective === 'sales_conversions' || objective === 'app_promotion') && platform?.id !== 'tiktok' && (
+                        <div className="space-y-3">
+                          <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400 px-1 block">Ad Format</span>
+                          <div className="flex p-1 bg-gray-100/80 rounded-base border border-gray-100 w-fit">
+                            <button
+                              onClick={() => setAdType('FLEXIBLE')}
+                              className={`px-6 py-2.5 rounded-base text-xs font-medium transition-all ${adType === 'FLEXIBLE' ? 'bg-white text-primary-500 shadow-adsgo-card' : 'text-gray-500 hover:text-gray-700'}`}
+                            >
+                              Flexible Ad
+                            </button>
+                            <button
+                              onClick={() => setAdType('SINGLE')}
+                              className={`px-6 py-2.5 rounded-base text-xs font-medium transition-all ${adType === 'SINGLE' ? 'bg-white text-primary-500 shadow-adsgo-card' : 'text-gray-500 hover:text-gray-700'}`}
+                            >
+                              Single Ad
+                            </button>
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="space-y-3">
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400 px-1 block">广告文案与标题</span>
                     <div className="bg-gray-50/50 border border-gray-100 rounded-inner p-10 flex flex-col md:flex-row gap-10">
                       <div className="flex flex-col gap-3 w-full md:w-80">
                         {[
@@ -2721,153 +2898,138 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
                             <div className="space-y-3">
                               <div className="flex items-center justify-between px-1">
                                 <label className="text-xs font-medium text-gray-500">文案组（标题 + 正文）</label>
-                                {platform?.id !== 'tiktok' && (
-                                  <span className="text-xs text-gray-400">{unifiedCopyGroups.length}/5</span>
+                                {platform?.id === 'tiktok' && (
+                                  <span className="text-xs text-gray-400 font-medium">TikTok 每组仅 1 条标题 + 1 条正文</span>
                                 )}
                               </div>
-                              {unifiedCopyGroups.map((group, i) => (
-                                <div key={group.id} className="bg-white border border-gray-100 rounded-inner p-5 space-y-3">
-                                  <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-2">
-                                      <FileText size={14} className="text-primary-500/70" />
-                                      <span className="text-xs font-semibold text-gray-700">文案组 {i + 1}</span>
+                              {unifiedCopyGroups.map((group, i) => {
+                                const isTikTok = platform?.id === 'tiktok';
+                                const maxItemsPerGroup = isTikTok ? 1 : 5;
+                                const headlines = group.headlines || [''];
+                                const bodies = group.bodies || [''];
+                                const updateGroup = (patch) => setUnifiedCopyGroups(prev => prev.map(g => g.id === group.id ? { ...g, ...patch } : g));
+                                return (
+                                  <div key={group.id} className="bg-white border border-gray-100 rounded-inner p-5 space-y-4">
+                                    <div className="flex items-center justify-between">
+                                      <div className="flex items-center gap-2">
+                                        <FileText size={14} className="text-primary-500/70" />
+                                        <span className="text-xs font-semibold text-gray-700">文案组 {i + 1}</span>
+                                      </div>
+                                      {unifiedCopyGroups.length > 1 && (
+                                        <button
+                                          onClick={() => setUnifiedCopyGroups(prev => prev.filter(g => g.id !== group.id))}
+                                          className="w-7 h-7 flex items-center justify-center rounded-full text-gray-400 hover:text-rose-500 hover:bg-rose-50 transition-colors"
+                                          title="删除该文案组"
+                                        >
+                                          <X size={14} />
+                                        </button>
+                                      )}
                                     </div>
-                                    {platform?.id !== 'tiktok' && unifiedCopyGroups.length > 1 && (
-                                      <button
-                                        onClick={() => setUnifiedCopyGroups(prev => prev.filter(g => g.id !== group.id))}
-                                        className="w-7 h-7 flex items-center justify-center rounded-full text-gray-400 hover:text-rose-500 hover:bg-rose-50 transition-colors"
-                                        title="删除该文案组"
-                                      >
-                                        <X size={14} />
-                                      </button>
-                                    )}
+
+                                    {/* 标题列表 */}
+                                    <div className="space-y-2">
+                                      <div className="flex items-center justify-between px-1">
+                                        <label className="text-xs font-medium text-gray-400">统一广告标题</label>
+                                        {!isTikTok && (
+                                          <span className="text-xs text-gray-400">{headlines.length}/{maxItemsPerGroup}</span>
+                                        )}
+                                      </div>
+                                      {headlines.map((h, hi) => (
+                                        <div key={hi} className="flex items-center gap-2">
+                                          <input
+                                            type="text"
+                                            value={h}
+                                            onChange={(e) => {
+                                              const next = [...headlines];
+                                              next[hi] = e.target.value;
+                                              updateGroup({ headlines: next });
+                                            }}
+                                            placeholder={`请输入广告标题${headlines.length > 1 ? ` ${hi + 1}` : ''}...`}
+                                            className="flex-1 h-12 px-4 bg-gray-50 border border-gray-100 rounded-base outline-none text-sm text-gray-700 focus:border-primary-500 focus:bg-white focus:shadow-primary-focus transition-all"
+                                          />
+                                          {!isTikTok && headlines.length > 1 && (
+                                            <button
+                                              onClick={() => updateGroup({ headlines: headlines.filter((_, j) => j !== hi) })}
+                                              className="w-9 h-9 shrink-0 flex items-center justify-center rounded-full text-gray-400 hover:text-rose-500 hover:bg-rose-50 transition-colors"
+                                              title="删除该标题"
+                                            >
+                                              <X size={14} />
+                                            </button>
+                                          )}
+                                        </div>
+                                      ))}
+                                      {!isTikTok && headlines.length < maxItemsPerGroup && (
+                                        <button
+                                          onClick={() => updateGroup({ headlines: [...headlines, ''] })}
+                                          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-primary-500 hover:bg-primary-50 rounded-base transition-colors"
+                                        >
+                                          <Plus size={12} /> 添加标题
+                                        </button>
+                                      )}
+                                    </div>
+
+                                    {/* 正文列表 */}
+                                    <div className="space-y-2">
+                                      <div className="flex items-center justify-between px-1">
+                                        <label className="text-xs font-medium text-gray-400">统一广告正文</label>
+                                        {!isTikTok && (
+                                          <span className="text-xs text-gray-400">{bodies.length}/{maxItemsPerGroup}</span>
+                                        )}
+                                      </div>
+                                      {bodies.map((b, bi) => (
+                                        <div key={bi} className="flex items-start gap-2">
+                                          <textarea
+                                            value={b}
+                                            onChange={(e) => {
+                                              const next = [...bodies];
+                                              next[bi] = e.target.value;
+                                              updateGroup({ bodies: next });
+                                            }}
+                                            placeholder={`请输入广告正文${bodies.length > 1 ? ` ${bi + 1}` : ''}...`}
+                                            className="flex-1 p-4 bg-gray-50 border border-gray-100 rounded-base outline-none text-sm text-gray-700 h-24 focus:border-primary-500 focus:bg-white focus:shadow-primary-focus transition-all resize-none"
+                                          />
+                                          {!isTikTok && bodies.length > 1 && (
+                                            <button
+                                              onClick={() => updateGroup({ bodies: bodies.filter((_, j) => j !== bi) })}
+                                              className="w-9 h-9 shrink-0 flex items-center justify-center rounded-full text-gray-400 hover:text-rose-500 hover:bg-rose-50 transition-colors mt-1"
+                                              title="删除该正文"
+                                            >
+                                              <X size={14} />
+                                            </button>
+                                          )}
+                                        </div>
+                                      ))}
+                                      {!isTikTok && bodies.length < maxItemsPerGroup && (
+                                        <button
+                                          onClick={() => updateGroup({ bodies: [...bodies, ''] })}
+                                          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-primary-500 hover:bg-primary-50 rounded-base transition-colors"
+                                        >
+                                          <Plus size={12} /> 添加正文
+                                        </button>
+                                      )}
+                                    </div>
                                   </div>
-                                  <div className="space-y-2">
-                                    <label className="text-xs font-medium text-gray-400 px-1">统一广告标题</label>
-                                    <input
-                                      type="text"
-                                      value={group.headline}
-                                      onChange={(e) => setUnifiedCopyGroups(prev => prev.map(g => g.id === group.id ? { ...g, headline: e.target.value } : g))}
-                                      placeholder="请输入广告标题..."
-                                      className="w-full h-12 px-4 bg-gray-50 border border-gray-100 rounded-base outline-none text-sm text-gray-700 focus:border-primary-500 focus:bg-white focus:shadow-primary-focus transition-all"
-                                    />
-                                  </div>
-                                  <div className="space-y-2">
-                                    <label className="text-xs font-medium text-gray-400 px-1">统一广告正文</label>
-                                    <textarea
-                                      value={group.body}
-                                      onChange={(e) => setUnifiedCopyGroups(prev => prev.map(g => g.id === group.id ? { ...g, body: e.target.value } : g))}
-                                      placeholder="请输入广告正文..."
-                                      className="w-full p-4 bg-gray-50 border border-gray-100 rounded-base outline-none text-sm text-gray-700 h-24 focus:border-primary-500 focus:bg-white focus:shadow-primary-focus transition-all resize-none"
-                                    />
-                                  </div>
-                                </div>
-                              ))}
-                              {platform?.id !== 'tiktok' && unifiedCopyGroups.length < 5 && (
-                                <button
-                                  onClick={() => setUnifiedCopyGroups(prev => [...prev, { id: _genId(), headline: '', body: '' }])}
-                                  className="flex items-center gap-2 px-4 py-2 text-xs font-medium text-primary-500 hover:bg-primary-50 rounded-base transition-colors"
-                                >
-                                  <Plus size={14} /> 添加文案组
-                                </button>
-                              )}
-                              {platform?.id === 'tiktok' && (
-                                <p className="text-xs text-gray-400 font-medium px-1">TikTok 渠道每条广告仅支持 1 个文案，已强制单组。</p>
-                              )}
+                                );
+                              })}
+                              <button
+                                onClick={() => setUnifiedCopyGroups(prev => [
+                                  ...prev,
+                                  { id: _genId(), headlines: [''], bodies: [''] },
+                                ])}
+                                className="flex items-center gap-2 px-4 py-2 text-xs font-medium text-primary-500 hover:bg-primary-50 rounded-base transition-colors"
+                              >
+                                <Plus size={14} /> 添加文案组
+                              </button>
                             </div>
                           </div>
                         )}
+                      </div>
+                    </div>
                       </div>
                     </div>
                   </div>
 
-                  {/* Schedule */}
-                  <div className="space-y-6">
-                    <div className="flex items-center gap-2 px-1">
-                      <label className="text-xs font-medium text-gray-500">广告投放排期</label>
-                      <Info size={12} className="text-gray-300" />
-                    </div>
-                    <div className="bg-gray-50/50 border border-gray-100 rounded-inner p-10 flex flex-col md:flex-row gap-10">
-                      <div className="flex flex-col gap-3 w-full md:w-80">
-                        {[
-                          { id: 'CONTINUOUS', label: '长期投放', desc: 'No End Date', icon: <Clock size={18} /> },
-                          { id: 'SCHEDULED', label: '定期投放', desc: 'Custom Date Range', icon: <Calendar size={18} /> },
-                        ].map(opt => (
-                          <button
-                            key={opt.id}
-                            onClick={() => setScheduleType(opt.id)}
-                            className={`flex items-center gap-4 p-5 rounded-base border-2 transition-all ${
-                              scheduleType === opt.id
-                                ? 'bg-white border-primary-500 shadow-primary-focus'
-                                : 'bg-transparent border-gray-100 hover:border-gray-200'
-                            }`}
-                          >
-                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${scheduleType === opt.id ? 'bg-primary-500 text-white' : 'bg-white text-gray-400'}`}>
-                              {opt.icon}
-                            </div>
-                            <div className="text-left">
-                              <p className={`text-xs font-semibold ${scheduleType === opt.id ? 'text-gray-900' : 'text-gray-500'}`}>{opt.label}</p>
-                              <p className="text-xs text-gray-400 font-bold mt-0.5">{opt.desc}</p>
-                            </div>
-                          </button>
-                        ))}
-                      </div>
-                      <div className="flex-1 flex flex-col justify-center">
-                        {scheduleType === 'CONTINUOUS' ? (
-                          <div className="p-8 bg-primary-50/50 rounded-section border border-primary-500/10 animate-in fade-in slide-in-from-left-4">
-                            <div className="flex items-start gap-4">
-                              <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-primary-500 shadow-sm shrink-0">
-                                <Clock size={24} />
-                              </div>
-                              <div>
-                                <h4 className="text-sm font-semibold text-gray-900 tracking-tight">常青投放模式</h4>
-                                <p className="text-xs text-gray-500 font-medium leading-relaxed mt-2">
-                                  广告发布后将立即开始投放，并且不设具体的结束日期，直至您手动暂停或预算消耗完毕。
-                                </p>
-                              </div>
-                            </div>
-                          </div>
-                        ) : (
-                          <div className="space-y-8 animate-in fade-in slide-in-from-left-4">
-                            <div className="grid grid-cols-2 gap-6">
-                              <div className="space-y-3">
-                                <label className="text-xs font-medium text-gray-500 px-1">开始日期</label>
-                                <input
-                                  type="date"
-                                  value={startDate}
-                                  onChange={(e) => setStartDate(e.target.value)}
-                                  className="w-full h-14 px-6 bg-white border border-gray-200 rounded-base outline-none text-sm text-gray-700 focus:border-primary-500 focus:shadow-primary-focus transition-all duration-200"
-                                />
-                              </div>
-                              <div className="space-y-3">
-                                <label className="text-xs font-medium text-gray-500 px-1">结束日期</label>
-                                <input
-                                  type="date"
-                                  value={endDate}
-                                  onChange={(e) => setEndDate(e.target.value)}
-                                  className="w-full h-14 px-6 bg-white border border-gray-200 rounded-base outline-none text-sm text-gray-700 focus:border-primary-500 focus:shadow-primary-focus transition-all duration-200"
-                                />
-                              </div>
-                            </div>
-                            <div className="space-y-3">
-                              <label className="text-xs font-medium text-gray-500 px-1">快速设置时长</label>
-                              <div className="flex gap-3">
-                                {[3, 7, 14, 30].map(days => (
-                                  <button
-                                    key={days}
-                                    onClick={() => handleQuickSchedule(days)}
-                                    className="flex-1 py-3 bg-white border border-gray-200 rounded-base text-xs font-medium text-gray-600 hover:border-primary-500 hover:text-primary-500 transition-all duration-200"
-                                  >
-                                    {days} 天
-                                  </button>
-                                ))}
-                              </div>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
+                  {/* 排期已合并到「版位与排期」子模块（在 TargetingChannelCard 内渲染） */}
                 </TargetingChannelCard>
               )}
 
@@ -2880,6 +3042,7 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
                     </div>
                     <CampaignPlanView
                       ref={campaignPlanRef}
+                      platform={platform}
                       adsetAds={adsetAds} setAdsetAds={setAdsetAds}
                       campaignConfigs={campaignConfigs} setCampaignConfigs={setCampaignConfigs}
                       structure={structure} onStructureChange={handleStructureChange}
@@ -2905,7 +3068,7 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
                       targetingMeta={{
                         ALL_COUNTRIES,
                         ALL_LANGUAGES,
-                        CAMPAIGN_OBJECTIVES,
+                        CAMPAIGN_OBJECTIVES: getAvailableObjectives(platform?.id),
                         ADSET_GOALS_MAPPING,
                         STANDARD_EVENTS,
                         COUNTRY_LANGUAGE_MAPPING,
@@ -2975,8 +3138,8 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
                   landingPageTemplate={lpTemplateUrl}
                   productUtm={productLpUtm}
                   copyStrategy={copyStrategy}
-                  unifiedHeadline={unifiedCopyGroups.map(g => g.headline)}
-                  unifiedBody={unifiedCopyGroups.map(g => g.body)}
+                  unifiedHeadline={unifiedCopyGroups.map(g => (g.headlines && g.headlines[0]) || '')}
+                  unifiedBody={unifiedCopyGroups.map(g => (g.bodies && g.bodies[0]) || '')}
                   unifiedCopyGroups={unifiedCopyGroups}
                   unifiedCopyApplyMode={unifiedCopyApplyMode}
                   campaignType={campaignType}
@@ -3030,10 +3193,16 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
 const AccountChoiceModal = ({ onSelect, onClose, selectedAccountType, setSelectedAccountType, renderStep1, renderStep2, connectedPlatform, selections }) => {
   const zIndex = useZIndex(true);
   const isMeta = connectedPlatform === 'meta';
-  const hasBaseSelections = isMeta
+  const isTikTok = connectedPlatform === 'tiktok';
+  // Meta + TikTok 共用身份字段流；Google 走 conversion dataset 流。
+  const usesIdentityFlow = isMeta || isTikTok;
+  const hasBaseSelections = usesIdentityFlow
     ? (selections.adAccount && selections.fbPage && selections.pixel && selections.event)
     : (selections.adAccount && selections.conversionDataset && selections.event);
   const canProceed = hasBaseSelections && selections.contactPhone && !validatePhone(selections.contactPhone, selections.phoneCountryCode);
+  const platformLabel = isTikTok ? 'TikTok' : isMeta ? 'Meta' : 'Google';
+  const identityLabel = isTikTok ? 'TikTok 身份' : isMeta ? 'Facebook page' : '转化数据集';
+  const identityPlural = isTikTok ? 'TikTok 身份' : isMeta ? 'Facebook Pages' : '转化数据集';
 
   return (
     <div className="fixed inset-0 flex items-center justify-center px-4 animate-in fade-in duration-300" style={{ zIndex }}>
@@ -3046,9 +3215,9 @@ const AccountChoiceModal = ({ onSelect, onClose, selectedAccountType, setSelecte
                 {selectedAccountType === 'own' ? 'Account Connection Needed' : 'Let AdsGo Handle Everything'}
               </h2>
               <p className="text-sm font-medium text-gray-500 leading-relaxed max-w-md">
-                {selectedAccountType === 'own' 
-                  ? 'Please connect your Meta account, and select a valid ad account and Facebook page to publish your ads.'
-                  : "We've prepped everything for you : Stable ad accounts, professional Facebook Pages."}
+                {selectedAccountType === 'own'
+                  ? `Please connect your ${platformLabel} account, and select a valid ad account and ${identityLabel} to publish your ads.`
+                  : `We've prepped everything for you : Stable ad accounts, professional ${identityPlural}.`}
               </p>
             </div>
             <button 
