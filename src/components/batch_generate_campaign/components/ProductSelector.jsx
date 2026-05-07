@@ -8,7 +8,7 @@ import {
   Flame, Zap, Info, ChevronDown, ListFilter, Box,
   Facebook, Chrome, ExternalLink, RefreshCw, AlertCircle, ChevronUp,
   ArrowLeft, Edit2, User, Image as ImageIcon, Link2Off, Briefcase,
-  AlertTriangle, Smartphone, Apple
+  AlertTriangle, Smartphone, Apple, Monitor
 } from 'lucide-react';
 import { Z_INDEX } from '../../../constants/zIndex';
 import { useZIndex } from '../../../hooks/useZIndex';
@@ -260,11 +260,12 @@ const SearchableTreeSelect = ({ options, value, onChange, placeholder, isSearcha
 
 // --- SelectionModal ---
 
-const SelectionModal = ({ 
-  type, onClose, authStatus, anyConnected, isAddModalOpen, 
+const SelectionModal = ({
+  type, onClose, authStatus, anyConnected, isAddModalOpen,
   handleAuthorize, isAuthLoading, setIsAddModalOpen,
   selectedProducts, onSelectProducts, onUpdateCreatives,
-  productCreatives, modalContext, modalGroupId, onAddAdsToGroup
+  productCreatives, modalContext, modalGroupId, onAddAdsToGroup,
+  channelPlatform, channelSelectedAccount, onOpenChannelAccountPicker,
 }) => {
   const zIndex = useZIndex(true);
   const [search, setSearch] = useState('');
@@ -354,6 +355,7 @@ const SelectionModal = ({
               {[
                 { id: 'library', label: '创意素材库' },
                 { id: 'product_assets', label: 'Product Assets' },
+                { id: 'media_creatives', label: 'Media Creatives' },
               ].map(tab => (
                 <button
                   key={tab.id}
@@ -378,7 +380,83 @@ const SelectionModal = ({
           </div>
         )}
         <div className="flex-1 overflow-y-auto p-8 no-scrollbar relative min-h-[400px]">
-          {isAuthLoading ? (
+          {type === 'creative_lib' && activeCreativeTab === 'media_creatives' ? (
+            (() => {
+              const mediaState =
+                !channelPlatform ? 'NO_PLATFORM' :
+                !authStatus[channelPlatform.id] ? 'NEED_AUTH' :
+                !channelSelectedAccount ? 'NEED_PICK' :
+                'PICKED';
+              if (mediaState === 'NO_PLATFORM') {
+                return (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center p-12 text-center animate-in fade-in zoom-in-95">
+                    <div className="w-20 h-20 bg-gray-50 rounded-xl flex items-center justify-center text-gray-300 mb-6"><Monitor size={40} /></div>
+                    <p className="text-sm text-gray-500 font-bold mb-2">尚未选择媒体渠道</p>
+                    <p className="text-xs text-gray-400 max-w-sm">请先在页面顶部"投放渠道媒体"中选择媒体平台，连接账号后即可在此使用素材库。</p>
+                  </div>
+                );
+              }
+              if (mediaState === 'NEED_AUTH') {
+                return (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center p-12 text-center animate-in fade-in zoom-in-95">
+                    <div className="w-20 h-20 bg-gray-50 rounded-xl flex items-center justify-center mb-6 overflow-hidden">
+                      {channelPlatform.logo ? <img src={channelPlatform.logo} alt="" className="w-12 h-12 object-contain" /> : <Monitor size={40} className="text-gray-300" />}
+                    </div>
+                    <p className="text-sm text-gray-500 font-bold mb-2">连接 {channelPlatform.name} 后查看媒体素材</p>
+                    <p className="text-xs text-gray-400 mb-6 max-w-sm">连接成功后将自动弹出账号选择，再选择目标账号即可加载该账号下的媒体素材。</p>
+                    <button
+                      onClick={() => handleAuthorize(channelPlatform.id)}
+                      disabled={isAuthLoading}
+                      className="px-10 py-4 bg-primary-500 text-white rounded-full font-semibold hover:bg-primary-600 transition-all shadow-xl shadow-primary-500/10 flex items-center gap-3 disabled:opacity-60 disabled:cursor-not-allowed"
+                    >
+                      {isAuthLoading ? <Loader2 size={20} className="animate-spin" /> : <Plus size={20} />}
+                      {isAuthLoading ? '连接中...' : `Connect ${channelPlatform.name} Ads`}
+                    </button>
+                  </div>
+                );
+              }
+              if (mediaState === 'NEED_PICK') {
+                return (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center p-12 text-center animate-in fade-in zoom-in-95">
+                    <div className="w-20 h-20 bg-primary-50 rounded-xl flex items-center justify-center text-primary-500 mb-6"><Briefcase size={40} /></div>
+                    <p className="text-sm text-gray-500 font-bold mb-2">已连接 {channelPlatform.name}，请选择广告账号</p>
+                    <p className="text-xs text-gray-400 mb-6 max-w-sm">从该 {channelPlatform.name} 已授权账户中选择一个，加载其媒体素材库。</p>
+                    <button
+                      onClick={() => onOpenChannelAccountPicker?.()}
+                      className="px-10 py-4 bg-primary-500 text-white rounded-full font-semibold hover:bg-primary-600 transition-all shadow-xl shadow-primary-500/10 flex items-center gap-3"
+                    >
+                      <Briefcase size={20} /> 选择 {channelPlatform.name} 账号
+                    </button>
+                  </div>
+                );
+              }
+              // PICKED
+              return (
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 px-3 py-2 bg-primary-50 border border-primary-100 rounded-base">
+                    {channelPlatform.logo && <img src={channelPlatform.logo} alt="" className="w-4 h-4 object-contain shrink-0" />}
+                    <p className="text-xs font-medium text-primary-700 truncate">
+                      已连接 {channelPlatform.name} · 账号 <span className="font-bold">{channelSelectedAccount.name}</span>（{channelSelectedAccount.id}）
+                    </p>
+                  </div>
+                  <div className="grid grid-cols-3 sm:grid-cols-4 gap-4">
+                    {CREATIVE_LIBRARY.map((item) => {
+                      const isSel = localSelected.has(item.id);
+                      return (
+                        <div key={item.id} onClick={() => toggleItem(item.id)} className={`relative p-3 bg-white border-2 rounded-section transition-all cursor-pointer group ${isSel ? 'border-primary-500 shadow-lg shadow-primary-50' : 'border-gray-100 hover:border-gray-300'}`}>
+                          <div className="aspect-square rounded-xl overflow-hidden mb-3 relative bg-gray-50">
+                            <img src={item.url} className="w-full h-full object-cover transition-transform group-hover:scale-110" />
+                            <div className={`absolute top-2 right-2 w-6 h-6 rounded-full border-2 flex items-center justify-center shadow-lg ${isSel ? 'bg-primary-500 border-primary-500' : 'bg-black/20 border-white/40'}`}>{isSel && <Check size={14} className="text-white" />}</div>
+                          </div>
+                          <p className="text-xs font-semibold text-gray-800 truncate px-1">{item.name || '未命名素材'}</p>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })()
+          ) : isAuthLoading ? (
             <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/80 backdrop-blur-sm z-[150] animate-in fade-in"><Loader2 size={48} className="text-primary-500 animate-spin mb-4" /><p className="text-sm font-medium text-gray-900">正在拉取并同步云端商品数据...</p></div>
           ) : isFetchingProducts ? (
             <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/80 backdrop-blur-sm z-10 animate-in fade-in"><Loader2 size={48} className="text-primary-500 animate-spin mb-4" /><p className="text-sm font-medium text-gray-900">Fetching products data...</p></div>
@@ -453,7 +531,7 @@ const SelectionModal = ({
           <button disabled={localSelected.size === 0} onClick={() => {
             const randomSuffix = () => Math.random().toString(36).substring(2, 9);
             if (type === 'creative_lib') {
-              const pool = activeCreativeTab === 'library' ? CREATIVE_LIBRARY : getProductAssets();
+              const pool = activeCreativeTab === 'library' || activeCreativeTab === 'media_creatives' ? CREATIVE_LIBRARY : getProductAssets();
               const selectedCreatives = pool.filter(i => localSelected.has(i.id));
               const newCreatives = selectedCreatives.map(c => ({
                 ...c,
@@ -1600,6 +1678,9 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreativeGr
           selectedProducts={selectedProducts} onSelectProducts={onSelectProducts}
           onUpdateCreatives={onUpdateCreatives} productCreatives={productCreatives} modalContext={modalContext}
           modalGroupId={modalGroupId} onAddAdsToGroup={addAdsToGroup}
+          channelPlatform={platform}
+          channelSelectedAccount={selectedAccount}
+          onOpenChannelAccountPicker={onMetaAccountPick}
         />
       )}
       {activeModal === 'batch_match' && (

@@ -251,6 +251,67 @@ const Stepper = ({ label, value, onChange, min = 1, max = 99, step = 1, hint }) 
 //   1) Channel (platform) dropdown
 //   2) Account dropdown — 4-state machine driven by platform + authStatus + selectedAccount
 //   The account selection here is the GLOBAL source of truth for selectedAccount.
+
+// ChannelPickerHero — Phase 1 入场体验：未选 platform 时占据中央焦点，4 平台铺开为大卡片。
+// 选完后该组件自然 unmount，sticky ChannelHeaderCard 接管。
+const PLATFORM_TAGLINES = {
+  meta:   'Facebook · Instagram · 全球最大社交广告',
+  tiktok: '短视频 · 年轻流量主场',
+  google: 'Search · YouTube · GDN',
+  bing:   'Microsoft · 海外搜索补充',
+};
+const ChannelPickerHero = ({ platforms, onPick }) => (
+  <section className="px-4 md:px-8 pt-12 pb-20 flex justify-center animate-in fade-in slide-in-from-bottom-4 duration-300">
+    <div className="bg-white rounded-section shadow-xl border border-gray-100 max-w-4xl w-full p-12">
+      <div className="flex flex-col items-center text-center mb-10">
+        <div className="w-14 h-14 bg-primary-500 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-primary-500/20 mb-5">
+          <Monitor size={28} />
+        </div>
+        <h2 className="text-2xl font-semibold text-gray-900 tracking-tight mb-2">Choose your media channel</h2>
+        <p className="text-sm font-medium text-gray-400">选择投放媒体渠道开始本次 Campaign 配置</p>
+        <p className="text-xs text-gray-300 mt-2 max-w-md leading-relaxed">系统将基于此自动匹配产品规范、广告位、素材尺寸与目标账号。</p>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {platforms.map(p => {
+          const tagline = PLATFORM_TAGLINES[p.id] || '';
+          if (p.disabled) {
+            return (
+              <div key={p.id} className="relative flex items-center gap-4 p-5 bg-gray-50 rounded-inner border-2 border-gray-100 opacity-50 cursor-not-allowed select-none">
+                <div className="w-12 h-12 rounded-xl bg-white border border-gray-100 flex items-center justify-center shrink-0 overflow-hidden">
+                  <img src={p.logo} alt="" className="w-8 h-8 object-contain grayscale" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-base font-bold text-gray-500 truncate">{p.name}</p>
+                  <p className="text-xs text-gray-400 truncate mt-0.5">{tagline}</p>
+                </div>
+                <span className="absolute top-2 right-2 bg-gray-900 text-white text-[10px] font-bold px-2 py-0.5 rounded-full tracking-wider">COMING SOON</span>
+              </div>
+            );
+          }
+          return (
+            <button
+              key={p.id}
+              type="button"
+              onClick={() => onPick(p)}
+              className="group flex items-center gap-4 p-5 bg-white rounded-inner border-2 border-gray-100 hover:border-primary-500 hover:shadow-lg hover:-translate-y-0.5 cursor-pointer transition-all text-left"
+            >
+              <div className="w-12 h-12 rounded-xl bg-white border border-gray-100 flex items-center justify-center shrink-0 overflow-hidden group-hover:border-primary-500/30 transition-colors">
+                <img src={p.logo} alt="" className="w-8 h-8 object-contain" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-base font-bold text-gray-900 truncate group-hover:text-primary-500 transition-colors">{p.name}</p>
+                <p className="text-xs text-gray-400 truncate mt-0.5">{tagline}</p>
+              </div>
+              <ArrowRight size={16} className="text-gray-300 shrink-0 group-hover:text-primary-500 group-hover:translate-x-0.5 transition-all" />
+            </button>
+          );
+        })}
+      </div>
+      <p className="text-xs text-gray-300 text-center mt-8">选完渠道后可继续选择广告账号（账号选填，亦可跳过）</p>
+    </div>
+  </section>
+);
+
 const ChannelHeaderCard = ({
   platform, onChangePlatform,
   selectedAccount, onSelectAccount,
@@ -289,7 +350,7 @@ const ChannelHeaderCard = ({
   };
 
   return (
-    <div className="bg-gray-900 text-white rounded-section px-8 py-5 shadow-xl border border-gray-800 backdrop-blur-md bg-opacity-95 flex items-center gap-6 flex-wrap animate-in fade-in slide-in-from-top-2">
+    <div className="bg-gray-900/95 text-white rounded-section px-8 py-5 shadow-xl border border-gray-800 backdrop-blur-md flex items-center gap-6 flex-wrap animate-in fade-in slide-in-from-top-2">
       <div className="w-10 h-10 bg-primary-500 rounded-xl flex items-center justify-center text-white shrink-0"><Monitor size={20} /></div>
       <div className="flex-1 min-w-[180px]">
         <h3 className="text-base font-semibold text-white">投放渠道媒体</h3>
@@ -308,13 +369,13 @@ const ChannelHeaderCard = ({
           <ChevronDown size={14} className={`text-gray-500 transition-transform shrink-0 ${openDropdown === 'platform' ? 'rotate-180' : ''}`} />
         </div>
         {openDropdown === 'platform' && (
-          <div className="absolute top-full right-0 mt-2 w-full min-w-[200px] bg-white rounded-base shadow-xl border border-gray-100 p-2 space-y-1 animate-in fade-in zoom-in-95 duration-200 z-[20]">
+          <div className="absolute top-full right-0 mt-2 w-full min-w-[200px] bg-gray-900 rounded-base shadow-xl border border-gray-700 p-2 space-y-1 animate-in fade-in zoom-in-95 duration-200 z-[20]">
             {PLATFORMS.map(p => (
               <div key={p.id} className="relative group">
                 <button disabled={p.disabled}
                   onClick={() => { if (!p.disabled) { handleChangePlatformWithConfirm(p); setOpenDropdown(null); } }}
                   className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-base transition-all ${
-                    p.disabled ? 'opacity-40 cursor-not-allowed' : platform?.id === p.id ? 'bg-primary-50 text-primary-500' : 'hover:bg-gray-50 text-gray-600'}`}>
+                    p.disabled ? 'opacity-40 cursor-not-allowed text-gray-500' : platform?.id === p.id ? 'bg-primary-500/15 text-primary-300' : 'hover:bg-gray-800 text-gray-200'}`}>
                   <img src={p.logo} className="w-5 h-5 rounded object-contain shrink-0" alt="" />
                   <span className="text-xs font-bold">{p.name}</span>
                   {!p.disabled && platform?.id === p.id && <Check size={12} className="ml-auto" />}
@@ -367,10 +428,10 @@ const ChannelHeaderCard = ({
         </div>
 
         {openDropdown === 'account' && !triggerDisabled && (
-          <div className="absolute top-full right-0 mt-2 w-full min-w-[280px] bg-white rounded-base shadow-xl border border-gray-100 animate-in fade-in zoom-in-95 duration-200 z-[20] overflow-hidden">
+          <div className="absolute top-full right-0 mt-2 w-full min-w-[280px] bg-gray-900 rounded-base shadow-xl border border-gray-700 animate-in fade-in zoom-in-95 duration-200 z-[20] overflow-hidden">
             {accountState === 'NEED_AUTH' ? (
               <div className="p-4 space-y-3">
-                <p className="text-xs text-gray-500 font-medium leading-relaxed">
+                <p className="text-xs text-gray-300 font-medium leading-relaxed">
                   使用 {platform.name} 广告账户前，请先连接您的 {platform.name} Ads 账号。
                 </p>
                 <button
@@ -396,14 +457,14 @@ const ChannelHeaderCard = ({
                         key={acc.id}
                         onClick={() => { handleSelectAccountWithConfirm(acc); setOpenDropdown(null); }}
                         className={`w-full text-left px-3 py-2.5 rounded-base transition-all flex items-center justify-between gap-3 ${
-                          isSelected ? 'bg-primary-50 text-primary-500' : 'hover:bg-gray-50 text-gray-700'
+                          isSelected ? 'bg-primary-500/15 text-primary-300' : 'hover:bg-gray-800 text-gray-200'
                         }`}
                       >
                         <div className="min-w-0">
-                          <p className={`text-sm font-bold truncate ${isSelected ? 'text-primary-500' : 'text-gray-700'}`}>{acc.name}</p>
+                          <p className={`text-sm font-bold truncate ${isSelected ? 'text-primary-300' : 'text-white'}`}>{acc.name}</p>
                           <p className="text-xs text-gray-400 font-medium truncate mt-0.5">{acc.id}</p>
                         </div>
-                        {isSelected && <Check size={14} className="text-primary-500 shrink-0" />}
+                        {isSelected && <Check size={14} className="text-primary-300 shrink-0" />}
                       </button>
                     );
                   })
@@ -430,6 +491,7 @@ const TargetingChannelCard = ({
   placementMode, setPlacementMode, manualPlacements, setManualPlacements,
   platform, campaignType,
   dailyBudget, setDailyBudget,
+  budgetType, setBudgetType,
   advancedOpen, setAdvancedOpen,
   productCount = 0,
   children,
@@ -660,7 +722,25 @@ const TargetingChannelCard = ({
         {/* Daily Budget — 4th column, matches dropdown card visual */}
         <div>
           <div className="bg-white rounded-inner p-4 border border-gray-100 shadow-sm flex flex-col gap-2 group focus-within:border-primary-500/30 transition-all h-full">
-            <span className="text-xs font-medium text-gray-500">每日预算</span>
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-xs font-medium text-gray-500">每日预算</span>
+              <div className="inline-flex items-center bg-gray-100 rounded-base p-0.5">
+                <button
+                  type="button"
+                  onClick={() => setBudgetType('CBO')}
+                  className={`px-2.5 py-0.5 rounded-base text-[10px] font-medium transition-all ${
+                    budgetType === 'CBO' ? 'bg-white text-primary-500 shadow-adsgo-card' : 'text-gray-500'
+                  }`}
+                >CBO</button>
+                <button
+                  type="button"
+                  onClick={() => setBudgetType('ABO')}
+                  className={`px-2.5 py-0.5 rounded-base text-[10px] font-medium transition-all ${
+                    budgetType === 'ABO' ? 'bg-white text-primary-500 shadow-adsgo-card' : 'text-gray-500'
+                  }`}
+                >ABO</button>
+              </div>
+            </div>
             <div className="flex items-center gap-2.5 min-w-0">
               <DollarSign size={16} className="text-primary-500 shrink-0" />
               <input
@@ -1538,6 +1618,15 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
   const [dailyBudget, setDailyBudget] = useState(50);
   const [view, setView] = useState('config');
 
+  // ref：用于点击"预览发布计划"前命令式校验架构图，未填素材组的 adset 由 CampaignPlanView 自行高亮 + 滚动定位
+  const campaignPlanRef = useRef(null);
+
+  // 架构图 state 提升至 BatchGenerateAds 层，避免 view 切换 (config↔preview) 时 CampaignPlanView 卸载丢失：
+  //   adsetAds：每 adset 已分配的 ads 列表（含拖入素材组拆分后的结果）
+  //   campaignConfigs：每 campaign 的 locations / language / objective / budget 等
+  const [adsetAds, setAdsetAds] = useState({});
+  const [campaignConfigs, setCampaignConfigs] = useState({});
+
   const [showPublishModal, setShowPublishModal] = useState(false);
 
   // Publish flow state lifted out of PublishModal: PublishModal is defined inline
@@ -1611,6 +1700,9 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
     objective !== '' &&
     adsetGoal !== '' &&
     !(currentGoalObj?.needsEvent && !event);
+
+  // 广告结构初始化设置完整：targeting 全选 + 日预算 > 0（与 TargetingChannelCard 内部 isInitComplete 保持一致，决定是否暴露 Campaign 结构预览）
+  const isInitComplete = isTargetingComplete && Number(dailyBudget) > 0;
 
   const detectedBrand = {
     name: 'Luminaire Vintage',
@@ -2313,8 +2405,8 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
 
   return (
     <div className="bg-gray-50/50 min-h-full">
-      {/* Sticky Channel + Account header (replaces former black banner) */}
-      {view === 'config' && (
+      {/* Sticky Channel + Account header (replaces former black banner) — 仅 Phase 2 (platform 已选) 渲染 */}
+      {view === 'config' && platform && (
         <div className="sticky top-0 w-full px-4 md:px-8 pt-4 animate-in slide-in-from-top-full duration-500" style={{ zIndex: Z_INDEX.HEADER }}>
           <div className="max-w-7xl mx-auto">
             <ChannelHeaderCard
@@ -2345,6 +2437,12 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
         <div className="w-full max-w-7xl">
 
           {view === 'config' ? (
+            !platform ? (
+              <ChannelPickerHero
+                platforms={PLATFORMS}
+                onPick={(p) => setPlatform(p)}
+              />
+            ) : (
             <div className="space-y-8 animate-fade-in pb-20">
 
               {/* Card 2: Add Product */}
@@ -2354,6 +2452,7 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
                    <h3 className="text-xl font-semibold text-gray-900">添加投放产品</h3>
                 </div>
                 <ProductSelector
+                  platform={platform}
                   selectedProducts={selectedProducts}
                   onSelectProducts={setSelectedProducts}
                   productCreativeGroups={productCreativeGroupsMap}
@@ -2439,6 +2538,7 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
                   manualPlacements={manualPlacements} setManualPlacements={setManualPlacements}
                   platform={platform} campaignType={campaignType}
                   dailyBudget={dailyBudget} setDailyBudget={setDailyBudget}
+                  budgetType={budgetType} setBudgetType={setBudgetType}
                   productCount={selectedProducts.length}
                   advancedOpen={advancedOpen} setAdvancedOpen={setAdvancedOpen}
                 >
@@ -2771,14 +2871,17 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
                 </TargetingChannelCard>
               )}
 
-              {/* Card 3: Strategy & Budget */}
-              {allProductsReady && (!isAnyProductMissingCreatives || campaignType === 'CATALOG') && (
+              {/* Card 3: Strategy & Budget — 仅当广告结构初始化设置完整且产品就绪后才暴露 */}
+              {allProductsReady && (!isAnyProductMissingCreatives || campaignType === 'CATALOG') && isInitComplete && (
                  <div className="bg-white rounded-section p-10 adsgo-card-shadow animate-in fade-in slide-in-from-top-8">
                     <div className="flex items-center gap-3 mb-8">
                        <div className="w-10 h-10 bg-primary-500 rounded-xl flex items-center justify-center text-white"><Layers size={20} /></div>
                        <h3 className="text-xl font-semibold text-gray-900">Campaign 结构预览</h3>
                     </div>
                     <CampaignPlanView
+                      ref={campaignPlanRef}
+                      adsetAds={adsetAds} setAdsetAds={setAdsetAds}
+                      campaignConfigs={campaignConfigs} setCampaignConfigs={setCampaignConfigs}
                       structure={structure} onStructureChange={handleStructureChange}
                       campaignType={campaignType}
                       budgetType={budgetType} onBudgetTypeChange={setBudgetType}
@@ -2797,6 +2900,7 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
                         adsetGoal,
                         event,
                         dailyBudget,
+                        budgetType,
                       }}
                       targetingMeta={{
                         ALL_COUNTRIES,
@@ -2830,11 +2934,15 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
                  </div>
               )}
 
-              {/* Preview Button */}
-              {allProductsReady && (!isAnyProductMissingCreatives || campaignType === 'CATALOG') && (
+              {/* Preview Button — 与 Campaign 结构预览一同出现，仅在结构初始化完成后暴露 */}
+              {allProductsReady && (!isAnyProductMissingCreatives || campaignType === 'CATALOG') && isInitComplete && (
                 <div className="flex flex-col items-center">
                   <button
-                    onClick={() => { setView('preview'); _hasGeneratedOnce = true; setHasGeneratedOnce(true); }}
+                    onClick={() => {
+                      const result = campaignPlanRef.current?.validateAdsets?.();
+                      if (result && !result.ok) return; // 存在空 adset → CampaignPlanView 已自行高亮 + 滚动
+                      setView('preview'); _hasGeneratedOnce = true; setHasGeneratedOnce(true);
+                    }}
                     className="group relative w-full max-w-4xl py-8 px-16 rounded-full font-bold text-2xl flex items-center justify-center bg-primary-500 text-white hover:bg-primary-600 shadow-xl transition-all"
                   >
                     <Sparkles size={28} className="mr-5" />
@@ -2843,13 +2951,15 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
                 </div>
               )}
             </div>
+            )
           ) : (
             // Preview View Wrapper - Keeping the original card style for the preview page
             <div className="bg-white rounded-section shadow-xl border border-gray-100 overflow-hidden relative mb-20 animate-fade-in">
               <div className="p-10 md:p-14">
-                <CampaignPreviewView 
+                <CampaignPreviewView
                   structure={structure}
-                  budgetType={budgetType} 
+                  numCampaigns={Math.max(structure.numCampaigns || 1, 1)}
+                  budgetType={budgetType}
                   dailyBudget={dailyBudget}
                   initialAdsetAudiences={adsetAudiences} 
                   productCreativesMap={productCreativesMap}
@@ -2874,10 +2984,20 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
                   adSetGroupsCount={adSetGroupsCount}
                   adType={adType}
                   adsetAudienceDetails={adsetAudienceDetails}
+                  platform={platform}
                   authStatus={authStatus}
                   selectedAccount={selectedAccount}
                   onAuthStatusChange={setAuthStatus}
                   onSelectAccount={() => setShowMetaAccountPicker(true)}
+                  onAuthorizeChannel={async (platformId) => {
+                    await handleAuthorizeChannel(platformId);
+                    if ((platformId === 'meta' || platformId === 'tiktok' || platformId === 'google') && !selectedAccount) {
+                      accountPickLoading.triggerLoad();
+                      setShowMetaAccountPicker(true);
+                    }
+                  }}
+                  onOpenAccountPicker={() => { accountPickLoading.triggerLoad(); setShowMetaAccountPicker(true); }}
+                  channelAuthLoading={channelAuthLoading}
                   onBudgetChange={setDailyBudget}
                   onBudgetTypeChange={setBudgetType}
                   campaignNameTemplate={campaignNameTemplate}

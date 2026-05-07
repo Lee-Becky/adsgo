@@ -984,6 +984,7 @@ const CampaignPreviewView = ({
   structure, budgetType, dailyBudget, initialAdsetAudiences, productCreativesMap, selectedProducts, brand, onBack, onPublish, campaignName, optimizationEvent, landingPageType, landingPageTemplate, productUtm, copyStrategy, unifiedHeadline, unifiedBody, campaignType,
   estimatedTotalDaily, adSetGroupsCount, adType = 'SINGLE', adsetAudienceDetails = {},
   authStatus, selectedAccount, onAuthStatusChange, onSelectAccount,
+  platform, onAuthorizeChannel, onOpenAccountPicker, channelAuthLoading,
   isExistingCampaign, campaignObjective, onBudgetChange, onBudgetTypeChange,
   campaignNameTemplate = '{Brand}-{location}-{date}',
   adsetNameTemplate = '{location}-{audience_type}-{creative_type}-{date}',
@@ -993,6 +994,7 @@ const CampaignPreviewView = ({
   selectedProductSet = '',
   onSelectCatalog,
   onSelectProductSet,
+  numCampaigns = 1,
 }) => {
   const isFlexible = adType === 'FLEXIBLE' && (campaignObjective === 'sales_conversions' || campaignObjective === 'app_promotion');
 
@@ -1234,7 +1236,7 @@ const CampaignPreviewView = ({
     setLocalAdSets(adSets);
   }, [campaignType, selectedProducts, structure, productCreativesMap, initialAdsetAudiences, landingPageType, landingPageTemplate, productUtm, copyStrategy, unifiedHeadline, unifiedBody, optimizationEvent, adSetGroupsCount, isFlexible, adsetNameTemplate, adNameTemplate, selectedLocations, selectedCta]);
 
-  const totalDailyBudget = estimatedTotalDaily || (budgetType === 'CBO' ? dailyBudget : dailyBudget * localAdSets.length);
+  const totalDailyBudget = (estimatedTotalDaily || (budgetType === 'CBO' ? dailyBudget : dailyBudget * localAdSets.length)) * Math.max(numCampaigns, 1);
 
   const handleUpdateField = (field, value) => {
     if (editingAdSetIndex === null) return;
@@ -1612,8 +1614,15 @@ const CampaignPreviewView = ({
       { id: 'AI', label: 'AI Generate', icon: <Sparkles size={13} /> },
       { id: 'LIBRARY', label: 'Creative Library', icon: <Layout size={13} /> },
       { id: 'ASSETS', label: 'Product Assets', icon: <ShoppingBag size={13} /> },
+      { id: 'MEDIA', label: 'Media Creatives', icon: <Monitor size={13} /> },
       { id: 'UPLOAD', label: 'Upload', icon: <Plus size={13} /> },
     ];
+
+    const mediaState =
+      !platform ? 'NO_PLATFORM' :
+      !authStatus?.[platform.id] ? 'NEED_AUTH' :
+      !selectedAccount ? 'NEED_PICK' :
+      'PICKED';
 
     const isSelected = (c) => selected.some(s => s.url === c.url);
 
@@ -1720,6 +1729,84 @@ const CampaignPreviewView = ({
                       <p className="text-sm">暂无可用创意</p>
                     </div>
                   )
+                ) : activeTab === 'MEDIA' ? (
+                  mediaState === 'NO_PLATFORM' ? (
+                    <div className="flex flex-col items-center justify-center h-full text-gray-400 gap-3 text-center px-6">
+                      <div className="w-16 h-16 bg-gray-50 rounded-xl flex items-center justify-center text-gray-300"><Monitor size={32} /></div>
+                      <p className="text-sm font-bold text-gray-500">尚未选择媒体渠道</p>
+                      <p className="text-xs text-gray-400 max-w-xs">请返回上一步在"投放渠道媒体"中选择媒体平台并连接账号。</p>
+                    </div>
+                  ) : mediaState === 'NEED_AUTH' ? (
+                    <div className="flex flex-col items-center justify-center h-full gap-3 text-center px-6">
+                      <div className="w-16 h-16 bg-gray-50 rounded-xl flex items-center justify-center overflow-hidden">
+                        {platform.logo ? <img src={platform.logo} alt="" className="w-10 h-10 object-contain" /> : <Monitor size={32} className="text-gray-300" />}
+                      </div>
+                      <p className="text-sm font-bold text-gray-500">连接 {platform.name} 后查看媒体素材</p>
+                      <p className="text-xs text-gray-400 max-w-xs">连接成功后将自动弹出账号选择，再选择目标账号即可加载该账号下的媒体素材。</p>
+                      <button
+                        onClick={() => onAuthorizeChannel?.(platform.id)}
+                        disabled={channelAuthLoading}
+                        className="mt-2 px-6 py-2.5 bg-primary-500 text-white rounded-full text-sm font-semibold hover:bg-primary-600 transition-all shadow-md flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+                      >
+                        {channelAuthLoading ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />}
+                        {channelAuthLoading ? '连接中...' : `Connect ${platform.name} Ads`}
+                      </button>
+                    </div>
+                  ) : mediaState === 'NEED_PICK' ? (
+                    <div className="flex flex-col items-center justify-center h-full gap-3 text-center px-6">
+                      <div className="w-16 h-16 bg-primary-50 rounded-xl flex items-center justify-center text-primary-500"><Briefcase size={32} /></div>
+                      <p className="text-sm font-bold text-gray-500">已连接 {platform.name}，请选择广告账号</p>
+                      <p className="text-xs text-gray-400 max-w-xs">从已授权账户中选择一个，加载其媒体素材库。</p>
+                      <button
+                        onClick={() => onOpenAccountPicker?.()}
+                        className="mt-2 px-6 py-2.5 bg-primary-500 text-white rounded-full text-sm font-semibold hover:bg-primary-600 transition-all shadow-md flex items-center gap-2"
+                      >
+                        <Briefcase size={14} /> 选择 {platform.name} 账号
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2 px-3 py-2 bg-primary-50 border border-primary-100 rounded-md">
+                        {platform.logo && <img src={platform.logo} alt="" className="w-4 h-4 object-contain shrink-0" />}
+                        <p className="text-[11px] font-medium text-primary-700 truncate">
+                          已连接 {platform.name} · 账号 <span className="font-bold">{selectedAccount.name}</span>
+                        </p>
+                      </div>
+                      {allCreatives.length > 0 ? (
+                        <div className="grid grid-cols-4 gap-1.5">
+                          {allCreatives.map((c, i) => {
+                            const sel = isSelected(c);
+                            const selIdx = selected.findIndex(s => s.url === c.url);
+                            return (
+                              <div
+                                key={`media-${c.id || i}`}
+                                onClick={() => toggle(c)}
+                                className={`relative aspect-square rounded-md overflow-hidden cursor-pointer border-2 transition-all ${
+                                  sel ? 'border-primary-500 shadow-md' : 'border-transparent hover:border-gray-300'
+                                }`}
+                              >
+                                <img src={c.url} className="w-full h-full object-cover" alt="" />
+                                {sel && <div className="absolute inset-0 bg-primary-500/20" />}
+                                {sel && (
+                                  <div className="absolute top-1.5 right-1.5 w-5 h-5 bg-primary-500 rounded-full flex items-center justify-center text-white text-[10px] font-bold shadow">
+                                    {selIdx + 1}
+                                  </div>
+                                )}
+                                {!sel && selected.length >= maxCount && (
+                                  <div className="absolute inset-0 bg-white/50" />
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      ) : (
+                        <div className="flex flex-col items-center justify-center py-12 text-gray-400 gap-2">
+                          <Monitor size={32} className="text-gray-200" />
+                          <p className="text-sm">该账号下暂无媒体素材</p>
+                        </div>
+                      )}
+                    </div>
+                  )
                 ) : (
                   <div className="flex flex-col items-center justify-center h-full text-gray-400 gap-2">
                     <Sparkles size={32} className="text-gray-200" />
@@ -1792,7 +1879,6 @@ const CampaignPreviewView = ({
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-xl font-semibold text-gray-900">发布方案预览</h2>
-          <p className="text-sm text-gray-400 font-medium mt-1 tracking-widest">{localCampaignName} • {campaignType === 'CATALOG' ? '目录广告' : '落地页广告'} 架构</p>
         </div>
         <button onClick={onBack} className="border border-primary-500 text-primary-500 rounded-base text-sm font-medium hover:bg-primary-50 active:bg-primary-100 transition-all duration-200 px-6 py-3 flex items-center gap-2">
           <ChevronLeft size={16} /> 返回修改配置
@@ -1800,13 +1886,24 @@ const CampaignPreviewView = ({
       </div>
 
       <div className="space-y-16">
+        {Array.from({ length: numCampaigns }, (_, cIdx) => (
+        <React.Fragment key={`campaign-block-${cIdx}`}>
+        {cIdx > 0 && (
+          <div className="flex items-center gap-3 px-1 -my-4" aria-hidden>
+            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent" />
+            <span className="text-[10px] font-semibold tracking-wider text-gray-400 uppercase">
+              Campaign {cIdx + 1}
+            </span>
+            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent" />
+          </div>
+        )}
         <div className="bg-gray-900 p-6 rounded-section shadow-xl text-white relative overflow-visible">
           <div className="absolute top-0 right-0 w-80 h-80 bg-primary-500/10 rounded-full blur-[100px] -translate-y-40 translate-x-40 pointer-events-none"></div>
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
               <div className="w-11 h-11 bg-primary-500 rounded-inner flex items-center justify-center shadow-lg border-2 border-white/10"><Briefcase size={22} /></div>
               <div>
-                <p className="text-xs font-medium text-gray-500">Campaign Overview</p>
+                <p className="text-xs font-medium text-gray-500">Campaign {cIdx + 1} Overview</p>
                 {!isExistingCampaign ? (
                   isEditingCampaignName ? (
                     <div className="flex items-center gap-2">
@@ -2013,6 +2110,8 @@ const CampaignPreviewView = ({
             </div>
           ))}
         </div>
+        </React.Fragment>
+        ))}
       </div>
 
       <div className="fixed bottom-0 left-0 right-0 bg-gray-900 text-white px-8 py-4 z-[100] border-t border-white/5 backdrop-blur-xl bg-opacity-95 shadow-[0_-20px_40px_rgba(0,0,0,0.1)]">
@@ -2020,7 +2119,7 @@ const CampaignPreviewView = ({
           <div className="flex items-center gap-12">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-primary-500 rounded-base flex items-center justify-center shadow-lg"><Layers size={20} /></div>
-              <div><p className="text-xs font-medium text-gray-500">结构方案</p><p className="text-base font-semibold">{adSetGroupsCount || localAdSets.length} Adsets • {campaignType === 'CATALOG' ? 'Dynamic' : localAdSets.reduce((acc, as) => acc + as.ads.length, 0)} Ads</p></div>
+              <div><p className="text-xs font-medium text-gray-500">结构方案</p><p className="text-base font-semibold">{numCampaigns} Campaigns • {(adSetGroupsCount || localAdSets.length) * numCampaigns} Adsets • {campaignType === 'CATALOG' ? 'Dynamic' : localAdSets.reduce((acc, as) => acc + as.ads.length, 0) * numCampaigns} Ads</p></div>
             </div>
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-emerald-600 rounded-base flex items-center justify-center shadow-lg"><DollarSign size={20} /></div>

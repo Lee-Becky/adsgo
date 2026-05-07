@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef, useEffect } from 'react';
+import React, { useState, useMemo, useRef, useEffect, useCallback, useImperativeHandle, forwardRef } from 'react';
 import { Users, Info, Sparkles, DollarSign, ChevronDown, Briefcase, Target, Layers, Lock, Edit3, Check, LayoutGrid, Facebook, Search, X, Loader2, Send, ChevronUp, MessageSquare, RefreshCw, Plus, Link, Copy, Trash2, Globe, MapPin, ChevronLeft, ArrowRight, CheckCircle2, MousePointerClick } from 'lucide-react';
 import { Z_INDEX } from '../../../constants/zIndex';
 import useDropdownLoading from '../../../hooks/useDropdownLoading';
@@ -661,11 +661,28 @@ const CampaignDetailPanel = ({ campaignIdx, config, onChange, onSelectExistingCa
   const currentObjectiveObj = CAMPAIGN_OBJECTIVES.find(o => o.value === config.objective);
   const filteredEvents = STANDARD_EVENTS.filter(ev => ev.toLowerCase().includes(eventSearch.toLowerCase()));
 
+  const defaultCampaignName = `Campaign ${campaignIdx + 1}`;
+  const campaignNameValue = config.campaignName !== undefined ? config.campaignName : defaultCampaignName;
+
   return (
     <div className="space-y-5">
       <div className="flex items-baseline gap-2">
         <span className="text-xs font-bold text-primary-500/60 tabular-nums">C{campaignIdx + 1}</span>
         <h4 className="text-sm font-semibold text-gray-900 tracking-tight">Campaign {campaignIdx + 1} 配置</h4>
+      </div>
+
+      {/* Campaign 名称 — editable */}
+      <div className="space-y-2">
+        <label className="text-xs font-medium text-gray-500 px-1">Campaign 名称</label>
+        <div className="bg-white rounded-inner p-3 border border-gray-100 shadow-sm flex items-center gap-2 focus-within:border-primary-500/30 transition-all">
+          <Edit3 size={14} className="text-primary-500 shrink-0" />
+          <input
+            value={campaignNameValue}
+            onChange={(e) => onChange({ campaignName: e.target.value })}
+            placeholder={defaultCampaignName}
+            className="flex-1 min-w-0 bg-transparent border-none outline-none text-sm font-semibold text-gray-700 placeholder-gray-300"
+          />
+        </div>
       </div>
 
       {/* Locations (multi) — editable */}
@@ -825,10 +842,11 @@ const CampaignDetailPanel = ({ campaignIdx, config, onChange, onSelectExistingCa
         </div>
       </div>
 
-      {/* Daily Budget — 标题右侧并列 CBO/ABO toggle */}
+      {/* Daily Budget — 标题 / 投放预算模式 / 数字 三段纵向（避免窄宽挤压） */}
       <div className="space-y-2">
-        <div className="flex items-center justify-between px-1">
-          <label className="text-xs font-medium text-gray-500">每日预算</label>
+        <label className="text-xs font-medium text-gray-500 px-1">每日预算</label>
+        <div className="flex items-center justify-between gap-2 px-1">
+          <span className="text-[10px] font-medium text-gray-400">投放预算模式</span>
           <div className="flex p-0.5 bg-gray-100/80 rounded-base border border-gray-100">
             <button
               onClick={() => onChange({ budgetType: 'CBO' })}
@@ -877,11 +895,28 @@ const AdsetDetailPanel = ({
     }, 1500);
   };
 
+  const defaultAdsetName = `Adset ${campaignIdx + 1}.${adsetIdx + 1}`;
+  const adsetNameValue = details.adsetName !== undefined ? details.adsetName : defaultAdsetName;
+
   return (
     <div className="space-y-5">
       <div className="flex items-baseline gap-2">
         <span className="text-xs font-bold text-primary-500/60 tabular-nums">A{campaignIdx + 1}.{adsetIdx + 1}</span>
         <h4 className="text-sm font-semibold text-gray-900 tracking-tight">Adset {campaignIdx + 1}.{adsetIdx + 1} 配置</h4>
+      </div>
+
+      {/* Adset 名称 — editable */}
+      <div className="space-y-2">
+        <label className="text-xs font-medium text-gray-500 px-1">Adset 名称</label>
+        <div className="bg-white rounded-inner p-3 border border-gray-100 shadow-sm flex items-center gap-2 focus-within:border-primary-500/30 transition-all">
+          <Edit3 size={14} className="text-primary-500 shrink-0" />
+          <input
+            value={adsetNameValue}
+            onChange={(e) => onSaveDetails?.({ adsetName: e.target.value })}
+            placeholder={defaultAdsetName}
+            className="flex-1 min-w-0 bg-transparent border-none outline-none text-sm font-semibold text-gray-700 placeholder-gray-300"
+          />
+        </div>
       </div>
 
       {/* 受众类型 segment — 精确选择 */}
@@ -1073,7 +1108,7 @@ const AdsetDetailPanel = ({
   );
 };
 
-const CampaignPlanView = ({
+const CampaignPlanView = forwardRef(({
   structure,
   onStructureChange,
   campaignType,
@@ -1108,7 +1143,11 @@ const CampaignPlanView = ({
   numByCreativeAdsets = 1,
   onSaveAdsetCreatives,
   onAddByCreativeAdset,
-}) => {
+  adsetAds: adsetAdsProp,
+  setAdsetAds: setAdsetAdsProp,
+  campaignConfigs: campaignConfigsProp,
+  setCampaignConfigs: setCampaignConfigsProp,
+}, ref) => {
   const [showLalDropdown, setShowLalDropdown] = useState(false);
   const [showCustomAudienceDropdown, setShowCustomAudienceDropdown] = useState(false);
   const [showSavedAudienceDropdown, setShowSavedAudienceDropdown] = useState(false);
@@ -1124,37 +1163,49 @@ const CampaignPlanView = ({
   const [focusedAdsetIdx, setFocusedAdsetIdx] = useState(0);
 
   // ── New state: multi-campaign tree + per-adset ad list + selected node + per-campaign config ──
-  const [adsetAds, setAdsetAds] = useState({});
+  // adsetAds / campaignConfigs 由父组件 BatchGenerateAds 提供（state lifted up），
+  // 避免 view 切到 preview 再返回时本地 state 被卸载而丢失已配置的 ads / configs。
+  const [adsetAdsLocal, setAdsetAdsLocal] = useState({});
+  const adsetAds = adsetAdsProp !== undefined ? adsetAdsProp : adsetAdsLocal;
+  const setAdsetAds = setAdsetAdsProp || setAdsetAdsLocal;
   // shape: { [`${campaignIdx}::${adsetIdx}`]: [{ id, productId, groupId, groupName, creatives: [...] }] }
   const [hoveredAdsetKey, setHoveredAdsetKey] = useState(null);
+  // 校验态：未添加素材组的 adset key 集合（`${cIdx}::${aIdx}`），由 validateAdsets() 触发，drop 后自动清除
+  const [errorAdsetKeys, setErrorAdsetKeys] = useState({});
+  const adsetRowRefs = useRef({});
   const [selectedNode, setSelectedNode] = useState({ type: 'campaign', campaignIdx: 0 });
-  const [campaignConfigs, setCampaignConfigs] = useState({});
+  const [campaignConfigsLocal, setCampaignConfigsLocal] = useState({});
+  const campaignConfigs = campaignConfigsProp !== undefined ? campaignConfigsProp : campaignConfigsLocal;
+  const setCampaignConfigs = setCampaignConfigsProp || setCampaignConfigsLocal;
   // shape: { [campaignIdx]: { selectedLocations, selectedLanguage, objective, adsetGoal, event, dailyBudget, selectedCampaignId, budgetType } }
   const [campaignDropdown, setCampaignDropdown] = useState(null); // 'location' | 'language' | 'objective' | null
   const [campaignObjectiveStage, setCampaignObjectiveStage] = useState('objective');
 
-  // Initialise / extend campaignConfigs when numCampaigns changes — copy section defaults the first time each idx appears.
+  // Lazy fallback：未编辑过的 campaign idx 实时回退到当前 sectionDefaults，
+  // 用户首次在 CampaignDetailPanel 编辑时才把值固化进 campaignConfigs。
+  // 这样既满足"初始化透传顶部已选值"，又不破坏"已自定义 campaign 不被顶部覆盖"的语义。
+  const buildDefaultCampaignConfig = useCallback(() => ({
+    selectedLocations: [...(sectionDefaults.selectedLocations || [])],
+    selectedLanguage: sectionDefaults.selectedLanguage || null,
+    objective: sectionDefaults.objective || '',
+    adsetGoal: sectionDefaults.adsetGoal || '',
+    event: sectionDefaults.event || '',
+    dailyBudget: sectionDefaults.dailyBudget ?? 50,
+    budgetType: sectionDefaults.budgetType || 'CBO',
+    selectedCampaignId: null,
+  }), [sectionDefaults]);
+
+  const getCampaignConfig = useCallback(
+    (cIdx) => campaignConfigs[cIdx] || buildDefaultCampaignConfig(),
+    [campaignConfigs, buildDefaultCampaignConfig]
+  );
+
+  // 当 numCampaigns 缩小时，清理被删除 idx 的残留 config（避免 stale state 占用内存）
   useEffect(() => {
     setCampaignConfigs(prev => {
+      const N = Math.max(structure.numCampaigns || 1, 1);
       const next = { ...prev };
       let changed = false;
-      const N = Math.max(structure.numCampaigns || 1, 1);
-      for (let i = 0; i < N; i++) {
-        if (!next[i]) {
-          next[i] = {
-            selectedLocations: [...(sectionDefaults.selectedLocations || [])],
-            selectedLanguage: sectionDefaults.selectedLanguage || null,
-            objective: sectionDefaults.objective || '',
-            adsetGoal: sectionDefaults.adsetGoal || '',
-            event: sectionDefaults.event || '',
-            dailyBudget: sectionDefaults.dailyBudget ?? 50,
-            selectedCampaignId: null,
-            budgetType: 'CBO',
-          };
-          changed = true;
-        }
-      }
-      // Drop indices >= N
       Object.keys(next).forEach(k => {
         if (Number(k) >= N) { delete next[k]; changed = true; }
       });
@@ -1165,7 +1216,7 @@ const CampaignPlanView = ({
   const updateCampaignConfig = (campaignIdx, patch) => {
     setCampaignConfigs(prev => ({
       ...prev,
-      [campaignIdx]: { ...(prev[campaignIdx] || {}), ...patch },
+      [campaignIdx]: { ...(prev[campaignIdx] || buildDefaultCampaignConfig()), ...patch },
     }));
   };
 
@@ -1249,6 +1300,34 @@ const CampaignPlanView = ({
   });
   const numAdsPerAdset = Math.max(structure.numAdsPerAdset || 1, 1);
 
+  // 暴露 validateAdsets() 给父组件，用于"预览发布计划"前命令式校验。
+  // 返回 { ok: boolean }；ok=false 时已自行将所有空 adset 标记为红框 + 滚动到第一个空 adset。
+  useImperativeHandle(ref, () => ({
+    validateAdsets: () => {
+      const empties = [];
+      campaignTrees.forEach(tree => {
+        tree.adsets.forEach(adset => {
+          const key = `${tree.campaignIdx}::${adset.adsetIdx}`;
+          if (!(adsetAds[key] && adsetAds[key].length > 0)) {
+            empties.push({ cIdx: tree.campaignIdx, aIdx: adset.adsetIdx, key });
+          }
+        });
+      });
+      if (empties.length === 0) {
+        setErrorAdsetKeys({});
+        return { ok: true };
+      }
+      const errMap = {};
+      empties.forEach(e => { errMap[e.key] = true; });
+      setErrorAdsetKeys(errMap);
+      const firstEl = adsetRowRefs.current[empties[0].key];
+      if (firstEl && typeof firstEl.scrollIntoView === 'function') {
+        firstEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      return { ok: false };
+    },
+  }), [campaignTrees, adsetAds]);
+
   // Drop a creative group onto an adset → 按 adType 拆分成 N 个 ad，prepend 到该 adset 的 ads 列表（左侧靠近 drop zone）
   const handleDropGroupToAdset = (campaignIdx, adsetIdx, payload) => {
     if (!payload?.productId || !payload?.groupId) return;
@@ -1265,6 +1344,14 @@ const CampaignPlanView = ({
       ...prev,
       [`${campaignIdx}::${adsetIdx}`]: [...newAds, ...(prev[`${campaignIdx}::${adsetIdx}`] || [])],
     }));
+    // 清除该 adset 的错误高亮（如果存在）
+    setErrorAdsetKeys(prev => {
+      const key = `${campaignIdx}::${adsetIdx}`;
+      if (!prev[key]) return prev;
+      const next = { ...prev };
+      delete next[key];
+      return next;
+    });
   };
   const removeAdFromAdset = (campaignIdx, adsetIdx, adId) => {
     setAdsetAds(prev => ({
@@ -1496,14 +1583,14 @@ const CampaignPlanView = ({
         )}
 
         {/* 横向架构图 + 右侧详情面板 */}
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6">
           {/* Tree pane (left) */}
-          <div className="bg-gray-50/40 border border-gray-100 rounded-inner p-6 max-h-[640px] overflow-y-auto custom-scrollbar">
-            <div className="space-y-8">
+          <div className="bg-gray-50/40 border border-gray-100 rounded-inner p-6 max-h-[640px] overflow-auto custom-scrollbar">
+            <div className="space-y-8 min-w-max">
               {campaignTrees.map(tree => {
                 const cIdx = tree.campaignIdx;
                 const isCampaignSelected = selectedNode.type === 'campaign' && selectedNode.campaignIdx === cIdx;
-                const cfg = campaignConfigs[cIdx] || {};
+                const cfg = getCampaignConfig(cIdx);
                 return (
                   <div key={cIdx} className="grid grid-cols-[100px_1fr] gap-3 items-center">
                     {/* Campaign node — column layout: icon top, label below */}
@@ -1556,8 +1643,15 @@ const CampaignPlanView = ({
                         const aIdx = adset.adsetIdx;
                         const audienceType = getAudienceType(cIdx, aIdx);
                         const isAdsetSelected = selectedNode.type === 'adset' && selectedNode.campaignIdx === cIdx && selectedNode.adsetIdx === aIdx;
+                        const hasError = !!errorAdsetKeys[adset.key];
                         return (
-                          <div key={adset.key} className="grid grid-cols-[100px_1fr] gap-3 items-center">
+                          <div
+                            key={adset.key}
+                            ref={(el) => { if (el) adsetRowRefs.current[adset.key] = el; else delete adsetRowRefs.current[adset.key]; }}
+                            className={`grid grid-cols-[100px_1fr] gap-3 items-center rounded-base transition-all ${
+                              hasError ? 'ring-2 ring-rose-400 ring-offset-2 ring-offset-gray-50/40 bg-rose-50/40 animate-pulse p-2 -m-2' : ''
+                            }`}
+                          >
                             {/* Adset node — 与 Campaign 同款结构：CRUD 按钮 absolute 右上角 */}
                             <div className="relative isolate">
                               <button
@@ -1591,8 +1685,8 @@ const CampaignPlanView = ({
                               </div>
                             </div>
 
-                            {/* 固定 drop zone（左）+ 动态 ad 列表（右，新加入靠左） */}
-                            <div className="flex flex-wrap items-start gap-2">
+                            {/* 固定 drop zone（左）+ 动态 ad 列表（右，新加入靠左），单行；横向溢出由外层 tree pane 滚动 */}
+                            <div className="flex flex-nowrap items-start gap-2">
                               {(() => {
                                 const adsetKey = `${cIdx}::${aIdx}`;
                                 const isHovered = hoveredAdsetKey === adsetKey;
@@ -1619,7 +1713,7 @@ const CampaignPlanView = ({
                                 );
                               })()}
                               {getAdsForAdset(cIdx, aIdx).map(ad => (
-                                <div key={ad.id} className="relative w-16 h-20 rounded-base border border-gray-100 bg-white shadow-adsgo-card overflow-hidden group/ad">
+                                <div key={ad.id} className="shrink-0 relative w-16 h-20 rounded-base border border-gray-100 bg-white shadow-adsgo-card overflow-hidden group/ad">
                                   {adType === 'FLEXIBLE' && ad.creatives.length > 1 ? (
                                     <div className="grid grid-cols-2 gap-0.5 w-full h-full bg-gray-100">
                                       {ad.creatives.slice(0, 4).map((c, i) => (
@@ -1689,7 +1783,7 @@ const CampaignPlanView = ({
             {selectedNode.type === 'campaign' ? (
               <CampaignDetailPanel
                 campaignIdx={selectedNode.campaignIdx}
-                config={campaignConfigs[selectedNode.campaignIdx] || {}}
+                config={getCampaignConfig(selectedNode.campaignIdx)}
                 onChange={(patch) => updateCampaignConfig(selectedNode.campaignIdx, patch)}
                 openDropdown={campaignDropdown}
                 setOpenDropdown={setCampaignDropdown}
@@ -1734,6 +1828,8 @@ const CampaignPlanView = ({
     )}
     </>
   );
-};
+});
+
+CampaignPlanView.displayName = 'CampaignPlanView';
 
 export default CampaignPlanView;
