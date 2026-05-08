@@ -7,6 +7,7 @@ import {
 import { useOnboardingState } from './useOnboardingState'
 import { useOnboardingContext } from './OnboardingContext'
 import { useTourSeen } from './useTourSeen'
+import { Z_INDEX } from '../../constants/zIndex'
 
 const STEPS = [
   {
@@ -348,9 +349,10 @@ export default function OnboardingWidget({
       {/* Expanded card */}
       {(isExpanded || isClosing) && (
         <div
-          className={`fixed bottom-[96px] right-6 z-[850] w-80 sm:w-[22rem] origin-bottom-right ${
+          className={`fixed bottom-[96px] right-6 w-80 sm:w-[22rem] origin-bottom-right ${
             isClosing ? 'animate-bubble-collapse' : 'animate-bubble-expand'
           }`}
+          style={{ zIndex: Z_INDEX.FLOATING_ACTION }}
         >
           <div className="rounded-xl shadow-xl border border-[#F0F0F0] bg-white overflow-hidden max-h-[80vh] flex flex-col">
             {/* Header */}
@@ -454,7 +456,8 @@ export default function OnboardingWidget({
       {!isExpanded && !isClosing && !dismissed && !supportOpen && (
         <button
           onClick={() => setIsExpanded(true)}
-          className="fixed bottom-[96px] right-6 z-[850] w-14 h-14 rounded-full bg-gradient-to-r from-primary to-purple-600 text-white shadow-lg hover:shadow-primary-focus flex items-center justify-center transition-all duration-200 animate-pulse-subtle"
+          className="fixed bottom-[96px] right-6 w-14 h-14 rounded-full bg-gradient-to-r from-primary to-purple-600 text-white shadow-lg hover:shadow-primary-focus flex items-center justify-center transition-all duration-200 animate-pulse-subtle"
+          style={{ zIndex: Z_INDEX.FLOATING_ACTION }}
         >
           <Compass className="w-5 h-5" />
           {!allDone && (

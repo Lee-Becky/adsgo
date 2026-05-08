@@ -8,21 +8,66 @@ import {
   Flame, Zap, Info, ChevronDown, ListFilter, Box,
   Facebook, Chrome, ExternalLink, RefreshCw, AlertCircle, ChevronUp,
   ArrowLeft, Edit2, User, Image as ImageIcon, Link2Off, Briefcase,
-  AlertTriangle, Smartphone, Apple, Monitor
+  AlertTriangle, Smartphone, Apple, Monitor, Play
 } from 'lucide-react';
 import { Z_INDEX } from '../../../constants/zIndex';
 import { useZIndex } from '../../../hooks/useZIndex';
+import { Popover } from '../../common/Popover';
+import MediaPreviewModal from '../../common/MediaPreviewModal';
 import { generateAIGCCreative } from '../services/mockAiService';
 import { authorizePlatform, MOCK_ACCOUNTS } from '../services/authService';
 import useDropdownLoading from '../../../hooks/useDropdownLoading';
 
 export const MOCK_CATALOGS = [
-  { id: 'cat_8820192', name: 'Luminaire official catalog 2024' },
-  { id: 'cat_1192837', name: 'Seasonal accessories feed' },
-  { id: 'cat_5543210', name: 'Best sellers - global' },
+  { id: 'cat_8820192', name: 'Luminaire official catalog 2024', productCount: 128 },
+  { id: 'cat_1192837', name: 'Seasonal accessories feed', productCount: 47 },
+  { id: 'cat_5543210', name: 'Best sellers - global', productCount: 312 },
 ];
 
 export const MOCK_PRODUCT_SETS = ['All Products', 'Best Sellers', 'New Arrivals'];
+
+// 每 catalog 内的 product sets（用于 Ad 编辑弹窗 Product Set 单选）
+export const MOCK_CATALOG_PRODUCT_SETS = {
+  cat_8820192: [
+    { id: 'set_a1', name: 'All Products' },
+    { id: 'set_a2', name: 'Best Sellers' },
+    { id: 'set_a3', name: 'New Arrivals' },
+    { id: 'set_a4', name: 'Limited Edition' },
+  ],
+  cat_1192837: [
+    { id: 'set_b1', name: 'All Products' },
+    { id: 'set_b2', name: 'Spring 2024' },
+    { id: 'set_b3', name: 'Summer Capsule' },
+  ],
+  cat_5543210: [
+    { id: 'set_c1', name: 'All Products' },
+    { id: 'set_c2', name: 'Top 100' },
+    { id: 'set_c3', name: 'Trending Now' },
+    { id: 'set_c4', name: 'Promo Picks' },
+  ],
+};
+
+// 每 catalog 内的 products（用于 Ad 编辑弹窗 Specific Products 多选）
+export const MOCK_CATALOG_PRODUCTS = {
+  cat_8820192: Array.from({ length: 12 }, (_, i) => ({
+    id: `p_a_${i + 1}`,
+    name: `Luminaire Item ${i + 1}`,
+    sku: `LUM-${1000 + i}`,
+    imageUrl: `https://picsum.photos/seed/lum${i}/80/80`,
+  })),
+  cat_1192837: Array.from({ length: 8 }, (_, i) => ({
+    id: `p_b_${i + 1}`,
+    name: `Accessory ${i + 1}`,
+    sku: `ACC-${2000 + i}`,
+    imageUrl: `https://picsum.photos/seed/acc${i}/80/80`,
+  })),
+  cat_5543210: Array.from({ length: 15 }, (_, i) => ({
+    id: `p_c_${i + 1}`,
+    name: `Bestseller ${i + 1}`,
+    sku: `BST-${3000 + i}`,
+    imageUrl: `https://picsum.photos/seed/bst${i}/80/80`,
+  })),
+};
 
 export const MOCK_APPS = [
   { id: 'app_1001', name: 'Luminaire Shop', bundle: 'com.luminaire.shop', platform: 'iOS', icon: 'https://picsum.photos/seed/app1/200/200' },
@@ -207,18 +252,25 @@ const AssetGrid = ({ title, subtitle, assets = [], onAssetsChange, maxCount = 99
 const SearchableSelect = ({ options, value, onChange, placeholder, isSearchable = true, error }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const triggerRef = useRef(null);
   const filteredOptions = options.filter(opt => opt.label.toLowerCase().includes(searchTerm.toLowerCase()));
   const selectedOption = options.find(opt => opt.value === value);
   return (
-    <div className="relative">
-      <div onClick={() => setIsOpen(!isOpen)} className={`w-full bg-white border rounded-base px-5 py-3.5 text-sm font-bold text-gray-700 flex items-center justify-between cursor-pointer transition-all ${isOpen ? 'border-primary-500 shadow-primary-focus' : error ? 'border-rose-400' : 'border-gray-200 hover:border-gray-300 shadow-sm'}`}><span className={!value ? 'text-gray-300' : ''}>{selectedOption ? selectedOption.label : placeholder}</span><ChevronDown size={16} className={`text-gray-400 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} /></div>
-      {isOpen && (
-        <div className="absolute z-[200] top-full mt-2 w-full bg-white border border-gray-100 rounded-section shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-          {isSearchable && (<div className="p-3 border-b border-gray-50 bg-gray-50/50"><input autoFocus className="w-full bg-white border border-gray-200 rounded-xl px-4 py-2 text-xs font-bold outline-none focus:border-primary-500" placeholder="Search..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} /></div>)}
-          <div className="max-h-[240px] overflow-y-auto p-2">{filteredOptions.map(opt => (<div key={opt.value} onClick={() => { onChange(opt.value); setIsOpen(false); }} className={`px-4 py-3 rounded-xl text-xs font-bold cursor-pointer mb-1 last:mb-0 ${value === opt.value ? 'bg-primary-50 text-primary-500' : 'hover:bg-gray-50'}`}>{opt.label}</div>))}</div>
-        </div>
-      )}
-    </div>
+    <>
+      <div ref={triggerRef} onClick={() => setIsOpen(!isOpen)} className={`w-full bg-white border rounded-base px-5 py-3.5 text-sm font-bold text-gray-700 flex items-center justify-between cursor-pointer transition-all ${isOpen ? 'border-primary-500 shadow-primary-focus' : error ? 'border-rose-400' : 'border-gray-200 hover:border-gray-300 shadow-sm'}`}><span className={!value ? 'text-gray-300' : ''}>{selectedOption ? selectedOption.label : placeholder}</span><ChevronDown size={16} className={`text-gray-400 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} /></div>
+      <Popover
+        open={isOpen}
+        anchorRef={triggerRef}
+        placement="bottom-start"
+        matchWidth
+        onClose={() => setIsOpen(false)}
+        zIndex={Z_INDEX.MODAL_BASE + 500}
+        className="bg-white border border-gray-100 rounded-section shadow-xl overflow-hidden"
+      >
+        {isSearchable && (<div className="p-3 border-b border-gray-50 bg-gray-50/50"><input autoFocus className="w-full bg-white border border-gray-200 rounded-xl px-4 py-2 text-xs font-bold outline-none focus:border-primary-500" placeholder="Search..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} /></div>)}
+        <div className="max-h-[240px] overflow-y-auto p-2">{filteredOptions.map(opt => (<div key={opt.value} onClick={() => { onChange(opt.value); setIsOpen(false); }} className={`px-4 py-3 rounded-xl text-xs font-bold cursor-pointer mb-1 last:mb-0 ${value === opt.value ? 'bg-primary-50 text-primary-500' : 'hover:bg-gray-50'}`}>{opt.label}</div>))}</div>
+      </Popover>
+    </>
   );
 };
 
@@ -226,6 +278,7 @@ const SearchableTreeSelect = ({ options, value, onChange, placeholder, isSearcha
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [hoveredParent, setHoveredParent] = useState(null);
+  const triggerRef = useRef(null);
   const filteredTree = options.map(parent => ({ ...parent, children: parent.children ? parent.children.filter(child => child.label.toLowerCase().includes(searchTerm.toLowerCase()) || parent.label.toLowerCase().includes(searchTerm.toLowerCase())) : [] })).filter(parent => (parent.children && parent.children.length > 0) || parent.label.toLowerCase().includes(searchTerm.toLowerCase()));
   const getDisplayValue = () => {
     if (!value) return placeholder;
@@ -238,23 +291,28 @@ const SearchableTreeSelect = ({ options, value, onChange, placeholder, isSearcha
   };
   useEffect(() => { if (value && !hoveredParent) { const parent = options.find(p => p.children?.some(c => c.value === value)); if (parent) setHoveredParent(parent); } }, [value, options, hoveredParent]);
   return (
-    <div className="relative">
-      <div onClick={() => setIsOpen(!isOpen)} className={`w-full bg-white border rounded-base px-5 py-3.5 text-sm font-bold text-gray-700 flex items-center justify-between cursor-pointer transition-all ${isOpen ? 'border-primary-500 shadow-primary-focus' : error ? 'border-rose-400' : 'border-gray-200 hover:border-gray-300 shadow-sm'}`}><span className={!value ? 'text-gray-300' : ''}>{getDisplayValue()}</span><ChevronDown size={16} className={`text-gray-400 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} /></div>
-      {isOpen && (
-        <div className="absolute z-[200] top-full mt-2 w-[560px] bg-white border border-gray-100 rounded-section shadow-xl flex overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 h-[380px]">
-          <div className={`w-[240px] border-r border-gray-100 flex flex-col bg-gray-50/30`}>
-            {isSearchable && (<div className="p-4 border-b border-gray-200 bg-white sticky top-0 z-10"><div className="relative"><Search size={14} className="absolute left-3 top-1/2 -trangray-y-1/2 text-gray-400" /><input autoFocus className="w-full bg-gray-50 border border-gray-100 rounded-xl pl-9 pr-4 py-2 text-xs font-bold outline-none focus:border-primary-500 transition-all" placeholder="Search..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} /></div></div>)}
-            <div className="flex-1 overflow-y-auto custom-scrollbar p-2">{filteredTree.map((parent) => (<div key={parent.value} onMouseEnter={() => setHoveredParent(parent)} className={`px-4 py-3 rounded-xl text-xs font-bold cursor-pointer transition-all mb-1 flex items-center justify-between group ${hoveredParent?.value === parent.value ? 'bg-white text-primary-500 shadow-sm border border-gray-100' : 'text-gray-500 hover:text-gray-900 hover:bg-white/50'}`}><span className="truncate pr-2">{parent.label}</span>{parent.children?.length > 0 && <ChevronRight size={14} className={`transition-transform ${hoveredParent?.value === parent.value ? 'trangray-x-0.5 opacity-100' : 'opacity-30'}`} />}</div>))}</div>
-          </div>
-          <div className="flex-1 bg-white flex flex-col">
-            <div className="p-4 border-b border-gray-50"><h6 className="text-xs font-semibold text-gray-400">{hoveredParent ? hoveredParent.label : 'Select category'}</h6></div>
-            <div className="flex-1 overflow-y-auto custom-scrollbar p-2">
-              {hoveredParent?.children?.length > 0 ? (<div className="grid grid-cols-1 gap-1">{hoveredParent.children.map((child) => (<div key={child.value} onClick={() => { onChange(child.value); setIsOpen(false); setSearchTerm(''); }} className={`px-4 py-3 rounded-xl text-xs font-bold cursor-pointer transition-all ${value === child.value ? 'bg-primary-50 text-primary-500' : 'text-gray-600 hover:bg-gray-50'}`}>{child.label}</div>))}</div>) : (<div className="h-full flex flex-col items-center justify-center text-gray-300 p-8 text-center"><div className="w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center mb-3"><Layers size={20} className="opacity-20" /></div><p className="text-xs font-bold opacity-40">{hoveredParent ? 'No sub-categories' : 'Hover a category to view details'}</p></div>)}
-            </div>
+    <>
+      <div ref={triggerRef} onClick={() => setIsOpen(!isOpen)} className={`w-full bg-white border rounded-base px-5 py-3.5 text-sm font-bold text-gray-700 flex items-center justify-between cursor-pointer transition-all ${isOpen ? 'border-primary-500 shadow-primary-focus' : error ? 'border-rose-400' : 'border-gray-200 hover:border-gray-300 shadow-sm'}`}><span className={!value ? 'text-gray-300' : ''}>{getDisplayValue()}</span><ChevronDown size={16} className={`text-gray-400 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} /></div>
+      <Popover
+        open={isOpen}
+        anchorRef={triggerRef}
+        placement="bottom-start"
+        onClose={() => setIsOpen(false)}
+        zIndex={Z_INDEX.MODAL_BASE + 500}
+        className="w-[560px] bg-white border border-gray-100 rounded-section shadow-xl flex overflow-hidden h-[380px]"
+      >
+        <div className={`w-[240px] border-r border-gray-100 flex flex-col bg-gray-50/30`}>
+          {isSearchable && (<div className="p-4 border-b border-gray-200 bg-white sticky top-0 z-10"><div className="relative"><Search size={14} className="absolute left-3 top-1/2 -trangray-y-1/2 text-gray-400" /><input autoFocus className="w-full bg-gray-50 border border-gray-100 rounded-xl pl-9 pr-4 py-2 text-xs font-bold outline-none focus:border-primary-500 transition-all" placeholder="Search..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} /></div></div>)}
+          <div className="flex-1 overflow-y-auto custom-scrollbar p-2">{filteredTree.map((parent) => (<div key={parent.value} onMouseEnter={() => setHoveredParent(parent)} className={`px-4 py-3 rounded-xl text-xs font-bold cursor-pointer transition-all mb-1 flex items-center justify-between group ${hoveredParent?.value === parent.value ? 'bg-white text-primary-500 shadow-sm border border-gray-100' : 'text-gray-500 hover:text-gray-900 hover:bg-white/50'}`}><span className="truncate pr-2">{parent.label}</span>{parent.children?.length > 0 && <ChevronRight size={14} className={`transition-transform ${hoveredParent?.value === parent.value ? 'trangray-x-0.5 opacity-100' : 'opacity-30'}`} />}</div>))}</div>
+        </div>
+        <div className="flex-1 bg-white flex flex-col">
+          <div className="p-4 border-b border-gray-50"><h6 className="text-xs font-semibold text-gray-400">{hoveredParent ? hoveredParent.label : 'Select category'}</h6></div>
+          <div className="flex-1 overflow-y-auto custom-scrollbar p-2">
+            {hoveredParent?.children?.length > 0 ? (<div className="grid grid-cols-1 gap-1">{hoveredParent.children.map((child) => (<div key={child.value} onClick={() => { onChange(child.value); setIsOpen(false); setSearchTerm(''); }} className={`px-4 py-3 rounded-xl text-xs font-bold cursor-pointer transition-all ${value === child.value ? 'bg-primary-50 text-primary-500' : 'text-gray-600 hover:bg-gray-50'}`}>{child.label}</div>))}</div>) : (<div className="h-full flex flex-col items-center justify-center text-gray-300 p-8 text-center"><div className="w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center mb-3"><Layers size={20} className="opacity-20" /></div><p className="text-xs font-bold opacity-40">{hoveredParent ? 'No sub-categories' : 'Hover a category to view details'}</p></div>)}
           </div>
         </div>
-      )}
-    </div>
+      </Popover>
+    </>
   );
 };
 
@@ -495,6 +553,78 @@ const SelectionModal = ({
                 );
               })}
             </div>
+          ) : type === 'shopify' ? (
+            (() => {
+              const selectedItems = items.filter(i => localSelected.has(i.id));
+              const sorted = [...filtered].sort((a, b) => {
+                const aSel = localSelected.has(a.id) ? 0 : 1;
+                const bSel = localSelected.has(b.id) ? 0 : 1;
+                return aSel - bSel;
+              });
+              const trimmed = search.trim();
+              const highlightMatch = (text) => {
+                if (!trimmed || !text) return text;
+                const lower = String(text).toLowerCase();
+                const q = trimmed.toLowerCase();
+                const idx = lower.indexOf(q);
+                if (idx === -1) return text;
+                return (
+                  <>
+                    {text.slice(0, idx)}
+                    <mark className="bg-primary-50 text-primary-600 px-0.5 rounded">{text.slice(idx, idx + trimmed.length)}</mark>
+                    {text.slice(idx + trimmed.length)}
+                  </>
+                );
+              };
+              return (
+                <div className="space-y-3">
+                  {selectedItems.length > 0 && (
+                    <div className="flex flex-wrap gap-2 pb-3 border-b border-gray-100">
+                      <span className="text-xs font-medium text-gray-400 self-center mr-1">已选 {selectedItems.length}：</span>
+                      {selectedItems.map(item => (
+                        <span key={item.id} className="inline-flex items-center gap-2 pl-1 pr-2 py-1 bg-primary-50 border border-primary-100 rounded-full">
+                          {(item.imageUrl || item.url) ? (
+                            <img src={item.imageUrl || item.url} className="w-5 h-5 rounded-full object-cover" />
+                          ) : (
+                            <div className="w-5 h-5 rounded-full bg-white flex items-center justify-center text-primary-400"><PackageCheck size={10} /></div>
+                          )}
+                          <span className="text-xs font-medium text-primary-700 max-w-[140px] truncate">{item.name || '未命名产品'}</span>
+                          <button onClick={() => toggleItem(item.id)} className="text-primary-400 hover:text-primary-600" title="取消选择"><X size={11} /></button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  <div className="border border-gray-100 rounded-xl overflow-hidden divide-y divide-gray-50">
+                    {sorted.map(item => {
+                      const isSel = localSelected.has(item.id);
+                      return (
+                        <div
+                          key={item.id}
+                          onClick={() => toggleItem(item.id)}
+                          className={`flex items-center gap-3 px-4 py-2.5 cursor-pointer transition-colors ${isSel ? 'bg-primary-50/60 hover:bg-primary-50' : 'bg-white hover:bg-gray-50'}`}
+                        >
+                          <div className="w-10 h-10 rounded-lg overflow-hidden border border-gray-100 shrink-0 bg-gray-50">
+                            {(item.imageUrl || item.url)
+                              ? <img src={item.imageUrl || item.url} className="w-full h-full object-cover" />
+                              : <div className="w-full h-full flex items-center justify-center text-gray-300"><PackageCheck size={16} /></div>}
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <p className={`text-sm truncate ${isSel ? 'font-semibold text-primary-700' : 'font-medium text-gray-800'}`}>{highlightMatch(item.name || '未命名产品')}</p>
+                            <div className="flex items-center gap-1 mt-0.5">
+                              <Link2 size={10} className="text-gray-300 shrink-0" />
+                              <p className="text-[11px] font-medium text-gray-400 truncate">{highlightMatch(item.url || '')}</p>
+                            </div>
+                          </div>
+                          <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${isSel ? 'bg-primary-500 border-primary-500' : 'border-gray-200'}`}>
+                            {isSel && <Check size={12} className="text-white" strokeWidth={3} />}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })()
           ) : (
             <div className="grid grid-cols-3 sm:grid-cols-4 gap-4">
               {filtered.map((item) => {
@@ -570,6 +700,17 @@ const AppPickerSection = ({ platform, authStatus, isAuthLoading, handleAuthorize
   const platformId = platform?.id;
   const requiresAuth = platformId === 'meta' || platformId === 'tiktok';
   const isAuthorized = requiresAuth ? !!authStatus?.[platformId] : false;
+  const [appSearch, setAppSearch] = useState('');
+  const [isAppDropdownOpen, setIsAppDropdownOpen] = useState(false);
+  const appPickerRef = useRef(null);
+  useEffect(() => {
+    if (!isAppDropdownOpen) return;
+    const handler = (e) => {
+      if (appPickerRef.current && !appPickerRef.current.contains(e.target)) setIsAppDropdownOpen(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [isAppDropdownOpen]);
 
   if (!platform) {
     return (
@@ -635,8 +776,36 @@ const AppPickerSection = ({ platform, authStatus, isAuthLoading, handleAuthorize
     }
   };
 
+  const trimmed = appSearch.trim().toLowerCase();
+  const filteredApps = trimmed
+    ? MOCK_APPS.filter(a =>
+        a.name.toLowerCase().includes(trimmed) ||
+        a.bundle.toLowerCase().includes(trimmed) ||
+        a.platform.toLowerCase().includes(trimmed)
+      )
+    : MOCK_APPS;
+  const sortedApps = [...filteredApps].sort((a, b) => {
+    const aSel = selectedAppIds.has(a.id) ? 0 : 1;
+    const bSel = selectedAppIds.has(b.id) ? 0 : 1;
+    return aSel - bSel;
+  });
+  const selectedApps = MOCK_APPS.filter(a => selectedAppIds.has(a.id));
+  const highlightMatch = (text) => {
+    if (!trimmed || !text) return text;
+    const lower = String(text).toLowerCase();
+    const idx = lower.indexOf(trimmed);
+    if (idx === -1) return text;
+    return (
+      <>
+        {text.slice(0, idx)}
+        <mark className="bg-primary-50 text-primary-600 px-0.5 rounded">{text.slice(idx, idx + trimmed.length)}</mark>
+        {text.slice(idx + trimmed.length)}
+      </>
+    );
+  };
+
   return (
-    <div className="space-y-4 animate-in fade-in slide-in-from-top-4">
+    <div className="space-y-3 animate-in fade-in slide-in-from-top-4">
       <div className="flex items-center justify-between px-2">
         <div className="flex items-center gap-2">
           <Smartphone size={14} className="text-primary-500" />
@@ -644,34 +813,64 @@ const AppPickerSection = ({ platform, authStatus, isAuthLoading, handleAuthorize
         </div>
         <span className="text-xs font-medium text-gray-400">已选 {selectedAppIds.size} / {MOCK_APPS.length}</span>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-        {MOCK_APPS.map(app => {
-          const isSelected = selectedAppIds.has(app.id);
-          return (
-            <button
-              key={app.id}
-              onClick={() => toggleApp(app)}
-              className={`flex items-center gap-4 p-5 rounded-base border-2 transition-all text-left ${
-                isSelected ? 'bg-primary-50 border-primary-500 shadow-primary-focus' : 'bg-white border-gray-100 hover:border-primary-500/30'
-              }`}
-            >
-              <div className="w-12 h-12 rounded-xl overflow-hidden border border-gray-100 shrink-0 bg-gray-50">
-                <img src={app.icon} alt={app.name} className="w-full h-full object-cover" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="text-sm font-semibold text-gray-900 truncate">{app.name}</p>
-                <p className="text-xs text-gray-400 font-medium truncate mt-0.5">{app.bundle}</p>
-              </div>
-              <div className="flex items-center gap-2 shrink-0">
-                <span className={`text-xs font-medium px-2 py-1 rounded-tag ${app.platform === 'iOS' ? 'bg-gray-100 text-gray-700' : 'bg-emerald-50 text-emerald-600'}`}>{app.platform}</span>
-                <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-all ${isSelected ? 'bg-primary-500 text-white' : 'border-2 border-gray-200'}`}>
-                  {isSelected && <Check size={12} strokeWidth={3} />}
-                </div>
-              </div>
-            </button>
-          );
-        })}
+
+      <div ref={appPickerRef} className="relative">
+        <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+        <input
+          type="text"
+          value={appSearch}
+          onChange={(e) => { setAppSearch(e.target.value); if (!isAppDropdownOpen) setIsAppDropdownOpen(true); }}
+          onFocus={() => setIsAppDropdownOpen(true)}
+          onClick={() => setIsAppDropdownOpen(true)}
+          placeholder={selectedAppIds.size > 0 ? `已选 ${selectedAppIds.size} 个 App，继续搜索/勾选...` : '点击展开下拉，或输入名称、包名、平台关键词搜索 App...'}
+          className="w-full h-11 pl-9 pr-16 bg-white border border-gray-200 rounded-base outline-none text-xs font-medium text-gray-700 focus:border-primary-500 focus:shadow-primary-focus transition-all"
+        />
+        <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1">
+          {appSearch && (
+            <button onMouseDown={(e) => { e.preventDefault(); setAppSearch(''); }} className="p-1 text-gray-400 hover:text-gray-600" title="清空搜索"><X size={14} /></button>
+          )}
+          <ChevronDown size={14} className={`text-gray-400 transition-transform ${isAppDropdownOpen ? 'rotate-180' : ''}`} />
+        </div>
       </div>
+      <Popover
+        open={isAppDropdownOpen}
+        anchorRef={appPickerRef}
+        placement="bottom-start"
+        matchWidth
+        onClose={() => setIsAppDropdownOpen(false)}
+        className="bg-white border border-gray-200 rounded-xl shadow-xl overflow-hidden"
+      >
+        <div className="divide-y divide-gray-50 max-h-[360px] overflow-y-auto custom-scrollbar">
+          {sortedApps.length === 0 ? (
+            <div className="px-4 py-10 flex flex-col items-center justify-center text-gray-300">
+              <AlertCircle size={28} className="mb-2" />
+              <p className="text-xs font-medium">未找到匹配的 App</p>
+            </div>
+          ) : sortedApps.map(app => {
+            const isSelected = selectedAppIds.has(app.id);
+            return (
+              <button
+                key={app.id}
+                type="button"
+                onMouseDown={(e) => { e.preventDefault(); toggleApp(app); }}
+                className={`w-full flex items-center gap-3 px-4 py-2.5 cursor-pointer transition-colors text-left ${isSelected ? 'bg-primary-50/60 hover:bg-primary-50' : 'bg-white hover:bg-gray-50'}`}
+              >
+                <div className="w-9 h-9 rounded-lg overflow-hidden border border-gray-100 shrink-0 bg-gray-50">
+                  <img src={app.icon} alt={app.name} className="w-full h-full object-cover" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className={`text-sm truncate ${isSelected ? 'font-semibold text-primary-700' : 'font-medium text-gray-800'}`}>{highlightMatch(app.name)}</p>
+                  <p className="text-[11px] font-medium text-gray-400 truncate mt-0.5">{highlightMatch(app.bundle)}</p>
+                </div>
+                <span className={`text-xs font-medium px-2 py-0.5 rounded-tag shrink-0 ${app.platform === 'iOS' ? 'bg-gray-100 text-gray-700' : 'bg-emerald-50 text-emerald-600'}`}>{app.platform}</span>
+                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${isSelected ? 'bg-primary-500 border-primary-500' : 'border-gray-200'}`}>
+                  {isSelected && <Check size={12} className="text-white" strokeWidth={3} />}
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </Popover>
     </div>
   );
 };
@@ -686,6 +885,16 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreativeGr
   const [modalContext, setModalContext] = useState(null);
   const [modalGroupId, setModalGroupId] = useState(null);
   const [editingGroup, setEditingGroup] = useState(null); // { productId, groupId }
+  const [dragOverGroupKey, setDragOverGroupKey] = useState(null); // `${productId}::${groupId}`
+  const catalogTriggerRef = useRef(null);
+  const setTriggerRef = useRef(null);
+  const [previewMedia, setPreviewMedia] = useState(null); // { url, mediaType, name? }
+  const [flashAdId, setFlashAdId] = useState(null); // 临时视觉反馈：被点击的素材 id
+  useEffect(() => {
+    if (!flashAdId) return;
+    const t = setTimeout(() => setFlashAdId(null), 220);
+    return () => clearTimeout(t);
+  }, [flashAdId]);
   const [expandedAnalysisId, setExpandedAnalysisId] = useState(null);
   const [selectedCatalogLocal, setSelectedCatalogLocal] = useState(null);
   const [selectedProductSetLocal, setSelectedProductSetLocal] = useState('All Products');
@@ -818,6 +1027,7 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreativeGr
   };
 
   const removeProduct = (id) => {
+    if (selectedProducts.length <= 1) return;
     if (multiAnalysisTimers.current[id]) {
       clearTimeout(multiAnalysisTimers.current[id]);
       delete multiAnalysisTimers.current[id];
@@ -1133,19 +1343,34 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreativeGr
     }
   };
 
+  const filesToCreatives = (files, productId) => {
+    return Array.from(files)
+      .filter(file => file.type.startsWith('image/') || file.type.startsWith('video/'))
+      .map(file => ({
+        id: `upload-${Date.now()}-${Math.random()}`,
+        url: URL.createObjectURL(file),
+        productId,
+        mediaType: file.type.startsWith('video/') ? 'video' : 'image',
+      }));
+  };
+
   const handleUploadForGroup = (productId, groupId) => {
     const input = document.createElement('input');
     input.type = 'file';
-    input.accept = 'image/*';
+    input.multiple = true;
+    input.accept = 'image/*,video/mp4,video/quicktime,video/webm';
     input.onchange = (e) => {
-      const file = e.target.files?.[0];
-      if (file) {
-        const url = URL.createObjectURL(file);
-        const newCreative = { id: `upload-${Date.now()}-${Math.random()}`, url, productId };
-        addAdsToGroup(productId, groupId, [newCreative]);
-      }
+      const newCreatives = filesToCreatives(e.target.files || [], productId);
+      if (newCreatives.length) addAdsToGroup(productId, groupId, newCreatives);
     };
     input.click();
+  };
+
+  const handleDropForGroup = (e, productId, groupId) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const newCreatives = filesToCreatives(e.dataTransfer.files || [], productId);
+    if (newCreatives.length) addAdsToGroup(productId, groupId, newCreatives);
   };
 
   const handleSyncConnect = (platform) => {
@@ -1266,9 +1491,9 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreativeGr
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 animate-in slide-in-from-top-4">
-                  <div className="space-y-3 relative">
+                  <div className="space-y-3">
                     <label className="text-xs font-semibold text-gray-400 px-1">选择目录 (catalog)</label>
-                    <div onClick={() => setCatalogDropdownOpen(!catalogDropdownOpen)} className={`flex items-center justify-between p-6 bg-white border-2 rounded-lg cursor-pointer hover:border-primary-500 hover:shadow-lg transition-all ${catalogDropdownOpen ? 'border-primary-500 shadow-lg' : 'border-gray-100'}`}>
+                    <div ref={catalogTriggerRef} onClick={() => setCatalogDropdownOpen(!catalogDropdownOpen)} className={`flex items-center justify-between p-6 bg-white border-2 rounded-lg cursor-pointer hover:border-primary-500 hover:shadow-lg transition-all ${catalogDropdownOpen ? 'border-primary-500 shadow-lg' : 'border-gray-100'}`}>
                       <div className="flex items-center gap-4 min-w-0">
                         <div className="w-11 h-11 bg-primary-50 text-primary-500 rounded-xl flex items-center justify-center shrink-0"><Database size={22} /></div>
                         <div className="min-w-0">
@@ -1278,35 +1503,40 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreativeGr
                       </div>
                       <ChevronDown size={14} className={`text-gray-300 transition-transform ${catalogDropdownOpen ? 'rotate-180' : ''}`} />
                     </div>
-                    {catalogDropdownOpen && (
-                      <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-100 rounded-base shadow-xl z-[100] overflow-hidden animate-in fade-in slide-in-from-top-2">
-                        {catalogLoading.isLoading ? (
-                          <div className="p-6 flex flex-col items-center justify-center gap-2">
-                            <Loader2 size={20} className="animate-spin text-primary-500/70" />
-                            <p className="text-xs font-medium text-gray-400 animate-pulse">Loading catalogs...</p>
-                          </div>
-                        ) : MOCK_CATALOGS.length > 0 ? (
-                          MOCK_CATALOGS.map(c => (
-                            <div key={c.id} onClick={() => { setSelectedCatalog(c); setCatalogDropdownOpen(false); }} className="flex items-center justify-between px-6 py-4 hover:bg-gray-50 cursor-pointer transition-colors group">
-                              <div>
-                                <p className="text-xs font-medium text-gray-800 group-hover:text-primary-500 transition-colors">{c.name}</p>
-                                <p className="text-xs text-gray-400 font-bold">id: {c.id}</p>
-                              </div>
-                              {selectedCatalog?.id === c.id && <Check size={16} className="text-primary-500" />}
+                    <Popover
+                      open={catalogDropdownOpen}
+                      anchorRef={catalogTriggerRef}
+                      placement="bottom-start"
+                      matchWidth
+                      onClose={() => setCatalogDropdownOpen(false)}
+                      className="bg-white border border-gray-100 rounded-base shadow-xl overflow-hidden"
+                    >
+                      {catalogLoading.isLoading ? (
+                        <div className="p-6 flex flex-col items-center justify-center gap-2">
+                          <Loader2 size={20} className="animate-spin text-primary-500/70" />
+                          <p className="text-xs font-medium text-gray-400 animate-pulse">Loading catalogs...</p>
+                        </div>
+                      ) : MOCK_CATALOGS.length > 0 ? (
+                        MOCK_CATALOGS.map(c => (
+                          <div key={c.id} onClick={() => { setSelectedCatalog(c); setCatalogDropdownOpen(false); }} className="flex items-center justify-between px-6 py-4 hover:bg-gray-50 cursor-pointer transition-colors group">
+                            <div>
+                              <p className="text-xs font-medium text-gray-800 group-hover:text-primary-500 transition-colors">{c.name}</p>
+                              <p className="text-xs text-gray-400 font-bold">id: {c.id}</p>
                             </div>
-                          ))
-                        ) : (
-                          <div className="p-8 text-center space-y-4">
-                            <AlertCircle size={32} className="mx-auto text-gray-200" /><p className="text-xs font-bold text-gray-400">暂无可用目录，请先在 Meta 后台创建</p>
-                            <a href="#" className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary-500 hover:underline"><ExternalLink size={12} /> 查看 Meta feeds 创建帮助文档</a>
+                            {selectedCatalog?.id === c.id && <Check size={16} className="text-primary-500" />}
                           </div>
-                        )}
-                      </div>
-                    )}
+                        ))
+                      ) : (
+                        <div className="p-8 text-center space-y-4">
+                          <AlertCircle size={32} className="mx-auto text-gray-200" /><p className="text-xs font-bold text-gray-400">暂无可用目录，请先在 Meta 后台创建</p>
+                          <a href="#" className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary-500 hover:underline"><ExternalLink size={12} /> 查看 Meta feeds 创建帮助文档</a>
+                        </div>
+                      )}
+                    </Popover>
                   </div>
-                  <div className="space-y-3 relative">
+                  <div className="space-y-3">
                     <label className="text-xs font-semibold text-gray-400 px-1">产品系列 (Product set)</label>
-                    <div onClick={() => setSetDropdownOpen(!setDropdownOpen)} className={`flex items-center justify-between p-6 bg-white border-2 rounded-lg cursor-pointer hover:border-primary-500 hover:shadow-lg transition-all ${setDropdownOpen ? 'border-primary-500 shadow-lg' : 'border-gray-100'}`}>
+                    <div ref={setTriggerRef} onClick={() => setSetDropdownOpen(!setDropdownOpen)} className={`flex items-center justify-between p-6 bg-white border-2 rounded-lg cursor-pointer hover:border-primary-500 hover:shadow-lg transition-all ${setDropdownOpen ? 'border-primary-500 shadow-lg' : 'border-gray-100'}`}>
                       <div className="flex items-center gap-4 min-w-0">
                         <div className="w-11 h-11 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center shrink-0"><ListFilter size={22} /></div>
                         <div>
@@ -1316,23 +1546,28 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreativeGr
                       </div>
                       <ChevronDown size={14} className={`text-gray-300 transition-transform ${setDropdownOpen ? 'rotate-180' : ''}`} />
                     </div>
-                    {setDropdownOpen && (
-                      <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-100 rounded-base shadow-xl z-[100] overflow-hidden animate-in fade-in slide-in-from-top-2">
-                        {productSetLoading.isLoading ? (
-                          <div className="p-6 flex flex-col items-center justify-center gap-2">
-                            <Loader2 size={20} className="animate-spin text-primary-500/70" />
-                            <p className="text-xs font-medium text-gray-400 animate-pulse">Loading product sets...</p>
+                    <Popover
+                      open={setDropdownOpen}
+                      anchorRef={setTriggerRef}
+                      placement="bottom-start"
+                      matchWidth
+                      onClose={() => setSetDropdownOpen(false)}
+                      className="bg-white border border-gray-100 rounded-base shadow-xl overflow-hidden"
+                    >
+                      {productSetLoading.isLoading ? (
+                        <div className="p-6 flex flex-col items-center justify-center gap-2">
+                          <Loader2 size={20} className="animate-spin text-primary-500/70" />
+                          <p className="text-xs font-medium text-gray-400 animate-pulse">Loading product sets...</p>
+                        </div>
+                      ) : (
+                        MOCK_PRODUCT_SETS.map(s => (
+                          <div key={s} onClick={() => { setSelectedProductSet(s); setSetDropdownOpen(false); }} className="flex items-center justify-between px-6 py-4 hover:bg-gray-50 cursor-pointer transition-colors group">
+                            <p className="text-xs font-medium text-gray-800 group-hover:text-primary-500 transition-colors">{s}</p>
+                            {selectedProductSet === s && <Check size={16} className="text-primary-500" />}
                           </div>
-                        ) : (
-                          MOCK_PRODUCT_SETS.map(s => (
-                            <div key={s} onClick={() => { setSelectedProductSet(s); setSetDropdownOpen(false); }} className="flex items-center justify-between px-6 py-4 hover:bg-gray-50 cursor-pointer transition-colors group">
-                              <p className="text-xs font-medium text-gray-800 group-hover:text-primary-500 transition-colors">{s}</p>
-                              {selectedProductSet === s && <Check size={16} className="text-primary-500" />}
-                            </div>
-                          ))
-                        )}
-                      </div>
-                    )}
+                        ))
+                      )}
+                    </Popover>
                   </div>
                 </div>
               )}
@@ -1483,8 +1718,26 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreativeGr
                             <Loader2 size={12} className="animate-spin" />Analyzing...{isExpanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
                           </button>
                         )}
+                        {showAnalysisResult && campaignType !== 'CATALOG' && (
+                          <button
+                            onClick={() => onAddGroup(p.id)}
+                            className="shrink-0 flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-primary-500 hover:bg-primary-50 rounded-base transition-colors"
+                            title="为该产品添加新的素材组"
+                          >
+                            <Plus size={14} /> 添加素材组
+                          </button>
+                        )}
                         {(!isAnalyzing || p.isFromHistory) && (
-                          <button onClick={() => removeProduct(p.id)} className="shrink-0 p-3 text-gray-300 hover:text-rose-500 transition-colors rounded-xl hover:bg-rose-50">
+                          <button
+                            onClick={() => removeProduct(p.id)}
+                            disabled={selectedProducts.length <= 1}
+                            title={selectedProducts.length <= 1 ? '至少保留 1 个产品' : '删除该产品'}
+                            className={`shrink-0 p-3 transition-colors rounded-xl ${
+                              selectedProducts.length <= 1
+                                ? 'text-gray-200 cursor-not-allowed'
+                                : 'text-gray-300 hover:text-rose-500 hover:bg-rose-50'
+                            }`}
+                          >
                             <Trash2 size={18} />
                           </button>
                         )}
@@ -1496,8 +1749,25 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreativeGr
                           const groupGenCount = generatingCounts[`${p.id}::${group.id}`] || 0;
                           const groupAds = group.ads || [];
                           const isThisGroupEditing = isEditingThisProductGroup && editingGroup?.groupId === group.id;
+                          const groupKey = `${p.id}::${group.id}`;
+                          const isDragOver = dragOverGroupKey === groupKey;
                           return (
-                            <div key={group.id} className="bg-gray-50/50 border border-gray-100 rounded-inner p-4">
+                            <div
+                              key={group.id}
+                              onDragEnter={(e) => { e.preventDefault(); e.stopPropagation(); setDragOverGroupKey(groupKey); }}
+                              onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                              onDragLeave={(e) => {
+                                e.preventDefault(); e.stopPropagation();
+                                if (e.currentTarget.contains(e.relatedTarget)) return;
+                                setDragOverGroupKey(null);
+                              }}
+                              onDrop={(e) => { handleDropForGroup(e, p.id, group.id); setDragOverGroupKey(null); }}
+                              className={`border rounded-inner p-4 transition-colors ${
+                                isDragOver
+                                  ? 'bg-primary-50/30 border-primary-500 border-dashed'
+                                  : 'bg-gray-50/50 border-gray-100'
+                              }`}
+                            >
                               <div className="flex items-center justify-between mb-3 gap-2">
                                 <div className="flex items-center gap-2 min-w-0 flex-1">
                                   <Layers size={14} className="text-primary-500/70 shrink-0" />
@@ -1543,15 +1813,91 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreativeGr
                                 {[...Array(groupGenCount)].map((_, i) => (
                                   <NanoBananaSkeleton key={`gen-${group.id}-${i}`} />
                                 ))}
-                                {groupAds.map(c => (
-                                  <div key={c.id} className="relative w-14 h-20 rounded-lg overflow-hidden shrink-0 border border-gray-100 group/item shadow-sm">
-                                    <img src={c.url} className="w-full h-full object-cover" />
-                                    <button onClick={() => removeAdFromGroup(p.id, group.id, c.id)} className="absolute top-1 right-1 w-5 h-5 bg-white/90 rounded-full flex items-center justify-center opacity-0 group-hover/item:opacity-100 transition-all text-rose-500 shadow-md">
-                                      <X size={10} />
-                                    </button>
-                                  </div>
-                                ))}
-                                <div className="sticky right-0 flex gap-2 shrink-0 bg-gray-50/0 pl-2 z-[1]">
+                                {groupAds.map(c => {
+                                  const isFlashing = flashAdId === c.id;
+                                  const handlePreview = (e) => {
+                                    if (e) { e.preventDefault(); e.stopPropagation(); }
+                                    console.log('[Thumbnail] click', c);
+                                    setFlashAdId(c.id);
+                                    setPreviewMedia({ url: c.url, mediaType: c.mediaType || 'image', name: c.fileName || c.id || '' });
+                                    // 终极兜底：直接 DOM 操作渲染浮窗，完全绕开 React state / portal / 任何组件
+                                    // 如果连这个都看不到，说明浏览器层面被拦截
+                                    try {
+                                      const existing = document.getElementById('__media_preview_overlay__');
+                                      if (existing) existing.remove();
+                                      const url = c.url;
+                                      const isVideo = (c.mediaType || '') === 'video';
+                                      const overlay = document.createElement('div');
+                                      overlay.id = '__media_preview_overlay__';
+                                      overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);z-index:2147483647;display:flex;align-items:center;justify-content:center;padding:32px;cursor:zoom-out;';
+                                      const closeOverlay = () => { overlay.remove(); document.removeEventListener('keydown', escHandler); };
+                                      const escHandler = (ev) => { if (ev.key === 'Escape') closeOverlay(); };
+                                      document.addEventListener('keydown', escHandler);
+                                      overlay.onclick = closeOverlay;
+                                      const inner = document.createElement('div');
+                                      inner.style.cssText = 'background:#fff;border-radius:12px;padding:16px;max-width:90vw;max-height:85vh;display:flex;flex-direction:column;align-items:center;gap:12px;cursor:default;position:relative;box-shadow:0 25px 60px rgba(0,0,0,0.6);';
+                                      inner.onclick = (ev) => ev.stopPropagation();
+                                      const closeBtn = document.createElement('button');
+                                      closeBtn.type = 'button';
+                                      closeBtn.textContent = '×';
+                                      closeBtn.style.cssText = 'position:absolute;top:-14px;right:-14px;width:32px;height:32px;border-radius:50%;background:#fff;border:2px solid #e5e7eb;cursor:pointer;font-size:18px;line-height:1;';
+                                      closeBtn.onclick = (ev) => { ev.stopPropagation(); closeOverlay(); };
+                                      const media = document.createElement(isVideo ? 'video' : 'img');
+                                      media.src = url || '';
+                                      media.style.cssText = 'max-width:100%;max-height:75vh;border-radius:8px;object-fit:contain;background:#000;';
+                                      if (isVideo) { media.controls = true; media.autoplay = true; media.playsInline = true; }
+                                      const caption = document.createElement('p');
+                                      caption.textContent = c.fileName || c.id || '';
+                                      caption.style.cssText = 'font-size:12px;color:#6b7280;margin:0;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;';
+                                      inner.appendChild(closeBtn);
+                                      inner.appendChild(media);
+                                      if (caption.textContent) inner.appendChild(caption);
+                                      overlay.appendChild(inner);
+                                      document.body.appendChild(overlay);
+                                      console.log('[Preview] overlay injected to body, url=', url);
+                                    } catch (err) {
+                                      console.error('[Preview] DOM inject failed', err);
+                                    }
+                                  };
+                                  return (
+                                    <div
+                                      key={c.id}
+                                      className="relative w-14 h-20 rounded-lg overflow-hidden shrink-0 border border-gray-100 group/item shadow-sm bg-gray-100 hover:ring-2 hover:ring-primary-500/40 transition-all"
+                                      style={isFlashing ? { boxShadow: '0 0 0 3px #f43f5e, 0 0 12px rgba(244,63,94,0.6)' } : undefined}
+                                    >
+                                      {c.mediaType === 'video' ? (
+                                        <video src={c.url} muted playsInline className="absolute inset-0 w-full h-full object-cover pointer-events-none" />
+                                      ) : (
+                                        <img src={c.url} className="absolute inset-0 w-full h-full object-cover pointer-events-none" />
+                                      )}
+                                      {/* 透明覆盖按钮：点击触发预览（onPointerDown + onClick 双保险） */}
+                                      <button
+                                        type="button"
+                                        onPointerDown={handlePreview}
+                                        onClick={handlePreview}
+                                        title="点击预览"
+                                        aria-label="预览素材"
+                                        className="absolute inset-0 w-full h-full cursor-zoom-in"
+                                        style={{ zIndex: 2 }}
+                                      />
+                                      {c.mediaType === 'video' && (
+                                        <div className="absolute bottom-1 right-1 w-4 h-4 bg-black/60 rounded-full flex items-center justify-center text-white pointer-events-none" style={{ zIndex: 4 }}>
+                                          <Play size={8} fill="currentColor" />
+                                        </div>
+                                      )}
+                                      <button
+                                        type="button"
+                                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); removeAdFromGroup(p.id, group.id, c.id); }}
+                                        title="移除素材"
+                                        className="absolute top-1 right-1 w-5 h-5 bg-white/90 rounded-full flex items-center justify-center opacity-0 group-hover/item:opacity-100 transition-all text-rose-500 shadow-md"
+                                        style={{ zIndex: 5 }}
+                                      >
+                                        <X size={10} />
+                                      </button>
+                                    </div>
+                                  );
+                                })}
+                                <div className="sticky right-0 flex gap-2 shrink-0 bg-gray-50/0 pl-2" style={{ zIndex: 6 }}>
                                   <button onClick={() => { setModalContext(p.id); setModalGroupId(group.id); setActiveModal('creative_lib'); }} className="w-14 h-20 rounded-lg border-2 border-dashed border-gray-100 flex flex-col items-center justify-center text-gray-300 hover:border-primary-500 hover:text-primary-500/70 hover:bg-primary-50 transition-all gap-1" title="从素材库选择">
                                     <Database size={16} />
                                     <span className="text-xs font-medium">库</span>
@@ -1569,14 +1915,6 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreativeGr
                             </div>
                           );
                         })}
-                        <div className="flex justify-end">
-                          <button
-                            onClick={() => onAddGroup(p.id)}
-                            className="flex items-center gap-2 px-4 py-2 text-xs font-medium text-primary-500 hover:bg-primary-50 rounded-base transition-colors"
-                          >
-                            <Plus size={14} /> 添加素材组
-                          </button>
-                        </div>
                       </div>
                     </div>
                     {isAnalyzing && isExpanded && !p.isFromHistory && (
@@ -1978,6 +2316,76 @@ const AddProductModal = ({ onClose, authStatus, handleAuthorize, isAuthLoading, 
           )}
         </div>
       </div>
+      <MediaPreviewModal media={previewMedia} onClose={() => setPreviewMedia(null)} />
+      {/* Fallback 内联兜底浮窗：不走 portal、不依赖任何外部组件，确保点击素材一定可见。
+          如果 MediaPreviewModal 没出现但这个出现了 → 是 portal/独立组件的问题。
+          如果两者都没出现 → 是 setPreviewMedia state 没生效。 */}
+      {previewMedia && (
+        <div
+          onClick={() => setPreviewMedia(null)}
+          style={{
+            position: 'fixed',
+            top: 0, left: 0, right: 0, bottom: 0,
+            zIndex: 2147483647,
+            background: 'rgba(0,0,0,0.85)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: 32,
+            cursor: 'zoom-out',
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              position: 'relative',
+              maxWidth: '90vw',
+              maxHeight: '85vh',
+              background: '#fff',
+              borderRadius: 12,
+              padding: 16,
+              boxShadow: '0 25px 60px rgba(0,0,0,0.6)',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: 12,
+              cursor: 'default',
+            }}
+          >
+            <button
+              type="button"
+              onClick={(e) => { e.stopPropagation(); setPreviewMedia(null); }}
+              style={{
+                position: 'absolute', top: -14, right: -14,
+                width: 32, height: 32, borderRadius: '50%',
+                background: '#fff', border: '2px solid #e5e7eb',
+                cursor: 'pointer', fontSize: 18, lineHeight: 1,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}
+              aria-label="关闭预览"
+            >×</button>
+            {previewMedia.mediaType === 'video' ? (
+              <video
+                src={previewMedia.url}
+                controls
+                autoPlay
+                style={{ maxWidth: '100%', maxHeight: '75vh', borderRadius: 8, background: '#000' }}
+              />
+            ) : (
+              <img
+                src={previewMedia.url}
+                alt={previewMedia.name || 'preview'}
+                style={{ maxWidth: '100%', maxHeight: '75vh', objectFit: 'contain', borderRadius: 8 }}
+              />
+            )}
+            {previewMedia.name && (
+              <p style={{ fontSize: 12, color: '#6b7280', margin: 0, maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {previewMedia.name}
+              </p>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

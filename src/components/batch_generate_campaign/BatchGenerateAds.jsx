@@ -5,11 +5,13 @@ import {
   Type, Rocket, Facebook, Instagram, Hash, Loader2,
   CheckCircle2, Layers, RefreshCw, MapPin, Zap, ArrowRight, ChevronLeft,
   Megaphone, MousePointer2, Users, Smartphone, ChevronRight, Link2Off, AlertCircle,
-  DollarSign
+  DollarSign, Database
 } from 'lucide-react';
 import { Z_INDEX } from '../../constants/zIndex';
 import { useZIndex } from '../../hooks/useZIndex';
-import ProductSelector from './components/ProductSelector';
+import { Popover } from '../common/Popover';
+import { useMediaQuery } from '../../hooks/useMediaQuery';
+import ProductSelector, { MOCK_CATALOGS, MOCK_CATALOG_PRODUCT_SETS, MOCK_CATALOG_PRODUCTS } from './components/ProductSelector';
 import CampaignPlanView from './components/CampaignPlanView';
 import CampaignPreviewView from './components/CampaignPreviewView';
 import useDropdownLoading from '../../hooks/useDropdownLoading';
@@ -65,10 +67,9 @@ const PLATFORM_PLACEMENTS = {
     { id: 'messenger', label: 'Messenger' },
   ],
   tiktok: [
-    { id: 'in_feed', label: 'In-Feed Ads' },
-    { id: 'topview', label: 'TopView' },
-    { id: 'spark_ads', label: 'Spark Ads' },
-    { id: 'pangle', label: 'Pangle (Audience Network)' },
+    { id: 'tiktok', label: 'TikTok' },
+    { id: 'pangle', label: 'Pangle' },
+    { id: 'global_app_bundle', label: 'Global App Bundle', sublabels: ['CapCut', 'Fizzo'] },
   ],
 };
 
@@ -139,14 +140,15 @@ export const IncludeExcludeAudienceDropdown = ({
   align = 'right',        // 'left' | 'right'
 }) => {
   const [activeTab, setActiveTab] = useState('lal');
+  const triggerRef = useRef(null);
   const platformId = platform?.id || 'meta';
   const platformName = platform?.name || 'Meta';
   const isAuthed = !!authStatus?.[platformId];
   const ConnectIcon = platformId === 'tiktok' ? Smartphone : Facebook;
   const total = (lalSelected?.length || 0) + (customSelected?.length || 0);
   return (
-    <div className="relative">
-      <div onClick={onToggle}
+    <>
+      <div ref={triggerRef} onClick={onToggle}
         className={`bg-white rounded-inner p-4 border border-gray-100 shadow-sm flex flex-col gap-2 group cursor-pointer hover:border-primary-500/20 transition-all h-full ${triggerClassName}`}>
         <span className="text-xs font-medium text-gray-500">{triggerLabel}</span>
         <div className="flex items-center justify-between">
@@ -159,9 +161,14 @@ export const IncludeExcludeAudienceDropdown = ({
           <ChevronDown size={14} className={`text-gray-300 transition-transform shrink-0 ${open ? 'rotate-180' : ''}`} />
         </div>
       </div>
-      {open && (
-        <div className={`absolute top-full ${align === 'left' ? 'left-0' : 'right-0'} mt-2 w-[320px] bg-white rounded-base shadow-xl border border-gray-100 animate-in fade-in zoom-in-95 duration-200 z-[20] overflow-hidden`}>
-          {!isAuthed ? (
+      <Popover
+        open={!!open}
+        anchorRef={triggerRef}
+        placement={align === 'left' ? 'bottom-start' : 'bottom-end'}
+        onClose={() => onToggle?.()}
+        className="w-[320px] bg-white rounded-base shadow-xl border border-gray-100 overflow-hidden"
+      >
+        {!isAuthed ? (
             <div className="p-4 space-y-3 text-center">
               <p className="text-xs font-medium text-gray-500">需要连接 {platformName} 以加载受众</p>
               <button
@@ -228,9 +235,8 @@ export const IncludeExcludeAudienceDropdown = ({
               </div>
             </>
           )}
-        </div>
-      )}
-    </div>
+      </Popover>
+    </>
   );
 };
 
@@ -553,7 +559,12 @@ const ChannelHeaderCard = ({
   onAuthorize, isAuthLoading,
   openDropdown, setOpenDropdown, dropdownRef,
   objective, onChangeObjective, availableObjectives = [],
+  orientation = 'horizontal',
 }) => {
+  const isVertical = orientation === 'vertical';
+  const platformTriggerRef = useRef(null);
+  const objectiveTriggerRef = useRef(null);
+  const accountTriggerRef = useRef(null);
   const accountState =
     !platform                          ? 'NO_PLATFORM' :
     !authStatus?.[platform.id]         ? 'NEED_AUTH'   :
@@ -587,15 +598,20 @@ const ChannelHeaderCard = ({
   };
 
   return (
-    <div className="bg-gray-900/95 text-white rounded-section px-8 py-5 shadow-xl border border-gray-800 backdrop-blur-md flex items-center gap-6 flex-wrap animate-in fade-in slide-in-from-top-2">
-      <div className="w-10 h-10 bg-primary-500 rounded-xl flex items-center justify-center text-white shrink-0"><Monitor size={20} /></div>
-      <div className="flex-1 min-w-[180px]">
-        <h3 className="text-base font-semibold text-white">投放渠道媒体</h3>
-        <p className="text-xs text-gray-400 font-medium mt-0.5">选择媒体平台与关联广告账号</p>
+    <div className={`bg-gray-900/95 text-white rounded-section shadow-xl border border-gray-800 backdrop-blur-md animate-in fade-in slide-in-from-top-2 ${
+      isVertical ? 'p-5 flex flex-col gap-3' : 'px-8 py-5 flex items-center gap-6 flex-wrap'
+    }`}>
+      <div className={isVertical ? 'flex items-center gap-3' : 'flex items-center gap-3 shrink-0'}>
+        <div className="w-10 h-10 bg-primary-500 rounded-xl flex items-center justify-center text-white shrink-0"><Monitor size={20} /></div>
+        <div className={isVertical ? 'min-w-0' : 'min-w-[180px]'}>
+          <h3 className="text-base font-semibold text-white">投放渠道媒体</h3>
+          <p className="text-xs text-gray-400 font-medium mt-0.5">{isVertical ? '平台 · 目标 · 账号' : '选择媒体平台与关联广告账号'}</p>
+        </div>
       </div>
+      {!isVertical && <div className="flex-1 min-w-[20px]" />}
 
       {/* Platform dropdown */}
-      <div className="relative shrink-0 min-w-[200px]" ref={openDropdown === 'platform' ? dropdownRef : null}>
+      <div ref={platformTriggerRef} className={isVertical ? 'w-full' : 'shrink-0 min-w-[200px]'}>
         <div onClick={() => setOpenDropdown(openDropdown === 'platform' ? null : 'platform')}
           className="bg-gray-800 rounded-inner px-4 py-2.5 border border-gray-700 flex items-center justify-between gap-3 cursor-pointer hover:border-primary-500/50 transition-all">
           <div className="flex items-center gap-2.5 min-w-0">
@@ -605,33 +621,38 @@ const ChannelHeaderCard = ({
           </div>
           <ChevronDown size={14} className={`text-gray-500 transition-transform shrink-0 ${openDropdown === 'platform' ? 'rotate-180' : ''}`} />
         </div>
-        {openDropdown === 'platform' && (
-          <div className="absolute top-full right-0 mt-2 w-full min-w-[200px] bg-gray-900 rounded-base shadow-xl border border-gray-700 p-2 space-y-1 animate-in fade-in zoom-in-95 duration-200 z-[20]">
-            {PLATFORMS.map(p => (
-              <div key={p.id} className="relative group">
-                <button disabled={p.disabled}
-                  onClick={() => { if (!p.disabled) { handleChangePlatformWithConfirm(p); setOpenDropdown(null); } }}
-                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-base transition-all ${
-                    p.disabled ? 'opacity-40 cursor-not-allowed text-gray-500' : platform?.id === p.id ? 'bg-primary-500/15 text-primary-300' : 'hover:bg-gray-800 text-gray-200'}`}>
-                  <img src={p.logo} className="w-5 h-5 rounded object-contain shrink-0" alt="" />
-                  <span className="text-xs font-bold">{p.name}</span>
-                  {!p.disabled && platform?.id === p.id && <Check size={12} className="ml-auto" />}
-                </button>
-                {p.disabled && (
-                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                    <div className="bg-gray-900 text-white text-xs font-medium px-2 py-1 rounded shadow-lg">COMING SOON</div>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
       </div>
+      <Popover
+        open={openDropdown === 'platform'}
+        anchorRef={platformTriggerRef}
+        placement="bottom-end"
+        matchWidth
+        onClose={() => setOpenDropdown(null)}
+        className="bg-gray-900 rounded-base shadow-xl border border-gray-700 p-2 space-y-1 min-w-[200px]"
+      >
+        {PLATFORMS.map(p => (
+          <div key={p.id} className="relative group">
+            <button disabled={p.disabled}
+              onClick={() => { if (!p.disabled) { handleChangePlatformWithConfirm(p); setOpenDropdown(null); } }}
+              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-base transition-all ${
+                p.disabled ? 'opacity-40 cursor-not-allowed text-gray-500' : platform?.id === p.id ? 'bg-primary-500/15 text-primary-300' : 'hover:bg-gray-800 text-gray-200'}`}>
+              <img src={p.logo} className="w-5 h-5 rounded object-contain shrink-0" alt="" />
+              <span className="text-xs font-bold">{p.name}</span>
+              {!p.disabled && platform?.id === p.id && <Check size={12} className="ml-auto" />}
+            </button>
+            {p.disabled && (
+              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                <div className="bg-gray-900 text-white text-xs font-medium px-2 py-1 rounded shadow-lg">COMING SOON</div>
+              </div>
+            )}
+          </div>
+        ))}
+      </Popover>
 
       {/* Campaign Objective dropdown — 媒体选定后必填，置于平台与账号之间。
           注意 dropdown key 必须与下方 TargetingChannelCard 的 Conversion Event ('objective') 错开，
           否则共享 openDropdown 状态会触发联动 bug。 */}
-      <div className="relative shrink-0 min-w-[220px]" ref={openDropdown === 'campaignObjective' ? dropdownRef : null}>
+      <div ref={objectiveTriggerRef} className={isVertical ? 'w-full' : 'shrink-0 min-w-[220px]'}>
         <div
           onClick={() => { if (!objectiveDisabled) setOpenDropdown(openDropdown === 'campaignObjective' ? null : 'campaignObjective'); }}
           className={`bg-gray-800 rounded-inner px-4 py-2.5 border border-gray-700 flex items-center justify-between gap-3 transition-all ${
@@ -658,36 +679,41 @@ const ChannelHeaderCard = ({
           </div>
           <ChevronDown size={14} className={`text-gray-500 transition-transform shrink-0 ${openDropdown === 'campaignObjective' ? 'rotate-180' : ''}`} />
         </div>
-        {openDropdown === 'campaignObjective' && !objectiveDisabled && (
-          <div className="absolute top-full right-0 mt-2 w-full min-w-[260px] bg-gray-900 rounded-base shadow-xl border border-gray-700 p-2 space-y-1 animate-in fade-in zoom-in-95 duration-200 z-[20]">
-            {availableObjectives.map(obj => {
-              const Icon = obj.icon;
-              const isActive = objective === obj.value;
-              return (
-                <button
-                  key={obj.value}
-                  onClick={() => { onChangeObjective?.(obj.value); setOpenDropdown(null); }}
-                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-base transition-all text-left ${
-                    isActive ? 'bg-primary-500/15 text-primary-300' : 'hover:bg-gray-800 text-gray-200'
-                  }`}
-                >
-                  <div className={`w-6 h-6 rounded-base flex items-center justify-center ${isActive ? 'bg-primary-500 text-white' : `${obj.bg} ${obj.color}`}`}>
-                    {Icon && <Icon size={14} />}
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-xs font-bold truncate">{obj.label}</p>
-                    <p className="text-[10px] text-gray-400 truncate">{obj.description}</p>
-                  </div>
-                  {isActive && <Check size={12} className="ml-auto text-primary-300 shrink-0" />}
-                </button>
-              );
-            })}
-          </div>
-        )}
       </div>
+      <Popover
+        open={openDropdown === 'campaignObjective' && !objectiveDisabled}
+        anchorRef={objectiveTriggerRef}
+        placement="bottom-end"
+        matchWidth
+        onClose={() => setOpenDropdown(null)}
+        className="bg-gray-900 rounded-base shadow-xl border border-gray-700 p-2 space-y-1 min-w-[260px]"
+      >
+        {availableObjectives.map(obj => {
+          const Icon = obj.icon;
+          const isActive = objective === obj.value;
+          return (
+            <button
+              key={obj.value}
+              onClick={() => { onChangeObjective?.(obj.value); setOpenDropdown(null); }}
+              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-base transition-all text-left ${
+                isActive ? 'bg-primary-500/15 text-primary-300' : 'hover:bg-gray-800 text-gray-200'
+              }`}
+            >
+              <div className={`w-6 h-6 rounded-base flex items-center justify-center ${isActive ? 'bg-primary-500 text-white' : `${obj.bg} ${obj.color}`}`}>
+                {Icon && <Icon size={14} />}
+              </div>
+              <div className="min-w-0">
+                <p className="text-xs font-bold truncate">{obj.label}</p>
+                <p className="text-[10px] text-gray-400 truncate">{obj.description}</p>
+              </div>
+              {isActive && <Check size={12} className="ml-auto text-primary-300 shrink-0" />}
+            </button>
+          );
+        })}
+      </Popover>
 
       {/* Account dropdown — 4-state machine */}
-      <div className="relative shrink-0 min-w-[260px]" ref={openDropdown === 'account' ? dropdownRef : null}>
+      <div ref={accountTriggerRef} className={isVertical ? 'w-full' : 'shrink-0 min-w-[260px]'}>
         <div
           onClick={handleTriggerClick}
           className={`bg-gray-800 rounded-inner px-4 py-2.5 border border-gray-700 flex items-center justify-between gap-3 transition-all ${
@@ -721,54 +747,58 @@ const ChannelHeaderCard = ({
           </div>
           <ChevronDown size={14} className={`text-gray-500 transition-transform shrink-0 ${openDropdown === 'account' ? 'rotate-180' : ''}`} />
         </div>
-
-        {openDropdown === 'account' && !triggerDisabled && (
-          <div className="absolute top-full right-0 mt-2 w-full min-w-[280px] bg-gray-900 rounded-base shadow-xl border border-gray-700 animate-in fade-in zoom-in-95 duration-200 z-[20] overflow-hidden">
-            {accountState === 'NEED_AUTH' ? (
-              <div className="p-4 space-y-3">
-                <p className="text-xs text-gray-300 font-medium leading-relaxed">
-                  使用 {platform.name} 广告账户前，请先连接您的 {platform.name} Ads 账号。
-                </p>
-                <button
-                  disabled={isAuthLoading}
-                  onClick={() => onAuthorize(platform.id)}
-                  className="w-full flex items-center justify-center gap-2 bg-primary-500 hover:bg-primary-600 text-white py-3 rounded-base font-semibold transition-all disabled:opacity-60 disabled:cursor-not-allowed"
-                >
-                  {isAuthLoading ? <Loader2 size={16} className="animate-spin" /> : (platform.id === 'meta' ? <Facebook size={16} /> : <Smartphone size={16} />)}
-                  <span className="text-sm">{isAuthLoading ? '连接中...' : `Connect ${platform.name} Ads`}</span>
-                </button>
+      </div>
+      <Popover
+        open={openDropdown === 'account' && !triggerDisabled}
+        anchorRef={accountTriggerRef}
+        placement="bottom-end"
+        matchWidth
+        onClose={() => setOpenDropdown(null)}
+        className="bg-gray-900 rounded-base shadow-xl border border-gray-700 overflow-hidden min-w-[280px]"
+      >
+        {accountState === 'NEED_AUTH' ? (
+          <div className="p-4 space-y-3">
+            <p className="text-xs text-gray-300 font-medium leading-relaxed">
+              使用 {platform?.name} 广告账户前，请先连接您的 {platform?.name} Ads 账号。
+            </p>
+            <button
+              disabled={isAuthLoading}
+              onClick={() => onAuthorize(platform.id)}
+              className="w-full flex items-center justify-center gap-2 bg-primary-500 hover:bg-primary-600 text-white py-3 rounded-base font-semibold transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              {isAuthLoading ? <Loader2 size={16} className="animate-spin" /> : (platform?.id === 'meta' ? <Facebook size={16} /> : <Smartphone size={16} />)}
+              <span className="text-sm">{isAuthLoading ? '连接中...' : `Connect ${platform?.name} Ads`}</span>
+            </button>
+          </div>
+        ) : (
+          <div className="p-2 space-y-1 max-h-[280px] overflow-y-auto custom-scrollbar">
+            {availableAccounts.length === 0 ? (
+              <div className="px-4 py-6 text-center">
+                <p className="text-xs text-gray-400 font-medium">该渠道暂无可用账户</p>
               </div>
             ) : (
-              <div className="p-2 space-y-1 max-h-[280px] overflow-y-auto custom-scrollbar">
-                {availableAccounts.length === 0 ? (
-                  <div className="px-4 py-6 text-center">
-                    <p className="text-xs text-gray-400 font-medium">该渠道暂无可用账户</p>
-                  </div>
-                ) : (
-                  availableAccounts.map(acc => {
-                    const isSelected = selectedAccount?.id === acc.id;
-                    return (
-                      <button
-                        key={acc.id}
-                        onClick={() => { handleSelectAccountWithConfirm(acc); setOpenDropdown(null); }}
-                        className={`w-full text-left px-3 py-2.5 rounded-base transition-all flex items-center justify-between gap-3 ${
-                          isSelected ? 'bg-primary-500/15 text-primary-300' : 'hover:bg-gray-800 text-gray-200'
-                        }`}
-                      >
-                        <div className="min-w-0">
-                          <p className={`text-sm font-bold truncate ${isSelected ? 'text-primary-300' : 'text-white'}`}>{acc.name}</p>
-                          <p className="text-xs text-gray-400 font-medium truncate mt-0.5">{acc.id}</p>
-                        </div>
-                        {isSelected && <Check size={14} className="text-primary-300 shrink-0" />}
-                      </button>
-                    );
-                  })
-                )}
-              </div>
+              availableAccounts.map(acc => {
+                const isSelected = selectedAccount?.id === acc.id;
+                return (
+                  <button
+                    key={acc.id}
+                    onClick={() => { handleSelectAccountWithConfirm(acc); setOpenDropdown(null); }}
+                    className={`w-full text-left px-3 py-2.5 rounded-base transition-all flex items-center justify-between gap-3 ${
+                      isSelected ? 'bg-primary-500/15 text-primary-300' : 'hover:bg-gray-800 text-gray-200'
+                    }`}
+                  >
+                    <div className="min-w-0">
+                      <p className={`text-sm font-bold truncate ${isSelected ? 'text-primary-300' : 'text-white'}`}>{acc.name}</p>
+                      <p className="text-xs text-gray-400 font-medium truncate mt-0.5">{acc.id}</p>
+                    </div>
+                    {isSelected && <Check size={14} className="text-primary-300 shrink-0" />}
+                  </button>
+                );
+              })
             )}
           </div>
         )}
-      </div>
+      </Popover>
     </div>
   );
 };
@@ -797,9 +827,18 @@ const TargetingChannelCard = ({
   globalAdsetLalExclude, setGlobalAdsetLalExclude,
   globalAdsetCustomExclude, setGlobalAdsetCustomExclude,
   authStatus, onAuthorize, isAuthLoading, selectedAccount, onPickAccount,
+  isTikTokAppSales = false, selectedCatalog, onSelectCatalog,
   children,
 }) => {
   const isFlexibleObjective = objective === 'sales_conversions' || objective === 'app_promotion';
+  const locationTriggerRef = useRef(null);
+  const languageTriggerRef = useRef(null);
+  const conversionEventTriggerRef = useRef(null);
+  const bidStrategyTriggerRef = useRef(null);
+  const strategyTriggerRef = useRef(null);
+  const catalogTriggerRef = useRef(null);
+  const [catalogDropdownOpen, setCatalogDropdownOpen] = useState(false);
+  const tiktokCatalogLoading = useDropdownLoading('tiktokCatalogs', isTikTokAppSales && authStatus?.tiktok && !!selectedAccount);
   // Campaign 架构 现已无条件展示在最前；保留早期 isInitComplete 检查的语义已迁移到父
   // 组件层面（决定是否暴露 "预览发布计划" CTA），此处不再需要本地副本。
   const platformId = platform?.id;
@@ -829,7 +868,7 @@ const TargetingChannelCard = ({
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 relative z-[10]">
         {/* Location Selector */}
         <div>
-          <div className="relative" ref={openDropdown === 'location' ? dropdownRef : null}>
+          <div ref={locationTriggerRef}>
             <div onClick={() => setOpenDropdown(openDropdown === 'location' ? null : 'location')}
               className="bg-white rounded-inner p-4 border border-gray-100 shadow-sm flex flex-col gap-2 group cursor-pointer hover:border-primary-500/20 transition-all h-full">
               <span className="text-xs font-medium text-gray-500">投放国家/地区</span>
@@ -843,48 +882,52 @@ const TargetingChannelCard = ({
                 <ChevronDown size={14} className={`text-gray-300 transition-transform ${openDropdown === 'location' ? 'rotate-180' : ''}`} />
               </div>
             </div>
-            {openDropdown === 'location' && (
-              <div className="absolute top-full left-0 mt-2 w-[500px] bg-white rounded-base shadow-xl border border-gray-100 overflow-hidden flex animate-in fade-in zoom-in-95 duration-200">
-                <div className="w-1/2 border-r border-gray-50 flex flex-col">
-                  <div className="p-4 border-b border-gray-50">
-                    <div className="relative">
-                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300 w-3.5 h-3.5" />
-                      <input className="w-full pl-9 pr-3 py-2 bg-gray-50 border-none rounded-base text-xs font-bold text-gray-900 focus:ring-2 focus:ring-primary-500/10"
-                        placeholder="Search locations..." value={locationSearch} onChange={(e) => setLocationSearch(e.target.value)} autoFocus />
-                    </div>
-                  </div>
-                  <div className="flex-1 max-h-[300px] overflow-y-auto custom-scrollbar p-2 space-y-1">
-                    {filteredCountries.map(c => (
-                      <button key={c.code} onClick={() => toggleLocation(c)}
-                        className={`w-full text-left px-3 py-2 rounded-base text-xs font-bold transition-all flex items-center justify-between ${
-                          selectedLocations.some(l => l.code === c.code) ? 'bg-primary-50 text-primary-500' : 'text-gray-600 hover:bg-gray-50'}`}>
-                        {c.name}
-                        {selectedLocations.some(l => l.code === c.code) && <Check size={12} />}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                <div className="w-1/2 bg-gray-50/30 flex flex-col">
-                  <div className="p-4 border-b border-gray-50 flex items-center justify-between">
-                    <span className="text-xs font-medium text-gray-500">Selected ({selectedLocations.length})</span>
-                  </div>
-                  <div className="flex-1 max-h-[300px] overflow-y-auto custom-scrollbar p-4 flex flex-wrap gap-2 content-start">
-                    {selectedLocations.map(l => (
-                      <div key={l.code} className="flex items-center gap-1.5 px-2.5 py-1.5 bg-white border border-gray-100 rounded-tag shadow-sm animate-in zoom-in">
-                        <span className="text-xs font-medium text-gray-700">{l.code}</span>
-                        <button onClick={() => toggleLocation(l)} className="text-gray-300 hover:text-rose-500 transition-colors"><X size={10} strokeWidth={3} /></button>
-                      </div>
-                    ))}
-                  </div>
+          </div>
+          <Popover
+            open={openDropdown === 'location'}
+            anchorRef={locationTriggerRef}
+            placement="bottom-start"
+            onClose={() => setOpenDropdown(null)}
+            className="w-[500px] bg-white rounded-base shadow-xl border border-gray-100 overflow-hidden flex"
+          >
+            <div className="w-1/2 border-r border-gray-50 flex flex-col">
+              <div className="p-4 border-b border-gray-50">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300 w-3.5 h-3.5" />
+                  <input className="w-full pl-9 pr-3 py-2 bg-gray-50 border-none rounded-base text-xs font-bold text-gray-900 focus:ring-2 focus:ring-primary-500/10"
+                    placeholder="Search locations..." value={locationSearch} onChange={(e) => setLocationSearch(e.target.value)} autoFocus />
                 </div>
               </div>
-            )}
-          </div>
+              <div className="flex-1 max-h-[300px] overflow-y-auto custom-scrollbar p-2 space-y-1">
+                {filteredCountries.map(c => (
+                  <button key={c.code} onClick={() => toggleLocation(c)}
+                    className={`w-full text-left px-3 py-2 rounded-base text-xs font-bold transition-all flex items-center justify-between ${
+                      selectedLocations.some(l => l.code === c.code) ? 'bg-primary-50 text-primary-500' : 'text-gray-600 hover:bg-gray-50'}`}>
+                    {c.name}
+                    {selectedLocations.some(l => l.code === c.code) && <Check size={12} />}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="w-1/2 bg-gray-50/30 flex flex-col">
+              <div className="p-4 border-b border-gray-50 flex items-center justify-between">
+                <span className="text-xs font-medium text-gray-500">Selected ({selectedLocations.length})</span>
+              </div>
+              <div className="flex-1 max-h-[300px] overflow-y-auto custom-scrollbar p-4 flex flex-wrap gap-2 content-start">
+                {selectedLocations.map(l => (
+                  <div key={l.code} className="flex items-center gap-1.5 px-2.5 py-1.5 bg-white border border-gray-100 rounded-tag shadow-sm animate-in zoom-in">
+                    <span className="text-xs font-medium text-gray-700">{l.code}</span>
+                    <button onClick={() => toggleLocation(l)} className="text-gray-300 hover:text-rose-500 transition-colors"><X size={10} strokeWidth={3} /></button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </Popover>
         </div>
 
         {/* Language Selector (single-select) */}
         <div>
-          <div className="relative" ref={openDropdown === 'language' ? dropdownRef : null}>
+          <div ref={languageTriggerRef}>
             <div onClick={() => setOpenDropdown(openDropdown === 'language' ? null : 'language')}
               className="bg-white rounded-inner p-4 border border-gray-100 shadow-sm flex flex-col gap-2 group cursor-pointer hover:border-primary-500/20 transition-all h-full">
               <span className="text-xs font-medium text-gray-500">Language</span>
@@ -898,39 +941,42 @@ const TargetingChannelCard = ({
                 <ChevronDown size={14} className={`text-gray-300 transition-transform ${openDropdown === 'language' ? 'rotate-180' : ''}`} />
               </div>
             </div>
-            {openDropdown === 'language' && (
-              <div className="absolute top-full left-0 mt-2 w-[260px] bg-white rounded-base shadow-xl border border-gray-100 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-                <div className="p-3 border-b border-gray-50">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300 w-3.5 h-3.5" />
-                    <input className="w-full pl-9 pr-3 py-2 bg-gray-50 border-none rounded-base text-xs font-bold text-gray-900 focus:ring-2 focus:ring-primary-500/10"
-                      placeholder="Search languages..." value={languageSearch} onChange={(e) => setLanguageSearch(e.target.value)} autoFocus />
-                  </div>
-                </div>
-                <div className="max-h-[280px] overflow-y-auto custom-scrollbar p-2 space-y-0.5">
-                  {filteredLanguages.map(lang => (
-                    <button key={lang.code} onClick={() => { setSelectedLanguage(lang); setOpenDropdown(null); }}
-                      className={`w-full text-left px-3 py-2 rounded-base text-xs font-bold transition-all flex items-center justify-between ${
-                        selectedLanguage?.code === lang.code ? 'bg-primary-50 text-primary-500' : 'text-gray-600 hover:bg-gray-50'}`}>
-                      {lang.name}
-                      {selectedLanguage?.code === lang.code && <Check size={12} />}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
+          <Popover
+            open={openDropdown === 'language'}
+            anchorRef={languageTriggerRef}
+            placement="bottom-start"
+            onClose={() => setOpenDropdown(null)}
+            className="w-[260px] bg-white rounded-base shadow-xl border border-gray-100 overflow-hidden"
+          >
+            <div className="p-3 border-b border-gray-50">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300 w-3.5 h-3.5" />
+                <input className="w-full pl-9 pr-3 py-2 bg-gray-50 border-none rounded-base text-xs font-bold text-gray-900 focus:ring-2 focus:ring-primary-500/10"
+                  placeholder="Search languages..." value={languageSearch} onChange={(e) => setLanguageSearch(e.target.value)} autoFocus />
+              </div>
+            </div>
+            <div className="max-h-[280px] overflow-y-auto custom-scrollbar p-2 space-y-0.5">
+              {filteredLanguages.map(lang => (
+                <button key={lang.code} onClick={() => { setSelectedLanguage(lang); setOpenDropdown(null); }}
+                  className={`w-full text-left px-3 py-2 rounded-base text-xs font-bold transition-all flex items-center justify-between ${
+                    selectedLanguage?.code === lang.code ? 'bg-primary-50 text-primary-500' : 'text-gray-600 hover:bg-gray-50'}`}>
+                  {lang.name}
+                  {selectedLanguage?.code === lang.code && <Check size={12} />}
+                </button>
+              ))}
+            </div>
+          </Popover>
         </div>
 
         {/* Conversion Event — 仅承载 conversion goal + pixel event 两级（campaign objective 已上提至顶部 ChannelHeaderCard）。
             objective 未选时禁用，并提示在顶部选择。 */}
         <div>
-          <div className="relative" ref={openDropdown === 'objective' ? dropdownRef : null}>
+          <div ref={conversionEventTriggerRef}>
             <div
               onClick={() => {
                 if (!objective) return;
                 setOpenDropdown(openDropdown === 'objective' ? null : 'objective');
-                // 始终从 goal 进入（objective 已在顶部选过）
                 setObjectiveStage('goal');
               }}
               className={`bg-white rounded-inner p-4 border border-gray-100 shadow-sm flex flex-col gap-2 group transition-all h-full ${
@@ -950,53 +996,57 @@ const TargetingChannelCard = ({
                 <ChevronDown size={14} className={`text-gray-300 transition-transform shrink-0 ${openDropdown === 'objective' ? 'rotate-180' : ''}`} />
               </div>
             </div>
-            {openDropdown === 'objective' && objective && (
-              <div className="absolute top-full right-0 mt-2 w-[320px] bg-white rounded-base shadow-xl border border-gray-100 p-3 animate-in fade-in zoom-in-95 duration-200 z-[20]">
-                {objectiveStage === 'goal' && (
-                  <div className="space-y-1">
-                    <p className="text-[10px] font-bold text-gray-400 tracking-widest mb-2 px-2">Conversion Goal</p>
-                    <div className="grid grid-cols-1 gap-1">
-                      {availableGoals.map(goal => (
-                        <button key={goal.value} onClick={() => {
-                          setAdsetGoal(goal.value);
-                          if (goal.needsEvent) { setObjectiveStage('event'); } else { setEvent(''); setOpenDropdown(null); }
-                        }} className={`w-full text-left px-3 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-between group ${
-                          adsetGoal === goal.value ? 'bg-gray-900 text-white shadow-md' : 'hover:bg-gray-50 text-gray-600'
-                        }`}>
-                          <span>{goal.label}</span>
-                          {goal.needsEvent ? <ArrowRight size={12} className="opacity-30 group-hover:opacity-100" /> : (adsetGoal === goal.value && <CheckCircle2 size={12} />)}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-                {objectiveStage === 'event' && (
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2 px-1">
-                      <button onClick={() => setObjectiveStage('goal')} className="p-1 hover:bg-gray-100 rounded-md transition-colors text-gray-400"><ChevronLeft size={14} /></button>
-                      <p className="text-[10px] font-bold text-gray-400 tracking-widest">Pixel Event</p>
-                    </div>
-                    <div className="relative px-1">
-                      <Search size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300" />
-                      <input className="w-full pl-9 pr-3 py-2 bg-gray-50 border-none rounded-base text-xs font-bold text-gray-900 focus:ring-2 focus:ring-primary-500/20"
-                        placeholder="Search events..." value={eventSearch} onChange={(e) => setEventSearch(e.target.value)} autoFocus />
-                    </div>
-                    <div className="max-h-48 overflow-y-auto custom-scrollbar space-y-0.5 pr-1">
-                      {filteredEvents.map(ev => (
-                        <button key={ev} onClick={() => { setEvent(ev); setOpenDropdown(null); }}
-                          className={`w-full text-left px-3 py-2 rounded-base text-xs font-bold transition-all flex items-center justify-between ${
-                            event === ev ? 'bg-primary-500 text-white shadow-md' : 'hover:bg-gray-50 text-gray-600'
-                          }`}>
-                          {ev}
-                          {event === ev && <CheckCircle2 size={12} />}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
+          </div>
+          <Popover
+            open={openDropdown === 'objective' && !!objective}
+            anchorRef={conversionEventTriggerRef}
+            placement="bottom-end"
+            onClose={() => setOpenDropdown(null)}
+            className="w-[320px] bg-white rounded-base shadow-xl border border-gray-100 p-3"
+          >
+            {objectiveStage === 'goal' && (
+              <div className="space-y-1">
+                <p className="text-[10px] font-bold text-gray-400 tracking-widest mb-2 px-2">Conversion Goal</p>
+                <div className="grid grid-cols-1 gap-1">
+                  {availableGoals.map(goal => (
+                    <button key={goal.value} onClick={() => {
+                      setAdsetGoal(goal.value);
+                      if (goal.needsEvent) { setObjectiveStage('event'); } else { setEvent(''); setOpenDropdown(null); }
+                    }} className={`w-full text-left px-3 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-between group ${
+                      adsetGoal === goal.value ? 'bg-gray-900 text-white shadow-md' : 'hover:bg-gray-50 text-gray-600'
+                    }`}>
+                      <span>{goal.label}</span>
+                      {goal.needsEvent ? <ArrowRight size={12} className="opacity-30 group-hover:opacity-100" /> : (adsetGoal === goal.value && <CheckCircle2 size={12} />)}
+                    </button>
+                  ))}
+                </div>
               </div>
             )}
-          </div>
+            {objectiveStage === 'event' && (
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 px-1">
+                  <button onClick={() => setObjectiveStage('goal')} className="p-1 hover:bg-gray-100 rounded-md transition-colors text-gray-400"><ChevronLeft size={14} /></button>
+                  <p className="text-[10px] font-bold text-gray-400 tracking-widest">Pixel Event</p>
+                </div>
+                <div className="relative px-1">
+                  <Search size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300" />
+                  <input className="w-full pl-9 pr-3 py-2 bg-gray-50 border-none rounded-base text-xs font-bold text-gray-900 focus:ring-2 focus:ring-primary-500/20"
+                    placeholder="Search events..." value={eventSearch} onChange={(e) => setEventSearch(e.target.value)} autoFocus />
+                </div>
+                <div className="max-h-48 overflow-y-auto custom-scrollbar space-y-0.5 pr-1">
+                  {filteredEvents.map(ev => (
+                    <button key={ev} onClick={() => { setEvent(ev); setOpenDropdown(null); }}
+                      className={`w-full text-left px-3 py-2 rounded-base text-xs font-bold transition-all flex items-center justify-between ${
+                        event === ev ? 'bg-primary-500 text-white shadow-md' : 'hover:bg-gray-50 text-gray-600'
+                      }`}>
+                      {ev}
+                      {event === ev && <CheckCircle2 size={12} />}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </Popover>
         </div>
 
         {/* Daily Budget — 4th column, matches dropdown card visual */}
@@ -1036,6 +1086,73 @@ const TargetingChannelCard = ({
         </div>
       </div>
 
+      {/* TikTok + APP + Sales 场景下：Catalog 选择字段 */}
+      {isTikTokAppSales && (
+        <div className="mt-4">
+          <div ref={catalogTriggerRef}>
+            <div
+              onClick={() => {
+                if (!authStatus?.tiktok) { onAuthorize?.('tiktok'); return; }
+                if (!selectedAccount) { onPickAccount?.(); return; }
+                setCatalogDropdownOpen(prev => !prev);
+              }}
+              className="bg-white rounded-inner p-4 border border-gray-100 shadow-sm flex flex-col gap-2 group cursor-pointer hover:border-primary-500/20 transition-all"
+            >
+              <span className="text-xs font-medium text-gray-500">Catalog（产品目录）</span>
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <Database size={16} className="text-primary-500 shrink-0" />
+                  {!authStatus?.tiktok ? (
+                    <span className="text-sm font-bold text-gray-400 truncate">请连接 TikTok 加载 catalog</span>
+                  ) : !selectedAccount ? (
+                    <span className="text-sm font-bold text-gray-400 truncate">请选择 TikTok 账号</span>
+                  ) : tiktokCatalogLoading.isLoading ? (
+                    <span className="text-sm font-bold text-gray-400 flex items-center gap-2"><Loader2 size={14} className="animate-spin" /> 加载 catalog 中…</span>
+                  ) : selectedCatalog ? (
+                    <div className="min-w-0">
+                      <p className="text-sm font-bold text-gray-700 truncate">{selectedCatalog.name}</p>
+                      <p className="text-[11px] text-gray-400 font-medium truncate">ID {selectedCatalog.id} · {selectedCatalog.productCount} 件商品</p>
+                    </div>
+                  ) : (
+                    <span className="text-sm font-bold text-gray-300">请选择 catalog</span>
+                  )}
+                </div>
+                <ChevronDown size={14} className={`text-gray-300 transition-transform shrink-0 ${catalogDropdownOpen ? 'rotate-180' : ''}`} />
+              </div>
+            </div>
+          </div>
+          <Popover
+            open={catalogDropdownOpen && !!authStatus?.tiktok && !!selectedAccount && !tiktokCatalogLoading.isLoading}
+            anchorRef={catalogTriggerRef}
+            placement="bottom-start"
+            matchWidth
+            onClose={() => setCatalogDropdownOpen(false)}
+            className="bg-white border border-gray-100 rounded-base shadow-xl overflow-hidden p-1"
+          >
+            {MOCK_CATALOGS.map(c => {
+              const isSel = selectedCatalog?.id === c.id;
+              return (
+                <button
+                  key={c.id}
+                  onClick={() => { onSelectCatalog?.(c); setCatalogDropdownOpen(false); }}
+                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-base transition-all text-left ${isSel ? 'bg-primary-50' : 'hover:bg-gray-50'}`}
+                >
+                  <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${isSel ? 'bg-primary-500 text-white' : 'bg-primary-50 text-primary-500'}`}>
+                    <Database size={16} />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className={`text-xs font-bold truncate ${isSel ? 'text-primary-600' : 'text-gray-800'}`}>{c.name}</p>
+                    <p className="text-[10px] text-gray-400 font-medium truncate">ID {c.id}</p>
+                  </div>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-tag bg-emerald-50 text-emerald-600 border border-emerald-100 shrink-0">{c.productCount} 件</span>
+                  {isSel && <Check size={14} className="text-primary-500 shrink-0" />}
+                </button>
+              );
+            })}
+          </Popover>
+        </div>
+      )}
+
       {/* 竞价 + 受众预设 — Meta: [策略 + 金额 + 包含 + 排除] 4col；TikTok: [金额 + 包含 + 排除] 3col */}
       {(() => {
         const isTikTok = platform?.id === 'tiktok';
@@ -1057,7 +1174,8 @@ const TargetingChannelCard = ({
         return (
           <div className={`grid gap-4 mt-4 relative z-[5] grid-cols-1 md:grid-cols-2 ${isTikTok ? 'lg:grid-cols-3' : 'lg:grid-cols-4'}`}>
             {!isTikTok && (
-              <div className="relative" ref={openDropdown === 'bidStrategy' ? dropdownRef : null}>
+              <>
+              <div ref={bidStrategyTriggerRef}>
                 <div onClick={() => setOpenDropdown(openDropdown === 'bidStrategy' ? null : 'bidStrategy')}
                   className="bg-white rounded-inner p-4 border border-gray-100 shadow-sm flex flex-col gap-2 group cursor-pointer hover:border-primary-500/20 transition-all h-full">
                   <span className="text-xs font-medium text-gray-500">竞价策略</span>
@@ -1071,21 +1189,26 @@ const TargetingChannelCard = ({
                     <ChevronDown size={14} className={`text-gray-300 transition-transform shrink-0 ${openDropdown === 'bidStrategy' ? 'rotate-180' : ''}`} />
                   </div>
                 </div>
-                {openDropdown === 'bidStrategy' && (
-                  <div className="absolute top-full right-0 mt-2 w-[300px] bg-white rounded-base shadow-xl border border-gray-100 p-2 animate-in fade-in zoom-in-95 duration-200 z-[20]">
-                    {BID_STRATEGIES.map(s => (
-                      <button key={s.value} onClick={() => { onChangeBidStrategy?.(s.value); setOpenDropdown(null); }}
-                        className={`w-full text-left px-3 py-2.5 rounded-base transition-all flex items-center justify-between gap-3 ${bidStrategy === s.value ? 'bg-gray-900 text-white' : 'hover:bg-gray-50 text-gray-600'}`}>
-                        <div className="min-w-0">
-                          <p className="text-xs font-bold truncate">{s.label}</p>
-                          <p className={`text-[10px] truncate ${bidStrategy === s.value ? 'text-gray-300' : 'text-gray-400'}`}>{s.desc}</p>
-                        </div>
-                        {bidStrategy === s.value && <Check size={12} className="shrink-0" />}
-                      </button>
-                    ))}
-                  </div>
-                )}
               </div>
+              <Popover
+                open={openDropdown === 'bidStrategy'}
+                anchorRef={bidStrategyTriggerRef}
+                placement="bottom-end"
+                onClose={() => setOpenDropdown(null)}
+                className="w-[300px] bg-white rounded-base shadow-xl border border-gray-100 p-2"
+              >
+                {BID_STRATEGIES.map(s => (
+                  <button key={s.value} onClick={() => { onChangeBidStrategy?.(s.value); setOpenDropdown(null); }}
+                    className={`w-full text-left px-3 py-2.5 rounded-base transition-all flex items-center justify-between gap-3 ${bidStrategy === s.value ? 'bg-gray-900 text-white' : 'hover:bg-gray-50 text-gray-600'}`}>
+                    <div className="min-w-0">
+                      <p className="text-xs font-bold truncate">{s.label}</p>
+                      <p className={`text-[10px] truncate ${bidStrategy === s.value ? 'text-gray-300' : 'text-gray-400'}`}>{s.desc}</p>
+                    </div>
+                    {bidStrategy === s.value && <Check size={12} className="shrink-0" />}
+                  </button>
+                ))}
+              </Popover>
+              </>
             )}
             <div>
               <div className={`bg-white rounded-inner p-4 border border-gray-100 shadow-sm flex flex-col gap-2 transition-all h-full ${amountDisabled ? 'opacity-60' : 'focus-within:border-primary-500/30'}`}>
@@ -1158,7 +1281,7 @@ const TargetingChannelCard = ({
           {/* 架构策略 dropdown */}
           {campaignType !== 'CATALOG' && (
             <div>
-              <div className="relative" ref={openDropdown === 'strategy' ? dropdownRef : null}>
+              <div ref={strategyTriggerRef}>
                 <div onClick={() => setOpenDropdown(openDropdown === 'strategy' ? null : 'strategy')}
                   className="bg-white rounded-inner p-4 border border-gray-100 shadow-sm flex flex-col gap-2 group cursor-pointer hover:border-primary-500/20 transition-all h-full">
                   <span className="text-xs font-medium text-gray-500">架构策略</span>
@@ -1172,27 +1295,32 @@ const TargetingChannelCard = ({
                     <ChevronDown size={14} className={`text-gray-300 transition-transform shrink-0 ${openDropdown === 'strategy' ? 'rotate-180' : ''}`} />
                   </div>
                 </div>
-                {openDropdown === 'strategy' && (
-                  <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-base shadow-xl border border-gray-100 overflow-hidden animate-in fade-in zoom-in-95 duration-200 z-[20]">
-                    {STRATEGY_OPTIONS.map(opt => {
-                      const active = structure.strategy === opt.id;
-                      return (
-                        <button
-                          key={opt.id}
-                          onClick={() => { onStructureChange({ ...structure, strategy: opt.id }); setOpenDropdown(null); }}
-                          className={`w-full text-left px-4 py-3 transition-colors flex items-start justify-between gap-3 ${active ? 'bg-primary-50' : 'hover:bg-gray-50'}`}
-                        >
-                          <div className="min-w-0">
-                            <p className={`text-sm font-semibold ${active ? 'text-primary-500' : 'text-gray-700'}`}>{opt.label}</p>
-                            <p className="text-xs text-gray-400 font-medium mt-0.5">{opt.desc}</p>
-                          </div>
-                          {active && <Check size={14} className="text-primary-500 shrink-0 mt-1" />}
-                        </button>
-                      );
-                    })}
-                  </div>
-                )}
               </div>
+              <Popover
+                open={openDropdown === 'strategy'}
+                anchorRef={strategyTriggerRef}
+                placement="bottom-start"
+                matchWidth
+                onClose={() => setOpenDropdown(null)}
+                className="bg-white rounded-base shadow-xl border border-gray-100 overflow-hidden"
+              >
+                {STRATEGY_OPTIONS.map(opt => {
+                  const active = structure.strategy === opt.id;
+                  return (
+                    <button
+                      key={opt.id}
+                      onClick={() => { onStructureChange({ ...structure, strategy: opt.id }); setOpenDropdown(null); }}
+                      className={`w-full text-left px-4 py-3 transition-colors flex items-start justify-between gap-3 ${active ? 'bg-primary-50' : 'hover:bg-gray-50'}`}
+                    >
+                      <div className="min-w-0">
+                        <p className={`text-sm font-semibold ${active ? 'text-primary-500' : 'text-gray-700'}`}>{opt.label}</p>
+                        <p className="text-xs text-gray-400 font-medium mt-0.5">{opt.desc}</p>
+                      </div>
+                      {active && <Check size={14} className="text-primary-500 shrink-0 mt-1" />}
+                    </button>
+                  );
+                })}
+              </Popover>
             </div>
           )}
 
@@ -1277,10 +1405,17 @@ const TargetingChannelCard = ({
                             onClick={() => togglePlacement(p.id)}
                             className={`flex items-center gap-2 px-3 py-2.5 rounded-base border text-xs font-medium transition-all ${checked ? 'bg-primary-50 border-primary-500 text-primary-500' : 'bg-white border-gray-100 text-gray-600 hover:border-gray-200'}`}
                           >
-                            <div className={`w-4 h-4 rounded-sm flex items-center justify-center transition-all ${checked ? 'bg-primary-500 text-white' : 'border border-gray-300 bg-white'}`}>
+                            <div className={`w-4 h-4 rounded-sm flex items-center justify-center transition-all shrink-0 ${checked ? 'bg-primary-500 text-white' : 'border border-gray-300 bg-white'}`}>
                               {checked && <Check size={10} strokeWidth={3} />}
                             </div>
-                            <span className="truncate">{p.label}</span>
+                            <div className="min-w-0 flex-1 text-left">
+                              <span className="block truncate">{p.label}</span>
+                              {p.sublabels && (
+                                <span className="block text-[10px] font-medium text-gray-400 truncate mt-0.5">
+                                  {p.sublabels.join(' · ')}
+                                </span>
+                              )}
+                            </div>
                           </button>
                         );
                       })}
@@ -1505,15 +1640,16 @@ const NamingStrategySection = ({
     { value: '',  label: 'none' },
   ];
 
-  // 点击命名区域外部时取消激活
+  // 点击命名区域外部时取消激活 —— 仅在有激活态时 attach，避免无谓拦截全局点击
   React.useEffect(() => {
+    if (!activeFieldKey && !showCustomSepPopover) return;
     const handler = () => {
       setActiveFieldKey(null);
       setShowCustomSepPopover(false);
     };
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
-  }, []);
+  }, [activeFieldKey, showCustomSepPopover]);
 
   const today = new Date().toISOString().slice(0, 10).replace(/-/g, '');
   const locStr = selectedLocations.length > 0
@@ -1875,6 +2011,7 @@ const MinimizedPublishIndicator = ({ campaignStatus, adsetProgress, onExpand, on
 const _genId = () => (typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : `id_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`);
 
 const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
+  const isLgUp = useMediaQuery('(min-width: 1024px)');
   const [selectedProducts, setSelectedProducts] = useState([]);
   // Source of truth: each product has 1+ creative groups, each with editable name + ads
   const [productCreativeGroupsMap, setProductCreativeGroupsMap] = useState({});
@@ -1904,6 +2041,7 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
   }, [selectedProducts, productCreativeGroupsMap]);
   const [selectedCatalog, setSelectedCatalog] = useState(null);
   const [selectedProductSet, setSelectedProductSet] = useState('All Products');
+  const [adsetCatalogMap, setAdsetCatalogMap] = useState({}); // { [adsetIdx]: catalog | null }
   const [selectedAccount, setSelectedAccount] = useState(() =>
     _hasGeneratedOnce ? MOCK_ACCOUNTS[0] : null
   );
@@ -2050,7 +2188,7 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
   const [placementMode, setPlacementMode] = useState('AUTO');
   const [manualPlacements, setManualPlacements] = useState({
     meta: ['facebook_feed', 'instagram_feed', 'stories', 'reels'],
-    tiktok: ['in_feed', 'topview', 'spark_ads'],
+    tiktok: ['tiktok', 'pangle', 'global_app_bundle'],
   });
   const [adsetCreativeSelections, setAdsetCreativeSelections] = useState({});
   const [numByCreativeAdsets, setNumByCreativeAdsets] = useState(1);
@@ -2058,7 +2196,12 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
   // 每个 campaign 用 stripe = 100 槽位（即 flatIdx = cIdx*100 + aIdx），最多 10 campaigns × 100 adsets。
   const [adsetAudiences, setAdsetAudiences] = useState(() => Array(1000));
   const [adType, setAdType] = useState('FLEXIBLE');
+  const [creativesPerAd, setCreativesPerAd] = useState(3);
+  const [isCollabAd, setIsCollabAd] = useState(false);
+  const [collabValue, setCollabValue] = useState('');
   const [adsetAudienceDetails, setAdsetAudienceDetails] = useState({});
+  // TikTok + APP 投放 + sales 目标场景，激活 Catalog / Product Range 配置链路
+  const isTikTokAppSales = platform?.id === 'tiktok' && campaignType === 'APP' && objective === 'sales_conversions';
   const [budgetType, setBudgetType] = useState('CBO');
   const [dailyBudget, setDailyBudget] = useState(50);
   // 竞价策略 / 竞价目标：bidStrategy 仅 Meta 用；bidAmount 全平台共用（数字字符串）
@@ -2640,6 +2783,7 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
     });
     const [phoneError, setPhoneError] = useState('');
     const [isPhoneCodeOpen, setIsPhoneCodeOpen] = useState(false);
+    const phoneCodeBtnRef = useRef(null);
 
     const [activeDropdown, setActiveDropdown] = useState(null);
     const [showTosModal, setShowTosModal] = useState(false);
@@ -2710,27 +2854,34 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
 
     const CustomDropdown = ({ label, options, value, onChange, placeholder, isOpen, onToggle, isLoading }) => {
       const selectedOption = options.find(opt => opt.value === value);
+      const triggerRef = useRef(null);
       return (
-        <div className="space-y-2 relative">
+        <div className="space-y-2">
           <label className="text-xs font-medium text-gray-500">{label}</label>
-          <div onClick={onToggle} className={`w-full h-12 px-4 bg-white border rounded-base flex items-center justify-between cursor-pointer transition-all duration-200 ${isOpen ? 'border-primary-500 ring-2 ring-primary-500/10' : 'border-gray-200 hover:border-gray-300'}`}>
+          <div ref={triggerRef} onClick={onToggle} className={`w-full h-12 px-4 bg-white border rounded-base flex items-center justify-between cursor-pointer transition-all duration-200 ${isOpen ? 'border-primary-500 ring-2 ring-primary-500/10' : 'border-gray-200 hover:border-gray-300'}`}>
             <span className={`text-sm font-bold ${selectedOption ? 'text-gray-900' : 'text-gray-400'}`}>{selectedOption ? selectedOption.label : placeholder}</span>
             <ChevronDown size={16} className={`text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
           </div>
-          {isOpen && (
-            <div className="absolute z-[150] top-full left-0 right-0 mt-2 bg-white border border-gray-100 rounded-base shadow-xl py-2 animate-in fade-in zoom-in-95 duration-200">
-              {isLoading ? (
-                <div className="p-6 flex flex-col items-center justify-center gap-2">
-                  <Loader2 size={18} className="animate-spin text-primary-500/70" />
-                  <p className="text-xs font-medium text-gray-400 animate-pulse">Loading...</p>
-                </div>
-              ) : (
-                options.map((opt) => (
-                  <div key={opt.value} onClick={() => { onChange(opt.value); onToggle(); }} className={`rounded-base px-3 py-2 text-sm font-bold cursor-pointer transition-colors ${value === opt.value ? 'bg-primary-50 text-primary-500' : 'hover:bg-gray-50 text-gray-600'}`}>{opt.label}</div>
-                ))
-              )}
-            </div>
-          )}
+          <Popover
+            open={isOpen}
+            anchorRef={triggerRef}
+            placement="bottom-start"
+            matchWidth
+            onClose={onToggle}
+            zIndex={Z_INDEX.MODAL_BASE + 500}
+            className="bg-white border border-gray-100 rounded-base shadow-xl py-2"
+          >
+            {isLoading ? (
+              <div className="p-6 flex flex-col items-center justify-center gap-2">
+                <Loader2 size={18} className="animate-spin text-primary-500/70" />
+                <p className="text-xs font-medium text-gray-400 animate-pulse">Loading...</p>
+              </div>
+            ) : (
+              options.map((opt) => (
+                <div key={opt.value} onClick={() => { onChange(opt.value); onToggle(); }} className={`rounded-base px-3 py-2 text-sm font-bold cursor-pointer transition-colors ${value === opt.value ? 'bg-primary-50 text-primary-500' : 'hover:bg-gray-50 text-gray-600'}`}>{opt.label}</div>
+              ))
+            )}
+          </Popover>
         </div>
       );
     };
@@ -2841,30 +2992,36 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
                 <div className="space-y-2">
                   <label className="text-xs font-semibold text-gray-700">Contact Phone</label>
                   <div className="flex gap-2">
-                    <div className="relative shrink-0">
+                    <div className="shrink-0">
                       <button
+                        ref={phoneCodeBtnRef}
                         onClick={() => setIsPhoneCodeOpen(!isPhoneCodeOpen)}
                         className={`h-12 px-3 flex items-center gap-2 bg-white border rounded-base text-sm font-medium transition-all min-w-[100px] ${isPhoneCodeOpen ? 'border-primary-500 shadow-sm' : 'border-gray-200 hover:border-gray-300'}`}
                       >
                         <span className="text-gray-900">{selections.phoneCountryCode}</span>
                         <ChevronDown size={14} className={`text-gray-300 transition-transform ${isPhoneCodeOpen ? 'rotate-180' : ''}`} />
                       </button>
-                      {isPhoneCodeOpen && (
-                        <div className="absolute top-full left-0 mt-1 w-64 bg-white border border-gray-100 rounded-base shadow-xl max-h-48 overflow-y-auto custom-scrollbar z-[120] animate-in fade-in zoom-in-95 duration-200">
-                          {PHONE_COUNTRY_CODES.map(cc => (
-                            <button
-                              key={cc.code}
-                              onClick={() => { setSelections({...selections, phoneCountryCode: cc.code}); setIsPhoneCodeOpen(false); setPhoneError(''); }}
-                              className={`w-full text-left px-4 py-2.5 text-xs font-medium transition-all flex items-center justify-between ${
-                                selections.phoneCountryCode === cc.code ? 'bg-primary-50 text-primary-500' : 'text-gray-600 hover:bg-gray-50'
-                              }`}
-                            >
-                              <span>{cc.country}</span>
-                              <span className="text-gray-400 font-bold">{cc.code}</span>
-                            </button>
-                          ))}
-                        </div>
-                      )}
+                      <Popover
+                        open={isPhoneCodeOpen}
+                        anchorRef={phoneCodeBtnRef}
+                        placement="bottom-start"
+                        onClose={() => setIsPhoneCodeOpen(false)}
+                        zIndex={Z_INDEX.MODAL_BASE + 500}
+                        className="w-64 bg-white border border-gray-100 rounded-base shadow-xl max-h-48 overflow-y-auto custom-scrollbar"
+                      >
+                        {PHONE_COUNTRY_CODES.map(cc => (
+                          <button
+                            key={cc.code}
+                            onClick={() => { setSelections({...selections, phoneCountryCode: cc.code}); setIsPhoneCodeOpen(false); setPhoneError(''); }}
+                            className={`w-full text-left px-4 py-2.5 text-xs font-medium transition-all flex items-center justify-between ${
+                              selections.phoneCountryCode === cc.code ? 'bg-primary-50 text-primary-500' : 'text-gray-600 hover:bg-gray-50'
+                            }`}
+                          >
+                            <span>{cc.country}</span>
+                            <span className="text-gray-400 font-bold">{cc.code}</span>
+                          </button>
+                        ))}
+                      </Popover>
                     </div>
                     <input
                       type="tel"
@@ -3031,42 +3188,53 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
     );
   };
 
+  const channelHeaderShared = view === 'config' && platform && objective ? (
+    <ChannelHeaderCard
+      platform={platform}
+      onChangePlatform={(p) => {
+        setPlatform(p);
+        setSelectedAccount(null);
+        setSelectedProducts([]);
+        setProductCreativeGroupsMap({});
+        setProductAnalyses({});
+        setAnalysisFinished(false);
+        setIsAnalyzing(false);
+        setSelectedCatalog(null);
+      }}
+      selectedAccount={selectedAccount}
+      onSelectAccount={setSelectedAccount}
+      availableAccounts={platform ? (PLATFORM_ACCOUNTS[platform.id] || []) : []}
+      authStatus={authStatus}
+      onAuthorize={handleAuthorizeChannel}
+      isAuthLoading={channelAuthLoading}
+      openDropdown={openDropdown} setOpenDropdown={setOpenDropdown} dropdownRef={dropdownRef}
+      objective={objective}
+      onChangeObjective={handleChangeObjective}
+      availableObjectives={getAvailableObjectives(platform?.id)}
+    />
+  ) : null;
+
   return (
     <div className="bg-gray-50/50 min-h-full">
-      {/* Sticky Channel + Account header — 仅 onboarding 完成（platform + objective 均已选）后渲染，
-          避免与入场两步选择卡片同屏出现导致重复操作 */}
-      {view === 'config' && platform && objective && (
+      {/* 仅渲染一份 ChannelHeader：sm 顶部 sticky；lg+ 左侧 sidebar */}
+      {channelHeaderShared && !isLgUp && (
         <div className="sticky top-0 w-full px-4 md:px-8 pt-4 animate-in slide-in-from-top-full duration-500" style={{ zIndex: Z_INDEX.HEADER }}>
           <div className="max-w-7xl mx-auto">
-            <ChannelHeaderCard
-              platform={platform}
-              onChangePlatform={(p) => {
-                setPlatform(p);
-                setSelectedAccount(null);
-                setSelectedProducts([]);
-                setProductCreativeGroupsMap({});
-                setProductAnalyses({});
-                setAnalysisFinished(false);
-                setIsAnalyzing(false);
-                setSelectedCatalog(null);
-              }}
-              selectedAccount={selectedAccount}
-              onSelectAccount={setSelectedAccount}
-              availableAccounts={platform ? (PLATFORM_ACCOUNTS[platform.id] || []) : []}
-              authStatus={authStatus}
-              onAuthorize={handleAuthorizeChannel}
-              isAuthLoading={channelAuthLoading}
-              openDropdown={openDropdown} setOpenDropdown={setOpenDropdown} dropdownRef={dropdownRef}
-              objective={objective}
-              onChangeObjective={handleChangeObjective}
-              availableObjectives={getAvailableObjectives(platform?.id)}
-            />
+            {React.cloneElement(channelHeaderShared, { orientation: 'horizontal' })}
           </div>
         </div>
       )}
 
       <div className="p-4 md:p-8 flex justify-center">
-        <div className="w-full max-w-7xl">
+        <div className={`w-full ${channelHeaderShared && isLgUp ? 'max-w-7xl lg:max-w-[1680px] 2xl:max-w-[1880px] grid grid-cols-[280px_1fr] gap-6' : 'max-w-7xl'}`}>
+          {channelHeaderShared && isLgUp && (
+            <aside>
+              <div className="sticky top-4">
+                {React.cloneElement(channelHeaderShared, { orientation: 'vertical' })}
+              </div>
+            </aside>
+          )}
+          <div>
 
           {view === 'config' ? (
             (!platform || !objective) ? (
@@ -3191,6 +3359,9 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
                   isAuthLoading={channelAuthLoading}
                   selectedAccount={selectedAccount}
                   onPickAccount={() => setShowMetaAccountPicker(true)}
+                  isTikTokAppSales={isTikTokAppSales}
+                  selectedCatalog={selectedCatalog}
+                  onSelectCatalog={setSelectedCatalog}
                 >
                   {/* Naming Strategy */}
                   <NamingStrategySection
@@ -3315,6 +3486,74 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
                             >
                               Single Ad
                             </button>
+                            <button
+                              onClick={() => setAdType('CAROUSEL')}
+                              className={`px-6 py-2.5 rounded-base text-xs font-medium transition-all ${adType === 'CAROUSEL' ? 'bg-white text-primary-500 shadow-adsgo-card' : 'text-gray-500 hover:text-gray-700'}`}
+                            >
+                              Carousel Ad
+                            </button>
+                          </div>
+                          {(adType === 'FLEXIBLE' || adType === 'CAROUSEL') && (
+                            <div className="flex items-center gap-3 pt-1 animate-in slide-in-from-top-2 fade-in duration-200">
+                              <label className="text-xs font-medium text-gray-500 shrink-0">每 Ad 的 creative 数量</label>
+                              <input
+                                type="number"
+                                min={1}
+                                max={10}
+                                step={1}
+                                value={creativesPerAd}
+                                onChange={(e) => {
+                                  const raw = e.target.value;
+                                  if (raw === '') { setCreativesPerAd(''); return; }
+                                  const n = Math.floor(Number(raw));
+                                  if (!Number.isFinite(n)) return;
+                                  setCreativesPerAd(Math.max(1, Math.min(10, n)));
+                                }}
+                                onBlur={(e) => {
+                                  const n = Math.floor(Number(e.target.value));
+                                  if (!Number.isFinite(n) || n < 1) setCreativesPerAd(1);
+                                  else if (n > 10) setCreativesPerAd(10);
+                                }}
+                                className="w-20 h-9 px-3 bg-white border border-gray-200 rounded-base outline-none text-xs font-semibold text-gray-700 tabular-nums focus:border-primary-500 focus:shadow-primary-focus transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                              />
+                              <span className="text-[11px] text-gray-400 font-medium">取值 1 ~ 10</span>
+                            </div>
+                          )}
+                        </div>
+                      )}
+
+                      {platform?.id === 'meta' && (
+                        <div className="space-y-3">
+                          <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400 px-1 block">合创广告 (Branded Content)</span>
+                          <div className="bg-gray-50/50 border border-gray-100 rounded-inner p-4">
+                            <div className="flex items-center justify-between gap-4">
+                              <div className="min-w-0">
+                                <p className="text-sm font-semibold text-gray-900">启用合创广告</p>
+                                <p className="text-xs text-gray-400 mt-0.5">未填或格式错误将按非合创广告发布</p>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => setIsCollabAd(!isCollabAd)}
+                                aria-pressed={isCollabAd}
+                                className={`relative inline-flex items-center w-11 h-6 rounded-full transition-colors shrink-0 ${isCollabAd ? 'bg-primary-500' : 'bg-gray-300'}`}
+                              >
+                                <span
+                                  className="inline-block w-5 h-5 bg-white rounded-full shadow transition-transform"
+                                  style={{ transform: isCollabAd ? 'translateX(22px)' : 'translateX(2px)' }}
+                                />
+                              </button>
+                            </div>
+                            {isCollabAd && (
+                              <div className="mt-3 animate-in slide-in-from-top-2 fade-in duration-200">
+                                <input
+                                  type="text"
+                                  value={collabValue}
+                                  onChange={e => setCollabValue(e.target.value)}
+                                  placeholder="请粘贴合创广告 code 或合作帖子 URL"
+                                  className="w-full px-3 py-2 text-xs bg-white border border-gray-200 rounded-base focus:border-primary-500 focus:shadow-primary-focus outline-none transition-all"
+                                />
+                              </div>
+                            )}
                           </div>
                         </div>
                       )}
@@ -3651,6 +3890,21 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
                       numByCreativeAdsets={numByCreativeAdsets}
                       onSaveAdsetCreatives={handleSaveAdsetCreatives}
                       onAddByCreativeAdset={handleAddByCreativeAdset}
+                      placementOptions={platform ? (PLATFORM_PLACEMENTS[platform.id] || []) : []}
+                      defaultPlacements={platform ? (manualPlacements[platform.id] || (PLATFORM_PLACEMENTS[platform.id] || []).map(p => p.id)) : []}
+                      isTikTokAppSales={isTikTokAppSales}
+                      globalCatalog={selectedCatalog}
+                      catalogs={MOCK_CATALOGS}
+                      adsetCatalogMap={adsetCatalogMap}
+                      onSaveAdsetCatalog={(adsetIdx, catalog) => setAdsetCatalogMap(prev => {
+                        const next = { ...prev };
+                        if (catalog == null) delete next[adsetIdx];
+                        else next[adsetIdx] = catalog;
+                        return next;
+                      })}
+                      onAuthorizeChannel={handleAuthorizeChannel}
+                      onOpenAccountPicker={() => { accountPickLoading.triggerLoad(); setShowMetaAccountPicker(true); }}
+                      channelAuthLoading={channelAuthLoading}
                     />
                  </div>
               )}
@@ -3682,10 +3936,19 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
                   numCampaigns={Math.max(structure.numCampaigns || 1, 1)}
                   budgetType={budgetType}
                   dailyBudget={dailyBudget}
-                  initialAdsetAudiences={adsetAudiences} 
+                  initialAdsetAudiences={adsetAudiences}
                   productCreativesMap={productCreativesMap}
                   selectedProducts={selectedProducts}
                   brand={detectedBrand}
+                  isTikTokAppSales={isTikTokAppSales}
+                  globalCatalog={selectedCatalog}
+                  catalogs={MOCK_CATALOGS}
+                  adsetCatalogMap={adsetCatalogMap}
+                  catalogProductSets={MOCK_CATALOG_PRODUCT_SETS}
+                  catalogProducts={MOCK_CATALOG_PRODUCTS}
+                  onAuthorizeChannel={handleAuthorizeChannel}
+                  onOpenAccountPicker={() => { accountPickLoading.triggerLoad(); setShowMetaAccountPicker(true); }}
+                  channelAuthLoading={channelAuthLoading}
                   onBack={() => setView('config')}
                   onPublish={() => setShowPublishModal(true)}
                   campaignName={selectedCampaign?.name || 'NEW-AI-CAMPAIGN-001'}
@@ -3710,6 +3973,7 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
                   estimatedTotalDaily={estimatedTotalDaily}
                   adSetGroupsCount={adSetGroupsCount}
                   adType={adType}
+                  creativesPerAd={creativesPerAd}
                   adsetAudienceDetails={adsetAudienceDetails}
                   platform={platform}
                   authStatus={authStatus}
@@ -3735,11 +3999,16 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
                   selectedProductSet={selectedProductSet}
                   onSelectCatalog={setSelectedCatalog}
                   onSelectProductSet={setSelectedProductSet}
+                  isTikTokAppSales={isTikTokAppSales}
+                  globalCatalog={selectedCatalog}
+                  catalogs={MOCK_CATALOGS}
+                  adsetCatalogMap={adsetCatalogMap}
                 />
               </div>
             </div>
           )}
-          
+
+          </div>
         </div>
       </div>
 

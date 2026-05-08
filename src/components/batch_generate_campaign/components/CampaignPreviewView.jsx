@@ -5,11 +5,13 @@ import {
   Layers, Target, Box, Plus, Tag, Link as LinkIcon, Megaphone,
   ChevronDown, Search, Languages, Users, UserPlus, UserMinus,
   ShoppingBag, Monitor, Smartphone, Layout, Facebook, Loader2, Trash2,
-  Database, ListFilter
+  Database, ListFilter, Info
 } from 'lucide-react';
 import useDropdownLoading from '../../../hooks/useDropdownLoading';
 import { IncludeExcludeAudienceDropdown } from '../BatchGenerateAds';
 import { MOCK_CATALOGS, MOCK_PRODUCT_SETS } from './ProductSelector';
+import { Popover } from '../../common/Popover';
+import { Z_INDEX } from '../../../constants/zIndex';
 
 
 
@@ -78,6 +80,7 @@ const VariableTextInput = ({ value, onChange, placeholder, multiline = false, va
   const divRef = useRef(null);
   const lastSyncedRef = useRef(value || '');
   const [showDropdown, setShowDropdown] = useState(false);
+  const insertBtnRef = useRef(null);
 
   useEffect(() => {
     if (!divRef.current) return;
@@ -141,6 +144,7 @@ const VariableTextInput = ({ value, onChange, placeholder, multiline = false, va
         className={`ce-input w-full ${multiline ? 'min-h-[8rem] p-5' : 'h-12 px-5 flex items-center'} pr-12 border border-gray-200 rounded-base bg-white text-sm font-medium focus:border-primary-500 outline-none transition-all whitespace-pre-wrap break-words`}
       />
       <button
+        ref={insertBtnRef}
         type="button"
         onMouseDown={e => e.preventDefault()}
         onClick={() => setShowDropdown(v => !v)}
@@ -149,24 +153,25 @@ const VariableTextInput = ({ value, onChange, placeholder, multiline = false, va
       >
         <Plus size={14} />
       </button>
-      {showDropdown && (
-        <>
-          <div className="fixed inset-0 z-[290]" onClick={() => setShowDropdown(false)} />
-          <div className={`absolute right-0 ${multiline ? 'top-12' : 'top-full mt-1'} w-44 bg-white rounded-base border border-gray-200 shadow-xl z-[300] max-h-64 overflow-auto py-1`}>
-            {vars.map(v => (
-              <button
-                key={v.key}
-                type="button"
-                onMouseDown={e => e.preventDefault()}
-                onClick={() => { insertVarAtCursor(v.key); setShowDropdown(false); }}
-                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-primary-50 hover:text-primary-600"
-              >
-                {v.label}
-              </button>
-            ))}
-          </div>
-        </>
-      )}
+      <Popover
+        open={showDropdown}
+        anchorRef={insertBtnRef}
+        placement="bottom-end"
+        onClose={() => setShowDropdown(false)}
+        className="w-44 bg-white rounded-base border border-gray-200 shadow-xl max-h-64 overflow-auto py-1"
+      >
+        {vars.map(v => (
+          <button
+            key={v.key}
+            type="button"
+            onMouseDown={e => e.preventDefault()}
+            onClick={() => { insertVarAtCursor(v.key); setShowDropdown(false); }}
+            className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-primary-50 hover:text-primary-600"
+          >
+            {v.label}
+          </button>
+        ))}
+      </Popover>
     </div>
   );
 };
@@ -279,7 +284,7 @@ const DPAPreviewCard = () => {
 };
 
 // Sub-component for Adset Editing to prevent parent re-renders and scroll resets
-const EditAdSetModal = ({ isOpen, adSet, onUpdateField, onToggleItem, onClose, authStatus, selectedAccount, onAuthStatusChange, onSelectAccount, budgetType, dailyBudget, platform, effectiveBidStrategy = 'highest_volume', globalBidAmount = '' }) => {
+const EditAdSetModal = ({ isOpen, adSet, onUpdateField, onToggleItem, onClose, authStatus, selectedAccount, onAuthStatusChange, onSelectAccount, budgetType, dailyBudget, platform, effectiveBidStrategy = 'highest_volume', globalBidAmount = '', isTikTokAppSales = false, catalogs = [], onAuthorizeChannel, onOpenAccountPicker, channelAuthLoading = false }) => {
   const [locationSearch, setLocationSearch] = useState('');
   const [showLocationDropdown, setShowLocationDropdown] = useState(false);
   const [interestSearch, setInterestSearch] = useState('');
@@ -292,6 +297,11 @@ const EditAdSetModal = ({ isOpen, adSet, onUpdateField, onToggleItem, onClose, a
   const [showAudExc, setShowAudExc] = useState(false);
 
   const [isMetaConnecting, setIsMetaConnecting] = useState(false);
+  const [showCatalog, setShowCatalog] = useState(false);
+  const catalogTriggerRef = useRef(null);
+  const locationTriggerRef = useRef(null);
+  const interestTriggerRef = useRef(null);
+  const languageTriggerRef = useRef(null);
 
   const platformId = platform?.id || 'meta';
   const platformName = platform?.name || 'Meta';
@@ -384,6 +394,71 @@ const EditAdSetModal = ({ isOpen, adSet, onUpdateField, onToggleItem, onClose, a
               </>
             )}
           </div>
+
+          {/* Catalog — 仅 TikTok APP Sales 场景；含授权三态 */}
+          {isTikTokAppSales && (
+            <div className="space-y-3">
+              <label className="text-xs font-medium text-gray-500 px-1">Catalog（产品目录）</label>
+              <div
+                ref={catalogTriggerRef}
+                onClick={() => {
+                  if (!authStatus?.tiktok) { onAuthorizeChannel?.('tiktok'); return; }
+                  if (!selectedAccount) { onOpenAccountPicker?.(); return; }
+                  setShowCatalog(prev => !prev);
+                }}
+                className="bg-white rounded-base p-3 border border-gray-200 flex items-center justify-between gap-2 cursor-pointer hover:border-primary-500/30 transition-all"
+              >
+                <div className="flex items-center gap-2 min-w-0 flex-1">
+                  <Database size={14} className="text-primary-500 shrink-0" />
+                  {!authStatus?.tiktok ? (
+                    <span className="text-sm font-semibold text-gray-300 truncate">请连接 TikTok 加载 catalog</span>
+                  ) : !selectedAccount ? (
+                    <span className="text-sm font-semibold text-gray-300 truncate">请选择 TikTok 账号</span>
+                  ) : channelAuthLoading ? (
+                    <span className="text-sm font-semibold text-gray-400 flex items-center gap-2"><Loader2 size={12} className="animate-spin" /> 加载中…</span>
+                  ) : adSet.catalog ? (
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-gray-700 truncate">{adSet.catalog.name}</p>
+                      <p className="text-[10px] text-gray-400 font-medium truncate">ID {adSet.catalog.id} · {adSet.catalog.productCount} 件</p>
+                    </div>
+                  ) : (
+                    <span className="text-sm font-semibold text-gray-300">未选择</span>
+                  )}
+                </div>
+                <ChevronDown size={12} className={`text-gray-300 shrink-0 transition-transform ${showCatalog ? 'rotate-180' : ''}`} />
+              </div>
+              <Popover
+                open={showCatalog && !!authStatus?.tiktok && !!selectedAccount}
+                anchorRef={catalogTriggerRef}
+                placement="bottom-start"
+                matchWidth
+                onClose={() => setShowCatalog(false)}
+                zIndex={Z_INDEX.MODAL_BASE + 500}
+                className="bg-white border border-gray-100 rounded-base shadow-xl overflow-hidden p-1"
+              >
+                {catalogs.map(c => {
+                  const isSel = adSet.catalog?.id === c.id;
+                  return (
+                    <button
+                      key={c.id}
+                      onClick={() => { onUpdateField('catalog', c); setShowCatalog(false); }}
+                      className={`w-full flex items-center gap-3 px-3 py-2 rounded-base text-left transition-all ${isSel ? 'bg-primary-50' : 'hover:bg-gray-50'}`}
+                    >
+                      <div className={`w-7 h-7 rounded-base flex items-center justify-center shrink-0 ${isSel ? 'bg-primary-500 text-white' : 'bg-primary-50 text-primary-500'}`}>
+                        <Database size={12} />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className={`text-xs font-bold truncate ${isSel ? 'text-primary-600' : 'text-gray-800'}`}>{c.name}</p>
+                        <p className="text-[10px] text-gray-400 font-medium truncate">ID {c.id}</p>
+                      </div>
+                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-tag bg-emerald-50 text-emerald-600 border border-emerald-100 shrink-0">{c.productCount}</span>
+                      {isSel && <Check size={12} className="text-primary-500 shrink-0" />}
+                    </button>
+                  );
+                })}
+              </Popover>
+            </div>
+          )}
 
           {/* 竞价目标 — Meta：按 effective bidStrategy 变形（highest_volume 隐藏）；TikTok：选填金额 */}
           {(() => {
@@ -488,7 +563,7 @@ const EditAdSetModal = ({ isOpen, adSet, onUpdateField, onToggleItem, onClose, a
             <div className="space-y-3">
               <label className="text-xs font-medium text-gray-500 px-1">地理位置 (Locations)</label>
               <div className="relative">
-                <div className="min-h-[3.5rem] p-2 border border-gray-200 rounded-base flex flex-wrap gap-2 items-center focus-within:border-primary-500 focus-within:bg-white transition-all cursor-text" onClick={() => setShowLocationDropdown(true)}>
+                <div ref={locationTriggerRef} className="min-h-[3.5rem] p-2 border border-gray-200 rounded-base flex flex-wrap gap-2 items-center focus-within:border-primary-500 focus-within:bg-white transition-all cursor-text" onClick={() => setShowLocationDropdown(true)}>
                   <Globe size={16} className="text-gray-300 ml-2" />
                   {adSet.locations?.map(loc => (
                     <span key={loc} className="px-3 py-1 bg-primary-50 text-primary-500 rounded-tag text-xs font-medium flex items-center gap-1.5 border border-primary-500/15 animate-in zoom-in-95">
@@ -505,22 +580,25 @@ const EditAdSetModal = ({ isOpen, adSet, onUpdateField, onToggleItem, onClose, a
                     onFocus={() => setShowLocationDropdown(true)}
                   />
                 </div>
-                {showLocationDropdown && (
-                  <>
-                    <div className="fixed inset-0 z-[260]" onClick={() => setShowLocationDropdown(false)} />
-                    <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-100 rounded-inner shadow-xl z-[270] max-h-60 overflow-y-auto p-2 animate-in slide-in-from-top-2">
-                      {AVAILABLE_LOCATIONS.filter(l => l.name.toLowerCase().includes(locationSearch.toLowerCase())).map(loc => {
-                        const isSel = adSet.locations?.includes(loc.name);
-                        return (
-                          <div key={loc.id} onClick={() => onToggleItem('locations', loc.name)} className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 rounded-inner cursor-pointer transition-colors group">
-                            <span className={`text-xs font-medium ${isSel ? 'text-primary-500' : 'text-gray-600'}`}>{loc.name}</span>
-                            {isSel && <Check size={14} className="text-primary-500" />}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </>
-                )}
+                <Popover
+                  open={showLocationDropdown}
+                  anchorRef={locationTriggerRef}
+                  placement="bottom-start"
+                  matchWidth
+                  onClose={() => setShowLocationDropdown(false)}
+                  zIndex={Z_INDEX.MODAL_BASE + 500}
+                  className="bg-white border border-gray-100 rounded-inner shadow-xl max-h-60 overflow-y-auto p-2"
+                >
+                  {AVAILABLE_LOCATIONS.filter(l => l.name.toLowerCase().includes(locationSearch.toLowerCase())).map(loc => {
+                    const isSel = adSet.locations?.includes(loc.name);
+                    return (
+                      <div key={loc.id} onClick={() => onToggleItem('locations', loc.name)} className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 rounded-inner cursor-pointer transition-colors group">
+                        <span className={`text-xs font-medium ${isSel ? 'text-primary-500' : 'text-gray-600'}`}>{loc.name}</span>
+                        {isSel && <Check size={14} className="text-primary-500" />}
+                      </div>
+                    );
+                  })}
+                </Popover>
               </div>
             </div>
 
@@ -540,9 +618,10 @@ const EditAdSetModal = ({ isOpen, adSet, onUpdateField, onToggleItem, onClose, a
                   ))}
                 </div>
               )}
-              <div className="relative">
+              <div>
                 {/* Trigger */}
                 <div
+                  ref={interestTriggerRef}
                   className="px-4 py-3 border border-gray-200 rounded-base flex items-center justify-between cursor-pointer hover:border-amber-300 transition-all"
                   onClick={() => setShowInterestDropdown(!showInterestDropdown)}
                 >
@@ -555,10 +634,14 @@ const EditAdSetModal = ({ isOpen, adSet, onUpdateField, onToggleItem, onClose, a
                   <ChevronDown size={14} className={`text-gray-300 transition-transform ${showInterestDropdown ? 'rotate-180' : ''}`} />
                 </div>
                 {/* Dual-panel dropdown */}
-                {showInterestDropdown && (
-                  <>
-                    <div className="fixed inset-0 z-[260]" onClick={() => setShowInterestDropdown(false)} />
-                    <div className="absolute top-full left-0 mt-2 w-[540px] bg-white rounded-section shadow-xl border border-gray-100 overflow-hidden flex animate-in fade-in zoom-in-95 duration-200 z-[270]">
+                <Popover
+                  open={showInterestDropdown}
+                  anchorRef={interestTriggerRef}
+                  placement="bottom-start"
+                  onClose={() => setShowInterestDropdown(false)}
+                  zIndex={Z_INDEX.MODAL_BASE + 500}
+                  className="w-[540px] bg-white rounded-section shadow-xl border border-gray-100 overflow-hidden flex"
+                >
                       {/* Left: Search & List */}
                       <div className="w-[55%] border-r border-gray-100 flex flex-col">
                         <div className="p-3 border-b border-gray-100">
@@ -643,32 +726,35 @@ const EditAdSetModal = ({ isOpen, adSet, onUpdateField, onToggleItem, onClose, a
                           })}
                         </div>
                       </div>
-                    </div>
-                  </>
-                )}
+                </Popover>
               </div>
             </div>
 
             {/* Language (Single search select) */}
             <div className="space-y-3">
               <label className="text-xs font-medium text-gray-500 px-1">语言 (Language)</label>
-              <div className="relative">
-                <div onClick={() => setShowLanguageDropdown(!showLanguageDropdown)} className="w-full h-14 px-5 border border-gray-200 rounded-base flex items-center justify-between cursor-pointer hover:border-gray-300 transition-all">
+              <div>
+                <div ref={languageTriggerRef} onClick={() => setShowLanguageDropdown(!showLanguageDropdown)} className="w-full h-14 px-5 border border-gray-200 rounded-base flex items-center justify-between cursor-pointer hover:border-gray-300 transition-all">
                   <div className="flex items-center gap-3">
                     <Languages size={18} className="text-gray-400" />
                     <span className="text-sm font-medium text-gray-700">{adSet.language || 'All languages'}</span>
                   </div>
                   <ChevronDown size={16} className={`text-gray-300 transition-transform duration-300 ${showLanguageDropdown ? 'rotate-180' : ''}`} />
                 </div>
-                {showLanguageDropdown && (
-                  <>
-                    <div className="fixed inset-0 z-[260]" onClick={() => setShowLanguageDropdown(false)} />
-                    <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-100 rounded-inner shadow-xl z-[270] max-h-60 overflow-hidden flex flex-col animate-in slide-in-from-top-2">
+                <Popover
+                  open={showLanguageDropdown}
+                  anchorRef={languageTriggerRef}
+                  placement="bottom-start"
+                  matchWidth
+                  onClose={() => setShowLanguageDropdown(false)}
+                  zIndex={Z_INDEX.MODAL_BASE + 500}
+                  className="bg-white border border-gray-100 rounded-inner shadow-xl max-h-60 overflow-hidden flex flex-col"
+                >
                       <div className="p-3 border-b border-gray-50 bg-gray-50/50">
-                        <input 
+                        <input
                           autoFocus
-                          type="text" 
-                          className="w-full h-10 px-4 border border-gray-200 rounded-base text-xs text-gray-700 bg-white focus:outline-none focus:border-primary-500 focus:shadow-primary-focus transition-all duration-200" 
+                          type="text"
+                          className="w-full h-10 px-4 border border-gray-200 rounded-base text-xs text-gray-700 bg-white focus:outline-none focus:border-primary-500 focus:shadow-primary-focus transition-all duration-200"
                           placeholder="搜索语言..."
                           value={languageSearch}
                           onChange={e => setLanguageSearch(e.target.value)}
@@ -681,9 +767,7 @@ const EditAdSetModal = ({ isOpen, adSet, onUpdateField, onToggleItem, onClose, a
                           </div>
                         ))}
                       </div>
-                    </div>
-                  </>
-                )}
+                </Popover>
               </div>
             </div>
           </div>
@@ -812,7 +896,7 @@ const OBJECTIVE_CTA_MAPPING = {
 
 const CampaignPreviewView = ({
   structure, budgetType, dailyBudget, initialAdsetAudiences, productCreativesMap, selectedProducts, brand, onBack, onPublish, campaignName, optimizationEvent, landingPageType, landingPageTemplate, productUtm, copyStrategy, unifiedHeadline, unifiedBody, campaignType,
-  estimatedTotalDaily, adSetGroupsCount, adType = 'SINGLE', adsetAudienceDetails = {},
+  estimatedTotalDaily, adSetGroupsCount, adType = 'SINGLE', creativesPerAd = 1, adsetAudienceDetails = {},
   authStatus, selectedAccount, onAuthStatusChange, onSelectAccount,
   platform, onAuthorizeChannel, onOpenAccountPicker, channelAuthLoading,
   isExistingCampaign, campaignObjective, onBudgetChange, onBudgetTypeChange,
@@ -830,6 +914,12 @@ const CampaignPreviewView = ({
   onSelectCatalog,
   onSelectProductSet,
   numCampaigns = 1,
+  isTikTokAppSales = false,
+  globalCatalog = null,
+  catalogs = [],
+  adsetCatalogMap = {},
+  catalogProductSets = {},
+  catalogProducts = {},
 }) => {
   // 受众字段优先级解析：adset detail override → 02 全局预设 → savedAudience（如选） → 硬编码兜底
   const resolveAudience = (i) => {
@@ -874,6 +964,10 @@ const CampaignPreviewView = ({
   const [editingAdInfo, setEditingAdInfo] = useState(null);
   const [editAdCatalogOpen, setEditAdCatalogOpen] = useState(false);
   const [editAdSetOpen, setEditAdSetOpen] = useState(false);
+  // Product Range（TikTok APP Sales）下拉与搜索
+  const [adRangeSetOpen, setAdRangeSetOpen] = useState(false);
+  const [adRangeProductsOpen, setAdRangeProductsOpen] = useState(false);
+  const [adRangeSearch, setAdRangeSearch] = useState('');
   const [changeCreativeInfo, setChangeCreativeInfo] = useState(null);
   const [loadedAdsCount, setLoadedAdsCount] = useState(0);
   const [isEditingCampaignName, setIsEditingCampaignName] = useState(false);
@@ -895,6 +989,7 @@ const CampaignPreviewView = ({
   );
   const [selectedCta, setSelectedCta] = useState(OBJECTIVE_CTA_MAPPING[campaignObjective] || 'Shop Now');
   const [isCtaOpen, setIsCtaOpen] = useState(false);
+  const ctaTriggerRef = useRef(null);
   const [localBudget, setLocalBudget] = useState(dailyBudget);
 
   const totalAdsCount = useMemo(() => {
@@ -934,31 +1029,40 @@ const CampaignPreviewView = ({
 
   // Build ads array for an adset — Flexible: ceil(N/10) ads with imageUrls[]; Single: 1 creative per ad
   const buildAds = (creatives, adSetIdx, namePrefix, resolveProduct) => {
-    if (isFlexible && creatives.length > 0) {
+    // FLEXIBLE / CAROUSEL：按 creativesPerAd 切分，每 ad 含多个素材（Meta 硬上限 10）
+    const isMultiCreativeAd = adType === 'FLEXIBLE' || adType === 'CAROUSEL';
+    if (isMultiCreativeAd && creatives.length > 0) {
+      const chunkSize = Math.max(1, Math.min(10, Number(creativesPerAd) || 1));
+      const formatLabel = adType === 'CAROUSEL' ? 'Carousel' : 'Flexible';
+      const idPrefix = adType === 'CAROUSEL' ? 'car' : 'flex';
       const result = [];
-      for (let j = 0; j < creatives.length; j += 10) {
-        const chunk = creatives.slice(j, j + 10);
+      for (let j = 0; j < creatives.length; j += chunkSize) {
+        const chunk = creatives.slice(j, j + chunkSize);
         const c0 = chunk[0];
         const p = resolveProduct(c0);
         const copy = p ? getAdCopy(p) : { headline: '', body: '' };
         result.push({
-          id: `${adSetIdx}-flex-${Math.floor(j / 10)}`,
-          name: applyNameTemplate(adNameTemplate, { Brand: brand?.name || 'MyBrand', creative_type: 'Flexible', number: chunk.length, date: today }),
+          id: `${adSetIdx}-${idPrefix}-${Math.floor(j / chunkSize)}`,
+          name: applyNameTemplate(adNameTemplate, { Brand: brand?.name || 'MyBrand', creative_type: formatLabel, number: chunk.length, date: today }),
           headline: [copy.headline],
           primaryText: [copy.body],
           imageUrl: c0.url,
           imageUrls: chunk.map(c => c.url),
-          adFormat: 'FLEXIBLE',
+          adFormat: adType,
           cta: 'Shop Now',
           destinationUrl: p ? getAdUrl(p) : '',
           utmParams: '',
           productId: p?.id || '',
+          productRange: 'All',
+          productSetId: '',
+          productIds: [],
           offerType: 'AUTO',
           promoCode: '90%OFF'
         });
       }
       return result;
     }
+    // SINGLE：每素材一个 ad；若 adset 内素材 > 1，会被拆分为多 ad（卡片上 hover 提示）
     return creatives.map((c, cIdx) => {
       const p = resolveProduct(c);
       const copy = p ? getAdCopy(p) : { headline: '', body: '' };
@@ -968,10 +1072,14 @@ const CampaignPreviewView = ({
         headline: [copy.headline],
         primaryText: [copy.body],
         imageUrl: c.url,
+        adFormat: 'SINGLE',
         cta: 'Shop Now',
         destinationUrl: p ? getAdUrl(p) : '',
         utmParams: '',
         productId: p?.id || '',
+        productRange: 'All',
+        productSetId: '',
+        productIds: [],
         offerType: 'AUTO',
         promoCode: '90%OFF'
       };
@@ -1094,8 +1202,34 @@ const CampaignPreviewView = ({
         }
       }
     }
-    setLocalAdSets(adSets);
-  }, [campaignType, selectedProducts, structure, productCreativesMap, initialAdsetAudiences, landingPageType, landingPageTemplate, productUtm, copyStrategy, unifiedHeadline, unifiedBody, optimizationEvent, adSetGroupsCount, isFlexible, adsetNameTemplate, adNameTemplate, selectedLocations, selectedCta]);
+    // 注入 adset 级 catalog（仅 isTikTokAppSales 场景；其他场景写 null）
+    adSets = adSets.map((as, i) => ({
+      ...as,
+      catalog: isTikTokAppSales ? (adsetCatalogMap[i] || globalCatalog || null) : null,
+    }));
+    // 合并：保留用户在预览页编辑过的 adset / ad 字段，避免依赖变更后被回滚
+    setLocalAdSets(prev => {
+      if (!prev || prev.length === 0) return adSets;
+      return adSets.map((newAs, i) => {
+        const prevAs = prev[i];
+        if (!prevAs) return newAs;
+        return {
+          ...newAs,
+          catalog: prevAs.catalog ?? newAs.catalog,
+          ads: newAs.ads.map((newAd, j) => {
+            const prevAd = prevAs.ads?.[j];
+            if (!prevAd) return newAd;
+            return {
+              ...newAd,
+              productRange: prevAd.productRange ?? newAd.productRange,
+              productSetId: prevAd.productSetId ?? newAd.productSetId,
+              productIds: prevAd.productIds ?? newAd.productIds,
+            };
+          }),
+        };
+      });
+    });
+  }, [campaignType, selectedProducts, structure, productCreativesMap, initialAdsetAudiences, landingPageType, landingPageTemplate, productUtm, copyStrategy, unifiedHeadline, unifiedBody, optimizationEvent, adSetGroupsCount, isFlexible, adType, creativesPerAd, adsetNameTemplate, adNameTemplate, selectedLocations, selectedCta, isTikTokAppSales, globalCatalog, adsetCatalogMap]);
 
   const totalDailyBudget = (estimatedTotalDaily || (budgetType === 'CBO' ? dailyBudget : dailyBudget * localAdSets.length)) * Math.max(numCampaigns, 1);
 
@@ -1299,11 +1433,11 @@ const CampaignPreviewView = ({
             <div className="space-y-3">
               <label className="text-xs font-medium text-gray-400 px-1 flex items-center gap-2"><Megaphone size={12} className="text-primary-500"/> 行动号召 (CTA)</label>
               <div className="relative">
-                <select 
-                  value={ad.cta} 
+                <select
+                  value={ad.cta}
                   onChange={e => {
                     const next = [...localAdSets]; next[asIndex].ads[adIndex].cta = e.target.value; setLocalAdSets(next);
-                  }} 
+                  }}
                   className="w-full h-12 px-5 border border-gray-200 rounded-base bg-white text-sm font-medium focus:border-primary-500 outline-none transition-all appearance-none"
                 >
                   {CTA_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
@@ -1311,6 +1445,187 @@ const CampaignPreviewView = ({
                 <ChevronDown size={14} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-300 pointer-events-none" />
               </div>
             </div>
+
+            {/* Product Range — 仅 TikTok APP Sales 显示，含授权回退 */}
+            {isTikTokAppSales && (() => {
+              const adsetCatalog = localAdSets[asIndex]?.catalog;
+              const updateAd = (patch) => {
+                const next = [...localAdSets];
+                next[asIndex].ads[adIndex] = { ...next[asIndex].ads[adIndex], ...patch };
+                setLocalAdSets(next);
+              };
+              const productRange = ad.productRange || 'All';
+              const sets = adsetCatalog ? (catalogProductSets[adsetCatalog.id] || []) : [];
+              const products = adsetCatalog ? (catalogProducts[adsetCatalog.id] || []) : [];
+              const filteredSets = adRangeSearch ? sets.filter(s => s.name.toLowerCase().includes(adRangeSearch.toLowerCase())) : sets;
+              const filteredProducts = adRangeSearch ? products.filter(p => p.name.toLowerCase().includes(adRangeSearch.toLowerCase()) || p.sku?.toLowerCase().includes(adRangeSearch.toLowerCase())) : products;
+              const selectedSet = sets.find(s => s.id === ad.productSetId);
+              const selectedProductObjs = (ad.productIds || []).map(id => products.find(p => p.id === id)).filter(Boolean);
+              return (
+                <div className="space-y-3">
+                  <label className="text-xs font-medium text-gray-400 px-1 flex items-center gap-2"><Layers size={12} className="text-primary-500"/> Product Range</label>
+                  {!authStatus?.tiktok ? (
+                    <div className="bg-amber-50 border border-amber-100 px-3 py-2.5 rounded-base flex items-center justify-between gap-2">
+                      <span className="text-xs text-amber-700">请先连接 TikTok 加载 catalog</span>
+                      <button type="button" disabled={channelAuthLoading}
+                        onClick={() => onAuthorizeChannel?.('tiktok')}
+                        className="px-3 py-1 bg-primary-500 text-white text-xs font-semibold rounded-base hover:bg-primary-600 disabled:opacity-50">
+                        {channelAuthLoading ? '连接中...' : '连接 TikTok'}
+                      </button>
+                    </div>
+                  ) : !selectedAccount ? (
+                    <div className="bg-amber-50 border border-amber-100 px-3 py-2.5 rounded-base flex items-center justify-between gap-2">
+                      <span className="text-xs text-amber-700">请选择 TikTok 账号</span>
+                      <button type="button" onClick={() => onSelectAccount?.()} className="px-3 py-1 bg-primary-500 text-white text-xs font-semibold rounded-base hover:bg-primary-600">选择账号</button>
+                    </div>
+                  ) : !adsetCatalog ? (
+                    <div className="bg-amber-50 border border-amber-100 px-3 py-2.5 rounded-base flex items-center justify-between gap-2">
+                      <span className="text-xs text-amber-700">该 Adset 尚未配置 Catalog</span>
+                      <button type="button"
+                        onClick={() => { setEditingAdInfo(null); setEditingAdSetIndex(asIndex); }}
+                        className="px-3 py-1 bg-primary-500 text-white text-xs font-semibold rounded-base hover:bg-primary-600">去配置 Catalog</button>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="flex p-1 bg-gray-100 rounded-base w-fit">
+                        {[
+                          { id: 'All', label: 'All Products' },
+                          { id: 'ProductSet', label: 'Product Set' },
+                          { id: 'SpecificProducts', label: 'Specific Products' },
+                        ].map(opt => (
+                          <button
+                            key={opt.id}
+                            type="button"
+                            onClick={() => { updateAd({ productRange: opt.id }); setAdRangeSearch(''); setAdRangeSetOpen(false); setAdRangeProductsOpen(false); }}
+                            className={`px-4 py-1.5 rounded-base text-xs font-semibold transition-all ${productRange === opt.id ? 'bg-white text-primary-500 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                          >{opt.label}</button>
+                        ))}
+                      </div>
+
+                      {productRange === 'ProductSet' && (
+                        <div className="relative">
+                          <button
+                            type="button"
+                            onClick={() => { setAdRangeSetOpen(v => !v); setAdRangeProductsOpen(false); setAdRangeSearch(''); }}
+                            className="w-full h-12 px-5 flex items-center justify-between border border-gray-200 rounded-base bg-white text-sm font-medium hover:border-primary-300 outline-none transition-all"
+                          >
+                            <span className={selectedSet ? 'text-gray-800' : 'text-gray-400'}>{selectedSet ? selectedSet.name : '搜索并选择 Product Set...'}</span>
+                            <ChevronDown size={14} className={`text-gray-400 transition-transform ${adRangeSetOpen ? 'rotate-180' : ''}`} />
+                          </button>
+                          {adRangeSetOpen && (
+                            <>
+                              <div className="fixed inset-0 z-[290]" onClick={() => setAdRangeSetOpen(false)} />
+                              <div className="absolute left-0 right-0 top-full mt-1 bg-white rounded-base border border-gray-200 shadow-xl z-[300] max-h-72 overflow-hidden flex flex-col">
+                                <div className="p-2 border-b border-gray-100">
+                                  <input
+                                    autoFocus
+                                    value={adRangeSearch}
+                                    onChange={e => setAdRangeSearch(e.target.value)}
+                                    placeholder="搜索 product set..."
+                                    className="w-full h-8 px-3 bg-gray-50 border border-gray-100 rounded text-xs outline-none focus:border-primary-500"
+                                  />
+                                </div>
+                                <div className="overflow-y-auto custom-scrollbar p-1">
+                                  {filteredSets.length === 0 ? (
+                                    <p className="text-center text-xs text-gray-400 py-4">无匹配 Product Set</p>
+                                  ) : filteredSets.map(s => {
+                                    const isSel = ad.productSetId === s.id;
+                                    return (
+                                      <button
+                                        key={s.id}
+                                        type="button"
+                                        onClick={() => { updateAd({ productSetId: s.id }); setAdRangeSetOpen(false); setAdRangeSearch(''); }}
+                                        className={`w-full text-left px-3 py-2 rounded text-xs font-medium transition-all flex items-center justify-between ${isSel ? 'bg-primary-50 text-primary-600' : 'text-gray-700 hover:bg-gray-50'}`}
+                                      >
+                                        {s.name}
+                                        {isSel && <Check size={12} />}
+                                      </button>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            </>
+                          )}
+                        </div>
+                      )}
+
+                      {productRange === 'SpecificProducts' && (
+                        <div className="space-y-2">
+                          {selectedProductObjs.length > 0 && (
+                            <div className="flex flex-wrap gap-1.5">
+                              {selectedProductObjs.map(p => (
+                                <span key={p.id} className="inline-flex items-center gap-1 pl-1 pr-1.5 py-0.5 bg-primary-50 border border-primary-100 rounded-full">
+                                  <img src={p.imageUrl} className="w-4 h-4 rounded-full object-cover" alt="" />
+                                  <span className="text-xs font-medium text-primary-700 max-w-[120px] truncate">{p.name}</span>
+                                  <button
+                                    type="button"
+                                    onClick={() => updateAd({ productIds: (ad.productIds || []).filter(id => id !== p.id) })}
+                                    className="text-primary-400 hover:text-primary-600"
+                                  ><X size={10} /></button>
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                          <div className="relative">
+                            <button
+                              type="button"
+                              onClick={() => { setAdRangeProductsOpen(v => !v); setAdRangeSetOpen(false); setAdRangeSearch(''); }}
+                              className="w-full h-12 px-5 flex items-center justify-between border border-gray-200 rounded-base bg-white text-sm font-medium hover:border-primary-300 outline-none transition-all"
+                            >
+                              <span className="text-gray-400">{(ad.productIds || []).length > 0 ? `已选 ${(ad.productIds || []).length} / ${products.length}，继续添加...` : '搜索并多选 Products...'}</span>
+                              <ChevronDown size={14} className={`text-gray-400 transition-transform ${adRangeProductsOpen ? 'rotate-180' : ''}`} />
+                            </button>
+                            {adRangeProductsOpen && (
+                              <>
+                                <div className="fixed inset-0 z-[290]" onClick={() => setAdRangeProductsOpen(false)} />
+                                <div className="absolute left-0 right-0 top-full mt-1 bg-white rounded-base border border-gray-200 shadow-xl z-[300] max-h-80 overflow-hidden flex flex-col">
+                                  <div className="p-2 border-b border-gray-100">
+                                    <input
+                                      autoFocus
+                                      value={adRangeSearch}
+                                      onChange={e => setAdRangeSearch(e.target.value)}
+                                      placeholder="搜索名称或 SKU..."
+                                      className="w-full h-8 px-3 bg-gray-50 border border-gray-100 rounded text-xs outline-none focus:border-primary-500"
+                                    />
+                                  </div>
+                                  <div className="overflow-y-auto custom-scrollbar p-1">
+                                    {filteredProducts.length === 0 ? (
+                                      <p className="text-center text-xs text-gray-400 py-4">无匹配 Product</p>
+                                    ) : filteredProducts.map(p => {
+                                      const isSel = (ad.productIds || []).includes(p.id);
+                                      return (
+                                        <button
+                                          key={p.id}
+                                          type="button"
+                                          onClick={() => {
+                                            const cur = ad.productIds || [];
+                                            updateAd({ productIds: isSel ? cur.filter(id => id !== p.id) : [...cur, p.id] });
+                                          }}
+                                          className={`w-full flex items-center gap-2 px-2 py-1.5 rounded text-left transition-all ${isSel ? 'bg-primary-50' : 'hover:bg-gray-50'}`}
+                                        >
+                                          <img src={p.imageUrl} className="w-7 h-7 rounded object-cover shrink-0" alt="" />
+                                          <div className="min-w-0 flex-1">
+                                            <p className={`text-xs font-medium truncate ${isSel ? 'text-primary-700' : 'text-gray-800'}`}>{p.name}</p>
+                                            <p className="text-[10px] text-gray-400 font-medium truncate">{p.sku}</p>
+                                          </div>
+                                          <div className={`w-4 h-4 rounded border-2 flex items-center justify-center shrink-0 ${isSel ? 'bg-primary-500 border-primary-500' : 'border-gray-200'}`}>
+                                            {isSel && <Check size={10} className="text-white" strokeWidth={3} />}
+                                          </div>
+                                        </button>
+                                      );
+                                    })}
+                                  </div>
+                                </div>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </>
+                  )}
+                </div>
+              );
+            })()}
 
             {isCatalog ? (
               <>
@@ -1453,8 +1768,10 @@ const CampaignPreviewView = ({
     const ad = localAdSets[asIndex]?.ads[adIndex];
     if (!ad) return null;
 
-    const isFlexibleAd = ad.adFormat === 'FLEXIBLE' || Array.isArray(ad.imageUrls);
-    const maxCount = isFlexibleAd ? 10 : 1;
+    const isMultiCreativeAd = ad.adFormat === 'FLEXIBLE' || ad.adFormat === 'CAROUSEL' || Array.isArray(ad.imageUrls);
+    const isFlexibleAd = isMultiCreativeAd; // 兼容下游引用
+    // Meta 平台下所有 ad 均允许最多 10 个素材；其他平台仅多素材类型允许多选
+    const maxCount = (platform?.id === 'meta' || isMultiCreativeAd) ? 10 : 1;
 
     // Flatten all available creatives, deduplicate by URL
     const allCreativesRaw = Object.values(productCreativesMap || {}).flat();
@@ -1472,6 +1789,45 @@ const CampaignPreviewView = ({
 
     const [activeTab, setActiveTab] = useState('LIBRARY');
     const [selected, setSelected] = useState(() => initSelected.filter(Boolean));
+    const [uploadDragOver, setUploadDragOver] = useState(false);
+    const [uploadMessage, setUploadMessage] = useState(null); // { type: 'info'|'warn', text }
+    const uploadInputRef = useRef(null);
+
+    const filesToCreatives = (files) => Array.from(files)
+      .filter(f => f.type.startsWith('image/') || f.type.startsWith('video/'))
+      .map(f => ({
+        id: `upload-${Date.now()}-${Math.random()}`,
+        url: URL.createObjectURL(f),
+        mediaType: f.type.startsWith('video/') ? 'video' : 'image',
+        fileName: f.name,
+      }));
+
+    const ingestUploads = (fileList) => {
+      const incoming = filesToCreatives(fileList);
+      if (incoming.length === 0) {
+        setUploadMessage({ type: 'warn', text: '未识别到有效的图片或视频文件' });
+        return;
+      }
+      const remaining = Math.max(0, maxCount - selected.length);
+      if (remaining === 0) {
+        setUploadMessage({ type: 'warn', text: `已达 ${maxCount} 个素材上限，本次上传的 ${incoming.length} 个未加入` });
+        return;
+      }
+      const accepted = incoming.slice(0, remaining);
+      const dropped = incoming.length - accepted.length;
+      setSelected(prev => [...prev, ...accepted]);
+      if (dropped > 0) {
+        setUploadMessage({ type: 'warn', text: `已添加 ${accepted.length} 个；超出上限 ${maxCount}，未加入 ${dropped} 个` });
+      } else {
+        setUploadMessage({ type: 'info', text: `已添加 ${accepted.length} 个素材到 Selected` });
+      }
+    };
+
+    useEffect(() => {
+      if (!uploadMessage) return;
+      const t = setTimeout(() => setUploadMessage(null), 3500);
+      return () => clearTimeout(t);
+    }, [uploadMessage]);
 
     const tabs = [
       { id: 'AI', label: 'AI Generate', icon: <Sparkles size={13} /> },
@@ -1570,7 +1926,11 @@ const CampaignPreviewView = ({
                               sel ? 'border-primary-500 shadow-md' : 'border-transparent hover:border-gray-300'
                             }`}
                           >
-                            <img src={c.url} className="w-full h-full object-cover" alt="" />
+                            {c.mediaType === 'video' ? (
+                              <video src={c.url} muted playsInline preload="metadata" className="w-full h-full object-cover" />
+                            ) : (
+                              <img src={c.url} className="w-full h-full object-cover" alt="" />
+                            )}
                             {sel && (
                               <div className="absolute inset-0 bg-primary-500/20" />
                             )}
@@ -1648,7 +2008,11 @@ const CampaignPreviewView = ({
                                   sel ? 'border-primary-500 shadow-md' : 'border-transparent hover:border-gray-300'
                                 }`}
                               >
-                                <img src={c.url} className="w-full h-full object-cover" alt="" />
+                                {c.mediaType === 'video' ? (
+                                  <video src={c.url} muted playsInline preload="metadata" className="w-full h-full object-cover" />
+                                ) : (
+                                  <img src={c.url} className="w-full h-full object-cover" alt="" />
+                                )}
                                 {sel && <div className="absolute inset-0 bg-primary-500/20" />}
                                 {sel && (
                                   <div className="absolute top-1.5 right-1.5 w-5 h-5 bg-primary-500 rounded-full flex items-center justify-center text-white text-[10px] font-bold shadow">
@@ -1670,6 +2034,96 @@ const CampaignPreviewView = ({
                       )}
                     </div>
                   )
+                ) : activeTab === 'UPLOAD' ? (
+                  <div className="h-full flex flex-col gap-3">
+                    <div
+                      onClick={() => uploadInputRef.current?.click()}
+                      onDragEnter={(e) => { e.preventDefault(); e.stopPropagation(); setUploadDragOver(true); }}
+                      onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                      onDragLeave={(e) => {
+                        e.preventDefault(); e.stopPropagation();
+                        if (e.currentTarget.contains(e.relatedTarget)) return;
+                        setUploadDragOver(false);
+                      }}
+                      onDrop={(e) => {
+                        e.preventDefault(); e.stopPropagation();
+                        setUploadDragOver(false);
+                        if (e.dataTransfer?.files?.length) ingestUploads(e.dataTransfer.files);
+                      }}
+                      className={`flex-1 min-h-[260px] flex flex-col items-center justify-center rounded-section border-2 border-dashed cursor-pointer transition-all ${
+                        uploadDragOver
+                          ? 'bg-primary-50/60 border-primary-500 scale-[1.01]'
+                          : 'bg-gray-50/40 border-gray-200 hover:border-primary-500/60 hover:bg-primary-50/30'
+                      }`}
+                    >
+                      <input
+                        ref={uploadInputRef}
+                        type="file"
+                        multiple
+                        accept="image/*,video/mp4,video/quicktime,video/webm"
+                        className="hidden"
+                        onChange={(e) => { ingestUploads(e.target.files || []); e.target.value = ''; }}
+                      />
+                      <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-4 transition-colors ${uploadDragOver ? 'bg-primary-500 text-white' : 'bg-white text-primary-500 shadow-sm'}`}>
+                        <Plus size={28} />
+                      </div>
+                      <p className="text-sm font-semibold text-gray-700 mb-1">{uploadDragOver ? '松开鼠标即可上传' : '点击或拖拽文件到此处'}</p>
+                      <p className="text-xs text-gray-400 font-medium">支持图片 (jpg/png/webp) 与视频 (mp4/mov/webm)，可批量</p>
+                      <p className="text-[11px] text-gray-400 mt-2">当前可再添加 <span className="font-bold text-primary-500">{Math.max(0, maxCount - selected.length)}</span> / {maxCount} 个</p>
+                    </div>
+                    {uploadMessage && (
+                      <div className={`px-3 py-2 rounded-base text-xs font-medium flex items-center gap-2 animate-in slide-in-from-bottom-2 fade-in duration-200 ${
+                        uploadMessage.type === 'warn'
+                          ? 'bg-amber-50 text-amber-700 border border-amber-100'
+                          : 'bg-emerald-50 text-emerald-700 border border-emerald-100'
+                      }`}>
+                        {uploadMessage.type === 'warn' ? <Info size={12} /> : <Check size={12} />}
+                        {uploadMessage.text}
+                      </div>
+                    )}
+                  </div>
+                ) : activeTab === 'AI' ? (
+                  (() => {
+                    const aiAtLimit = selected.length >= maxCount;
+                    const handleGenerate = () => {
+                      if (aiAtLimit) return;
+                      const placeholderId = `aigc-${Date.now()}-${Math.random()}`;
+                      const placeholder = { id: placeholderId, url: '', mediaType: 'image', isGenerating: true, fileName: 'AI generating…' };
+                      setSelected(prev => [...prev, placeholder]);
+                      // 模拟 AI 生成（2.4s 后替换为真实 mock 素材）
+                      setTimeout(() => {
+                        const seed = Math.random().toString(36).slice(2, 8);
+                        setSelected(prev => prev.map(c => c.id === placeholderId
+                          ? { ...c, url: `https://picsum.photos/seed/${seed}/800/800`, isGenerating: false, fileName: `AIGC-${seed}.jpg` }
+                          : c));
+                      }, 2400);
+                    };
+                    return (
+                      <div className="h-full flex flex-col items-center justify-center gap-6 px-8 text-center">
+                        <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary-500 to-purple-500 flex items-center justify-center text-white shadow-xl shadow-primary-500/20">
+                          <Sparkles size={36} />
+                        </div>
+                        <div className="space-y-1">
+                          <p className="text-base font-semibold text-gray-900">AI 一键生成创意</p>
+                          <p className="text-xs text-gray-400 font-medium">每点击一次按钮，立即往 Selected 添加一个生成中的占位，完成后自动替换为成品素材</p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={handleGenerate}
+                          disabled={aiAtLimit}
+                          className={`inline-flex items-center gap-2 px-8 py-3 rounded-full text-sm font-semibold transition-all shadow-lg ${
+                            aiAtLimit
+                              ? 'bg-gray-100 text-gray-300 cursor-not-allowed shadow-none'
+                              : 'bg-gradient-to-r from-primary-500 to-purple-500 text-white hover:shadow-xl hover:scale-[1.02] active:scale-95'
+                          }`}
+                        >
+                          <Sparkles size={16} />
+                          {aiAtLimit ? `已达上限 ${maxCount} 个` : '生成一张创意'}
+                        </button>
+                        <p className="text-[11px] text-gray-400">已选 <span className="font-bold text-primary-500">{selected.length}</span> / {maxCount}</p>
+                      </div>
+                    );
+                  })()
                 ) : (
                   <div className="flex flex-col items-center justify-center h-full text-gray-400 gap-2">
                     <Sparkles size={32} className="text-gray-200" />
@@ -1697,11 +2151,21 @@ const CampaignPreviewView = ({
                 ) : (
                   <div className="grid grid-cols-2 gap-1.5">
                     {selected.map((c, i) => (
-                      <div key={i} className="relative group/sel rounded-md overflow-hidden border border-gray-100">
-                        <img src={c.url} className="w-full aspect-square object-cover" alt="" />
+                      <div key={c.id || i} className="relative group/sel rounded-md overflow-hidden border border-gray-100">
+                        {c.isGenerating ? (
+                          <div className="w-full aspect-square relative overflow-hidden flex items-center justify-center bg-gradient-to-br from-purple-100 via-primary-50 to-purple-50 animate-pulse">
+                            <Sparkles size={18} className="text-primary-500/70" />
+                            <span className="absolute bottom-1 left-1 right-1 text-[9px] text-center text-primary-600/80 font-semibold">AI 生成中…</span>
+                          </div>
+                        ) : c.mediaType === 'video' ? (
+                          <video src={c.url} muted playsInline preload="metadata" className="w-full aspect-square object-cover" />
+                        ) : (
+                          <img src={c.url} className="w-full aspect-square object-cover" alt="" />
+                        )}
                         <button
                           onClick={() => selected.length > 1 && setSelected(selected.filter((_, j) => j !== i))}
                           className="absolute top-1 right-1 w-5 h-5 bg-black/50 rounded-full flex items-center justify-center text-white opacity-0 group-hover/sel:opacity-100 transition-opacity"
+                          title={c.isGenerating ? '取消生成' : '移除'}
                         >
                           <X size={10} />
                         </button>
@@ -1726,7 +2190,8 @@ const CampaignPreviewView = ({
             </button>
             <button
               onClick={handleConfirm}
-              disabled={selected.length === 0}
+              disabled={selected.length === 0 || selected.some(c => c.isGenerating)}
+              title={selected.some(c => c.isGenerating) ? '等待 AI 生成完成后再应用' : undefined}
               className="px-6 py-2.5 bg-primary-500 text-white rounded-base text-sm font-medium hover:bg-primary-600 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
             >
               Confirm Apply
@@ -1748,18 +2213,31 @@ const CampaignPreviewView = ({
         </button>
       </div>
 
+      {numCampaigns >= 2 && (
+        <div className="sticky top-0 z-10 -mx-4 px-4 py-3 bg-white/85 backdrop-blur border-b border-gray-100 flex items-center gap-2 flex-wrap">
+          <span className="text-xs font-medium text-gray-400 shrink-0">快速跳转：</span>
+          {Array.from({ length: numCampaigns }, (_, i) => (
+            <button
+              key={i}
+              onClick={() => document.getElementById(`campaign-block-${i}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+              className="px-3 py-1.5 rounded-base text-xs font-medium text-gray-600 hover:bg-primary-50 hover:text-primary-500 transition-colors"
+            >
+              Campaign {i + 1}
+            </button>
+          ))}
+        </div>
+      )}
+
       <div className="space-y-16">
         {Array.from({ length: numCampaigns }, (_, cIdx) => (
-        <React.Fragment key={`campaign-block-${cIdx}`}>
-        {cIdx > 0 && (
-          <div className="flex items-center gap-3 px-1 -my-4" aria-hidden>
-            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent" />
-            <span className="text-[10px] font-semibold tracking-wider text-gray-400 uppercase">
-              Campaign {cIdx + 1}
-            </span>
-            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent" />
-          </div>
-        )}
+        <div id={`campaign-block-${cIdx}`} key={`campaign-block-${cIdx}`} className="space-y-16 scroll-mt-20">
+        <div className={`flex items-center gap-3 px-1 ${cIdx === 0 ? 'mb-2' : '-my-4'}`} aria-hidden>
+          <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent" />
+          <span className="text-[10px] font-semibold tracking-wider text-gray-400 uppercase">
+            Campaign {cIdx + 1}
+          </span>
+          <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent" />
+        </div>
         <div className="bg-gray-900 p-6 rounded-section shadow-xl text-white relative overflow-visible">
           <div className="absolute top-0 right-0 w-80 h-80 bg-primary-500/10 rounded-full blur-[100px] -translate-y-40 translate-x-40 pointer-events-none"></div>
           <div className="flex items-center justify-between mb-4">
@@ -1830,25 +2308,29 @@ const CampaignPreviewView = ({
                 </div>
               </div>
             </div>
-            <div className="bg-white/5 rounded-inner p-3 border border-white/5 relative">
+            <div ref={ctaTriggerRef} className="bg-white/5 rounded-inner p-3 border border-white/5">
               <p className="text-xs font-medium text-gray-500 mb-0.5">CTA</p>
               <div className="flex items-center gap-1.5 cursor-pointer" onClick={() => setIsCtaOpen(!isCtaOpen)}>
                 <p className="text-sm font-medium">{selectedCta}</p>
                 <ChevronDown size={11} className={`text-gray-500 transition-transform ml-auto ${isCtaOpen ? 'rotate-180' : ''}`} />
               </div>
-              {isCtaOpen && (
-                <div className="absolute top-full left-0 mt-2 w-44 bg-white rounded-base shadow-xl border border-gray-100 p-1.5 animate-in fade-in zoom-in-95 duration-200" style={{ zIndex: 9999 }}>
-                  {CTA_OPTIONS.map(opt => (
-                    <button key={opt} onClick={() => { setSelectedCta(opt); setIsCtaOpen(false); }}
-                      className={`w-full text-left px-3 py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-between ${
-                        selectedCta === opt ? 'bg-primary-50 text-primary-600' : 'text-gray-600 hover:bg-gray-50'
-                      }`}>
-                      {opt}
-                      {selectedCta === opt && <Check size={12} />}
-                    </button>
-                  ))}
-                </div>
-              )}
+              <Popover
+                open={isCtaOpen}
+                anchorRef={ctaTriggerRef}
+                placement="bottom-start"
+                onClose={() => setIsCtaOpen(false)}
+                className="w-44 bg-white rounded-base shadow-xl border border-gray-100 p-1.5"
+              >
+                {CTA_OPTIONS.map(opt => (
+                  <button key={opt} onClick={() => { setSelectedCta(opt); setIsCtaOpen(false); }}
+                    className={`w-full text-left px-3 py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-between ${
+                      selectedCta === opt ? 'bg-primary-50 text-primary-600' : 'text-gray-600 hover:bg-gray-50'
+                    }`}>
+                    {opt}
+                    {selectedCta === opt && <Check size={12} />}
+                  </button>
+                ))}
+              </Popover>
             </div>
           </div>
         </div>
@@ -1898,6 +2380,13 @@ const CampaignPreviewView = ({
                     return <AdSkeleton key={aIdx} />;
                   }
 
+                  const adFormatLabel = ad.adFormat === 'FLEXIBLE' ? 'Flexible'
+                    : ad.adFormat === 'CAROUSEL' ? 'Carousel'
+                    : 'Single';
+                  const adFormatBadgeCls = ad.adFormat === 'FLEXIBLE' ? 'bg-violet-50 text-violet-600 border-violet-100'
+                    : ad.adFormat === 'CAROUSEL' ? 'bg-amber-50 text-amber-600 border-amber-100'
+                    : 'bg-gray-100 text-gray-600 border-gray-200';
+                  const isSingleSplit = ad.adFormat === 'SINGLE' && adSet.ads.length > 1;
                   return (
                     <div key={aIdx} className="group relative">
                       <div className="bg-white rounded-section border border-gray-200 overflow-hidden shadow-adsgo-card transition-all hover:shadow-xl hover:border-primary-500/20 relative animate-in fade-in zoom-in-95 duration-500">
@@ -1919,10 +2408,22 @@ const CampaignPreviewView = ({
                           )}
                         </div>
                         <div className="p-4 bg-white border-b border-gray-50">
-                          <div className="flex items-center justify-between mb-3">
-                            <div className="flex items-center gap-2">
-                              <div className="w-8 h-8 rounded-full bg-gray-900 flex items-center justify-center text-xs font-medium text-white">{brand.name.charAt(0)}</div>
-                              <div><p className="text-xs font-medium text-gray-900">{brand.name}</p><p className="text-xs text-gray-500">Sponsored</p></div>
+                          <div className="flex items-center justify-between mb-3 gap-3">
+                            <div className="flex items-center gap-2 min-w-0">
+                              <div className="w-8 h-8 rounded-full bg-gray-900 flex items-center justify-center text-xs font-medium text-white shrink-0">{brand.name.charAt(0)}</div>
+                              <div className="min-w-0"><p className="text-xs font-medium text-gray-900 truncate">{brand.name}</p><p className="text-xs text-gray-500">Sponsored</p></div>
+                            </div>
+                            {/* Ad Format 徽标：放在 brand 右侧、与 sponsored 一行齐平，hover 编辑按钮在更外侧 */}
+                            <div className="relative group/badge shrink-0 mr-9">
+                              <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-tag text-[10px] font-bold tracking-wide border ${adFormatBadgeCls}`}>
+                                {adFormatLabel}
+                                {isSingleSplit && <Info size={9} className="opacity-70" />}
+                              </span>
+                              {isSingleSplit && (
+                                <div className="absolute top-full right-0 mt-1 px-2.5 py-1.5 bg-gray-900 text-white text-[10px] font-medium rounded shadow-lg whitespace-nowrap opacity-0 group-hover/badge:opacity-100 pointer-events-none transition-opacity duration-150 z-20">
+                                  发布时将自动拆分为多个 Ad（adset 内每个素材独立成 ad）
+                                </div>
+                              )}
                             </div>
                           </div>
                           <p className="text-xs text-gray-700 leading-relaxed line-clamp-2">{Array.isArray(ad.primaryText) ? ad.primaryText[0] : ad.primaryText}</p>
@@ -1973,7 +2474,7 @@ const CampaignPreviewView = ({
             </div>
           ))}
         </div>
-        </React.Fragment>
+        </div>
         ))}
       </div>
 
@@ -2026,6 +2527,11 @@ const CampaignPreviewView = ({
         platform={platform}
         effectiveBidStrategy={bidStrategy}
         globalBidAmount={bidAmount}
+        isTikTokAppSales={isTikTokAppSales}
+        catalogs={catalogs}
+        onAuthorizeChannel={onAuthorizeChannel}
+        onOpenAccountPicker={onOpenAccountPicker}
+        channelAuthLoading={channelAuthLoading}
       />
       {EditAdModal()}
       <ChangeCreativeModal />

@@ -1,14 +1,18 @@
 export const Z_INDEX = {
   BASE: 0,
   CONTENT: 1,
-  DROPDOWN: 100,
+  DROPDOWN_LEGACY: 100,    // 旧 inline dropdown 层级（保留用于向后兼容）
   STICKY: 200,
   HEADER: 500,
   SIDEBAR: 600,
+  FLOATING_ACTION: 700,    // 右下角悬浮按钮（探索 / 聊天）
   OVERLAY: 1000,
+  POPOVER: 1500,           // 用户实时交互的 dropdown / popover / menu，永远高于 FLOATING_ACTION
   MODAL_BASE: 2000,
   NOTIFICATION: 9999
 };
+// 别名：保留旧 DROPDOWN 名称以避免破坏现有引用
+Z_INDEX.DROPDOWN = Z_INDEX.DROPDOWN_LEGACY;
 
 // 全局弹窗层级管理
 let currentMaxZIndex = Z_INDEX.MODAL_BASE;
