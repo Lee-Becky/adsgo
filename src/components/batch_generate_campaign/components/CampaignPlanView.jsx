@@ -1714,6 +1714,11 @@ const CampaignPlanView = forwardRef(({
   // 返回 { ok: boolean }；ok=false 时已自行将所有空 adset 标记为红框 + 滚动到第一个空 adset。
   useImperativeHandle(ref, () => ({
     validateAdsets: () => {
+      // CATALOG（DPA）类型不需要素材，所有 adset 直接视为已就绪
+      if (campaignType === 'CATALOG') {
+        setErrorAdsetKeys({});
+        return { ok: true };
+      }
       const empties = [];
       campaignTrees.forEach(tree => {
         tree.adsets.forEach(adset => {
@@ -2170,7 +2175,16 @@ const CampaignPlanView = forwardRef(({
                                 items-stretch 让 drop zone 自动跟随组卡片高度（ad 卡为手机比例，
                                 整体会比单纯 h-20 高）。 */}
                             <div className="flex flex-nowrap items-stretch gap-2">
-                              {(() => {
+                              {campaignType === 'CATALOG' ? (
+                                <div
+                                  className="shrink-0 w-24 h-full rounded-base border-2 border-primary-500/20 bg-gradient-to-br from-primary-50 to-purple-50 flex flex-col items-center justify-center gap-1 px-1.5 text-center"
+                                  title="动态目录广告（Dynamic Product Ad）— 素材按 catalog 自动生成"
+                                >
+                                  <img src="https://img.clipp.io/img/ad_preview_dpa.png" className="w-7 h-7 object-contain" alt="DPA" />
+                                  <span className="text-[10px] font-bold text-primary-600 leading-tight">动态目录广告</span>
+                                  <span className="text-[8px] text-primary-500/70 font-medium leading-tight">DPA · 自动生成</span>
+                                </div>
+                              ) : (() => {
                                 const adsetKey = `${cIdx}::${aIdx}`;
                                 const isHovered = hoveredAdsetKey === adsetKey;
                                 return (
@@ -2222,33 +2236,43 @@ const CampaignPlanView = forwardRef(({
                                   {/* ads 行 — ad 卡 w-12 h-[88px] (手机竖屏 9:16 近似)；
                                       object-contain + 灰底，保证横图 / 竖图 / 方图都不变形。 */}
                                   <div className="flex gap-1 items-start flex-1 min-h-0">
-                                    {group.ads.map(ad => (
-                                      <div key={ad.id} className="shrink-0 relative w-10 h-[68px] rounded-base border border-gray-100 bg-gray-100 shadow-adsgo-card overflow-hidden group/ad">
-                                        {adType === 'FLEXIBLE' && ad.creatives.length > 1 ? (
-                                          <div className="grid grid-cols-2 gap-0.5 w-full h-full bg-gray-100">
-                                            {ad.creatives.slice(0, 4).map((c, i) => (
-                                              <div key={i} className="bg-gray-100 overflow-hidden flex items-center justify-center">
-                                                <img src={c.url} className="max-w-full max-h-full object-contain" alt="" />
-                                              </div>
-                                            ))}
-                                            {ad.creatives.length > 4 && (
-                                              <div className="absolute bottom-0.5 right-0.5 bg-gray-900/80 text-white text-[9px] font-bold px-1 py-0 rounded leading-none">+{ad.creatives.length - 4}</div>
-                                            )}
-                                          </div>
-                                        ) : ad.creatives[0]?.url ? (
-                                          <img src={ad.creatives[0].url} className="w-full h-full object-contain" alt="" />
-                                        ) : (
-                                          <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-300">
-                                            <Layers size={16} />
-                                          </div>
-                                        )}
-                                        <div className="absolute top-0.5 right-0.5 flex gap-0.5 opacity-0 group-hover/ad:opacity-100 transition-opacity">
-                                          <button onClick={(e) => { e.stopPropagation(); removeAdFromAdset(cIdx, aIdx, ad.id); }} className="w-4 h-4 bg-white/90 rounded-full flex items-center justify-center text-gray-500 hover:text-rose-500 shadow" title="删除此 ad">
-                                            <X size={9} />
-                                          </button>
-                                        </div>
+                                    {campaignType === 'CATALOG' ? (
+                                      <div
+                                        className="shrink-0 relative w-10 h-[68px] rounded-base border border-primary-500/20 bg-gradient-to-br from-primary-50 to-purple-50 shadow-adsgo-card overflow-hidden flex flex-col items-center justify-center gap-0.5"
+                                        title="动态目录广告（Dynamic Product Ad）"
+                                      >
+                                        <img src="https://img.clipp.io/img/ad_preview_dpa.png" className="w-5 h-5 object-contain" alt="DPA" />
+                                        <span className="text-[7px] font-bold text-primary-600 tracking-wide leading-none text-center px-0.5">DPA</span>
                                       </div>
-                                    ))}
+                                    ) : (
+                                      group.ads.map(ad => (
+                                        <div key={ad.id} className="shrink-0 relative w-10 h-[68px] rounded-base border border-gray-100 bg-gray-100 shadow-adsgo-card overflow-hidden group/ad">
+                                          {adType === 'FLEXIBLE' && ad.creatives.length > 1 ? (
+                                            <div className="grid grid-cols-2 gap-0.5 w-full h-full bg-gray-100">
+                                              {ad.creatives.slice(0, 4).map((c, i) => (
+                                                <div key={i} className="bg-gray-100 overflow-hidden flex items-center justify-center">
+                                                  <img src={c.url} className="max-w-full max-h-full object-contain" alt="" />
+                                                </div>
+                                              ))}
+                                              {ad.creatives.length > 4 && (
+                                                <div className="absolute bottom-0.5 right-0.5 bg-gray-900/80 text-white text-[9px] font-bold px-1 py-0 rounded leading-none">+{ad.creatives.length - 4}</div>
+                                              )}
+                                            </div>
+                                          ) : ad.creatives[0]?.url ? (
+                                            <img src={ad.creatives[0].url} className="w-full h-full object-contain" alt="" />
+                                          ) : (
+                                            <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-300">
+                                              <Layers size={16} />
+                                            </div>
+                                          )}
+                                          <div className="absolute top-0.5 right-0.5 flex gap-0.5 opacity-0 group-hover/ad:opacity-100 transition-opacity">
+                                            <button onClick={(e) => { e.stopPropagation(); removeAdFromAdset(cIdx, aIdx, ad.id); }} className="w-4 h-4 bg-white/90 rounded-full flex items-center justify-center text-gray-500 hover:text-rose-500 shadow" title="删除此 ad">
+                                              <X size={9} />
+                                            </button>
+                                          </div>
+                                        </div>
+                                      ))
+                                    )}
                                   </div>
                                 </div>
                               ))}
