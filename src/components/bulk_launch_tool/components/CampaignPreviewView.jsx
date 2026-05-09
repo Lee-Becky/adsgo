@@ -5,10 +5,10 @@ import {
   Layers, Target, Box, Plus, Tag, Link as LinkIcon, Megaphone,
   ChevronDown, Search, Languages, Users, UserPlus, UserMinus,
   ShoppingBag, Monitor, Smartphone, Layout, Facebook, Loader2, Trash2,
-  Database, ListFilter, Info, Music, Upload
+  Database, ListFilter, Info
 } from 'lucide-react';
 import useDropdownLoading from '../../../hooks/useDropdownLoading';
-import { IncludeExcludeAudienceDropdown } from '../BatchGenerateAds';
+import { IncludeExcludeAudienceDropdown } from '../BulkLaunchTool';
 import { MOCK_CATALOGS, MOCK_PRODUCT_SETS } from './ProductSelector';
 import { Popover } from '../../common/Popover';
 import { Z_INDEX } from '../../../constants/zIndex';
@@ -964,7 +964,6 @@ const CampaignPreviewView = ({
   const [editingAdInfo, setEditingAdInfo] = useState(null);
   const [editAdCatalogOpen, setEditAdCatalogOpen] = useState(false);
   const [editAdSetOpen, setEditAdSetOpen] = useState(false);
-  const [editAdCtaOpen, setEditAdCtaOpen] = useState(false);
   // Product Range（TikTok APP Sales）下拉与搜索
   const [adRangeSetOpen, setAdRangeSetOpen] = useState(false);
   const [adRangeProductsOpen, setAdRangeProductsOpen] = useState(false);
@@ -1432,157 +1431,20 @@ const CampaignPreviewView = ({
             </div>
 
             <div className="space-y-3">
-              <label className="text-xs font-medium text-gray-400 px-1 flex items-center gap-2">
-                <Megaphone size={12} className="text-primary-500"/> 行动号召 (CTA)
-                {platform?.id === 'tiktok' && <span className="text-[10px] font-medium text-gray-300">支持多选</span>}
-              </label>
-              {platform?.id === 'tiktok' ? (() => {
-                const ctaArr = Array.isArray(ad.cta) ? ad.cta : (ad.cta ? [ad.cta] : []);
-                const updateCtaArr = (arr) => {
-                  const next = [...localAdSets];
-                  next[asIndex].ads[adIndex].cta = arr;
-                  setLocalAdSets(next);
-                };
-                const toggleCta = (opt) => {
-                  if (ctaArr.includes(opt)) {
-                    if (ctaArr.length === 1) return;
-                    updateCtaArr(ctaArr.filter(c => c !== opt));
-                  } else {
-                    updateCtaArr([...ctaArr, opt]);
-                  }
-                };
-                return (
-                  <>
-                    {ctaArr.length > 0 && (
-                      <div className="flex flex-wrap gap-1.5">
-                        {ctaArr.map(opt => (
-                          <span key={opt} className="inline-flex items-center gap-1 pl-2.5 pr-1.5 py-1 bg-primary-50 border border-primary-100 rounded-full text-xs font-semibold text-primary-700">
-                            {opt}
-                            {ctaArr.length > 1 && (
-                              <button
-                                type="button"
-                                onClick={() => updateCtaArr(ctaArr.filter(c => c !== opt))}
-                                className="text-primary-400 hover:text-primary-600"
-                              ><X size={10} /></button>
-                            )}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                    <div className="relative">
-                      <button
-                        type="button"
-                        onClick={() => setEditAdCtaOpen(v => !v)}
-                        className="w-full h-12 px-5 flex items-center justify-between border border-gray-200 rounded-base bg-white text-sm font-medium hover:border-primary-300 focus:border-primary-500 outline-none transition-all"
-                      >
-                        <span className={ctaArr.length > 0 ? 'text-gray-800' : 'text-gray-400'}>
-                          {ctaArr.length > 0 ? `已选 ${ctaArr.length} 个 CTA，继续添加...` : '选择 CTA(可多选)...'}
-                        </span>
-                        <ChevronDown size={14} className={`text-gray-400 transition-transform ${editAdCtaOpen ? 'rotate-180' : ''}`} />
-                      </button>
-                      {editAdCtaOpen && (
-                        <>
-                          <div className="fixed inset-0 z-[290]" onClick={() => setEditAdCtaOpen(false)} />
-                          <div className="absolute left-0 right-0 top-full mt-1 bg-white rounded-base border border-gray-200 shadow-xl z-[300] max-h-72 overflow-auto py-1">
-                            {CTA_OPTIONS.map(opt => {
-                              const isSel = ctaArr.includes(opt);
-                              return (
-                                <button
-                                  key={opt}
-                                  type="button"
-                                  onClick={() => toggleCta(opt)}
-                                  className={`w-full flex items-center gap-2 px-3 py-2 text-left transition-all ${isSel ? 'bg-primary-50' : 'hover:bg-gray-50'}`}
-                                >
-                                  <div className={`w-4 h-4 rounded border-2 flex items-center justify-center shrink-0 ${isSel ? 'bg-primary-500 border-primary-500' : 'border-gray-200'}`}>
-                                    {isSel && <Check size={10} className="text-white" strokeWidth={3} />}
-                                  </div>
-                                  <span className={`text-sm font-medium ${isSel ? 'text-primary-700' : 'text-gray-700'}`}>{opt}</span>
-                                </button>
-                              );
-                            })}
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  </>
-                );
-              })() : (
-                <div className="relative">
-                  <select
-                    value={Array.isArray(ad.cta) ? (ad.cta[0] || '') : ad.cta}
-                    onChange={e => {
-                      const next = [...localAdSets]; next[asIndex].ads[adIndex].cta = e.target.value; setLocalAdSets(next);
-                    }}
-                    className="w-full h-12 px-5 border border-gray-200 rounded-base bg-white text-sm font-medium focus:border-primary-500 outline-none transition-all appearance-none"
-                  >
-                    {CTA_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
-                  </select>
-                  <ChevronDown size={14} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-300 pointer-events-none" />
-                </div>
-              )}
+              <label className="text-xs font-medium text-gray-400 px-1 flex items-center gap-2"><Megaphone size={12} className="text-primary-500"/> 行动号召 (CTA)</label>
+              <div className="relative">
+                <select
+                  value={ad.cta}
+                  onChange={e => {
+                    const next = [...localAdSets]; next[asIndex].ads[adIndex].cta = e.target.value; setLocalAdSets(next);
+                  }}
+                  className="w-full h-12 px-5 border border-gray-200 rounded-base bg-white text-sm font-medium focus:border-primary-500 outline-none transition-all appearance-none"
+                >
+                  {CTA_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                </select>
+                <ChevronDown size={14} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-300 pointer-events-none" />
+              </div>
             </div>
-
-            {platform?.id === 'tiktok' && (() => {
-              const music = ad.music || null;
-              const updateMusic = (m) => {
-                const next = [...localAdSets];
-                next[asIndex].ads[adIndex].music = m;
-                setLocalAdSets(next);
-              };
-              const onPickFile = (file) => {
-                if (!file) return;
-                const isMp3 = file.type === 'audio/mpeg' || /\.mp3$/i.test(file.name);
-                if (!isMp3) {
-                  alert('仅支持 MP3 格式音乐文件');
-                  return;
-                }
-                updateMusic({
-                  name: file.name,
-                  size: file.size,
-                  url: URL.createObjectURL(file),
-                });
-              };
-              return (
-                <div className="space-y-3">
-                  <label className="text-xs font-medium text-gray-400 px-1 flex items-center gap-2">
-                    <Music size={12} className="text-primary-500"/> 背景音乐 (Music)
-                    <span className="text-[10px] font-medium text-gray-300">仅支持 MP3</span>
-                  </label>
-                  {music ? (
-                    <div className="flex items-center gap-3 p-3 bg-gray-50 border border-gray-100 rounded-base">
-                      <div className="w-10 h-10 bg-primary-50 text-primary-500 rounded-inner flex items-center justify-center shrink-0">
-                        <Music size={16} />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs font-semibold text-gray-800 truncate">{music.name}</p>
-                        {music.url && (
-                          <audio controls src={music.url} className="w-full h-7 mt-1" />
-                        )}
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => updateMusic(null)}
-                        className="w-8 h-8 flex items-center justify-center rounded-full text-gray-400 hover:text-red-400 hover:bg-red-50 transition-colors shrink-0"
-                        title="移除音乐"
-                      >
-                        <X size={14} />
-                      </button>
-                    </div>
-                  ) : (
-                    <label className="flex items-center justify-center gap-2 w-full h-12 px-5 border border-dashed border-gray-300 rounded-base bg-white text-sm font-medium text-gray-500 hover:border-primary-400 hover:text-primary-500 cursor-pointer transition-all">
-                      <Upload size={14} />
-                      上传 MP3 文件
-                      <input
-                        type="file"
-                        accept="audio/mpeg,.mp3"
-                        className="hidden"
-                        onChange={e => { onPickFile(e.target.files?.[0]); e.target.value = ''; }}
-                      />
-                    </label>
-                  )}
-                </div>
-              );
-            })()}
 
             {/* Product Range — 仅 TikTok APP Sales 显示，含授权回退 */}
             {isTikTokAppSales && (() => {

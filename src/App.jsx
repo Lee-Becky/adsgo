@@ -18,6 +18,7 @@ import AdInsights from './components/AdInsights'
 import { AutoRegeneration } from './components/autoRegeneration'
 import { CampaignGenerator } from './components/campaignGenerator'
 import BatchGenerateAds from './components/batch_generate_campaign/BatchGenerateAds'
+import BulkLaunchTool from './components/bulk_launch_tool/BulkLaunchTool'
 import { Analysis360, AIAnalysis, Audit360 } from './components/analysis'
 import AdManagerV3 from './components/adManagerV3/AdManagerV3'
 import AIGenerate from './components/creativeHub/AIGenerate'
@@ -247,6 +248,15 @@ function App() {
       case 'batchGenerateAds':
         return (
           <BatchGenerateAds
+            onPageChange={handlePageChange}
+            onPublishSuccess={() => {
+              if (!publishedAt) setPublishedAt(Date.now())
+            }}
+          />
+        )
+      case 'bulkLaunchTool':
+        return (
+          <BulkLaunchTool
             onPageChange={handlePageChange}
             onPublishSuccess={() => {
               if (!publishedAt) setPublishedAt(Date.now())

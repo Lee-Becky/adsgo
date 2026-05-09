@@ -37,6 +37,14 @@ export const MENU_ITEMS = [
     subtitle: 'High-performance multi-product campaign architecture orchestration'
   },
   {
+    key: 'bulkLaunchTool',
+    label: 'Bulk Launch',
+    shortLabel: 'Bulk',
+    icon: 'Zap',
+    title: 'Bulk Launch',
+    subtitle: 'High-performance multi-product campaign architecture orchestration'
+  },
+  {
     key: 'aiOptimize',
     label: 'AI Optimize',
     shortLabel: 'Opt',
