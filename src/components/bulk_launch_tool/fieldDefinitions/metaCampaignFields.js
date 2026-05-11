@@ -21,6 +21,7 @@ const fields = [
     sdkPath: 'campaign.name',
     level, channel, apiVersion,
     type: 'text',
+    customRenderer: 'nameTemplate',
     required: true,
     group: 'basic',
     placeholder: '例：US-Summer-Sales-CBO-001',

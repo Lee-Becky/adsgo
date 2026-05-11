@@ -77,6 +77,7 @@ export default {
         'step-enter': 'stepEnter 0.35s ease-out',
         'progress-indeterminate': 'progressIndeterminate 1.8s ease-in-out infinite',
         'pulse-subtle': 'pulseSubtle 2s ease-in-out infinite',
+        'error-pulse': 'errorPulse 1.2s ease-in-out 3',
         'bubble-expand': 'bubbleExpand 0.3s ease-out',
         'bubble-collapse': 'bubbleCollapse 0.25s ease-in forwards',
         'shimmer': 'shimmer 2.5s ease-in-out infinite',
@@ -100,6 +101,10 @@ export default {
         pulseSubtle: {
           '0%, 100%': { boxShadow: '0 0 0 0 rgba(112,51,245,0.2)' },
           '50%': { boxShadow: '0 0 0 6px rgba(112,51,245,0)' },
+        },
+        errorPulse: {
+          '0%, 100%': { boxShadow: '0 0 0 0 rgba(244,63,94,0.55)', borderColor: 'rgb(244,63,94)' },
+          '50%':      { boxShadow: '0 0 0 10px rgba(244,63,94,0)',  borderColor: 'rgb(244,63,94)' },
         },
         bubbleExpand: {
           '0%': { opacity: '0', transform: 'scale(0.8) translateY(10px)' },

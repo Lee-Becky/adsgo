@@ -6,7 +6,7 @@
  */
 import {
   Layers, Users, MapPin, DollarSign, Calendar, Activity, Image as ImageIcon,
-  Settings2, MousePointerClick, Target,
+  Settings2, MousePointerClick, Target, Handshake,
 } from 'lucide-react';
 
 // 静态 accent 配色字典（避免 Tailwind purge 时 dynamic class 丢失）
@@ -36,8 +36,9 @@ export const GROUP_META = {
   schedule:  { label: '排期',       icon: Calendar,          accent: 'rose',     defaultOpen: false, desc: '开始 / 结束时间 / 分时段投放',                     order: 6  },
   cta:       { label: '行动号召',   icon: MousePointerClick, accent: 'orange',   defaultOpen: false, desc: '按钮文案 / 跳转链接 / 联系方式',                   order: 7  },
   creative:  { label: '创意素材',   icon: ImageIcon,         accent: 'fuchsia',  defaultOpen: false, desc: '图片 / 视频 / 标题 / 正文 / 创意规格',             order: 8  },
-  tracking:  { label: '跟踪与归因', icon: Activity,          accent: 'cyan',     defaultOpen: false, desc: '转化域名 / UTM / 像素事件',                        order: 9  },
-  advanced:  { label: '高级设置',   icon: Settings2,         accent: 'slate',    defaultOpen: false, desc: '不常用 / 实验性参数',                              order: 10 },
+  branded_content: { label: '合创广告', icon: Handshake,       accent: 'orange',   defaultOpen: false, desc: 'Branded Content / Collab Ads — 与创作者合作授权', order: 9  },
+  tracking:  { label: '跟踪与归因', icon: Activity,          accent: 'cyan',     defaultOpen: false, desc: '转化域名 / UTM / 像素事件',                        order: 10 },
+  advanced:  { label: '高级设置',   icon: Settings2,         accent: 'slate',    defaultOpen: false, desc: '不常用 / 实验性参数',                              order: 11 },
 };
 
 /** 取得某 group 的元数据，未定义时给个合理 fallback */

@@ -31,7 +31,9 @@ import {
   deriveSectionDefaults,
   writeBudgetType, writeBudget, writeBidStrategy, writeBidAmount,
   writeAdType, writeObjective, writeOptGoal, writeLocations, writeLanguage, writeEvent,
+  statusFieldName, publishStatusToSdk,
 } from './utils/formDataAdapter';
+import PublishConfirmModal from './components/PublishConfirmModal';
 import { derivePlan, deriveStructureFromPlan } from './utils/campaignPlan';
 import { getFieldDefs, validateAllLevels, pruneAllLevels, getDefaultLevelValues } from './fieldDefinitions';
 
@@ -791,9 +793,12 @@ const BulkLaunchTool = ({ onPageChange, onPublishSuccess }) => {
   const [selectedProducts, setSelectedProducts] = useState([]);
   // Source of truth: each product has 1+ creative groups, each with editable name + ads
   const [productCreativeGroupsMap, setProductCreativeGroupsMap] = useState({});
-  // Phase 2.M：素材组级 ad copy 配置（title / body / link_url / call_to_action_type）
-  // shape: { [productId]: { [groupId]: { title, body, link_url, call_to_action_type } } }
+  // Phase 2.M：素材组级 ad copy 配置
+  // shape: { [productId]: { [groupId]: { titles?: string[], bodies?: string[], ad_text?: string, link_url, call_to_action_type } } }
   const [creativeGroupCopyMap, setCreativeGroupCopyMap] = useState({});
+  // CATALOG 系列级文案（无素材组场景）：每 catalog × product_set 一份独立 AdCopy
+  // shape: { [catalogId]: { [productSetId]: AdCopy } }
+  const [catalogCampaignCopyMap, setCatalogCampaignCopyMap] = useState({});
   // Derived flat map for downstream consumers (CampaignPlanView, preview, publish)
   const productCreativesMap = useMemo(() => {
     const out = {};
@@ -1009,6 +1014,8 @@ const BulkLaunchTool = ({ onPageChange, onPublishSuccess }) => {
   const [hasConfirmed, setHasConfirmed] = useState(false);
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [savedStructures, setSavedStructures] = useState(() => listSavedStructures());
+  // Phase 2.N: 发布二次确认
+  const [showPublishConfirm, setShowPublishConfirm] = useState(false);
 
   const refreshSavedStructures = () => setSavedStructures(listSavedStructures());
 
@@ -1035,6 +1042,52 @@ const BulkLaunchTool = ({ onPageChange, onPublishSuccess }) => {
   const handleDeleteSaved = (id) => {
     deleteSavedStructure(id);
     refreshSavedStructures();
+  };
+
+  // Phase 2.P：找到首个未填 / 错误字段，scroll + 红框呼吸闪烁提示。返回是否阻断（true=有错应阻断）
+  const focusFirstFieldError = () => {
+    const errs = validation?.errors || {};
+    let target = null;
+    for (const lvl of ['campaign', 'adset', 'ad']) {
+      const fields = errs[lvl] || {};
+      const firstName = Object.keys(fields)[0];
+      if (firstName) { target = { level: lvl, name: firstName }; break; }
+    }
+    if (!target) return false;
+
+    // 1) 让 GroupedFieldsRenderer 监听到事件后展开包含该字段的 group（若已折叠）
+    window.dispatchEvent(new CustomEvent('bulk-launch:focus-field', { detail: target }));
+
+    // 2) 等下一帧 group 展开 + DOM 渲染完，再 scroll + 加动画
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      const sel = `[data-field-name="${target.level}::${target.name}"]`;
+      const el = document.querySelector(sel);
+      if (!el) return;
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      // 移除可能残留的高亮 → 重新触发动画（即便相邻两次错误是同一个字段）
+      el.classList.remove('field-error-flash');
+      // 强制 reflow，让浏览器重启动画
+      // eslint-disable-next-line no-unused-expressions
+      el.offsetWidth;
+      el.classList.add('field-error-flash');
+      window.setTimeout(() => {
+        el.classList.remove('field-error-flash');
+      }, 3000); // ~0.7s × 4 次 = 2.8s，略长留 0.2s 缓冲
+    }));
+    return true;
+  };
+
+  // Phase 2.N：发布确认 — 把 UI 选择的 PAUSED/ACTIVE 映射到渠道字段并写入三级 formData，再触发父级 onPublishSuccess
+  const handlePublishConfirm = (statusUi) => {
+    const fieldName = statusFieldName(platform?.id);
+    const sdkStatus = publishStatusToSdk(platform?.id, statusUi);
+    setFormData(prev => ({
+      campaign: { ...(prev.campaign || {}), [fieldName]: sdkStatus },
+      adset:    { ...(prev.adset    || {}), [fieldName]: sdkStatus },
+      ad:       { ...(prev.ad       || {}), [fieldName]: sdkStatus },
+    }));
+    setShowPublishConfirm(false);
+    onPublishSuccess?.({ channel: platform?.id, status: sdkStatus });
   };
 
   // Phase 2.A: 三级 SDK 字段统一 formData。
@@ -1570,18 +1623,8 @@ const BulkLaunchTool = ({ onPageChange, onPublishSuccess }) => {
             </div>
           </div>
           <div className="max-h-80 overflow-y-auto p-4 no-scrollbar">
-            <div 
-              onClick={() => { setSelectedCampaignId(null); setShowCampaignModal(false); }}
-              className="p-4 rounded-base hover:bg-gray-50 cursor-pointer flex items-center justify-between group border border-transparent hover:border-primary-500/15"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-primary-50 text-primary-500/70 rounded-lg flex items-center justify-center"><Plus size={20}/></div>
-                <span className="text-sm font-semibold text-gray-400">创建全新系列 (Default)</span>
-              </div>
-              {!selectedCampaignId && <Check size={18} className="text-primary-500" />}
-            </div>
-
-            <div className="mt-4 pt-4 border-t border-gray-50 space-y-2">
+            {/* 本弹窗用于「为广告结构导入存量系列初始化配置」，不承担创建新系列入口 */}
+            <div className="space-y-2">
               {!isMetaConnected ? (
                 <div className="p-4">
                   <button
@@ -1860,10 +1903,11 @@ const BulkLaunchTool = ({ onPageChange, onPublishSuccess }) => {
                   );
                 })()}
 
-                {/* Confirm Action Bar：始终显示在结构配置模块底部；点击其一才会显露下方"添加投放产品"模块 */}
+                {/* Confirm Action Bar：始终显示在结构配置模块底部；点击其一才会显露下方"添加投放产品"模块
+                    Phase 2.P：点击前先 focusFirstFieldError —— 有未填/错误字段则阻断并定位 */}
                 <ConfirmActionBar
-                  onSaveAndContinue={() => setShowSaveModal(true)}
-                  onUseOnce={() => setHasConfirmed(true)}
+                  onSaveAndContinue={() => { if (focusFirstFieldError()) return; setShowSaveModal(true); }}
+                  onUseOnce={() => { if (focusFirstFieldError()) return; setHasConfirmed(true); }}
                 />
                 </>)}
               </div>
@@ -1933,6 +1977,14 @@ const BulkLaunchTool = ({ onPageChange, onPublishSuccess }) => {
                   onSelectProductSet={setSelectedProductSet}
                   catalogCombos={catalogCombos}
                   onCatalogCombosChange={setCatalogCombos}
+                  // CATALOG 系列级文案：每 product_set 一份；CatalogCombosField 内部 mount AdCopyEditor
+                  catalogCampaignCopyMap={catalogCampaignCopyMap}
+                  onSaveCatalogCopy={(catalogId, productSetId, copy) => {
+                    setCatalogCampaignCopyMap(prev => ({
+                      ...prev,
+                      [catalogId]: { ...(prev[catalogId] || {}), [productSetId]: copy },
+                    }));
+                  }}
                   availableAccounts={platform ? (PLATFORM_ACCOUNTS[platform.id] || []) : []}
                 />
               </div>
@@ -2033,8 +2085,27 @@ const BulkLaunchTool = ({ onPageChange, onPublishSuccess }) => {
                       onOpenAccountPicker={() => { accountPickLoading.triggerLoad(); setShowMetaAccountPicker(true); }}
                       channelAuthLoading={channelAuthLoading}
                       planMode={planMode}
+                      creativeGroupCopyMap={creativeGroupCopyMap}
                     />
                  </div>
+              )}
+
+              {/* Phase 2.N：发布入口 — 与 Campaign 结构预览同一可见门控 */}
+              {allProductsReady && (!isAnyProductMissingCreatives || campaignType === 'CATALOG')
+                && ((initMode === 'manual' && isInitComplete && hasConfirmed)
+                    || (initMode === 'import' && !!selectedCampaignId)) && (
+                <div className="flex flex-col items-center pt-4">
+                  <button
+                    onClick={() => setShowPublishConfirm(true)}
+                    className="group w-full max-w-2xl py-5 px-12 rounded-full font-bold text-lg flex items-center justify-center bg-primary-500 text-white hover:bg-primary-600 shadow-xl transition-all"
+                  >
+                    <Rocket size={22} className="mr-3" />
+                    立即发布
+                  </button>
+                  {!validation.valid && (
+                    <p className="text-[11px] text-amber-600 mt-2">⚠ 还有必填项未填，发布前请补全</p>
+                  )}
+                </div>
               )}
 
             </div>
@@ -2057,6 +2128,26 @@ const BulkLaunchTool = ({ onPageChange, onPublishSuccess }) => {
         defaultName={`${platform?.name || ''} ${campaignType} ${new Date().toISOString().slice(0, 16).replace('T', ' ')}`}
         onCancel={() => setShowSaveModal(false)}
         onConfirm={handleSaveAndContinue}
+      />
+
+      {/* Phase 2.N：发布二次确认 — 状态选择 + 校验提示 */}
+      <PublishConfirmModal
+        open={showPublishConfirm}
+        onClose={() => setShowPublishConfirm(false)}
+        onConfirm={handlePublishConfirm}
+        channel={platform?.id || 'meta'}
+        channelName={platform?.name || 'Meta'}
+        counts={{
+          campaigns: Math.max(structure.numCampaigns || 1, 1),
+          adsets: Object.keys(adsetAds || {}).length,
+          ads: Object.values(adsetAds || {}).reduce((sum, list) => sum + (list?.length || 0), 0),
+        }}
+        errorCount={
+          ['campaign', 'adset', 'ad'].reduce(
+            (sum, lvl) => sum + Object.keys(validation.errors[lvl] || {}).length,
+            0
+          )
+        }
       />
 
     </div>

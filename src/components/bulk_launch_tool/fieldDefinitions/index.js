@@ -157,6 +157,9 @@ const CORE_FIELDS_V2 = {
       'name', 'ad_format',
       'page_id', 'instagram_user_id',
       'url_tags',
+      // 合创广告（Branded Content / Collab Ads）— Ad 结构化部分
+      'branded_content', 'branded_content_sponsor_page_id',
+      'instagram_branded_content', 'facebook_branded_content',
     ],
   },
   tiktok: {
@@ -202,10 +205,12 @@ export function isFieldCore(channel, level, fieldName) {
 /**
  * @param {'meta'|'tiktok'} channel
  * @param {'campaign'|'adset'|'ad'} level
+ * @param {{ showExcluded?: boolean }} [opts]  showExcluded=true: 不把 excludeFromCreate 折成 hideInUi（架构图详情面板等需要看到全字段时启用）
  * @returns {import('./schema').FieldDef[]}
  */
-export function getFieldDefs(channel, level) {
+export function getFieldDefs(channel, level, opts) {
   if (!channel || !level) return [];
+  const showExcluded = !!opts?.showExcluded;
   const raw = REGISTRY[channel]?.[level] || [];
   const coreSet = new Set(CORE_FIELDS[channel]?.[level] || []);
   const hideSet = new Set(HIDE_IN_UI[channel]?.[level] || []);
@@ -214,14 +219,15 @@ export function getFieldDefs(channel, level) {
     const baseHidden = d.hideInUi !== undefined ? d.hideInUi : hideSet.has(d.name);
     // Phase 2.K：'targeting' 旧 group 名映射为 'audience'（向后兼容）
     const baseGroup = d.group === 'targeting' ? 'audience' : d.group;
-    // Phase 2.M：非 V2 core 字段统一压入 advanced 组
-    const finalGroup = coreV2Set.has(d.name) ? baseGroup : 'advanced';
+    // Phase 2.M：非 V2 core 字段统一压入 advanced 组；
+    // showExcluded（架构图详情面板等需要完整 schema 时）保留原始 group，便于文案/CTA/合创广告/跟踪 各归各位。
+    const finalGroup = (coreV2Set.has(d.name) || showExcluded) ? baseGroup : 'advanced';
     return {
       ...d,
       group: finalGroup,
       coreField: d.coreField !== undefined ? d.coreField : coreSet.has(d.name),
-      // Phase 2.I: excludeFromCreate（创建态噪音字段）叠到 hideInUi
-      hideInUi: baseHidden || !!d.excludeFromCreate,
+      // Phase 2.I: excludeFromCreate（创建态噪音字段）叠到 hideInUi；showExcluded 时不折叠
+      hideInUi: baseHidden || (!showExcluded && !!d.excludeFromCreate),
     };
   });
 }

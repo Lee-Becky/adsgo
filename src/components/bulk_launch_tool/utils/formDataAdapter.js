@@ -32,6 +32,65 @@ export function expandAttributionPreset(preset) {
   return META_ATTRIBUTION_PRESETS[preset] || null;
 }
 
+// ─── Phase 2.N: publish 状态渠道映射 ───
+// Meta:   campaign/adset/ad.status         ∈ {PAUSED, ACTIVE}
+// TikTok: campaign/adgroup/ad.operation_status ∈ {DISABLE, ENABLE}
+/** 渠道 → 该渠道存放"初始状态"的字段名 */
+export function statusFieldName(channelId) {
+  return channelId === 'tiktok' ? 'operation_status' : 'status';
+}
+
+/** UI 二元值 'PAUSED' | 'ACTIVE' → 该渠道的 SDK 值 */
+export function publishStatusToSdk(channelId, uiStatus) {
+  if (channelId === 'tiktok') return uiStatus === 'ACTIVE' ? 'ENABLE' : 'DISABLE';
+  return uiStatus === 'ACTIVE' ? 'ACTIVE' : 'PAUSED';
+}
+
+// ─── Phase 2.O: 命名模板变量 ───
+/** 默认变量集（NameTemplateField + resolveNameTemplate 共用）。Label 用于 Popover 展示，key 用作 {token}。 */
+export const NAME_VARIABLES = [
+  { key: 'creative_name', label: '素材名称', hint: '仅 Ad 层有效；其他层级显示字面' },
+  { key: 'optimize_goal', label: '优化目标', hint: 'adset.optimization_goal' },
+  { key: 'locations',     label: '投放地区', hint: 'Meta: geo_locations.countries / TikTok: location_ids' },
+  { key: 'age',           label: '年龄',     hint: 'age_min-age_max' },
+  { key: 'gender',        label: '性别',     hint: 'genders 联合' },
+];
+
+/** 把 `Q4-{locations}-{age}` 替换为实际值；未命中或空值的 token 保留字面量。 */
+export function resolveNameTemplate(template, ctx = {}) {
+  if (!template) return '';
+  return String(template).replace(/\{(\w+)\}/g, (m, key) => {
+    const v = ctx[key];
+    if (v === undefined || v === null || v === '') return m;
+    if (Array.isArray(v)) return v.filter(Boolean).join('|');
+    return String(v);
+  });
+}
+
+/** 从 formData snapshot 派生 NameTemplateField 预览所需 ctx。perAdCtx 用于 ad 层节点 override。 */
+export function deriveNameResolveCtx(channel, level, rootFormData, perAdCtx = {}) {
+  const adset = rootFormData?.adset || {};
+  // locations：Meta 取 geo_locations.countries（主要维度），TikTok 取 location_ids
+  let locations = null;
+  if (channel === 'tiktok') {
+    locations = Array.isArray(adset.location_ids) && adset.location_ids.length ? adset.location_ids : null;
+  } else {
+    const geo = adset.geo_locations || {};
+    locations = (geo.countries && geo.countries.length) ? geo.countries
+              : (geo.regions   && geo.regions.length)   ? geo.regions
+              : (geo.cities    && geo.cities.length)    ? geo.cities
+              : null;
+  }
+  const ageMin = adset.age_min, ageMax = adset.age_max;
+  return {
+    optimize_goal: adset.optimization_goal || adset.optimization_event || null,
+    locations,
+    age: (ageMin != null && ageMax != null) ? `${ageMin}-${ageMax}` : (ageMin != null ? `${ageMin}+` : null),
+    gender: Array.isArray(adset.genders) && adset.genders.length ? adset.genders.join('+') : (adset.gender || null),
+    creative_name: perAdCtx.creative_name || null,
+  };
+}
+
 /** 把 SDK 数组反推回 preset 字符串（saved structures 应用兼容） */
 export function detectAttributionPreset(specArray) {
   if (!Array.isArray(specArray) || specArray.length === 0) return null;

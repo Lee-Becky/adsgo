@@ -19,6 +19,7 @@ const fields = [
     sdkPath: 'campaign.campaign_name',
     level, channel, apiVersion,
     type: 'text',
+    customRenderer: 'nameTemplate',
     required: true,
     group: 'basic',
     validation: { max: 512 },

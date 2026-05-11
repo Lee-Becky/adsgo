@@ -30,6 +30,7 @@ const fields = [
     sdkPath: 'ad.name',
     level, channel, apiVersion,
     type: 'text',
+    customRenderer: 'nameTemplate',
     required: true,
     group: 'basic',
   },
@@ -513,7 +514,8 @@ const fields = [
     level, channel, apiVersion,
     type: 'select',
     options: META_PAGES,
-    group: 'creative',
+    group: 'branded_content',
+    helpText: '合创广告中作为广告投放主体的赞助方主页 ID。',
   },
   {
     name: 'collaborative_ads_lsb_image_bank_id',
@@ -691,9 +693,8 @@ const fields = [
     sdkPath: 'ad.creative.instagram_branded_content',
     level, channel, apiVersion,
     type: 'json',
-    group: 'creative',
-    helpText: 'Branded content wizard 单独流程；本轮不暴露。',
-    excludeFromCreate: true,
+    group: 'branded_content',
+    helpText: 'Instagram 平台合创广告（branded content）配置 — 含合作创作者 ID、付费合作伙伴标签等。',
   },
   {
     name: 'facebook_branded_content',
@@ -701,8 +702,8 @@ const fields = [
     sdkPath: 'ad.creative.facebook_branded_content',
     level, channel, apiVersion,
     type: 'json',
-    group: 'creative',
-    excludeFromCreate: true,
+    group: 'branded_content',
+    helpText: 'Facebook 平台合创广告配置。',
   },
   // — DSA 免责声明（欧盟监管） —
   {
@@ -727,17 +728,16 @@ const fields = [
     dependsOn: { field: 'ad_format', equals: 'PLAYABLES' },
   },
 
-  // — 合创广告 / Branded Content Ads（用户原话："Ad 层不是还有合创广告吗"） —
-  // SDK: AdCreativeBrandedContentAds 17 fields
+  // — 合创广告 / Branded Content Ads（Ad 结构化部分，独立 group：'branded_content'） —
+  // SDK: AdCreativeBrandedContentAds 14 fields — 广告主与创作者（KOL）合作授权 KOL 帖子作为广告素材投放
   {
     name: 'branded_content',
-    label: '合创广告（Branded Content / Collab Ads）',
+    label: '合创广告主结构',
     sdkPath: 'ad.creative.branded_content',
     level, channel, apiVersion,
     type: 'composite',
-    group: 'creative',
-    helpText: '广告主与创作者（KOL / 创作者）合作授权 KOL 帖子作为广告素材投放。下一轮独立 wizard 实施。',
-    excludeFromCreate: true,  // 整体占位；下轮"合创广告 wizard"独立实施
+    group: 'branded_content',
+    helpText: '广告主与创作者（KOL / 创作者）合作授权 KOL 帖子作为广告素材投放。',
     subFields: [
       { name: 'acting_business_id',           label: '投放方 BC ID',  sdkPath: 'acting_business_id',           level, channel, apiVersion, type: 'text' },
       { name: 'creator_ad_permission_type',   label: '创作者授权类型', sdkPath: 'creator_ad_permission_type',   level, channel, apiVersion, type: 'select',

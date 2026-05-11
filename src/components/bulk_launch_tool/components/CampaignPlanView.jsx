@@ -841,11 +841,28 @@ const AdDetailPanel = ({
   formData, nodeOverrides, setNodeOverride, clearNodeOverride,
   // 批量模式（fallback）
   levelData: levelDataProp, onFieldChange: onFieldChangeProp, inheritanceMap: inheritanceMapProp,
+  // 素材组级 ad copy（productId → groupId → { title / body / link_url / call_to_action_type / ... }）
+  creativeGroupCopyMap = {},
 }) => {
   const isSingleMode = !!formData && !!setNodeOverride && !!adId;
   const overrideForNode = nodeOverrides?.ad?.[adId] || {};
   const adsetOverride = nodeOverrides?.adset?.[adsetFlatIdx] || {};
   const adsetEffective = { ...(formData?.adset || {}), ...adsetOverride };
+
+  // 素材组级 copy 作为该 ad 的默认值（落地页 / 文案 / CTA），可被 per-ad override 覆盖
+  const groupCopy = (adRef?.productId && adRef?.groupId)
+    ? (creativeGroupCopyMap?.[adRef.productId]?.[adRef.groupId] || {})
+    : {};
+
+  // 单素材静态绑定（adRef.creatives[0] 或主图）：把 image_hash / video_id / image_url 等也注入展示
+  const primaryCreative = adRef?.creatives?.[0];
+  const creativeBindings = primaryCreative
+    ? {
+        ...(primaryCreative.mediaType === 'video'
+          ? { video_id: primaryCreative.videoId || primaryCreative.id, image_url: primaryCreative.thumbnailUrl }
+          : { image_hash: primaryCreative.imageHash, image_url: primaryCreative.url }),
+      }
+    : {};
 
   // ad_format 取值优先级：per-ad override > 该 adset 的 __adFormat > 'SINGLE_IMAGE'
   const inheritedFormat = adsetOverride?.__adFormat;
@@ -853,6 +870,8 @@ const AdDetailPanel = ({
   const levelData = isSingleMode
     ? {
         ...baseAd,
+        ...creativeBindings,
+        ...groupCopy,
         ...overrideForNode,
         ad_format: overrideForNode.ad_format ?? inheritedFormat ?? baseAd.ad_format ?? 'SINGLE_IMAGE',
       }
@@ -899,7 +918,8 @@ const AdDetailPanel = ({
         ) : null}
       </div>
 
-      {/* 字段集 = ad 层 schema（CORE_FIELDS_V2 已强制 core/advanced 分组）；mergedSlots 在 ad 层零注入 */}
+      {/* 字段集 = ad 层全 schema（含 excludeFromCreate 的文案 / CTA / 落地页 / image_hash / video_id 等）；
+          架构图详情面板需要展示完整 ad creative，不仅是 create-flow 中的核心字段 */}
       <LevelFieldsEditor
         channel={platform?.id}
         level="ad"
@@ -909,6 +929,7 @@ const AdDetailPanel = ({
         inheritanceMap={inheritanceMap}
         onResetField={onResetField}
         showAdvanced
+        showAllFields
         compact
       />
     </div>
@@ -972,6 +993,8 @@ const CampaignPlanView = forwardRef(({
   setNodeOverride,
   clearNodeOverride,
   planMode = 'product',          // 'product' | 'catalog' | 'app' — 决定「广告结构策略」副标题
+  // 素材组级 ad copy（productId → groupId → { title / body / link_url / call_to_action_type / ... }）— 仅 ad 详情面板渲染所用
+  creativeGroupCopyMap = {},
 }, ref) => {
   const [adsetPlacementsMap, setAdsetPlacementsMap] = useState({});
   const [showLalDropdown, setShowLalDropdown] = useState(false);
@@ -1299,27 +1322,34 @@ const CampaignPlanView = forwardRef(({
     return legacyAdTypeToSdkFormat(platform?.id, adType);
   }, [nodeOverrides, platform?.id, adType, adsetFlatIdxFor]);
 
-  const setAdFormatForAdset = useCallback((cIdx, aIdx, format) => {
+  // Per-(adset, productId, groupId) ad_format：每个素材组在每个 adset 内独立设置拆分方案
+  // 数据契约：nodeOverrides.adset[flatIdx].__groupFormats = { 'productId::groupId': format }
+  const getAdFormatForGroup = useCallback((cIdx, aIdx, productId, groupId) => {
     const flat = adsetFlatIdxFor(cIdx, aIdx);
-    setNodeOverride?.('adset', flat, '__adFormat', format);
-    // 切换 format 触发该 adset 已有 ads 重新拆分（按 (productId, groupId) 反查素材组）
+    const groupKey = `${productId}::${groupId}`;
+    const groupOverride = nodeOverrides?.adset?.[flat]?.__groupFormats?.[groupKey];
+    if (groupOverride) return groupOverride;
+    return getAdFormatFor(cIdx, aIdx);
+  }, [nodeOverrides, adsetFlatIdxFor, getAdFormatFor]);
+
+  const setAdFormatForGroup = useCallback((cIdx, aIdx, productId, groupId, format) => {
+    const flat = adsetFlatIdxFor(cIdx, aIdx);
+    const groupKey = `${productId}::${groupId}`;
+    const cur = nodeOverrides?.adset?.[flat]?.__groupFormats || {};
+    const next = { ...cur, [groupKey]: format };
+    setNodeOverride?.('adset', flat, '__groupFormats', next);
+    // 切换 format 触发该组已有 ads 重新拆分（仅该组，不影响同 adset 其它组）
     const adsetKey = `${cIdx}::${aIdx}`;
-    const existing = adsetAds[adsetKey] || [];
+    const existing = (adsetAds[adsetKey] || []).filter(a => a.productId === productId && a.groupId === groupId);
     if (existing.length === 0) return;
-    const seen = new Set();
-    const groupsTouched = [];
-    existing.forEach(a => {
-      const k = `${a.productId}::${a.groupId}`;
-      if (!seen.has(k)) { seen.add(k); groupsTouched.push({ productId: a.productId, groupId: a.groupId }); }
-    });
-    // 清掉受影响 ad 的 per-ad overrides（v1 简化：format 切换重置该 adset 下所有 ad 字段编辑）
+    // 清掉该组 ads 的 per-ad overrides（v1 简化：format 切换重置该组所有 ad 字段编辑）
     existing.forEach(a => {
       const adOverride = nodeOverrides?.ad?.[a.id] || {};
       Object.keys(adOverride).forEach(name => clearNodeOverride?.('ad', a.id, name));
     });
-    // 重拆分（handleDropGroupToAdset 现在读 getAdFormatFor，所以 format 已经更新到位）
+    // 重拆分（handleDropGroupToAdset 读 getAdFormatForGroup，format 已经更新到位）
     setTimeout(() => {
-      groupsTouched.forEach(g => handleDropGroupToAdsetRef.current?.(cIdx, aIdx, g));
+      handleDropGroupToAdsetRef.current?.(cIdx, aIdx, { productId, groupId });
     }, 0);
   }, [adsetAds, nodeOverrides, setNodeOverride, clearNodeOverride, adsetFlatIdxFor]);
 
@@ -1382,7 +1412,7 @@ const CampaignPlanView = forwardRef(({
     const group = groups.find(g => g.id === payload.groupId);
     if (!group) return;
     if (!group.ads || group.ads.length === 0) return;
-    const format = getAdFormatFor(campaignIdx, adsetIdx);
+    const format = getAdFormatForGroup(campaignIdx, adsetIdx, payload.productId, payload.groupId);
     const baseId = `${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
     const newAds = splitGroupByAdFormat(group, format, baseId, payload);
     if (newAds.length === 0) return;
@@ -1904,20 +1934,6 @@ const CampaignPlanView = forwardRef(({
                                   <p className="text-[11px] font-bold text-gray-900 truncate leading-tight">Adset {cIdx + 1}.{aIdx + 1}</p>
                                   <p className="text-[9px] text-gray-400 font-medium truncate leading-tight">{audienceLabel}</p>
                                 </div>
-                                {/* ad_format 切换器：CATALOG 模式锁定；其它情况按 channel 列出 SDK 枚举 */}
-                                <select
-                                  value={getAdFormatFor(cIdx, aIdx)}
-                                  onChange={(e) => setAdFormatForAdset(cIdx, aIdx, e.target.value)}
-                                  onClick={(e) => e.stopPropagation()}
-                                  onMouseDown={(e) => e.stopPropagation()}
-                                  disabled={campaignType === 'CATALOG'}
-                                  title={campaignType === 'CATALOG' ? 'CATALOG 模式由系统自动选择 DPA / CATALOG_CAROUSEL' : '切换 ad 格式（同时按新格式重拆分该 adset 下的 ad）'}
-                                  className="text-[9px] border border-gray-200 rounded px-1 py-0 bg-white max-w-full truncate disabled:bg-gray-50 disabled:text-gray-400"
-                                >
-                                  {adFormatOptions.map(o => (
-                                    <option key={o.value} value={o.value}>{o.label}</option>
-                                  ))}
-                                </select>
                               </button>
                               {/* CRUD buttons — 复制 + 删除（绝对定位，与 Campaign 同款） */}
                               <div className="absolute top-1 right-1 flex gap-0.5 z-30">
@@ -2005,15 +2021,29 @@ const CampaignPlanView = forwardRef(({
                               {groupAdsByGroup(getAdsForAdset(cIdx, aIdx)).map(group => (
                                 <div
                                   key={`${group.productId}::${group.groupId}`}
-                                  className="shrink-0 relative bg-gray-50/60 border border-dashed border-gray-200 rounded-base px-1.5 pt-0.5 pb-1 h-full flex flex-col group/group"
+                                  className="shrink-0 relative bg-gray-50/60 border border-dashed border-gray-200 rounded-base px-1.5 pt-1 pb-1 h-full flex flex-col group/group"
                                 >
-                                  {/* 头部单行：产品名 · 组名 + 清空（hover 显示） */}
-                                  <div className="flex items-center justify-between gap-1.5 mb-1 px-0.5 max-w-[240px] shrink-0">
-                                    <span className="text-[9px] text-gray-500 truncate leading-tight">
+                                  {/* 头部 row 1：产品名 · 组名 + 右上 ad_format 切换 + 清空（hover 显示） */}
+                                  <div className="flex items-center justify-between gap-1 mb-0.5 px-0.5 max-w-[240px] shrink-0">
+                                    <span className="text-[9px] text-gray-500 truncate leading-tight flex-1 min-w-0">
                                       <span className="text-gray-400">{productNameById[group.productId] || '—'}</span>
                                       <span className="text-gray-300 mx-1">·</span>
                                       <span className="text-gray-600 font-semibold">{group.groupName}</span>
                                     </span>
+                                    {/* per-group ad_format 切换器：仅本素材组在本 adset 内的拆分方案 */}
+                                    <select
+                                      value={getAdFormatForGroup(cIdx, aIdx, group.productId, group.groupId)}
+                                      onChange={(e) => setAdFormatForGroup(cIdx, aIdx, group.productId, group.groupId, e.target.value)}
+                                      onClick={(e) => e.stopPropagation()}
+                                      onMouseDown={(e) => e.stopPropagation()}
+                                      disabled={campaignType === 'CATALOG'}
+                                      title={campaignType === 'CATALOG' ? 'CATALOG 模式由系统自动选择' : '切换此素材组在该 adset 内的拆分 ad 方案'}
+                                      className="shrink-0 text-[9px] border border-gray-200 rounded px-1 py-0 bg-white max-w-[64px] truncate disabled:bg-gray-50 disabled:text-gray-400"
+                                    >
+                                      {adFormatOptions.map(o => (
+                                        <option key={o.value} value={o.value}>{o.label}</option>
+                                      ))}
+                                    </select>
                                     <button
                                       type="button"
                                       onClick={(e) => { e.stopPropagation(); removeAllAdsOfGroup(cIdx, aIdx, group.productId, group.groupId); }}
@@ -2035,19 +2065,19 @@ const CampaignPlanView = forwardRef(({
                                         <span className="text-[7px] font-bold text-primary-600 tracking-wide leading-none text-center px-0.5">DPA</span>
                                       </div>
                                     ) : (
-                                      group.ads.map(ad => {
+                                      group.ads.map((ad, adIndex) => {
                                         const isAdMain = selectedNode.type === 'ad' && selectedNode.adId === ad.id;
                                         const isAdExtra = selectedExtras.has(`ad:${cIdx}:${aIdx}:${ad.id}`);
                                         const isAdActive = isAdMain || isAdExtra;
                                         return (
+                                        <div key={ad.id} className="shrink-0 flex flex-col items-center gap-0.5">
                                         <div
-                                          key={ad.id}
                                           onClick={(e) => {
                                             e.stopPropagation();
                                             handleNodeClick({ type: 'ad', campaignIdx: cIdx, adsetIdx: aIdx, adId: ad.id });
                                           }}
-                                          title="点击编辑 ad 字段"
-                                          className={`shrink-0 relative w-10 h-[68px] rounded-base border bg-gray-100 shadow-adsgo-card overflow-hidden group/ad cursor-pointer transition-all ${
+                                          title={`Ad ${adIndex + 1} — 点击编辑 ad 字段`}
+                                          className={`relative w-10 h-[68px] rounded-base border bg-gray-100 shadow-adsgo-card overflow-hidden group/ad cursor-pointer transition-all ${
                                             isAdActive ? 'border-primary-500 ring-2 ring-primary-500/40' : 'border-gray-100 hover:border-primary-500/40'
                                           }`}
                                         >
@@ -2089,6 +2119,11 @@ const CampaignPlanView = forwardRef(({
                                               <X size={9} />
                                             </button>
                                           </div>
+                                        </div>
+                                        {/* Ad 序号标签 */}
+                                        <span className={`text-[9px] font-bold leading-none tabular-nums ${isAdActive ? 'text-primary-600' : 'text-gray-400'}`}>
+                                          Ad{adIndex + 1}
+                                        </span>
                                         </div>
                                         );
                                       })
@@ -2283,6 +2318,7 @@ const CampaignPlanView = forwardRef(({
                   nodeOverrides={nodeOverrides}
                   setNodeOverride={setNodeOverride}
                   clearNodeOverride={clearNodeOverride}
+                  creativeGroupCopyMap={creativeGroupCopyMap}
                 />
               );
             })()}

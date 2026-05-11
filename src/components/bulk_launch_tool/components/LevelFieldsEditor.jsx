@@ -23,13 +23,15 @@ const LevelFieldsEditor = ({
   showAdvanced,  // eslint-disable-line no-unused-vars
   // 窄面板模式（架构树右侧详情面板）：单列 + 标签头换行 + 隐藏 SDK path
   compact = false,
+  // 架构图 ad 详情面板：把 excludeFromCreate（文案 / CTA / 落地页 / image_hash / video_id 等）也展示
+  showAllFields = false,
 }) => {
   if (!channel) {
     return <p className="text-xs text-gray-400 py-4">请先在页面顶部选择投放渠道。</p>;
   }
 
   // 字段集 = 全部 schema 字段（含 advanced），过滤 hideInUi
-  const allDefs = getFieldDefs(channel, level).filter(d => !d.hideInUi);
+  const allDefs = getFieldDefs(channel, level, { showExcluded: showAllFields }).filter(d => !d.hideInUi);
 
   // 合并控件 slot 分配
   const mergedSlots = {};

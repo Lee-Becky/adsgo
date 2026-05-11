@@ -8,6 +8,9 @@ import Select from './controls/Select';
 import MultiSelect from './controls/MultiSelect';
 import Switch from './controls/Switch';
 import DateTimeInput from './controls/DateTimeInput';
+import NameTemplateField from './MergedFields/NameTemplateField';
+import HistoryNamingDropdown from './MergedFields/HistoryNamingDropdown';
+import { deriveNameResolveCtx } from '../utils/formDataAdapter';
 
 /**
  * 单字段渲染器（Phase 2.D：派发到美化控件）。
@@ -48,7 +51,10 @@ const DynamicFieldRenderer = ({
   // composite 字段
   if (def.type === 'composite' && Array.isArray(def.subFields)) {
     return (
-      <div className={`flex flex-col gap-1.5 ${colSpanCls}`}>
+      <div
+        className={`flex flex-col gap-1.5 ${colSpanCls} rounded-base border border-transparent`}
+        data-field-name={`${def.level}::${def.name}`}
+      >
         <CompositeFieldRenderer
           def={def}
           value={value}
@@ -77,17 +83,33 @@ const DynamicFieldRenderer = ({
   switch (def.type) {
     case 'text':
     case 'url':
-      control = (
-        <TextInput
-          value={value}
-          onChange={handleChange}
-          placeholder={def.placeholder}
-          disabled={disabled}
-          error={error}
-          type={def.type === 'url' ? 'url' : 'text'}
-          maxLength={def.validation?.maxLength}
-        />
-      );
+      if (def.customRenderer === 'nameTemplate') {
+        // Phase 2.O：name 字段升级为「带变量插入助手」的命名输入
+        control = (
+          <NameTemplateField
+            channel={def.channel}
+            level={def.level}
+            value={value}
+            onChange={handleChange}
+            required={isRequired}
+            error={error}
+            maxLength={def.validation?.maxLength}
+            resolveContext={deriveNameResolveCtx(def.channel, def.level, rootFormData)}
+          />
+        );
+      } else {
+        control = (
+          <TextInput
+            value={value}
+            onChange={handleChange}
+            placeholder={def.placeholder}
+            disabled={disabled}
+            error={error}
+            type={def.type === 'url' ? 'url' : 'text'}
+            maxLength={def.validation?.maxLength}
+          />
+        );
+      }
       break;
     case 'textarea':
       control = (
@@ -189,8 +211,13 @@ const DynamicFieldRenderer = ({
       break;
   }
 
+  const isNameTemplate = def.customRenderer === 'nameTemplate';
+
   return (
-    <div className={`flex flex-col gap-1.5 ${colSpanCls}`}>
+    <div
+      className={`flex flex-col gap-1.5 ${colSpanCls} rounded-base border border-transparent`}
+      data-field-name={`${def.level}::${def.name}`}
+    >
       <div className={`flex items-center gap-x-1.5 ${compact ? 'flex-wrap gap-y-1' : ''}`}>
         <label className="text-xs font-medium text-gray-700">
           {def.label}
@@ -200,6 +227,16 @@ const DynamicFieldRenderer = ({
           <span title={def.helpText} className="text-gray-300 cursor-help">
             <Info size={11} />
           </span>
+        )}
+        {/* Phase 2.O：name 字段把「历史命名」放在 label 右侧（不挤进组件下方工具栏） */}
+        {isNameTemplate && (
+          <div className="ml-auto">
+            <HistoryNamingDropdown
+              channel={def.channel}
+              level={def.level}
+              onApply={handleChange}
+            />
+          </div>
         )}
         {disabled && (
           <span className="ml-auto text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-gray-100 text-gray-400 font-semibold">

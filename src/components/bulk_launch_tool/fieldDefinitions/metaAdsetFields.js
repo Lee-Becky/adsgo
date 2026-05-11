@@ -50,6 +50,7 @@ const fields = [
     sdkPath: 'adset.name',
     level, channel, apiVersion,
     type: 'text',
+    customRenderer: 'nameTemplate',
     required: true,
     group: 'basic',
     validation: { maxLength: 200 },

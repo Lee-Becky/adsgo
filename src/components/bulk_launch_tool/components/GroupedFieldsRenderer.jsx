@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { ChevronDown } from 'lucide-react';
 import DynamicFieldRenderer from './DynamicFieldRenderer';
 import { GROUP_META, ACCENT, getGroupMeta } from '../fieldDefinitions/groupMeta';
@@ -51,6 +51,22 @@ const GroupedFieldsRenderer = ({
     return init;
   });
   const toggle = (g) => setOpenMap(prev => ({ ...prev, [g]: !prev[g] }));
+
+  // Phase 2.P：监听全局聚焦字段事件 —— 若目标 level + 字段属于本渲染器某 group，自动展开该 group 让 scrollIntoView 命中
+  useEffect(() => {
+    const onFocus = (e) => {
+      const targetLevel = e.detail?.level;
+      const targetName = e.detail?.name;
+      if (!targetLevel || !targetName || targetLevel !== level) return;
+      // 在 buckets 中找包含该字段的 group
+      const groupName = Object.entries(buckets).find(
+        ([, list]) => list.some(d => d.name === targetName)
+      )?.[0];
+      if (groupName) setOpenMap(prev => prev[groupName] ? prev : { ...prev, [groupName]: true });
+    };
+    window.addEventListener('bulk-launch:focus-field', onFocus);
+    return () => window.removeEventListener('bulk-launch:focus-field', onFocus);
+  }, [level, buckets]);
 
   const isOverrideMode = !!inheritanceMap;
   const fieldOverridden = (name) => isOverrideMode && !!inheritanceMap[name];

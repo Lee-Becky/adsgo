@@ -879,7 +879,7 @@ const AppPickerSection = ({ platform, authStatus, isAuthLoading, handleAuthorize
   );
 };
 
-const ProductSelector = ({ selectedProducts, onSelectProducts, productCreativeGroups, onUpdateGroupAds, onAddGroup, onRemoveGroup, onRenameGroup, onAnalysisStart, onAnalysisComplete, onReset, hasGeneratedOnce, analysisFinished, isAnalyzing, campaignType, onCampaignTypeChange, selectedAccount, onSelectAccount, productAnalyses, onProductAnalysesChange, authStatus, onAuthStatusChange, onMetaAccountPick, selectedCatalog: selectedCatalogProp, onSelectCatalog, selectedProductSet: selectedProductSetProp, onSelectProductSet, catalogCombos = [], onCatalogCombosChange, platform, availableAccounts = [], creativeGroupCopyMap = {}, onSaveGroupCopy }) => {
+const ProductSelector = ({ selectedProducts, onSelectProducts, productCreativeGroups, onUpdateGroupAds, onAddGroup, onRemoveGroup, onRenameGroup, onAnalysisStart, onAnalysisComplete, onReset, hasGeneratedOnce, analysisFinished, isAnalyzing, campaignType, onCampaignTypeChange, selectedAccount, onSelectAccount, productAnalyses, onProductAnalysesChange, authStatus, onAuthStatusChange, onMetaAccountPick, selectedCatalog: selectedCatalogProp, onSelectCatalog, selectedProductSet: selectedProductSetProp, onSelectProductSet, catalogCombos = [], onCatalogCombosChange, platform, availableAccounts = [], creativeGroupCopyMap = {}, onSaveGroupCopy, catalogCampaignCopyMap = {}, onSaveCatalogCopy }) => {
   const [urlInput, setUrlInput] = useState('');
   const [isAuthLoading, setIsAuthLoading] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
@@ -1515,6 +1515,9 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreativeGr
                     channel={platform.id}
                     value={catalogCombos}
                     onChange={onCatalogCombosChange}
+                    catalogCampaignCopyMap={catalogCampaignCopyMap}
+                    onSaveCatalogCopy={onSaveCatalogCopy}
+                    ctaOptions={ctaOptions}
                   />
                 </div>
               )}
