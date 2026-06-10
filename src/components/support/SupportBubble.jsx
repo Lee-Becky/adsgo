@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { MessageCircle, X, Mail, BookOpen } from 'lucide-react'
+import { Z_INDEX } from '../../constants/zIndex'
 
 export default function SupportBubble() {
   const [isOpen, setIsOpen] = useState(false)
@@ -55,7 +56,7 @@ export default function SupportBubble() {
   }, [isOpen])
 
   return (
-    <div ref={containerRef} className="fixed bottom-6 right-6 z-[850]">
+    <div ref={containerRef} className="fixed bottom-6 right-6" style={{ zIndex: Z_INDEX.FLOATING_ACTION }}>
       {(isOpen || isClosing) && (
         <div
           className={`absolute bottom-[72px] right-0 w-80 origin-bottom-right ${

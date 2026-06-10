@@ -17,6 +17,10 @@ import MediaPreviewModal from '../../common/MediaPreviewModal';
 import { generateAIGCCreative } from '../services/mockAiService';
 import { authorizePlatform, MOCK_ACCOUNTS } from '../services/authService';
 import useDropdownLoading from '../../../hooks/useDropdownLoading';
+import CatalogCombosField from './MergedFields/CatalogCombosField';
+import AdCopyEditor from './MergedFields/AdCopyEditor';
+import metaAdFieldDefs from '../fieldDefinitions/metaAdFields';
+import tiktokAdFieldDefs from '../fieldDefinitions/tiktokAdFields';
 
 export const MOCK_CATALOGS = [
   { id: 'cat_8820192', name: 'Luminaire official catalog 2024', productCount: 128 },
@@ -875,7 +879,7 @@ const AppPickerSection = ({ platform, authStatus, isAuthLoading, handleAuthorize
   );
 };
 
-const ProductSelector = ({ selectedProducts, onSelectProducts, productCreativeGroups, onUpdateGroupAds, onAddGroup, onRemoveGroup, onRenameGroup, onAnalysisStart, onAnalysisComplete, onReset, hasGeneratedOnce, analysisFinished, isAnalyzing, campaignType, onCampaignTypeChange, selectedAccount, onSelectAccount, productAnalyses, onProductAnalysesChange, authStatus, onAuthStatusChange, onMetaAccountPick, selectedCatalog: selectedCatalogProp, onSelectCatalog, selectedProductSet: selectedProductSetProp, onSelectProductSet, platform, availableAccounts = [] }) => {
+const ProductSelector = ({ selectedProducts, onSelectProducts, productCreativeGroups, onUpdateGroupAds, onAddGroup, onRemoveGroup, onRenameGroup, onAnalysisStart, onAnalysisComplete, onReset, hasGeneratedOnce, analysisFinished, isAnalyzing, campaignType, onCampaignTypeChange, selectedAccount, onSelectAccount, productAnalyses, onProductAnalysesChange, authStatus, onAuthStatusChange, onMetaAccountPick, selectedCatalog: selectedCatalogProp, onSelectCatalog, selectedProductSet: selectedProductSetProp, onSelectProductSet, catalogCombos = [], onCatalogCombosChange, platform, availableAccounts = [], creativeGroupCopyMap = {}, onSaveGroupCopy, catalogCampaignCopyMap = {}, onSaveCatalogCopy }) => {
   const [urlInput, setUrlInput] = useState('');
   const [isAuthLoading, setIsAuthLoading] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
@@ -889,6 +893,15 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreativeGr
   const catalogTriggerRef = useRef(null);
   const setTriggerRef = useRef(null);
   const [previewMedia, setPreviewMedia] = useState(null); // { url, mediaType, name? }
+  // Phase 2.M：素材组级 ad copy 编辑入口
+  const [copyEditorTarget, setCopyEditorTarget] = useState(null); // { productId, groupId, groupName }
+  const ctaOptions = useMemo(() => {
+    const channelKey = (platform === 'tiktok') ? 'tiktok' : 'meta';
+    const defs = channelKey === 'meta' ? metaAdFieldDefs : tiktokAdFieldDefs;
+    const fieldName = channelKey === 'meta' ? 'call_to_action_type' : 'call_to_action';
+    const f = (defs || []).find(d => d?.name === fieldName);
+    return Array.isArray(f?.options) ? f.options.map(o => ({ value: o.value, label: o.label })) : [];
+  }, [platform]);
   const [flashAdId, setFlashAdId] = useState(null); // 临时视觉反馈：被点击的素材 id
   useEffect(() => {
     if (!flashAdId) return;
@@ -1490,85 +1503,22 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreativeGr
                   <button onClick={() => setActiveModal('select_account')} className="px-8 py-4 bg-primary-500 text-white rounded-xl font-semibold hover:bg-primary-600 transition-all shadow-lg shadow-primary-500/10">选择广告账户</button>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 animate-in slide-in-from-top-4">
-                  <div className="space-y-3">
-                    <label className="text-xs font-semibold text-gray-400 px-1">选择目录 (catalog)</label>
-                    <div ref={catalogTriggerRef} onClick={() => setCatalogDropdownOpen(!catalogDropdownOpen)} className={`flex items-center justify-between p-6 bg-white border-2 rounded-lg cursor-pointer hover:border-primary-500 hover:shadow-lg transition-all ${catalogDropdownOpen ? 'border-primary-500 shadow-lg' : 'border-gray-100'}`}>
-                      <div className="flex items-center gap-4 min-w-0">
-                        <div className="w-11 h-11 bg-primary-50 text-primary-500 rounded-xl flex items-center justify-center shrink-0"><Database size={22} /></div>
-                        <div className="min-w-0">
-                          <p className="text-xs font-medium text-gray-800 truncate">{selectedCatalog?.name || '请选择一个目录...'}</p>
-                          {selectedCatalog && <p className="text-xs text-gray-400 font-bold mt-0.5">id: {selectedCatalog.id}</p>}
-                        </div>
-                      </div>
-                      <ChevronDown size={14} className={`text-gray-300 transition-transform ${catalogDropdownOpen ? 'rotate-180' : ''}`} />
+                <div className="bg-gradient-to-b from-primary-50/30 to-white border border-primary-500/15 rounded-2xl p-6 animate-in slide-in-from-top-4">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 rounded-xl bg-primary-50 text-primary-600 flex items-center justify-center"><Database size={20} strokeWidth={2.2} /></div>
+                    <div>
+                      <h4 className="text-base font-semibold text-gray-900">目录与商品系列组合</h4>
+                      <p className="text-xs text-gray-500 mt-0.5">添加多组组合：每个目录将生成 1 个 Campaign，每个商品系列生成 1 个 AdSet。同一目录仅可选 1 次。</p>
                     </div>
-                    <Popover
-                      open={catalogDropdownOpen}
-                      anchorRef={catalogTriggerRef}
-                      placement="bottom-start"
-                      matchWidth
-                      onClose={() => setCatalogDropdownOpen(false)}
-                      className="bg-white border border-gray-100 rounded-base shadow-xl overflow-hidden"
-                    >
-                      {catalogLoading.isLoading ? (
-                        <div className="p-6 flex flex-col items-center justify-center gap-2">
-                          <Loader2 size={20} className="animate-spin text-primary-500/70" />
-                          <p className="text-xs font-medium text-gray-400 animate-pulse">Loading catalogs...</p>
-                        </div>
-                      ) : MOCK_CATALOGS.length > 0 ? (
-                        MOCK_CATALOGS.map(c => (
-                          <div key={c.id} onClick={() => { setSelectedCatalog(c); setCatalogDropdownOpen(false); }} className="flex items-center justify-between px-6 py-4 hover:bg-gray-50 cursor-pointer transition-colors group">
-                            <div>
-                              <p className="text-xs font-medium text-gray-800 group-hover:text-primary-500 transition-colors">{c.name}</p>
-                              <p className="text-xs text-gray-400 font-bold">id: {c.id}</p>
-                            </div>
-                            {selectedCatalog?.id === c.id && <Check size={16} className="text-primary-500" />}
-                          </div>
-                        ))
-                      ) : (
-                        <div className="p-8 text-center space-y-4">
-                          <AlertCircle size={32} className="mx-auto text-gray-200" /><p className="text-xs font-bold text-gray-400">暂无可用目录，请先在 Meta 后台创建</p>
-                          <a href="#" className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary-500 hover:underline"><ExternalLink size={12} /> 查看 Meta feeds 创建帮助文档</a>
-                        </div>
-                      )}
-                    </Popover>
                   </div>
-                  <div className="space-y-3">
-                    <label className="text-xs font-semibold text-gray-400 px-1">产品系列 (Product set)</label>
-                    <div ref={setTriggerRef} onClick={() => setSetDropdownOpen(!setDropdownOpen)} className={`flex items-center justify-between p-6 bg-white border-2 rounded-lg cursor-pointer hover:border-primary-500 hover:shadow-lg transition-all ${setDropdownOpen ? 'border-primary-500 shadow-lg' : 'border-gray-100'}`}>
-                      <div className="flex items-center gap-4 min-w-0">
-                        <div className="w-11 h-11 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center shrink-0"><ListFilter size={22} /></div>
-                        <div>
-                          <p className="text-xs font-medium text-gray-800">{selectedProductSet || '选择产品系列...'}</p>
-                          <p className="text-xs text-gray-400 font-bold mt-0.5">set criteria</p>
-                        </div>
-                      </div>
-                      <ChevronDown size={14} className={`text-gray-300 transition-transform ${setDropdownOpen ? 'rotate-180' : ''}`} />
-                    </div>
-                    <Popover
-                      open={setDropdownOpen}
-                      anchorRef={setTriggerRef}
-                      placement="bottom-start"
-                      matchWidth
-                      onClose={() => setSetDropdownOpen(false)}
-                      className="bg-white border border-gray-100 rounded-base shadow-xl overflow-hidden"
-                    >
-                      {productSetLoading.isLoading ? (
-                        <div className="p-6 flex flex-col items-center justify-center gap-2">
-                          <Loader2 size={20} className="animate-spin text-primary-500/70" />
-                          <p className="text-xs font-medium text-gray-400 animate-pulse">Loading product sets...</p>
-                        </div>
-                      ) : (
-                        MOCK_PRODUCT_SETS.map(s => (
-                          <div key={s} onClick={() => { setSelectedProductSet(s); setSetDropdownOpen(false); }} className="flex items-center justify-between px-6 py-4 hover:bg-gray-50 cursor-pointer transition-colors group">
-                            <p className="text-xs font-medium text-gray-800 group-hover:text-primary-500 transition-colors">{s}</p>
-                            {selectedProductSet === s && <Check size={16} className="text-primary-500" />}
-                          </div>
-                        ))
-                      )}
-                    </Popover>
-                  </div>
+                  <CatalogCombosField
+                    channel={platform.id}
+                    value={catalogCombos}
+                    onChange={onCatalogCombosChange}
+                    catalogCampaignCopyMap={catalogCampaignCopyMap}
+                    onSaveCatalogCopy={onSaveCatalogCopy}
+                    ctaOptions={ctaOptions}
+                  />
                 </div>
               )}
             </div>
@@ -1636,9 +1586,13 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreativeGr
               )}
             </div>
           )}
-          {!analysisFinished && !isAnalyzing && campaignType === 'CATALOG' && selectedCatalog && (
+          {!analysisFinished && !isAnalyzing && campaignType === 'CATALOG' && catalogCombos.length > 0 && catalogCombos.every(c => c.catalog_id && c.product_set_ids?.length > 0) && (
             <div className="flex flex-col items-center pt-8 border-t border-gray-50 space-y-10 animate-in fade-in slide-in-from-bottom-6">
-              <button onClick={() => onAnalysisComplete({})} className="h-24 px-20 bg-primary-500 text-white rounded-section text-lg font-semibold flex items-center gap-6 hover:bg-primary-600 transition-all shadow-[0_20px_50px_rgba(0,0,0,0.2)] hover:scale-105 active:scale-95 group"><Box size={32} className="group-hover:scale-110 transition-transform" /> 配置 {selectedProductSet} 的 feeds 广告结构 <ChevronRight size={32} /></button>
+              <button onClick={() => onAnalysisComplete({})} className="h-24 px-16 bg-primary-500 text-white rounded-section text-lg font-semibold flex items-center gap-6 hover:bg-primary-600 transition-all shadow-[0_20px_50px_rgba(0,0,0,0.2)] hover:scale-105 active:scale-95 group">
+                <Box size={32} className="group-hover:scale-110 transition-transform" />
+                配置 {catalogCombos.length} 个目录组合（共 {catalogCombos.reduce((n, c) => n + (c.product_set_ids?.length || 0), 0)} 个 AdSet）的 feeds 广告结构
+                <ChevronRight size={32} />
+              </button>
               <p className="text-xs text-gray-400 font-bold">Next-gen media planning system</p>
             </div>
           )}
@@ -1798,16 +1752,33 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreativeGr
                                     </button>
                                   )}
                                   <span className="text-xs font-medium text-gray-400 shrink-0">· {groupAds.length} 素材</span>
+                                  {(() => {
+                                    const copy = creativeGroupCopyMap?.[p.id]?.[group.id] || {};
+                                    const filled = Boolean(copy.title || copy.body || copy.link_url || copy.call_to_action_type);
+                                    return filled ? (
+                                      <span className="text-[10px] font-medium text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded-tag shrink-0">已配置文案</span>
+                                    ) : null;
+                                  })()}
                                 </div>
-                                {groups.length > 1 && (
+                                <div className="flex items-center gap-1 shrink-0">
                                   <button
-                                    onClick={() => onRemoveGroup(p.id, group.id)}
-                                    className="shrink-0 p-1.5 text-gray-300 hover:text-rose-500 hover:bg-rose-50 rounded-base transition-colors"
-                                    title="删除该素材组"
+                                    onClick={() => setCopyEditorTarget({ productId: p.id, groupId: group.id, groupName: group.name })}
+                                    className="flex items-center gap-1 px-2 h-7 text-[11px] font-medium text-fuchsia-600 bg-fuchsia-50 hover:bg-fuchsia-100 rounded-base transition-colors"
+                                    title="编辑该素材组文案（标题 / 正文 / 落地页 / CTA）"
                                   >
-                                    <Trash2 size={14} />
+                                    <FileText size={12} />
+                                    文案
                                   </button>
-                                )}
+                                  {groups.length > 1 && (
+                                    <button
+                                      onClick={() => onRemoveGroup(p.id, group.id)}
+                                      className="p-1.5 text-gray-300 hover:text-rose-500 hover:bg-rose-50 rounded-base transition-colors"
+                                      title="删除该素材组"
+                                    >
+                                      <Trash2 size={14} />
+                                    </button>
+                                  )}
+                                </div>
                               </div>
                               <div className="flex items-center gap-3 overflow-x-auto no-scrollbar py-1 min-w-0">
                                 {[...Array(groupGenCount)].map((_, i) => (
@@ -2317,6 +2288,21 @@ const AddProductModal = ({ onClose, authStatus, handleAuthorize, isAuthLoading, 
         </div>
       </div>
       <MediaPreviewModal media={previewMedia} onClose={() => setPreviewMedia(null)} />
+      {/* Phase 2.M：素材组级 ad copy 编辑器 */}
+      <AdCopyEditor
+        open={!!copyEditorTarget}
+        onClose={() => setCopyEditorTarget(null)}
+        productId={copyEditorTarget?.productId}
+        groupId={copyEditorTarget?.groupId}
+        groupName={copyEditorTarget?.groupName}
+        channel={(platform === 'tiktok') ? 'tiktok' : 'meta'}
+        value={copyEditorTarget ? (creativeGroupCopyMap?.[copyEditorTarget.productId]?.[copyEditorTarget.groupId] || {}) : {}}
+        ctaOptions={ctaOptions}
+        onSave={(next) => {
+          if (!copyEditorTarget) return;
+          onSaveGroupCopy?.(copyEditorTarget.productId, copyEditorTarget.groupId, next);
+        }}
+      />
       {/* Fallback 内联兜底浮窗：不走 portal、不依赖任何外部组件，确保点击素材一定可见。
           如果 MediaPreviewModal 没出现但这个出现了 → 是 portal/独立组件的问题。
           如果两者都没出现 → 是 setPreviewMedia state 没生效。 */}

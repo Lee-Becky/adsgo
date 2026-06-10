@@ -23,6 +23,29 @@ body {
   pointer-events: none;
 }
 
+/* Phase 2.P：字段未填 / 错误时的红色呼吸闪烁高亮（不依赖 box-shadow 外扩，避免被祖先 overflow-hidden 裁切） */
+@keyframes errorFieldFlash {
+  0%, 100% {
+    border-color: rgb(244, 63, 94);
+    background-color: rgba(255, 241, 242, 0.85);
+  }
+  50% {
+    border-color: rgb(253, 164, 175);
+    background-color: rgba(255, 241, 242, 0.15);
+  }
+}
+.field-error-flash {
+  border-color: rgb(244, 63, 94) !important;
+  border-width: 2px !important;
+  border-style: solid !important;
+  border-radius: 8px !important;
+  padding: 8px !important;
+  margin: -7px !important; /* 抵消 padding + 1px 边宽增量，避免布局抖动 */
+  background-color: rgba(255, 241, 242, 0.6);
+  animation: errorFieldFlash 0.7s ease-in-out 4;
+  box-shadow: inset 0 0 0 1px rgba(244, 63, 94, 0.35);
+}
+
 /* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
