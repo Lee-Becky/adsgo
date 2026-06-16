@@ -7,7 +7,7 @@ const MetricCard = ({ icon: Icon, label, value, subValue, colorClass, bgClass })
       <div className={`w-10 h-10 rounded-xl ${bgClass} ${colorClass} flex items-center justify-center transition-transform group-hover:scale-110`}>
         <Icon size={20} />
       </div>
-      <span className="text-[11px] font-black text-slate-400 tracking-wider">{label}</span>
+      <span className="text-[11px] font-black text-slate-400">{label}</span>
     </div>
     <div className="space-y-1">
       <div className="text-lg font-black text-slate-900 truncate">
@@ -48,12 +48,7 @@ const ObjectiveOverview = ({ formData }) => {
 
   // Calculate total budget
   const totalDailyBudget = formData.marketGroups.reduce((acc, group) => {
-    if (group.budgetMode === 'unified') {
-      return acc + (parseFloat(group.unifiedBudget) || 0)
-    } else {
-      const splitTotal = Object.values(group.splitBudgets).reduce((s, b) => s + (parseFloat(b) || 0), 0)
-      return acc + splitTotal
-    }
+    return acc + (parseFloat(group.budget ?? group.unifiedBudget) || 0)
   }, 0)
 
   // Objective Summary (based on first group or general)
@@ -77,7 +72,7 @@ const ObjectiveOverview = ({ formData }) => {
       <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-8 mb-12">
         <div className="space-y-2">
           <div className="flex items-center gap-3">
-            <div className="px-3 py-1 bg-indigo-500 rounded-full text-[10px] font-black tracking-[0.2em]">Strategy Overview</div>
+            <div className="px-3 py-1 bg-indigo-500 rounded-full text-[10px] font-black">Strategy Overview</div>
             <div className="w-1 h-1 rounded-full bg-slate-700" />
             <span className="text-slate-400 text-xs font-bold">{formData.marketGroups.length} Strategy Groups</span>
           </div>

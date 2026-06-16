@@ -63,7 +63,7 @@ const ImageCropper = ({ imageSrc, onCrop, onCancel }) => {
         
         <div className="p-8 space-y-6">
           <div className="space-y-3">
-            <div className="flex justify-between text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+            <div className="flex justify-between text-[11px] font-bold text-slate-400">
               <span>Zoom</span>
               <span>{Math.round(zoom * 100)}%</span>
             </div>

@@ -321,7 +321,7 @@ const ProductList = ({ onProductClick }) => {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse table-fixed min-w-[1000px]">
               <thead>
-                <tr className="border-b border-slate-50 text-slate-400 text-sm font-bold tracking-wider">
+                <tr className="border-b border-slate-50 text-slate-400 text-sm font-bold">
                   <th className="px-8 py-5 w-[35%]">Landingpage</th>
                   <th className="px-8 py-5 w-[12%]">Category</th>
                   <th className="px-8 py-5 w-[10%]">Type</th>
@@ -512,7 +512,7 @@ const ProductList = ({ onProductClick }) => {
                   <div className="space-y-8 mb-12">
                     <h2 className="text-3xl font-bold text-slate-900 leading-tight font-sans">Paste your <span className="text-indigo-500">product link</span> to get product info</h2>
                     <div className="space-y-4">
-                      <p className="text-[10px] font-bold text-slate-400 tracking-[0.2em] font-sans">AdsGo Supports</p>
+                      <p className="text-[10px] font-bold text-slate-400 font-sans">AdsGo Supports</p>
                       <div className="flex items-center justify-center gap-4">
                         {platformIcons.map(icon => (
                           <div key={icon.id} className="w-10 h-10 rounded-full bg-white border border-slate-100 flex items-center justify-center p-2 shadow-sm hover:shadow-md hover:scale-110 transition-all cursor-default">

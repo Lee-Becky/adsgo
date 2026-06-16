@@ -2,9 +2,8 @@ import { useState, useEffect, useRef } from 'react'
 import { Save, CheckCircle2 } from 'lucide-react'
 import {
   BudgetKPISection,
-  AssetSection,
-  RulesLibrarySection,
-  ObjectiveOverview
+  ObjectiveOverview,
+  StrategyPhaseSection
 } from './optimizeGoals/index'
 import { useOnboardingTour } from '../onboarding/useOnboardingTour'
 import OnboardingSpotlight from '../onboarding/OnboardingSpotlight'
@@ -19,23 +18,32 @@ const OptimizeGoals = ({ onGoalSave }) => {
           { value: 'uk', label: 'United Kingdom' }
         ],
         platforms: ['meta', 'google'],
+        os: 'all',
         campaignObjective: 'sales_conversions',
         adsetGoal: 'in_web_actions',
         event: 'Purchase',
-        budgetMode: 'unified',
-        unifiedBudget: '',
-        splitBudgets: {},
-        kpiType: 'ROAS',
-        kpiMode: 'unified',
-        unifiedKPI: '',
-        splitKPIs: {}
+        budget: '',
+        roasTarget: '',
+        roasRedline: '',
+        cpaTarget: '',
+        cpaRedline: '',
       }
     ],
-    adScopeAccounts: [],
-    assetLoading: false,
-    optimizePreferences: [
-      { text: 'If ROAS is below 1.5 in the last 3 days, then reduce budget by 50% for the adset or campaign.', type: 'Rule' }
-    ]
+    strategy: {
+      phase: '',
+      customPhase: '',
+      validFrom: '',
+      validTo: '',
+      cycleType: 'weekly',
+      dayOfWeek: 0,
+      dayOfMonth: 1,
+      monthInQuarter: 1,
+      executionHour: 9,
+      executionMinute: 0,
+      autoExecute: false,
+      coreObjectives: '',
+      dataSources: { offline: [], attribution: [], adAccount: [], creative: [] }
+    },
   })
 
   const [validation, setValidation] = useState({
@@ -52,7 +60,7 @@ const OptimizeGoals = ({ onGoalSave }) => {
   const showPageTour = isActive && ctxSubStep >= 1
 
   const isReadyToSave = formData.marketGroups.every(g =>
-    g.unifiedBudget?.toString().trim() && g.unifiedKPI?.toString().trim()
+    (g.budget ?? g.unifiedBudget)?.toString().trim()
   )
 
   // Reset sub-step when tour activates
@@ -85,7 +93,7 @@ const OptimizeGoals = ({ onGoalSave }) => {
   return (
     <div className="min-h-full bg-slate-50 flex flex-col font-sans text-slate-900 selection:bg-indigo-100 relative pb-24">
 
-      <main className="flex-1 max-w-6xl mx-auto w-full px-10 py-12">
+      <main className="flex-1 w-full py-12">
         <div className="space-y-10">
 
           <ObjectiveOverview formData={formData} />
@@ -101,24 +109,13 @@ const OptimizeGoals = ({ onGoalSave }) => {
             />
           </div>
 
-          <div className="bg-white rounded-[32px] border border-slate-200 shadow-[0_4px_24px_rgba(0,0,0,0.04)] relative">
-            <AssetSection
-              formData={formData}
-              updateFormData={updateFormData}
-              validation={validation}
-              setValidation={setValidation}
-            />
-          </div>
-
-          <div className="bg-white rounded-[32px] border border-slate-200 shadow-[0_4px_24px_rgba(0,0,0,0.04)] relative">
-            <RulesLibrarySection
-              formData={formData}
-              updateFormData={updateFormData}
-            />
-          </div>
+          <StrategyPhaseSection
+            strategy={formData.strategy}
+            onChange={(newStrategy) => updateFormData('strategy', newStrategy)}
+          />
 
           <div className="pt-4">
-            <p className="text-[11px] font-bold text-slate-400 text-center tracking-widest">
+            <p className="text-[11px] font-bold text-slate-400 text-center">
               All configurations are processed by AdsGo AI engine
             </p>
           </div>
@@ -138,7 +135,7 @@ const OptimizeGoals = ({ onGoalSave }) => {
             </span>
           ) : (
             <span className="text-slate-400">
-              请先填写市场组的预算（Budget）和目标（KPI）
+              Please fill in budget for each strategy group
             </span>
           )}
         </div>
@@ -146,7 +143,7 @@ const OptimizeGoals = ({ onGoalSave }) => {
           ref={saveButtonRef}
           onClick={handleSave}
           disabled={!isReadyToSave}
-          className={`px-8 py-3 rounded-2xl font-black text-xs tracking-wider flex items-center gap-2 transition-all duration-200 ${
+          className={`px-8 py-3 rounded-2xl font-black text-xs flex items-center gap-2 transition-all duration-200 ${
             isReadyToSave
               ? 'bg-slate-900 text-white hover:bg-black active:scale-95 shadow-2xl shadow-slate-900/20 border border-white/10'
               : 'bg-slate-200 text-slate-400 cursor-not-allowed'

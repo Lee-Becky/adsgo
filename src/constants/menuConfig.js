@@ -157,6 +157,22 @@ export const MENU_ITEMS = [
         subtitle: 'Set and manage optimization goals'
       },
       {
+        key: 'adAccounts',
+        label: 'Ad Accounts',
+        shortLabel: 'Acct',
+        icon: 'Link2',
+        title: 'Ad Accounts',
+        subtitle: 'Manage connected ad accounts across platforms'
+      },
+      {
+        key: 'datasets',
+        label: 'Datasets',
+        shortLabel: 'Data',
+        icon: 'Database',
+        title: 'Datasets',
+        subtitle: 'Configure and manage data sources for AI optimization'
+      },
+      {
         key: 'products',
         label: 'Products',
         shortLabel: 'Prod',

@@ -27,6 +27,8 @@ import CreativeLibrary from './components/creativeHub/CreativeLibrary'
 import { ProductList, ProductDetails } from './components/brand/products'
 import { Competitors } from './components/brand/competitors'
 import BrandProfile from './components/brand/BrandProfile'
+import { AdAccounts } from './components/brand/adAccounts'
+import { DatasetsPage } from './components/brand/datasets'
 import MediaPlan from './components/mediaPlan/MediaPlan'
 import CreateBrandModal from './components/brand/CreateBrandModal'
 import BrandSwitchLoading from './components/brand/BrandSwitchLoading'
@@ -308,6 +310,10 @@ function App() {
             }} 
           />
         )
+      case 'adAccounts':
+        return <AdAccounts />
+      case 'datasets':
+        return <DatasetsPage />
       case 'competitors':
         return <Competitors />
       case 'productDetails':

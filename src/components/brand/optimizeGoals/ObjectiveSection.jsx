@@ -145,7 +145,7 @@ const ObjectiveSection = ({ formData, updateFormData, validation, setValidation 
           <div className="space-y-8 animate-in slide-in-from-top-4 duration-500 pt-8 border-t border-slate-100 flex flex-col lg:flex-row lg:items-center gap-10">
             <div className="lg:w-[35%] space-y-4">
               <div className="flex items-center gap-2">
-                <h3 className="text-xs font-black text-slate-900 tracking-widest">Conversion Event</h3>
+                <h3 className="text-xs font-black text-slate-900">Conversion Event</h3>
               </div>
               <p className="text-[11px] text-slate-400 leading-relaxed">
                 Define the specific event or outcome you want to track and optimize for your campaign.
@@ -194,7 +194,7 @@ const ObjectiveSection = ({ formData, updateFormData, validation, setValidation 
                     
                     {selectorStage === 'goal' ? (
                       <div className="space-y-3">
-                        <p className="text-[10px] font-black text-slate-400 tracking-widest mb-2 px-2">Select conv. goal</p>
+                        <p className="text-[10px] font-black text-slate-400 mb-2 px-2">Select conv. goal</p>
                         <div className="grid grid-cols-1 gap-1.5">
                           {adsetGoals.map(goal => (
                             <button
@@ -216,7 +216,7 @@ const ObjectiveSection = ({ formData, updateFormData, validation, setValidation 
                           <button onClick={() => setSelectorStage('goal')} className="p-1 hover:bg-slate-100 rounded-md transition-colors text-slate-400 hover:text-slate-900">
                             <ChevronLeft size={16} />
                           </button>
-                          <p className="text-[10px] font-black text-slate-400 tracking-widest">Back</p>
+                          <p className="text-[10px] font-black text-slate-400">Back</p>
                         </div>
                         <div className="relative">
                           <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" />

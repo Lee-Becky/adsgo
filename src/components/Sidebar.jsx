@@ -48,7 +48,8 @@ import {
   Brain, Building2, Info, Package, Box, Cog, Star, BookOpen,
   ChevronsUpDown, Check, LogOut, CreditCard, Link, HelpCircle,
   ChevronLeft, Wand2, Monitor, PieChart, BrainCircuit, ShieldCheck,
-  Fingerprint, Swords, Award, Video, Compass, LayoutDashboard
+  Fingerprint, Swords, Award, Video, Compass, LayoutDashboard,
+  Link2, Database
 } from 'lucide-react'
 import { MENU_ITEMS, SETTINGS_MENU } from '../constants/menuConfig'
 
@@ -107,7 +108,8 @@ const Sidebar = ({ isMobile, isPinned, onTogglePinned, onClose, selectedBrand, o
     Sparkles, Zap, Trash2, BarChart3, Palette, FolderOpen,
     Eye, Brain, Building2, Info, Package, Box, Users,
     Wand2, Monitor, PieChart, BrainCircuit, ShieldCheck,
-    Fingerprint, Swords, Image, Award, Video, Compass, LayoutDashboard
+    Fingerprint, Swords, Image, Award, Video, Compass, LayoutDashboard,
+    Link2, Database
   }
 
   // 构建完整路径

@@ -52,10 +52,46 @@ import { mockProfile } from './mockData';
 import BaseModal from './Common';
 
 const industryOptions = [
-  "时尚/配饰", "美妆/个护", "服装/鞋履", "体育/户外", "消费电子/3C",
-  "电商/零售", "企业服务/Saas", "制造业", "金融科技", "医疗健康",
-  "教育培训", "文娱传媒", "社交/社区", "游戏/电竞", "房地产/建筑",
-  "交通物流", "餐饮/食品", "旅游/酒店", "家居/生活"
+  "电商", "游戏", "社交", "短视频/直播", "工具应用",
+  "金融/保险", "教育", "旅游出行", "娱乐", "阅读",
+  "健康医疗", "生活服务", "新闻资讯", "汽车", "房产/家装",
+  "招聘求职", "餐饮外卖", "美妆个护", "服饰鞋包", "母婴",
+  "运动健身", "企业服务", "其他"
+];
+
+const AD_PLATFORMS = [
+  { id: 'meta', name: 'Meta', color: '#1877F2', icon: 'https://www.google.com/s2/favicons?domain=facebook.com&sz=32' },
+  { id: 'google', name: 'Google', color: '#DB4437', icon: 'https://www.google.com/s2/favicons?domain=google.com&sz=32' },
+  { id: 'tiktok', name: 'TikTok', color: '#000000', icon: 'https://www.google.com/s2/favicons?domain=tiktok.com&sz=32' },
+  { id: 'bing', name: 'Bing', color: '#008373', icon: 'https://www.google.com/s2/favicons?domain=bing.com&sz=32' },
+  { id: 'snapchat', name: 'Snapchat', color: '#FFFC00', icon: 'https://www.google.com/s2/favicons?domain=snapchat.com&sz=32' },
+];
+
+const MARKET_REGIONS = [
+  { group: 'North America', markets: ['US','CA','MX'] },
+  { group: 'Latin America', markets: ['BR','AR','CO','CL','PE'] },
+  { group: 'Europe', markets: ['UK','DE','FR','ES','IT','NL','PL','SE','NO','DK','FI','AT','CH','BE'] },
+  { group: 'Middle East & N. Africa', markets: ['SA','AE','EG','TR','IL','QA','KW','BH'] },
+  { group: 'Northeast Asia', markets: ['JP','KR','HK','TW'] },
+  { group: 'Southeast Asia', markets: ['TH','VN','ID','MY','PH','SG'] },
+  { group: 'South Asia & Oceania', markets: ['IN','AU','NZ'] },
+  { group: 'Other', markets: ['Global','SEA','LATAM','EMEA','APAC'] },
+];
+
+const PHONE_COUNTRY_CODES = [
+  { code: '+1', label: 'US/CA' },
+  { code: '+44', label: 'UK' },
+  { code: '+86', label: 'CN' },
+  { code: '+81', label: 'JP' },
+  { code: '+82', label: 'KR' },
+  { code: '+49', label: 'DE' },
+  { code: '+33', label: 'FR' },
+  { code: '+61', label: 'AU' },
+  { code: '+91', label: 'IN' },
+  { code: '+55', label: 'BR' },
+  { code: '+65', label: 'SG' },
+  { code: '+852', label: 'HK' },
+  { code: '+886', label: 'TW' },
 ];
 
 const emptyProfile = {
@@ -63,6 +99,9 @@ const emptyProfile = {
   domain: "",
   businessType: "",
   product_description: "",
+  platforms: [],
+  markets: [],
+  contactPhone: { countryCode: '+1', number: '' },
   product_lifecycle: "",
   company_scale: "",
   company_location: "",
@@ -130,6 +169,8 @@ const BrandProfile = () => {
   const [updateDomain, setUpdateDomain] = useState(mockProfile.domain || '');
   const [isUpdating, setIsUpdating] = useState(false);
   const [elapsedTime, setElapsedTime] = useState(0);
+  const [showCustomMarketInput, setShowCustomMarketInput] = useState(false);
+  const [customMarketValue, setCustomMarketValue] = useState('');
 
   useEffect(() => {
     const handleScroll = () => {
@@ -387,7 +428,7 @@ const BrandProfile = () => {
             <div className="w-[360px] flex flex-col p-8 shrink-0 overflow-y-auto border-r border-slate-100 bg-white shadow-sm">
               <div className="mb-10">
                 <div className="flex items-center justify-between mb-4">
-                  <span className="text-sm font-black text-slate-900  tracking-widest">生成进度</span>
+                  <span className="text-sm font-black text-slate-900">生成进度</span>
                   <span className="text-sm font-mono font-bold text-blue-600">{analysisProgress}%</span>
                 </div>
                 <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
@@ -466,7 +507,7 @@ const BrandProfile = () => {
               <div className="mb-6 flex items-center justify-between px-2">
                 <div className="flex items-center gap-3">
                   <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                  <span className="text-[11px] font-black text-slate-400 tracking-[0.2em]">Browser Live View</span>
+                  <span className="text-[11px] font-black text-slate-400">Browser Live View</span>
                 </div>
               </div>
               
@@ -516,7 +557,7 @@ const BrandProfile = () => {
                       <div className="flex-1 flex flex-col items-center justify-center text-center max-w-4xl mx-auto space-y-12 py-10 relative">
                         <div className="absolute -top-40 left-1/2 -translate-x-1/2 w-96 h-96 bg-indigo-500/10 rounded-full blur-[120px]" />
                         
-                        <div className="px-6 py-2.5 bg-indigo-50 text-indigo-600 rounded-full text-xs font-black tracking-[0.3em] border border-indigo-100 shadow-sm
+                        <div className="px-6 py-2.5 bg-indigo-50 text-indigo-600 rounded-full text-xs font-black border border-indigo-100 shadow-sm
                         ">
                           AI-Powered Market Intelligence
                         </div>
@@ -555,8 +596,8 @@ const BrandProfile = () => {
 
       {!isUpdating && (
         <>
-          <div className="sticky top-0 z-50 py-3 px-10 pointer-events-none no-print">
-            <div className="max-w-[1400px] mx-auto flex justify-end gap-3">
+          <div className="sticky top-0 z-50 py-3 pointer-events-none no-print">
+            <div className="flex justify-end gap-3">
               {!isEditMode ? (
                 <button 
                   onClick={handleEdit} 
@@ -576,7 +617,7 @@ const BrandProfile = () => {
           </div>
 
           <main className="py-6 pb-24 relative">
-            <div className="max-w-[1280px] mx-auto px-8 space-y-12">
+            <div className="space-y-12">
               
               {/* Brand Header Card */}
               <div className={`bg-white rounded-3xl p-10 border border-slate-200 shadow-sm animate-fadeIn relative transition-all ${isEditMode ? 'ring-2 ring-amber-500/10' : ''}`}>
@@ -672,8 +713,8 @@ const BrandProfile = () => {
                         <div className="flex items-center gap-2">
                           <Building2 size={14} className="text-slate-400" />
                           {isEditMode ? (
-                            <select 
-                              value={profile.businessType} 
+                            <select
+                              value={profile.businessType}
                               onChange={e => setProfile({...profile, businessType: e.target.value})}
                               className="text-sm font-bold text-slate-400 bg-slate-50 border-b border-slate-200 outline-none rounded px-2 py-0.5 transition-all focus:bg-white focus:border-amber-500"
                             >
@@ -686,12 +727,48 @@ const BrandProfile = () => {
                             <span className="text-sm font-bold text-slate-400">{profile.businessType}</span>
                           )}
                         </div>
+
+                        <div className="flex items-center gap-2">
+                          <Phone size={14} className="text-slate-400" />
+                          {isEditMode ? (
+                            <div className="flex items-center gap-1.5">
+                              <select
+                                value={profile.contactPhone?.countryCode || '+1'}
+                                onChange={e => setProfile(prev => ({
+                                  ...prev,
+                                  contactPhone: { ...(prev.contactPhone || {}), countryCode: e.target.value }
+                                }))}
+                                className="text-xs font-bold text-slate-600 bg-slate-50 border-b border-slate-200 outline-none rounded px-2 py-1 transition-all focus:bg-white focus:border-amber-500"
+                              >
+                                {PHONE_COUNTRY_CODES.map(c => (
+                                  <option key={c.code} value={c.code}>{c.code} {c.label}</option>
+                                ))}
+                              </select>
+                              <input
+                                type="tel"
+                                value={profile.contactPhone?.number || ''}
+                                onChange={e => setProfile(prev => ({
+                                  ...prev,
+                                  contactPhone: { ...(prev.contactPhone || {}), number: e.target.value }
+                                }))}
+                                placeholder="Phone number"
+                                className="text-sm font-bold text-slate-600 bg-slate-50 border-b border-slate-200 outline-none rounded px-2 py-0.5 w-36 transition-all focus:bg-white focus:border-amber-500"
+                              />
+                            </div>
+                          ) : (
+                            <span className="text-sm font-bold text-slate-400">
+                              {profile.contactPhone?.number
+                                ? `${profile.contactPhone.countryCode} ${profile.contactPhone.number}`
+                                : profile.phone || '—'}
+                            </span>
+                          )}
+                        </div>
                       </div>
                     </div>
 
                     <div className={`bg-slate-50 p-6 rounded-2xl transition-all ${isEditMode ? 'ring-2 ring-amber-500/5 bg-white border border-amber-100 shadow-inner' : ''}`}>
                       {isEditMode ? (
-                        <textarea 
+                        <textarea
                           value={profile.product_description}
                           onChange={(e) => setProfile({...profile, product_description: e.target.value})}
                           className="w-full min-h-[100px] bg-transparent text-slate-700 text-base leading-relaxed outline-none resize-none"
@@ -705,27 +782,164 @@ const BrandProfile = () => {
                 </div>
 
                 {/* Basic Info Grid */}
-                <div className="grid grid-cols-2 lg:grid-cols-5 gap-8">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
                   {[
                     { label: 'Lifecycle', key: 'product_lifecycle' },
                     { label: 'Scale', key: 'company_scale' },
-                    { label: 'Target region', key: 'target_region' },
                     { label: 'Business model', key: 'business_model' },
                     { label: 'Company location', key: 'company_location' }
                   ].map(field => (
                     <div key={field.key} className="space-y-2">
-                      <span className="text-[10px] font-bold text-slate-400 tracking-widest opacity-50">{field.label}</span>
+                      <span className="text-[10px] font-bold text-slate-400 opacity-50">{field.label}</span>
                       {isEditMode ? (
-                        <input 
-                          value={profile[field.key]} 
-                          onChange={e => setProfile({...profile, [field.key]: e.target.value})} 
-                          className="font-bold text-slate-800 bg-slate-50 border-b border-slate-200 outline-none w-full px-2 py-1 rounded transition-all focus:bg-white focus:border-amber-500" 
+                        <input
+                          value={profile[field.key]}
+                          onChange={e => setProfile({...profile, [field.key]: e.target.value})}
+                          className="font-bold text-slate-800 bg-slate-50 border-b border-slate-200 outline-none w-full px-2 py-1 rounded transition-all focus:bg-white focus:border-amber-500"
                         />
                       ) : (
                         <p className="font-bold text-slate-800">{profile[field.key]}</p>
                       )}
                     </div>
                   ))}
+                </div>
+
+                {/* Ad Platforms + Coverage Markets */}
+                <div className="mt-8 pt-6 border-t border-slate-100 flex flex-col lg:flex-row gap-12">
+                  {/* Ad Platforms */}
+                  <div className="space-y-2">
+                    <span className="text-[10px] font-bold text-slate-400 opacity-50">Ad Platforms</span>
+                    <div className="flex flex-wrap gap-2">
+                      {AD_PLATFORMS.map(p => {
+                        const isSelected = profile.platforms?.includes(p.id)
+                        return (
+                          <button
+                            key={p.id}
+                            onClick={() => {
+                              if (!isEditMode) return
+                              setProfile(prev => ({
+                                ...prev,
+                                platforms: isSelected
+                                  ? prev.platforms.filter(x => x !== p.id)
+                                  : [...(prev.platforms || []), p.id]
+                              }))
+                            }}
+                            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold border transition-all ${
+                              isSelected
+                                ? 'border-indigo-200 bg-indigo-50 text-indigo-700 shadow-sm'
+                                : 'border-slate-100 bg-slate-50 text-slate-400'
+                            } ${isEditMode ? 'cursor-pointer hover:border-indigo-300' : 'cursor-default'}`}
+                          >
+                            <img src={p.icon} alt={p.name} className="w-4 h-4" />
+                            {p.name}
+                            {isSelected && <Check size={12} className="text-indigo-500" />}
+                          </button>
+                        )
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Coverage Markets */}
+                  <div className="space-y-2">
+                    <span className="text-[10px] font-bold text-slate-400 opacity-50">Coverage Markets</span>
+                    {isEditMode ? (
+                      <div className="space-y-3">
+                        {MARKET_REGIONS.map(region => (
+                          <div key={region.group} className="flex items-start gap-3">
+                            <span className="text-[10px] font-black text-slate-400 w-36 pt-2 shrink-0">{region.group}</span>
+                            <div className="flex flex-wrap gap-1.5">
+                              {region.markets.map(m => {
+                                const isSelected = profile.markets?.includes(m)
+                                return (
+                                  <button
+                                    key={m}
+                                    onClick={() => setProfile(prev => ({
+                                      ...prev,
+                                      markets: isSelected
+                                        ? (prev.markets || []).filter(x => x !== m)
+                                        : [...(prev.markets || []), m]
+                                    }))}
+                                    className={`px-2.5 py-1 text-[11px] font-bold rounded-lg transition-all ${
+                                      isSelected
+                                        ? 'bg-indigo-100 text-indigo-700 border border-indigo-200'
+                                        : 'bg-slate-50 text-slate-400 border border-slate-100 hover:border-indigo-200'
+                                    }`}
+                                  >
+                                    {m}
+                                  </button>
+                                )
+                              })}
+                            </div>
+                          </div>
+                        ))}
+                        {/* Manual market input */}
+                        <div className="flex items-center gap-2 pt-2 border-t border-slate-100 mt-2">
+                          {showCustomMarketInput ? (
+                            <>
+                              <input
+                                className="px-3 py-1.5 border border-slate-200 rounded-lg text-xs font-bold text-slate-900 outline-none focus:border-indigo-400 w-28 uppercase"
+                                maxLength={10}
+                                placeholder="e.g. NG"
+                                value={customMarketValue}
+                                onChange={(e) => setCustomMarketValue(e.target.value.toUpperCase())}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter' && customMarketValue.trim()) {
+                                    const code = customMarketValue.trim()
+                                    if (!profile.markets?.includes(code)) {
+                                      setProfile(prev => ({ ...prev, markets: [...(prev.markets || []), code] }))
+                                    }
+                                    setCustomMarketValue('')
+                                    setShowCustomMarketInput(false)
+                                  } else if (e.key === 'Escape') {
+                                    setCustomMarketValue('')
+                                    setShowCustomMarketInput(false)
+                                  }
+                                }}
+                                autoFocus
+                              />
+                              <button
+                                onClick={() => {
+                                  const code = customMarketValue.trim()
+                                  if (code && !profile.markets?.includes(code)) {
+                                    setProfile(prev => ({ ...prev, markets: [...(prev.markets || []), code] }))
+                                  }
+                                  setCustomMarketValue('')
+                                  setShowCustomMarketInput(false)
+                                }}
+                                className="px-3 py-1.5 text-[11px] font-bold bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition-colors"
+                              >
+                                Confirm
+                              </button>
+                              <button
+                                onClick={() => { setCustomMarketValue(''); setShowCustomMarketInput(false) }}
+                                className="px-3 py-1.5 text-[11px] font-bold text-slate-500 hover:text-slate-700 transition-colors"
+                              >
+                                Cancel
+                              </button>
+                            </>
+                          ) : (
+                            <button
+                              onClick={() => setShowCustomMarketInput(true)}
+                              className="flex items-center gap-1 px-3 py-1.5 text-[11px] font-bold text-indigo-500 hover:text-indigo-700 hover:bg-indigo-50 rounded-lg transition-colors"
+                            >
+                              <Plus size={12} />
+                              Add custom market
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex flex-wrap gap-2">
+                        {(profile.markets?.length > 0) ? profile.markets.map(m => (
+                          <span key={m} className="px-3 py-1.5 text-xs font-bold bg-indigo-50 text-indigo-600 rounded-lg border border-indigo-100">
+                            {m}
+                          </span>
+                        )) : (
+                          <span className="text-sm font-bold text-slate-400">{profile.target_region || 'Not configured'}</span>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 {/* Tags area */}
@@ -771,7 +985,7 @@ const BrandProfile = () => {
                     <h2 className="text-xl font-black text-slate-900">Brand DNA</h2>
                   </div>
                   <div className="space-y-4">
-                    <h3 className="text-xs font-bold text-slate-400 tracking-widest opacity-50">Brand Colors</h3>
+                    <h3 className="text-xs font-bold text-slate-400 opacity-50">Brand Colors</h3>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                       {profile.colors?.map((color) => (
                         <div key={color.id} className="group relative flex items-center gap-3 p-3 bg-slate-50 border border-slate-100 rounded-2xl transition-all hover:bg-white hover:shadow-md">
@@ -800,7 +1014,7 @@ const BrandProfile = () => {
                     </div>
                   </div>
                   <div className="space-y-4">
-                    <h3 className="text-xs font-bold text-slate-400 tracking-widest opacity-50">Brand Tone</h3>
+                    <h3 className="text-xs font-bold text-slate-400 opacity-50">Brand Tone</h3>
                     {isEditMode ? (
                       <input 
                         value={profile.brand_tone?.join(', ')} 
@@ -819,7 +1033,7 @@ const BrandProfile = () => {
                     )}
                   </div>
                   <div className="space-y-4">
-                    <h3 className="text-xs font-bold text-slate-400 tracking-widest opacity-50">Market Keywords</h3>
+                    <h3 className="text-xs font-bold text-slate-400 opacity-50">Market Keywords</h3>
                     {isEditMode ? (
                       <input 
                         value={profile.market_keywords?.join(', ')} 
@@ -847,7 +1061,7 @@ const BrandProfile = () => {
                     <h2 className="text-xl font-black text-slate-900">Core Advantages</h2>
                   </div>
                   <div className={`bg-slate-50 p-6 rounded-2xl border-l-4 border-amber-500 transition-all ${isEditMode ? 'bg-white shadow-inner ring-2 ring-amber-500/5 border-amber-100' : ''}`}>
-                    <p className="text-sm font-bold text-slate-500 tracking-widest opacity-50 mb-2">Value Proposition</p>
+                    <p className="text-sm font-bold text-slate-500 opacity-50 mb-2">Value Proposition</p>
                     {isEditMode ? (
                       <textarea 
                         value={profile.unique_value_proposition} 
@@ -968,7 +1182,7 @@ const BrandProfile = () => {
                          }} className="absolute top-4 right-4 text-slate-300 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"><Trash2 size={16} /></button>
                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                            <div className="space-y-2">
-                             <label className="text-[10px] font-bold text-slate-400 tracking-widest opacity-50">Name</label>
+                             <label className="text-[10px] font-bold text-slate-400 opacity-50">Name</label>
                              <input value={segment.name} onChange={e => {
                                const newSegments = [...profile.customer_segments];
                                newSegments[idx].name = e.target.value;
@@ -976,7 +1190,7 @@ const BrandProfile = () => {
                              }} className="w-full bg-white border border-slate-200 rounded-lg px-4 py-2 font-bold outline-none focus:border-amber-500 transition-all shadow-sm" />
                            </div>
                            <div className="space-y-2">
-                             <label className="text-[10px] font-bold text-slate-400 tracking-widest opacity-50">Keywords</label>
+                             <label className="text-[10px] font-bold text-slate-400 opacity-50">Keywords</label>
                              <input value={segment.keywords?.join(', ') || ''} onChange={e => {
                                const newSegments = [...profile.customer_segments];
                                newSegments[idx].keywords = e.target.value.split(',').map(s => s.trim());
@@ -984,7 +1198,7 @@ const BrandProfile = () => {
                              }} className="w-full bg-white border border-slate-200 rounded-lg px-4 py-2 font-bold outline-none focus:border-amber-500 transition-all shadow-sm" />
                            </div>
                            <div className="md:col-span-2 space-y-2">
-                             <label className="text-[10px] font-bold text-slate-400 tracking-widest opacity-50">Description</label>
+                             <label className="text-[10px] font-bold text-slate-400 opacity-50">Description</label>
                              <textarea value={segment.description} onChange={e => {
                                const newSegments = [...profile.customer_segments];
                                newSegments[idx].description = e.target.value;
@@ -1000,7 +1214,7 @@ const BrandProfile = () => {
                    <>
                      <div className="w-full max-w-[1100px] mx-auto px-10 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
                         <div className="space-y-8 animate-fadeIn" key={currentAudienceIndex}>
-                          <div className="text-sm font-bold text-slate-400 tracking-widest opacity-50">Audience {String(currentAudienceIndex + 1).padStart(2, '0')}</div>
+                          <div className="text-sm font-bold text-slate-400 opacity-50">Audience {String(currentAudienceIndex + 1).padStart(2, '0')}</div>
                           <h3 className="text-5xl font-black text-slate-900 leading-tight">{profile.customer_segments?.[currentAudienceIndex]?.name}</h3>
                           <p className="text-xl text-slate-700 leading-relaxed font-medium">{profile.customer_segments?.[currentAudienceIndex]?.description}</p>
                           <div className="flex flex-wrap gap-2">
@@ -1090,7 +1304,7 @@ const BrandProfile = () => {
                   <div className="space-y-6">
                     <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
                       <Megaphone size={16} className="text-slate-400" />
-                      <h3 className="text-sm font-bold text-slate-400 tracking-wider">营销渠道</h3>
+                      <h3 className="text-sm font-bold text-slate-400">营销渠道</h3>
                     </div>
                     {isEditMode ? (
                       <textarea 
@@ -1122,7 +1336,7 @@ const BrandProfile = () => {
                   <div className="space-y-6">
                     <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
                       <Users size={16} className="text-slate-400" />
-                      <h3 className="text-sm font-bold text-slate-400 tracking-wider">客户聚集地</h3>
+                      <h3 className="text-sm font-bold text-slate-400">客户聚集地</h3>
                     </div>
                     {isEditMode ? (
                       <textarea 
@@ -1235,7 +1449,7 @@ const BrandProfile = () => {
               </div>
 
               <div className="space-y-4">
-                <label className="text-[11px] font-black text-slate-400 tracking-widest flex items-center gap-2">
+                <label className="text-[11px] font-black text-slate-400 flex items-center gap-2">
                   <Globe size={12} />
                   Brand Url
                 </label>

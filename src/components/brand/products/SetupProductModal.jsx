@@ -132,7 +132,7 @@ const AssetGrid = ({ title, subtitle, assets = [], onAssetsChange, maxCount = 99
             className="w-[140px] aspect-square bg-slate-900 rounded-[24px] flex flex-col items-center justify-center cursor-pointer hover:bg-black transition-all shadow-xl group shrink-0"
           >
             <span className="text-lg font-black text-white">{moreCount} more</span>
-            <span className="text-[10px] font-bold text-white/60 uppercase tracking-widest mt-1">assets</span>
+            <span className="text-[10px] font-bold text-white/60 mt-1">assets</span>
           </div>
         )}
 
@@ -143,7 +143,7 @@ const AssetGrid = ({ title, subtitle, assets = [], onAssetsChange, maxCount = 99
             className="w-[140px] aspect-square bg-slate-100 border border-slate-200 rounded-[24px] flex flex-col items-center justify-center cursor-pointer hover:bg-slate-200 transition-all group shrink-0"
           >
             <ChevronRight size={24} className="text-slate-400 rotate-180 mb-1" />
-            <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Collapse</span>
+            <span className="text-[10px] font-black text-slate-500">Collapse</span>
           </div>
         )}
 
@@ -329,7 +329,7 @@ const SearchableTreeSelect = ({ options, value, onChange, placeholder, isSearcha
 
           <div className="flex-1 bg-white flex flex-col">
             <div className="p-4 border-b border-slate-50">
-              <h6 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+              <h6 className="text-[10px] font-black text-slate-400">
                 {hoveredParent ? hoveredParent.label : 'Select Category'}
               </h6>
             </div>
@@ -355,7 +355,7 @@ const SearchableTreeSelect = ({ options, value, onChange, placeholder, isSearcha
                   <div className="w-12 h-12 rounded-full bg-slate-50 flex items-center justify-center mb-3">
                     <Layers size={20} className="opacity-20" />
                   </div>
-                  <p className="text-[10px] font-bold uppercase tracking-tighter opacity-40">
+                  <p className="text-[10px] font-bold opacity-40">
                     {hoveredParent ? 'No sub-categories' : 'Hover a category to view details'}
                   </p>
                 </div>
