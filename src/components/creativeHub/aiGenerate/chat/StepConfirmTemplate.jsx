@@ -34,7 +34,7 @@ export default function StepConfirmTemplate({
               'px-2.5 py-1 rounded-full text-[13px] font-medium transition-all border shrink-0',
               chatTemplateCategory === cat
                 ? 'bg-primary-500 text-white border-primary-500'
-                : 'bg-white text-gray-600 border-gray-200 hover:border-primary-300 hover:text-primary-600'
+                : 'bg-white text-neutral-600 border-neutral-200 hover:border-primary-300 hover:text-primary-600'
             )}
           >
             {cat}
@@ -55,7 +55,7 @@ export default function StepConfirmTemplate({
                 'relative aspect-square rounded-lg overflow-hidden border-2 transition-all',
                 isSelected
                   ? 'border-primary-500 ring-2 ring-primary-500/20'
-                  : 'border-transparent hover:border-gray-300'
+                  : 'border-transparent hover:border-neutral-300'
               )}
             >
               <img src={tmpl.url} alt="" className="w-full h-full object-cover" />
@@ -80,7 +80,7 @@ export default function StepConfirmTemplate({
       <div className="flex items-center justify-between pt-1">
         <button
           onClick={() => onChangeStep(2)}
-          className="px-6 h-10 bg-white border border-gray-300 text-gray-700 rounded-full text-sm font-medium hover:bg-gray-50 hover:text-primary-600 hover:border-primary-500 transition-all"
+          className="px-6 h-10 bg-white border border-neutral-300 text-neutral-700 rounded-full text-sm font-medium hover:bg-neutral-50 hover:text-primary-600 hover:border-primary-500 transition-all"
         >
           Back
         </button>
@@ -90,7 +90,7 @@ export default function StepConfirmTemplate({
           {!hasSelection && (
             <button
               onClick={() => onConfirmStep(3)}
-              className="flex items-center gap-2 px-4 h-10 bg-white border border-gray-200 rounded-full text-sm text-gray-700 hover:border-primary-300 hover:text-primary-600 transition-all"
+              className="flex items-center gap-2 px-4 h-10 bg-white border border-neutral-200 rounded-full text-sm text-neutral-700 hover:border-primary-300 hover:text-primary-600 transition-all"
             >
               <div className="w-5 h-5 rounded-md bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center shrink-0">
                 <Sparkles size={11} className="text-white" />

@@ -4,9 +4,9 @@ import { RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, Responsi
 import DevGuideButton from './DevGuideButton'
 import { DEV_GUIDES } from './devGuideContent'
 
-const BRAND_COLOR = '#7033F5'
-const BRAND_LIGHT = '#f3f0ff'
-const BRAND_MID = '#c4b5fd'
+const BRAND_COLOR = '#8B5CF6'  // = --luna-violet
+const BRAND_LIGHT = '#FAF5FF'  // = --luna-bg
+const BRAND_MID   = '#DDD6FE'  // = --luna-violet-pale
 
 const DIMENSION_LABELS = {
   budget_optimization:     'Budget Optimization',
@@ -131,16 +131,16 @@ export default function ScoreCard({ dimensionsData, phaseData, onDimensionSelect
 
   return (
     <div
-      className="bg-[#f8f7fc] rounded-xl p-4"
+      className="bg-primary-50/30 rounded-xl p-4"
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
     >
       <div className="flex items-center mb-4">
         <div className="lg:w-[calc(50%-20px)] flex-shrink-0">
-          <h4 className="text-sm font-semibold text-gray-800">Multi-dimensional Monitoring</h4>
+          <h4 className="text-sm font-semibold text-neutral-800">Multi-dimensional Monitoring</h4>
         </div>
         <div className="hidden lg:flex flex-1 items-center pl-10">
-          <h4 className="text-sm font-semibold text-gray-800">Optimize Detail</h4>
+          <h4 className="text-sm font-semibold text-neutral-800">Optimize Detail</h4>
           <div className="ml-auto">
             <DevGuideButton title="Multi-dimensional Monitoring" content={DEV_GUIDES.optimizationScore} />
           </div>
@@ -198,7 +198,7 @@ export default function ScoreCard({ dimensionsData, phaseData, onDimensionSelect
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                 <div className="text-center">
                   <span className="text-sm font-bold" style={{ color: phase.color }}>{phase.label}</span>
-                  <span className="block text-[9px] text-gray-400 font-medium leading-tight">
+                  <span className="block text-[9px] text-neutral-400 font-medium leading-tight">
                     {phaseData?.learningPercent ?? 0}% in learning
                   </span>
                 </div>
@@ -209,11 +209,11 @@ export default function ScoreCard({ dimensionsData, phaseData, onDimensionSelect
             <div className="flex items-center justify-center gap-5 mt-1 mb-3">
               <div className="flex items-center gap-1.5">
                 <div className="w-5 h-0 border-t-2" style={{ borderColor: BRAND_COLOR }} />
-                <span className="text-[10px] text-gray-500">Current</span>
+                <span className="text-[10px] text-neutral-500">Current</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <div className="w-5 h-0 border-t-2 border-dashed" style={{ borderColor: BRAND_MID }} />
-                <span className="text-[10px] text-gray-500">After optimization</span>
+                <span className="text-[10px] text-neutral-500">After optimization</span>
               </div>
             </div>
 
@@ -224,12 +224,12 @@ export default function ScoreCard({ dimensionsData, phaseData, onDimensionSelect
             >
               <div className="flex items-center gap-2 mb-1.5">
                 <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: BRAND_COLOR }} />
-                <span className="text-xs font-bold text-gray-800">{DIMENSION_LABELS[active.id]}</span>
+                <span className="text-xs font-bold text-neutral-800">{DIMENSION_LABELS[active.id]}</span>
                 <span className="text-xs font-bold ml-auto" style={{ color: BRAND_COLOR }}>
-                  {active.currentScore.toFixed(1)}<span className="text-gray-400 font-normal">/5</span>
+                  {active.currentScore.toFixed(1)}<span className="text-neutral-400 font-normal">/5</span>
                 </span>
               </div>
-              <p className="text-[11px] text-gray-600 leading-relaxed">{active.problem}</p>
+              <p className="text-[11px] text-neutral-600 leading-relaxed">{active.problem}</p>
             </div>
           </div>
 
@@ -253,7 +253,7 @@ export default function ScoreCard({ dimensionsData, phaseData, onDimensionSelect
 
               {/* Header — with left accent border matching problem area */}
               <div
-                className="flex items-center gap-3 mb-5 pb-4 border-b border-gray-100 border-l-[3px] pl-4 -ml-1 rounded-l"
+                className="flex items-center gap-3 mb-5 pb-4 border-b border-neutral-100 border-l-[3px] pl-4 -ml-1 rounded-l"
                 style={{ borderLeftColor: BRAND_COLOR }}
               >
                 <div
@@ -265,8 +265,8 @@ export default function ScoreCard({ dimensionsData, phaseData, onDimensionSelect
                   </span>
                 </div>
                 <div className="flex-1">
-                  <h4 className="text-sm font-bold text-gray-900">{DIMENSION_LABELS[active.id]}</h4>
-                  <p className="text-[11px] text-gray-500 mt-0.5">
+                  <h4 className="text-sm font-bold text-neutral-900">{DIMENSION_LABELS[active.id]}</h4>
+                  <p className="text-[11px] text-neutral-500 mt-0.5">
                     Current <strong style={{ color: BRAND_COLOR }}>{active.currentScore.toFixed(1)}</strong> → After optimization <strong className="text-emerald-600">{Math.min(active.currentScore + active.potentialScore, 5).toFixed(1)}</strong>
                   </p>
                 </div>
@@ -274,7 +274,7 @@ export default function ScoreCard({ dimensionsData, phaseData, onDimensionSelect
 
               {/* Score bar */}
               <div className="mb-5">
-                <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden relative">
+                <div className="h-1.5 bg-neutral-100 rounded-full overflow-hidden relative">
                   <div
                     className="absolute inset-y-0 left-0 rounded-full transition-all duration-500"
                     style={{
@@ -301,7 +301,7 @@ export default function ScoreCard({ dimensionsData, phaseData, onDimensionSelect
                 </div>
                 <ul className="space-y-2.5">
                   {active.adsGoWillDo.map((action, idx) => (
-                    <li key={idx} className="text-xs text-gray-700 flex items-start gap-2.5 leading-relaxed">
+                    <li key={idx} className="text-xs text-neutral-700 flex items-start gap-2.5 leading-relaxed">
                       <div
                         className="w-5 h-5 rounded-md flex items-center justify-center flex-shrink-0 mt-0.5"
                         style={{ backgroundColor: BRAND_LIGHT }}
@@ -326,7 +326,7 @@ export default function ScoreCard({ dimensionsData, phaseData, onDimensionSelect
                       <div className="w-5 h-5 rounded-md bg-amber-50 border border-amber-200 flex items-center justify-center flex-shrink-0 mt-0.5">
                         <span className="text-[10px] font-bold text-amber-500">{idx + 1}</span>
                       </div>
-                      <span className="text-xs text-gray-700 leading-relaxed">{action.text}</span>
+                      <span className="text-xs text-neutral-700 leading-relaxed">{action.text}</span>
                     </li>
                   ))}
                 </ul>
@@ -336,20 +336,20 @@ export default function ScoreCard({ dimensionsData, phaseData, onDimensionSelect
               <div className="rounded-lg px-4 py-3 bg-emerald-50/60 border border-emerald-100">
                 <p className="text-[11px] font-semibold text-emerald-700 tracking-wide mb-1.5">Expected Impact</p>
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="text-xs text-gray-600">Score:</span>
+                  <span className="text-xs text-neutral-600">Score:</span>
                   <span className="text-xs font-bold" style={{ color: BRAND_COLOR }}>{active.currentScore.toFixed(1)}</span>
-                  <span className="text-xs text-gray-400">→</span>
+                  <span className="text-xs text-neutral-400">→</span>
                   <span className="text-xs font-bold text-emerald-600">{Math.min(active.currentScore + active.potentialScore, 5).toFixed(1)}</span>
                 </div>
-                <p className="text-[11px] text-gray-600 leading-relaxed">{active.expectedImpact}</p>
+                <p className="text-[11px] text-neutral-600 leading-relaxed">{active.expectedImpact}</p>
               </div>
             </div>
           </div>
         </div>
 
         {/* Progress indicator */}
-        <div className="flex flex-col items-center gap-2 mt-4 pt-3 border-t border-gray-100">
-          <p className="text-[10px] text-gray-400 flex items-center gap-1">
+        <div className="flex flex-col items-center gap-2 mt-4 pt-3 border-t border-neutral-100">
+          <p className="text-[10px] text-neutral-400 flex items-center gap-1">
             <Lightbulb className="w-3 h-3 text-amber-400 flex-shrink-0" />
             每日根据历史已执行的动作及现存问题重新分析评估
           </p>

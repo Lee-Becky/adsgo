@@ -104,7 +104,7 @@ function getPhase(kpiAchievement) {
 const spendPercent = dailyBudget > 0 ? (cappedSpend / dailyBudget) : 0
 
 const spendColor =
-  spendPercent < 0.7  ? 'text-slate-600'   :  // 正常
+  spendPercent < 0.7  ? 'text-neutral-600'   :  // 正常
   spendPercent < 0.9  ? 'text-amber-600'   :  // 接近上限
   'text-rose-600'                               // 已到上限
 \`\`\`
@@ -160,7 +160,7 @@ const kpiTrend = buildKPITrend(activeCampaigns, kpiType)
 
 - 左侧: 阶段 \`\${phase.label} (\${Math.round(kpiAchievement * 100)}%)\` + KPI + Spend
 - 右侧: Recharts \`<LineChart>\` 迷你图，宽 120px 高 32px，无坐标轴无标签
-- sparkline 颜色: 趋势上升 → stroke-emerald-500，下降 → stroke-rose-500
+- sparkline 颜色: 趋势上升 → stroke-success-500，下降 → stroke-rose-500
 - 趋势判断: kpiTrend[last].kpiValue > kpiTrend[0].kpiValue → 上升
 
 KPI 格式化规则:
@@ -274,9 +274,9 @@ const phasesWithStatus = PLAN_PHASES.map(phase => {
 
 | status | 边框 | 背景 | 额外 |
 |--------|------|------|------|
-| completed | border-emerald-300 | bg-emerald-50 | 右上角 ✓ |
+| completed | border-success-300 | bg-success-50 | 右上角 ✓ |
 | active | border-primary-500 border-2 | bg-primary-50 | "You are here" badge |
-| upcoming | border-slate-200 | bg-white | 文字 text-slate-400 |
+| upcoming | border-neutral-200 | bg-white | 文字 text-neutral-400 |
 
 每张卡片内部布局:
 \`\`\`
@@ -454,9 +454,9 @@ function generateForecast(direction, weeklyChangePct, estimatedDays, kpiType) {
 样式按 sentiment:
 | sentiment | 边框 | icon 颜色 | 背景 |
 |-----------|------|-----------|------|
-| positive | border-emerald-200 | text-emerald-600 | bg-emerald-50 |
+| positive | border-success-200 | text-success-600 | bg-success-50 |
 | caution | border-amber-200 | text-amber-600 | bg-amber-50 |
-| neutral | border-gray-200 | text-gray-500 | bg-gray-50 |
+| neutral | border-neutral-200 | text-neutral-500 | bg-neutral-50 |
 
 右侧趋势图: 复用 kpiTrend 数据，Recharts LineChart 宽 140px 高 56px，线条颜色同 sentiment。
 
@@ -647,7 +647,7 @@ function groupTimelineByDay(timeline) {
 
 \`\`\`javascript
 const EVENT_STYLES = {
-  budget_optimize:    { Icon: DollarSign, dotColor: 'bg-blue-500',   iconBg: 'bg-blue-50',   iconText: 'text-blue-500' },
+  budget_optimize:    { Icon: DollarSign, dotColor: 'bg-info-500',   iconBg: 'bg-info-50',   iconText: 'text-info-500' },
   regen_creative:     { Icon: Sparkles,   dotColor: 'bg-purple-500', iconBg: 'bg-purple-50', iconText: 'text-purple-500' },
   recommend_campaign: { Icon: Layers,     dotColor: 'bg-amber-500',  iconBg: 'bg-amber-50',  iconText: 'text-amber-500' },
 }
@@ -693,8 +693,8 @@ function formatTime(isoTimestamp, isEstimate = false) {
 └──────────────────────────────────────────────────────────────────┘
 \`\`\`
 
-左栏样式: 实心圆点 ● + 实线竖线 + text-gray-800 标题
-右栏样式: 空心圆点 ◐ (border-2 bg-white) + 虚线竖线 + text-gray-600 标题 + opacity-80
+左栏样式: 实心圆点 ● + 实线竖线 + text-neutral-800 标题
+右栏样式: 空心圆点 ◐ (border-2 bg-white) + 虚线竖线 + text-neutral-600 标题 + opacity-80
 
 ### 真实数据替换步骤
 
@@ -782,7 +782,7 @@ function generateActions({
   if (daysSinceLastCreative >= 7) {
     actions.push({
       id: 'creative_refresh',
-      priority: 'medium',           // 中优先级 → 左边框 blue-400
+      priority: 'medium',           // 中优先级 → 左边框 info-400
       icon: 'Sparkles',
       title: 'Consider refreshing creatives',
       description: \`No new creatives in \${daysSinceLastCreative} days. AI can generate branded creatives matching your brand colors, product features, and tone — typically 5 ads in ~4 minutes.\`,
@@ -805,7 +805,7 @@ function generateActions({
 
     actions.push({
       id: 'kpi_review',
-      priority: 'low',             // 低优先级 → 左边框 gray-300
+      priority: 'low',             // 低优先级 → 左边框 neutral-300
       icon: 'TrendingUp',
       title: 'Review KPI targets',
       description: \`Current \${kpiType} \${kpiFormatted} is approaching your \${targetFormatted} target — consider \${direction} it\`,
@@ -901,8 +901,8 @@ function generateActions({
 
 优先级左边框:
 - high → border-l-4 border-amber-500
-- medium → border-l-4 border-blue-400
-- low → border-l-4 border-gray-300
+- medium → border-l-4 border-info-400
+- low → border-l-4 border-neutral-300
 
 ### 真实数据替换步骤
 
@@ -935,7 +935,7 @@ const spendPercent = dailyBudget > 0
 
 // 进度条颜色
 const barColor =
-  spendPercent < 70  ? 'bg-emerald-500' :   // 安全（绿色）
+  spendPercent < 70  ? 'bg-success-500' :   // 安全（绿色）
   spendPercent < 90  ? 'bg-amber-500'   :   // 接近上限（琥珀）
   'bg-rose-500'                              // 到上限（红色）
 \`\`\`
@@ -966,8 +966,8 @@ $3,500 / $3,500 daily
 \`\`\`javascript
 // ON/OFF badge 样式
 const badgeStyle = (isOn) => isOn
-  ? 'bg-emerald-100 text-emerald-700'   // ON = 绿色
-  : 'bg-gray-100 text-gray-500'          // OFF = 灰色
+  ? 'bg-success-100 text-success-700'   // ON = 绿色
+  : 'bg-neutral-100 text-neutral-500'          // OFF = 灰色
 \`\`\`
 
 **输出**:
@@ -1120,9 +1120,9 @@ const firstTodo = currentWeekPlan?.youNeedToDo?.find(t => !t.completed)?.text
 **步骤 5: 情感样式映射**
 \`\`\`javascript
 const SENTIMENT_STYLES = {
-  positive: { border: 'border-emerald-200', bg: 'bg-emerald-50/60', stroke: '#10b981' },
+  positive: { border: 'border-success-200', bg: 'bg-success-50/60', stroke: '#10b981' },
   caution:  { border: 'border-amber-200',   bg: 'bg-amber-50/60',   stroke: '#f59e0b' },
-  neutral:  { border: 'border-gray-200',    bg: 'bg-gray-50/60',    stroke: '#6b7280' },
+  neutral:  { border: 'border-neutral-200',    bg: 'bg-neutral-50/60',    stroke: '#6b7280' },
 }
 \`\`\`
 
@@ -1318,11 +1318,11 @@ const handleTodoToggle = (weekId, todoId) => {
 \`\`\`
 
 样式规则:
-- completed: bg-emerald-50, border-emerald-200
+- completed: bg-success-50, border-success-200
 - current: bg-primary-50, border-primary-300, ring-2 ring-primary-100（强调当前周）
-- upcoming: bg-gray-50, border-gray-200
+- upcoming: bg-neutral-50, border-neutral-200
 - AI Plan 最多展示 3 条（line-clamp-2 截断）
-- Todo 复选框: 完成=emerald-500 + 删除线，未完成=白底灰框
+- Todo 复选框: 完成=success-500 + 删除线，未完成=白底灰框
 
 ### 边界条件
 
@@ -1637,10 +1637,10 @@ const isPositive = benefit.change.includes('+') || !benefit.change.includes('-')
 **步骤 4: 类型样式映射**
 \`\`\`javascript
 const TYPE_STYLES = {
-  adset:    { bg: 'bg-blue-50',   border: 'border-blue-200',   iconColor: 'text-blue-500' },
+  adset:    { bg: 'bg-info-50',   border: 'border-info-200',   iconColor: 'text-info-500' },
   ad:       { bg: 'bg-purple-50', border: 'border-purple-200', iconColor: 'text-purple-500' },
   creative: { bg: 'bg-amber-50',  border: 'border-amber-200',  iconColor: 'text-amber-500' },
-  campaign: { bg: 'bg-emerald-50',border: 'border-emerald-200',iconColor: 'text-emerald-500' },
+  campaign: { bg: 'bg-success-50',border: 'border-success-200',iconColor: 'text-success-500' },
 }
 \`\`\`
 

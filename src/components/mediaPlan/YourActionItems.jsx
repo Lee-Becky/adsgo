@@ -7,8 +7,8 @@ const ICON_MAP = { DollarSign, Layers, Sparkles, TrendingUp, Wallet }
 
 const PRIORITY_STYLES = {
   high: 'border-l-amber-500',
-  medium: 'border-l-blue-400',
-  low: 'border-l-gray-300',
+  medium: 'border-l-info-400',
+  low: 'border-l-neutral-300',
 }
 
 function generateActions({
@@ -166,15 +166,15 @@ export default function YourActionItems({
   return (
     <div>
       <div className="flex items-center justify-between mb-3">
-        <h4 className="text-sm font-semibold text-gray-900">Your Actions</h4>
+        <h4 className="text-sm font-semibold text-neutral-900">Your Actions</h4>
         <DevGuideButton title="Your Actions" content={DEV_GUIDES.yourActions} />
       </div>
 
       {actions.length === 0 ? (
-        <div className="bg-emerald-50/60 rounded-lg px-5 py-8 text-center">
-          <CheckCircle className="w-8 h-8 text-emerald-400 mx-auto mb-2" />
-          <p className="text-sm font-medium text-emerald-700">All caught up</p>
-          <p className="text-xs text-emerald-600 mt-0.5">AdsGo is handling everything.</p>
+        <div className="bg-success-50/60 rounded-lg px-5 py-8 text-center">
+          <CheckCircle className="w-8 h-8 text-success-400 mx-auto mb-2" />
+          <p className="text-sm font-medium text-success-700">All caught up</p>
+          <p className="text-xs text-success-600 mt-0.5">AdsGo is handling everything.</p>
         </div>
       ) : (
         <div className="space-y-2.5">
@@ -183,14 +183,14 @@ export default function YourActionItems({
             return (
               <div
                 key={action.id}
-                className={`bg-white rounded-lg border border-gray-200 border-l-4 ${PRIORITY_STYLES[action.priority]} overflow-hidden`}
+                className={`bg-white rounded-lg border border-neutral-200 border-l-4 ${PRIORITY_STYLES[action.priority]} overflow-hidden`}
               >
                 <div className="px-4 py-3">
                   {/* Header */}
                   <div className="flex items-center justify-between gap-3">
                     <div className="flex items-center gap-2 min-w-0">
-                      <Icon className="w-4 h-4 text-gray-500 flex-shrink-0" />
-                      <span className="text-xs font-semibold text-gray-800 truncate">{action.title}</span>
+                      <Icon className="w-4 h-4 text-neutral-500 flex-shrink-0" />
+                      <span className="text-xs font-semibold text-neutral-800 truncate">{action.title}</span>
                     </div>
                     {action.buttons ? (
                       <div className="flex items-center gap-2 flex-shrink-0">
@@ -220,13 +220,13 @@ export default function YourActionItems({
                   </div>
 
                   {/* Description */}
-                  <p className="text-xs text-gray-500 mt-1.5 leading-relaxed">{action.description}</p>
+                  <p className="text-xs text-neutral-500 mt-1.5 leading-relaxed">{action.description}</p>
 
                   {/* Auto guide */}
                   {action.autoGuideText && (
-                    <div className="mt-2.5 pt-2.5 border-t border-gray-100 flex items-center gap-2">
+                    <div className="mt-2.5 pt-2.5 border-t border-neutral-100 flex items-center gap-2">
                       <Lightbulb className="w-3 h-3 text-amber-500 flex-shrink-0" />
-                      <span className="text-[11px] text-gray-500 flex-1">{action.autoGuideText}</span>
+                      <span className="text-[11px] text-neutral-500 flex-1">{action.autoGuideText}</span>
                       <button
                         onClick={() => handleAutoEnable(action.autoGuideKey)}
                         className="text-[11px] font-medium text-primary-500 hover:text-primary-600 flex items-center gap-0.5 flex-shrink-0 transition-colors"

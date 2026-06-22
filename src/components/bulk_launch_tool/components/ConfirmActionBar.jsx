@@ -14,8 +14,8 @@ const ConfirmActionBar = ({ onSaveAndContinue, onUseOnce }) => (
           <Settings2 size={18} strokeWidth={2.2} />
         </div>
         <div className="min-w-0">
-          <p className="text-sm font-semibold text-gray-900">广告结构配置已就绪</p>
-          <p className="text-xs text-gray-500 mt-0.5">是否将本次配置保存为模板，便于下次快速使用？</p>
+          <p className="text-sm font-semibold text-neutral-900">广告结构配置已就绪</p>
+          <p className="text-xs text-neutral-500 mt-0.5">是否将本次配置保存为模板，便于下次快速使用？</p>
         </div>
       </div>
       <div className="flex items-center gap-2 shrink-0">

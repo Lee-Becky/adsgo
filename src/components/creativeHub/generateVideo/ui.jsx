@@ -23,7 +23,7 @@ export function BtnPrimary({ children, className, loading, disabled, loadingText
         'focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500',
         loading && 'bg-primary-400 text-white cursor-wait',
         !loading && !isDisabled && 'bg-primary-500 text-white hover:bg-primary-600 active:bg-primary-700',
-        isDisabled && !loading && 'bg-gray-100 text-gray-400 border border-gray-200 shadow-none cursor-not-allowed',
+        isDisabled && !loading && 'bg-neutral-100 text-neutral-400 border border-neutral-200 shadow-none cursor-not-allowed',
         className,
       )}
     >
@@ -46,10 +46,10 @@ export function BtnDefault({ children, className, ...props }) {
       type="button"
       {...props}
       className={cn(
-        'px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg text-sm font-medium shadow-sm transition-all',
-        'hover:bg-gray-50 hover:text-primary-600 hover:border-primary-500 active:bg-gray-100',
+        'px-4 py-2 bg-white border border-neutral-300 text-neutral-700 rounded-lg text-sm font-medium shadow-sm transition-all',
+        'hover:bg-neutral-50 hover:text-primary-600 hover:border-primary-500 active:bg-neutral-100',
         'focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500',
-        'disabled:bg-gray-100 disabled:text-gray-400 disabled:border-gray-200 disabled:shadow-none disabled:cursor-not-allowed inline-flex items-center justify-center gap-2',
+        'disabled:bg-neutral-100 disabled:text-neutral-400 disabled:border-neutral-200 disabled:shadow-none disabled:cursor-not-allowed inline-flex items-center justify-center gap-2',
         className,
       )}
     >
@@ -65,8 +65,8 @@ export function BtnText({ children, className, ...props }) {
       type="button"
       {...props}
       className={cn(
-        'px-4 py-2 bg-transparent text-gray-700 rounded-lg text-sm font-medium transition-all',
-        'hover:bg-gray-100 active:bg-gray-200',
+        'px-4 py-2 bg-transparent text-neutral-700 rounded-lg text-sm font-medium transition-all',
+        'hover:bg-neutral-100 active:bg-neutral-200',
         'focus:outline-none focus:ring-2 focus:ring-primary-500/20',
         className,
       )}
@@ -101,8 +101,8 @@ export function BtnDashed({ children, className, ...props }) {
       type="button"
       {...props}
       className={cn(
-        'px-4 py-2 bg-white border border-dashed border-gray-300 text-gray-700 rounded-lg text-sm font-medium transition-all',
-        'hover:bg-gray-50 hover:text-primary-600 hover:border-primary-500',
+        'px-4 py-2 bg-white border border-dashed border-neutral-300 text-neutral-700 rounded-lg text-sm font-medium transition-all',
+        'hover:bg-neutral-50 hover:text-primary-600 hover:border-primary-500',
         'focus:outline-none focus:ring-2 focus:ring-primary-500/20',
         className,
       )}
@@ -115,14 +115,14 @@ export function BtnDashed({ children, className, ...props }) {
 /** Label — components-forms §4 */
 export function FieldLabel({ children, htmlFor, className }) {
   return (
-    <label htmlFor={htmlFor} className={cn('text-sm font-medium text-gray-700', className)}>
+    <label htmlFor={htmlFor} className={cn('text-sm font-medium text-neutral-700', className)}>
       {children}
     </label>
   );
 }
 
 export function FieldHint({ children }) {
-  return <p className="text-xs text-gray-500 mt-1.5">{children}</p>;
+  return <p className="text-xs text-neutral-500 mt-1.5">{children}</p>;
 }
 
 /** 输入 — components-forms §4 */
@@ -132,8 +132,8 @@ export function InputAdsgo(props) {
     <input
       {...rest}
       className={cn(
-        'w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm text-gray-700 placeholder:text-gray-400 transition-all',
-        'hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500',
+        'w-full px-3 py-2 bg-white border border-neutral-300 rounded-lg text-sm text-neutral-700 placeholder:text-neutral-400 transition-all',
+        'hover:border-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500',
         className,
       )}
     />
@@ -147,8 +147,8 @@ export function TextareaAdsgo(props) {
       rows={rows}
       {...rest}
       className={cn(
-        'w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm text-gray-700 placeholder:text-gray-400 transition-all resize-none',
-        'hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500',
+        'w-full px-3 py-2 bg-white border border-neutral-300 rounded-lg text-sm text-neutral-700 placeholder:text-neutral-400 transition-all resize-none',
+        'hover:border-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500',
         className,
       )}
     />
@@ -183,17 +183,17 @@ export function SelectAdsgo({ value, options, onChange, placeholder = '请选择
         type="button"
         onClick={openMenu}
         className={cn(
-          'w-full flex items-center justify-between px-3 py-2 bg-white border rounded-lg text-sm text-gray-700 transition-all',
-          open ? 'border-primary-500 ring-2 ring-primary-500/20' : 'border-gray-300 hover:border-gray-400',
+          'w-full flex items-center justify-between px-3 py-2 bg-white border rounded-lg text-sm text-neutral-700 transition-all',
+          open ? 'border-primary-500 ring-2 ring-primary-500/20' : 'border-neutral-300 hover:border-neutral-400',
           'focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500',
         )}
       >
         <span className="truncate">{value || placeholder}</span>
-        <ChevronDown className={cn('w-4 h-4 text-gray-400 shrink-0 transition-transform duration-200', open && 'rotate-180')} />
+        <ChevronDown className={cn('w-4 h-4 text-neutral-400 shrink-0 transition-transform duration-200', open && 'rotate-180')} />
       </button>
       {open && (
         <div
-          className="absolute left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg py-1 max-h-60 overflow-auto animate-in fade-in slide-in-from-top-2 duration-200"
+          className="absolute left-0 right-0 mt-1 bg-white border border-neutral-200 rounded-lg shadow-lg py-1 max-h-60 overflow-auto animate-in fade-in slide-in-from-top-2 duration-200"
           style={{ zIndex: z }}
         >
           {options.map((opt) => (
@@ -206,7 +206,7 @@ export function SelectAdsgo({ value, options, onChange, placeholder = '请选择
               }}
               className={cn(
                 'w-full px-3 py-2 text-left text-sm transition-colors',
-                opt === value ? 'bg-primary-50 text-primary-600 font-medium' : 'text-gray-700 hover:bg-gray-50',
+                opt === value ? 'bg-primary-50 text-primary-600 font-medium' : 'text-neutral-700 hover:bg-neutral-50',
               )}
             >
               {opt}
@@ -222,7 +222,7 @@ export function SelectAdsgo({ value, options, onChange, placeholder = '请选择
 export function ToggleAdsgo({ checked, onChange, label }) {
   return (
     <label className="flex items-center justify-between gap-3 cursor-pointer group w-full">
-      <span className="text-sm text-gray-700">{label}</span>
+      <span className="text-sm text-neutral-700">{label}</span>
       <button
         type="button"
         role="switch"
@@ -230,7 +230,7 @@ export function ToggleAdsgo({ checked, onChange, label }) {
         onClick={() => onChange(!checked)}
         className={cn(
           'relative w-10 h-5 rounded-full transition-colors shrink-0',
-          checked ? 'bg-primary-500' : 'bg-gray-200 group-hover:bg-gray-300',
+          checked ? 'bg-primary-500' : 'bg-neutral-200 group-hover:bg-neutral-300',
         )}
       >
         <span
@@ -247,7 +247,7 @@ export function ToggleAdsgo({ checked, onChange, label }) {
 /** Line Tabs — components-navigation §13 */
 export function LineTabs({ tabs, activeId, onChange, className }) {
   return (
-    <div className={cn('border-b border-gray-200', className)}>
+    <div className={cn('border-b border-neutral-200', className)}>
       <nav className="flex space-x-6">
         {tabs.map((t) => {
           const active = t.id === activeId;
@@ -258,7 +258,7 @@ export function LineTabs({ tabs, activeId, onChange, className }) {
               onClick={() => onChange(t.id)}
               className={cn(
                 'whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm transition-colors -mb-px',
-                active ? 'border-primary-500 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
+                active ? 'border-primary-500 text-primary-600' : 'border-transparent text-neutral-500 hover:text-neutral-700 hover:border-neutral-300',
               )}
             >
               {t.label}
@@ -275,7 +275,7 @@ export function PillTabs({ tabs, activeId, onChange, className }) {
   return (
     <div
       className={cn(
-        'inline-flex items-center p-1 rounded-xl bg-gray-100/80 border border-gray-200/50',
+        'inline-flex items-center p-1 rounded-xl bg-neutral-100/80 border border-neutral-200/50',
         className,
       )}
     >
@@ -291,7 +291,7 @@ export function PillTabs({ tabs, activeId, onChange, className }) {
               'focus:outline-none focus:ring-2 focus:ring-primary-500/20',
               active
                 ? 'bg-white text-primary-600 shadow-sm ring-1 ring-black/[0.04]'
-                : 'text-gray-400 hover:text-gray-600',
+                : 'text-neutral-400 hover:text-neutral-600',
             )}
           >
             {t.label}
@@ -351,8 +351,8 @@ export function AlertInfo({ title, children }) {
 export function MetricTile({ label, value }) {
   return (
     <div className="bg-white rounded-xl border border-[#F0F0F0] shadow-[-2px_2px_16px_rgba(14,0,45,0.06)] p-5">
-      <p className="text-sm font-medium text-gray-500">{label}</p>
-      <p className="text-2xl font-bold text-gray-900 mt-1 truncate" title={value}>
+      <p className="text-sm font-medium text-neutral-500">{label}</p>
+      <p className="text-2xl font-bold text-neutral-900 mt-1 truncate" title={value}>
         {value}
       </p>
     </div>
@@ -371,7 +371,7 @@ export function FlowStepper({ steps, activeStep, maxReached, onStepClick, onGoBa
         <button
           type="button"
           onClick={onGoBack}
-          className="shrink-0 flex items-center gap-1 px-2 py-1 mr-2 rounded-md text-xs text-gray-400 hover:text-primary-600 hover:bg-primary-50/50 transition-all"
+          className="shrink-0 flex items-center gap-1 px-2 py-1 mr-2 rounded-md text-xs text-neutral-400 hover:text-primary-600 hover:bg-primary-50/50 transition-all"
         >
           <ChevronLeft className="w-3.5 h-3.5" />
           返回
@@ -408,7 +408,7 @@ export function FlowStepper({ steps, activeStep, maxReached, onStepClick, onGoBa
                       ? 'w-6 h-6 text-xs font-bold bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-sm shadow-primary-500/30'
                       : 'w-5 h-5 text-[10px]',
                     done && !current && 'bg-primary-500 text-white',
-                    !done && !current && 'border-2 border-gray-200 text-gray-400 bg-white',
+                    !done && !current && 'border-2 border-neutral-200 text-neutral-400 bg-white',
                   )}
                 >
                   {done ? <Check className="w-3 h-3" /> : s.id}
@@ -419,8 +419,8 @@ export function FlowStepper({ steps, activeStep, maxReached, onStepClick, onGoBa
                     'text-[11px] whitespace-nowrap leading-none transition-colors',
                     current ? 'inline' : 'hidden sm:inline',
                     done && 'text-primary-600 font-medium',
-                    current && 'text-gray-900 font-semibold',
-                    !done && !current && 'text-gray-400',
+                    current && 'text-neutral-900 font-semibold',
+                    !done && !current && 'text-neutral-400',
                   )}
                 >
                   {s.bar}
@@ -432,7 +432,7 @@ export function FlowStepper({ steps, activeStep, maxReached, onStepClick, onGoBa
                 <div
                   className={cn(
                     'w-4 sm:w-6 h-px mx-0.5 sm:mx-1 shrink-0 rounded-full transition-colors duration-500',
-                    done ? 'bg-primary-300' : 'bg-gray-200',
+                    done ? 'bg-primary-300' : 'bg-neutral-200',
                   )}
                 />
               )}
@@ -449,16 +449,16 @@ export function CardAdsgo({ title, subtitle, children, right, footer, className,
   return (
     <div className={cn('bg-white rounded-xl border border-[#F0F0F0] shadow-[-2px_2px_16px_rgba(14,0,45,0.06)] transition-all duration-300 overflow-hidden', className)}>
       {(title || right) && (
-        <div className="px-5 py-4 border-b border-[#F5F5F5] bg-gray-50/50 flex items-start justify-between gap-4">
+        <div className="px-5 py-4 border-b border-[#F5F5F5] bg-neutral-50/50 flex items-start justify-between gap-4">
           <div className="min-w-0">
-            {title && <h3 className="font-semibold text-gray-900 text-base">{title}</h3>}
-            {subtitle && <p className="mt-1 text-xs text-gray-500 leading-relaxed">{subtitle}</p>}
+            {title && <h3 className="font-semibold text-neutral-900 text-base">{title}</h3>}
+            {subtitle && <p className="mt-1 text-xs text-neutral-500 leading-relaxed">{subtitle}</p>}
           </div>
           {right}
         </div>
       )}
       <div className={cn('p-5', bodyClassName)}>{children}</div>
-      {footer && <div className="px-5 py-3 bg-gray-50 border-t border-gray-100 flex items-center justify-end gap-3">{footer}</div>}
+      {footer && <div className="px-5 py-3 bg-neutral-50 border-t border-neutral-100 flex items-center justify-end gap-3">{footer}</div>}
     </div>
   );
 }
@@ -472,7 +472,7 @@ export function GeneratingPanel({ title, message, subMessage }) {
           <Loader2 className="animate-spin h-4 w-4 text-primary-500" />
         </div>
         <div>
-          <p className="text-sm font-semibold text-gray-900">{title}</p>
+          <p className="text-sm font-semibold text-neutral-900">{title}</p>
           <p className="text-[11px] text-primary-500 font-medium">Generating...</p>
         </div>
       </div>
@@ -480,19 +480,19 @@ export function GeneratingPanel({ title, message, subMessage }) {
         <div className="w-14 h-14 rounded-2xl bg-primary-50 flex items-center justify-center mb-4">
           <Loader2 className="animate-spin h-7 w-7 text-primary-500" />
         </div>
-        <p className="text-sm text-gray-700 font-medium text-center">{message}</p>
-        {subMessage && <p className="text-xs text-gray-400 mt-1">{subMessage}</p>}
+        <p className="text-sm text-neutral-700 font-medium text-center">{message}</p>
+        {subMessage && <p className="text-xs text-neutral-400 mt-1">{subMessage}</p>}
         {/* Progress bar */}
         <div className="w-full max-w-xs mt-5">
-          <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+          <div className="h-1.5 bg-neutral-100 rounded-full overflow-hidden">
             <div className="h-full bg-gradient-to-r from-primary-400 to-primary-500 rounded-full animate-progress-indeterminate" />
           </div>
         </div>
         <div className="grid grid-cols-4 gap-2.5 mt-5 w-full max-w-xs">
-          <div className="aspect-square bg-gray-100 rounded-lg animate-pulse" />
-          <div className="aspect-square bg-gray-100 rounded-lg animate-pulse" style={{ animationDelay: '0.15s' }} />
-          <div className="aspect-square bg-gray-100 rounded-lg animate-pulse" style={{ animationDelay: '0.3s' }} />
-          <div className="aspect-square bg-gray-100 rounded-lg animate-pulse" style={{ animationDelay: '0.45s' }} />
+          <div className="aspect-square bg-neutral-100 rounded-lg animate-pulse" />
+          <div className="aspect-square bg-neutral-100 rounded-lg animate-pulse" style={{ animationDelay: '0.15s' }} />
+          <div className="aspect-square bg-neutral-100 rounded-lg animate-pulse" style={{ animationDelay: '0.3s' }} />
+          <div className="aspect-square bg-neutral-100 rounded-lg animate-pulse" style={{ animationDelay: '0.45s' }} />
         </div>
       </div>
     </div>
@@ -515,10 +515,10 @@ export function StickyFooter({ left, children }) {
       {/* Spacer to prevent content from being hidden behind the fixed footer */}
       <div className="h-16" />
       <div
-        className="fixed bottom-0 right-0 z-[50] px-6 py-3 bg-white/95 backdrop-blur-sm border-t border-gray-200 flex items-center justify-between gap-4 transition-all duration-300"
+        className="fixed bottom-0 right-0 z-[50] px-6 py-3 bg-white/95 backdrop-blur-sm border-t border-neutral-200 flex items-center justify-between gap-4 transition-all duration-300"
         style={{ left: 'var(--sidebar-w, 256px)' }}
       >
-        <div className="flex items-center gap-3 min-w-0 text-sm text-gray-500">
+        <div className="flex items-center gap-3 min-w-0 text-sm text-neutral-500">
           {left}
         </div>
         <div className="flex items-center gap-3 shrink-0">

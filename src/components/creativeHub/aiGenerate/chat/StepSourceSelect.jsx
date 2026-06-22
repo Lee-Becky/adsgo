@@ -54,7 +54,7 @@ export default function StepSourceSelect({
   if (chatPhase === 'source-select') {
     return (
       <div className="w-[440px]">
-        <p className="text-[14px] text-gray-500 mb-3">Paste your product link to continue.</p>
+        <p className="text-[14px] text-neutral-500 mb-3">Paste your product link to continue.</p>
 
         {/* Primary: URL input */}
         <div className="mb-3 rounded-xl border border-primary-200 bg-primary-50/30">
@@ -62,12 +62,12 @@ export default function StepSourceSelect({
             <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 bg-primary-50 text-primary-500">
               <Globe size={15} />
             </div>
-            <p className="text-[16px] font-medium text-gray-900 leading-tight">Product URL</p>
+            <p className="text-[16px] font-medium text-neutral-900 leading-tight">Product URL</p>
           </div>
           <div className="px-3.5 pb-3.5">
             <div className="flex gap-2">
               <div className="relative flex-1">
-                <Globe size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                <Globe size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400 pointer-events-none" />
                 <input
                   type="url"
                   value={chatUrlValue}
@@ -76,17 +76,17 @@ export default function StepSourceSelect({
                   onKeyDown={e => { if (e.key === 'Enter') handleUrlContinue(); }}
                   placeholder="https://example.com/product-page"
                   className={cn(
-                    'w-full pl-9 pr-3 py-2 bg-white border rounded-lg text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500/20 transition-all',
+                    'w-full pl-9 pr-3 py-2 bg-white border rounded-lg text-sm placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary-500/20 transition-all',
                     chatUrlError
                       ? 'border-error-500 focus:border-error-500 focus:ring-error-500/20'
-                      : 'border-gray-200 focus:border-primary-500'
+                      : 'border-neutral-200 focus:border-primary-500'
                   )}
                 />
               </div>
               <button
                 onClick={handleUrlContinue}
                 disabled={!chatUrlValue}
-                className="px-4 h-10 bg-primary-500 text-white rounded-full text-sm font-medium hover:bg-primary-600 shadow-sm shadow-primary-500/20 disabled:bg-gray-200 disabled:text-gray-400 disabled:shadow-none transition-all shrink-0 whitespace-nowrap"
+                className="px-4 h-10 bg-primary-500 text-white rounded-full text-sm font-medium hover:bg-primary-600 shadow-sm shadow-primary-500/20 disabled:bg-neutral-200 disabled:text-neutral-400 disabled:shadow-none transition-all shrink-0 whitespace-nowrap"
               >
                 Continue
               </button>
@@ -102,7 +102,7 @@ export default function StepSourceSelect({
 
         {/* Divider */}
         <div className="mb-3">
-          <span className="text-[14px] text-gray-500">Or select your product from below.</span>
+          <span className="text-[14px] text-neutral-500">Or select your product from below.</span>
         </div>
 
         {/* Secondary sources */}
@@ -121,16 +121,16 @@ export default function StepSourceSelect({
                   onSetPhase('product-list');
                 }
               }}
-              className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl border border-gray-200 hover:border-primary-300 hover:bg-primary-50/40 transition-all text-left group"
+              className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl border border-neutral-200 hover:border-primary-300 hover:bg-primary-50/40 transition-all text-left group"
             >
               <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 bg-primary-50 text-primary-500">
                 <src.Icon size={15} />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-[16px] font-medium text-gray-900 leading-tight">{src.name}</p>
-                <p className="text-[12px] text-gray-500 leading-tight mt-0.5">{src.desc}</p>
+                <p className="text-[16px] font-medium text-neutral-900 leading-tight">{src.name}</p>
+                <p className="text-[12px] text-neutral-500 leading-tight mt-0.5">{src.desc}</p>
               </div>
-              <ChevronRight size={14} className="text-gray-300 group-hover:text-primary-400 shrink-0 transition-colors" />
+              <ChevronRight size={14} className="text-neutral-300 group-hover:text-primary-400 shrink-0 transition-colors" />
             </button>
           ))}
         </div>
@@ -142,7 +142,7 @@ export default function StepSourceSelect({
   if (chatPhase === 'thirdparty-select') {
     return (
       <div className="w-[440px]">
-        <p className="text-[14px] text-gray-500 mb-3">Select a platform to import your product from.</p>
+        <p className="text-[14px] text-neutral-500 mb-3">Select a platform to import your product from.</p>
         <div className="space-y-1.5">
           {THIRD_PARTY_PLATFORMS.map(platform => {
             const isConnected = platform.status === 'connected';
@@ -158,14 +158,14 @@ export default function StepSourceSelect({
                     onOpenConnectModal(platform.name);
                   }
                 }}
-                className="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl border border-gray-200 hover:border-primary-300 hover:bg-primary-50/40 transition-all text-left group"
+                className="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl border border-neutral-200 hover:border-primary-300 hover:bg-primary-50/40 transition-all text-left group"
               >
-                <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 bg-white border border-gray-100">
-                  <PlatformIcon size={16} className="text-gray-600" />
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 bg-white border border-neutral-100">
+                  <PlatformIcon size={16} className="text-neutral-600" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-[16px] font-medium text-gray-900 leading-tight">{platform.name}</p>
-                  <p className="text-[12px] text-gray-500 leading-tight mt-0.5">{platform.desc}</p>
+                  <p className="text-[16px] font-medium text-neutral-900 leading-tight">{platform.name}</p>
+                  <p className="text-[12px] text-neutral-500 leading-tight mt-0.5">{platform.desc}</p>
                 </div>
                 {isConnected && (
                   <span className="px-2 py-0.5 rounded-full text-[11px] font-medium bg-success-50 text-success-500 shrink-0 mr-1 flex items-center gap-1">
@@ -173,7 +173,7 @@ export default function StepSourceSelect({
                     Connected
                   </span>
                 )}
-                <ChevronRight size={14} className="text-gray-300 group-hover:text-primary-400 shrink-0 transition-colors" />
+                <ChevronRight size={14} className="text-neutral-300 group-hover:text-primary-400 shrink-0 transition-colors" />
               </button>
             );
           })}
@@ -181,7 +181,7 @@ export default function StepSourceSelect({
         <div className="mt-4">
           <button
             onClick={() => { onSetPhase('source-select'); onSetSource(null); }}
-            className="px-6 h-10 bg-white border border-gray-300 text-gray-700 rounded-full text-sm font-medium hover:bg-gray-50 hover:text-primary-600 hover:border-primary-500 transition-all"
+            className="px-6 h-10 bg-white border border-neutral-300 text-neutral-700 rounded-full text-sm font-medium hover:bg-neutral-50 hover:text-primary-600 hover:border-primary-500 transition-all"
           >
             Back
           </button>
@@ -237,8 +237,8 @@ export default function StepSourceSelect({
                 <circle cx="60" cy="52" r="4" fill="#C3A2FE"/>
               </svg>
               <div className="text-center max-w-xs">
-                <p className="text-[16px] font-semibold text-gray-800">No Products Yet</p>
-                <p className="text-[14px] text-gray-400 mt-1">
+                <p className="text-[16px] font-semibold text-neutral-800">No Products Yet</p>
+                <p className="text-[14px] text-neutral-400 mt-1">
                   Add products to AdsGo to get started.{' '}
                   <button className="text-primary-500 hover:text-primary-600 transition-colors font-medium">Learn more</button>
                 </p>
@@ -246,7 +246,7 @@ export default function StepSourceSelect({
             </div>
             <button
               onClick={handleBack}
-              className="px-6 h-10 bg-white border border-gray-300 text-gray-700 rounded-full text-sm font-medium hover:bg-gray-50 hover:text-primary-600 hover:border-primary-500 transition-all"
+              className="px-6 h-10 bg-white border border-neutral-300 text-neutral-700 rounded-full text-sm font-medium hover:bg-neutral-50 hover:text-primary-600 hover:border-primary-500 transition-all"
             >
               Back
             </button>
@@ -254,7 +254,7 @@ export default function StepSourceSelect({
         ) : (
           <>
             <div className="space-y-2">
-              <p className="text-[14px] text-gray-500 mb-3">
+              <p className="text-[14px] text-neutral-500 mb-3">
                 {chatSource === 'myproducts' ? 'Here are your products synced to AdsGo. Please select one product to continue.'
                   : chatSource === 'thirdparty' && chatThirdPartyPlatform === 'shopify' ? 'Here are your Shopify products. Please select one product to continue.'
                   : chatSource === 'thirdparty' && chatThirdPartyPlatform === 'meta' ? 'Here are your Meta Catalog products. Please select one product to continue.'
@@ -273,7 +273,7 @@ export default function StepSourceSelect({
                         'px-2.5 py-1 rounded-full text-[13px] font-medium transition-all border shrink-0',
                         chatProductCategoryFilter === cat
                           ? 'bg-primary-500 text-white border-primary-500'
-                          : 'bg-white text-gray-600 border-gray-200 hover:border-primary-300 hover:text-primary-600'
+                          : 'bg-white text-neutral-600 border-neutral-200 hover:border-primary-300 hover:text-primary-600'
                       )}
                     >
                       {cat}
@@ -284,13 +284,13 @@ export default function StepSourceSelect({
 
               {/* Search */}
               <div className="relative">
-                <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" />
                 <input
                   type="text"
                   value={chatSearchQuery}
                   onChange={e => onSetSearchQuery(e.target.value)}
                   placeholder="Search products..."
-                  className="w-full pl-9 pr-3 py-2 bg-white border border-gray-300 rounded-lg text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all"
+                  className="w-full pl-9 pr-3 py-2 bg-white border border-neutral-300 rounded-lg text-sm placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all"
                 />
               </div>
 
@@ -305,15 +305,15 @@ export default function StepSourceSelect({
                       onClick={() => onSetProductIdx(origIdx)}
                       className={cn(
                         'w-full flex items-center gap-2.5 p-2.5 rounded-lg border transition-all text-left',
-                        isSelected ? 'border-primary-400 bg-primary-50 ring-2 ring-primary-500/20' : 'border-transparent hover:bg-gray-50'
+                        isSelected ? 'border-primary-400 bg-primary-50 ring-2 ring-primary-500/20' : 'border-transparent hover:bg-neutral-50'
                       )}
                     >
-                      <img src={product.pic} alt="" className="w-10 h-10 rounded-lg object-cover shrink-0 border border-gray-100" />
+                      <img src={product.pic} alt="" className="w-10 h-10 rounded-lg object-cover shrink-0 border border-neutral-100" />
                       <div className="flex-1 min-w-0">
-                        <p className={cn('text-sm font-medium truncate', isSelected ? 'text-primary-700' : 'text-gray-900')}>{product.name}</p>
-                        <p className={cn('text-[13px] truncate', isSelected ? 'text-primary-400' : 'text-gray-400')}>{product.url ?? product.cat}</p>
+                        <p className={cn('text-sm font-medium truncate', isSelected ? 'text-primary-700' : 'text-neutral-900')}>{product.name}</p>
+                        <p className={cn('text-[13px] truncate', isSelected ? 'text-primary-400' : 'text-neutral-400')}>{product.url ?? product.cat}</p>
                       </div>
-                      <span className={cn('text-[14px] font-semibold shrink-0', isSelected ? 'text-primary-600' : 'text-gray-500')}>{product.price}</span>
+                      <span className={cn('text-[14px] font-semibold shrink-0', isSelected ? 'text-primary-600' : 'text-neutral-500')}>{product.price}</span>
                     </button>
                   );
                 }) : (
@@ -324,8 +324,8 @@ export default function StepSourceSelect({
                       <path d="M45 45L55 55" stroke="#7033F5" strokeWidth="2" strokeLinecap="round"/>
                     </svg>
                     <div className="text-center max-w-xs">
-                      <p className="text-[16px] font-semibold text-gray-800">No Results Found</p>
-                      <p className="text-[14px] text-gray-400 mt-1 break-words">No products match "{chatSearchQuery}"</p>
+                      <p className="text-[16px] font-semibold text-neutral-800">No Results Found</p>
+                      <p className="text-[14px] text-neutral-400 mt-1 break-words">No products match "{chatSearchQuery}"</p>
                     </div>
                   </div>
                 )}
@@ -336,14 +336,14 @@ export default function StepSourceSelect({
             <div className="flex items-center justify-between mt-4">
               <button
                 onClick={handleBack}
-                className="px-6 h-10 bg-white border border-gray-300 text-gray-700 rounded-full text-sm font-medium hover:bg-gray-50 hover:text-primary-600 hover:border-primary-500 transition-all"
+                className="px-6 h-10 bg-white border border-neutral-300 text-neutral-700 rounded-full text-sm font-medium hover:bg-neutral-50 hover:text-primary-600 hover:border-primary-500 transition-all"
               >
                 Back
               </button>
               <button
                 onClick={() => onConfirmStep(1)}
                 disabled={chatProductIdx === null}
-                className="px-6 h-10 bg-primary-500 text-white rounded-full text-sm font-medium hover:bg-primary-600 shadow-sm shadow-primary-500/20 disabled:bg-gray-200 disabled:text-gray-400 disabled:shadow-none transition-all"
+                className="px-6 h-10 bg-primary-500 text-white rounded-full text-sm font-medium hover:bg-primary-600 shadow-sm shadow-primary-500/20 disabled:bg-neutral-200 disabled:text-neutral-400 disabled:shadow-none transition-all"
               >
                 Continue
               </button>
@@ -358,9 +358,9 @@ export default function StepSourceSelect({
   if (chatPhase === 'url-input') {
     return (
       <div className="w-[440px]">
-        <p className="text-[14px] text-gray-500 mb-3">Paste your product URL below.</p>
+        <p className="text-[14px] text-neutral-500 mb-3">Paste your product URL below.</p>
         <div className="relative">
-          <Globe size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+          <Globe size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" />
           <input
             type="url"
             value={chatUrlValue}
@@ -369,8 +369,8 @@ export default function StepSourceSelect({
             onKeyDown={e => { if (e.key === 'Enter') handleUrlContinue(); }}
             placeholder="https://example.com/product-page"
             className={cn(
-              'w-full pl-9 pr-3 py-2 bg-white border rounded-lg text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500/20 transition-all',
-              chatUrlError ? 'border-error-500' : 'border-gray-300 focus:border-primary-500'
+              'w-full pl-9 pr-3 py-2 bg-white border rounded-lg text-sm placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary-500/20 transition-all',
+              chatUrlError ? 'border-error-500' : 'border-neutral-300 focus:border-primary-500'
             )}
           />
         </div>
@@ -383,14 +383,14 @@ export default function StepSourceSelect({
         <div className="flex items-center justify-between mt-6">
           <button
             onClick={() => { onSetPhase('source-select'); onSetSource(null); onSetUrlError(null); }}
-            className="px-6 h-10 bg-white border border-gray-300 text-gray-700 rounded-full text-sm font-medium hover:bg-gray-50 hover:text-primary-600 hover:border-primary-500 transition-all"
+            className="px-6 h-10 bg-white border border-neutral-300 text-neutral-700 rounded-full text-sm font-medium hover:bg-neutral-50 hover:text-primary-600 hover:border-primary-500 transition-all"
           >
             Back
           </button>
           <button
             onClick={handleUrlContinue}
             disabled={!chatUrlValue}
-            className="px-6 h-10 bg-primary-500 text-white rounded-full text-sm font-medium hover:bg-primary-600 shadow-sm shadow-primary-500/20 disabled:bg-gray-200 disabled:text-gray-400 disabled:shadow-none transition-all"
+            className="px-6 h-10 bg-primary-500 text-white rounded-full text-sm font-medium hover:bg-primary-600 shadow-sm shadow-primary-500/20 disabled:bg-neutral-200 disabled:text-neutral-400 disabled:shadow-none transition-all"
           >
             Continue
           </button>

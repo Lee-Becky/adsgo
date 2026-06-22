@@ -101,14 +101,14 @@ const FilterSection = ({ activeTab }) => {
               setDataPeriod('Custom')
             }
           }}
-          className="relative p-1 text-sm rounded hover:bg-indigo-50 transition-colors"
+          className="relative p-1 text-sm rounded hover:bg-primary-50 transition-colors"
         >
           {day}
-          {isStart && <span className="absolute bottom-0 left-1/2 -translate-x-1/2 text-[8px] text-indigo-600 font-bold">START</span>}
-          {isEnd && <span className="absolute bottom-0 left-1/2 -translate-x-1/2 text-[8px] text-indigo-600 font-bold">END</span>}
-          {isStart && !isEnd && <div className="absolute inset-0 bg-indigo-100 rounded"></div>}
-          {isEnd && <div className="absolute inset-0 bg-indigo-100 rounded"></div>}
-          {isInRange && <div className="absolute inset-0 bg-indigo-50 rounded"></div>}
+          {isStart && <span className="absolute bottom-0 left-1/2 -translate-x-1/2 text-[8px] text-primary-600 font-bold">START</span>}
+          {isEnd && <span className="absolute bottom-0 left-1/2 -translate-x-1/2 text-[8px] text-primary-600 font-bold">END</span>}
+          {isStart && !isEnd && <div className="absolute inset-0 bg-primary-100 rounded"></div>}
+          {isEnd && <div className="absolute inset-0 bg-primary-100 rounded"></div>}
+          {isInRange && <div className="absolute inset-0 bg-primary-50 rounded"></div>}
         </button>
       )
     }
@@ -118,8 +118,8 @@ const FilterSection = ({ activeTab }) => {
   return (
     <div>
       <div className="flex items-center gap-2 mb-4">
-        <Filter size={18} className="text-gray-500" />
-        <h3 className="font-semibold text-gray-900">Filters</h3>
+        <Filter size={18} className="text-neutral-500" />
+        <h3 className="font-semibold text-neutral-900">Filters</h3>
       </div>
 
       <div className={`grid grid-cols-1 ${activeTab === 'all' ? 'md:grid-cols-4' : 'md:grid-cols-3'} gap-4`}>
@@ -161,16 +161,16 @@ const FilterSection = ({ activeTab }) => {
 
         {/* Data Period */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-neutral-700 mb-2">
             Data Period
           </label>
           <div className="relative">
             <button
               onClick={() => setShowCalendar(!showCalendar)}
-              className="w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none text-sm text-left flex items-center justify-between"
+              className="w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none text-sm text-left flex items-center justify-between"
             >
               <span>{customStartDate && customEndDate ? `${formatDate(customStartDate)} - ${formatDate(customEndDate)}` : dataPeriod}</span>
-              <Calendar size={16} className="text-gray-400" />
+              <Calendar size={16} className="text-neutral-400" />
             </button>
 
             {showCalendar && (
@@ -184,8 +184,8 @@ const FilterSection = ({ activeTab }) => {
                         onClick={() => handlePeriodClick(option.value)}
                         className={`px-3 py-2 text-xs rounded-lg text-left transition-colors ${
                           dataPeriod === option.value
-                            ? 'bg-indigo-600 text-white'
-                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                            ? 'bg-primary-600 text-white'
+                            : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
                         }`}
                       >
                         {option.label}
@@ -198,17 +198,17 @@ const FilterSection = ({ activeTab }) => {
                     {/* Calendar Grid */}
                     <div>
                       <div className="flex items-center justify-between mb-2">
-                        <button className="p-1 hover:bg-gray-100 rounded">
+                        <button className="p-1 hover:bg-neutral-100 rounded">
                           <ChevronLeft size={16} />
                         </button>
                         <span className="font-medium text-sm">
                           {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
                         </span>
-                        <button className="p-1 hover:bg-gray-100 rounded">
+                        <button className="p-1 hover:bg-neutral-100 rounded">
                           <ChevronRight size={16} />
                         </button>
                       </div>
-                      <div className="grid grid-cols-7 gap-1 text-center text-xs text-gray-500 mb-1">
+                      <div className="grid grid-cols-7 gap-1 text-center text-xs text-neutral-500 mb-1">
                         <div>Su</div>
                         <div>Mo</div>
                         <div>Tu</div>
@@ -228,13 +228,13 @@ const FilterSection = ({ activeTab }) => {
                 <div className="flex gap-2 mt-4 pt-4 border-t border-border">
                   <button
                     onClick={() => setShowCalendar(false)}
-                    className="flex-1 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                    className="flex-1 px-4 py-2 text-sm font-medium text-neutral-700 bg-neutral-100 rounded-lg hover:bg-neutral-200 transition-colors"
                   >
                     Cancel
                   </button>
                   <button
                     onClick={() => setShowCalendar(false)}
-                    className="flex-1 px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors"
+                    className="flex-1 px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors"
                   >
                     Confirm
                   </button>
@@ -254,20 +254,20 @@ const CustomSelect = ({ label, options }) => {
 
   return (
     <div>
-      <label className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">
+      <label className="block text-xs font-semibold text-neutral-600 mb-1.5 tracking-wide">
         {label}
       </label>
       <div className="relative">
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="w-full px-3 py-2.5 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none text-sm text-left flex items-center justify-between hover:border-indigo-300 transition-all shadow-sm"
+          className="w-full px-3 py-2.5 bg-white border border-neutral-200 rounded-xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none text-sm text-left flex items-center justify-between hover:border-primary-300 transition-all shadow-sm"
         >
-          <span className="font-medium text-gray-700">{selectedOption.label}</span>
-          <ChevronDown size={16} className={`text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+          <span className="font-medium text-neutral-700">{selectedOption.label}</span>
+          <ChevronDown size={16} className={`text-neutral-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
         </button>
 
         {isOpen && (
-          <div className="absolute top-full left-0 mt-1 w-full bg-white border border-gray-200 rounded-xl shadow-lg z-50 overflow-hidden">
+          <div className="absolute top-full left-0 mt-1 w-full bg-white border border-neutral-200 rounded-xl shadow-lg z-50 overflow-hidden">
             <div className="py-1">
               {options.map((option) => (
                 <button
@@ -276,13 +276,13 @@ const CustomSelect = ({ label, options }) => {
                     setSelectedOption(option)
                     setIsOpen(false)
                   }}
-                  className={`w-full px-3 py-2 text-left text-sm flex items-center justify-between hover:bg-indigo-50 transition-colors ${
-                    selectedOption.value === option.value ? 'bg-indigo-50 text-indigo-700 font-medium' : 'text-gray-700'
+                  className={`w-full px-3 py-2 text-left text-sm flex items-center justify-between hover:bg-primary-50 transition-colors ${
+                    selectedOption.value === option.value ? 'bg-primary-50 text-primary-700 font-medium' : 'text-neutral-700'
                   }`}
                 >
                   <span>{option.label}</span>
                   {selectedOption.value === option.value && (
-                    <Check size={14} className="text-indigo-600" />
+                    <Check size={14} className="text-primary-600" />
                   )}
                 </button>
               ))}

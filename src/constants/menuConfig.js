@@ -1,232 +1,308 @@
-// 统一的菜单配置文件
-// 用于 Sidebar 和 Header 共享使用
+// AdsGo 2.0 Menu Configuration
+// Used by Sidebar and Header — workspace-relative paths
 
-export const MENU_ITEMS = [
+import {
+  MessageCircle, LayoutDashboard, FileBarChart, Monitor,
+  Zap, Layers, FileText, Palette, Sparkles, Image,
+  BarChart3, PieChart, BrainCircuit, Users, Eye,
+  ShieldCheck, Award, Target, Link2, Database, Settings,
+} from 'lucide-react'
+
+/* ═══════════════════════════════════════════════════════════
+   MENU_ITEMS_V2 — 2.0 information architecture
+   Each item has a `path` (workspace-relative) used for navigation.
+   Groups use `children` for nested items.
+   ═══════════════════════════════════════════════════════════ */
+
+export const MENU_ITEMS_V2 = [
   {
-    key: 'overview',
-    label: 'Home',
-    shortLabel: 'Home',
-    icon: 'Layout',
-    title: 'Home',
-    subtitle: 'Ad campaign overview and real-time optimization',
-    hidden: true
+    key: 'chat',
+    label: 'Luna Chat',
+    shortLabel: 'Luna',
+    icon: 'MessageCircle',
+    path: 'chat',
+    title: 'Luna Chat',
+    subtitle: 'AI-powered advertising assistant',
+    isLuna: true,
   },
   {
-    key: 'mediaPlan',
-    label: 'Media Plan',
-    shortLabel: 'Plan',
+    key: 'plan',
+    label: 'Plan',
     icon: 'LayoutDashboard',
-    title: 'Media Plan',
-    subtitle: 'Your advertising command center'
+    children: [
+      {
+        key: 'media-plan',
+        label: 'Media Plan',
+        shortLabel: 'Plan',
+        icon: 'LayoutDashboard',
+        path: 'plan/media-plan',
+        title: 'Media Plan',
+        subtitle: 'Your advertising command center',
+      },
+      {
+        key: 'strategy-cycle',
+        label: 'Strategy Cycle',
+        shortLabel: 'PDCA',
+        icon: 'Target',
+        path: 'plan/strategy-cycle',
+        title: 'Strategy Cycle',
+        subtitle: 'Weekly PDCA strategy cycle',
+        isNew: true,
+      },
+    ],
   },
   {
-    key: 'campaignGenerator',
-    label: 'New Campaign（旧）',
-    shortLabel: '旧',
-    icon: 'Wand2',
-    title: 'New Campaign（旧）',
-    subtitle: 'Generate and publish campaigns',
-    hidden: true
+    key: 'report',
+    label: 'Data Reports',
+    icon: 'FileBarChart',
+    children: [
+      {
+        key: 'daily-brief',
+        label: "Today's Brief",
+        shortLabel: 'Brief',
+        icon: 'FileBarChart',
+        path: 'report/daily-brief',
+        title: "Today's Brief",
+        subtitle: 'AI-generated daily performance summary',
+        isNew: true,
+      },
+      {
+        key: 'performance',
+        label: 'Performance',
+        shortLabel: 'Perf',
+        icon: 'BarChart3',
+        path: 'report/performance',
+        title: 'Performance',
+        subtitle: 'Detailed performance data table',
+        isNew: true,
+      },
+    ],
   },
   {
-    key: 'batchGenerateAds',
-    label: 'Campaign Generator',
-    shortLabel: 'Gen',
-    icon: 'Layers',
-    title: 'Campaign Generator',
-    subtitle: 'High-performance multi-product campaign architecture orchestration'
+    key: 'ads',
+    label: 'Ads',
+    icon: 'Monitor',
+    children: [
+      {
+        key: 'campaigns',
+        label: 'Ad Manage',
+        shortLabel: 'AdMgr',
+        icon: 'Monitor',
+        path: 'ads/campaigns',
+        title: 'Ad Manage',
+        subtitle: 'Unified management of cross-channel campaigns and AI-driven budget optimization',
+      },
+    ],
   },
   {
-    key: 'bulkLaunchTool',
-    label: 'Bulk Launch',
-    shortLabel: 'Bulk',
-    icon: 'Zap',
-    title: 'Bulk Launch',
-    subtitle: 'High-performance multi-product campaign architecture orchestration'
-  },
-  {
-    key: 'aiOptimize',
-    label: 'AI Optimize',
-    shortLabel: 'Opt',
+    key: 'create',
+    label: 'Create',
     icon: 'Zap',
     children: [
       {
-        key: 'adManagerV3',
-        label: 'Ad Manager',
-        shortLabel: 'Ads',
-        icon: 'Monitor',
-        title: 'Ad Manager',
-        subtitle: 'Unified management of cross-channel campaigns and AI-driven budget optimization'
+        key: 'campaign-gen',
+        label: 'Campaign Generator',
+        shortLabel: 'Gen',
+        icon: 'Layers',
+        path: 'create/campaign-gen',
+        title: 'Campaign Generator',
+        subtitle: 'High-performance multi-product campaign architecture orchestration',
       },
       {
-        key: 'autoRegeneration',
-        label: 'Draft & Recom.',
+        key: 'bulk-launch',
+        label: 'Bulk Launch',
+        shortLabel: 'Bulk',
+        icon: 'Zap',
+        path: 'create/bulk-launch',
+        title: 'Bulk Launch',
+        subtitle: 'High-performance multi-product campaign architecture orchestration',
+      },
+      {
+        key: 'draft',
+        label: 'Drafts & Preview',
         shortLabel: 'Draft',
         icon: 'FileText',
-        title: 'Draft & Recom.',
-        subtitle: 'Management of unpublished drafts and AI-driven campaign recommendations based on performance'
-      }
-    ]
+        path: 'create/draft',
+        title: 'Drafts & Preview',
+        subtitle: 'Management of unpublished drafts and AI-driven campaign recommendations',
+      },
+    ],
   },
   {
-    key: 'creativeHub',
-    label: 'Creative Hub',
-    shortLabel: 'Hub',
+    key: 'creative',
+    label: 'Creative',
     icon: 'Palette',
     children: [
       {
-        key: 'aiGenerate',
-        label: 'AI Generate',
-        shortLabel: 'AIGC',
-        icon: 'Sparkles',
-        title: 'AI Generate',
-        subtitle: 'Generate ad creatives using AI'
-      },
-      {
-        key: 'generateVideo',
-        label: 'Generate Video',
-        shortLabel: 'Video',
-        icon: 'Video',
-        title: 'Generate Video',
-        subtitle: 'Generate AI marketing videos from product info and scripts',
-        hidden: true
-      },
-      {
-        key: 'creativeLibrary',
-        label: 'Creative Library',
+        key: 'library',
+        label: 'Library',
         shortLabel: 'Lib',
         icon: 'Image',
-        title: 'Creative Library',
-        subtitle: 'Browse and manage your creative assets'
-      }
-    ]
+        path: 'creative/library',
+        title: 'Library',
+        subtitle: 'Browse and manage your creative assets',
+      },
+      {
+        key: 'ai-gen',
+        label: 'AI Generate',
+        shortLabel: 'Aigc',
+        icon: 'Sparkles',
+        path: 'creative/ai-gen',
+        title: 'AI Generate',
+        subtitle: 'Generate ad creatives using AI',
+      },
+    ],
   },
   {
-    key: 'analysis',
-    label: 'Analysis',
-    shortLabel: 'Anls',
+    key: 'insight',
+    label: 'Insight',
     icon: 'BarChart3',
     children: [
       {
-        key: 'insights360',
-        label: 'Ad insights',
-        shortLabel: 'Ads',
+        key: 'dashboard',
+        label: 'Dashboard',
+        shortLabel: 'Dash',
         icon: 'PieChart',
-        title: 'Ad insights',
-        subtitle: 'Comprehensive 360-degree view of campaign insights'
+        path: 'insight/dashboard',
+        title: 'Dashboard',
+        subtitle: 'Comprehensive 360-degree view of campaign insights',
       },
       {
-        key: 'aiAnalysis',
-        label: 'AI Analysis',
-        shortLabel: 'Anal',
-        icon: 'BrainCircuit',
-        title: 'AI Analysis',
-        subtitle: 'AI-powered campaign analysis and recommendations'
+        key: 'audience',
+        label: 'Audience',
+        shortLabel: 'Audn',
+        icon: 'Users',
+        path: 'insight/audience',
+        title: 'Audience',
+        subtitle: 'Audience insights and analysis',
       },
       {
-        key: 'audit360',
-        label: '360° Audit',
-        shortLabel: 'Audit',
-        icon: 'PieChart',
-        title: '360° Audit',
-        subtitle: '360° Meta Audit — funnel metrics and insight tabs',
-        hidden: true
-      }
-    ]
+        key: 'page',
+        label: 'Page',
+        shortLabel: 'Page',
+        icon: 'Eye',
+        path: 'insight/page',
+        title: 'Page',
+        subtitle: 'Landing page insights',
+      },
+      {
+        key: 'creative-insight',
+        label: 'Creative',
+        shortLabel: 'Crtv',
+        icon: 'Sparkles',
+        path: 'insight/creative',
+        title: 'Creative',
+        subtitle: 'Creative performance insights',
+      },
+    ],
   },
   {
-    key: 'brandCenter',
-    label: 'Brand Center',
-    shortLabel: 'Brand',
-    icon: 'ShieldCheck',
+    key: 'settings',
+    label: 'Settings',
+    icon: 'Settings',
     children: [
       {
-        key: 'brandProfile',
-        label: 'Brand Profile',
-        shortLabel: 'Prof',
+        key: 'brand-info',
+        label: 'Brand Info',
+        shortLabel: 'Info',
         icon: 'Award',
-        title: 'Brand Profile',
-        subtitle: 'Comprehensive view of brand identity and market position'
+        path: 'settings/brand-info',
+        title: 'Brand Info',
+        subtitle: 'Comprehensive view of brand identity and market position',
       },
       {
-        key: 'optimizeGoals',
-        label: 'Optimize Goals',
-        shortLabel: 'Goal',
-        icon: 'Target',
-        title: 'Optimize Goals',
-        subtitle: 'Set and manage optimization goals'
-      },
-      {
-        key: 'adAccounts',
+        key: 'accounts',
         label: 'Ad Accounts',
         shortLabel: 'Acct',
         icon: 'Link2',
+        path: 'settings/accounts',
         title: 'Ad Accounts',
-        subtitle: 'Manage connected ad accounts across platforms'
+        subtitle: 'Manage connected ad accounts across platforms',
+      },
+      {
+        key: 'goals',
+        label: 'Goals & Red Lines',
+        shortLabel: 'Goal',
+        icon: 'Target',
+        path: 'settings/goals',
+        title: 'Goals & Red Lines',
+        subtitle: 'Set optimization goals and alert thresholds',
       },
       {
         key: 'datasets',
         label: 'Datasets',
         shortLabel: 'Data',
         icon: 'Database',
+        path: 'settings/datasets',
         title: 'Datasets',
-        subtitle: 'Configure and manage data sources for AI optimization'
+        subtitle: 'Configure and manage data sources for AI optimization',
       },
       {
-        key: 'products',
-        label: 'Products',
-        shortLabel: 'Prod',
-        icon: 'Package',
-        title: 'Products',
-        subtitle: 'Manage product information'
-      }
-    ]
-  }
+        key: 'skills',
+        label: 'Skills & AI Config',
+        shortLabel: 'Skill',
+        icon: 'BrainCircuit',
+        path: 'settings/skills',
+        title: 'Skills & AI Config',
+        subtitle: 'Configure Luna AI capabilities and automation',
+        isNew: true,
+      },
+    ],
+  },
 ]
 
+/* ── Icon lookup map ────────────────────────────────────────── */
+export const ICON_MAP = {
+  MessageCircle, LayoutDashboard, FileBarChart, Monitor,
+  Zap, Layers, FileText, Palette, Sparkles, Image,
+  BarChart3, PieChart, BrainCircuit, Users, Eye,
+  ShieldCheck, Award, Target, Link2, Database, Settings,
+}
+
+/* ── Legacy compat: SETTINGS_MENU (used by older code paths) ── */
 export const SETTINGS_MENU = {
   key: 'settings',
   label: 'Brand Management',
-  icon: 'Cog',
+  icon: 'Settings',
   title: 'Brand Management',
-  subtitle: 'The business suite defines how the AI evaluates performance and optimizes your ads. All ads in the group share one optimization goal and one budget, and are optimized together by the AI.'
+  subtitle: 'The business suite defines how the AI evaluates performance and optimizes your ads.',
 }
 
-// 根据 pageKey 获取页面信息
+/* ── Keep legacy MENU_ITEMS as alias for any remaining consumers ── */
+export const MENU_ITEMS = MENU_ITEMS_V2
+
+/* ═══════════════════════════════════════════════════════════
+   getPageInfo — resolve page title/subtitle from menu config
+   Accepts a route segment key (e.g. 'media-plan', 'campaigns')
+   or a full path segment (e.g. 'plan/media-plan').
+   ═══════════════════════════════════════════════════════════ */
 export const getPageInfo = (pageKey) => {
   const findPage = (items) => {
     for (const item of items) {
-      if (item.key === pageKey) return item;
+      // Match by key or path
+      if (item.key === pageKey || item.path === pageKey) return item
+      // Match by last segment of path (e.g. 'media-plan' matches path 'plan/media-plan')
+      if (item.path && item.path.split('/').pop() === pageKey) return item
       if (item.children) {
-        const found = findPage(item.children);
-        if (found) return found;
+        const found = findPage(item.children)
+        if (found) return found
       }
     }
-    return null;
-  };
+    return null
+  }
 
-  const allItems = [...MENU_ITEMS, SETTINGS_MENU]
-  const page = findPage(allItems)
-  
+  const page = findPage(MENU_ITEMS_V2)
+
   if (page) {
     return {
-      title: page.title,
-      subtitle: page.subtitle
+      title: page.title || page.label,
+      subtitle: page.subtitle || '',
     }
   }
 
-  // 特殊处理详情页映射
-  if (pageKey === 'productDetails') {
-    const productsPage = findPage(allItems.filter(i => i.key === 'brandCenter'))?.children?.find(c => c.key === 'products');
-    return {
-      title: productsPage?.title || 'Products',
-      subtitle: productsPage?.subtitle || 'Manage product information'
-    }
-  }
-  
-  // 默认返回 Home 信息
+  // Fallback
   return {
     title: 'Home',
-    subtitle: 'Ad campaign overview and real-time optimization'
+    subtitle: 'Ad campaign overview and real-time optimization',
   }
 }

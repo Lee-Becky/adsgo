@@ -50,11 +50,11 @@ const ProductVariableInserter = ({ onInsert, size = 'xs' }) => {
         offset={4}
         onClose={() => setOpen(false)}
         closeOnContentClick
-        className="bg-white rounded-base shadow-xl border border-gray-100 overflow-hidden min-w-[200px] py-1"
+        className="bg-white rounded-base shadow-xl border border-neutral-100 overflow-hidden min-w-[200px] py-1"
       >
-        <div className="px-2.5 py-1.5 border-b border-gray-50">
-          <p className="text-[10px] uppercase tracking-wider text-gray-400 font-semibold">商品变量</p>
-          <p className="text-[10px] text-gray-400 mt-0.5">发布时按当前商品自动替换</p>
+        <div className="px-2.5 py-1.5 border-b border-neutral-50">
+          <p className="text-[10px] uppercase tracking-wider text-neutral-400 font-semibold">商品变量</p>
+          <p className="text-[10px] text-neutral-400 mt-0.5">发布时按当前商品自动替换</p>
         </div>
         <div className="max-h-[280px] overflow-y-auto py-1">
           {PRODUCT_VARIABLES.map(v => (
@@ -62,9 +62,9 @@ const ProductVariableInserter = ({ onInsert, size = 'xs' }) => {
               key={v.token}
               type="button"
               onClick={() => { onInsert?.(v.token); setOpen(false); }}
-              className="w-full flex items-center justify-between gap-3 px-3 py-1.5 text-left hover:bg-gray-50 transition-colors"
+              className="w-full flex items-center justify-between gap-3 px-3 py-1.5 text-left hover:bg-neutral-50 transition-colors"
             >
-              <span className="text-xs font-medium text-gray-700">{v.label}</span>
+              <span className="text-xs font-medium text-neutral-700">{v.label}</span>
               <span className="text-[10px] font-mono text-primary-500">{v.token}</span>
             </button>
           ))}

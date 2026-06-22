@@ -40,12 +40,12 @@ const CatalogCombosField = ({ channel, value, onChange, helpText }) => {
     <div className="flex flex-col gap-2 col-span-full">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-1.5">
-          <label className="text-xs font-medium text-gray-700">
+          <label className="text-xs font-medium text-neutral-700">
             目录与系列组合
             <span className="text-rose-500 ml-0.5">*</span>
           </label>
           <span title={helpText || '每个目录将生成 1 个 Campaign，每个商品系列生成 1 个 Adset。同一目录仅可选 1 次。'}
-            className="text-gray-300 cursor-help"><Info size={11} /></span>
+            className="text-neutral-300 cursor-help"><Info size={11} /></span>
         </div>
         <button
           type="button"
@@ -57,8 +57,8 @@ const CatalogCombosField = ({ channel, value, onChange, helpText }) => {
       </div>
 
       {combos.length === 0 && (
-        <div className="text-center py-6 px-4 bg-gray-50 border border-dashed border-gray-200 rounded-base">
-          <p className="text-xs text-gray-400">暂无目录组合，点击右上「添加目录组合」开始</p>
+        <div className="text-center py-6 px-4 bg-neutral-50 border border-dashed border-neutral-200 rounded-base">
+          <p className="text-xs text-neutral-400">暂无目录组合，点击右上「添加目录组合」开始</p>
         </div>
       )}
 
@@ -68,11 +68,11 @@ const CatalogCombosField = ({ channel, value, onChange, helpText }) => {
             c.value === combo.catalog_id || !usedCatalogIds.has(c.value)
           );
           return (
-            <div key={idx} className="flex items-start gap-2 p-3 bg-white border border-gray-100 rounded-base">
-              <span className="text-[10px] font-bold text-gray-400 mt-2.5 shrink-0 w-5 text-center">{idx + 1}</span>
+            <div key={idx} className="flex items-start gap-2 p-3 bg-white border border-neutral-100 rounded-base">
+              <span className="text-[10px] font-bold text-neutral-400 mt-2.5 shrink-0 w-5 text-center">{idx + 1}</span>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 flex-1 min-w-0">
                 <div className="flex flex-col gap-1">
-                  <span className="text-[10px] uppercase tracking-wider text-gray-400 font-medium">目录</span>
+                  <span className="text-[10px] uppercase tracking-wider text-neutral-400 font-medium">目录</span>
                   <Select
                     value={combo.catalog_id}
                     onChange={(v) => updateCombo(idx, { catalog_id: v })}
@@ -81,7 +81,7 @@ const CatalogCombosField = ({ channel, value, onChange, helpText }) => {
                   />
                 </div>
                 <div className="flex flex-col gap-1">
-                  <span className="text-[10px] uppercase tracking-wider text-gray-400 font-medium">商品系列（多选）</span>
+                  <span className="text-[10px] uppercase tracking-wider text-neutral-400 font-medium">商品系列（多选）</span>
                   <MultiSelect
                     value={combo.product_set_ids}
                     onChange={(v) => updateCombo(idx, { product_set_ids: v })}
@@ -93,7 +93,7 @@ const CatalogCombosField = ({ channel, value, onChange, helpText }) => {
               <button
                 type="button"
                 onClick={() => removeCombo(idx)}
-                className="w-8 h-8 flex items-center justify-center rounded-full text-gray-400 hover:text-rose-500 hover:bg-rose-50 transition-colors mt-1 shrink-0"
+                className="w-8 h-8 flex items-center justify-center rounded-full text-neutral-400 hover:text-rose-500 hover:bg-rose-50 transition-colors mt-1 shrink-0"
                 title="删除该组合"
               >
                 <X size={14} />
@@ -102,7 +102,7 @@ const CatalogCombosField = ({ channel, value, onChange, helpText }) => {
           );
         })}
       </div>
-      <span className="text-[10px] text-gray-300 font-mono truncate">_dpa_combos · 派生 → campaigns × adsets</span>
+      <span className="text-[10px] text-neutral-300 font-mono truncate">_dpa_combos · 派生 → campaigns × adsets</span>
     </div>
   );
 };

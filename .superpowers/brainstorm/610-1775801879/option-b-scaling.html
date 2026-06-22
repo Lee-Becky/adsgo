@@ -1,0 +1,236 @@
+<style>
+  * { box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+  .demo-modal {
+    background: #fff;
+    border-radius: 14px;
+    border: 1px solid #e5e7eb;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.07);
+    font-family: inherit;
+  }
+  .demo-list {
+    background: #f9fafb;
+    border-bottom: 1px solid #f3f4f6;
+  }
+  .demo-list-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 16px; border-bottom: 1px solid #f3f4f6;
+    font-size: 12px; color: #374151;
+  }
+  .demo-list-row:last-child { border-bottom: none; }
+  .demo-check {
+    width: 14px; height: 14px; border-radius: 3px; flex-shrink: 0;
+    background: #6366f1; border: 1.5px solid #6366f1;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .demo-check::after { content: '✓'; color: white; font-size: 8px; }
+  .demo-thumb { width: 26px; height: 32px; border-radius: 5px; flex-shrink: 0; background: linear-gradient(135deg, #ddd6fe, #c7d2fe); }
+  .demo-thumb.t2 { background: linear-gradient(135deg, #fde68a, #fca5a5); }
+  .demo-thumb.t3 { background: linear-gradient(135deg, #a7f3d0, #6ee7b7); }
+  .dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
+  .demo-badge { display: inline-flex; align-items: center; gap: 5px; padding: 2px 7px; border-radius: 99px; font-size: 10px; font-weight: 500; border: 1px solid; margin-left: auto; }
+  .badge-g1 { background: #ede9fe; color: #7c3aed; border-color: #ddd6fe; }
+  .badge-g2 { background: #fdf4ff; color: #9333ea; border-color: #f0abfc; }
+
+  /* Footer */
+  .footer { padding: 10px 16px; background: #111827; }
+  .footer-label { font-size: 11px; font-weight: 600; color: #fff; white-space: nowrap; }
+  .footer-row { display: flex; align-items: center; gap: 8px; }
+
+  /* Group pills */
+  .gpill {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 5px 11px; border-radius: 7px; font-size: 11px; font-weight: 600;
+    cursor: pointer; white-space: nowrap; flex-shrink: 0;
+    border: none;
+  }
+  .gpill-new { background: rgba(255,255,255,0.12); color: #fff; border: 1.5px solid rgba(255,255,255,0.25); }
+
+  /* Scroll container */
+  .pills-scroll {
+    display: flex; gap: 6px; overflow-x: auto; flex: 1;
+    scrollbar-width: none; -ms-overflow-style: none;
+    padding-right: 4px;
+  }
+  .pills-scroll::-webkit-scrollbar { display: none; }
+
+  /* Overflow dropdown */
+  .overflow-btn {
+    background: rgba(255,255,255,0.1); color: #fff;
+    border: 1.5px solid rgba(255,255,255,0.2); border-radius: 7px;
+    padding: 5px 10px; font-size: 11px; font-weight: 600;
+    cursor: pointer; flex-shrink: 0; white-space: nowrap;
+  }
+
+  /* Section label */
+  .scenario-label {
+    font-size: 11px; font-weight: 700; color: #6b7280;
+    text-transform: uppercase; letter-spacing: 0.05em;
+    background: #f3f4f6; padding: 7px 16px; border-bottom: 1px solid #f3f4f6;
+  }
+
+  /* Pro/con tags */
+  .tag { border-radius: 4px; padding: 2px 7px; font-size: 10px; font-weight: 600; }
+  .tag-pro { background: #d1fae5; color: #065f46; }
+  .tag-con { background: #fee2e2; color: #991b1b; }
+  .tag-ok  { background: #e0e7ff; color: #3730a3; }
+  .tag-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+  .desc { font-size: 12px; color: #6b7280; line-height: 1.55; margin-top: 6px; }
+
+  .option { padding: 0 !important; overflow: hidden; }
+  .option .content { padding: 14px 16px !important; }
+  .option-inner-label { font-size: 11px; font-weight: 700; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 8px; }
+
+  /* Gradient fade hint for scroll */
+  .pills-fade-wrap { position: relative; flex: 1; overflow: hidden; }
+  .pills-fade-wrap::after {
+    content: ''; position: absolute; right: 0; top: 0; bottom: 0; width: 32px;
+    background: linear-gradient(to right, transparent, #111827);
+    pointer-events: none;
+  }
+
+  /* Generate group colors */
+  .g1  { background: rgba(99,102,241,0.85);  color:#fff; }
+  .g2  { background: rgba(147,51,234,0.85);  color:#fff; }
+  .g3  { background: rgba(245,158,11,0.85);  color:#fff; }
+  .g4  { background: rgba(22,163,74,0.85);   color:#fff; }
+  .g5  { background: rgba(225,29,72,0.85);   color:#fff; }
+  .g6  { background: rgba(14,165,233,0.85);  color:#fff; }
+  .g7  { background: rgba(234,88,12,0.85);   color:#fff; }
+  .g8  { background: rgba(168,85,247,0.85);  color:#fff; }
+  .g9  { background: rgba(16,185,129,0.85);  color:#fff; }
+  .g10 { background: rgba(239,68,68,0.85);   color:#fff; }
+
+  .d1  { background:#6366f1; }
+  .d2  { background:#9333ea; }
+  .d3  { background:#f59e0b; }
+  .d4  { background:#16a34a; }
+  .d5  { background:#e11d48; }
+  .d6  { background:#0ea5e9; }
+  .d7  { background:#ea580c; }
+  .d8  { background:#a855f7; }
+  .d9  { background:#10b981; }
+  .d10 { background:#ef4444; }
+</style>
+
+<h2>方案 B — 多组场景扩展性探索</h2>
+<p class="subtitle">选中 3 个素材后，底部操作栏在不同组数下的 3 种展示策略</p>
+
+<div class="options">
+
+  <!-- 策略 1: 直接换行 -->
+  <div class="option" data-choice="wrap" onclick="toggleSelect(this)">
+    <div class="content">
+      <div class="option-inner-label">策略 1 · 直接换行（原始方案）</div>
+      <div class="demo-modal">
+        <div class="demo-list">
+          <div class="demo-list-row"><div class="demo-check"></div><div class="demo-thumb"></div><span>素材1.jpg</span><span class="demo-badge badge-g1"><span class="dot d1"></span>素材组 1</span></div>
+          <div class="demo-list-row"><div class="demo-check"></div><div class="demo-thumb t2"></div><span>素材2.png</span><span class="demo-badge badge-g2"><span class="dot d2"></span>素材组 2</span></div>
+        </div>
+        <div class="footer">
+          <div class="footer-row" style="margin-bottom:6px">
+            <span class="footer-label">已选 3 个 &nbsp;·&nbsp; 移至：</span>
+          </div>
+          <div class="footer-row" style="flex-wrap:wrap; gap:6px">
+            <button class="gpill g1">素材组 1</button>
+            <button class="gpill g2">素材组 2</button>
+            <button class="gpill g3">素材组 3</button>
+            <button class="gpill g4">素材组 4</button>
+            <button class="gpill g5">素材组 5</button>
+            <button class="gpill g6">素材组 6</button>
+            <button class="gpill g7">素材组 7</button>
+            <button class="gpill g8">素材组 8</button>
+            <button class="gpill g9">素材组 9</button>
+            <button class="gpill g10">素材组 10</button>
+            <button class="gpill gpill-new">＋ 新增组</button>
+          </div>
+        </div>
+      </div>
+      <p class="desc">组多时底部高度暴增，Modal 被严重压缩，列表区域所剩无几。</p>
+      <div class="tag-row">
+        <span class="tag tag-con">✗ 多组时严重撑高</span>
+        <span class="tag tag-con">✗ 体验崩溃</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 策略 2: 横向滚动 -->
+  <div class="option" data-choice="scroll" onclick="toggleSelect(this)">
+    <div class="content">
+      <div class="option-inner-label">策略 2 · 横向滚动（固定一行高度）</div>
+      <div class="demo-modal">
+        <div class="demo-list">
+          <div class="demo-list-row"><div class="demo-check"></div><div class="demo-thumb"></div><span>素材1.jpg</span><span class="demo-badge badge-g1"><span class="dot d1"></span>素材组 1</span></div>
+          <div class="demo-list-row"><div class="demo-check"></div><div class="demo-thumb t2"></div><span>素材2.png</span><span class="demo-badge badge-g2"><span class="dot d2"></span>素材组 2</span></div>
+        </div>
+        <div class="footer">
+          <div class="footer-row">
+            <span class="footer-label" style="margin-right:4px">已选 3 个</span>
+            <div class="pills-fade-wrap">
+              <div class="pills-scroll">
+                <button class="gpill g1">素材组 1</button>
+                <button class="gpill g2">素材组 2</button>
+                <button class="gpill g3">素材组 3</button>
+                <button class="gpill g4">素材组 4</button>
+                <button class="gpill g5">素材组 5</button>
+                <button class="gpill g6">素材组 6</button>
+                <button class="gpill g7">素材组 7</button>
+                <button class="gpill g8">素材组 8</button>
+                <button class="gpill g9">素材组 9</button>
+                <button class="gpill g10">素材组 10</button>
+              </div>
+            </div>
+            <button class="gpill gpill-new" style="margin-left:4px">＋ 新增组</button>
+          </div>
+        </div>
+      </div>
+      <p class="desc">所有组横向排在一行，右侧渐隐提示可滑动。底部高度始终固定，不压缩列表空间。「新增组」钉在最右侧，始终可见。</p>
+      <div class="tag-row">
+        <span class="tag tag-pro">✓ 高度固定，不撑高 Modal</span>
+        <span class="tag tag-pro">✓ 一步执行，视觉清晰</span>
+        <span class="tag tag-ok">~ 需横滑才能看全部</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 策略 3: 前N个展示 + 溢出下拉 -->
+  <div class="option" data-choice="overflow" onclick="toggleSelect(this)">
+    <div class="content">
+      <div class="option-inner-label">策略 3 · 显示前 4 组 + 溢出下拉</div>
+      <div class="demo-modal">
+        <div class="demo-list">
+          <div class="demo-list-row"><div class="demo-check"></div><div class="demo-thumb"></div><span>素材1.jpg</span><span class="demo-badge badge-g1"><span class="dot d1"></span>素材组 1</span></div>
+          <div class="demo-list-row"><div class="demo-check"></div><div class="demo-thumb t2"></div><span>素材2.png</span><span class="demo-badge badge-g2"><span class="dot d2"></span>素材组 2</span></div>
+        </div>
+        <div class="footer">
+          <div class="footer-row">
+            <span class="footer-label" style="margin-right:4px">已选 3 个</span>
+            <div style="display:flex;gap:6px;flex:1;overflow:hidden">
+              <button class="gpill g1">素材组 1</button>
+              <button class="gpill g2">素材组 2</button>
+              <button class="gpill g3">素材组 3</button>
+              <button class="gpill g4">素材组 4</button>
+              <!-- overflow trigger -->
+              <button class="overflow-btn">更多 (6) ▾</button>
+            </div>
+            <button class="gpill gpill-new" style="margin-left:4px;flex-shrink:0">＋ 新增组</button>
+          </div>
+        </div>
+      </div>
+      <p class="desc">优先显示前 4 个组的 pill 按钮；超出部分收入「更多 (N) ▾」下拉菜单，同样一步点击执行。「新增组」钉在最右。常用的前几组可直接点击，不常用的隐藏在下拉里。</p>
+      <div class="tag-row">
+        <span class="tag tag-pro">✓ 高度永远固定</span>
+        <span class="tag tag-pro">✓ 常用组一步执行</span>
+        <span class="tag tag-ok">~ 较多组时需多一步</span>
+        <span class="tag tag-pro">✓ 扩展性最强</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div style="margin-top:16px;padding:12px 16px;background:#eff6ff;border-radius:10px;border:1px solid #bfdbfe;">
+  <p style="font-size:12px;color:#1e40af;font-weight:600;margin:0 0 4px">推荐：策略 3（前 4 + 溢出下拉）</p>
+  <p style="font-size:11px;color:#1e40af;margin:0;line-height:1.6">兼顾一步操作的效率（前4组直接点击）和无限扩展的可能。策略 2（横向滚动）也是好选择，但「可滚动」这一提示不够直觉，部分用户可能发现不了。两者均可实现，可告知偏好。</p>
+</div>

@@ -30,7 +30,7 @@ const BrandManagement = ({ editingBrand: externalEditingBrand, onClearEditingBra
       dailyBudget: '$1,200',
       convGoal: 'Max conversions-signup',
       kpi: 'CPA <= 30.00 USD',
-      color: 'bg-blue-500'
+      color: 'bg-info-500'
     },
     {
       id: 3,
@@ -40,7 +40,7 @@ const BrandManagement = ({ editingBrand: externalEditingBrand, onClearEditingBra
       dailyBudget: '$2,000',
       convGoal: 'Max leads',
       kpi: 'CPA <= 100.00 USD',
-      color: 'bg-green-500'
+      color: 'bg-success-500'
     }
   ]
 
@@ -105,16 +105,16 @@ const BrandManagement = ({ editingBrand: externalEditingBrand, onClearEditingBra
             {/* Brand Stats */}
             <div className="p-5 space-y-4">
               <div>
-                <p className="text-xs text-gray-500 mb-1">Daily Budget</p>
-                <p className="text-lg font-semibold text-gray-900">{brand.dailyBudget}</p>
+                <p className="text-xs text-neutral-500 mb-1">Daily Budget</p>
+                <p className="text-lg font-semibold text-neutral-900">{brand.dailyBudget}</p>
               </div>
               <div>
-                <p className="text-xs text-gray-500 mb-1">Conversion Goal</p>
-                <p className="text-base font-semibold text-gray-900">{brand.convGoal}</p>
+                <p className="text-xs text-neutral-500 mb-1">Conversion Goal</p>
+                <p className="text-base font-semibold text-neutral-900">{brand.convGoal}</p>
               </div>
               <div>
-                <p className="text-xs text-gray-500 mb-1">KPI</p>
-                <p className="text-base font-semibold text-gray-900">{brand.kpi}</p>
+                <p className="text-xs text-neutral-500 mb-1">KPI</p>
+                <p className="text-base font-semibold text-neutral-900">{brand.kpi}</p>
               </div>
             </div>
 
@@ -123,7 +123,7 @@ const BrandManagement = ({ editingBrand: externalEditingBrand, onClearEditingBra
               <div className="flex gap-2">
                 <button 
                   onClick={() => handleEdit(brand)}
-                  className="flex-1 flex items-center justify-center gap-2 text-sm text-gray-600 hover:text-primary hover:bg-gray-50 py-2.5 rounded-lg transition-colors border border-border"
+                  className="flex-1 flex items-center justify-center gap-2 text-sm text-neutral-600 hover:text-primary hover:bg-neutral-50 py-2.5 rounded-lg transition-colors border border-border"
                 >
                   <Pencil size={16} />
                   <span>Edit</span>

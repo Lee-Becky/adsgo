@@ -11,7 +11,7 @@ const Switch = ({ value, onChange, disabled, labels }) => {
       aria-pressed={on}
       className={[
         'relative inline-flex items-center h-6 w-11 rounded-full transition-colors shrink-0',
-        on ? 'bg-primary-500' : 'bg-gray-300',
+        on ? 'bg-primary-500' : 'bg-neutral-300',
         disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:opacity-90',
       ].join(' ')}
     >
@@ -20,7 +20,7 @@ const Switch = ({ value, onChange, disabled, labels }) => {
         style={{ transform: on ? 'translateX(22px)' : 'translateX(2px)' }}
       />
       {labels && (
-        <span className={`ml-14 text-xs ${disabled ? 'text-gray-400' : 'text-gray-500'}`}>
+        <span className={`ml-14 text-xs ${disabled ? 'text-neutral-400' : 'text-neutral-500'}`}>
           {on ? labels.on : labels.off}
         </span>
       )}

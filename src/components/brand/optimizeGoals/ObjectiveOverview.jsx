@@ -2,18 +2,18 @@ import React from 'react'
 import { Globe, Monitor, Target, DollarSign, ChevronRight } from 'lucide-react'
 
 const MetricCard = ({ icon: Icon, label, value, subValue, colorClass, bgClass }) => (
-  <div className="flex-1 min-w-[180px] p-5 rounded-[24px] bg-white border border-slate-100 shadow-sm hover:shadow-md transition-all group">
+  <div className="flex-1 min-w-[180px] p-5 rounded-xl bg-white border border-neutral-100 shadow-sm hover:shadow-md transition-all group">
     <div className="flex items-center gap-3 mb-3">
       <div className={`w-10 h-10 rounded-xl ${bgClass} ${colorClass} flex items-center justify-center transition-transform group-hover:scale-110`}>
         <Icon size={20} />
       </div>
-      <span className="text-[11px] font-black text-slate-400">{label}</span>
+      <span className="text-[11px] font-black text-neutral-400">{label}</span>
     </div>
     <div className="space-y-1">
-      <div className="text-lg font-black text-slate-900 truncate">
+      <div className="text-lg font-black text-neutral-900 truncate">
         {typeof value === 'string' || typeof value === 'number' ? (value || 'Not set') : value}
       </div>
-      {subValue && <div className="text-[10px] font-bold text-slate-400 truncate">{subValue}</div>}
+      {subValue && <div className="text-[10px] font-bold text-neutral-400 truncate">{subValue}</div>}
     </div>
   </div>
 )
@@ -63,18 +63,18 @@ const ObjectiveOverview = ({ formData }) => {
   const objectiveLabel = objectiveLabels[firstGroup.campaignObjective] || firstGroup.campaignObjective || 'Strategy'
 
   return (
-    <div className="bg-slate-900 rounded-[40px] p-10 text-white relative overflow-hidden shadow-2xl shadow-indigo-900/20 group/container">
+    <div className="bg-neutral-900 rounded-2xl p-10 text-white relative overflow-hidden shadow-2xl shadow-primary-900/20 group/container">
       {/* Decorative Background */}
-      <div className="absolute top-0 right-0 w-2/3 h-full bg-gradient-to-l from-indigo-500/10 via-transparent to-transparent pointer-events-none" />
-      <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-indigo-600/10 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-indigo-500/[0.03] rounded-full blur-[150px] pointer-events-none" />
+      <div className="absolute top-0 right-0 w-2/3 h-full bg-gradient-to-l from-primary-500/10 via-transparent to-transparent pointer-events-none" />
+      <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-primary-600/10 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary-500/[0.03] rounded-full blur-[150px] pointer-events-none" />
       
       <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-8 mb-12">
         <div className="space-y-2">
           <div className="flex items-center gap-3">
-            <div className="px-3 py-1 bg-indigo-500 rounded-full text-[10px] font-black">Strategy Overview</div>
-            <div className="w-1 h-1 rounded-full bg-slate-700" />
-            <span className="text-slate-400 text-xs font-bold">{formData.marketGroups.length} Strategy Groups</span>
+            <div className="px-3 py-1 bg-primary-500 rounded-full text-[10px] font-black">Strategy Overview</div>
+            <div className="w-1 h-1 rounded-full bg-neutral-700" />
+            <span className="text-neutral-400 text-xs font-bold">{formData.marketGroups.length} Strategy Groups</span>
           </div>
         </div>
       </div>
@@ -85,8 +85,8 @@ const ObjectiveOverview = ({ formData }) => {
           label="Target locations"
           value={uniqueLocations.length > 0 ? `${uniqueLocations.length} locations` : 'Global'}
           subValue={locationText}
-          bgClass="bg-blue-50"
-          colorClass="text-blue-600"
+          bgClass="bg-info-50"
+          colorClass="text-info-600"
         />
         
         <MetricCard 
@@ -97,12 +97,12 @@ const ObjectiveOverview = ({ formData }) => {
               {uniquePlatforms.map(id => (
                 <img key={id} src={platformIcons[id]} className="w-5 h-5 rounded-md border border-white/10" alt={id} />
               ))}
-              {uniquePlatforms.length === 0 && <span className="text-xs text-slate-400">None</span>}
+              {uniquePlatforms.length === 0 && <span className="text-xs text-neutral-400">None</span>}
             </div>
           }
           subValue={`${uniquePlatforms.length} ad platforms`}
-          bgClass="bg-indigo-50"
-          colorClass="text-indigo-600"
+          bgClass="bg-primary-50"
+          colorClass="text-primary-600"
         />
 
         <MetricCard 
@@ -119,8 +119,8 @@ const ObjectiveOverview = ({ formData }) => {
           label="Total Daily Budget"
           value={`$${totalDailyBudget.toLocaleString()}`}
           subValue="Sum of all groups"
-          bgClass="bg-emerald-50"
-          colorClass="text-emerald-600"
+          bgClass="bg-success-50"
+          colorClass="text-success-600"
         />
       </div>
     </div>

@@ -52,7 +52,7 @@ const BulkEditModal = ({ open, onClose, level, count, fieldDefs = [], onApply })
         return <NumberInput value={value} onChange={setValue} placeholder="0" prefix="$" min={1} />;
       case 'switch':
         return (
-          <div className="h-10 flex items-center px-3 bg-white border border-gray-200 rounded-base">
+          <div className="h-10 flex items-center px-3 bg-white border border-neutral-200 rounded-base">
             <Switch value={!!value} onChange={setValue} labels={{ on: '开启', off: '关闭' }} />
           </div>
         );
@@ -78,24 +78,24 @@ const BulkEditModal = ({ open, onClose, level, count, fieldDefs = [], onApply })
       onClick={(e) => { if (e.target === e.currentTarget) onClose?.(); }}
     >
       <div className="bg-white rounded-2xl shadow-2xl w-[480px] max-w-[92vw] overflow-hidden animate-in zoom-in-95">
-        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-neutral-100">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-primary-50 text-primary-600 flex items-center justify-center">
               <Layers size={18} strokeWidth={2.2} />
             </div>
             <div>
-              <h3 className="text-base font-semibold text-gray-900">批量编辑 {count} 个 {levelLabel}</h3>
-              <p className="text-[11px] text-gray-400 mt-0.5">仅本次编辑生效，可随时取消</p>
+              <h3 className="text-base font-semibold text-neutral-900">批量编辑 {count} 个 {levelLabel}</h3>
+              <p className="text-[11px] text-neutral-400 mt-0.5">仅本次编辑生效，可随时取消</p>
             </div>
           </div>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-700 p-1 rounded-base hover:bg-gray-50">
+          <button onClick={onClose} className="text-neutral-400 hover:text-neutral-700 p-1 rounded-base hover:bg-neutral-50">
             <X size={16} />
           </button>
         </div>
 
         <div className="px-5 py-5 space-y-4">
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-medium text-gray-700">选择要批量修改的字段</label>
+            <label className="text-xs font-medium text-neutral-700">选择要批量修改的字段</label>
             <Select
               value={fieldName}
               onChange={(v) => { setFieldName(v); setValue(''); }}
@@ -106,7 +106,7 @@ const BulkEditModal = ({ open, onClose, level, count, fieldDefs = [], onApply })
 
           {fieldName && (
             <div className="flex flex-col gap-1.5 animate-in fade-in slide-in-from-top-2">
-              <label className="text-xs font-medium text-gray-700">{def?.label} 的新值</label>
+              <label className="text-xs font-medium text-neutral-700">{def?.label} 的新值</label>
               {renderValueControl()}
               <p className="text-[11px] text-amber-600 mt-1">
                 ⚠ 应用后将覆盖所有 {count} 个 {levelLabel} 上该字段的现有值
@@ -115,15 +115,15 @@ const BulkEditModal = ({ open, onClose, level, count, fieldDefs = [], onApply })
           )}
         </div>
 
-        <div className="px-5 py-3 bg-gray-50/50 border-t border-gray-100 flex items-center justify-end gap-2">
+        <div className="px-5 py-3 bg-neutral-50/50 border-t border-neutral-100 flex items-center justify-end gap-2">
           <button onClick={onClose}
-            className="px-4 h-9 text-xs font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-base transition-colors">
+            className="px-4 h-9 text-xs font-medium text-neutral-600 hover:text-neutral-800 hover:bg-neutral-100 rounded-base transition-colors">
             取消
           </button>
           <button
             onClick={handleApply}
             disabled={!canApply}
-            className="px-4 h-9 text-xs font-semibold text-white bg-primary-500 hover:bg-primary-600 rounded-base transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
+            className="px-4 h-9 text-xs font-semibold text-white bg-primary-500 hover:bg-primary-600 rounded-base transition-colors disabled:bg-neutral-300 disabled:cursor-not-allowed"
           >
             应用至 {count} 个 {levelLabel}
           </button>

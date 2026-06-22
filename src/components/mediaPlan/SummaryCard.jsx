@@ -29,12 +29,12 @@ const SENTIMENT_STYLES = {
     fillColor: '#f59e0b',
   },
   neutral: {
-    border: 'border-gray-200',
-    bg: 'bg-gray-50/60',
-    accentBorder: 'border-l-gray-300',
-    iconBg: 'bg-gray-100 text-gray-500',
-    iconRing: 'ring-gray-100/50',
-    headlineColor: 'text-gray-700',
+    border: 'border-neutral-200',
+    bg: 'bg-neutral-50/60',
+    accentBorder: 'border-l-neutral-300',
+    iconBg: 'bg-neutral-100 text-neutral-500',
+    iconRing: 'ring-neutral-100/50',
+    headlineColor: 'text-neutral-700',
     strokeColor: '#6b7280',
     fillColor: '#6b7280',
   },
@@ -188,7 +188,7 @@ export default function SummaryCard({ kpiTrend, kpiType, currentKPI, kpiTarget, 
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-base font-semibold text-gray-900 flex items-center gap-2">
+        <h3 className="text-base font-semibold text-neutral-900 flex items-center gap-2">
           <LayoutDashboard className="w-4.5 h-4.5 text-primary-500" />
           Summary
         </h3>
@@ -206,8 +206,8 @@ export default function SummaryCard({ kpiTrend, kpiType, currentKPI, kpiTarget, 
                 {summary.headline}
               </h4>
               <p className="text-xs leading-relaxed">
-                <span className="font-medium text-gray-700">{bodyParts.lead}</span>
-                {bodyParts.rest && <span className="text-gray-500"> {bodyParts.rest}</span>}
+                <span className="font-medium text-neutral-700">{bodyParts.lead}</span>
+                {bodyParts.rest && <span className="text-neutral-500"> {bodyParts.rest}</span>}
               </p>
             </div>
           </div>
@@ -216,13 +216,13 @@ export default function SummaryCard({ kpiTrend, kpiType, currentKPI, kpiTarget, 
           {kpiTrend.length >= 2 && (
             <div className="lg:w-[35%] flex-shrink-0">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-medium text-gray-500">Past 7 days</span>
+                <span className="text-xs font-medium text-neutral-500">Past 7 days</span>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-gray-600">
+                  <span className="text-xs text-neutral-600">
                     {kpiType === 'ROAS' ? `${kpiTrend[0].kpiValue.toFixed(2)}x` : `$${kpiTrend[0].kpiValue.toFixed(0)}`}
                   </span>
-                  <span className="text-gray-300">&rarr;</span>
-                  <span className="text-xs font-semibold text-gray-700">
+                  <span className="text-neutral-300">&rarr;</span>
+                  <span className="text-xs font-semibold text-neutral-700">
                     {kpiType === 'ROAS' ? `${kpiTrend[kpiTrend.length - 1].kpiValue.toFixed(2)}x` : `$${kpiTrend[kpiTrend.length - 1].kpiValue.toFixed(0)}`}
                   </span>
                 </div>

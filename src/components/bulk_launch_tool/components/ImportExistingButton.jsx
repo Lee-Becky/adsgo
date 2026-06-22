@@ -28,7 +28,7 @@ const ImportExistingButton = ({ onClick, selectedCampaign, onClear }) => {
         <button
           type="button"
           onClick={onClear}
-          className="text-gray-400 hover:text-rose-500 transition-colors"
+          className="text-neutral-400 hover:text-rose-500 transition-colors"
           title="清除已导入系列"
         >
           <X size={11} />
@@ -40,7 +40,7 @@ const ImportExistingButton = ({ onClick, selectedCampaign, onClear }) => {
     <button
       type="button"
       onClick={onClick}
-      className="inline-flex items-center gap-1.5 h-8 px-3 rounded-full text-xs font-medium border border-gray-200 text-gray-700 bg-white hover:border-primary-500/40 hover:text-primary-600 hover:bg-primary-50/30 transition-all"
+      className="inline-flex items-center gap-1.5 h-8 px-3 rounded-full text-xs font-medium border border-neutral-200 text-neutral-700 bg-white hover:border-primary-500/40 hover:text-primary-600 hover:bg-primary-50/30 transition-all"
       title="选择已存在的广告系列预填 3 层结构字段"
     >
       <Database size={12} />

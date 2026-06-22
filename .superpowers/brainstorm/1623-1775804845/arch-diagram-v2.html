@@ -1,0 +1,277 @@
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f8fafc; }
+  h2 { font-size: 15px; font-weight: 700; color: #111827; margin-bottom: 4px; }
+  .subtitle { font-size: 11px; color: #9ca3af; margin-bottom: 20px; }
+  .section-label {
+    font-size: 10px; font-weight: 700; color: #9ca3af;
+    text-transform: uppercase; letter-spacing: 0.06em; margin: 18px 0 8px;
+  }
+
+  /* ── Architecture Diagram ── */
+  .arch-card {
+    background: #fff; border-radius: 14px; border: 1px solid #e5e7eb;
+    padding: 28px 24px 24px; box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  }
+  .campaign-node { display: flex; flex-direction: column; align-items: center; margin-bottom: 28px; }
+  .campaign-icon {
+    width: 48px; height: 48px; border-radius: 12px; background: #111827; color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; box-shadow: 0 4px 14px rgba(0,0,0,0.2); z-index: 1; position: relative;
+  }
+  .campaign-line { width: 1px; height: 20px; background: #e5e7eb; margin-top: 2px; }
+  .campaign-label { font-size: 10px; color: #9ca3af; font-weight: 500; margin-top: -14px; margin-bottom: 6px; }
+  .adsets-row { display: flex; gap: 12px; justify-content: center; align-items: flex-start; overflow-x: auto; padding-bottom: 4px; }
+  .adset-node { display: flex; flex-direction: column; align-items: center; gap: 6px; flex-shrink: 0; }
+  .adset-icon {
+    width: 38px; height: 38px; border-radius: 9px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 700; position: relative; cursor: pointer; transition: transform 0.15s;
+    background: #ede9fe; color: #6d28d9; border: 1.5px solid #ddd6fe;
+  }
+  .adset-icon:hover { transform: scale(1.08); }
+  .adset-icon-num {
+    position: absolute; top: -4px; right: -4px;
+    width: 15px; height: 15px; background: #111827; color: #fff;
+    font-size: 8px; font-weight: 700; border-radius: 99px;
+    display: flex; align-items: center; justify-content: center; border: 1.5px solid #fff;
+  }
+  .adset-name { font-size: 9.5px; color: #6b7280; font-weight: 500; text-align: center; max-width: 80px; }
+  .thumb-row { display: flex; gap: 3px; flex-wrap: wrap; justify-content: center; max-width: 90px; }
+  .mini-thumb { width: 22px; height: 28px; border-radius: 4px; overflow: hidden; border: 1.5px solid #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+  .mini-thumb div { width: 100%; height: 100%; }
+  .overflow-count {
+    width: 22px; height: 28px; border-radius: 4px; background: #f3f4f6; border: 1.5px solid #e5e7eb;
+    display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 600; color: #9ca3af;
+  }
+  .edit-creatives-btn {
+    display: inline-flex; align-items: center; gap: 3px; padding: 3px 9px; border-radius: 6px;
+    background: #f3f4f6; border: 1px solid #e5e7eb; font-size: 9px; font-weight: 600; color: #6b7280;
+    cursor: pointer; transition: all 0.15s; white-space: nowrap; margin-top: 2px;
+  }
+  .edit-creatives-btn:hover { background: #ede9fe; color: #6d28d9; border-color: #ddd6fe; }
+  .add-adset-node { display: flex; flex-direction: column; align-items: center; gap: 6px; flex-shrink: 0; }
+  .add-adset-btn {
+    width: 38px; height: 38px; border-radius: 9px; background: #fff;
+    border: 1.5px dashed #d1d5db; display: flex; align-items: center; justify-content: center;
+    font-size: 18px; color: #9ca3af; cursor: pointer; transition: all 0.15s;
+  }
+  .add-adset-btn:hover { border-color: #6366f1; color: #6366f1; background: #ede9fe; }
+  .add-adset-label { font-size: 9px; color: #9ca3af; font-weight: 500; white-space: nowrap; }
+
+  .mt1{background:linear-gradient(135deg,#ddd6fe,#a5b4fc)}
+  .mt2{background:linear-gradient(135deg,#fde68a,#fca5a5)}
+  .mt3{background:linear-gradient(135deg,#a7f3d0,#6ee7b7)}
+  .mt4{background:linear-gradient(135deg,#fbcfe8,#f9a8d4)}
+  .mt5{background:linear-gradient(135deg,#bae6fd,#7dd3fc)}
+  .mt6{background:linear-gradient(135deg,#fed7aa,#fdba74)}
+  .mt7{background:linear-gradient(135deg,#d1fae5,#6ee7b7)}
+  .mt8{background:linear-gradient(135deg,#e0e7ff,#c7d2fe)}
+
+  /* ── Modal ── */
+  .modal-overlay {
+    background: rgba(0,0,0,0.45); backdrop-filter: blur(4px);
+    border-radius: 12px; padding: 16px; margin-top: 20px;
+  }
+  .modal-wrap {
+    background: #fff; border-radius: 14px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+    overflow: hidden; max-width: 540px; margin: 0 auto;
+  }
+  .modal-header {
+    padding: 14px 18px 12px; border-bottom: 1px solid #f3f4f6;
+    display: flex; align-items: flex-start; justify-content: space-between;
+  }
+  .modal-title { font-size: 13px; font-weight: 700; color: #111827; }
+  .modal-sub { font-size: 10px; color: #9ca3af; margin-top: 2px; }
+  .close-btn {
+    width: 24px; height: 24px; border-radius: 99px; background: #f3f4f6; border: none;
+    display: flex; align-items: center; justify-content: center;
+    color: #9ca3af; font-size: 12px; flex-shrink: 0; cursor: pointer;
+  }
+
+  /* ── Creative Grid inside modal ── */
+  .creative-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+    padding: 14px 18px;
+    max-height: 300px;
+    overflow-y: auto;
+  }
+  .creative-cell {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    cursor: pointer; border-radius: 8px; padding: 6px 4px; transition: background 0.1s; position: relative;
+  }
+  .creative-cell:hover { background: #f9fafb; }
+  .creative-cell.checked { background: #f0f0ff; }
+
+  .thumb-wrap {
+    width: 100%; aspect-ratio: 3/4; border-radius: 7px; overflow: hidden;
+    position: relative; border: 2px solid #e5e7eb; transition: border-color 0.15s;
+  }
+  .creative-cell.checked .thumb-wrap { border-color: #6366f1; box-shadow: 0 0 0 2px #c7d2fe; }
+  .thumb-fill { width: 100%; height: 100%; display: block; }
+
+  .check-badge {
+    position: absolute; top: 4px; left: 4px;
+    width: 16px; height: 16px; border-radius: 4px;
+    border: 1.5px solid rgba(255,255,255,0.85);
+    background: rgba(255,255,255,0.25); backdrop-filter: blur(2px);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .creative-cell.checked .check-badge { background: #6366f1; border-color: #6366f1; }
+  .creative-cell.checked .check-badge::after { content: '✓'; color: #fff; font-size: 10px; font-weight: 800; }
+
+  .creative-name {
+    font-size: 9px; color: #6b7280; font-weight: 500;
+    text-align: center; width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .creative-url {
+    font-size: 8.5px; color: #9ca3af;
+    text-align: center; width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+
+  /* Modal footer */
+  .modal-footer {
+    padding: 10px 18px; border-top: 1px solid #f3f4f6;
+    display: flex; align-items: center; justify-content: space-between; background: #fff;
+  }
+  .footer-count { font-size: 11px; color: #9ca3af; }
+  .footer-count b { color: #111827; font-weight: 700; }
+  .btn-save {
+    padding: 6px 16px; border-radius: 8px; background: #6366f1;
+    color: #fff; border: none; font-size: 11px; font-weight: 600; cursor: pointer;
+  }
+  .btn-cancel {
+    padding: 6px 14px; border-radius: 8px; background: #f3f4f6;
+    color: #6b7280; border: none; font-size: 11px; font-weight: 600; cursor: pointer; margin-right: 6px;
+  }
+</style>
+
+<h2>按素材拆组 — 架构图直接操作方案</h2>
+<p class="subtitle">「修改本组创意」弹窗改为缩略图网格，更紧凑高效</p>
+
+<!-- Architecture Diagram -->
+<div class="section-label">架构图</div>
+<div class="arch-card">
+  <div class="campaign-node">
+    <div class="campaign-icon">📁</div>
+    <div class="campaign-label">Target Campaign</div>
+    <div class="campaign-line"></div>
+  </div>
+  <div class="adsets-row">
+    <div class="adset-node">
+      <div class="adset-icon">Adv+<div class="adset-icon-num">1</div></div>
+      <div class="adset-name">素材组 1</div>
+      <div class="thumb-row">
+        <div class="mini-thumb"><div class="mt1"></div></div>
+        <div class="mini-thumb"><div class="mt2"></div></div>
+        <div class="mini-thumb"><div class="mt3"></div></div>
+        <div class="mini-thumb"><div class="mt4"></div></div>
+        <div class="overflow-count">+4</div>
+      </div>
+      <button class="edit-creatives-btn">✏️ 修改本组创意</button>
+    </div>
+    <div class="adset-node">
+      <div class="adset-icon">Adv+<div class="adset-icon-num">2</div></div>
+      <div class="adset-name">素材组 2</div>
+      <div class="thumb-row">
+        <div class="mini-thumb"><div class="mt5"></div></div>
+        <div class="mini-thumb"><div class="mt6"></div></div>
+        <div class="mini-thumb"><div class="mt1"></div></div>
+      </div>
+      <button class="edit-creatives-btn">✏️ 修改本组创意</button>
+    </div>
+    <div class="adset-node">
+      <div class="adset-icon">Adv+<div class="adset-icon-num">3</div></div>
+      <div class="adset-name">素材组 3</div>
+      <div class="thumb-row">
+        <div class="mini-thumb"><div class="mt2"></div></div>
+        <div class="mini-thumb"><div class="mt4"></div></div>
+      </div>
+      <button class="edit-creatives-btn">✏️ 修改本组创意</button>
+    </div>
+    <div class="add-adset-node">
+      <div class="add-adset-btn">+</div>
+      <div class="add-adset-label">新增 Adset</div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="section-label">「修改本组创意」弹窗 — 缩略图网格布局</div>
+<div class="modal-overlay">
+  <div class="modal-wrap">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title">修改本组创意 — 素材组 1</div>
+        <div class="modal-sub">勾选的创意将出现在此 Adset 中，已选创意自动回显</div>
+      </div>
+      <button class="close-btn">✕</button>
+    </div>
+
+    <div class="creative-grid">
+      <!-- checked items (currently in group 1) -->
+      <div class="creative-cell checked">
+        <div class="thumb-wrap"><div class="thumb-fill mt1"></div><div class="check-badge"></div></div>
+        <div class="creative-name">春季主图.jpg</div>
+        <div class="creative-url">链接夹克</div>
+      </div>
+      <div class="creative-cell checked">
+        <div class="thumb-wrap"><div class="thumb-fill mt2"></div><div class="check-badge"></div></div>
+        <div class="creative-name">Banner_v2.png</div>
+        <div class="creative-url">链接夹克</div>
+      </div>
+      <div class="creative-cell checked">
+        <div class="thumb-wrap"><div class="thumb-fill mt3"></div><div class="check-badge"></div></div>
+        <div class="creative-name">产品展示.mp4</div>
+        <div class="creative-url">休闲裤</div>
+      </div>
+      <!-- unchecked -->
+      <div class="creative-cell">
+        <div class="thumb-wrap"><div class="thumb-fill mt4"></div><div class="check-badge"></div></div>
+        <div class="creative-name">夏季新品.jpg</div>
+        <div class="creative-url">休闲裤</div>
+      </div>
+      <div class="creative-cell">
+        <div class="thumb-wrap"><div class="thumb-fill mt5"></div><div class="check-badge"></div></div>
+        <div class="creative-name">模特大图.jpg</div>
+        <div class="creative-url">T恤</div>
+      </div>
+      <div class="creative-cell">
+        <div class="thumb-wrap"><div class="thumb-fill mt6"></div><div class="check-badge"></div></div>
+        <div class="creative-name">活动海报.png</div>
+        <div class="creative-url">T恤</div>
+      </div>
+      <div class="creative-cell">
+        <div class="thumb-wrap"><div class="thumb-fill mt7"></div><div class="check-badge"></div></div>
+        <div class="creative-name">品牌故事.mp4</div>
+        <div class="creative-url">夹克</div>
+      </div>
+      <div class="creative-cell checked">
+        <div class="thumb-wrap"><div class="thumb-fill mt8"></div><div class="check-badge"></div></div>
+        <div class="creative-name">限定款KV.jpg</div>
+        <div class="creative-url">休闲裤</div>
+      </div>
+      <div class="creative-cell">
+        <div class="thumb-wrap"><div class="thumb-fill mt2" style="filter:saturate(0.3)"></div><div class="check-badge"></div></div>
+        <div class="creative-name">简约风.jpg</div>
+        <div class="creative-url">T恤</div>
+      </div>
+      <div class="creative-cell checked">
+        <div class="thumb-wrap"><div class="thumb-fill mt1" style="filter:hue-rotate(60deg)"></div><div class="check-badge"></div></div>
+        <div class="creative-name">黑白版图.jpg</div>
+        <div class="creative-url">夹克</div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <span class="footer-count">已选 <b>5</b> 个创意</span>
+      <div>
+        <button class="btn-cancel">取消</button>
+        <button class="btn-save">保存</button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -12,17 +12,17 @@ export default function DormantView({ onRestart, onPageChange }) {
   return (
     <div className="space-y-6">
       {/* Header Banner - Dormant Status */}
-      <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
+      <div className="bg-neutral-50 rounded-xl p-6 border border-neutral-200">
         <div className="flex items-start gap-4">
-          <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
-            <PauseCircle className="w-6 h-6 text-gray-400" />
+          <div className="w-12 h-12 rounded-full bg-neutral-200 flex items-center justify-center flex-shrink-0">
+            <PauseCircle className="w-6 h-6 text-neutral-400" />
           </div>
           <div>
-            <h2 className="text-lg font-semibold text-gray-900">Your ads are currently paused</h2>
-            <p className="text-sm text-gray-500 mt-1">
+            <h2 className="text-lg font-semibold text-neutral-900">Your ads are currently paused</h2>
+            <p className="text-sm text-neutral-500 mt-1">
               Paused for {pausedInfo.daysPaused} days · Last active on {formattedDate}
             </p>
-            <p className="text-xs text-gray-400 mt-2">{pausedInfo.reason}</p>
+            <p className="text-xs text-neutral-400 mt-2">{pausedInfo.reason}</p>
           </div>
         </div>
       </div>
@@ -33,43 +33,43 @@ export default function DormantView({ onRestart, onPageChange }) {
         <div className="bg-white rounded-xl border border-[#F0F0F0] shadow-[-2px_2px_16px_rgba(14,0,45,0.06)] p-5">
           <div className="flex items-center gap-2 mb-4">
             <TrendingUp className="w-5 h-5 text-emerald-500" />
-            <h3 className="text-sm font-semibold text-gray-900">Historical Performance</h3>
+            <h3 className="text-sm font-semibold text-neutral-900">Historical Performance</h3>
           </div>
 
           <div className="space-y-4">
             {/* Peak ROAS */}
             <div className="flex items-center justify-between">
-              <span className="text-xs text-gray-500">Peak ROAS</span>
+              <span className="text-xs text-neutral-500">Peak ROAS</span>
               <span className="text-sm font-semibold text-emerald-600">{historicalPeak.roas}</span>
             </div>
 
             {/* Peak CPA */}
             <div className="flex items-center justify-between">
-              <span className="text-xs text-gray-500">Best CPA</span>
+              <span className="text-xs text-neutral-500">Best CPA</span>
               <span className="text-sm font-semibold text-emerald-600">${historicalPeak.cpa}</span>
             </div>
 
             {/* Total Conversions */}
             <div className="flex items-center justify-between">
-              <span className="text-xs text-gray-500">Total Conversions</span>
-              <span className="text-sm font-semibold text-gray-900">{historicalPeak.conversions.toLocaleString()}</span>
+              <span className="text-xs text-neutral-500">Total Conversions</span>
+              <span className="text-sm font-semibold text-neutral-900">{historicalPeak.conversions.toLocaleString()}</span>
             </div>
 
             {/* Total Spend */}
             <div className="flex items-center justify-between">
-              <span className="text-xs text-gray-500">Total Spend</span>
-              <span className="text-sm font-semibold text-gray-900">${historicalPeak.spend.toLocaleString()}</span>
+              <span className="text-xs text-neutral-500">Total Spend</span>
+              <span className="text-sm font-semibold text-neutral-900">${historicalPeak.spend.toLocaleString()}</span>
             </div>
 
             {/* Days Active */}
             <div className="flex items-center justify-between">
-              <span className="text-xs text-gray-500">Days Active</span>
-              <span className="text-sm font-semibold text-gray-900">{historicalPeak.daysActive} days</span>
+              <span className="text-xs text-neutral-500">Days Active</span>
+              <span className="text-sm font-semibold text-neutral-900">{historicalPeak.daysActive} days</span>
             </div>
           </div>
 
           {/* Success Badge */}
-          <div className="mt-4 pt-4 border-t border-gray-100">
+          <div className="mt-4 pt-4 border-t border-neutral-100">
             <div className="flex items-center gap-2">
               <div className="w-5 h-5 rounded-full bg-emerald-100 flex items-center justify-center">
                 <Target className="w-3 h-3 text-emerald-600" />
@@ -85,20 +85,20 @@ export default function DormantView({ onRestart, onPageChange }) {
         <div className="bg-white rounded-xl border border-[#F0F0F0] shadow-[-2px_2px_16px_rgba(14,0,45,0.06)] p-5">
           <div className="flex items-center gap-2 mb-4">
             <Zap className="w-5 h-5 text-blue-500" />
-            <h3 className="text-sm font-semibold text-gray-900">{restartRecommendation.title}</h3>
+            <h3 className="text-sm font-semibold text-neutral-900">{restartRecommendation.title}</h3>
           </div>
 
           <ul className="space-y-3">
             {restartRecommendation.reasons.map((reason, index) => (
               <li key={index} className="flex items-start gap-2">
                 <div className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-1.5 flex-shrink-0" />
-                <span className="text-xs text-gray-600 leading-relaxed">{reason}</span>
+                <span className="text-xs text-neutral-600 leading-relaxed">{reason}</span>
               </li>
             ))}
           </ul>
 
           {/* AI Analysis Badge */}
-          <div className="mt-4 pt-4 border-t border-gray-100">
+          <div className="mt-4 pt-4 border-t border-neutral-100">
             <div className="flex items-center gap-2">
               <div className="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center">
                 <BarChart3 className="w-3 h-3 text-blue-600" />
@@ -114,7 +114,7 @@ export default function DormantView({ onRestart, onPageChange }) {
         <div className="bg-white rounded-xl border border-[#F0F0F0] shadow-[-2px_2px_16px_rgba(14,0,45,0.06)] p-5">
           <div className="flex items-center gap-2 mb-4">
             <Clock className="w-5 h-5 text-amber-500" />
-            <h3 className="text-sm font-semibold text-gray-900">Opportunity Cost</h3>
+            <h3 className="text-sm font-semibold text-neutral-900">Opportunity Cost</h3>
           </div>
 
           <div className="space-y-4">
@@ -138,7 +138,7 @@ export default function DormantView({ onRestart, onPageChange }) {
           </div>
 
           {/* Disclaimer */}
-          <p className="text-xs text-gray-400 mt-4 pt-3 border-t border-gray-100">
+          <p className="text-xs text-neutral-400 mt-4 pt-3 border-t border-neutral-100">
             {opportunityCost.note} based on {opportunityCost.basedOnIndustry} benchmarks
           </p>
         </div>
@@ -151,8 +151,8 @@ export default function DormantView({ onRestart, onPageChange }) {
             <Zap className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h3 className="text-base font-semibold text-gray-900">{restartRecommendation.quickStart.title}</h3>
-            <p className="text-sm text-gray-500">Choose how you want to restart your campaigns</p>
+            <h3 className="text-base font-semibold text-neutral-900">{restartRecommendation.quickStart.title}</h3>
+            <p className="text-sm text-neutral-500">Choose how you want to restart your campaigns</p>
           </div>
         </div>
 
@@ -163,9 +163,9 @@ export default function DormantView({ onRestart, onPageChange }) {
           >
             <div className="flex items-center gap-2 mb-2">
               <TrendingUp className="w-4 h-4 text-emerald-500" />
-              <span className="text-sm font-semibold text-gray-900">Resume Best Performer</span>
+              <span className="text-sm font-semibold text-neutral-900">Resume Best Performer</span>
             </div>
-            <span className="text-xs text-gray-500">{restartRecommendation.quickStart.options[0].desc}</span>
+            <span className="text-xs text-neutral-500">{restartRecommendation.quickStart.options[0].desc}</span>
           </button>
 
           <button
@@ -174,9 +174,9 @@ export default function DormantView({ onRestart, onPageChange }) {
           >
             <div className="flex items-center gap-2 mb-2">
               <Zap className="w-4 h-4 text-blue-500" />
-              <span className="text-sm font-semibold text-gray-900">Start Fresh</span>
+              <span className="text-sm font-semibold text-neutral-900">Start Fresh</span>
             </div>
-            <span className="text-xs text-gray-500">{restartRecommendation.quickStart.options[1].desc}</span>
+            <span className="text-xs text-neutral-500">{restartRecommendation.quickStart.options[1].desc}</span>
           </button>
 
           <button
@@ -185,9 +185,9 @@ export default function DormantView({ onRestart, onPageChange }) {
           >
             <div className="flex items-center gap-2 mb-2">
               <Target className="w-4 h-4 text-purple-500" />
-              <span className="text-sm font-semibold text-gray-900">Custom Restart</span>
+              <span className="text-sm font-semibold text-neutral-900">Custom Restart</span>
             </div>
-            <span className="text-xs text-gray-500">{restartRecommendation.quickStart.options[2].desc}</span>
+            <span className="text-xs text-neutral-500">{restartRecommendation.quickStart.options[2].desc}</span>
           </button>
         </div>
       </div>

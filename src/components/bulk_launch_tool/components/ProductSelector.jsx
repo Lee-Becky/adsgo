@@ -207,11 +207,11 @@ const TagEditor = ({ tags = [], onTagsChange, placeholder, label = "" }) => {
     <div className="flex flex-wrap items-center gap-2">
       {tags.map((t, i) => (
         <span key={i} className="inline-flex items-center gap-2 px-4 py-2 bg-primary-50 border border-primary-100 rounded-tag text-xs font-medium text-primary-700 transition-all hover:bg-primary-100 animate-in zoom-in-95 duration-200 cursor-default group/tag shadow-sm">
-          {t}<button onClick={() => onTagsChange(tags.filter((_, idx) => idx !== i))} className="text-gray-400 hover:text-rose-500 transition-colors"><X size={14} strokeWidth={3} /></button>
+          {t}<button onClick={() => onTagsChange(tags.filter((_, idx) => idx !== i))} className="text-neutral-400 hover:text-rose-500 transition-colors"><X size={14} strokeWidth={3} /></button>
         </span>
       ))}
       <div className="relative group/input min-w-[120px]">
-        <input className="bg-gray-50 border border-transparent hover:border-gray-200 rounded-base px-4 py-2 text-sm font-bold text-gray-500 outline-none w-full transition-all focus:bg-white focus:border-primary-500 focus:shadow-primary-focus shadow-inner placeholder:text-gray-300" placeholder={tags.length === 0 ? placeholder : `+ ${label}`} value={val} onChange={(e) => setVal(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter' && val.trim()) { e.preventDefault(); if (!tags.includes(val.trim())) { onTagsChange([...tags, val.trim()]); } setVal(''); } }} />
+        <input className="bg-neutral-50 border border-transparent hover:border-neutral-200 rounded-base px-4 py-2 text-sm font-bold text-neutral-500 outline-none w-full transition-all focus:bg-white focus:border-primary-500 focus:shadow-primary-focus shadow-inner placeholder:text-neutral-300" placeholder={tags.length === 0 ? placeholder : `+ ${label}`} value={val} onChange={(e) => setVal(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter' && val.trim()) { e.preventDefault(); if (!tags.includes(val.trim())) { onTagsChange([...tags, val.trim()]); } setVal(''); } }} />
       </div>
     </div>
   );
@@ -231,22 +231,22 @@ const AssetGrid = ({ title, subtitle, assets = [], onAssetsChange, maxCount = 99
   return (
     <div className="space-y-4">
       <input type="file" ref={fileInputRef} className="hidden" multiple={maxCount > 1} accept="image/*,video/*" onChange={handleFileChange} />
-      <div className="flex items-center justify-between"><div className="space-y-1"><div className="flex items-center gap-2"><div className="w-1 h-3 bg-blue-400 rounded-full" /><h5 className="text-sm font-medium text-gray-900">{title}</h5></div><p className="text-xs text-gray-400 font-medium leading-tight">{subtitle}</p></div></div>
+      <div className="flex items-center justify-between"><div className="space-y-1"><div className="flex items-center gap-2"><div className="w-1 h-3 bg-blue-400 rounded-full" /><h5 className="text-sm font-medium text-neutral-900">{title}</h5></div><p className="text-xs text-neutral-400 font-medium leading-tight">{subtitle}</p></div></div>
       <div className={`flex flex-wrap gap-4 items-start ${isExpandable && !isExpanded ? 'overflow-hidden max-h-[140px]' : ''}`}>
         {assets.length < maxCount && (
-          <div onClick={() => fileInputRef.current?.click()} className="w-[140px] aspect-square bg-gray-50 border-2 border-dashed border-gray-200 rounded-section flex items-center justify-center cursor-pointer hover:bg-primary-50 hover:border-primary-500/30 transition-all group active:scale-[0.97] shrink-0"><Plus size={32} className="text-gray-300 group-hover:text-primary-50 transition-colors" /></div>
+          <div onClick={() => fileInputRef.current?.click()} className="w-[140px] aspect-square bg-neutral-50 border-2 border-dashed border-neutral-200 rounded-section flex items-center justify-center cursor-pointer hover:bg-primary-50 hover:border-primary-500/30 transition-all group active:scale-[0.97] shrink-0"><Plus size={32} className="text-neutral-300 group-hover:text-primary-50 transition-colors" /></div>
         )}
         {displayAssets.map((asset, i) => (
-          <div key={i} className="w-[140px] aspect-square bg-white border border-gray-100 rounded-section relative overflow-hidden group shadow-sm hover:shadow-md transition-all shrink-0">
+          <div key={i} className="w-[140px] aspect-square bg-white border border-neutral-100 rounded-section relative overflow-hidden group shadow-sm hover:shadow-md transition-all shrink-0">
             <img src={asset.url || `https://picsum.photos/seed/${title}${i}/300/300`} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2"><button onClick={() => onAssetsChange(assets.filter((_, idx) => idx !== i))} className="p-2 bg-white rounded-xl text-rose-500 shadow-lg hover:scale-110 active:scale-90 transition-all"><Trash2 size={14} /></button></div>
           </div>
         ))}
         {isExpandable && !isExpanded && assets.length > 4 && (
-          <div onClick={onToggle} className="w-[140px] aspect-square bg-gray-900 rounded-section flex flex-col items-center justify-center cursor-pointer hover:bg-primary-600 transition-all shadow-xl group shrink-0"><span className="text-lg font-semibold text-white">{moreCount} more</span><span className="text-xs font-bold text-white/60 mt-1">assets</span></div>
+          <div onClick={onToggle} className="w-[140px] aspect-square bg-neutral-900 rounded-section flex flex-col items-center justify-center cursor-pointer hover:bg-primary-600 transition-all shadow-xl group shrink-0"><span className="text-lg font-semibold text-white">{moreCount} more</span><span className="text-xs font-bold text-white/60 mt-1">assets</span></div>
         )}
         {isExpandable && isExpanded && (
-          <div onClick={onToggle} className="w-[140px] aspect-square bg-gray-100 border border-gray-200 rounded-section flex flex-col items-center justify-center cursor-pointer hover:bg-gray-200 transition-all group shrink-0"><ChevronRight size={24} className="text-gray-400 rotate-180 mb-1" /><span className="text-xs font-semibold text-gray-50">collapse</span></div>
+          <div onClick={onToggle} className="w-[140px] aspect-square bg-neutral-100 border border-neutral-200 rounded-section flex flex-col items-center justify-center cursor-pointer hover:bg-neutral-200 transition-all group shrink-0"><ChevronRight size={24} className="text-neutral-400 rotate-180 mb-1" /><span className="text-xs font-semibold text-neutral-50">collapse</span></div>
         )}
       </div>
     </div>
@@ -261,7 +261,7 @@ const SearchableSelect = ({ options, value, onChange, placeholder, isSearchable 
   const selectedOption = options.find(opt => opt.value === value);
   return (
     <>
-      <div ref={triggerRef} onClick={() => setIsOpen(!isOpen)} className={`w-full bg-white border rounded-base px-5 py-3.5 text-sm font-bold text-gray-700 flex items-center justify-between cursor-pointer transition-all ${isOpen ? 'border-primary-500 shadow-primary-focus' : error ? 'border-rose-400' : 'border-gray-200 hover:border-gray-300 shadow-sm'}`}><span className={!value ? 'text-gray-300' : ''}>{selectedOption ? selectedOption.label : placeholder}</span><ChevronDown size={16} className={`text-gray-400 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} /></div>
+      <div ref={triggerRef} onClick={() => setIsOpen(!isOpen)} className={`w-full bg-white border rounded-base px-5 py-3.5 text-sm font-bold text-neutral-700 flex items-center justify-between cursor-pointer transition-all ${isOpen ? 'border-primary-500 shadow-primary-focus' : error ? 'border-rose-400' : 'border-neutral-200 hover:border-neutral-300 shadow-sm'}`}><span className={!value ? 'text-neutral-300' : ''}>{selectedOption ? selectedOption.label : placeholder}</span><ChevronDown size={16} className={`text-neutral-400 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} /></div>
       <Popover
         open={isOpen}
         anchorRef={triggerRef}
@@ -269,10 +269,10 @@ const SearchableSelect = ({ options, value, onChange, placeholder, isSearchable 
         matchWidth
         onClose={() => setIsOpen(false)}
         zIndex={Z_INDEX.MODAL_BASE + 500}
-        className="bg-white border border-gray-100 rounded-section shadow-xl overflow-hidden"
+        className="bg-white border border-neutral-100 rounded-section shadow-xl overflow-hidden"
       >
-        {isSearchable && (<div className="p-3 border-b border-gray-50 bg-gray-50/50"><input autoFocus className="w-full bg-white border border-gray-200 rounded-xl px-4 py-2 text-xs font-bold outline-none focus:border-primary-500" placeholder="Search..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} /></div>)}
-        <div className="max-h-[240px] overflow-y-auto p-2">{filteredOptions.map(opt => (<div key={opt.value} onClick={() => { onChange(opt.value); setIsOpen(false); }} className={`px-4 py-3 rounded-xl text-xs font-bold cursor-pointer mb-1 last:mb-0 ${value === opt.value ? 'bg-primary-50 text-primary-500' : 'hover:bg-gray-50'}`}>{opt.label}</div>))}</div>
+        {isSearchable && (<div className="p-3 border-b border-neutral-50 bg-neutral-50/50"><input autoFocus className="w-full bg-white border border-neutral-200 rounded-xl px-4 py-2 text-xs font-bold outline-none focus:border-primary-500" placeholder="Search..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} /></div>)}
+        <div className="max-h-[240px] overflow-y-auto p-2">{filteredOptions.map(opt => (<div key={opt.value} onClick={() => { onChange(opt.value); setIsOpen(false); }} className={`px-4 py-3 rounded-xl text-xs font-bold cursor-pointer mb-1 last:mb-0 ${value === opt.value ? 'bg-primary-50 text-primary-500' : 'hover:bg-neutral-50'}`}>{opt.label}</div>))}</div>
       </Popover>
     </>
   );
@@ -296,23 +296,23 @@ const SearchableTreeSelect = ({ options, value, onChange, placeholder, isSearcha
   useEffect(() => { if (value && !hoveredParent) { const parent = options.find(p => p.children?.some(c => c.value === value)); if (parent) setHoveredParent(parent); } }, [value, options, hoveredParent]);
   return (
     <>
-      <div ref={triggerRef} onClick={() => setIsOpen(!isOpen)} className={`w-full bg-white border rounded-base px-5 py-3.5 text-sm font-bold text-gray-700 flex items-center justify-between cursor-pointer transition-all ${isOpen ? 'border-primary-500 shadow-primary-focus' : error ? 'border-rose-400' : 'border-gray-200 hover:border-gray-300 shadow-sm'}`}><span className={!value ? 'text-gray-300' : ''}>{getDisplayValue()}</span><ChevronDown size={16} className={`text-gray-400 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} /></div>
+      <div ref={triggerRef} onClick={() => setIsOpen(!isOpen)} className={`w-full bg-white border rounded-base px-5 py-3.5 text-sm font-bold text-neutral-700 flex items-center justify-between cursor-pointer transition-all ${isOpen ? 'border-primary-500 shadow-primary-focus' : error ? 'border-rose-400' : 'border-neutral-200 hover:border-neutral-300 shadow-sm'}`}><span className={!value ? 'text-neutral-300' : ''}>{getDisplayValue()}</span><ChevronDown size={16} className={`text-neutral-400 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} /></div>
       <Popover
         open={isOpen}
         anchorRef={triggerRef}
         placement="bottom-start"
         onClose={() => setIsOpen(false)}
         zIndex={Z_INDEX.MODAL_BASE + 500}
-        className="w-[560px] bg-white border border-gray-100 rounded-section shadow-xl flex overflow-hidden h-[380px]"
+        className="w-[560px] bg-white border border-neutral-100 rounded-section shadow-xl flex overflow-hidden h-[380px]"
       >
-        <div className={`w-[240px] border-r border-gray-100 flex flex-col bg-gray-50/30`}>
-          {isSearchable && (<div className="p-4 border-b border-gray-200 bg-white sticky top-0 z-10"><div className="relative"><Search size={14} className="absolute left-3 top-1/2 -trangray-y-1/2 text-gray-400" /><input autoFocus className="w-full bg-gray-50 border border-gray-100 rounded-xl pl-9 pr-4 py-2 text-xs font-bold outline-none focus:border-primary-500 transition-all" placeholder="Search..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} /></div></div>)}
-          <div className="flex-1 overflow-y-auto custom-scrollbar p-2">{filteredTree.map((parent) => (<div key={parent.value} onMouseEnter={() => setHoveredParent(parent)} className={`px-4 py-3 rounded-xl text-xs font-bold cursor-pointer transition-all mb-1 flex items-center justify-between group ${hoveredParent?.value === parent.value ? 'bg-white text-primary-500 shadow-sm border border-gray-100' : 'text-gray-500 hover:text-gray-900 hover:bg-white/50'}`}><span className="truncate pr-2">{parent.label}</span>{parent.children?.length > 0 && <ChevronRight size={14} className={`transition-transform ${hoveredParent?.value === parent.value ? 'trangray-x-0.5 opacity-100' : 'opacity-30'}`} />}</div>))}</div>
+        <div className={`w-[240px] border-r border-neutral-100 flex flex-col bg-neutral-50/30`}>
+          {isSearchable && (<div className="p-4 border-b border-neutral-200 bg-white sticky top-0 z-10"><div className="relative"><Search size={14} className="absolute left-3 top-1/2 -trangray-y-1/2 text-neutral-400" /><input autoFocus className="w-full bg-neutral-50 border border-neutral-100 rounded-xl pl-9 pr-4 py-2 text-xs font-bold outline-none focus:border-primary-500 transition-all" placeholder="Search..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} /></div></div>)}
+          <div className="flex-1 overflow-y-auto custom-scrollbar p-2">{filteredTree.map((parent) => (<div key={parent.value} onMouseEnter={() => setHoveredParent(parent)} className={`px-4 py-3 rounded-xl text-xs font-bold cursor-pointer transition-all mb-1 flex items-center justify-between group ${hoveredParent?.value === parent.value ? 'bg-white text-primary-500 shadow-sm border border-neutral-100' : 'text-neutral-500 hover:text-neutral-900 hover:bg-white/50'}`}><span className="truncate pr-2">{parent.label}</span>{parent.children?.length > 0 && <ChevronRight size={14} className={`transition-transform ${hoveredParent?.value === parent.value ? 'trangray-x-0.5 opacity-100' : 'opacity-30'}`} />}</div>))}</div>
         </div>
         <div className="flex-1 bg-white flex flex-col">
-          <div className="p-4 border-b border-gray-50"><h6 className="text-xs font-semibold text-gray-400">{hoveredParent ? hoveredParent.label : 'Select category'}</h6></div>
+          <div className="p-4 border-b border-neutral-50"><h6 className="text-xs font-semibold text-neutral-400">{hoveredParent ? hoveredParent.label : 'Select category'}</h6></div>
           <div className="flex-1 overflow-y-auto custom-scrollbar p-2">
-            {hoveredParent?.children?.length > 0 ? (<div className="grid grid-cols-1 gap-1">{hoveredParent.children.map((child) => (<div key={child.value} onClick={() => { onChange(child.value); setIsOpen(false); setSearchTerm(''); }} className={`px-4 py-3 rounded-xl text-xs font-bold cursor-pointer transition-all ${value === child.value ? 'bg-primary-50 text-primary-500' : 'text-gray-600 hover:bg-gray-50'}`}>{child.label}</div>))}</div>) : (<div className="h-full flex flex-col items-center justify-center text-gray-300 p-8 text-center"><div className="w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center mb-3"><Layers size={20} className="opacity-20" /></div><p className="text-xs font-bold opacity-40">{hoveredParent ? 'No sub-categories' : 'Hover a category to view details'}</p></div>)}
+            {hoveredParent?.children?.length > 0 ? (<div className="grid grid-cols-1 gap-1">{hoveredParent.children.map((child) => (<div key={child.value} onClick={() => { onChange(child.value); setIsOpen(false); setSearchTerm(''); }} className={`px-4 py-3 rounded-xl text-xs font-bold cursor-pointer transition-all ${value === child.value ? 'bg-primary-50 text-primary-500' : 'text-neutral-600 hover:bg-neutral-50'}`}>{child.label}</div>))}</div>) : (<div className="h-full flex flex-col items-center justify-center text-neutral-300 p-8 text-center"><div className="w-12 h-12 rounded-full bg-neutral-50 flex items-center justify-center mb-3"><Layers size={20} className="opacity-20" /></div><p className="text-xs font-bold opacity-40">{hoveredParent ? 'No sub-categories' : 'Hover a category to view details'}</p></div>)}
           </div>
         </div>
       </Popover>
@@ -407,13 +407,13 @@ const SelectionModal = ({
       style={{ zIndex }}
     >
       <div className="bg-white w-full max-w-4xl rounded-section shadow-xl overflow-hidden animate-in slide-in-from-bottom-8 flex flex-col max-h-[90vh]">
-        <div className="p-8 border-b border-gray-200 flex items-center justify-between bg-white shrink-0">
-          <h3 className="text-xl font-semibold text-gray-900">{type === 'history' ? '历史分析产品库' : type === 'shopify' ? '请选择products' : '从创意素材库选择'}</h3>
-          <button onClick={onClose} className="p-2 hover:bg-gray-50 rounded-full text-gray-300 transition-colors"><X size={24} /></button>
+        <div className="p-8 border-b border-neutral-200 flex items-center justify-between bg-white shrink-0">
+          <h3 className="text-xl font-semibold text-neutral-900">{type === 'history' ? '历史分析产品库' : type === 'shopify' ? '请选择products' : '从创意素材库选择'}</h3>
+          <button onClick={onClose} className="p-2 hover:bg-neutral-50 rounded-full text-neutral-300 transition-colors"><X size={24} /></button>
         </div>
         {type === 'creative_lib' && (
-          <div className="px-8 py-3 bg-gray-50 border-b border-gray-200 flex items-center gap-2 shrink-0">
-            <div className="flex bg-white p-1 rounded-xl border border-gray-200 shadow-sm">
+          <div className="px-8 py-3 bg-neutral-50 border-b border-neutral-200 flex items-center gap-2 shrink-0">
+            <div className="flex bg-white p-1 rounded-xl border border-neutral-200 shadow-sm">
               {[
                 { id: 'library', label: '创意素材库' },
                 { id: 'product_assets', label: 'Product Assets' },
@@ -422,7 +422,7 @@ const SelectionModal = ({
                 <button
                   key={tab.id}
                   onClick={() => handleTabSwitch(tab.id)}
-                  className={`px-4 py-2 rounded-lg text-xs font-medium transition-all ${activeCreativeTab === tab.id ? 'bg-primary-500 text-white shadow-md' : 'text-gray-400 hover:bg-gray-50'}`}
+                  className={`px-4 py-2 rounded-lg text-xs font-medium transition-all ${activeCreativeTab === tab.id ? 'bg-primary-500 text-white shadow-md' : 'text-neutral-400 hover:bg-neutral-50'}`}
                 >
                   {tab.label}
                 </button>
@@ -431,14 +431,14 @@ const SelectionModal = ({
           </div>
         )}
         {type === 'shopify' && (
-          <div className="px-8 py-4 bg-gray-50 border-b border-gray-200 flex items-center gap-4 shrink-0">
+          <div className="px-8 py-4 bg-neutral-50 border-b border-neutral-200 flex items-center gap-4 shrink-0">
             {anyConnected && (<button onClick={() => setIsAddModalOpen(true)} className="w-10 h-10 bg-primary-500 text-white rounded-xl flex items-center justify-center shadow-lg hover:bg-primary-600 transition-all shrink-0 group" title="Connect product data source"><Plus size={20} className="group-hover:rotate-90 transition-transform" /></button>)}
-            <div className="flex bg-white p-1 rounded-xl border border-gray-200 shadow-sm">
+            <div className="flex bg-white p-1 rounded-xl border border-neutral-200 shadow-sm">
               {[{ id: 'ALL', label: '全部', icon: <Box size={14} /> }, { id: 'shopify', label: 'Shopify', icon: <ShoppingBag size={14} />, color: 'text-emerald-600' }, { id: 'meta', label: 'Facebook feeds', icon: <Facebook size={14} />, color: 'text-blue-600' }, { id: 'google', label: 'Google GMC', icon: <Chrome size={14} />, color: 'text-orange-500' }].map(p => (
-                <button key={p.id} onClick={() => setActivePlatform(p.id)} className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-medium transition-all ${activePlatform === p.id ? 'bg-primary-500 text-white shadow-md' : `${p.color || 'text-gray-400'} hover:bg-gray-50`} ${p.id !== 'ALL' && !authStatus[p.id] ? 'opacity-60' : ''}`}>{p.icon} {p.label}</button>
+                <button key={p.id} onClick={() => setActivePlatform(p.id)} className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-medium transition-all ${activePlatform === p.id ? 'bg-primary-500 text-white shadow-md' : `${p.color || 'text-neutral-400'} hover:bg-neutral-50`} ${p.id !== 'ALL' && !authStatus[p.id] ? 'opacity-60' : ''}`}>{p.icon} {p.label}</button>
               ))}
             </div>
-            <div className="relative flex-1"><Search className="absolute left-4 top-1/2 -trangray-y-1/2 text-gray-400" size={16} /><input type="text" autoFocus placeholder="搜索商品名称、链接..." className="w-full pl-12 pr-4 h-11 bg-white border border-gray-200 rounded-xl outline-none text-xs font-bold focus:border-primary-500 shadow-sm" value={search} onChange={(e) => setSearch(e.target.value)} /></div>
+            <div className="relative flex-1"><Search className="absolute left-4 top-1/2 -trangray-y-1/2 text-neutral-400" size={16} /><input type="text" autoFocus placeholder="搜索商品名称、链接..." className="w-full pl-12 pr-4 h-11 bg-white border border-neutral-200 rounded-xl outline-none text-xs font-bold focus:border-primary-500 shadow-sm" value={search} onChange={(e) => setSearch(e.target.value)} /></div>
           </div>
         )}
         <div className="flex-1 overflow-y-auto p-8 no-scrollbar relative min-h-[400px]">
@@ -452,20 +452,20 @@ const SelectionModal = ({
               if (mediaState === 'NO_PLATFORM') {
                 return (
                   <div className="absolute inset-0 flex flex-col items-center justify-center p-12 text-center animate-in fade-in zoom-in-95">
-                    <div className="w-20 h-20 bg-gray-50 rounded-xl flex items-center justify-center text-gray-300 mb-6"><Monitor size={40} /></div>
-                    <p className="text-sm text-gray-500 font-bold mb-2">尚未选择媒体渠道</p>
-                    <p className="text-xs text-gray-400 max-w-sm">请先在页面顶部"投放渠道媒体"中选择媒体平台，连接账号后即可在此使用素材库。</p>
+                    <div className="w-20 h-20 bg-neutral-50 rounded-xl flex items-center justify-center text-neutral-300 mb-6"><Monitor size={40} /></div>
+                    <p className="text-sm text-neutral-500 font-bold mb-2">尚未选择媒体渠道</p>
+                    <p className="text-xs text-neutral-400 max-w-sm">请先在页面顶部"投放渠道媒体"中选择媒体平台，连接账号后即可在此使用素材库。</p>
                   </div>
                 );
               }
               if (mediaState === 'NEED_AUTH') {
                 return (
                   <div className="absolute inset-0 flex flex-col items-center justify-center p-12 text-center animate-in fade-in zoom-in-95">
-                    <div className="w-20 h-20 bg-gray-50 rounded-xl flex items-center justify-center mb-6 overflow-hidden">
-                      {channelPlatform.logo ? <img src={channelPlatform.logo} alt="" className="w-12 h-12 object-contain" /> : <Monitor size={40} className="text-gray-300" />}
+                    <div className="w-20 h-20 bg-neutral-50 rounded-xl flex items-center justify-center mb-6 overflow-hidden">
+                      {channelPlatform.logo ? <img src={channelPlatform.logo} alt="" className="w-12 h-12 object-contain" /> : <Monitor size={40} className="text-neutral-300" />}
                     </div>
-                    <p className="text-sm text-gray-500 font-bold mb-2">连接 {channelPlatform.name} 后查看媒体素材</p>
-                    <p className="text-xs text-gray-400 mb-6 max-w-sm">连接成功后将自动弹出账号选择，再选择目标账号即可加载该账号下的媒体素材。</p>
+                    <p className="text-sm text-neutral-500 font-bold mb-2">连接 {channelPlatform.name} 后查看媒体素材</p>
+                    <p className="text-xs text-neutral-400 mb-6 max-w-sm">连接成功后将自动弹出账号选择，再选择目标账号即可加载该账号下的媒体素材。</p>
                     <button
                       onClick={() => handleAuthorize(channelPlatform.id)}
                       disabled={isAuthLoading}
@@ -481,8 +481,8 @@ const SelectionModal = ({
                 return (
                   <div className="absolute inset-0 flex flex-col items-center justify-center p-12 text-center animate-in fade-in zoom-in-95">
                     <div className="w-20 h-20 bg-primary-50 rounded-xl flex items-center justify-center text-primary-500 mb-6"><Briefcase size={40} /></div>
-                    <p className="text-sm text-gray-500 font-bold mb-2">已连接 {channelPlatform.name}，请选择广告账号</p>
-                    <p className="text-xs text-gray-400 mb-6 max-w-sm">从该 {channelPlatform.name} 已授权账户中选择一个，加载其媒体素材库。</p>
+                    <p className="text-sm text-neutral-500 font-bold mb-2">已连接 {channelPlatform.name}，请选择广告账号</p>
+                    <p className="text-xs text-neutral-400 mb-6 max-w-sm">从该 {channelPlatform.name} 已授权账户中选择一个，加载其媒体素材库。</p>
                     <button
                       onClick={() => onOpenChannelAccountPicker?.()}
                       className="px-10 py-4 bg-primary-500 text-white rounded-full font-semibold hover:bg-primary-600 transition-all shadow-xl shadow-primary-500/10 flex items-center gap-3"
@@ -505,12 +505,12 @@ const SelectionModal = ({
                     {CREATIVE_LIBRARY.map((item) => {
                       const isSel = localSelected.has(item.id);
                       return (
-                        <div key={item.id} onClick={() => toggleItem(item.id)} className={`relative p-3 bg-white border-2 rounded-section transition-all cursor-pointer group ${isSel ? 'border-primary-500 shadow-lg shadow-primary-50' : 'border-gray-100 hover:border-gray-300'}`}>
-                          <div className="aspect-square rounded-xl overflow-hidden mb-3 relative bg-gray-50">
+                        <div key={item.id} onClick={() => toggleItem(item.id)} className={`relative p-3 bg-white border-2 rounded-section transition-all cursor-pointer group ${isSel ? 'border-primary-500 shadow-lg shadow-primary-50' : 'border-neutral-100 hover:border-neutral-300'}`}>
+                          <div className="aspect-square rounded-xl overflow-hidden mb-3 relative bg-neutral-50">
                             <img src={item.url} className="w-full h-full object-cover transition-transform group-hover:scale-110" />
                             <div className={`absolute top-2 right-2 w-6 h-6 rounded-full border-2 flex items-center justify-center shadow-lg ${isSel ? 'bg-primary-500 border-primary-500' : 'bg-black/20 border-white/40'}`}>{isSel && <Check size={14} className="text-white" />}</div>
                           </div>
-                          <p className="text-xs font-semibold text-gray-800 truncate px-1">{item.name || '未命名素材'}</p>
+                          <p className="text-xs font-semibold text-neutral-800 truncate px-1">{item.name || '未命名素材'}</p>
                         </div>
                       );
                     })}
@@ -519,13 +519,13 @@ const SelectionModal = ({
               );
             })()
           ) : isAuthLoading ? (
-            <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/80 backdrop-blur-sm z-[150] animate-in fade-in"><Loader2 size={48} className="text-primary-500 animate-spin mb-4" /><p className="text-sm font-medium text-gray-900">正在拉取并同步云端商品数据...</p></div>
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/80 backdrop-blur-sm z-[150] animate-in fade-in"><Loader2 size={48} className="text-primary-500 animate-spin mb-4" /><p className="text-sm font-medium text-neutral-900">正在拉取并同步云端商品数据...</p></div>
           ) : isFetchingProducts ? (
-            <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/80 backdrop-blur-sm z-10 animate-in fade-in"><Loader2 size={48} className="text-primary-500 animate-spin mb-4" /><p className="text-sm font-medium text-gray-900">Fetching products data...</p></div>
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/80 backdrop-blur-sm z-10 animate-in fade-in"><Loader2 size={48} className="text-primary-500 animate-spin mb-4" /><p className="text-sm font-medium text-neutral-900">Fetching products data...</p></div>
           ) : needsConnection ? (
             <div className="absolute inset-0 flex flex-col items-center justify-center p-12 text-center animate-in fade-in zoom-in-95">
-              <div className="w-20 h-20 bg-gray-50 rounded-xl flex items-center justify-center text-gray-200 mb-6"><ShoppingBag size={40} /></div>
-              <p className="text-sm text-gray-400 font-bold mb-8 max-w-sm">Connect your store to sync products automatically or manually set up a product for analysis.</p>
+              <div className="w-20 h-20 bg-neutral-50 rounded-xl flex items-center justify-center text-neutral-200 mb-6"><ShoppingBag size={40} /></div>
+              <p className="text-sm text-neutral-400 font-bold mb-8 max-w-sm">Connect your store to sync products automatically or manually set up a product for analysis.</p>
               <button onClick={() => setIsAddModalOpen(true)} className="px-10 py-4 bg-primary-500 text-white rounded-full font-semibold hover:bg-primary-600 transition-all shadow-xl shadow-primary-500/10 flex items-center gap-3"><Plus size={20} /> Connect product data source</button>
             </div>
           ) : filtered.length === 0 ? (
@@ -535,22 +535,22 @@ const SelectionModal = ({
               {filtered.map((item) => {
                 const isSel = localSelected.has(item.id);
                 return (
-                  <div key={item.id} onClick={() => toggleItem(item.id)} className={`flex items-center gap-4 p-4 bg-white border-2 rounded-section transition-all cursor-pointer group ${isSel ? 'border-primary-500 shadow-lg shadow-primary-50' : 'border-gray-100 hover:border-gray-300 hover:shadow-md'}`}>
-                    <div className="w-12 h-12 rounded-xl overflow-hidden border border-gray-100 shrink-0 shadow-sm bg-gray-50">
+                  <div key={item.id} onClick={() => toggleItem(item.id)} className={`flex items-center gap-4 p-4 bg-white border-2 rounded-section transition-all cursor-pointer group ${isSel ? 'border-primary-500 shadow-lg shadow-primary-50' : 'border-neutral-100 hover:border-neutral-300 hover:shadow-md'}`}>
+                    <div className="w-12 h-12 rounded-xl overflow-hidden border border-neutral-100 shrink-0 shadow-sm bg-neutral-50">
                       {item.imageUrl ? (
                         <img src={item.imageUrl} className="w-full h-full object-cover" />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center text-gray-300"><PackageCheck size={20} /></div>
+                        <div className="w-full h-full flex items-center justify-center text-neutral-300"><PackageCheck size={20} /></div>
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-800 truncate">{item.name || '未命名产品'}</p>
+                      <p className="text-sm font-medium text-neutral-800 truncate">{item.name || '未命名产品'}</p>
                       <div className="flex items-center gap-1.5 mt-0.5 opacity-60 group-hover:opacity-100 transition-opacity">
                         <Link2 size={10} className="shrink-0" />
-                        <p className="text-xs text-gray-400 truncate">{item.url}</p>
+                        <p className="text-xs text-neutral-400 truncate">{item.url}</p>
                       </div>
                     </div>
-                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 ${isSel ? 'bg-primary-500 border-primary-500' : 'border-gray-200'}`}>
+                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 ${isSel ? 'bg-primary-500 border-primary-500' : 'border-neutral-200'}`}>
                       {isSel && <Check size={14} className="text-white" />}
                     </div>
                   </div>
@@ -583,8 +583,8 @@ const SelectionModal = ({
               return (
                 <div className="space-y-3">
                   {selectedItems.length > 0 && (
-                    <div className="flex flex-wrap gap-2 pb-3 border-b border-gray-100">
-                      <span className="text-xs font-medium text-gray-400 self-center mr-1">已选 {selectedItems.length}：</span>
+                    <div className="flex flex-wrap gap-2 pb-3 border-b border-neutral-100">
+                      <span className="text-xs font-medium text-neutral-400 self-center mr-1">已选 {selectedItems.length}：</span>
                       {selectedItems.map(item => (
                         <span key={item.id} className="inline-flex items-center gap-2 pl-1 pr-2 py-1 bg-primary-50 border border-primary-100 rounded-full">
                           {(item.imageUrl || item.url) ? (
@@ -598,28 +598,28 @@ const SelectionModal = ({
                       ))}
                     </div>
                   )}
-                  <div className="border border-gray-100 rounded-xl overflow-hidden divide-y divide-gray-50">
+                  <div className="border border-neutral-100 rounded-xl overflow-hidden divide-y divide-neutral-50">
                     {sorted.map(item => {
                       const isSel = localSelected.has(item.id);
                       return (
                         <div
                           key={item.id}
                           onClick={() => toggleItem(item.id)}
-                          className={`flex items-center gap-3 px-4 py-2.5 cursor-pointer transition-colors ${isSel ? 'bg-primary-50/60 hover:bg-primary-50' : 'bg-white hover:bg-gray-50'}`}
+                          className={`flex items-center gap-3 px-4 py-2.5 cursor-pointer transition-colors ${isSel ? 'bg-primary-50/60 hover:bg-primary-50' : 'bg-white hover:bg-neutral-50'}`}
                         >
-                          <div className="w-10 h-10 rounded-lg overflow-hidden border border-gray-100 shrink-0 bg-gray-50">
+                          <div className="w-10 h-10 rounded-lg overflow-hidden border border-neutral-100 shrink-0 bg-neutral-50">
                             {(item.imageUrl || item.url)
                               ? <img src={item.imageUrl || item.url} className="w-full h-full object-cover" />
-                              : <div className="w-full h-full flex items-center justify-center text-gray-300"><PackageCheck size={16} /></div>}
+                              : <div className="w-full h-full flex items-center justify-center text-neutral-300"><PackageCheck size={16} /></div>}
                           </div>
                           <div className="min-w-0 flex-1">
-                            <p className={`text-sm truncate ${isSel ? 'font-semibold text-primary-700' : 'font-medium text-gray-800'}`}>{highlightMatch(item.name || '未命名产品')}</p>
+                            <p className={`text-sm truncate ${isSel ? 'font-semibold text-primary-700' : 'font-medium text-neutral-800'}`}>{highlightMatch(item.name || '未命名产品')}</p>
                             <div className="flex items-center gap-1 mt-0.5">
-                              <Link2 size={10} className="text-gray-300 shrink-0" />
-                              <p className="text-[11px] font-medium text-gray-400 truncate">{highlightMatch(item.url || '')}</p>
+                              <Link2 size={10} className="text-neutral-300 shrink-0" />
+                              <p className="text-[11px] font-medium text-neutral-400 truncate">{highlightMatch(item.url || '')}</p>
                             </div>
                           </div>
-                          <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${isSel ? 'bg-primary-500 border-primary-500' : 'border-gray-200'}`}>
+                          <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${isSel ? 'bg-primary-500 border-primary-500' : 'border-neutral-200'}`}>
                             {isSel && <Check size={12} className="text-white" strokeWidth={3} />}
                           </div>
                         </div>
@@ -634,19 +634,19 @@ const SelectionModal = ({
               {filtered.map((item) => {
                 const isSel = localSelected.has(item.id);
                 return (
-                  <div key={item.id} onClick={() => toggleItem(item.id)} className={`relative p-3 bg-white border-2 rounded-section transition-all cursor-pointer group ${isSel ? 'border-primary-500 shadow-lg shadow-primary-50' : 'border-gray-100 hover:border-gray-300'}`}>
-                    <div className="aspect-square rounded-xl overflow-hidden mb-3 relative bg-gray-50">
-                      {(item.imageUrl || item.url) ? (<img src={item.imageUrl || item.url} className="w-full h-full object-cover transition-transform group-hover:scale-110" />) : (<div className="w-full h-full flex flex-col items-center justify-center gap-2 text-gray-300 bg-gray-50"><PackageCheck size={32} /><span className="text-xs font-medium">暂无预览图</span></div>)}
+                  <div key={item.id} onClick={() => toggleItem(item.id)} className={`relative p-3 bg-white border-2 rounded-section transition-all cursor-pointer group ${isSel ? 'border-primary-500 shadow-lg shadow-primary-50' : 'border-neutral-100 hover:border-neutral-300'}`}>
+                    <div className="aspect-square rounded-xl overflow-hidden mb-3 relative bg-neutral-50">
+                      {(item.imageUrl || item.url) ? (<img src={item.imageUrl || item.url} className="w-full h-full object-cover transition-transform group-hover:scale-110" />) : (<div className="w-full h-full flex flex-col items-center justify-center gap-2 text-neutral-300 bg-neutral-50"><PackageCheck size={32} /><span className="text-xs font-medium">暂无预览图</span></div>)}
                       <div className={`absolute top-2 right-2 w-6 h-6 rounded-full border-2 flex items-center justify-center shadow-lg ${isSel ? 'bg-primary-500 border-primary-500' : 'bg-black/20 border-white/40'}`}>{isSel && <Check size={14} className="text-white" />}</div>
                     </div>
                     <div className="space-y-1">
-                      <p className="text-xs font-semibold text-gray-800 truncate px-1">
+                      <p className="text-xs font-semibold text-neutral-800 truncate px-1">
                         {item.name || (type === 'creative_lib' ? '未命名创意' : '未命名产品')}
                       </p>
                       {type !== 'creative_lib' && (
                         <div className="flex items-center gap-1.5 px-1 opacity-40 group-hover:opacity-100 transition-opacity">
                           <Link2 size={10} />
-                          <p className="text-xs font-bold text-gray-400 truncate">{item.url}</p>
+                          <p className="text-xs font-bold text-neutral-400 truncate">{item.url}</p>
                         </div>
                       )}
                     </div>
@@ -656,8 +656,8 @@ const SelectionModal = ({
             </div>
           )}
         </div>
-        <div className="p-8 bg-gray-50 border-t border-gray-200 flex items-center justify-between shrink-0 sticky bottom-0 z-20">
-          <div className="text-sm font-bold text-gray-400">
+        <div className="p-8 bg-neutral-50 border-t border-neutral-200 flex items-center justify-between shrink-0 sticky bottom-0 z-20">
+          <div className="text-sm font-bold text-neutral-400">
             {type === 'creative_lib' ? '已选 ' : '已选中 '}
             <span className="text-primary-500 font-semibold">{localSelected.size}</span> 
             {type === 'creative_lib' ? ' 个创意' : ' 个项目'}
@@ -688,7 +688,7 @@ const SelectionModal = ({
               onSelectProducts([...selectedProducts, ...trimmed]);
             }
             onClose();
-          }} className={`px-10 py-4 rounded-base font-semibold shadow-xl transition-all ${localSelected.size === 0 ? 'bg-gray-200 text-white cursor-not-allowed shadow-none' : 'bg-primary-500 text-white hover:bg-primary-600'}`}>
+          }} className={`px-10 py-4 rounded-base font-semibold shadow-xl transition-all ${localSelected.size === 0 ? 'bg-neutral-200 text-white cursor-not-allowed shadow-none' : 'bg-primary-500 text-white hover:bg-primary-600'}`}>
             {type === 'creative_lib' ? '确认' : '确认选择产品'}
           </button>
         </div>
@@ -718,11 +718,11 @@ const AppPickerSection = ({ platform, authStatus, isAuthLoading, handleAuthorize
 
   if (!platform) {
     return (
-      <div className="bg-white border-2 border-dashed border-gray-200 rounded-xl p-12 flex flex-col items-center text-center space-y-4">
+      <div className="bg-white border-2 border-dashed border-neutral-200 rounded-xl p-12 flex flex-col items-center text-center space-y-4">
         <div className="w-16 h-16 bg-amber-50 text-amber-500 rounded-base flex items-center justify-center shadow-sm"><AlertCircle size={32} /></div>
         <div className="max-w-md space-y-2">
-          <h4 className="text-lg font-semibold text-gray-900">请先在顶部选择投放渠道</h4>
-          <p className="text-xs text-gray-400 font-bold leading-relaxed">App 广告需先在『投放目标与渠道』中选择 Meta 或 TikTok。</p>
+          <h4 className="text-lg font-semibold text-neutral-900">请先在顶部选择投放渠道</h4>
+          <p className="text-xs text-neutral-400 font-bold leading-relaxed">App 广告需先在『投放目标与渠道』中选择 Meta 或 TikTok。</p>
         </div>
       </div>
     );
@@ -731,13 +731,13 @@ const AppPickerSection = ({ platform, authStatus, isAuthLoading, handleAuthorize
   if (requiresAuth && !isAuthorized) {
     const isMeta = platformId === 'meta';
     return (
-      <div className="bg-white border-2 border-dashed border-gray-200 rounded-xl p-12 flex flex-col items-center text-center space-y-6">
-        <div className={`w-16 h-16 rounded-base flex items-center justify-center shadow-sm ${isMeta ? 'bg-blue-50 text-blue-600' : 'bg-gray-900 text-white'}`}>
+      <div className="bg-white border-2 border-dashed border-neutral-200 rounded-xl p-12 flex flex-col items-center text-center space-y-6">
+        <div className={`w-16 h-16 rounded-base flex items-center justify-center shadow-sm ${isMeta ? 'bg-blue-50 text-blue-600' : 'bg-neutral-900 text-white'}`}>
           {isMeta ? <Facebook size={32} /> : <Smartphone size={32} />}
         </div>
         <div className="max-w-md space-y-2">
-          <h4 className="text-lg font-semibold text-gray-900">投放 App 广告需先授权 {isMeta ? 'Meta Ads' : 'TikTok Ads'}</h4>
-          <p className="text-xs text-gray-400 font-bold leading-relaxed">
+          <h4 className="text-lg font-semibold text-neutral-900">投放 App 广告需先授权 {isMeta ? 'Meta Ads' : 'TikTok Ads'}</h4>
+          <p className="text-xs text-neutral-400 font-bold leading-relaxed">
             我们需要访问您的 {isMeta ? 'Meta' : 'TikTok'} 广告账户以读取已绑定的 App 列表与投放权限。
           </p>
         </div>
@@ -756,8 +756,8 @@ const AppPickerSection = ({ platform, authStatus, isAuthLoading, handleAuthorize
         <div className="flex items-center gap-6">
           <div className="w-14 h-14 bg-white rounded-base flex items-center justify-center text-primary-500 shadow-sm"><RefreshCw size={28} className="animate-spin-slow" /></div>
           <div>
-            <h4 className="text-base font-semibold text-gray-900">{isMeta ? 'Meta' : 'TikTok'} 已授权，请选择关联广告账户</h4>
-            <p className="text-xs text-gray-400 font-bold mt-1">Found 2 available accounts</p>
+            <h4 className="text-base font-semibold text-neutral-900">{isMeta ? 'Meta' : 'TikTok'} 已授权，请选择关联广告账户</h4>
+            <p className="text-xs text-neutral-400 font-bold mt-1">Found 2 available accounts</p>
           </div>
         </div>
         <button onClick={onPickAccount} className="px-8 py-4 bg-primary-500 text-white rounded-xl font-semibold hover:bg-primary-600 transition-all shadow-lg shadow-primary-500/10">选择广告账户</button>
@@ -813,13 +813,13 @@ const AppPickerSection = ({ platform, authStatus, isAuthLoading, handleAuthorize
       <div className="flex items-center justify-between px-2">
         <div className="flex items-center gap-2">
           <Smartphone size={14} className="text-primary-500" />
-          <h4 className="text-sm font-semibold text-gray-900">从已绑定的 App 列表中选择</h4>
+          <h4 className="text-sm font-semibold text-neutral-900">从已绑定的 App 列表中选择</h4>
         </div>
-        <span className="text-xs font-medium text-gray-400">已选 {selectedAppIds.size} / {MOCK_APPS.length}</span>
+        <span className="text-xs font-medium text-neutral-400">已选 {selectedAppIds.size} / {MOCK_APPS.length}</span>
       </div>
 
       <div ref={appPickerRef} className="relative">
-        <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+        <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400 pointer-events-none" />
         <input
           type="text"
           value={appSearch}
@@ -827,13 +827,13 @@ const AppPickerSection = ({ platform, authStatus, isAuthLoading, handleAuthorize
           onFocus={() => setIsAppDropdownOpen(true)}
           onClick={() => setIsAppDropdownOpen(true)}
           placeholder={selectedAppIds.size > 0 ? `已选 ${selectedAppIds.size} 个 App，继续搜索/勾选...` : '点击展开下拉，或输入名称、包名、平台关键词搜索 App...'}
-          className="w-full h-11 pl-9 pr-16 bg-white border border-gray-200 rounded-base outline-none text-xs font-medium text-gray-700 focus:border-primary-500 focus:shadow-primary-focus transition-all"
+          className="w-full h-11 pl-9 pr-16 bg-white border border-neutral-200 rounded-base outline-none text-xs font-medium text-neutral-700 focus:border-primary-500 focus:shadow-primary-focus transition-all"
         />
         <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1">
           {appSearch && (
-            <button onMouseDown={(e) => { e.preventDefault(); setAppSearch(''); }} className="p-1 text-gray-400 hover:text-gray-600" title="清空搜索"><X size={14} /></button>
+            <button onMouseDown={(e) => { e.preventDefault(); setAppSearch(''); }} className="p-1 text-neutral-400 hover:text-neutral-600" title="清空搜索"><X size={14} /></button>
           )}
-          <ChevronDown size={14} className={`text-gray-400 transition-transform ${isAppDropdownOpen ? 'rotate-180' : ''}`} />
+          <ChevronDown size={14} className={`text-neutral-400 transition-transform ${isAppDropdownOpen ? 'rotate-180' : ''}`} />
         </div>
       </div>
       <Popover
@@ -842,11 +842,11 @@ const AppPickerSection = ({ platform, authStatus, isAuthLoading, handleAuthorize
         placement="bottom-start"
         matchWidth
         onClose={() => setIsAppDropdownOpen(false)}
-        className="bg-white border border-gray-200 rounded-xl shadow-xl overflow-hidden"
+        className="bg-white border border-neutral-200 rounded-xl shadow-xl overflow-hidden"
       >
-        <div className="divide-y divide-gray-50 max-h-[360px] overflow-y-auto custom-scrollbar">
+        <div className="divide-y divide-neutral-50 max-h-[360px] overflow-y-auto custom-scrollbar">
           {sortedApps.length === 0 ? (
-            <div className="px-4 py-10 flex flex-col items-center justify-center text-gray-300">
+            <div className="px-4 py-10 flex flex-col items-center justify-center text-neutral-300">
               <AlertCircle size={28} className="mb-2" />
               <p className="text-xs font-medium">未找到匹配的 App</p>
             </div>
@@ -857,17 +857,17 @@ const AppPickerSection = ({ platform, authStatus, isAuthLoading, handleAuthorize
                 key={app.id}
                 type="button"
                 onMouseDown={(e) => { e.preventDefault(); toggleApp(app); }}
-                className={`w-full flex items-center gap-3 px-4 py-2.5 cursor-pointer transition-colors text-left ${isSelected ? 'bg-primary-50/60 hover:bg-primary-50' : 'bg-white hover:bg-gray-50'}`}
+                className={`w-full flex items-center gap-3 px-4 py-2.5 cursor-pointer transition-colors text-left ${isSelected ? 'bg-primary-50/60 hover:bg-primary-50' : 'bg-white hover:bg-neutral-50'}`}
               >
-                <div className="w-9 h-9 rounded-lg overflow-hidden border border-gray-100 shrink-0 bg-gray-50">
+                <div className="w-9 h-9 rounded-lg overflow-hidden border border-neutral-100 shrink-0 bg-neutral-50">
                   <img src={app.icon} alt={app.name} className="w-full h-full object-cover" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className={`text-sm truncate ${isSelected ? 'font-semibold text-primary-700' : 'font-medium text-gray-800'}`}>{highlightMatch(app.name)}</p>
-                  <p className="text-[11px] font-medium text-gray-400 truncate mt-0.5">{highlightMatch(app.bundle)}</p>
+                  <p className={`text-sm truncate ${isSelected ? 'font-semibold text-primary-700' : 'font-medium text-neutral-800'}`}>{highlightMatch(app.name)}</p>
+                  <p className="text-[11px] font-medium text-neutral-400 truncate mt-0.5">{highlightMatch(app.bundle)}</p>
                 </div>
-                <span className={`text-xs font-medium px-2 py-0.5 rounded-tag shrink-0 ${app.platform === 'iOS' ? 'bg-gray-100 text-gray-700' : 'bg-emerald-50 text-emerald-600'}`}>{app.platform}</span>
-                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${isSelected ? 'bg-primary-500 border-primary-500' : 'border-gray-200'}`}>
+                <span className={`text-xs font-medium px-2 py-0.5 rounded-tag shrink-0 ${app.platform === 'iOS' ? 'bg-neutral-100 text-neutral-700' : 'bg-emerald-50 text-emerald-600'}`}>{app.platform}</span>
+                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${isSelected ? 'bg-primary-500 border-primary-500' : 'border-neutral-200'}`}>
                   {isSelected && <Check size={12} className="text-white" strokeWidth={3} />}
                 </div>
               </button>
@@ -1185,13 +1185,13 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreativeGr
         style={{ zIndex }}
       >
         <div className="bg-white w-full max-w-4xl rounded-section shadow-xl overflow-hidden animate-in slide-in-from-bottom-8 flex flex-col max-h-[90vh]">
-          <div className="p-8 border-b border-gray-200 flex items-center justify-between bg-white shrink-0">
+          <div className="p-8 border-b border-neutral-200 flex items-center justify-between bg-white shrink-0">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-base overflow-hidden border border-gray-100 shrink-0 shadow-sm">
+              <div className="w-12 h-12 rounded-base overflow-hidden border border-neutral-100 shrink-0 shadow-sm">
                 <img src={product.imageUrl} className="w-full h-full object-cover" />
               </div>
               <div>
-                <h3 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
+                <h3 className="text-xl font-semibold text-neutral-900 flex items-center gap-2">
                   产品分析报告
                   {isProductAnalyzing && (
                     <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-primary-50 text-primary-500 rounded-tag text-xs font-semibold animate-pulse">
@@ -1199,14 +1199,14 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreativeGr
                     </span>
                   )}
                 </h3>
-                <p className="text-xs text-gray-400 font-bold mt-1 uppercase">{product.name}</p>
+                <p className="text-xs text-neutral-400 font-bold mt-1 uppercase">{product.name}</p>
               </div>
             </div>
-            <button onClick={onClose} className="p-2 hover:bg-gray-50 rounded-full text-gray-300 transition-colors"><X size={24} /></button>
+            <button onClick={onClose} className="p-2 hover:bg-neutral-50 rounded-full text-neutral-300 transition-colors"><X size={24} /></button>
           </div>
 
-          <div ref={modalScrollRef} className="flex-1 overflow-y-auto p-10 no-scrollbar bg-gray-50/30">
-            <div className="bg-white rounded-xl p-10 border border-gray-100 shadow-xl overflow-hidden">
+          <div ref={modalScrollRef} className="flex-1 overflow-y-auto p-10 no-scrollbar bg-neutral-50/30">
+            <div className="bg-white rounded-xl p-10 border border-neutral-100 shadow-xl overflow-hidden">
               <div className="space-y-6">
                 {visibleSteps.map((step, stepIdx) => {
                   let listIdx = 0;
@@ -1217,8 +1217,8 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreativeGr
                   return (
                     <div key={stepIdx} className="animate-in fade-in slide-in-from-bottom-2 duration-500">
                       {step.type === 'system' && (
-                        <div className="pb-4 border-b border-gray-200 mb-4">
-                          <p className="text-sm font-medium text-gray-600">
+                        <div className="pb-4 border-b border-neutral-200 mb-4">
+                          <p className="text-sm font-medium text-neutral-600">
                             {step.text.split('https://www.cupshe.com').map((part, i, arr) => (
                               <React.Fragment key={i}>
                                 {part}
@@ -1229,57 +1229,57 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreativeGr
                         </div>
                       )}
                       {step.type === 'action_header' && (
-                        <h4 className="text-lg font-semibold text-gray-900 mb-2">{step.text}</h4>
+                        <h4 className="text-lg font-semibold text-neutral-900 mb-2">{step.text}</h4>
                       )}
                       {step.type === 'action' && (
-                        <div className="flex items-start gap-3 pl-4 border-l-2 border-gray-50 mb-2">
-                          <p className="text-sm font-medium text-gray-400">{step.text}</p>
+                        <div className="flex items-start gap-3 pl-4 border-l-2 border-neutral-50 mb-2">
+                          <p className="text-sm font-medium text-neutral-400">{step.text}</p>
                         </div>
                       )}
                       {step.type === 'image' && (
                         <div className="pl-4 mb-6">
-                          <div className="rounded-section border border-gray-200 overflow-hidden shadow-xl max-w-2xl transition-all hover:scale-[1.01]">
+                          <div className="rounded-section border border-neutral-200 overflow-hidden shadow-xl max-w-2xl transition-all hover:scale-[1.01]">
                             <img src={step.url} alt="Captured UI" className="w-full h-auto" />
                           </div>
                         </div>
                       )}
                       {step.type === 'key_value' && (
                         <p className="text-sm leading-relaxed mb-2">
-                          <span className="font-semibold text-gray-900">{step.text}</span>
-                          <span className="text-gray-600 ml-1.5">{step.value}</span>
+                          <span className="font-semibold text-neutral-900">{step.text}</span>
+                          <span className="text-neutral-600 ml-1.5">{step.value}</span>
                         </p>
                       )}
                       {step.type === 'header' && (
-                        <p className="text-sm font-medium text-gray-900 pt-2 mb-2">{step.text}</p>
+                        <p className="text-sm font-medium text-neutral-900 pt-2 mb-2">{step.text}</p>
                       )}
                       {step.type === 'bullet' && (
                         <div className="flex items-start gap-3 pl-4 mb-1.5">
-                          <span className="text-gray-900 mt-1.5 text-xs font-medium">•</span>
-                          <p className="text-sm font-medium text-gray-600 leading-relaxed">
+                          <span className="text-neutral-900 mt-1.5 text-xs font-medium">•</span>
+                          <p className="text-sm font-medium text-neutral-600 leading-relaxed">
                             {step.text.split('-').map((part, i) => (
-                              i === 0 ? <span key={i} className="font-semibold text-gray-900">{part}</span> : <span key={i}>- {part}</span>
+                              i === 0 ? <span key={i} className="font-semibold text-neutral-900">{part}</span> : <span key={i}>- {part}</span>
                             ))}
                           </p>
                         </div>
                       )}
                       {step.type === 'ordered' && (
                         <div className="flex items-start gap-3 pl-4 mb-1.5">
-                          <span className="text-gray-900 text-sm font-medium">{listIdx}.</span>
-                          <p className="text-sm font-medium text-gray-600 leading-relaxed">
+                          <span className="text-neutral-900 text-sm font-medium">{listIdx}.</span>
+                          <p className="text-sm font-medium text-neutral-600 leading-relaxed">
                             {step.text.split('-').map((part, i) => (
-                              i === 0 ? <span key={i} className="font-semibold text-gray-900">{part}</span> : <span key={i}>- {part}</span>
+                              i === 0 ? <span key={i} className="font-semibold text-neutral-900">{part}</span> : <span key={i}>- {part}</span>
                             ))}
                           </p>
                         </div>
                       )}
                       {step.type === 'source' && (
-                        <div className="mt-6 pt-6 border-t border-gray-200">
-                          <p className="text-sm font-medium text-gray-600 leading-relaxed">{step.text}</p>
+                        <div className="mt-6 pt-6 border-t border-neutral-200">
+                          <p className="text-sm font-medium text-neutral-600 leading-relaxed">{step.text}</p>
                         </div>
                       )}
                       {step.type === 'footer' && (
                         <div className="mt-4">
-                          <p className="text-sm font-medium text-gray-600 italic">{step.text}</p>
+                          <p className="text-sm font-medium text-neutral-600 italic">{step.text}</p>
                         </div>
                       )}
                     </div>
@@ -1289,7 +1289,7 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreativeGr
             </div>
           </div>
           
-          <div className="p-8 bg-white border-t border-gray-200 flex justify-end shrink-0">
+          <div className="p-8 bg-white border-t border-neutral-200 flex justify-end shrink-0">
             <button 
               onClick={onClose}
               className="px-10 py-4 bg-primary-500 text-white rounded-base font-semibold hover:bg-primary-600 transition-all shadow-xl active:scale-95"
@@ -1411,14 +1411,14 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreativeGr
         )}
         <div className={(analysisFinished || isAnalyzing) ? 'opacity-40 grayscale-[0.5] blur-[0.5px]' : ''}>
           <div className="flex justify-center mb-4">
-            <div className="bg-gray-100/50 p-1 rounded-base border border-gray-100 flex items-center shadow-sm">
-              <button onClick={() => onCampaignTypeChange('PRODUCT')} className={`px-8 py-3 rounded-xl text-xs font-medium transition-all flex items-center gap-2 ${campaignType === 'PRODUCT' ? 'bg-white text-primary-500 shadow-md' : 'text-gray-400 hover:text-gray-600'}`}>
+            <div className="bg-neutral-100/50 p-1 rounded-base border border-neutral-100 flex items-center shadow-sm">
+              <button onClick={() => onCampaignTypeChange('PRODUCT')} className={`px-8 py-3 rounded-xl text-xs font-medium transition-all flex items-center gap-2 ${campaignType === 'PRODUCT' ? 'bg-white text-primary-500 shadow-md' : 'text-neutral-400 hover:text-neutral-600'}`}>
                 <Tag size={14} /> 投放产品广告
               </button>
-              <button onClick={() => onCampaignTypeChange('CATALOG')} className={`px-8 py-3 rounded-xl text-xs font-medium transition-all flex items-center gap-2 ${campaignType === 'CATALOG' ? 'bg-white text-primary-500 shadow-md' : 'text-gray-400 hover:text-gray-600'}`}>
+              <button onClick={() => onCampaignTypeChange('CATALOG')} className={`px-8 py-3 rounded-xl text-xs font-medium transition-all flex items-center gap-2 ${campaignType === 'CATALOG' ? 'bg-white text-primary-500 shadow-md' : 'text-neutral-400 hover:text-neutral-600'}`}>
                 <Database size={14} /> 投放目录广告
               </button>
-              <button onClick={() => onCampaignTypeChange('APP')} className={`px-8 py-3 rounded-xl text-xs font-medium transition-all flex items-center gap-2 ${campaignType === 'APP' ? 'bg-white text-primary-500 shadow-md' : 'text-gray-400 hover:text-gray-600'}`}>
+              <button onClick={() => onCampaignTypeChange('APP')} className={`px-8 py-3 rounded-xl text-xs font-medium transition-all flex items-center gap-2 ${campaignType === 'APP' ? 'bg-white text-primary-500 shadow-md' : 'text-neutral-400 hover:text-neutral-600'}`}>
                 <Smartphone size={14} /> 投放 App 广告
               </button>
             </div>
@@ -1430,27 +1430,27 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreativeGr
                   <div className="absolute -top-4 left-6 z-10">
                   </div>
                 )}
-                <div className={`bg-gray-50 border-2 border-dashed border-gray-200 rounded-xl p-6 flex items-center gap-6 focus-within:bg-white focus-within:border-primary-500 transition-all ${selectedProducts.length > 0 ? 'border-gray-300' : ''}`}>
-                  <div className="w-12 h-12 bg-white rounded-base flex items-center justify-center text-gray-300 shadow-sm border border-gray-100"><Link2 size={24} /></div>
+                <div className={`bg-neutral-50 border-2 border-dashed border-neutral-200 rounded-xl p-6 flex items-center gap-6 focus-within:bg-white focus-within:border-primary-500 transition-all ${selectedProducts.length > 0 ? 'border-neutral-300' : ''}`}>
+                  <div className="w-12 h-12 bg-white rounded-base flex items-center justify-center text-neutral-300 shadow-sm border border-neutral-100"><Link2 size={24} /></div>
                   <input 
                     type="text" 
                     placeholder="粘贴投放目标 URL，回车立即解析..." 
-                    className="flex-1 bg-transparent border-none outline-none text-base font-medium text-gray-800 placeholder:text-gray-300" 
+                    className="flex-1 bg-transparent border-none outline-none text-base font-medium text-neutral-800 placeholder:text-neutral-300" 
                     value={urlInput} 
                     onChange={(e) => setUrlInput(e.target.value)} 
                     onKeyDown={(e) => { if (e.key === 'Enter') handleAddUrl(); }} 
                   />
                   <button 
                     onClick={handleAddUrl}
-                    className={`w-12 h-12 rounded-base flex items-center justify-center transition-all ${urlInput.trim() ? 'bg-primary-500 text-white shadow-lg hover:bg-primary-600 active:scale-95' : 'bg-white text-gray-200 border border-gray-100'}`}
+                    className={`w-12 h-12 rounded-base flex items-center justify-center transition-all ${urlInput.trim() ? 'bg-primary-500 text-white shadow-lg hover:bg-primary-600 active:scale-95' : 'bg-white text-neutral-200 border border-neutral-100'}`}
                   >
                     <Plus size={24} />
                   </button>
                 </div>
               </div>
               <div className="flex gap-4 px-2">
-                <button onClick={() => setActiveModal('history')} className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-100 rounded-xl text-xs font-medium text-gray-400 hover:text-primary-500 hover:border-primary-500/15 transition-all shadow-sm"><History size={14} /> 从产品库选择历史产品</button>
-                <button onClick={() => setActiveModal('shopify')} className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-100 rounded-xl text-xs font-medium text-gray-400 hover:text-primary-500 hover:border-primary-500/15 transition-all shadow-sm"><ShoppingBag size={14} /> 从 Shopify 选择产品</button>
+                <button onClick={() => setActiveModal('history')} className="flex items-center gap-2 px-4 py-2 bg-white border border-neutral-100 rounded-xl text-xs font-medium text-neutral-400 hover:text-primary-500 hover:border-primary-500/15 transition-all shadow-sm"><History size={14} /> 从产品库选择历史产品</button>
+                <button onClick={() => setActiveModal('shopify')} className="flex items-center gap-2 px-4 py-2 bg-white border border-neutral-100 rounded-xl text-xs font-medium text-neutral-400 hover:text-primary-500 hover:border-primary-500/15 transition-all shadow-sm"><ShoppingBag size={14} /> 从 Shopify 选择产品</button>
               </div>
             </div>
           ) : campaignType === 'APP' ? (
@@ -1470,21 +1470,21 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreativeGr
           ) : (
             <div className="space-y-8 animate-in fade-in slide-in-from-top-4">
               {!platform ? (
-                <div className="bg-white border-2 border-dashed border-gray-200 rounded-xl p-12 flex flex-col items-center text-center space-y-4">
+                <div className="bg-white border-2 border-dashed border-neutral-200 rounded-xl p-12 flex flex-col items-center text-center space-y-4">
                   <div className="w-16 h-16 bg-amber-50 text-amber-500 rounded-base flex items-center justify-center shadow-sm"><AlertCircle size={32} /></div>
                   <div className="max-w-md space-y-2">
-                    <h4 className="text-lg font-semibold text-gray-900">请先在顶部选择投放渠道</h4>
-                    <p className="text-xs text-gray-400 font-bold leading-relaxed">投放目录广告需先在『投放目标与渠道』中选择 Meta 或 TikTok。</p>
+                    <h4 className="text-lg font-semibold text-neutral-900">请先在顶部选择投放渠道</h4>
+                    <p className="text-xs text-neutral-400 font-bold leading-relaxed">投放目录广告需先在『投放目标与渠道』中选择 Meta 或 TikTok。</p>
                   </div>
                 </div>
               ) : !authStatus[platform.id] ? (
-                <div className="bg-white border-2 border-dashed border-gray-200 rounded-xl p-12 flex flex-col items-center text-center space-y-6">
-                  <div className={`w-16 h-16 rounded-base flex items-center justify-center shadow-sm ${platform.id === 'meta' ? 'bg-blue-50 text-blue-600' : 'bg-gray-900 text-white'}`}>
+                <div className="bg-white border-2 border-dashed border-neutral-200 rounded-xl p-12 flex flex-col items-center text-center space-y-6">
+                  <div className={`w-16 h-16 rounded-base flex items-center justify-center shadow-sm ${platform.id === 'meta' ? 'bg-blue-50 text-blue-600' : 'bg-neutral-900 text-white'}`}>
                     {platform.id === 'meta' ? <Facebook size={32} /> : <Smartphone size={32} />}
                   </div>
                   <div className="max-w-md space-y-2">
-                    <h4 className="text-lg font-semibold text-gray-900">投放目录广告需先授权 {platform.name} {platform.id === 'meta' ? 'feeds' : 'Ads'}</h4>
-                    <p className="text-xs text-gray-400 font-bold leading-relaxed">我们需要访问您的 {platform.name} 广告账户以获取目录（Catalog）及其关联的产品系列（Product Sets）数据。</p>
+                    <h4 className="text-lg font-semibold text-neutral-900">投放目录广告需先授权 {platform.name} {platform.id === 'meta' ? 'feeds' : 'Ads'}</h4>
+                    <p className="text-xs text-neutral-400 font-bold leading-relaxed">我们需要访问您的 {platform.name} 广告账户以获取目录（Catalog）及其关联的产品系列（Product Sets）数据。</p>
                   </div>
                   <button onClick={() => handleAuthorize(platform.id)} disabled={isAuthLoading} className="px-12 py-4 bg-primary-500 text-white rounded-full font-semibold hover:bg-primary-600 transition-all shadow-xl flex items-center gap-3">
                     {isAuthLoading ? <Loader2 size={20} className="animate-spin" /> : (platform.id === 'meta' ? <Facebook size={20} /> : <Smartphone size={20} />)}
@@ -1496,8 +1496,8 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreativeGr
                   <div className="flex items-center gap-6">
                     <div className="w-14 h-14 bg-white rounded-base flex items-center justify-center text-primary-500 shadow-sm"><RefreshCw size={28} className="animate-spin-slow" /></div>
                     <div>
-                      <h4 className="text-base font-semibold text-gray-900">{platform.name} 已授权，请选择关联广告账户</h4>
-                      <p className="text-xs text-gray-400 font-bold mt-1">Found 2 available accounts</p>
+                      <h4 className="text-base font-semibold text-neutral-900">{platform.name} 已授权，请选择关联广告账户</h4>
+                      <p className="text-xs text-neutral-400 font-bold mt-1">Found 2 available accounts</p>
                     </div>
                   </div>
                   <button onClick={() => setActiveModal('select_account')} className="px-8 py-4 bg-primary-500 text-white rounded-xl font-semibold hover:bg-primary-600 transition-all shadow-lg shadow-primary-500/10">选择广告账户</button>
@@ -1507,8 +1507,8 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreativeGr
                   <div className="flex items-center gap-3 mb-4">
                     <div className="w-10 h-10 rounded-xl bg-primary-50 text-primary-600 flex items-center justify-center"><Database size={20} strokeWidth={2.2} /></div>
                     <div>
-                      <h4 className="text-base font-semibold text-gray-900">目录与商品系列组合</h4>
-                      <p className="text-xs text-gray-500 mt-0.5">添加多组组合：每个目录将生成 1 个 Campaign，每个商品系列生成 1 个 AdSet。同一目录仅可选 1 次。</p>
+                      <h4 className="text-base font-semibold text-neutral-900">目录与商品系列组合</h4>
+                      <p className="text-xs text-neutral-500 mt-0.5">添加多组组合：每个目录将生成 1 个 Campaign，每个商品系列生成 1 个 AdSet。同一目录仅可选 1 次。</p>
                     </div>
                   </div>
                   <CatalogCombosField
@@ -1524,22 +1524,22 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreativeGr
             </div>
           )}
           {selectedProducts.length > 0 && campaignType !== 'CATALOG' && (!analysisFinished && !isAnalyzing) && (
-            <div className="flex flex-col items-center pt-8 border-t border-gray-50 space-y-10 animate-in fade-in slide-in-from-bottom-6">
+            <div className="flex flex-col items-center pt-8 border-t border-neutral-50 space-y-10 animate-in fade-in slide-in-from-bottom-6">
               <div className="w-full flex flex-col items-center space-y-8">
                 <div className="w-full max-w-4xl space-y-4">
                   <div className="flex items-center justify-between px-6">
-                    <h5 className="text-xs font-semibold text-gray-400 flex items-center gap-2"><Layers size={14} className="text-primary-500/70" /> {(analysisFinished || isAnalyzing) ? '产品清单' : '待解析产品清单'} ({selectedProducts.length})</h5>
-                    <p className="text-xs text-gray-400 font-bold">{(analysisFinished || isAnalyzing) ? 'Add more products below' : 'Ready for agent deep scan'}</p>
+                    <h5 className="text-xs font-semibold text-neutral-400 flex items-center gap-2"><Layers size={14} className="text-primary-500/70" /> {(analysisFinished || isAnalyzing) ? '产品清单' : '待解析产品清单'} ({selectedProducts.length})</h5>
+                    <p className="text-xs text-neutral-400 font-bold">{(analysisFinished || isAnalyzing) ? 'Add more products below' : 'Ready for agent deep scan'}</p>
                   </div>
                   <div className="w-full space-y-3 px-2">
                     {selectedProducts.map((p) => (
-                      <div key={p.id} className="group relative flex items-center justify-between bg-white border border-gray-100 rounded-base p-4 shadow-adsgo-card hover:shadow-md hover:border-primary-500/15 transition-all">
+                      <div key={p.id} className="group relative flex items-center justify-between bg-white border border-neutral-100 rounded-base p-4 shadow-adsgo-card hover:shadow-md hover:border-primary-500/15 transition-all">
                         <div className="flex items-center gap-4">
-                          <div className="w-12 h-12 rounded-xl overflow-hidden border border-gray-100 shrink-0 relative bg-gray-50 group-hover:bg-white transition-colors">
+                          <div className="w-12 h-12 rounded-xl overflow-hidden border border-neutral-100 shrink-0 relative bg-neutral-50 group-hover:bg-white transition-colors">
                             {p.imageUrl ? (
                               <img src={p.imageUrl} className="w-full h-full object-cover" />
                             ) : (
-                              <div className="w-full h-full flex flex-col items-center justify-center bg-gray-50 text-gray-300 gap-1 border border-gray-100 rounded-xl relative overflow-hidden">
+                              <div className="w-full h-full flex flex-col items-center justify-center bg-neutral-50 text-neutral-300 gap-1 border border-neutral-100 rounded-xl relative overflow-hidden">
                                 <div className="absolute inset-0 bg-primary-50/30" />
                                 <div className="relative">
                                   <ImageIcon size={18} />
@@ -1547,19 +1547,19 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreativeGr
                                     <Link2 size={8} className="text-primary-500" />
                                   </div>
                                 </div>
-                                <span className="text-xs font-medium text-gray-400 uppercase relative z-10">{(analysisFinished || isAnalyzing) ? 'Analyzed' : 'Waiting...'}</span>
+                                <span className="text-xs font-medium text-neutral-400 uppercase relative z-10">{(analysisFinished || isAnalyzing) ? 'Analyzed' : 'Waiting...'}</span>
                               </div>
                             )}
                           </div>
                           <div className="min-w-0">
-                            <p className="text-sm font-medium text-gray-800 truncate max-w-xs">{p.name || '未命名产品'}</p>
+                            <p className="text-sm font-medium text-neutral-800 truncate max-w-xs">{p.name || '未命名产品'}</p>
                             <div className="flex items-center gap-1.5 mt-1 opacity-60">
-                              <Link2 size={12} className="shrink-0 text-gray-400" />
-                              <p className="text-xs font-bold text-gray-400 truncate max-w-xs">{p.url}</p>
+                              <Link2 size={12} className="shrink-0 text-neutral-400" />
+                              <p className="text-xs font-bold text-neutral-400 truncate max-w-xs">{p.url}</p>
                             </div>
                           </div>
                         </div>
-                        <button onClick={() => removeProduct(p.id)} className="p-3 text-gray-300 hover:text-rose-500 transition-colors rounded-xl hover:bg-rose-50">
+                        <button onClick={() => removeProduct(p.id)} className="p-3 text-neutral-300 hover:text-rose-500 transition-colors rounded-xl hover:bg-rose-50">
                           <Trash2 size={18} />
                         </button>
                       </div>
@@ -1582,37 +1582,37 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreativeGr
                 )}
               </div>
               {!analysisFinished && !isAnalyzing && (
-                <p className="text-xs text-gray-400 font-bold">Next-gen media planning system</p>
+                <p className="text-xs text-neutral-400 font-bold">Next-gen media planning system</p>
               )}
             </div>
           )}
           {!analysisFinished && !isAnalyzing && campaignType === 'CATALOG' && catalogCombos.length > 0 && catalogCombos.every(c => c.catalog_id && c.product_set_ids?.length > 0) && (
-            <div className="flex flex-col items-center pt-8 border-t border-gray-50 space-y-10 animate-in fade-in slide-in-from-bottom-6">
+            <div className="flex flex-col items-center pt-8 border-t border-neutral-50 space-y-10 animate-in fade-in slide-in-from-bottom-6">
               <button onClick={() => onAnalysisComplete({})} className="h-24 px-16 bg-primary-500 text-white rounded-section text-lg font-semibold flex items-center gap-6 hover:bg-primary-600 transition-all shadow-[0_20px_50px_rgba(0,0,0,0.2)] hover:scale-105 active:scale-95 group">
                 <Box size={32} className="group-hover:scale-110 transition-transform" />
                 配置 {catalogCombos.length} 个目录组合（共 {catalogCombos.reduce((n, c) => n + (c.product_set_ids?.length || 0), 0)} 个 AdSet）的 feeds 广告结构
                 <ChevronRight size={32} />
               </button>
-              <p className="text-xs text-gray-400 font-bold">Next-gen media planning system</p>
+              <p className="text-xs text-neutral-400 font-bold">Next-gen media planning system</p>
             </div>
           )}
         </div>
       </div>
       {campaignType !== 'CATALOG' && (analysisFinished || isAnalyzing) && (
         <section className="animate-in fade-in duration-700">
-          <div className="bg-gray-50/80 border border-gray-200/60 rounded-section overflow-hidden shadow-inner">
-            <div className="p-8 md:p-10 bg-white border-b border-gray-200 space-y-8">
+          <div className="bg-neutral-50/80 border border-neutral-200/60 rounded-section overflow-hidden shadow-inner">
+            <div className="p-8 md:p-10 bg-white border-b border-neutral-200 space-y-8">
               <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                 <div>
                   <div className="flex items-center gap-3 mb-2">
                     <div className="w-10 h-10 bg-primary-500 text-white rounded-base flex items-center justify-center shadow-lg shadow-primary-500/10"><Zap size={20} /></div>
-                    <h3 className="text-xl font-semibold text-gray-900">智能素材生产工作台</h3>
+                    <h3 className="text-xl font-semibold text-neutral-900">智能素材生产工作台</h3>
                   </div>
-                  <p className="text-xs text-gray-400 font-bold">Orchestrate creative production at scale</p>
+                  <p className="text-xs text-neutral-400 font-bold">Orchestrate creative production at scale</p>
                 </div>
                 {allReady && (
-                  <div className="flex items-center gap-4 bg-gray-50 p-2 rounded-base border border-gray-100">
-                    <button onClick={() => setActiveModal('batch_match')} className="flex items-center gap-2.5 px-6 py-3.5 bg-white border border-gray-200 rounded-xl text-xs font-medium text-gray-700 hover:border-primary-500 hover:text-primary-500 transition-all shadow-sm group">
+                  <div className="flex items-center gap-4 bg-neutral-50 p-2 rounded-base border border-neutral-100">
+                    <button onClick={() => setActiveModal('batch_match')} className="flex items-center gap-2.5 px-6 py-3.5 bg-white border border-neutral-200 rounded-xl text-xs font-medium text-neutral-700 hover:border-primary-500 hover:text-primary-500 transition-all shadow-sm group">
                       <Database size={16} className="group-hover:scale-110 transition-transform" /> 批量匹配素材库
                     </button>
                     <button onClick={() => setActiveModal('batch_aigc')} className="flex items-center gap-2.5 px-6 py-3.5 bg-primary-500 text-white rounded-xl text-xs font-medium hover:bg-primary-600 transition-all shadow-lg shadow-primary-500/15 group">
@@ -1633,25 +1633,25 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreativeGr
 
                 return (
                   <div key={p.id} className="space-y-3">
-                    <div className={`bg-white border rounded-section p-4 md:p-6 transition-all group ${totalCreatives === 0 && totalGenerating === 0 && showAnalysisResult ? 'border-amber-100 ring-2 ring-amber-500/5' : 'border-gray-100'}`}>
+                    <div className={`bg-white border rounded-section p-4 md:p-6 transition-all group ${totalCreatives === 0 && totalGenerating === 0 && showAnalysisResult ? 'border-amber-100 ring-2 ring-amber-500/5' : 'border-neutral-100'}`}>
                       {/* Product header row */}
                       <div className="flex items-center gap-4 mb-4">
-                        <div className="w-12 h-12 rounded-xl overflow-hidden border border-gray-100 shrink-0 shadow-sm bg-gray-50">
+                        <div className="w-12 h-12 rounded-xl overflow-hidden border border-neutral-100 shrink-0 shadow-sm bg-neutral-50">
                           {p.imageUrl ? (
                             <img src={p.imageUrl} className="w-full h-full object-cover" />
                           ) : (
-                            <div className="w-full h-full flex flex-col items-center justify-center bg-gray-50 text-gray-300 gap-1">
+                            <div className="w-full h-full flex flex-col items-center justify-center bg-neutral-50 text-neutral-300 gap-1">
                               <ImageIcon size={18} />
-                              <span className="text-[9px] font-medium text-gray-300 uppercase">获取中</span>
+                              <span className="text-[9px] font-medium text-neutral-300 uppercase">获取中</span>
                             </div>
                           )}
                         </div>
                         <div className="min-w-0 flex-1">
-                          <h4 className="text-sm font-medium text-gray-800 truncate">{p.name}</h4>
+                          <h4 className="text-sm font-medium text-neutral-800 truncate">{p.name}</h4>
                           {p.url && (
                             <div className="flex items-center gap-1 mt-0.5 max-w-[280px]">
-                              <Link2 size={9} className="text-gray-300 shrink-0" />
-                              <span className="text-[10px] text-gray-300 font-medium truncate">{p.url}</span>
+                              <Link2 size={9} className="text-neutral-300 shrink-0" />
+                              <span className="text-[10px] text-neutral-300 font-medium truncate">{p.url}</span>
                             </div>
                           )}
                           {(showAnalysisResult || (isMultiMode && (analysisFinished || isAnalyzing))) && (
@@ -1662,7 +1662,7 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreativeGr
                                   <Loader2 size={10} className="animate-spin" /> AI 分析产品中
                                 </button>
                               ) : (
-                                <button onClick={() => setShowReportFor(p.id)} className="text-xs font-medium text-gray-400 underline hover:text-primary-500">分析报告</button>
+                                <button onClick={() => setShowReportFor(p.id)} className="text-xs font-medium text-neutral-400 underline hover:text-primary-500">分析报告</button>
                               )}
                             </div>
                           )}
@@ -1688,8 +1688,8 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreativeGr
                             title={selectedProducts.length <= 1 ? '至少保留 1 个产品' : '删除该产品'}
                             className={`shrink-0 p-3 transition-colors rounded-xl ${
                               selectedProducts.length <= 1
-                                ? 'text-gray-200 cursor-not-allowed'
-                                : 'text-gray-300 hover:text-rose-500 hover:bg-rose-50'
+                                ? 'text-neutral-200 cursor-not-allowed'
+                                : 'text-neutral-300 hover:text-rose-500 hover:bg-rose-50'
                             }`}
                           >
                             <Trash2 size={18} />
@@ -1719,7 +1719,7 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreativeGr
                               className={`border rounded-inner p-4 transition-colors ${
                                 isDragOver
                                   ? 'bg-primary-50/30 border-primary-500 border-dashed'
-                                  : 'bg-gray-50/50 border-gray-100'
+                                  : 'bg-neutral-50/50 border-neutral-100'
                               }`}
                             >
                               <div className="flex items-center justify-between mb-3 gap-2">
@@ -1739,19 +1739,19 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreativeGr
                                         if (e.key === 'Enter') { e.currentTarget.blur(); }
                                         if (e.key === 'Escape') { setEditingGroup(null); }
                                       }}
-                                      className="flex-1 px-2 py-1 text-sm font-semibold text-gray-900 bg-white border border-primary-500 rounded-base outline-none focus:shadow-primary-focus"
+                                      className="flex-1 px-2 py-1 text-sm font-semibold text-neutral-900 bg-white border border-primary-500 rounded-base outline-none focus:shadow-primary-focus"
                                     />
                                   ) : (
                                     <button
                                       onClick={() => setEditingGroup({ productId: p.id, groupId: group.id })}
-                                      className="flex items-center gap-1.5 text-sm font-semibold text-gray-900 hover:text-primary-500 transition-colors group/name"
+                                      className="flex items-center gap-1.5 text-sm font-semibold text-neutral-900 hover:text-primary-500 transition-colors group/name"
                                       title="点击重命名"
                                     >
                                       <span className="truncate max-w-[200px]">{group.name}</span>
-                                      <Edit2 size={11} className="opacity-0 group-hover/name:opacity-100 transition-opacity text-gray-400" />
+                                      <Edit2 size={11} className="opacity-0 group-hover/name:opacity-100 transition-opacity text-neutral-400" />
                                     </button>
                                   )}
-                                  <span className="text-xs font-medium text-gray-400 shrink-0">· {groupAds.length} 素材</span>
+                                  <span className="text-xs font-medium text-neutral-400 shrink-0">· {groupAds.length} 素材</span>
                                   {(() => {
                                     const copy = creativeGroupCopyMap?.[p.id]?.[group.id] || {};
                                     const filled = Boolean(copy.title || copy.body || copy.link_url || copy.call_to_action_type);
@@ -1772,7 +1772,7 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreativeGr
                                   {groups.length > 1 && (
                                     <button
                                       onClick={() => onRemoveGroup(p.id, group.id)}
-                                      className="p-1.5 text-gray-300 hover:text-rose-500 hover:bg-rose-50 rounded-base transition-colors"
+                                      className="p-1.5 text-neutral-300 hover:text-rose-500 hover:bg-rose-50 rounded-base transition-colors"
                                       title="删除该素材组"
                                     >
                                       <Trash2 size={14} />
@@ -1833,7 +1833,7 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreativeGr
                                   return (
                                     <div
                                       key={c.id}
-                                      className="relative w-14 h-20 rounded-lg overflow-hidden shrink-0 border border-gray-100 group/item shadow-sm bg-gray-100 hover:ring-2 hover:ring-primary-500/40 transition-all"
+                                      className="relative w-14 h-20 rounded-lg overflow-hidden shrink-0 border border-neutral-100 group/item shadow-sm bg-neutral-100 hover:ring-2 hover:ring-primary-500/40 transition-all"
                                       style={isFlashing ? { boxShadow: '0 0 0 3px #f43f5e, 0 0 12px rgba(244,63,94,0.6)' } : undefined}
                                     >
                                       {c.mediaType === 'video' ? (
@@ -1868,8 +1868,8 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreativeGr
                                     </div>
                                   );
                                 })}
-                                <div className="sticky right-0 flex gap-2 shrink-0 bg-gray-50/0 pl-2" style={{ zIndex: 6 }}>
-                                  <button onClick={() => { setModalContext(p.id); setModalGroupId(group.id); setActiveModal('creative_lib'); }} className="w-14 h-20 rounded-lg border-2 border-dashed border-gray-100 flex flex-col items-center justify-center text-gray-300 hover:border-primary-500 hover:text-primary-500/70 hover:bg-primary-50 transition-all gap-1" title="从素材库选择">
+                                <div className="sticky right-0 flex gap-2 shrink-0 bg-neutral-50/0 pl-2" style={{ zIndex: 6 }}>
+                                  <button onClick={() => { setModalContext(p.id); setModalGroupId(group.id); setActiveModal('creative_lib'); }} className="w-14 h-20 rounded-lg border-2 border-dashed border-neutral-100 flex flex-col items-center justify-center text-neutral-300 hover:border-primary-500 hover:text-primary-500/70 hover:bg-primary-50 transition-all gap-1" title="从素材库选择">
                                     <Database size={16} />
                                     <span className="text-xs font-medium">库</span>
                                   </button>
@@ -1877,7 +1877,7 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreativeGr
                                     <Sparkles size={16} />
                                     <span className="text-xs font-medium">AI</span>
                                   </button>
-                                  <button onClick={() => handleUploadForGroup(p.id, group.id)} className="w-14 h-20 rounded-lg border-2 border-dashed border-gray-100 flex flex-col items-center justify-center text-gray-300 hover:border-gray-400 hover:bg-gray-50 transition-all gap-1" title="本地上传">
+                                  <button onClick={() => handleUploadForGroup(p.id, group.id)} className="w-14 h-20 rounded-lg border-2 border-dashed border-neutral-100 flex flex-col items-center justify-center text-neutral-300 hover:border-neutral-400 hover:bg-neutral-50 transition-all gap-1" title="本地上传">
                                     <Upload size={16} />
                                     <span className="text-xs font-medium">传</span>
                                   </button>
@@ -1889,7 +1889,7 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreativeGr
                       </div>
                     </div>
                     {isAnalyzing && isExpanded && !p.isFromHistory && (
-                      <div className="bg-white rounded-xl p-10 border border-gray-100 mx-4 animate-in slide-in-from-top-2 shadow-xl overflow-hidden">
+                      <div className="bg-white rounded-xl p-10 border border-neutral-100 mx-4 animate-in slide-in-from-top-2 shadow-xl overflow-hidden">
                         <div ref={analysisContainerRef} className="h-[500px] overflow-y-auto custom-scrollbar pr-4 space-y-6">
                           {ANALYSIS_STEPS.slice(0, currentStep + 1).map((step, stepIdx) => {
                             let listIdx = 0;
@@ -1900,8 +1900,8 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreativeGr
                             return (
                               <div key={stepIdx} className="animate-in fade-in slide-in-from-bottom-2 duration-500">
                                 {step.type === 'system' && (
-                                  <div className="pb-4 border-b border-gray-200 mb-4">
-                                    <p className="text-sm font-medium text-gray-600">
+                                  <div className="pb-4 border-b border-neutral-200 mb-4">
+                                    <p className="text-sm font-medium text-neutral-600">
                                       {step.text.split('https://www.cupshe.com').map((part, i, arr) => (
                                         <React.Fragment key={i}>
                                           {part}
@@ -1912,57 +1912,57 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreativeGr
                                   </div>
                                 )}
                                 {step.type === 'action_header' && (
-                                  <h4 className="text-lg font-semibold text-gray-900 mb-2">{step.text}</h4>
+                                  <h4 className="text-lg font-semibold text-neutral-900 mb-2">{step.text}</h4>
                                 )}
                                 {step.type === 'action' && (
-                                  <div className="flex items-start gap-3 pl-4 border-l-2 border-gray-50 mb-2">
-                                    <p className="text-sm font-medium text-gray-400">{step.text}</p>
+                                  <div className="flex items-start gap-3 pl-4 border-l-2 border-neutral-50 mb-2">
+                                    <p className="text-sm font-medium text-neutral-400">{step.text}</p>
                                   </div>
                                 )}
                                 {step.type === 'image' && (
                                   <div className="pl-4 mb-6">
-                                    <div className="rounded-section border border-gray-200 overflow-hidden shadow-xl max-w-2xl transition-all hover:scale-[1.01]">
+                                    <div className="rounded-section border border-neutral-200 overflow-hidden shadow-xl max-w-2xl transition-all hover:scale-[1.01]">
                                       <img src={step.url} alt="Captured UI" className="w-full h-auto" />
                                     </div>
                                   </div>
                                 )}
                                 {step.type === 'key_value' && (
                                   <p className="text-sm leading-relaxed mb-2">
-                                    <span className="font-semibold text-gray-900">{step.text}</span>
-                                    <span className="text-gray-600 ml-1.5">{step.value}</span>
+                                    <span className="font-semibold text-neutral-900">{step.text}</span>
+                                    <span className="text-neutral-600 ml-1.5">{step.value}</span>
                                   </p>
                                 )}
                                 {step.type === 'header' && (
-                                  <p className="text-sm font-medium text-gray-900 pt-2 mb-2">{step.text}</p>
+                                  <p className="text-sm font-medium text-neutral-900 pt-2 mb-2">{step.text}</p>
                                 )}
                                 {step.type === 'bullet' && (
                                   <div className="flex items-start gap-3 pl-4 mb-1.5">
-                                    <span className="text-gray-900 mt-1.5 text-xs font-medium">•</span>
-                                    <p className="text-sm font-medium text-gray-600 leading-relaxed">
+                                    <span className="text-neutral-900 mt-1.5 text-xs font-medium">•</span>
+                                    <p className="text-sm font-medium text-neutral-600 leading-relaxed">
                                       {step.text.split('-').map((part, i) => (
-                                        i === 0 ? <span key={i} className="font-semibold text-gray-900">{part}</span> : <span key={i}>- {part}</span>
+                                        i === 0 ? <span key={i} className="font-semibold text-neutral-900">{part}</span> : <span key={i}>- {part}</span>
                                       ))}
                                     </p>
                                   </div>
                                 )}
                                 {step.type === 'ordered' && (
                                   <div className="flex items-start gap-3 pl-4 mb-1.5">
-                                    <span className="text-gray-900 text-sm font-medium">{listIdx}.</span>
-                                    <p className="text-sm font-medium text-gray-600 leading-relaxed">
+                                    <span className="text-neutral-900 text-sm font-medium">{listIdx}.</span>
+                                    <p className="text-sm font-medium text-neutral-600 leading-relaxed">
                                       {step.text.split('-').map((part, i) => (
-                                        i === 0 ? <span key={i} className="font-semibold text-gray-900">{part}</span> : <span key={i}>- {part}</span>
+                                        i === 0 ? <span key={i} className="font-semibold text-neutral-900">{part}</span> : <span key={i}>- {part}</span>
                                       ))}
                                     </p>
                                   </div>
                                 )}
                                 {step.type === 'source' && (
-                                  <div className="mt-6 pt-6 border-t border-gray-200">
-                                    <p className="text-sm font-medium text-gray-600 leading-relaxed">{step.text}</p>
+                                  <div className="mt-6 pt-6 border-t border-neutral-200">
+                                    <p className="text-sm font-medium text-neutral-600 leading-relaxed">{step.text}</p>
                                   </div>
                                 )}
                                 {step.type === 'footer' && (
                                   <div className="mt-4">
-                                    <p className="text-sm font-medium text-gray-600 italic">{step.text}</p>
+                                    <p className="text-sm font-medium text-neutral-600 italic">{step.text}</p>
                                   </div>
                                 )}
                               </div>
@@ -1999,11 +1999,11 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreativeGr
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 bg-primary-500 rounded-base flex items-center justify-center text-white shadow-lg"><Database size={24} /></div>
                 <div>
-                  <h4 className="text-xl font-semibold text-gray-900">批量匹配素材库</h4>
-                  <p className="text-gray-400 text-xs font-bold mt-1">智能分析并关联现有营销资产</p>
+                  <h4 className="text-xl font-semibold text-neutral-900">批量匹配素材库</h4>
+                  <p className="text-neutral-400 text-xs font-bold mt-1">智能分析并关联现有营销资产</p>
                 </div>
               </div>
-              <button onClick={() => setActiveModal(null)} className="p-2 hover:bg-gray-50 rounded-full text-gray-300"><X size={24} /></button>
+              <button onClick={() => setActiveModal(null)} className="p-2 hover:bg-neutral-50 rounded-full text-neutral-300"><X size={24} /></button>
             </div>
             <div className="space-y-4">
               {[{ id: '24h', label: '智能匹配 24h 内上传素材', icon: <Sparkles size={16} /> }, { id: 'unused', label: '智能匹配历史从未投放过素材', icon: <FileText size={16} /> }, { id: 'top7d', label: '智能匹配近 7 天 TOP 素材', icon: <Flame size={16} /> }].map(opt => {
@@ -2013,10 +2013,10 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreativeGr
                     const next = new Set(selectedMatchOptions);
                     if (next.has(opt.id)) next.delete(opt.id); else next.add(opt.id);
                     setSelectedMatchOptions(next);
-                  }} className={`w-full p-6 rounded-base border-2 flex items-center justify-between transition-all group ${isSel ? 'border-primary-500 bg-primary-50 shadow-sm' : 'border-gray-100 bg-white hover:border-gray-200'}`}>
+                  }} className={`w-full p-6 rounded-base border-2 flex items-center justify-between transition-all group ${isSel ? 'border-primary-500 bg-primary-50 shadow-sm' : 'border-neutral-100 bg-white hover:border-neutral-200'}`}>
                     <div className="flex items-center gap-4">
-                      <div className={`p-2 rounded-lg ${isSel ? 'bg-primary-500 text-white' : 'bg-gray-50 text-gray-400'}`}>{opt.icon}</div>
-                      <span className={`text-sm font-medium ${isSel ? 'text-primary-700' : 'text-gray-600'}`}>{opt.label}</span>
+                      <div className={`p-2 rounded-lg ${isSel ? 'bg-primary-500 text-white' : 'bg-neutral-50 text-neutral-400'}`}>{opt.icon}</div>
+                      <span className={`text-sm font-medium ${isSel ? 'text-primary-700' : 'text-neutral-600'}`}>{opt.label}</span>
                     </div>
                     {isSel && <Check size={20} className="text-primary-500" />}
                   </button>
@@ -2034,31 +2034,31 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreativeGr
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 bg-primary-500 rounded-base flex items-center justify-center text-white shadow-lg"><Sparkles size={24} /></div>
                 <div>
-                  <h4 className="text-xl font-semibold text-gray-900">批量 AIGC 生成素材</h4>
-                  <p className="text-gray-400 text-xs font-bold mt-1">为每个所选商品并行生成差异化创意</p>
+                  <h4 className="text-xl font-semibold text-neutral-900">批量 AIGC 生成素材</h4>
+                  <p className="text-neutral-400 text-xs font-bold mt-1">为每个所选商品并行生成差异化创意</p>
                 </div>
               </div>
-              <button onClick={() => setActiveModal(null)} className="p-2 hover:bg-gray-50 rounded-full text-gray-300"><X size={24} /></button>
+              <button onClick={() => setActiveModal(null)} className="p-2 hover:bg-neutral-50 rounded-full text-neutral-300"><X size={24} /></button>
             </div>
             <div className="space-y-6">
               <div className="space-y-3">
-                <label className="text-xs font-semibold text-gray-400">每个商品生成的素材数量</label>
+                <label className="text-xs font-semibold text-neutral-400">每个商品生成的素材数量</label>
                 <div className="grid grid-cols-5 gap-3">
                   {[1, 2, 3, 4, 5].map(n => (
-                    <button key={n} onClick={() => setBatchAIGCCount(n)} className={`h-12 rounded-xl font-semibold text-sm border-2 transition-all ${batchAIGCCount === n ? 'bg-primary-500 border-primary-500 text-white shadow-lg shadow-primary-500/10' : 'bg-white border-gray-100 text-gray-400 hover:border-gray-200'}`}>{n}</button>
+                    <button key={n} onClick={() => setBatchAIGCCount(n)} className={`h-12 rounded-xl font-semibold text-sm border-2 transition-all ${batchAIGCCount === n ? 'bg-primary-500 border-primary-500 text-white shadow-lg shadow-primary-500/10' : 'bg-white border-neutral-100 text-neutral-400 hover:border-neutral-200'}`}>{n}</button>
                   ))}
                 </div>
               </div>
               <div className="space-y-3">
-                <label className="text-xs font-semibold text-gray-400">选择执行商品 ({selectedProducts.length - batchAIGCExclusions.size})</label>
+                <label className="text-xs font-semibold text-neutral-400">选择执行商品 ({selectedProducts.length - batchAIGCExclusions.size})</label>
                 <div className="max-h-60 overflow-y-auto space-y-2 no-scrollbar pr-2">
                   {selectedProducts.map(p => (
-                    <div key={p.id} onClick={() => { const next = new Set(batchAIGCExclusions); if (next.has(p.id)) next.delete(p.id); else next.add(p.id); setBatchAIGCExclusions(next); }} className={`flex items-center justify-between p-4 rounded-xl border-2 cursor-pointer transition-all ${!batchAIGCExclusions.has(p.id) ? 'border-purple-100 bg-white' : 'border-gray-100 opacity-50 grayscale'}`}>
+                    <div key={p.id} onClick={() => { const next = new Set(batchAIGCExclusions); if (next.has(p.id)) next.delete(p.id); else next.add(p.id); setBatchAIGCExclusions(next); }} className={`flex items-center justify-between p-4 rounded-xl border-2 cursor-pointer transition-all ${!batchAIGCExclusions.has(p.id) ? 'border-purple-100 bg-white' : 'border-neutral-100 opacity-50 grayscale'}`}>
                       <div className="flex items-center gap-3 min-w-0">
                         <img src={p.imageUrl} className="w-8 h-8 rounded-lg object-cover" />
-                        <p className="text-xs font-bold text-gray-800 truncate">{p.name}</p>
+                        <p className="text-xs font-bold text-neutral-800 truncate">{p.name}</p>
                       </div>
-                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${!batchAIGCExclusions.has(p.id) ? 'bg-primary-500 border-primary-500' : 'bg-transparent border-gray-200'}`}>
+                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${!batchAIGCExclusions.has(p.id) ? 'bg-primary-500 border-primary-500' : 'bg-transparent border-neutral-200'}`}>
                         {!batchAIGCExclusions.has(p.id) && <Check size={12} className="text-white" />}
                       </div>
                     </div>
@@ -2079,26 +2079,26 @@ const ProductSelector = ({ selectedProducts, onSelectProducts, productCreativeGr
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 bg-primary-500 rounded-base flex items-center justify-center text-white shadow-lg"><Briefcase size={24} /></div>
                 <div>
-                  <h4 className="text-xl font-semibold text-gray-900">选择 {platform?.name || 'Meta'} 广告账户</h4>
-                  <p className="text-gray-400 text-xs font-bold mt-1">关联广告账户并同步投放权限</p>
+                  <h4 className="text-xl font-semibold text-neutral-900">选择 {platform?.name || 'Meta'} 广告账户</h4>
+                  <p className="text-neutral-400 text-xs font-bold mt-1">关联广告账户并同步投放权限</p>
                 </div>
               </div>
-              <button onClick={() => setActiveModal(null)} className="p-2 hover:bg-gray-50 rounded-full text-gray-300"><X size={24} /></button>
+              <button onClick={() => setActiveModal(null)} className="p-2 hover:bg-neutral-50 rounded-full text-neutral-300"><X size={24} /></button>
             </div>
             <div className="space-y-3">
               {accountLoading.isLoading ? (
                 <div className="p-8 flex flex-col items-center justify-center gap-3">
                   <Loader2 size={24} className="animate-spin text-primary-500/70" />
-                  <p className="text-xs font-medium text-gray-400 animate-pulse">Loading accounts...</p>
+                  <p className="text-xs font-medium text-neutral-400 animate-pulse">Loading accounts...</p>
                 </div>
               ) : (
                 (availableAccounts.length > 0 ? availableAccounts : MOCK_ACCOUNTS).map(acc => (
-                  <button key={acc.id} onClick={() => { onSelectAccount(acc); setActiveModal(null); }} className={`w-full p-6 rounded-full border-2 flex items-center justify-between transition-all ${selectedAccount?.id === acc.id ? 'border-primary-500 bg-primary-50 shadow-lg shadow-primary-500/10' : 'border-gray-100 bg-white hover:border-gray-200'}`}>
+                  <button key={acc.id} onClick={() => { onSelectAccount(acc); setActiveModal(null); }} className={`w-full p-6 rounded-full border-2 flex items-center justify-between transition-all ${selectedAccount?.id === acc.id ? 'border-primary-500 bg-primary-50 shadow-lg shadow-primary-500/10' : 'border-neutral-100 bg-white hover:border-neutral-200'}`}>
                     <div className="flex items-center gap-4 text-left">
-                      <div className={`p-2 rounded-lg ${selectedAccount?.id === acc.id ? 'bg-primary-500 text-white' : 'bg-gray-50 text-gray-400'}`}><Briefcase size={16} /></div>
+                      <div className={`p-2 rounded-lg ${selectedAccount?.id === acc.id ? 'bg-primary-500 text-white' : 'bg-neutral-50 text-neutral-400'}`}><Briefcase size={16} /></div>
                       <div>
-                        <p className={`text-sm font-medium ${selectedAccount?.id === acc.id ? 'text-primary-700' : 'text-gray-600'}`}>{acc.name}</p>
-                        <p className="text-xs text-gray-400 font-bold">id: {acc.id}</p>
+                        <p className={`text-sm font-medium ${selectedAccount?.id === acc.id ? 'text-primary-700' : 'text-neutral-600'}`}>{acc.name}</p>
+                        <p className="text-xs text-neutral-400 font-bold">id: {acc.id}</p>
                       </div>
                     </div>
                     {selectedAccount?.id === acc.id && <Check size={20} className="text-primary-500" />}
@@ -2139,24 +2139,24 @@ const AddProductModal = ({ onClose, authStatus, handleAuthorize, isAuthLoading, 
       className="fixed inset-0 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-in fade-in duration-200"
       style={{ zIndex }}
     >
-      <div className={`bg-white rounded-section w-full shadow-xl border border-gray-100 animate-in zoom-in-95 duration-200 flex flex-col relative transition-all duration-500 ${addStep === 'setup' ? 'max-w-4xl h-[90vh]' : 'max-w-2xl min-h-[400px]'}`}>
+      <div className={`bg-white rounded-section w-full shadow-xl border border-neutral-100 animate-in zoom-in-95 duration-200 flex flex-col relative transition-all duration-500 ${addStep === 'setup' ? 'max-w-4xl h-[90vh]' : 'max-w-2xl min-h-[400px]'}`}>
         {isImportAnalyzing && (
           <div className="absolute inset-0 z-[120] bg-white rounded-section flex flex-col items-center justify-center p-10 text-center animate-in fade-in duration-300">
             <div className="w-20 h-20 rounded-section bg-primary-50 flex items-center justify-center mb-6 shadow-inner relative">
               <div className="absolute inset-0 rounded-section border-4 border-primary-500/15 border-t-primary-500 animate-spin" />
               <Loader2 className="text-primary-500 animate-spin" size={32} />
             </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-2 font-sans">Analyzing product info...</h3>
-            <p className="text-xs text-gray-400 font-medium mb-10 max-w-[320px] font-sans">We're fetching details from the URL. This might take a few moments.</p>
-            <button onClick={onClose} className="px-10 py-3.5 bg-primary-500 text-white rounded-full font-bold text-sm hover:bg-primary-600 transition-all active:scale-95 shadow-lg shadow-gray-200 font-sans">Close and analyze in background</button>
+            <h3 className="text-xl font-bold text-neutral-900 mb-2 font-sans">Analyzing product info...</h3>
+            <p className="text-xs text-neutral-400 font-medium mb-10 max-w-[320px] font-sans">We're fetching details from the URL. This might take a few moments.</p>
+            <button onClick={onClose} className="px-10 py-3.5 bg-primary-500 text-white rounded-full font-bold text-sm hover:bg-primary-600 transition-all active:scale-95 shadow-lg shadow-neutral-200 font-sans">Close and analyze in background</button>
           </div>
         )}
         <div className="p-8 pb-4 flex justify-between items-center shrink-0">
           <div className="flex items-center gap-4">
-            {addStep !== 'options' && (<button onClick={() => setAddStep('options')} className="p-2.5 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-full transition-all"><ArrowLeft size={20} /></button>)}
-            <h3 className="text-xl font-bold text-gray-900 font-sans">{addStep === 'options' ? '请选择同步产品 data 方式' : addStep === 'url' ? 'Import from URL' : addStep === 'setup' ? 'Setup your product' : addStep === 'shopify' ? 'Sync from Shopify' : addStep === 'gmc' ? 'Sync from Google GMC' : 'Sync from Meta feeds'}</h3>
+            {addStep !== 'options' && (<button onClick={() => setAddStep('options')} className="p-2.5 text-neutral-400 hover:text-neutral-600 hover:bg-neutral-50 rounded-full transition-all"><ArrowLeft size={20} /></button>)}
+            <h3 className="text-xl font-bold text-neutral-900 font-sans">{addStep === 'options' ? '请选择同步产品 data 方式' : addStep === 'url' ? 'Import from URL' : addStep === 'setup' ? 'Setup your product' : addStep === 'shopify' ? 'Sync from Shopify' : addStep === 'gmc' ? 'Sync from Google GMC' : 'Sync from Meta feeds'}</h3>
           </div>
-          <button onClick={onClose} className="p-2.5 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-full transition-all"><X size={20} /></button>
+          <button onClick={onClose} className="p-2.5 text-neutral-400 hover:text-neutral-600 hover:bg-neutral-50 rounded-full transition-all"><X size={20} /></button>
         </div>
         <div className="px-8 pb-8 flex-1 flex flex-col overflow-hidden">
           {addStep === 'options' && (
@@ -2164,20 +2164,20 @@ const AddProductModal = ({ onClose, authStatus, handleAuthorize, isAuthLoading, 
               {ADD_OPTIONS.filter(opt => ['shopify', 'meta', 'gmc'].includes(opt.id)).map((option) => {
                 const isConnected = option.id === 'shopify' ? authStatus.shopify : option.id === 'meta' ? authStatus.meta : authStatus.google;
                 return (
-                  <button key={option.id} onClick={() => setAddStep(option.id)} className="w-full group flex items-center gap-6 p-6 bg-gray-50 border border-gray-100 rounded-section hover:bg-white hover:shadow-xl hover:border-primary-500/15 transition-all text-left">
-                    <div className="w-14 h-14 rounded-base bg-white border border-gray-100 flex items-center justify-center text-gray-400 group-hover:text-primary-50 group-hover:border-primary-50 group-hover:shadow-inner transition-all overflow-hidden p-3 shrink-0">
+                  <button key={option.id} onClick={() => setAddStep(option.id)} className="w-full group flex items-center gap-6 p-6 bg-neutral-50 border border-neutral-100 rounded-section hover:bg-white hover:shadow-xl hover:border-primary-500/15 transition-all text-left">
+                    <div className="w-14 h-14 rounded-base bg-white border border-neutral-100 flex items-center justify-center text-neutral-400 group-hover:text-primary-50 group-hover:border-primary-50 group-hover:shadow-inner transition-all overflow-hidden p-3 shrink-0">
                       {option.logo ? <img src={option.logo} alt="" className="w-full h-full object-contain" /> : <option.icon size={26} />}
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-1">
-                        <h4 className="text-base font-bold text-gray-700 font-sans">{option.title}</h4>
+                        <h4 className="text-base font-bold text-neutral-700 font-sans">{option.title}</h4>
                         {isConnected && (
                           <span className="px-2 py-0.5 bg-emerald-50 text-emerald-600 text-xs font-semibold rounded-full border border-emerald-100">Connected</span>
                         )}
                       </div>
-                      <p className="text-xs font-medium text-gray-400 leading-relaxed font-sans">{option.subtitle}</p>
+                      <p className="text-xs font-medium text-neutral-400 leading-relaxed font-sans">{option.subtitle}</p>
                     </div>
-                    <ChevronRight size={20} className="text-gray-300 group-hover:text-primary-500/70 group-hover:trangray-x-1 transition-all" />
+                    <ChevronRight size={20} className="text-neutral-300 group-hover:text-primary-500/70 group-hover:trangray-x-1 transition-all" />
                   </button>
                 );
               })}
@@ -2186,19 +2186,19 @@ const AddProductModal = ({ onClose, authStatus, handleAuthorize, isAuthLoading, 
           {addStep === 'url' && (
             <div className="flex-1 flex flex-col pt-6 px-10 text-center">
               <div className="space-y-8 mb-12">
-                <h2 className="text-3xl font-bold text-gray-900 leading-tight font-sans">Paste your <span className="text-primary-500">product link</span> to get product info</h2>
+                <h2 className="text-3xl font-bold text-neutral-900 leading-tight font-sans">Paste your <span className="text-primary-500">product link</span> to get product info</h2>
                 <div className="space-y-4">
-                  <p className="text-xs font-bold text-gray-400 font-sans">AdsGo supports</p>
+                  <p className="text-xs font-bold text-neutral-400 font-sans">AdsGo supports</p>
                   <div className="flex items-center justify-center gap-4">
-                    {PLATFORM_ICONS.map(icon => (<div key={icon.id} className="w-10 h-10 rounded-full bg-white border border-gray-100 flex items-center justify-center p-2 shadow-sm hover:shadow-md hover:scale-110 transition-all cursor-default"><img src={icon.logo} alt={icon.id} className="w-full h-full object-contain" /></div>))}
-                    <div className="w-10 h-10 rounded-full bg-white border border-gray-100 flex items-center justify-center text-gray-300 font-bold text-sm">...</div>
+                    {PLATFORM_ICONS.map(icon => (<div key={icon.id} className="w-10 h-10 rounded-full bg-white border border-neutral-100 flex items-center justify-center p-2 shadow-sm hover:shadow-md hover:scale-110 transition-all cursor-default"><img src={icon.logo} alt={icon.id} className="w-full h-full object-contain" /></div>))}
+                    <div className="w-10 h-10 rounded-full bg-white border border-neutral-100 flex items-center justify-center text-neutral-300 font-bold text-sm">...</div>
                   </div>
                 </div>
               </div>
               <div className="space-y-8 max-w-[520px] mx-auto w-full flex-1 flex flex-col">
                 <div className="space-y-3">
                   <div className="relative group">
-                    <input type="text" value={productUrl} onChange={(e) => setProductUrl(e.target.value)} placeholder="e.g. amazon product link, shopify product link, etc." className={`w-full bg-gray-50 border-2 rounded-section px-8 py-6 text-sm font-medium text-gray-700 placeholder:text-gray-300 focus:outline-none transition-all duration-300 ${urlError ? 'border-rose-400 bg-rose-50/20' : 'border-gray-100 focus:bg-white focus:border-primary-500 focus:shadow-primary-focus shadow-inner'}`} />
+                    <input type="text" value={productUrl} onChange={(e) => setProductUrl(e.target.value)} placeholder="e.g. amazon product link, shopify product link, etc." className={`w-full bg-neutral-50 border-2 rounded-section px-8 py-6 text-sm font-medium text-neutral-700 placeholder:text-neutral-300 focus:outline-none transition-all duration-300 ${urlError ? 'border-rose-400 bg-rose-50/20' : 'border-neutral-100 focus:bg-white focus:border-primary-500 focus:shadow-primary-focus shadow-inner'}`} />
                     {urlError && <div className="absolute -bottom-7 left-4 flex items-center gap-1.5 text-rose-500 font-bold text-xs animate-in slide-in-from-top-1"><AlertTriangle size={12} />{urlError}</div>}
                   </div>
                 </div>
@@ -2213,14 +2213,14 @@ const AddProductModal = ({ onClose, authStatus, handleAuthorize, isAuthLoading, 
             <div className="flex-1 flex flex-col justify-center items-center text-center space-y-8 py-6">
               {!isShopifyConnected ? (
                 <>
-                  <div className="w-20 h-20 rounded-section bg-gray-50 border border-gray-100 flex items-center justify-center p-4 shadow-inner">
+                  <div className="w-20 h-20 rounded-section bg-neutral-50 border border-neutral-100 flex items-center justify-center p-4 shadow-inner">
                     <img src="https://cdn.worldvectorlogo.com/logos/shopify.svg" alt="" className="w-full h-full object-contain" />
                   </div>
                   <div className="max-w-[320px] space-y-2">
-                    <h4 className="text-lg font-bold text-gray-900 font-sans">Connect to Shopify</h4>
-                    <p className="text-xs text-gray-400 leading-relaxed font-medium font-sans">Link your Shopify store to automatically import products and keep assets in sync.</p>
+                    <h4 className="text-lg font-bold text-neutral-900 font-sans">Connect to Shopify</h4>
+                    <p className="text-xs text-neutral-400 leading-relaxed font-medium font-sans">Link your Shopify store to automatically import products and keep assets in sync.</p>
                   </div>
-                  <button onClick={() => handleAuthorize('shopify')} disabled={isAuthLoading} className="w-full max-w-[280px] bg-primary-500 text-white py-4 rounded-full font-bold text-sm hover:bg-primary-600 shadow-lg shadow-gray-200 transition-all active:scale-95 font-sans">Connect Shopify store</button>
+                  <button onClick={() => handleAuthorize('shopify')} disabled={isAuthLoading} className="w-full max-w-[280px] bg-primary-500 text-white py-4 rounded-full font-bold text-sm hover:bg-primary-600 shadow-lg shadow-neutral-200 transition-all active:scale-95 font-sans">Connect Shopify store</button>
                 </>
               ) : (
                 <>
@@ -2231,11 +2231,11 @@ const AddProductModal = ({ onClose, authStatus, handleAuthorize, isAuthLoading, 
                     <div className="absolute -top-1.5 -right-1.5 w-6 h-6 bg-green-500 border-4 border-white rounded-full flex items-center justify-center shadow-sm"><div className="w-1.5 h-1.5 bg-white rounded-full" /></div>
                   </div>
                   <div className="space-y-2">
-                    <h4 className="text-lg font-bold text-gray-900 font-sans">{shopifyStoreName}</h4>
+                    <h4 className="text-lg font-bold text-neutral-900 font-sans">{shopifyStoreName}</h4>
                     <div className="flex items-center justify-center gap-2"><span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" /><p className="text-xs text-green-600 font-bold font-sans">Connected</p></div>
                   </div>
                   <div className="w-full pt-6">
-                    <button onClick={() => { setIsShopifyConnected(false); onAuthStatusChange(p => ({ ...p, shopify: false })); }} className="px-8 py-3 bg-gray-50 border border-gray-100 rounded-full text-gray-400 hover:text-rose-500 hover:bg-rose-50 hover:border-rose-100 font-bold text-sm transition-all flex items-center gap-2 mx-auto shadow-sm font-sans"><Link2Off size={18} />Disconnect store</button>
+                    <button onClick={() => { setIsShopifyConnected(false); onAuthStatusChange(p => ({ ...p, shopify: false })); }} className="px-8 py-3 bg-neutral-50 border border-neutral-100 rounded-full text-neutral-400 hover:text-rose-500 hover:bg-rose-50 hover:border-rose-100 font-bold text-sm transition-all flex items-center gap-2 mx-auto shadow-sm font-sans"><Link2Off size={18} />Disconnect store</button>
                   </div>
                 </>
               )}
@@ -2248,18 +2248,18 @@ const AddProductModal = ({ onClose, authStatus, handleAuthorize, isAuthLoading, 
                   <div className="w-20 h-20 rounded-section bg-primary-50 flex items-center justify-center shadow-inner">
                     <Loader2 className="text-primary-500 animate-spin" size={32} />
                   </div>
-                  <p className="text-sm font-bold text-gray-900">Fetching your assets...</p>
+                  <p className="text-sm font-bold text-neutral-900">Fetching your assets...</p>
                 </div>
               ) : !syncStates[addStep].isConnected ? (
                 <>
-                  <div className="w-20 h-20 rounded-section bg-gray-50 border border-gray-100 flex items-center justify-center p-4 shadow-inner">
+                  <div className="w-20 h-20 rounded-section bg-neutral-50 border border-neutral-100 flex items-center justify-center p-4 shadow-inner">
                     <img src={addStep === 'gmc' ? 'https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://google.com&size=256' : 'https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://meta.com&size=256'} alt="" className="w-full h-full object-contain" />
                   </div>
                   <div className="max-w-[320px] space-y-2">
-                    <h4 className="text-lg font-bold text-gray-900 font-sans">{addStep === 'gmc' ? 'Google GMC' : 'Meta feeds'}</h4>
-                    <p className="text-xs text-gray-400 leading-relaxed font-medium font-sans">{addStep === 'gmc' ? 'Connect to Google Merchant Center to sync your products.' : 'Connect to Meta Commerce Manager to sync your product feeds.'}</p>
+                    <h4 className="text-lg font-bold text-neutral-900 font-sans">{addStep === 'gmc' ? 'Google GMC' : 'Meta feeds'}</h4>
+                    <p className="text-xs text-neutral-400 leading-relaxed font-medium font-sans">{addStep === 'gmc' ? 'Connect to Google Merchant Center to sync your products.' : 'Connect to Meta Commerce Manager to sync your product feeds.'}</p>
                   </div>
-                  <button onClick={() => handleSyncConnect(addStep)} className="w-full max-w-[280px] bg-primary-500 text-white py-4 rounded-full font-bold text-sm hover:bg-primary-600 shadow-lg shadow-gray-200 transition-all active:scale-95 font-sans">Connect</button>
+                  <button onClick={() => handleSyncConnect(addStep)} className="w-full max-w-[280px] bg-primary-500 text-white py-4 rounded-full font-bold text-sm hover:bg-primary-600 shadow-lg shadow-neutral-200 transition-all active:scale-95 font-sans">Connect</button>
                 </>
               ) : (
                 <>
@@ -2272,7 +2272,7 @@ const AddProductModal = ({ onClose, authStatus, handleAuthorize, isAuthLoading, 
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <h4 className="text-lg font-bold text-gray-900 font-sans">{syncStates[addStep].email}</h4>
+                    <h4 className="text-lg font-bold text-neutral-900 font-sans">{syncStates[addStep].email}</h4>
                     <div className="flex items-center justify-center gap-2">
                       <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
                       <p className="text-xs text-green-600 font-bold font-sans">Connected</p>

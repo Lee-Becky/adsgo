@@ -155,11 +155,11 @@ const CreativeDatasetWizard = ({ onClose, onCreate, defaultPlatform = 'meta' }) 
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center">
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative w-full max-w-3xl bg-white rounded-3xl shadow-2xl border border-slate-100 max-h-[85vh] flex flex-col">
-        <div className="flex items-center justify-between px-8 py-5 border-b border-slate-100">
-          <h3 className="text-sm font-black text-slate-900">New Creative Dataset</h3>
-          <button onClick={onClose} className="p-1.5 hover:bg-slate-100 rounded-lg">
-            <X size={18} className="text-slate-400" />
+      <div className="relative w-full max-w-3xl bg-white rounded-2xl shadow-2xl border border-neutral-100 max-h-[85vh] flex flex-col">
+        <div className="flex items-center justify-between px-8 py-5 border-b border-neutral-100">
+          <h3 className="text-sm font-black text-neutral-900">New Creative Dataset</h3>
+          <button onClick={onClose} className="p-1.5 hover:bg-neutral-100 rounded-lg">
+            <X size={18} className="text-neutral-400" />
           </button>
         </div>
 
@@ -177,9 +177,9 @@ const CreativeDatasetWizard = ({ onClose, onCreate, defaultPlatform = 'meta' }) 
             {step === 0 && (
               <div className="px-8 py-6 space-y-5">
                 <div>
-                  <label className="text-xs font-black text-slate-700 mb-1.5 block">Dataset Name</label>
+                  <label className="text-xs font-black text-neutral-700 mb-1.5 block">Dataset Name</label>
                   <input
-                    className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm font-medium text-slate-900 outline-none focus:border-indigo-400"
+                    className="w-full px-4 py-2.5 border border-neutral-200 rounded-xl text-sm font-medium text-neutral-900 outline-none focus:border-primary-400"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="e.g., Meta Creatives US"
@@ -187,16 +187,16 @@ const CreativeDatasetWizard = ({ onClose, onCreate, defaultPlatform = 'meta' }) 
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="text-xs font-black text-slate-700 mb-1.5 block">Data Start Date</label>
+                    <label className="text-xs font-black text-neutral-700 mb-1.5 block">Data Start Date</label>
                     <input
                       type="date"
-                      className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm font-medium text-slate-900 outline-none focus:border-indigo-400"
+                      className="w-full px-4 py-2.5 border border-neutral-200 rounded-xl text-sm font-medium text-neutral-900 outline-none focus:border-primary-400"
                       value={dataStartDate}
                       onChange={(e) => setDataStartDate(e.target.value)}
                     />
                   </div>
                   <div>
-                    <label className="text-xs font-black text-slate-700 mb-1.5 block">Asset Type</label>
+                    <label className="text-xs font-black text-neutral-700 mb-1.5 block">Asset Type</label>
                     <div className="flex items-center gap-2">
                       {ASSET_TYPES.map(t => (
                         <button
@@ -204,8 +204,8 @@ const CreativeDatasetWizard = ({ onClose, onCreate, defaultPlatform = 'meta' }) 
                           onClick={() => toggleAssetType(t.value)}
                           className={`px-4 py-2 rounded-lg text-[11px] font-bold transition-all ${
                             assetTypes.includes(t.value)
-                              ? 'bg-slate-900 text-white'
-                              : 'bg-slate-50 text-slate-500 hover:bg-slate-100'
+                              ? 'bg-neutral-900 text-white'
+                              : 'bg-neutral-50 text-neutral-500 hover:bg-neutral-100'
                           }`}
                         >
                           {t.label}
@@ -215,14 +215,14 @@ const CreativeDatasetWizard = ({ onClose, onCreate, defaultPlatform = 'meta' }) 
                   </div>
                 </div>
                 <div>
-                  <label className="text-xs font-black text-slate-700 mb-1.5 block">Platform & Accounts</label>
+                  <label className="text-xs font-black text-neutral-700 mb-1.5 block">Platform & Accounts</label>
                   <div className="flex items-center gap-2 mb-3">
                     {MEDIA_PLATFORMS.map(p => (
                       <button
                         key={p.id}
                         onClick={() => { setPlatform(p.id); setSelectedAccountIds([]) }}
                         className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-[11px] font-bold transition-all ${
-                          platform === p.id ? 'bg-slate-900 text-white' : 'bg-slate-50 text-slate-500 hover:bg-slate-100'
+                          platform === p.id ? 'bg-neutral-900 text-white' : 'bg-neutral-50 text-neutral-500 hover:bg-neutral-100'
                         }`}
                       >
                         <img src={p.icon} alt={p.name} className="w-3.5 h-3.5" />
@@ -231,9 +231,9 @@ const CreativeDatasetWizard = ({ onClose, onCreate, defaultPlatform = 'meta' }) 
                     ))}
                   </div>
                   <div className="relative mb-2">
-                    <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-300" />
+                    <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-300" />
                     <input
-                      className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs outline-none focus:border-indigo-400"
+                      className="w-full pl-9 pr-4 py-2 bg-neutral-50 border border-neutral-200 rounded-lg text-xs outline-none focus:border-primary-400"
                       placeholder="Search accounts..."
                       value={accountSearch}
                       onChange={(e) => setAccountSearch(e.target.value)}
@@ -244,9 +244,9 @@ const CreativeDatasetWizard = ({ onClose, onCreate, defaultPlatform = 'meta' }) 
                       {selectedAccountIds.map(id => {
                         const acc = mockAccountsForDataset.find(a => a.id === id)
                         return (
-                          <span key={id} className="px-2.5 py-1 text-[10px] font-bold bg-indigo-50 text-indigo-600 rounded-full flex items-center gap-1">
+                          <span key={id} className="px-2.5 py-1 text-[10px] font-bold bg-primary-50 text-primary-600 rounded-full flex items-center gap-1">
                             {acc?.name || id}
-                            <button onClick={() => toggleAccount(id)} className="hover:text-red-500 ml-0.5">×</button>
+                            <button onClick={() => toggleAccount(id)} className="hover:text-danger-500 ml-0.5">×</button>
                           </span>
                         )
                       })}
@@ -260,11 +260,11 @@ const CreativeDatasetWizard = ({ onClose, onCreate, defaultPlatform = 'meta' }) 
                           key={acc.id}
                           onClick={() => toggleAccount(acc.id)}
                           className={`w-full flex items-center gap-2 px-3 py-2.5 rounded-lg text-left transition-all ${
-                            isSelected ? 'bg-indigo-50 border border-indigo-200' : 'hover:bg-slate-50 border border-transparent'
+                            isSelected ? 'bg-primary-50 border border-primary-200' : 'hover:bg-neutral-50 border border-transparent'
                           }`}
                         >
-                          {isSelected ? <CheckSquare size={13} className="text-indigo-500" /> : <Square size={13} className="text-slate-300" />}
-                          <p className="text-xs font-semibold text-slate-700 truncate">{acc.name}</p>
+                          {isSelected ? <CheckSquare size={13} className="text-primary-500" /> : <Square size={13} className="text-neutral-300" />}
+                          <p className="text-xs font-semibold text-neutral-700 truncate">{acc.name}</p>
                         </button>
                       )
                     })}
@@ -278,7 +278,7 @@ const CreativeDatasetWizard = ({ onClose, onCreate, defaultPlatform = 'meta' }) 
               <div className="px-8 py-6 space-y-6">
                 {/* Group 1: Fixed Dimensions */}
                 <div>
-                  <h4 className="text-[10px] font-black text-slate-400 mb-2 flex items-center gap-1.5">
+                  <h4 className="text-[10px] font-black text-neutral-400 mb-2 flex items-center gap-1.5">
                     <Lock size={10} />
                     Fixed Dimensions
                   </h4>
@@ -286,12 +286,12 @@ const CreativeDatasetWizard = ({ onClose, onCreate, defaultPlatform = 'meta' }) 
                     {FIXED_DIMENSIONS.map(field => (
                       <div
                         key={field.key}
-                        className="flex items-center gap-2 px-3 py-2 rounded-lg text-[11px] font-medium bg-slate-100 text-slate-500 border border-slate-200 cursor-not-allowed"
+                        className="flex items-center gap-2 px-3 py-2 rounded-lg text-[11px] font-medium bg-neutral-100 text-neutral-500 border border-neutral-200 cursor-not-allowed"
                       >
-                        <Lock size={11} className="text-slate-400" />
-                        <CheckSquare size={13} className="text-slate-400" />
+                        <Lock size={11} className="text-neutral-400" />
+                        <CheckSquare size={13} className="text-neutral-400" />
                         {field.label}
-                        <span className="ml-auto text-[9px] font-bold text-slate-400 bg-slate-200 px-1.5 py-0.5 rounded">Fixed</span>
+                        <span className="ml-auto text-[9px] font-bold text-neutral-400 bg-neutral-200 px-1.5 py-0.5 rounded">Fixed</span>
                       </div>
                     ))}
                   </div>
@@ -299,7 +299,7 @@ const CreativeDatasetWizard = ({ onClose, onCreate, defaultPlatform = 'meta' }) 
 
                 {/* Group 2: Optional Dimensions */}
                 <div>
-                  <h4 className="text-[10px] font-black text-slate-400 mb-2">Optional Dimensions</h4>
+                  <h4 className="text-[10px] font-black text-neutral-400 mb-2">Optional Dimensions</h4>
                   <div className="grid grid-cols-2 gap-1.5">
                     {CREATIVE_DIMENSION_FIELDS.filter(f => !FIXED_KEYS.has(f.key)).map(field => {
                       const isSelected = optionalDimensions.includes(field.key)
@@ -309,11 +309,11 @@ const CreativeDatasetWizard = ({ onClose, onCreate, defaultPlatform = 'meta' }) 
                           onClick={() => toggleOptionalDim(field.key)}
                           className={`flex items-center gap-2 px-3 py-2 rounded-lg text-[11px] font-medium transition-all ${
                             isSelected
-                              ? 'bg-indigo-50 text-indigo-700 border border-indigo-200'
-                              : 'bg-slate-50 text-slate-600 border border-transparent hover:border-slate-200'
+                              ? 'bg-primary-50 text-primary-700 border border-primary-200'
+                              : 'bg-neutral-50 text-neutral-600 border border-transparent hover:border-neutral-200'
                           }`}
                         >
-                          {isSelected ? <CheckSquare size={13} className="text-indigo-500" /> : <Square size={13} className="text-slate-300" />}
+                          {isSelected ? <CheckSquare size={13} className="text-primary-500" /> : <Square size={13} className="text-neutral-300" />}
                           {field.label}
                         </button>
                       )
@@ -323,7 +323,7 @@ const CreativeDatasetWizard = ({ onClose, onCreate, defaultPlatform = 'meta' }) 
 
                 {/* Group 3: Media Metrics */}
                 <div>
-                  <h4 className="text-[10px] font-black text-slate-400 mb-2">Media Metrics</h4>
+                  <h4 className="text-[10px] font-black text-neutral-400 mb-2">Media Metrics</h4>
                   <div className="grid grid-cols-2 gap-1.5">
                     {CREATIVE_METRIC_FIELDS.map(field => {
                       const isSelected = mediaMetrics.includes(field.key)
@@ -333,11 +333,11 @@ const CreativeDatasetWizard = ({ onClose, onCreate, defaultPlatform = 'meta' }) 
                           onClick={() => toggleMediaMetric(field.key)}
                           className={`flex items-center gap-2 px-3 py-2 rounded-lg text-[11px] font-medium transition-all ${
                             isSelected
-                              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                              : 'bg-slate-50 text-slate-600 border border-transparent hover:border-slate-200'
+                              ? 'bg-success-50 text-success-700 border border-success-200'
+                              : 'bg-neutral-50 text-neutral-600 border border-transparent hover:border-neutral-200'
                           }`}
                         >
-                          {isSelected ? <CheckSquare size={13} className="text-emerald-500" /> : <Square size={13} className="text-slate-300" />}
+                          {isSelected ? <CheckSquare size={13} className="text-success-500" /> : <Square size={13} className="text-neutral-300" />}
                           {field.label}
                         </button>
                       )
@@ -347,8 +347,8 @@ const CreativeDatasetWizard = ({ onClose, onCreate, defaultPlatform = 'meta' }) 
 
                 {/* Group 4: Event Metrics */}
                 <div>
-                  <h4 className="text-[10px] font-black text-slate-400 mb-2 flex items-center gap-1.5">
-                    <Zap size={10} className="text-amber-500" />
+                  <h4 className="text-[10px] font-black text-neutral-400 mb-2 flex items-center gap-1.5">
+                    <Zap size={10} className="text-warning-500" />
                     Event Metrics
                   </h4>
                   <div className="space-y-1.5 max-h-[200px] overflow-y-auto">
@@ -359,10 +359,10 @@ const CreativeDatasetWizard = ({ onClose, onCreate, defaultPlatform = 'meta' }) 
                         <div
                           key={event.key}
                           className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all ${
-                            isAnySelected ? 'bg-amber-50 border border-amber-200' : 'bg-slate-50 border border-transparent hover:border-slate-200'
+                            isAnySelected ? 'bg-warning-50 border border-warning-200' : 'bg-neutral-50 border border-transparent hover:border-neutral-200'
                           }`}
                         >
-                          <span className={`text-xs font-bold flex-1 ${isAnySelected ? 'text-amber-700' : 'text-slate-600'}`}>
+                          <span className={`text-xs font-bold flex-1 ${isAnySelected ? 'text-warning-700' : 'text-neutral-600'}`}>
                             {event.label}
                           </span>
                           {EVENT_METRIC_TYPES.map(mt => {
@@ -373,8 +373,8 @@ const CreativeDatasetWizard = ({ onClose, onCreate, defaultPlatform = 'meta' }) 
                                 onClick={() => toggleEventMetric(event.key, mt.id)}
                                 className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-bold transition-all ${
                                   isOn
-                                    ? 'bg-amber-500 text-white'
-                                    : 'bg-white text-slate-400 border border-slate-200 hover:border-amber-300'
+                                    ? 'bg-warning-500 text-white'
+                                    : 'bg-white text-neutral-400 border border-neutral-200 hover:border-warning-300'
                                 }`}
                               >
                                 {isOn ? <CheckSquare size={10} /> : <Square size={10} />}
@@ -389,7 +389,7 @@ const CreativeDatasetWizard = ({ onClose, onCreate, defaultPlatform = 'meta' }) 
                 </div>
 
                 {/* Summary */}
-                <p className="text-[10px] text-slate-400">
+                <p className="text-[10px] text-neutral-400">
                   {FIXED_DIMENSIONS.length} fixed + {optionalDimensions.length} optional dims, {mediaMetrics.length} media metrics, {Object.keys(eventMetrics).length} event metrics
                 </p>
               </div>
@@ -399,18 +399,18 @@ const CreativeDatasetWizard = ({ onClose, onCreate, defaultPlatform = 'meta' }) 
             {step === 2 && (
               <div className="px-8 py-6 space-y-5">
                 <div>
-                  <h4 className="text-xs font-black text-slate-900 mb-1">Asset Name Split</h4>
-                  <p className="text-[11px] text-slate-400 mb-4">Parse asset names into dimensions for deeper analysis.</p>
+                  <h4 className="text-xs font-black text-neutral-900 mb-1">Asset Name Split</h4>
+                  <p className="text-[11px] text-neutral-400 mb-4">Parse asset names into dimensions for deeper analysis.</p>
                 </div>
 
                 {/* Manual / AI Tabs */}
-                <div className="flex items-center gap-1 p-0.5 bg-slate-100 rounded-lg w-fit">
+                <div className="flex items-center gap-1 p-0.5 bg-neutral-100 rounded-lg w-fit">
                   <button
                     onClick={() => setSplitTab('manual')}
                     className={`flex items-center gap-1.5 px-4 py-2 rounded-md text-[11px] font-bold transition-all ${
                       splitTab === 'manual'
-                        ? 'bg-white text-slate-900 shadow-sm'
-                        : 'text-slate-500 hover:text-slate-700'
+                        ? 'bg-white text-neutral-900 shadow-sm'
+                        : 'text-neutral-500 hover:text-neutral-700'
                     }`}
                   >
                     <Wrench size={12} />
@@ -420,8 +420,8 @@ const CreativeDatasetWizard = ({ onClose, onCreate, defaultPlatform = 'meta' }) 
                     onClick={() => setSplitTab('ai')}
                     className={`flex items-center gap-1.5 px-4 py-2 rounded-md text-[11px] font-bold transition-all ${
                       splitTab === 'ai'
-                        ? 'bg-white text-slate-900 shadow-sm'
-                        : 'text-slate-500 hover:text-slate-700'
+                        ? 'bg-white text-neutral-900 shadow-sm'
+                        : 'text-neutral-500 hover:text-neutral-700'
                     }`}
                   >
                     <Sparkles size={12} />
@@ -440,9 +440,9 @@ const CreativeDatasetWizard = ({ onClose, onCreate, defaultPlatform = 'meta' }) 
                 {splitTab === 'ai' && (
                   <div className="space-y-4">
                     <div>
-                      <label className="text-xs font-black text-slate-700 mb-1.5 block">Describe your naming convention</label>
+                      <label className="text-xs font-black text-neutral-700 mb-1.5 block">Describe your naming convention</label>
                       <textarea
-                        className="w-full px-4 py-3 border border-slate-200 rounded-2xl text-sm font-medium text-slate-900 outline-none focus:border-violet-400 resize-none"
+                        className="w-full px-4 py-3 border border-neutral-200 rounded-2xl text-sm font-medium text-neutral-900 outline-none focus:border-violet-400 resize-none"
                         rows={3}
                         placeholder="e.g., Our creative names follow the pattern: Theme_Version_Format. Theme can be Hero, Promo, UGC, etc. Version is like v1, v2. Format is the file extension."
                         value={aiPrompt}
@@ -500,9 +500,9 @@ const CreativeDatasetWizard = ({ onClose, onCreate, defaultPlatform = 'meta' }) 
                                   <span className="w-5 h-5 rounded bg-violet-100 text-violet-700 text-[10px] font-black flex items-center justify-center">
                                     {d.index + 1}
                                   </span>
-                                  <span className="text-xs font-bold text-slate-800">{d.name}</span>
-                                  <span className="text-[10px] text-slate-400 font-mono">{d.key}</span>
-                                  <span className="ml-auto text-[10px] font-bold text-emerald-600">
+                                  <span className="text-xs font-bold text-neutral-800">{d.name}</span>
+                                  <span className="text-[10px] text-neutral-400 font-mono">{d.key}</span>
+                                  <span className="ml-auto text-[10px] font-bold text-success-600">
                                     {Math.round(d.confidence * 100)}% confidence
                                   </span>
                                 </div>
@@ -515,8 +515,8 @@ const CreativeDatasetWizard = ({ onClose, onCreate, defaultPlatform = 'meta' }) 
                             <div className="space-y-1">
                               {aiResult.sampleParsed.map((s, i) => (
                                 <div key={i} className="flex items-center gap-2 text-[11px]">
-                                  <span className="text-slate-400 font-mono truncate max-w-[140px]">{s.original}</span>
-                                  <span className="text-slate-300">→</span>
+                                  <span className="text-neutral-400 font-mono truncate max-w-[140px]">{s.original}</span>
+                                  <span className="text-neutral-300">→</span>
                                   <div className="flex items-center gap-1">
                                     {s.parts.map((part, pi) => (
                                       <span key={pi} className="px-2 py-0.5 bg-violet-100 text-violet-700 font-bold rounded">

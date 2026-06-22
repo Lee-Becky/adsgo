@@ -26,15 +26,15 @@ const STEPS = [
 
 export default function PrePublishView({ onPageChange }) {
   return (
-    <div className="bg-white rounded-[20px] shadow-[-2px_2px_16px_rgba(14,0,45,0.06)] py-16 flex items-center justify-center">
+    <div className="bg-white rounded-2xl shadow-[-2px_2px_16px_rgba(14,0,45,0.06)] py-16 flex items-center justify-center">
       <div className="text-center max-w-lg px-6">
         {/* Hero icon */}
         <div className="w-16 h-16 rounded-2xl bg-primary-50 flex items-center justify-center mx-auto mb-5">
           <Rocket className="w-8 h-8 text-primary-500" />
         </div>
 
-        <h2 className="text-xl font-bold text-gray-900 mb-2">Launch your first campaign</h2>
-        <p className="text-sm text-gray-500 mb-8 leading-relaxed">
+        <h2 className="text-xl font-bold text-neutral-900 mb-2">Launch your first campaign</h2>
+        <p className="text-sm text-neutral-500 mb-8 leading-relaxed">
           Your Media Plan will come to life once your ads are running.
           Create and publish a campaign — AdsGo will take it from there.
         </p>
@@ -49,10 +49,10 @@ export default function PrePublishView({ onPageChange }) {
         </button>
 
         {/* Divider */}
-        <div className="my-8 border-t border-dashed border-gray-200" />
+        <div className="my-8 border-t border-dashed border-neutral-200" />
 
         {/* What happens after */}
-        <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4">
+        <h3 className="text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-4">
           What happens after you publish
         </h3>
         <div className="space-y-3 text-left max-w-sm mx-auto">
@@ -60,10 +60,10 @@ export default function PrePublishView({ onPageChange }) {
             const Icon = step.icon
             return (
               <div key={i} className="flex items-center gap-3">
-                <div className="w-7 h-7 rounded-lg bg-gray-50 flex items-center justify-center flex-shrink-0">
+                <div className="w-7 h-7 rounded-lg bg-neutral-50 flex items-center justify-center flex-shrink-0">
                   <Icon className={`w-3.5 h-3.5 ${step.color}`} />
                 </div>
-                <span className="text-xs text-gray-600 leading-relaxed">{step.text}</span>
+                <span className="text-xs text-neutral-600 leading-relaxed">{step.text}</span>
               </div>
             )
           })}

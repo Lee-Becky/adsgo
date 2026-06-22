@@ -19,45 +19,45 @@ function ModeSelectionActions({ onSelectDaily, onSelectAutopilot, currentMode, o
         onClick={onSelectDaily}
         className={`w-full text-left p-3 rounded-xl border-2 transition-all ${
           currentMode !== 'autopilot'
-            ? 'border-blue-500 bg-blue-50'
-            : 'border-slate-100 hover:border-blue-200 bg-white'
+            ? 'border-primary-500 bg-primary-50'
+            : 'border-neutral-100 hover:border-primary-200 bg-white'
         }`}
       >
         <div className="flex items-start justify-between gap-2">
           <div>
-            <p className="text-xs font-bold text-slate-800">📅 Daily Analysis</p>
-            <p className="text-[10px] text-slate-500 mt-0.5 leading-relaxed">
+            <p className="text-xs font-bold text-neutral-800">📅 Daily Analysis</p>
+            <p className="text-[10px] text-neutral-500 mt-0.5 leading-relaxed">
               AI 生成建议，你逐条审批<br />保持对每笔预算的完全控制
             </p>
           </div>
-          <span className="text-[10px] text-blue-600 font-bold mt-0.5 shrink-0">选择 →</span>
+          <span className="text-[10px] text-primary-600 font-bold mt-0.5 shrink-0">选择 →</span>
         </div>
       </button>
       <button
         onClick={onSelectAutopilot}
         className={`w-full text-left p-3 rounded-xl border-2 transition-all ${
           currentMode === 'autopilot'
-            ? 'border-slate-700 bg-slate-900'
-            : 'border-slate-100 hover:border-slate-400 bg-white'
+            ? 'border-neutral-700 bg-neutral-900'
+            : 'border-neutral-100 hover:border-neutral-400 bg-white'
         }`}
       >
         <div className="flex items-start justify-between gap-2">
           <div>
-            <p className={`text-xs font-bold ${currentMode === 'autopilot' ? 'text-white' : 'text-slate-800'}`}>
+            <p className={`text-xs font-bold ${currentMode === 'autopilot' ? 'text-white' : 'text-neutral-800'}`}>
               🤖 AI Autopilot
             </p>
-            <p className={`text-[10px] mt-0.5 leading-relaxed ${currentMode === 'autopilot' ? 'text-slate-300' : 'text-slate-500'}`}>
+            <p className={`text-[10px] mt-0.5 leading-relaxed ${currentMode === 'autopilot' ? 'text-neutral-300' : 'text-neutral-500'}`}>
               7×24h 全自动执行，无需人工干预<br />AI 自主决策，效率最高
             </p>
           </div>
-          <span className={`text-[10px] font-bold mt-0.5 shrink-0 ${currentMode === 'autopilot' ? 'text-slate-300' : 'text-slate-500'}`}>
+          <span className={`text-[10px] font-bold mt-0.5 shrink-0 ${currentMode === 'autopilot' ? 'text-neutral-300' : 'text-neutral-500'}`}>
             选择 →
           </span>
         </div>
       </button>
-      <p className="text-[10px] text-slate-400 text-center pt-1">你可以随时在此页面切换模式</p>
-      <div className="pt-1 border-t border-gray-100">
-        <button onClick={onSkip} className="text-xs text-gray-400 hover:text-gray-600 transition-colors">
+      <p className="text-[10px] text-neutral-400 text-center pt-1">你可以随时在此页面切换模式</p>
+      <div className="pt-1 border-t border-neutral-100">
+        <button onClick={onSkip} className="text-xs text-neutral-400 hover:text-neutral-600 transition-colors">
           跳过引导
         </button>
       </div>
@@ -261,9 +261,9 @@ const AdManagerV3 = ({ onEditBrandConfig, selectedBrand, onPageChange, autoExecu
       />
 
       {/* Filter and Data Section - Connected visually - Add margin when CrossChannelAISummary is hidden */}
-      <div className={`bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden ${activeTab === 'all' || activeTab === 'google' ? 'mt-4' : ''}`}>
+      <div className={`bg-white rounded-xl border border-neutral-200 shadow-sm overflow-hidden ${activeTab === 'all' || activeTab === 'google' ? 'mt-4' : ''}`}>
         {/* Filter Section - Light background for visual differentiation */}
-        <div ref={campaignTableRef} className="p-5 border-b border-slate-100 bg-gray-50">
+        <div ref={campaignTableRef} className="p-5 border-b border-neutral-100 bg-neutral-50">
           <FilterSection activeTab={activeTab} />
         </div>
 

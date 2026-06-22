@@ -2181,7 +2181,7 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
               <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
               <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
             </svg>
-            <span className="text-xs text-gray-600">{platform}</span>
+            <span className="text-xs text-neutral-600">{platform}</span>
           </div>
         )
       case 'Meta':
@@ -2190,7 +2190,7 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
               <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" fill="#1877F2"/>
             </svg>
-            <span className="text-xs text-gray-600">{platform}</span>
+            <span className="text-xs text-neutral-600">{platform}</span>
           </div>
         )
       case 'TikTok':
@@ -2199,24 +2199,24 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
               <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z" fill="#000000"/>
             </svg>
-            <span className="text-xs text-gray-600">{platform}</span>
+            <span className="text-xs text-neutral-600">{platform}</span>
           </div>
         )
       default:
-        return <span className="text-xs text-gray-600">{platform}</span>
+        return <span className="text-xs text-neutral-600">{platform}</span>
     }
   }
 
   const getStatusBadge = (status) => {
     switch (status) {
       case 'approved':
-        return <span className="text-[10px] font-bold text-green-600 bg-green-100 px-2 py-0.5 rounded">Approved</span>
+        return <span className="text-[10px] font-bold text-success-600 bg-success-100 px-2 py-0.5 rounded">Approved</span>
       case 'auto_applied':
-        return <span className="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-200">Auto-applied</span>
+        return <span className="text-[10px] font-bold text-primary-600 bg-primary-50 px-2 py-0.5 rounded border border-primary-200">Auto-applied</span>
       case 'rejected':
-        return <span className="text-[10px] font-bold text-red-600 bg-red-100 px-2 py-0.5 rounded">Rejected</span>
+        return <span className="text-[10px] font-bold text-danger-600 bg-danger-100 px-2 py-0.5 rounded">Rejected</span>
       case 'invalid_modified':
-        return <span className="text-[10px] font-bold text-orange-600 bg-orange-100 px-2 py-0.5 rounded">Invalid (Modified)</span>
+        return <span className="text-[10px] font-bold text-warning-600 bg-warning-100 px-2 py-0.5 rounded">Invalid (Modified)</span>
       default:
         return null
     }
@@ -2225,20 +2225,20 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
   const getBudgetChangeInfo = (suggestedBudget, currentBudget) => {
     if (suggestedBudget > currentBudget) {
       return {
-        icon: <TrendingUp size={14} className="text-red-600" />,
-        colorClass: 'text-red-600 font-semibold',
+        icon: <TrendingUp size={14} className="text-danger-600" />,
+        colorClass: 'text-danger-600 font-semibold',
         change: 'increase'
       }
     } else if (suggestedBudget < currentBudget) {
       return {
-        icon: <TrendingDown size={14} className="text-green-600" />,
-        colorClass: 'text-green-600 font-semibold',
+        icon: <TrendingDown size={14} className="text-success-600" />,
+        colorClass: 'text-success-600 font-semibold',
         change: 'decrease'
       }
     } else {
       return {
-        icon: <Minus size={14} className="text-gray-500" />,
-        colorClass: 'text-gray-500 font-semibold',
+        icon: <Minus size={14} className="text-neutral-500" />,
+        colorClass: 'text-neutral-500 font-semibold',
         change: 'maintain'
       }
     }
@@ -2251,7 +2251,7 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
   }
 
   const LocationTags = ({ locations, maxVisible = 3 }) => {
-    if (!locations || locations.length === 0) return <span className="text-xs text-gray-400">-</span>
+    if (!locations || locations.length === 0) return <span className="text-xs text-neutral-400">-</span>
     
     const visibleLocations = locations.slice(0, maxVisible)
     const hasMore = locations.length > maxVisible
@@ -2262,24 +2262,24 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
           {visibleLocations.map((loc, idx) => (
             <span 
               key={idx}
-              className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-blue-50 text-blue-700 border border-blue-200"
+              className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-info-50 text-info-700 border border-info-200"
             >
               {loc}
             </span>
           ))}
           {hasMore && (
-            <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-gray-100 text-gray-600 border border-gray-200">
+            <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-neutral-100 text-neutral-600 border border-neutral-200">
               +{locations.length - maxVisible}
             </span>
           )}
         </div>
         {hasMore && (
-          <div className="absolute z-50 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-opacity duration-200 top-full left-0 mt-1 p-2 bg-white border border-gray-200 rounded-lg shadow-lg max-w-xs">
+          <div className="absolute z-50 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-opacity duration-200 top-full left-0 mt-1 p-2 bg-white border border-neutral-200 rounded-lg shadow-lg max-w-xs">
             <div className="flex flex-wrap gap-1">
               {locations.map((loc, idx) => (
                 <span 
                   key={idx}
-                  className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-blue-50 text-blue-700 border border-blue-200"
+                  className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-info-50 text-info-700 border border-info-200"
                 >
                   {loc}
                 </span>
@@ -2292,10 +2292,10 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
   }
 
   const ConversionGoalTag = ({ goal }) => {
-    if (!goal) return <span className="text-xs text-gray-400">-</span>
+    if (!goal) return <span className="text-xs text-neutral-400">-</span>
     
     return (
-      <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-indigo-50 text-indigo-700 border border-indigo-200">
+      <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-primary-50 text-primary-700 border border-primary-200">
         {goal}
       </span>
     )
@@ -2305,11 +2305,11 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
   const MetricDisplay = ({ primary, secondary, isPercentage = false, showAvgPrefix = false, isROAS = false }) => {
     return (
       <div className="flex flex-col items-start">
-        <span className="font-medium text-gray-900 text-xs">
+        <span className="font-medium text-neutral-900 text-xs">
           {showAvgPrefix && 'Avg. '}{primary}
         </span>
         {secondary !== undefined && (
-          <span className="text-[10px] text-gray-400">
+          <span className="text-[10px] text-neutral-400">
             {isROAS ? `${secondary.toFixed(2)}X` : (isPercentage ? `${secondary.toFixed(2)}%` : secondary)}
           </span>
         )}
@@ -2323,17 +2323,17 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
     const sortIcon = isSorted ? (
       sortConfig.direction === 'asc' ? <ChevronUp size={12} /> : <ChevronDownIcon size={12} />
     ) : (
-      <ChevronDownIcon size={12} className="text-gray-300" />
+      <ChevronDownIcon size={12} className="text-neutral-300" />
     )
     
     return (
       <th 
         onClick={() => handleSort(sortKey)}
-        className={`${className} cursor-pointer hover:bg-gray-100 transition-colors select-none`}
+        className={`${className} cursor-pointer hover:bg-neutral-100 transition-colors select-none`}
       >
         <div className="flex items-center gap-1">
           {children}
-          <span className={isSorted ? 'text-indigo-600' : 'text-gray-300'}>{sortIcon}</span>
+          <span className={isSorted ? 'text-primary-600' : 'text-neutral-300'}>{sortIcon}</span>
         </div>
       </th>
     )
@@ -2343,171 +2343,171 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
     <>
       <div className="overflow-x-auto">
         <table className="w-full">
-          <thead className="bg-gray-50">
+          <thead className="bg-neutral-50">
             <tr>
-              <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 min-w-[60px] sticky top-0 bg-gray-50 z-10 shadow-sm">
+              <th className="px-2 py-2 text-left text-xs font-medium text-neutral-600 min-w-[60px] sticky top-0 bg-neutral-50 z-10 shadow-sm">
                 Off/On
               </th>
-              <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 min-w-[180px] sticky top-0 bg-gray-50 z-10 shadow-sm">
+              <th className="px-2 py-2 text-left text-xs font-medium text-neutral-600 min-w-[180px] sticky top-0 bg-neutral-50 z-10 shadow-sm">
                 Campaign
               </th>
-              <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 min-w-[200px] sticky top-0 bg-gray-50 z-10 shadow-sm">
+              <th className="px-2 py-2 text-left text-xs font-medium text-neutral-600 min-w-[200px] sticky top-0 bg-neutral-50 z-10 shadow-sm">
                 Ad Account
               </th>
-              <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 min-w-[120px] sticky top-0 bg-gray-50 z-10 shadow-sm">
+              <th className="px-2 py-2 text-left text-xs font-medium text-neutral-600 min-w-[120px] sticky top-0 bg-neutral-50 z-10 shadow-sm">
                 Locations
               </th>
-              <th className="px-2 py-2 text-left text-xs font-bold text-indigo-600 min-w-[100px] sticky top-0 bg-gray-50 z-10 shadow-sm">
+              <th className="px-2 py-2 text-left text-xs font-bold text-primary-600 min-w-[100px] sticky top-0 bg-neutral-50 z-10 shadow-sm">
                 Conv. goal
               </th>
-              <th className="px-2 py-2 text-left text-xs font-medium text-gray-600 min-w-[100px] sticky top-0 bg-gray-50 z-10 shadow-sm">
+              <th className="px-2 py-2 text-left text-xs font-medium text-neutral-600 min-w-[100px] sticky top-0 bg-neutral-50 z-10 shadow-sm">
                 Daily Budget
               </th>
-              <th className="px-2 py-2 text-center text-xs font-bold text-indigo-600 min-w-[100px] sticky top-0 bg-gray-50 z-10 shadow-sm">
+              <th className="px-2 py-2 text-center text-xs font-bold text-primary-600 min-w-[100px] sticky top-0 bg-neutral-50 z-10 shadow-sm">
                 Recommended budget
               </th>
-              <th className="px-2 py-2 text-left text-xs font-bold text-indigo-600 min-w-[250px] sticky top-0 bg-gray-50 z-10 shadow-sm">
+              <th className="px-2 py-2 text-left text-xs font-bold text-primary-600 min-w-[250px] sticky top-0 bg-neutral-50 z-10 shadow-sm">
                 Optimize reason
               </th>
-              <SortableHeader sortKey="spend" className="px-2 py-2 text-left text-xs font-medium text-gray-600 min-w-[90px] sticky top-0 bg-gray-50 z-10 shadow-sm">
+              <SortableHeader sortKey="spend" className="px-2 py-2 text-left text-xs font-medium text-neutral-600 min-w-[90px] sticky top-0 bg-neutral-50 z-10 shadow-sm">
                 Spend
               </SortableHeader>
-              <SortableHeader sortKey="impressions" className="px-2 py-2 text-left text-xs font-medium text-gray-600 min-w-[100px] sticky top-0 bg-gray-50 z-10 shadow-sm">
+              <SortableHeader sortKey="impressions" className="px-2 py-2 text-left text-xs font-medium text-neutral-600 min-w-[100px] sticky top-0 bg-neutral-50 z-10 shadow-sm">
                 Impressions
               </SortableHeader>
-              <SortableHeader sortKey="cpm" className="px-2 py-2 text-left text-xs font-medium text-gray-600 min-w-[70px] sticky top-0 bg-gray-50 z-10 shadow-sm">
+              <SortableHeader sortKey="cpm" className="px-2 py-2 text-left text-xs font-medium text-neutral-600 min-w-[70px] sticky top-0 bg-neutral-50 z-10 shadow-sm">
                 CPM
               </SortableHeader>
-              <SortableHeader sortKey="clicks" className="px-2 py-2 text-left text-xs font-medium text-gray-600 min-w-[70px] sticky top-0 bg-gray-50 z-10 shadow-sm">
+              <SortableHeader sortKey="clicks" className="px-2 py-2 text-left text-xs font-medium text-neutral-600 min-w-[70px] sticky top-0 bg-neutral-50 z-10 shadow-sm">
                 Clicks
               </SortableHeader>
-              <SortableHeader sortKey="cpc" className="px-2 py-2 text-left text-xs font-medium text-gray-600 min-w-[80px] sticky top-0 bg-gray-50 z-10 shadow-sm">
+              <SortableHeader sortKey="cpc" className="px-2 py-2 text-left text-xs font-medium text-neutral-600 min-w-[80px] sticky top-0 bg-neutral-50 z-10 shadow-sm">
                 <div className="flex flex-col items-start">
                   <span>CPC</span>
-                  <span className="text-[10px] text-gray-400">(CTR)</span>
+                  <span className="text-[10px] text-neutral-400">(CTR)</span>
                 </div>
               </SortableHeader>
-              <SortableHeader sortKey="event1s" className="px-2 py-2 text-left text-xs font-bold text-indigo-600 min-w-[80px] sticky top-0 bg-gray-50 z-10 shadow-sm">
+              <SortableHeader sortKey="event1s" className="px-2 py-2 text-left text-xs font-bold text-primary-600 min-w-[80px] sticky top-0 bg-neutral-50 z-10 shadow-sm">
                 Event1s
               </SortableHeader>
-              <SortableHeader sortKey="cpaEvent1" className="px-2 py-2 text-left text-xs font-bold text-indigo-600 min-w-[120px] sticky top-0 bg-gray-50 z-10 shadow-sm">
+              <SortableHeader sortKey="cpaEvent1" className="px-2 py-2 text-left text-xs font-bold text-primary-600 min-w-[120px] sticky top-0 bg-neutral-50 z-10 shadow-sm">
                 <div className="flex flex-col items-start">
                   <span>CPA-Event1</span>
-                  <span className="text-[10px] text-gray-400">(CVR)</span>
+                  <span className="text-[10px] text-neutral-400">(CVR)</span>
                 </div>
               </SortableHeader>
-              <SortableHeader sortKey="event2s" className="px-2 py-2 text-left text-xs font-bold text-indigo-600 min-w-[80px] sticky top-0 bg-gray-50 z-10 shadow-sm">
+              <SortableHeader sortKey="event2s" className="px-2 py-2 text-left text-xs font-bold text-primary-600 min-w-[80px] sticky top-0 bg-neutral-50 z-10 shadow-sm">
                 Event2s
               </SortableHeader>
-              <SortableHeader sortKey="cpaEvent2" className="px-2 py-2 text-left text-xs font-bold text-indigo-600 min-w-[120px] sticky top-0 bg-gray-50 z-10 shadow-sm">
+              <SortableHeader sortKey="cpaEvent2" className="px-2 py-2 text-left text-xs font-bold text-primary-600 min-w-[120px] sticky top-0 bg-neutral-50 z-10 shadow-sm">
                 <div className="flex flex-col items-start">
                   <span>CPA-Event2</span>
-                  <span className="text-[10px] text-gray-400">(CVR)</span>
+                  <span className="text-[10px] text-neutral-400">(CVR)</span>
                 </div>
               </SortableHeader>
-              <SortableHeader sortKey="purchases" className="px-2 py-2 text-left text-xs font-bold text-indigo-600 min-w-[80px] sticky top-0 bg-gray-50 z-10 shadow-sm">
+              <SortableHeader sortKey="purchases" className="px-2 py-2 text-left text-xs font-bold text-primary-600 min-w-[80px] sticky top-0 bg-neutral-50 z-10 shadow-sm">
                 Purchases
               </SortableHeader>
-              <SortableHeader sortKey="cpaPurchase" className="px-2 py-2 text-left text-xs font-bold text-indigo-600 min-w-[120px] sticky top-0 bg-gray-50 z-10 shadow-sm">
+              <SortableHeader sortKey="cpaPurchase" className="px-2 py-2 text-left text-xs font-bold text-primary-600 min-w-[120px] sticky top-0 bg-neutral-50 z-10 shadow-sm">
                 <div className="flex flex-col items-start">
                   <span>CPA-Purchase</span>
-                  <span className="text-[10px] text-gray-400">(CVR)</span>
+                  <span className="text-[10px] text-neutral-400">(CVR)</span>
                 </div>
               </SortableHeader>
-              <SortableHeader sortKey="purchaseValue" className="px-2 py-2 text-left text-xs font-bold text-indigo-600 min-w-[130px] sticky top-0 bg-gray-50 z-10 shadow-sm">
+              <SortableHeader sortKey="purchaseValue" className="px-2 py-2 text-left text-xs font-bold text-primary-600 min-w-[130px] sticky top-0 bg-neutral-50 z-10 shadow-sm">
                 <div className="flex flex-col items-start">
                   <span>Purchase Value</span>
-                  <span className="text-[10px] text-gray-400">(ROAS)</span>
+                  <span className="text-[10px] text-neutral-400">(ROAS)</span>
                 </div>
               </SortableHeader>
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
             {/* Summary row */}
-            <tr className="bg-indigo-50/50 hover:bg-indigo-50 transition-colors">
-              <td className="px-2 py-2 font-bold text-indigo-600 text-xs">
+            <tr className="bg-primary-50/50 hover:bg-primary-50 transition-colors">
+              <td className="px-2 py-2 font-bold text-primary-600 text-xs">
                 Totals
               </td>
-              <td className="px-2 py-2 text-xs text-gray-600">
+              <td className="px-2 py-2 text-xs text-neutral-600">
                 {summaryData.activeCampaigns} / {summaryData.totalCampaigns} Active
               </td>
-              <td className="px-2 py-2 text-xs text-gray-400">
+              <td className="px-2 py-2 text-xs text-neutral-400">
                 --
               </td>
-              <td className="px-2 py-2 text-xs text-gray-400">
+              <td className="px-2 py-2 text-xs text-neutral-400">
                 --
               </td>
-              <td className="px-2 py-2 text-xs text-gray-400">
+              <td className="px-2 py-2 text-xs text-neutral-400">
                 --
               </td>
-              <td className="px-2 py-2 font-bold text-gray-900 text-xs">
+              <td className="px-2 py-2 font-bold text-neutral-900 text-xs">
                 {formatCurrency(summaryData.totalDailyBudget)}
               </td>
               <td colSpan="2" className="px-2 py-2 text-center">
                 <div className="flex flex-col items-center leading-[1.1]">
                   <span className="text-xs font-semibold italic">Real-time dynamic analysis</span>
-                  <span className="text-[10px] text-gray-400">(Updated: {lastUpdated})</span>
+                  <span className="text-[10px] text-neutral-400">(Updated: {lastUpdated})</span>
                 </div>
               </td>
-              <td className="px-2 py-2 font-bold text-gray-900 text-xs">
+              <td className="px-2 py-2 font-bold text-neutral-900 text-xs">
                 {formatCurrency(summaryData.totalSpend)}
               </td>
-              <td className="px-2 py-2 text-xs text-gray-600">
+              <td className="px-2 py-2 text-xs text-neutral-600">
                 {formatNumber(summaryData.totalImpressions)}
               </td>
-              <td className="px-2 py-2 text-xs text-gray-600 text-left">
+              <td className="px-2 py-2 text-xs text-neutral-600 text-left">
                 <div className="flex items-center justify-start gap-1">
-                  <span className="font-medium text-gray-900 text-xs">{formatCurrency(summaryData.avgCPM)}</span>
+                  <span className="font-medium text-neutral-900 text-xs">{formatCurrency(summaryData.avgCPM)}</span>
                 </div>
               </td>
-              <td className="px-2 py-2 text-xs text-gray-600">
+              <td className="px-2 py-2 text-xs text-neutral-600">
                 {formatNumber(summaryData.totalClicks)}
               </td>
-              <td className="px-2 py-2 text-xs text-gray-600 text-left">
+              <td className="px-2 py-2 text-xs text-neutral-600 text-left">
                 <div className="flex items-center justify-start gap-1">
                   <div className="flex flex-col items-start">
-                    <span className="font-medium text-gray-900 text-xs">{formatCurrency(summaryData.avgCPC)}</span>
-                    <span className="text-[10px] text-gray-400">{summaryData.avgCTR.toFixed(2)}%</span>
+                    <span className="font-medium text-neutral-900 text-xs">{formatCurrency(summaryData.avgCPC)}</span>
+                    <span className="text-[10px] text-neutral-400">{summaryData.avgCTR.toFixed(2)}%</span>
                   </div>
                 </div>
               </td>
-              <td className="px-2 py-2 font-bold text-gray-900 text-xs">
+              <td className="px-2 py-2 font-bold text-neutral-900 text-xs">
                 {formatNumber(summaryData.totalEvent1s)}
               </td>
-              <td className="px-2 py-2 text-xs text-gray-600 text-left">
+              <td className="px-2 py-2 text-xs text-neutral-600 text-left">
                 <div className="flex items-center justify-start gap-1">
                   <div className="flex flex-col items-start">
-                    <span className="font-medium text-gray-900 text-xs">{formatCurrency(summaryData.avgCPAEvent1)}</span>
-                    <span className="text-[10px] text-gray-400">{summaryData.avgCVREvent1.toFixed(2)}%</span>
+                    <span className="font-medium text-neutral-900 text-xs">{formatCurrency(summaryData.avgCPAEvent1)}</span>
+                    <span className="text-[10px] text-neutral-400">{summaryData.avgCVREvent1.toFixed(2)}%</span>
                   </div>
                 </div>
               </td>
-              <td className="px-2 py-2 font-bold text-gray-900 text-xs">
+              <td className="px-2 py-2 font-bold text-neutral-900 text-xs">
                 {formatNumber(summaryData.totalEvent2s)}
               </td>
-              <td className="px-2 py-2 text-xs text-gray-600 text-left">
+              <td className="px-2 py-2 text-xs text-neutral-600 text-left">
                 <div className="flex items-center justify-start gap-1">
                   <div className="flex flex-col items-start">
-                    <span className="font-medium text-gray-900 text-xs">{formatCurrency(summaryData.avgCPAEvent2)}</span>
-                    <span className="text-[10px] text-gray-400">{summaryData.avgCVREvent2.toFixed(2)}%</span>
+                    <span className="font-medium text-neutral-900 text-xs">{formatCurrency(summaryData.avgCPAEvent2)}</span>
+                    <span className="text-[10px] text-neutral-400">{summaryData.avgCVREvent2.toFixed(2)}%</span>
                   </div>
                 </div>
               </td>
-              <td className="px-2 py-2 font-bold text-gray-900 text-xs">
+              <td className="px-2 py-2 font-bold text-neutral-900 text-xs">
                 {formatNumber(summaryData.totalPurchases)}
               </td>
-              <td className="px-2 py-2 text-xs text-gray-600 text-left">
+              <td className="px-2 py-2 text-xs text-neutral-600 text-left">
                 <div className="flex items-center justify-start gap-1">
                   <div className="flex flex-col items-start">
-                    <span className="font-medium text-gray-900 text-xs">{formatCurrency(summaryData.avgCPAPurchase)}</span>
-                    <span className="text-[10px] text-gray-400">{summaryData.avgCVRPurchase.toFixed(2)}%</span>
+                    <span className="font-medium text-neutral-900 text-xs">{formatCurrency(summaryData.avgCPAPurchase)}</span>
+                    <span className="text-[10px] text-neutral-400">{summaryData.avgCVRPurchase.toFixed(2)}%</span>
                   </div>
                 </div>
               </td>
-              <td className="px-2 py-2 text-xs text-gray-600 text-left">
+              <td className="px-2 py-2 text-xs text-neutral-600 text-left">
                 <div className="flex flex-col items-start">
-                  <span className="font-medium text-gray-900 text-xs">{formatCurrency(summaryData.totalPurchaseValue)}</span>
-                  <span className="text-[10px] text-gray-400">{summaryData.avgROAS.toFixed(2)}X</span>
+                  <span className="font-medium text-neutral-900 text-xs">{formatCurrency(summaryData.totalPurchaseValue)}</span>
+                  <span className="text-[10px] text-neutral-400">{summaryData.avgROAS.toFixed(2)}X</span>
                 </div>
               </td>
             </tr>
@@ -2518,17 +2518,17 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
               return (
                 <React.Fragment key={campaign.id}>
                   <tr 
-                    className={`hover:bg-gray-50 transition-colors ${!campaign.enabled ? 'opacity-50' : ''}`}
+                    className={`hover:bg-neutral-50 transition-colors ${!campaign.enabled ? 'opacity-50' : ''}`}
                   >
                     <td className="px-2 py-3">
                       <button
                         onClick={() => toggleCampaign(campaign.id)}
-                        className="text-gray-400 hover:text-indigo-600 transition-colors"
+                        className="text-neutral-400 hover:text-primary-600 transition-colors"
                       >
                         {campaign.enabled ? (
-                          <ToggleRight size={32} className="text-green-500" />
+                          <ToggleRight size={32} className="text-success-500" />
                         ) : (
-                          <ToggleLeft size={32} className="text-gray-400" />
+                          <ToggleLeft size={32} className="text-neutral-400" />
                         )}
                       </button>
                     </td>
@@ -2538,7 +2538,7 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
                           {campaign.platform && getPlatformLogo(campaign.platform)}
                         </div>
                         <span 
-                          className="font-medium text-gray-900 text-xs truncate block max-w-[160px]"
+                          className="font-medium text-neutral-900 text-xs truncate block max-w-[160px]"
                           title={campaign.campaign}
                         >
                           {campaign.campaign}
@@ -2554,7 +2554,7 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
                         </div>
                         <button
                           onClick={() => toggleExpand(campaign.id)}
-                          className="absolute bottom-0 right-0 text-gray-400 hover:text-indigo-600 transition-colors"
+                          className="absolute bottom-0 right-0 text-neutral-400 hover:text-primary-600 transition-colors"
                           title={campaign.expanded ? 'Collapse' : 'Expand'}
                         >
                           {campaign.expanded ? (
@@ -2566,7 +2566,7 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
                       </div>
                     </td>
                     <td className="px-2 py-3">
-                      <div className="text-xs text-gray-600 font-medium">
+                      <div className="text-xs text-neutral-600 font-medium">
                         {campaign.adAccount}
                       </div>
                     </td>
@@ -2579,18 +2579,18 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
                     <td className="px-2 py-3">
                       {campaign.budgetLevel === 'campaign' ? (
                         <div className="flex items-center gap-1">
-                          <span className="font-medium text-gray-900 text-xs">{formatCurrency(campaign.dailyBudget)}</span>
+                          <span className="font-medium text-neutral-900 text-xs">{formatCurrency(campaign.dailyBudget)}</span>
                           {campaign.status === 'Active' && (
                             <button
                               onClick={() => onBudgetEditClick && onBudgetEditClick(campaign)}
-                              className="text-gray-400 hover:text-indigo-600 transition-colors"
+                              className="text-neutral-400 hover:text-primary-600 transition-colors"
                             >
                               <Edit size={14} />
                             </button>
                           )}
                         </div>
                       ) : (
-                        <span className="text-xs font-medium text-gray-700 bg-blue-50 text-blue-700 px-2 py-1 rounded">
+                        <span className="text-xs font-medium text-neutral-700 bg-info-50 text-info-700 px-2 py-1 rounded">
                           ABO (Adset Budget)
                         </span>
                       )}
@@ -2599,7 +2599,7 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
                       {campaign.platform === 'Meta' ? (
                         campaign.budgetLevel === 'campaign' ? (
                           campaign.status === 'Paused' ? (
-                            <div className="text-xs text-gray-400 font-semibold">
+                            <div className="text-xs text-neutral-400 font-semibold">
                               --
                             </div>
                           ) : (
@@ -2618,13 +2618,13 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
                                       <div className="flex gap-1">
                                         <button
                                           onClick={() => handleApprove(campaign.id)}
-                                          className="text-[10px] bg-indigo-600 text-white px-1.5 py-0.5 rounded hover:bg-indigo-700 transition-colors"
+                                          className="text-[10px] bg-primary-600 text-white px-1.5 py-0.5 rounded hover:bg-primary-700 transition-colors"
                                         >
                                           Approve
                                         </button>
                                         <button
                                           onClick={() => handleReject(campaign.id)}
-                                          className="text-gray-400 hover:text-red-600 transition-colors"
+                                          className="text-neutral-400 hover:text-danger-600 transition-colors"
                                           title="Reject"
                                         >
                                           <ThumbsDown size={14} />
@@ -2642,14 +2642,14 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
                             </div>
                           )
                         ) : (
-                          <div className="text-[10px] text-indigo-600 font-semibold italic p-2">
+                          <div className="text-[10px] text-primary-600 font-semibold italic p-2">
                             Budget suggestions in adset
                           </div>
                         )
                       ) : (
                         <div className="flex items-center justify-center py-3">
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-gray-100 border border-gray-200">
-                            <span className="text-[9px] font-medium text-gray-500">
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-neutral-100 border border-neutral-200">
+                            <span className="text-[9px] font-medium text-neutral-500">
                               Coming soon
                             </span>
                           </span>
@@ -2660,15 +2660,15 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
                       {campaign.platform === 'Meta' ? (
                         campaign.budgetLevel === 'campaign' ? (
                           campaign.status === 'Paused' ? (
-                            <div className="text-xs text-gray-400 font-semibold">
+                            <div className="text-xs text-neutral-400 font-semibold">
                               --
                             </div>
                           ) : (
                             <div className="flex items-center gap-1">
                               <div className="flex-1 space-y-2">
                                 {campaign.budgetReason.reasons.map((reason, idx) => (
-                                  <div key={idx} className="text-[10px] text-gray-600 flex items-start gap-0.5 mb-0.5 leading-tight">
-                                    <span className="text-indigo-600 mt-0.5">•</span>
+                                  <div key={idx} className="text-[10px] text-neutral-600 flex items-start gap-0.5 mb-0.5 leading-tight">
+                                    <span className="text-primary-600 mt-0.5">•</span>
                                     <span>{reason}</span>
                                   </div>
                                 ))}
@@ -2681,7 +2681,7 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
                                   handleReject,
                                   onBudgetStatusChange 
                                 })}
-                                className="text-indigo-600 hover:text-indigo-700 transition-colors"
+                                className="text-primary-600 hover:text-primary-700 transition-colors"
                                 title="More Insights"
                               >
                                 <Eye size={16} />
@@ -2689,69 +2689,69 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
                             </div>
                           )
                         ) : (
-                          <div className="text-xs text-gray-500 italic">
+                          <div className="text-xs text-neutral-500 italic">
                             Budget adjustment suggestions are available at adset level.
                           </div>
                         )
                       ) : (
                         <div className="flex items-center justify-center py-3">
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-gray-100 border border-gray-200">
-                            <span className="text-[9px] font-medium text-gray-500">
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-neutral-100 border border-neutral-200">
+                            <span className="text-[9px] font-medium text-neutral-500">
                               Coming soon
                             </span>
                           </span>
                         </div>
                       )}
                     </td>
-                    <td className="px-2 py-3 font-medium text-gray-900 text-xs">
+                    <td className="px-2 py-3 font-medium text-neutral-900 text-xs">
                       {formatCurrency(campaign.spend)}
                     </td>
-                    <td className="px-2 py-3 text-xs text-gray-600">
+                    <td className="px-2 py-3 text-xs text-neutral-600">
                       {formatNumber(campaign.impressions)}
                     </td>
-                    <td className="px-2 py-3 text-xs text-gray-600 text-left">
+                    <td className="px-2 py-3 text-xs text-neutral-600 text-left">
                       {formatCurrency(campaign.cpm)}
                     </td>
-                    <td className="px-2 py-3 text-xs text-gray-600">
+                    <td className="px-2 py-3 text-xs text-neutral-600">
                       {formatNumber(campaign.clicks)}
                     </td>
-                    <td className="px-2 py-3 text-xs text-gray-600 text-left">
+                    <td className="px-2 py-3 text-xs text-neutral-600 text-left">
                       <div className="flex flex-col items-start">
-                        <span className="font-medium text-gray-900 text-xs">{formatCurrency(campaign.cpc)}</span>
-                        <span className="text-[10px] text-gray-400">{campaign.ctr.toFixed(2)}%</span>
+                        <span className="font-medium text-neutral-900 text-xs">{formatCurrency(campaign.cpc)}</span>
+                        <span className="text-[10px] text-neutral-400">{campaign.ctr.toFixed(2)}%</span>
                       </div>
                     </td>
-                    <td className="px-2 py-3 font-medium text-gray-900 text-xs">
+                    <td className="px-2 py-3 font-medium text-neutral-900 text-xs">
                       {formatNumber(campaign.event1s)}
                     </td>
-                    <td className="px-2 py-3 text-xs text-gray-600 text-left">
+                    <td className="px-2 py-3 text-xs text-neutral-600 text-left">
                       <div className="flex flex-col items-start">
-                        <span className="font-medium text-gray-900 text-xs">{formatCurrency(campaign.cpaEvent1)}</span>
-                        <span className="text-[10px] text-gray-400">{campaign.cvrEvent1.toFixed(2)}%</span>
+                        <span className="font-medium text-neutral-900 text-xs">{formatCurrency(campaign.cpaEvent1)}</span>
+                        <span className="text-[10px] text-neutral-400">{campaign.cvrEvent1.toFixed(2)}%</span>
                       </div>
                     </td>
-                    <td className="px-2 py-3 font-medium text-gray-900 text-xs">
+                    <td className="px-2 py-3 font-medium text-neutral-900 text-xs">
                       {formatNumber(campaign.event2s)}
                     </td>
-                    <td className="px-2 py-3 text-xs text-gray-600 text-left">
+                    <td className="px-2 py-3 text-xs text-neutral-600 text-left">
                       <div className="flex flex-col items-start">
-                        <span className="font-medium text-gray-900 text-xs">{formatCurrency(campaign.cpaEvent2)}</span>
-                        <span className="text-[10px] text-gray-400">{campaign.cvrEvent2.toFixed(2)}%</span>
+                        <span className="font-medium text-neutral-900 text-xs">{formatCurrency(campaign.cpaEvent2)}</span>
+                        <span className="text-[10px] text-neutral-400">{campaign.cvrEvent2.toFixed(2)}%</span>
                       </div>
                     </td>
-                    <td className="px-2 py-3 font-medium text-gray-900 text-xs">
+                    <td className="px-2 py-3 font-medium text-neutral-900 text-xs">
                       {formatNumber(campaign.purchases)}
                     </td>
-                    <td className="px-2 py-3 text-xs text-gray-600 text-left">
+                    <td className="px-2 py-3 text-xs text-neutral-600 text-left">
                       <div className="flex flex-col items-start">
-                        <span className="font-medium text-gray-900 text-xs">{formatCurrency(campaign.cpaPurchase)}</span>
-                        <span className="text-[10px] text-gray-400">{campaign.cvrPurchase.toFixed(2)}%</span>
+                        <span className="font-medium text-neutral-900 text-xs">{formatCurrency(campaign.cpaPurchase)}</span>
+                        <span className="text-[10px] text-neutral-400">{campaign.cvrPurchase.toFixed(2)}%</span>
                       </div>
                     </td>
-                    <td className="px-2 py-3 text-xs text-gray-600 text-left">
+                    <td className="px-2 py-3 text-xs text-neutral-600 text-left">
                       <div className="flex flex-col items-start">
-                        <span className="font-medium text-gray-900 text-xs">{formatCurrency(campaign.purchaseValue)}</span>
-                        <span className="text-[10px] text-gray-400">{campaign.roas.toFixed(2)}X</span>
+                        <span className="font-medium text-neutral-900 text-xs">{formatCurrency(campaign.purchaseValue)}</span>
+                        <span className="text-[10px] text-neutral-400">{campaign.roas.toFixed(2)}X</span>
                       </div>
                     </td>
                   </tr>
@@ -2760,25 +2760,25 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
                   {campaign.expanded && campaign.adsets.map((adset) => {
                     const adsetStatus = budgetStatus[adset.id] || 'pending'
                     return (
-                      <tr key={adset.id} className={`bg-gray-50 hover:bg-gray-100 ${!adset.enabled ? 'opacity-50' : ''}`}>
+                      <tr key={adset.id} className={`bg-neutral-50 hover:bg-neutral-100 ${!adset.enabled ? 'opacity-50' : ''}`}>
                         <td className="px-2 py-2">
                           <button
                             onClick={() => toggleAdset(campaign.id, adset.id)}
-                            className="text-gray-400 hover:text-indigo-600 transition-colors"
+                            className="text-neutral-400 hover:text-primary-600 transition-colors"
                           >
                             {adset.enabled ? (
-                              <ToggleRight size={24} className="text-green-500" />
+                              <ToggleRight size={24} className="text-success-500" />
                             ) : (
-                              <ToggleLeft size={24} className="text-gray-400" />
+                              <ToggleLeft size={24} className="text-neutral-400" />
                             )}
                           </button>
                         </td>
                         <td className="px-2 py-1.5">
                           <div className="flex items-center gap-2">
-                            <div className="w-2 h-2 border-l-2 border-b-2 border-gray-400 ml-2"></div>
+                            <div className="w-2 h-2 border-l-2 border-b-2 border-neutral-400 ml-2"></div>
                             <div>
                               <div 
-                                className="font-medium text-gray-700 text-xs truncate block max-w-[140px]"
+                                className="font-medium text-neutral-700 text-xs truncate block max-w-[140px]"
                                 title={adset.name}
                               >
                                 {adset.name}
@@ -2797,7 +2797,7 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
                                   setSelectedAdset(adset)
                                   setIsAdsetDetailOpen(true)
                                 }}
-                                className="text-xs text-indigo-600 hover:text-indigo-700 transition-colors mt-0.5"
+                                className="text-xs text-primary-600 hover:text-primary-700 transition-colors mt-0.5"
                               >
                                 View detail
                               </button>
@@ -2805,7 +2805,7 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
                           </div>
                         </td>
                         <td className="px-2 py-2">
-                          <div className="text-xs text-gray-500 font-medium">
+                          <div className="text-xs text-neutral-500 font-medium">
                             {campaign.adAccount}
                           </div>
                         </td>
@@ -2817,16 +2817,16 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
                         </td>
                         <td className="px-2 py-2">
                           {campaign.budgetLevel === 'campaign' ? (
-                            <span className="text-xs font-medium text-gray-700 bg-blue-50 text-blue-700 px-2 py-1 rounded">
+                            <span className="text-xs font-medium text-neutral-700 bg-info-50 text-info-700 px-2 py-1 rounded">
                               CBO (Campaign Budget)
                             </span>
                           ) : (
                             <div className="flex items-center gap-1">
-                              <span className="font-medium text-gray-700 text-xs">{formatCurrency(adset.dailyBudget)}</span>
+                              <span className="font-medium text-neutral-700 text-xs">{formatCurrency(adset.dailyBudget)}</span>
                               {adset.status === 'Active' && (
                                 <button
                                   onClick={() => onBudgetEditClick && onBudgetEditClick({ ...adset, isAdset: true, parentCampaign: campaign })}
-                                  className="text-gray-400 hover:text-indigo-600 transition-colors"
+                                  className="text-neutral-400 hover:text-primary-600 transition-colors"
                                 >
                                   <Edit size={14} />
                                 </button>
@@ -2837,12 +2837,12 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
                         <td className="px-2 py-2">
                           {campaign.platform === 'Meta' ? (
                             campaign.budgetLevel === 'campaign' ? (
-                              <div className="text-[10px] text-gray-500 italic">
+                              <div className="text-[10px] text-neutral-500 italic">
                                 Intelligent budget allocation to more advantageous adsets
                               </div>
                             ) : (
                               adset.status === 'Paused' ? (
-                                <div className="text-xs text-gray-400 font-semibold">
+                                <div className="text-xs text-neutral-400 font-semibold">
                                   --
                                 </div>
                               ) : (
@@ -2862,13 +2862,13 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
                                             <div className="flex gap-1">
                                               <button
                                                 onClick={() => handleApprove(adset.id)}
-                                                className="text-[10px] bg-indigo-600 text-white px-1.5 py-0.5 rounded hover:bg-indigo-700 transition-colors"
+                                                className="text-[10px] bg-primary-600 text-white px-1.5 py-0.5 rounded hover:bg-primary-700 transition-colors"
                                               >
                                                 Approve
                                               </button>
                                               <button
                                                 onClick={() => handleReject(adset.id)}
-                                                className="text-gray-400 hover:text-red-600 transition-colors"
+                                                className="text-neutral-400 hover:text-danger-600 transition-colors"
                                                 title="Reject"
                                               >
                                                 <ThumbsDown size={14} />
@@ -2889,8 +2889,8 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
                             )
                           ) : (
                             <div className="flex items-center justify-center py-2">
-                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-gray-100 border border-gray-200">
-                                <span className="text-[9px] font-medium text-gray-500">
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-neutral-100 border border-neutral-200">
+                                <span className="text-[9px] font-medium text-neutral-500">
                                   Coming soon
                                 </span>
                               </span>
@@ -2900,7 +2900,7 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
                         <td className="px-2 py-2">
                           {campaign.platform === 'Meta' ? (
                             adset.status === 'Paused' ? (
-                              <div className="text-xs text-gray-400 font-semibold">
+                              <div className="text-xs text-neutral-400 font-semibold">
                                 --
                               </div>
                             ) : (
@@ -2908,8 +2908,8 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
                                 <div className="flex items-center gap-1">
                                   <div className="flex-1 space-y-2">
                                 {adset.budgetReason.reasons.map((reason, idx) => (
-                                  <div key={idx} className="text-[10px] text-gray-600 flex items-start gap-0.5 mb-0.5 leading-tight">
-                                    <span className="text-indigo-600 mt-0.5">•</span>
+                                  <div key={idx} className="text-[10px] text-neutral-600 flex items-start gap-0.5 mb-0.5 leading-tight">
+                                    <span className="text-primary-600 mt-0.5">•</span>
                                     <span>{reason}</span>
                                   </div>
                                 ))}
@@ -2922,77 +2922,77 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
                                   handleReject,
                                   onBudgetStatusChange 
                                 })}
-                                className="text-indigo-600 hover:text-indigo-700 transition-colors"
+                                className="text-primary-600 hover:text-primary-700 transition-colors"
                                 title="More Insights"
                               >
                                     <Eye size={16} />
                                   </button>
                                 </div>
                               ) : (
-                                <div className="text-xs text-gray-500 italic">
+                                <div className="text-xs text-neutral-500 italic">
                                   No budget adjustment suggestions.
                                 </div>
                               )
                             )
                           ) : (
                             <div className="flex items-center justify-center py-2">
-                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-gray-100 border border-gray-200">
-                                <span className="text-[9px] font-medium text-gray-500">
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-neutral-100 border border-neutral-200">
+                                <span className="text-[9px] font-medium text-neutral-500">
                                   Coming soon
                                 </span>
                               </span>
                             </div>
                           )}
                         </td>
-                        <td className="px-2 py-2 font-medium text-gray-700 text-xs">
+                        <td className="px-2 py-2 font-medium text-neutral-700 text-xs">
                           {formatCurrency(adset.spend)}
                         </td>
-                        <td className="px-2 py-2 text-xs text-gray-600">
+                        <td className="px-2 py-2 text-xs text-neutral-600">
                           {formatNumber(adset.impressions)}
                         </td>
-                        <td className="px-2 py-2 text-xs text-gray-600 text-left">
+                        <td className="px-2 py-2 text-xs text-neutral-600 text-left">
                           {formatCurrency(adset.cpm)}
                         </td>
-                        <td className="px-2 py-2 text-xs text-gray-600">
+                        <td className="px-2 py-2 text-xs text-neutral-600">
                           {formatNumber(adset.clicks)}
                         </td>
-                        <td className="px-2 py-2 text-xs text-gray-600 text-left">
+                        <td className="px-2 py-2 text-xs text-neutral-600 text-left">
                           <div className="flex flex-col items-start">
-                            <span className="font-medium text-gray-700 text-xs">{formatCurrency(adset.cpc)}</span>
-                            <span className="text-[10px] text-gray-400">{adset.ctr.toFixed(2)}%</span>
+                            <span className="font-medium text-neutral-700 text-xs">{formatCurrency(adset.cpc)}</span>
+                            <span className="text-[10px] text-neutral-400">{adset.ctr.toFixed(2)}%</span>
                           </div>
                         </td>
-                        <td className="px-2 py-2 font-medium text-gray-700 text-xs">
+                        <td className="px-2 py-2 font-medium text-neutral-700 text-xs">
                           {formatNumber(adset.event1s)}
                         </td>
-                        <td className="px-2 py-2 text-xs text-gray-600 text-left">
+                        <td className="px-2 py-2 text-xs text-neutral-600 text-left">
                           <div className="flex flex-col items-start">
-                            <span className="font-medium text-gray-700 text-xs">{formatCurrency(adset.cpaEvent1)}</span>
-                            <span className="text-[10px] text-gray-400">{adset.cvrEvent1.toFixed(2)}%</span>
+                            <span className="font-medium text-neutral-700 text-xs">{formatCurrency(adset.cpaEvent1)}</span>
+                            <span className="text-[10px] text-neutral-400">{adset.cvrEvent1.toFixed(2)}%</span>
                           </div>
                         </td>
-                        <td className="px-2 py-2 font-medium text-gray-700 text-xs">
+                        <td className="px-2 py-2 font-medium text-neutral-700 text-xs">
                           {formatNumber(adset.event2s)}
                         </td>
-                        <td className="px-2 py-2 text-xs text-gray-600 text-left">
+                        <td className="px-2 py-2 text-xs text-neutral-600 text-left">
                           <div className="flex flex-col items-start">
-                            <span className="font-medium text-gray-700 text-xs">{formatCurrency(adset.cpaEvent2)}</span>
-                            <span className="text-[10px] text-gray-400">{adset.cvrEvent2.toFixed(2)}%</span>
+                            <span className="font-medium text-neutral-700 text-xs">{formatCurrency(adset.cpaEvent2)}</span>
+                            <span className="text-[10px] text-neutral-400">{adset.cvrEvent2.toFixed(2)}%</span>
                           </div>
                         </td>
-                        <td className="px-2 py-2 font-medium text-gray-700 text-xs">
+                        <td className="px-2 py-2 font-medium text-neutral-700 text-xs">
                           {formatNumber(adset.purchases)}
                         </td>
-                        <td className="px-2 py-2 text-xs text-gray-600 text-left">
+                        <td className="px-2 py-2 text-xs text-neutral-600 text-left">
                           <div className="flex flex-col items-start">
-                            <span className="font-medium text-gray-900 text-xs">{formatCurrency(adset.cpaPurchase)}</span>
-                            <span className="text-[10px] text-gray-400">{adset.cvrPurchase.toFixed(2)}%</span>
+                            <span className="font-medium text-neutral-900 text-xs">{formatCurrency(adset.cpaPurchase)}</span>
+                            <span className="text-[10px] text-neutral-400">{adset.cvrPurchase.toFixed(2)}%</span>
                           </div>
                         </td>
-                        <td className="px-2 py-2 text-xs text-gray-600 text-left">
+                        <td className="px-2 py-2 text-xs text-neutral-600 text-left">
                           <div className="flex flex-col items-start">
-                            <span className="font-medium text-gray-700 text-xs">{formatCurrency(adset.purchaseValue)}</span>
-                            <span className="text-[10px] text-gray-400">{adset.roas.toFixed(2)}X</span>
+                            <span className="font-medium text-neutral-700 text-xs">{formatCurrency(adset.purchaseValue)}</span>
+                            <span className="text-[10px] text-neutral-400">{adset.roas.toFixed(2)}X</span>
                           </div>
                         </td>
                       </tr>
@@ -3007,14 +3007,14 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
 
       {/* Pagination Controls */}
       <div className="flex items-center justify-between mt-4 px-2">
-        <div className="text-sm text-gray-500 italic">
+        <div className="text-sm text-neutral-500 italic">
           The latest data is automatically retrieved every 15 minutes.
         </div>
         <div className="flex items-center gap-2">
           <button
             onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
             disabled={currentPage === 1}
-            className="px-3 py-1.5 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium"
+            className="px-3 py-1.5 bg-white border border-neutral-300 rounded-lg hover:bg-neutral-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium"
           >
             Previous
           </button>
@@ -3025,8 +3025,8 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
                 onClick={() => setCurrentPage(page)}
                 className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                   currentPage === page
-                    ? 'bg-indigo-600 text-white'
-                    : 'bg-white border border-gray-300 hover:bg-gray-50'
+                    ? 'bg-primary-600 text-white'
+                    : 'bg-white border border-neutral-300 hover:bg-neutral-50'
                 }`}
               >
                 {page}
@@ -3036,7 +3036,7 @@ const CampaignTable = ({ budgetStatus, onBudgetStatusChange, onCampaignClick, on
           <button
             onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
             disabled={currentPage === totalPages}
-            className="px-3 py-1.5 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium"
+            className="px-3 py-1.5 bg-white border border-neutral-300 rounded-lg hover:bg-neutral-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium"
           >
             Next
           </button>

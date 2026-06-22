@@ -371,7 +371,7 @@ const BrandProfile = () => {
           splitPart.forEach((sub, i) => {
             newParts.push(sub);
             if (i < splitPart.length - 1) {
-              newParts.push(<strong key={sub+i} className="bg-amber-100/60 px-1 rounded mx-0.5 font-bold text-slate-800">{kw}</strong>);
+              newParts.push(<strong key={sub+i} className="bg-warning-100/60 px-1 rounded mx-0.5 font-bold text-neutral-800">{kw}</strong>);
             }
           });
         } else {
@@ -388,33 +388,17 @@ const BrandProfile = () => {
   const currentStep = Math.min(Math.floor(elapsedTime / 2.5), 3);
 
   return (
-    <div className={`${isUpdating ? 'h-[calc(100vh-80px)] overflow-hidden' : 'min-h-screen'} bg-[#F8FAFC] text-[#1E293B] font-sans relative transition-all duration-500`}>
-      <style>{`
-        @media print { .no-print { display: none !important; } }
-        .animate-fadeIn { animation: fadeIn 0.5s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #E2E8F0; border-radius: 20px; }
-        @keyframes scan {
-          0% { top: 0%; opacity: 0; }
-          5% { opacity: 1; }
-          95% { opacity: 1; }
-          100% { top: 100%; opacity: 0; }
-        }
-        .animate-scan {
-          animation: scan 3s linear infinite;
-        }
-      `}</style>
+    <div className={`${isUpdating ? 'h-[calc(100vh-80px)] overflow-hidden' : 'min-h-screen'} bg-neutral-50 text-neutral-800 font-sans relative transition-all duration-500`}>
+      {/* Inline <style> block removed — styles migrated to tailwind.config.js (scan keyframe) and index.css (print, custom-scrollbar) */}
 
       {/* AI Analysis View (Content Area Only) */}
       {isUpdating && (
-        <div className="absolute inset-0 bg-[#F8FAFC] z-[60] flex flex-col overflow-hidden animate-in fade-in duration-500 rounded-3xl">
+        <div className="absolute inset-0 bg-neutral-50 z-[60] flex flex-col overflow-hidden animate-in fade-in duration-500 rounded-2xl">
           {/* Top Status Bar */}
-          <div className="h-14 flex items-center justify-center px-6 shrink-0 relative border-b border-slate-100 bg-white">
+          <div className="h-14 flex items-center justify-center px-6 shrink-0 relative border-b border-neutral-100 bg-white">
             <div className="flex items-center gap-3">
-              <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
-              <span className="text-sm font-bold text-slate-700">
+              <div className="w-2 h-2 bg-info-500 rounded-full animate-pulse" />
+              <span className="text-sm font-bold text-neutral-700">
                 {analysisProgress < 25 ? '正在识别品牌信息...' : 
                  analysisProgress < 50 ? '正在抓取页面内容...' :
                  analysisProgress < 75 ? '正在分析竞争对手...' :
@@ -425,15 +409,15 @@ const BrandProfile = () => {
 
           <div className="flex-1 flex min-h-0">
             {/* Left Sidebar */}
-            <div className="w-[360px] flex flex-col p-8 shrink-0 overflow-y-auto border-r border-slate-100 bg-white shadow-sm">
+            <div className="w-[360px] flex flex-col p-8 shrink-0 overflow-y-auto border-r border-neutral-100 bg-white shadow-sm">
               <div className="mb-10">
                 <div className="flex items-center justify-between mb-4">
-                  <span className="text-sm font-black text-slate-900">生成进度</span>
-                  <span className="text-sm font-mono font-bold text-blue-600">{analysisProgress}%</span>
+                  <span className="text-sm font-black text-neutral-900">生成进度</span>
+                  <span className="text-sm font-mono font-bold text-info-600">{analysisProgress}%</span>
                 </div>
-                <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                <div className="h-2 bg-neutral-100 rounded-full overflow-hidden">
                   <div 
-                    className="h-full bg-indigo-600 transition-all duration-500 ease-out rounded-full shadow-[0_0_12px_rgba(79,70,229,0.4)]"
+                    className="h-full bg-primary-600 transition-all duration-500 ease-out rounded-full shadow-[0_0_12px_rgba(99,102,241,0.4)]"
                     style={{ width: `${analysisProgress}%` }}
                   />
                 </div>
@@ -447,29 +431,29 @@ const BrandProfile = () => {
                   return (
                     <div 
                       key={step.id}
-                      className={`p-6 rounded-[32px] border transition-all duration-500 ${
-                        isActive ? 'bg-white border-indigo-100 shadow-2xl shadow-indigo-500/10' : 
-                        isCompleted ? 'bg-slate-50/50 border-slate-100 opacity-60' :
+                      className={`p-6 rounded-2xl border transition-all duration-500 ${
+                        isActive ? 'bg-white border-primary-100 shadow-2xl shadow-primary-500/10' : 
+                        isCompleted ? 'bg-neutral-50/50 border-neutral-100 opacity-60' :
                         'bg-transparent border-transparent opacity-30'
                       }`}
                     >
                       <div className="flex items-start gap-5">
                         <div className={`mt-0.5 w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 transition-all duration-500 ${
-                          isCompleted ? 'bg-indigo-50 text-indigo-600' :
-                          isActive ? 'bg-amber-50 text-amber-600 ring-4 ring-amber-50/50' :
-                          'bg-slate-100 text-slate-300'
+                          isCompleted ? 'bg-primary-50 text-primary-600' :
+                          isActive ? 'bg-warning-50 text-warning-600 ring-4 ring-warning-50/50' :
+                          'bg-neutral-100 text-neutral-300'
                         }`}>
                           {isCompleted ? <Check size={20} strokeWidth={3} /> : 
                            isActive ? <RefreshCcw size={20} className="animate-spin" /> :
                            <div className="w-2.5 h-2.5 rounded-full bg-current" />}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <h4 className={`text-base font-black mb-1 transition-colors duration-500 ${isActive ? 'text-slate-900' : 'text-slate-500'}`}>
+                          <h4 className={`text-base font-black mb-1 transition-colors duration-500 ${isActive ? 'text-neutral-900' : 'text-neutral-500'}`}>
                             {step.title}
                           </h4>
                           {isActive && (
                             <div className="animate-in slide-in-from-top-2 duration-500 mt-2">
-                              <p className="text-xs text-slate-400 leading-relaxed mb-5 font-bold">
+                              <p className="text-xs text-neutral-400 leading-relaxed mb-5 font-bold">
                                 {step.desc}
                               </p>
                               <div className="space-y-3">
@@ -478,11 +462,11 @@ const BrandProfile = () => {
                                   return (
                                     <div key={taskIdx} className="flex items-center gap-3 text-xs font-black">
                                       {isTaskCompleted ? (
-                                        <Check size={14} className="text-green-500" strokeWidth={3} />
+                                        <Check size={14} className="text-success-500" strokeWidth={3} />
                                       ) : (
-                                        <RefreshCcw size={14} className="text-amber-500 animate-spin" />
+                                        <RefreshCcw size={14} className="text-warning-500 animate-spin" />
                                       )}
-                                      <span className={isTaskCompleted ? 'text-slate-400' : 'text-slate-600'}>
+                                      <span className={isTaskCompleted ? 'text-neutral-400' : 'text-neutral-600'}>
                                         {task}
                                       </span>
                                     </div>
@@ -503,34 +487,34 @@ const BrandProfile = () => {
             </div>
 
             {/* Main Preview Area */}
-            <div className="flex-1 bg-slate-50/50 p-12 pt-8 overflow-hidden flex flex-col">
+            <div className="flex-1 bg-neutral-50/50 p-12 pt-8 overflow-hidden flex flex-col">
               <div className="mb-6 flex items-center justify-between px-2">
                 <div className="flex items-center gap-3">
-                  <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                  <span className="text-[11px] font-black text-slate-400">Browser Live View</span>
+                  <div className="w-2 h-2 rounded-full bg-success-500 animate-pulse" />
+                  <span className="text-[11px] font-black text-neutral-400">Browser Live View</span>
                 </div>
               </div>
               
-              <div className="flex-1 bg-white rounded-[40px] border border-slate-200 shadow-[0_48px_96px_-12px_rgba(0,0,0,0.15)] overflow-hidden flex flex-col relative group/browser">
+              <div className="flex-1 bg-white rounded-2xl border border-neutral-200 shadow-[0_48px_96px_-12px_rgba(0,0,0,0.15)] overflow-hidden flex flex-col relative group/browser">
                 {/* Browser Header */}
-                <div className="h-16 bg-slate-50 border-b border-slate-100 flex items-center px-8 gap-8">
+                <div className="h-16 bg-neutral-50 border-b border-neutral-100 flex items-center px-8 gap-8">
                   <div className="flex gap-2.5">
                     <div className="w-3.5 h-3.5 rounded-full bg-[#FF5F57] shadow-inner" />
                     <div className="w-3.5 h-3.5 rounded-full bg-[#FFBD2E] shadow-inner" />
                     <div className="w-3.5 h-3.5 rounded-full bg-[#28C840] shadow-inner" />
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="px-6 py-2.5 bg-white rounded-t-2xl border border-slate-100 border-b-white -mb-[21px] flex items-center gap-4 relative z-10 shadow-[0_-4px_12px_rgba(0,0,0,0.02)]">
-                      <div className="w-4 h-4 bg-indigo-600 rounded-lg flex items-center justify-center">
+                    <div className="px-6 py-2.5 bg-white rounded-t-2xl border border-neutral-100 border-b-white -mb-[21px] flex items-center gap-4 relative z-10 shadow-[0_-4px_12px_rgba(0,0,0,0.02)]">
+                      <div className="w-4 h-4 bg-primary-600 rounded-lg flex items-center justify-center">
                         <span className="text-[10px] font-black text-white">1</span>
                       </div>
-                      <span className="text-xs font-black text-slate-700 tracking-tight">Brand Page</span>
-                      <div className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse" />
+                      <span className="text-xs font-black text-neutral-700 tracking-tight">Brand Page</span>
+                      <div className="w-2 h-2 rounded-full bg-primary-500 animate-pulse" />
                     </div>
                   </div>
-                  <div className="flex-1 h-10 bg-white rounded-2xl border border-slate-200 flex items-center px-5 gap-4 shadow-sm">
-                    <Link size={16} className="text-slate-300" />
-                    <span className="text-sm text-slate-400 font-bold truncate tracking-tight">{profile.domain}</span>
+                  <div className="flex-1 h-10 bg-white rounded-2xl border border-neutral-200 flex items-center px-5 gap-4 shadow-sm">
+                    <Link size={16} className="text-neutral-300" />
+                    <span className="text-sm text-neutral-400 font-bold truncate tracking-tight">{profile.domain}</span>
                   </div>
                 </div>
                 
@@ -541,42 +525,42 @@ const BrandProfile = () => {
                     <div className="w-full flex flex-col animate-in fade-in zoom-in-95 duration-1000">
                       <nav className="flex items-center justify-between mb-20 px-4">
                         <div className="flex items-center gap-4">
-                          <div className="w-12 h-12 bg-slate-900 rounded-[16px] flex items-center justify-center text-white shadow-2xl">
+                          <div className="w-12 h-12 bg-neutral-900 rounded-xl flex items-center justify-center text-white shadow-2xl">
                             <Sparkles size={24} />
                           </div>
-                          <span className="text-2xl font-black text-slate-900 tracking-tighter italic">Brand.ai</span>
+                          <span className="text-2xl font-black text-neutral-900 tracking-tighter italic">Brand.ai</span>
                         </div>
-                        <div className="flex items-center gap-10 text-sm font-black text-slate-500">
-                          <span className="hover:text-slate-900 transition-colors cursor-pointer">Products</span>
-                          <span className="hover:text-slate-900 transition-colors cursor-pointer">Solutions</span>
-                          <span className="hover:text-slate-900 transition-colors cursor-pointer">Pricing</span>
-                          <button className="px-8 py-3 bg-indigo-600 text-white rounded-2xl hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-200 active:scale-95">Get Started</button>
+                        <div className="flex items-center gap-10 text-sm font-black text-neutral-500">
+                          <span className="hover:text-neutral-900 transition-colors cursor-pointer">Products</span>
+                          <span className="hover:text-neutral-900 transition-colors cursor-pointer">Solutions</span>
+                          <span className="hover:text-neutral-900 transition-colors cursor-pointer">Pricing</span>
+                          <button className="px-8 py-3 bg-primary-600 text-white rounded-2xl hover:bg-primary-700 transition-all shadow-xl shadow-primary-200 active:scale-95">Get Started</button>
                         </div>
                       </nav>
                       
                       <div className="flex-1 flex flex-col items-center justify-center text-center max-w-4xl mx-auto space-y-12 py-10 relative">
-                        <div className="absolute -top-40 left-1/2 -translate-x-1/2 w-96 h-96 bg-indigo-500/10 rounded-full blur-[120px]" />
+                        <div className="absolute -top-40 left-1/2 -translate-x-1/2 w-96 h-96 bg-primary-500/10 rounded-full blur-[120px]" />
                         
-                        <div className="px-6 py-2.5 bg-indigo-50 text-indigo-600 rounded-full text-xs font-black border border-indigo-100 shadow-sm
+                        <div className="px-6 py-2.5 bg-primary-50 text-primary-600 rounded-full text-xs font-black border border-primary-100 shadow-sm
                         ">
                           AI-Powered Market Intelligence
                         </div>
                         
-                        <h2 className="text-[80px] font-black text-slate-900 leading-[1] tracking-tight">
+                        <h2 className="text-[80px] font-black text-neutral-900 leading-[1] tracking-tight">
                           The Future of<br />
-                          <span className="text-indigo-600 relative inline-block">
+                          <span className="text-primary-600 relative inline-block">
                             Your Brand
-                            <div className="absolute inset-x-0 -bottom-3 h-8 bg-yellow-200/40 -rotate-1 -z-10 rounded-md" />
+                            <div className="absolute inset-x-0 -bottom-3 h-8 bg-warning-200/40 -rotate-1 -z-10 rounded-md" />
                           </span>
                         </h2>
                         
-                        <p className="text-2xl text-slate-500 font-bold max-w-2xl mx-auto leading-relaxed">
+                        <p className="text-2xl text-neutral-500 font-bold max-w-2xl mx-auto leading-relaxed">
                           Analyze thousands of data points to create the perfect marketing strategy for your business.
                         </p>
                         
                         <div className="flex items-center gap-8 pt-6">
-                          <div className="w-64 h-20 bg-slate-50 rounded-[32px] border border-slate-100 animate-pulse" />
-                          <div className="w-64 h-20 bg-slate-50 rounded-[32px] border border-slate-100 animate-pulse" />
+                          <div className="w-64 h-20 bg-neutral-50 rounded-2xl border border-neutral-100 animate-pulse" />
+                          <div className="w-64 h-20 bg-neutral-50 rounded-2xl border border-neutral-100 animate-pulse" />
                         </div>
                       </div>
                     </div>
@@ -584,8 +568,8 @@ const BrandProfile = () => {
                   
                   {/* High Fidelity Scanner Effect */}
                   <div className="absolute inset-0 pointer-events-none">
-                    <div className="absolute inset-x-0 h-[4px] bg-gradient-to-r from-transparent via-indigo-500 to-transparent shadow-[0_0_30px_rgba(79,70,229,0.8)] z-20 animate-scan" />
-                    <div className="absolute inset-0 bg-indigo-500/5 backdrop-blur-[2px] animate-pulse" />
+                    <div className="absolute inset-x-0 h-[4px] bg-gradient-to-r from-transparent via-primary-500 to-transparent shadow-[0_0_30px_rgba(99,102,241,0.8)] z-20 animate-scan" />
+                    <div className="absolute inset-0 bg-primary-500/5 backdrop-blur-[2px] animate-pulse" />
                   </div>
                 </div>
               </div>
@@ -601,14 +585,14 @@ const BrandProfile = () => {
               {!isEditMode ? (
                 <button 
                   onClick={handleEdit} 
-                  className="pointer-events-auto bg-white text-slate-900 border border-slate-200 px-8 py-2.5 rounded-xl font-bold text-sm hover:bg-slate-50 transition-all active:scale-95 shadow-lg shadow-slate-100"
+                  className="pointer-events-auto bg-white text-neutral-900 border border-neutral-200 px-8 py-2.5 rounded-xl font-bold text-sm hover:bg-neutral-50 transition-all active:scale-95 shadow-lg shadow-neutral-100"
                 >
                   Edit profile
                 </button>
               ) : (
                 <button 
                   onClick={handleSave} 
-                  className="pointer-events-auto bg-slate-900 text-white px-8 py-2.5 rounded-xl font-bold text-sm hover:bg-black transition-all active:scale-95 shadow-lg shadow-slate-200"
+                  className="pointer-events-auto bg-neutral-900 text-white px-8 py-2.5 rounded-xl font-bold text-sm hover:bg-black transition-all active:scale-95 shadow-lg shadow-neutral-200"
                 >
                   Save
                 </button>
@@ -620,16 +604,16 @@ const BrandProfile = () => {
             <div className="space-y-12">
               
               {/* Brand Header Card */}
-              <div className={`bg-white rounded-3xl p-10 border border-slate-200 shadow-sm animate-fadeIn relative transition-all ${isEditMode ? 'ring-2 ring-amber-500/10' : ''}`}>
-                <div className="flex flex-col lg:flex-row gap-10 items-start mb-8 pb-8 border-b border-slate-100">
+              <div className={`bg-white rounded-2xl p-10 border border-neutral-200 shadow-sm animate-slide-up relative transition-all ${isEditMode ? 'ring-2 ring-warning-500/10' : ''}`}>
+                <div className="flex flex-col lg:flex-row gap-10 items-start mb-8 pb-8 border-b border-neutral-100">
                   
                   {/* Logo Section */}
                   <div className="shrink-0 space-y-4 w-32">
                     <div className="relative group/main">
-                      <div className="w-32 h-32 bg-white border border-slate-100 rounded-[24px] flex items-center justify-center text-5xl shadow-xl relative transition-all hover:scale-[1.02] ring-2 ring-indigo-500/10">
+                      <div className="w-32 h-32 bg-white border border-neutral-100 rounded-xl flex items-center justify-center text-5xl shadow-xl relative transition-all hover:scale-[1.02] ring-2 ring-primary-500/10">
                         {profile.logos?.[selectedLogoIndex] || profile.logos?.[0] || '🚀'}
                         {isEditMode && (
-                          <div className="absolute inset-0 bg-black/5 rounded-[24px] opacity-0 group-hover/main:opacity-100 transition-opacity flex items-center justify-center cursor-pointer">
+                          <div className="absolute inset-0 bg-black/5 rounded-xl opacity-0 group-hover/main:opacity-100 transition-opacity flex items-center justify-center cursor-pointer">
                             <Upload size={20} className="text-white drop-shadow-md" />
                           </div>
                         )}
@@ -640,13 +624,13 @@ const BrandProfile = () => {
                       {profile.logos?.map((logo, i) => (
                         <div 
                           key={i} 
-                          className={`relative group/sub w-9 h-9 bg-white border rounded-lg flex items-center justify-center text-base shadow-sm cursor-pointer transition-all ${i === selectedLogoIndex ? 'border-indigo-500 ring-2 ring-indigo-500/10 scale-105' : 'border-slate-100 hover:border-indigo-200'}`}
+                          className={`relative group/sub w-9 h-9 bg-white border rounded-lg flex items-center justify-center text-base shadow-sm cursor-pointer transition-all ${i === selectedLogoIndex ? 'border-primary-500 ring-2 ring-primary-500/10 scale-105' : 'border-neutral-100 hover:border-primary-200'}`}
                           onClick={() => setSelectedLogoIndex(i)}
                         >
                           {logo}
                           {isEditMode && (
                             <button 
-                              className="absolute -top-1 -right-1 bg-rose-500 text-white rounded-full p-0.5 opacity-0 group-hover/sub:opacity-100 transition-opacity shadow-lg"
+                              className="absolute -top-1 -right-1 bg-danger-500 text-white rounded-full p-0.5 opacity-0 group-hover/sub:opacity-100 transition-opacity shadow-lg"
                               onClick={(e) => { 
                                 e.stopPropagation(); 
                                 const newLogos = profile.logos.filter((_, idx) => idx !== i);
@@ -660,7 +644,7 @@ const BrandProfile = () => {
                         </div>
                       ))}
                       {isEditMode && (profile.logos?.length || 0) < 5 && (
-                        <div className="w-9 h-9 border-2 border-dashed border-slate-100 rounded-lg flex items-center justify-center text-slate-300 hover:text-indigo-400 hover:border-indigo-200 hover:bg-indigo-50 transition-all cursor-pointer">
+                        <div className="w-9 h-9 border-2 border-dashed border-neutral-100 rounded-lg flex items-center justify-center text-neutral-300 hover:text-primary-400 hover:border-primary-200 hover:bg-primary-50 transition-all cursor-pointer">
                           <Plus size={14} />
                         </div>
                       )}
@@ -676,15 +660,15 @@ const BrandProfile = () => {
                           value={profile.brand_name} 
                           onChange={(e) => setProfile({...profile, brand_name: e.target.value})}
                           placeholder="Enter brand name..."
-                          className="text-4xl font-black text-slate-900 w-full border-b-2 border-slate-200 focus:border-amber-500 outline-none pb-2 bg-slate-50 px-4 py-2 rounded-xl"
+                          className="text-4xl font-black text-neutral-900 w-full border-b-2 border-neutral-200 focus:border-warning-500 outline-none pb-2 bg-neutral-50 px-4 py-2 rounded-xl"
                         />
                       ) : (
-                        <h1 className="text-4xl font-black text-slate-900 tracking-tight">{profile.brand_name || 'Default Brand'}</h1>
+                        <h1 className="text-4xl font-black text-neutral-900 tracking-tight">{profile.brand_name || 'Default Brand'}</h1>
                       )}
                       
                       <div className="flex flex-wrap gap-6 items-center">
                         <div className="flex items-center gap-2">
-                          <Globe size={14} className="text-slate-400" />
+                          <Globe size={14} className="text-neutral-400" />
                           {isEditMode ? (
                             <input 
                               type="text"
@@ -697,13 +681,13 @@ const BrandProfile = () => {
                                 });
                               }}
                               placeholder="Brand Domain"
-                              className={`text-sm font-bold bg-slate-50 border-b border-slate-200 outline-none rounded px-2 py-0.5 transition-all w-64 ${
-                                !!domainAtEditStart ? 'text-slate-300 cursor-not-allowed' : 'text-slate-400 focus:bg-white focus:border-amber-500'
+                              className={`text-sm font-bold bg-neutral-50 border-b border-neutral-200 outline-none rounded px-2 py-0.5 transition-all w-64 ${
+                                !!domainAtEditStart ? 'text-neutral-300 cursor-not-allowed' : 'text-neutral-400 focus:bg-white focus:border-warning-500'
                               }`}
                             />
                           ) : (
                             <a href={`https://${profile.domain}`} target="_blank" rel="noreferrer" className="group/link hover:opacity-80 transition-opacity">
-                              <span className="text-base font-bold text-slate-400 group-hover/link:text-indigo-500 transition-colors border-b border-transparent group-hover/link:border-indigo-200">
+                              <span className="text-base font-bold text-neutral-400 group-hover/link:text-primary-500 transition-colors border-b border-transparent group-hover/link:border-primary-200">
                                 {profile.domain || 'Brand URL required'}
                               </span>
                             </a>
@@ -711,12 +695,12 @@ const BrandProfile = () => {
                         </div>
                         
                         <div className="flex items-center gap-2">
-                          <Building2 size={14} className="text-slate-400" />
+                          <Building2 size={14} className="text-neutral-400" />
                           {isEditMode ? (
                             <select
                               value={profile.businessType}
                               onChange={e => setProfile({...profile, businessType: e.target.value})}
-                              className="text-sm font-bold text-slate-400 bg-slate-50 border-b border-slate-200 outline-none rounded px-2 py-0.5 transition-all focus:bg-white focus:border-amber-500"
+                              className="text-sm font-bold text-neutral-400 bg-neutral-50 border-b border-neutral-200 outline-none rounded px-2 py-0.5 transition-all focus:bg-white focus:border-warning-500"
                             >
                               <option value="">请选择行业</option>
                               {industryOptions.map(opt => (
@@ -724,12 +708,12 @@ const BrandProfile = () => {
                               ))}
                             </select>
                           ) : (
-                            <span className="text-sm font-bold text-slate-400">{profile.businessType}</span>
+                            <span className="text-sm font-bold text-neutral-400">{profile.businessType}</span>
                           )}
                         </div>
 
                         <div className="flex items-center gap-2">
-                          <Phone size={14} className="text-slate-400" />
+                          <Phone size={14} className="text-neutral-400" />
                           {isEditMode ? (
                             <div className="flex items-center gap-1.5">
                               <select
@@ -738,7 +722,7 @@ const BrandProfile = () => {
                                   ...prev,
                                   contactPhone: { ...(prev.contactPhone || {}), countryCode: e.target.value }
                                 }))}
-                                className="text-xs font-bold text-slate-600 bg-slate-50 border-b border-slate-200 outline-none rounded px-2 py-1 transition-all focus:bg-white focus:border-amber-500"
+                                className="text-xs font-bold text-neutral-600 bg-neutral-50 border-b border-neutral-200 outline-none rounded px-2 py-1 transition-all focus:bg-white focus:border-warning-500"
                               >
                                 {PHONE_COUNTRY_CODES.map(c => (
                                   <option key={c.code} value={c.code}>{c.code} {c.label}</option>
@@ -752,11 +736,11 @@ const BrandProfile = () => {
                                   contactPhone: { ...(prev.contactPhone || {}), number: e.target.value }
                                 }))}
                                 placeholder="Phone number"
-                                className="text-sm font-bold text-slate-600 bg-slate-50 border-b border-slate-200 outline-none rounded px-2 py-0.5 w-36 transition-all focus:bg-white focus:border-amber-500"
+                                className="text-sm font-bold text-neutral-600 bg-neutral-50 border-b border-neutral-200 outline-none rounded px-2 py-0.5 w-36 transition-all focus:bg-white focus:border-warning-500"
                               />
                             </div>
                           ) : (
-                            <span className="text-sm font-bold text-slate-400">
+                            <span className="text-sm font-bold text-neutral-400">
                               {profile.contactPhone?.number
                                 ? `${profile.contactPhone.countryCode} ${profile.contactPhone.number}`
                                 : profile.phone || '—'}
@@ -766,16 +750,16 @@ const BrandProfile = () => {
                       </div>
                     </div>
 
-                    <div className={`bg-slate-50 p-6 rounded-2xl transition-all ${isEditMode ? 'ring-2 ring-amber-500/5 bg-white border border-amber-100 shadow-inner' : ''}`}>
+                    <div className={`bg-neutral-50 p-6 rounded-2xl transition-all ${isEditMode ? 'ring-2 ring-warning-500/5 bg-white border border-warning-100 shadow-inner' : ''}`}>
                       {isEditMode ? (
                         <textarea
                           value={profile.product_description}
                           onChange={(e) => setProfile({...profile, product_description: e.target.value})}
-                          className="w-full min-h-[100px] bg-transparent text-slate-700 text-base leading-relaxed outline-none resize-none"
+                          className="w-full min-h-[100px] bg-transparent text-neutral-700 text-base leading-relaxed outline-none resize-none"
                           placeholder="Enter product description..."
                         />
                       ) : (
-                        <p className="text-slate-700 text-base leading-relaxed font-medium">{profile.product_description}</p>
+                        <p className="text-neutral-700 text-base leading-relaxed font-medium">{profile.product_description}</p>
                       )}
                     </div>
                   </div>
@@ -790,25 +774,25 @@ const BrandProfile = () => {
                     { label: 'Company location', key: 'company_location' }
                   ].map(field => (
                     <div key={field.key} className="space-y-2">
-                      <span className="text-[10px] font-bold text-slate-400 opacity-50">{field.label}</span>
+                      <span className="text-[10px] font-bold text-neutral-400 opacity-50">{field.label}</span>
                       {isEditMode ? (
                         <input
                           value={profile[field.key]}
                           onChange={e => setProfile({...profile, [field.key]: e.target.value})}
-                          className="font-bold text-slate-800 bg-slate-50 border-b border-slate-200 outline-none w-full px-2 py-1 rounded transition-all focus:bg-white focus:border-amber-500"
+                          className="font-bold text-neutral-800 bg-neutral-50 border-b border-neutral-200 outline-none w-full px-2 py-1 rounded transition-all focus:bg-white focus:border-warning-500"
                         />
                       ) : (
-                        <p className="font-bold text-slate-800">{profile[field.key]}</p>
+                        <p className="font-bold text-neutral-800">{profile[field.key]}</p>
                       )}
                     </div>
                   ))}
                 </div>
 
                 {/* Ad Platforms + Coverage Markets */}
-                <div className="mt-8 pt-6 border-t border-slate-100 flex flex-col lg:flex-row gap-12">
+                <div className="mt-8 pt-6 border-t border-neutral-100 flex flex-col lg:flex-row gap-12">
                   {/* Ad Platforms */}
                   <div className="space-y-2">
-                    <span className="text-[10px] font-bold text-slate-400 opacity-50">Ad Platforms</span>
+                    <span className="text-[10px] font-bold text-neutral-400 opacity-50">Ad Platforms</span>
                     <div className="flex flex-wrap gap-2">
                       {AD_PLATFORMS.map(p => {
                         const isSelected = profile.platforms?.includes(p.id)
@@ -826,13 +810,13 @@ const BrandProfile = () => {
                             }}
                             className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold border transition-all ${
                               isSelected
-                                ? 'border-indigo-200 bg-indigo-50 text-indigo-700 shadow-sm'
-                                : 'border-slate-100 bg-slate-50 text-slate-400'
-                            } ${isEditMode ? 'cursor-pointer hover:border-indigo-300' : 'cursor-default'}`}
+                                ? 'border-primary-200 bg-primary-50 text-primary-700 shadow-sm'
+                                : 'border-neutral-100 bg-neutral-50 text-neutral-400'
+                            } ${isEditMode ? 'cursor-pointer hover:border-primary-300' : 'cursor-default'}`}
                           >
                             <img src={p.icon} alt={p.name} className="w-4 h-4" />
                             {p.name}
-                            {isSelected && <Check size={12} className="text-indigo-500" />}
+                            {isSelected && <Check size={12} className="text-primary-500" />}
                           </button>
                         )
                       })}
@@ -841,12 +825,12 @@ const BrandProfile = () => {
 
                   {/* Coverage Markets */}
                   <div className="space-y-2">
-                    <span className="text-[10px] font-bold text-slate-400 opacity-50">Coverage Markets</span>
+                    <span className="text-[10px] font-bold text-neutral-400 opacity-50">Coverage Markets</span>
                     {isEditMode ? (
                       <div className="space-y-3">
                         {MARKET_REGIONS.map(region => (
                           <div key={region.group} className="flex items-start gap-3">
-                            <span className="text-[10px] font-black text-slate-400 w-36 pt-2 shrink-0">{region.group}</span>
+                            <span className="text-[10px] font-black text-neutral-400 w-36 pt-2 shrink-0">{region.group}</span>
                             <div className="flex flex-wrap gap-1.5">
                               {region.markets.map(m => {
                                 const isSelected = profile.markets?.includes(m)
@@ -861,8 +845,8 @@ const BrandProfile = () => {
                                     }))}
                                     className={`px-2.5 py-1 text-[11px] font-bold rounded-lg transition-all ${
                                       isSelected
-                                        ? 'bg-indigo-100 text-indigo-700 border border-indigo-200'
-                                        : 'bg-slate-50 text-slate-400 border border-slate-100 hover:border-indigo-200'
+                                        ? 'bg-primary-100 text-primary-700 border border-primary-200'
+                                        : 'bg-neutral-50 text-neutral-400 border border-neutral-100 hover:border-primary-200'
                                     }`}
                                   >
                                     {m}
@@ -873,11 +857,11 @@ const BrandProfile = () => {
                           </div>
                         ))}
                         {/* Manual market input */}
-                        <div className="flex items-center gap-2 pt-2 border-t border-slate-100 mt-2">
+                        <div className="flex items-center gap-2 pt-2 border-t border-neutral-100 mt-2">
                           {showCustomMarketInput ? (
                             <>
                               <input
-                                className="px-3 py-1.5 border border-slate-200 rounded-lg text-xs font-bold text-slate-900 outline-none focus:border-indigo-400 w-28 uppercase"
+                                className="px-3 py-1.5 border border-neutral-200 rounded-lg text-xs font-bold text-neutral-900 outline-none focus:border-primary-400 w-28 uppercase"
                                 maxLength={10}
                                 placeholder="e.g. NG"
                                 value={customMarketValue}
@@ -906,13 +890,13 @@ const BrandProfile = () => {
                                   setCustomMarketValue('')
                                   setShowCustomMarketInput(false)
                                 }}
-                                className="px-3 py-1.5 text-[11px] font-bold bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition-colors"
+                                className="px-3 py-1.5 text-[11px] font-bold bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors"
                               >
                                 Confirm
                               </button>
                               <button
                                 onClick={() => { setCustomMarketValue(''); setShowCustomMarketInput(false) }}
-                                className="px-3 py-1.5 text-[11px] font-bold text-slate-500 hover:text-slate-700 transition-colors"
+                                className="px-3 py-1.5 text-[11px] font-bold text-neutral-500 hover:text-neutral-700 transition-colors"
                               >
                                 Cancel
                               </button>
@@ -920,7 +904,7 @@ const BrandProfile = () => {
                           ) : (
                             <button
                               onClick={() => setShowCustomMarketInput(true)}
-                              className="flex items-center gap-1 px-3 py-1.5 text-[11px] font-bold text-indigo-500 hover:text-indigo-700 hover:bg-indigo-50 rounded-lg transition-colors"
+                              className="flex items-center gap-1 px-3 py-1.5 text-[11px] font-bold text-primary-500 hover:text-primary-700 hover:bg-primary-50 rounded-lg transition-colors"
                             >
                               <Plus size={12} />
                               Add custom market
@@ -931,11 +915,11 @@ const BrandProfile = () => {
                     ) : (
                       <div className="flex flex-wrap gap-2">
                         {(profile.markets?.length > 0) ? profile.markets.map(m => (
-                          <span key={m} className="px-3 py-1.5 text-xs font-bold bg-indigo-50 text-indigo-600 rounded-lg border border-indigo-100">
+                          <span key={m} className="px-3 py-1.5 text-xs font-bold bg-primary-50 text-primary-600 rounded-lg border border-primary-100">
                             {m}
                           </span>
                         )) : (
-                          <span className="text-sm font-bold text-slate-400">{profile.target_region || 'Not configured'}</span>
+                          <span className="text-sm font-bold text-neutral-400">{profile.target_region || 'Not configured'}</span>
                         )}
                       </div>
                     )}
@@ -943,32 +927,32 @@ const BrandProfile = () => {
                 </div>
 
                 {/* Tags area */}
-                <div className="mt-8 pt-8 border-t border-slate-100 space-y-6">
+                <div className="mt-8 pt-8 border-t border-neutral-100 space-y-6">
                   <div className="flex flex-wrap gap-3">
-                    <span className="px-5 py-2 bg-slate-50/50 text-slate-600 rounded-full text-xs font-bold border border-slate-100 flex items-center gap-2.5 transition-all hover:bg-white hover:shadow-sm">
-                      <Layers size={14} className="text-slate-400" />
+                    <span className="px-5 py-2 bg-neutral-50/50 text-neutral-600 rounded-full text-xs font-bold border border-neutral-100 flex items-center gap-2.5 transition-all hover:bg-white hover:shadow-sm">
+                      <Layers size={14} className="text-neutral-400" />
                       Ai广告自动化Saas (跨渠道投放与优化: Meta/Google, 主打Smb快速上手与低成本替代代理)
                     </span>
-                    <span className="px-5 py-2 bg-slate-50/50 text-slate-600 rounded-full text-xs font-bold border border-slate-100 flex items-center gap-2.5 transition-all hover:bg-white hover:shadow-sm">
-                      <CreditCard size={14} className="text-slate-400" />
+                    <span className="px-5 py-2 bg-neutral-50/50 text-neutral-600 rounded-full text-xs font-bold border border-neutral-100 flex items-center gap-2.5 transition-all hover:bg-white hover:shadow-sm">
+                      <CreditCard size={14} className="text-neutral-400" />
                       {profile.business_model}
                     </span>
-                    <span className="px-5 py-2 bg-slate-50/50 text-slate-600 rounded-full text-xs font-bold border border-slate-100 flex items-center gap-2.5 transition-all hover:bg-white hover:shadow-sm">
-                      <TrendingUp size={14} className="text-slate-400" />
+                    <span className="px-5 py-2 bg-neutral-50/50 text-neutral-600 rounded-full text-xs font-bold border border-neutral-100 flex items-center gap-2.5 transition-all hover:bg-white hover:shadow-sm">
+                      <TrendingUp size={14} className="text-neutral-400" />
                       {profile.product_lifecycle}
                     </span>
-                    <span className="px-5 py-2 bg-slate-50/50 text-slate-600 rounded-full text-xs font-bold border border-slate-100 flex items-center gap-2.5 transition-all hover:bg-white hover:shadow-sm">
-                      <TagIcon size={14} className="text-slate-400" />
+                    <span className="px-5 py-2 bg-neutral-50/50 text-neutral-600 rounded-full text-xs font-bold border border-neutral-100 flex items-center gap-2.5 transition-all hover:bg-white hover:shadow-sm">
+                      <TagIcon size={14} className="text-neutral-400" />
                       {profile.pricing_model}
                     </span>
-                    <span className="px-5 py-2 bg-slate-50/50 text-slate-600 rounded-full text-xs font-bold border border-slate-100 flex items-center gap-2.5 transition-all hover:bg-white hover:shadow-sm">
-                      <Target size={14} className="text-slate-400" />
+                    <span className="px-5 py-2 bg-neutral-50/50 text-neutral-600 rounded-full text-xs font-bold border border-neutral-100 flex items-center gap-2.5 transition-all hover:bg-white hover:shadow-sm">
+                      <Target size={14} className="text-neutral-400" />
                       {profile.marketing_goal}
                     </span>
                   </div>
                   <div className="flex flex-wrap gap-8 pl-2">
                     {profile.audience_tags?.map((tag, idx) => (
-                      <span key={tag} className="text-sm font-bold text-slate-500 hover:text-indigo-600 transition-colors cursor-default">
+                      <span key={tag} className="text-sm font-bold text-neutral-500 hover:text-primary-600 transition-colors cursor-default">
                         {tag}
                       </span>
                     ))}
@@ -977,18 +961,18 @@ const BrandProfile = () => {
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <div className="bg-white rounded-3xl p-10 border border-slate-200 shadow-sm space-y-8 h-full">
+                <div className="bg-white rounded-2xl p-10 border border-neutral-200 shadow-sm space-y-8 h-full">
                   <div className="flex items-center gap-4 mb-2">
-                    <div className="w-12 h-12 rounded-2xl bg-purple-50 flex items-center justify-center text-purple-600 shadow-sm border border-purple-100">
+                    <div className="w-12 h-12 rounded-2xl bg-primary-50 flex items-center justify-center text-primary-600 shadow-sm border border-primary-100">
                       <Fingerprint size={24} />
                     </div>
-                    <h2 className="text-xl font-black text-slate-900">Brand DNA</h2>
+                    <h2 className="text-xl font-black text-neutral-900">Brand DNA</h2>
                   </div>
                   <div className="space-y-4">
-                    <h3 className="text-xs font-bold text-slate-400 opacity-50">Brand Colors</h3>
+                    <h3 className="text-xs font-bold text-neutral-400 opacity-50">Brand Colors</h3>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                       {profile.colors?.map((color) => (
-                        <div key={color.id} className="group relative flex items-center gap-3 p-3 bg-slate-50 border border-slate-100 rounded-2xl transition-all hover:bg-white hover:shadow-md">
+                        <div key={color.id} className="group relative flex items-center gap-3 p-3 bg-neutral-50 border border-neutral-100 rounded-2xl transition-all hover:bg-white hover:shadow-md">
                           <div className="relative w-10 h-10 shrink-0 overflow-hidden rounded-xl shadow-inner border border-black/5">
                             <div className="w-full h-full" style={{ backgroundColor: color.hex }} />
                             {isEditMode && (
@@ -1004,8 +988,8 @@ const BrandProfile = () => {
                             )}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <div className="text-[9px] font-bold text-slate-400 truncate">{color.label}</div>
-                            <div className="text-xs font-mono font-bold text-slate-700 select-none lowercase">
+                            <div className="text-[9px] font-bold text-neutral-400 truncate">{color.label}</div>
+                            <div className="text-xs font-mono font-bold text-neutral-700 select-none lowercase">
                               {color.hex}
                             </div>
                           </div>
@@ -1014,18 +998,18 @@ const BrandProfile = () => {
                     </div>
                   </div>
                   <div className="space-y-4">
-                    <h3 className="text-xs font-bold text-slate-400 opacity-50">Brand Tone</h3>
+                    <h3 className="text-xs font-bold text-neutral-400 opacity-50">Brand Tone</h3>
                     {isEditMode ? (
                       <input 
                         value={profile.brand_tone?.join(', ')} 
                         onChange={e => setProfile({...profile, brand_tone: e.target.value.split(',').map(s => s.trim())})}
-                        className="w-full bg-slate-50 border-b border-slate-200 rounded px-3 py-2 text-sm font-bold text-slate-600 outline-none focus:bg-white focus:border-amber-500 transition-all"
+                        className="w-full bg-neutral-50 border-b border-neutral-200 rounded px-3 py-2 text-sm font-bold text-neutral-600 outline-none focus:bg-white focus:border-warning-500 transition-all"
                         placeholder="Tone (comma separated)"
                       />
                     ) : (
                       <div className="flex flex-wrap gap-2">
                         {profile.brand_tone?.map((tone, idx) => (
-                          <span key={tone} className="px-5 py-2.5 bg-slate-50 text-slate-600 rounded-xl text-sm font-bold border border-slate-100 shadow-sm">
+                          <span key={tone} className="px-5 py-2.5 bg-neutral-50 text-neutral-600 rounded-xl text-sm font-bold border border-neutral-100 shadow-sm">
                             {tone}
                           </span>
                         ))}
@@ -1033,18 +1017,18 @@ const BrandProfile = () => {
                     )}
                   </div>
                   <div className="space-y-4">
-                    <h3 className="text-xs font-bold text-slate-400 opacity-50">Market Keywords</h3>
+                    <h3 className="text-xs font-bold text-neutral-400 opacity-50">Market Keywords</h3>
                     {isEditMode ? (
                       <input 
                         value={profile.market_keywords?.join(', ')} 
                         onChange={e => setProfile({...profile, market_keywords: e.target.value.split(',').map(s => s.trim())})}
-                        className="w-full bg-slate-50 border-b border-slate-200 rounded px-3 py-2 text-sm font-bold text-slate-600 outline-none focus:bg-white focus:border-amber-500 transition-all"
+                        className="w-full bg-neutral-50 border-b border-neutral-200 rounded px-3 py-2 text-sm font-bold text-neutral-600 outline-none focus:bg-white focus:border-warning-500 transition-all"
                         placeholder="Keywords (comma separated)"
                       />
                     ) : (
                       <div className="flex flex-wrap gap-4 items-baseline justify-center py-4">
                         {profile.market_keywords?.map((kw, idx) => (
-                          <span key={kw} className="font-bold transition-all hover:scale-110" style={{ fontSize: `${14 + (idx % 3) * 6}px`, color: ['#0f172a', '#334155', '#475569', '#64748b'][idx % 4] }}>
+                          <span key={kw} className="font-bold transition-all hover:scale-110" style={{ fontSize: `${14 + (idx % 3) * 6}px`, color: ['var(--neutral-900)', 'var(--neutral-700)', 'var(--neutral-600)', 'var(--neutral-500)'][idx % 4] }}>
                             {kw}
                           </span>
                         ))}
@@ -1053,29 +1037,29 @@ const BrandProfile = () => {
                   </div>
                 </div>
 
-                <div className="bg-white rounded-3xl p-10 border border-slate-200 shadow-sm space-y-8 h-full">
+                <div className="bg-white rounded-2xl p-10 border border-neutral-200 shadow-sm space-y-8 h-full">
                   <div className="flex items-center gap-4 mb-2">
-                    <div className="w-12 h-12 rounded-2xl bg-amber-50 flex items-center justify-center text-amber-600 shadow-sm border border-amber-100">
+                    <div className="w-12 h-12 rounded-2xl bg-warning-50 flex items-center justify-center text-warning-600 shadow-sm border border-warning-100">
                       <Sparkle size={24} />
                     </div>
-                    <h2 className="text-xl font-black text-slate-900">Core Advantages</h2>
+                    <h2 className="text-xl font-black text-neutral-900">Core Advantages</h2>
                   </div>
-                  <div className={`bg-slate-50 p-6 rounded-2xl border-l-4 border-amber-500 transition-all ${isEditMode ? 'bg-white shadow-inner ring-2 ring-amber-500/5 border-amber-100' : ''}`}>
-                    <p className="text-sm font-bold text-slate-500 opacity-50 mb-2">Value Proposition</p>
+                  <div className={`bg-neutral-50 p-6 rounded-2xl border-l-4 border-warning-500 transition-all ${isEditMode ? 'bg-white shadow-inner ring-2 ring-warning-500/5 border-warning-100' : ''}`}>
+                    <p className="text-sm font-bold text-neutral-500 opacity-50 mb-2">Value Proposition</p>
                     {isEditMode ? (
                       <textarea 
                         value={profile.unique_value_proposition} 
                         onChange={e => setProfile({...profile, unique_value_proposition: e.target.value})}
-                        className="text-lg font-bold text-slate-800 leading-snug w-full bg-transparent outline-none resize-none min-h-[100px]"
+                        className="text-lg font-bold text-neutral-800 leading-snug w-full bg-transparent outline-none resize-none min-h-[100px]"
                       />
                     ) : (
-                      <p className="text-lg font-bold text-slate-800 leading-snug">{profile.unique_value_proposition}</p>
+                      <p className="text-lg font-bold text-neutral-800 leading-snug">{profile.unique_value_proposition}</p>
                     )}
                   </div>
                   <div className="space-y-3">
                     {profile.dimensions?.differentiation_type?.map((type, idx) => (
-                      <div key={type} className="flex items-center gap-4 p-4 rounded-2xl border border-slate-100 hover:bg-slate-50 transition-colors">
-                        <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center text-amber-600 font-bold text-xs shrink-0">{idx + 1}</div>
+                      <div key={type} className="flex items-center gap-4 p-4 rounded-2xl border border-neutral-100 hover:bg-neutral-50 transition-colors">
+                        <div className="w-8 h-8 rounded-full bg-warning-100 flex items-center justify-center text-warning-600 font-bold text-xs shrink-0">{idx + 1}</div>
                         {isEditMode ? (
                           <input 
                             value={type} 
@@ -1084,10 +1068,10 @@ const BrandProfile = () => {
                               newTypes[idx] = e.target.value;
                               setProfile({...profile, dimensions: {...profile.dimensions, differentiation_type: newTypes}});
                             }}
-                            className="text-sm font-bold text-slate-700 bg-transparent outline-none w-full"
+                            className="text-sm font-bold text-neutral-700 bg-transparent outline-none w-full"
                           />
                         ) : (
-                          <p className="text-sm font-bold text-slate-700">{type}</p>
+                          <p className="text-sm font-bold text-neutral-700">{type}</p>
                         )}
                       </div>
                     )) || []}
@@ -1096,12 +1080,12 @@ const BrandProfile = () => {
               </div>
 
               {/* Product Features Section */}
-              <div className="bg-white rounded-[40px] p-10 border border-slate-200 shadow-sm space-y-8">
+              <div className="bg-white rounded-2xl p-10 border border-neutral-200 shadow-sm space-y-8">
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-2xl bg-pink-50 flex items-center justify-center text-pink-600 shadow-sm border border-pink-100 shadow-pink-500/5">
+                  <div className="w-12 h-12 rounded-2xl bg-danger-50 flex items-center justify-center text-danger-600 shadow-sm border border-danger-100 shadow-danger-500/5">
                     <Zap size={24} />
                   </div>
-                  <h2 className="text-2xl font-black text-slate-900">Brand Feature</h2>
+                  <h2 className="text-2xl font-black text-neutral-900">Brand Feature</h2>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 grid-auto-flow-dense">
                   {profile.product_features?.map((feature, idx) => {
@@ -1117,11 +1101,11 @@ const BrandProfile = () => {
                     return (
                       <div 
                         key={idx} 
-                        className={`${sizeClass} rounded-3xl p-8 border relative overflow-hidden group transition-all duration-500 ${
+                        className={`${sizeClass} rounded-2xl p-8 border relative overflow-hidden group transition-all duration-500 ${
                           isDark 
-                            ? 'bg-[#2D3748] text-white border-transparent shadow-xl' 
-                            : 'bg-white text-slate-900 border-slate-200 shadow-sm hover:translate-y-[-4px] hover:shadow-xl'
-                        } ${isEditMode ? 'ring-2 ring-amber-500/5 border-amber-100 shadow-lg' : ''}`}
+                            ? 'bg-neutral-800 text-white border-transparent shadow-xl' 
+                            : 'bg-white text-neutral-900 border-neutral-200 shadow-sm hover:translate-y-[-4px] hover:shadow-xl'
+                        } ${isEditMode ? 'ring-2 ring-warning-500/5 border-warning-100 shadow-lg' : ''}`}
                       >
                         {!isDark && <SvgGraphic type={idx % 2 === 0 ? 'wave' : 'chart'} color={idx % 3 === 0 ? '#F59E0B' : '#3B82F6'} />}
                         {isEditMode && (
@@ -1129,11 +1113,11 @@ const BrandProfile = () => {
                             const newFeatures = [...profile.product_features];
                             newFeatures.splice(idx, 1);
                             setProfile({...profile, product_features: newFeatures});
-                          }} className="absolute top-4 right-4 text-slate-300 hover:text-red-500 z-20"><Trash2 size={14} /></button>
+                          }} className="absolute top-4 right-4 text-neutral-300 hover:text-danger-500 z-20"><Trash2 size={14} /></button>
                         )}
                         <div className="relative z-10 space-y-6 flex flex-col h-full">
                           <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-colors shadow-sm ${
-                            isDark ? 'bg-white/10 text-white' : 'bg-slate-100 text-slate-500 group-hover:bg-pink-500 group-hover:text-white'
+                            isDark ? 'bg-white/10 text-white' : 'bg-neutral-100 text-neutral-500 group-hover:bg-danger-500 group-hover:text-white'
                           }`}>
                             {getFeatureIcon(idx)}
                           </div>
@@ -1143,7 +1127,7 @@ const BrandProfile = () => {
                                 const newFeatures = [...profile.product_features];
                                 newFeatures[idx].text = `${e.target.value}：${desc}`;
                                 setProfile({...profile, product_features: newFeatures});
-                              }} className="w-full font-black bg-transparent border-b border-slate-200 outline-none focus:border-amber-500 transition-all text-xl" />
+                              }} className="w-full font-black bg-transparent border-b border-neutral-200 outline-none focus:border-warning-500 transition-all text-xl" />
                               <textarea value={desc} onChange={e => {
                                 const newFeatures = [...profile.product_features];
                                 newFeatures[idx].text = `${title}：${e.target.value}`;
@@ -1153,7 +1137,7 @@ const BrandProfile = () => {
                           ) : (
                             <div className="space-y-4 flex-1">
                               <h3 className={`font-black leading-tight ${isDark ? 'text-3xl' : 'text-xl'}`}>{title}</h3>
-                              <p className={`leading-relaxed font-medium ${isDark ? 'text-slate-300 text-base' : 'text-slate-500 text-sm'}`}>{desc}</p>
+                              <p className={`leading-relaxed font-medium ${isDark ? 'text-neutral-300 text-base' : 'text-neutral-500 text-sm'}`}>{desc}</p>
                             </div>
                           )}
                         </div>
@@ -1161,65 +1145,65 @@ const BrandProfile = () => {
                     );
                   })}
                   {isEditMode && (
-                    <button onClick={() => setProfile({...profile, product_features: [...profile.product_features, { text: '新特性：描述内容', keywords: [] }]})} className="bg-white rounded-3xl p-8 border-2 border-dashed border-slate-200 text-slate-400 font-bold hover:border-amber-500 hover:text-amber-500 transition-all flex items-center justify-center gap-4 min-h-[300px] shadow-sm"><Plus size={48} /> Add feature</button>
+                    <button onClick={() => setProfile({...profile, product_features: [...profile.product_features, { text: '新特性：描述内容', keywords: [] }]})} className="bg-white rounded-2xl p-8 border-2 border-dashed border-neutral-200 text-neutral-400 font-bold hover:border-warning-500 hover:text-warning-500 transition-all flex items-center justify-center gap-4 min-h-[300px] shadow-sm"><Plus size={48} /> Add feature</button>
                   )}
                 </div>
               </div>
 
-              <div className={`relative rounded-[40px] overflow-hidden min-h-[600px] flex border border-slate-200 shadow-xl no-print transition-all ${isEditMode ? 'bg-white p-10 flex-col space-y-8' : 'bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 items-center'}`}>
+              <div className={`relative rounded-2xl overflow-hidden min-h-[600px] flex border border-neutral-200 shadow-xl no-print transition-all ${isEditMode ? 'bg-white p-10 flex-col space-y-8' : 'bg-gradient-to-br from-neutral-50 via-info-50 to-primary-50 items-center'}`}>
                  <div className={`${isEditMode ? 'relative mb-4' : 'absolute top-10 left-10 z-20'} flex items-center gap-4`}>
-                    <div className="w-12 h-12 rounded-2xl bg-white shadow-lg flex items-center justify-center text-emerald-500 border border-slate-100 shadow-emerald-500/10"><Users size={24} /></div>
-                    <h2 className="text-2xl font-black text-slate-900">Target audience</h2>
+                    <div className="w-12 h-12 rounded-2xl bg-white shadow-lg flex items-center justify-center text-success-500 border border-neutral-100 shadow-success-500/10"><Users size={24} /></div>
+                    <h2 className="text-2xl font-black text-neutral-900">Target audience</h2>
                  </div>
                  {isEditMode ? (
                    <div className="space-y-6 overflow-y-auto max-h-[500px] custom-scrollbar pr-4 w-full">
                      {profile.customer_segments?.map((segment, idx) => (
-                       <div key={idx} className="p-6 bg-slate-50 rounded-2xl border border-slate-100 relative group">
+                       <div key={idx} className="p-6 bg-neutral-50 rounded-2xl border border-neutral-100 relative group">
                          <button onClick={() => {
                            const newSegments = [...profile.customer_segments];
                            newSegments.splice(idx, 1);
                            setProfile({...profile, customer_segments: newSegments});
-                         }} className="absolute top-4 right-4 text-slate-300 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"><Trash2 size={16} /></button>
+                         }} className="absolute top-4 right-4 text-neutral-300 hover:text-danger-500 transition-colors opacity-0 group-hover:opacity-100"><Trash2 size={16} /></button>
                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                            <div className="space-y-2">
-                             <label className="text-[10px] font-bold text-slate-400 opacity-50">Name</label>
+                             <label className="text-[10px] font-bold text-neutral-400 opacity-50">Name</label>
                              <input value={segment.name} onChange={e => {
                                const newSegments = [...profile.customer_segments];
                                newSegments[idx].name = e.target.value;
                                setProfile({...profile, customer_segments: newSegments});
-                             }} className="w-full bg-white border border-slate-200 rounded-lg px-4 py-2 font-bold outline-none focus:border-amber-500 transition-all shadow-sm" />
+                             }} className="w-full bg-white border border-neutral-200 rounded-lg px-4 py-2 font-bold outline-none focus:border-warning-500 transition-all shadow-sm" />
                            </div>
                            <div className="space-y-2">
-                             <label className="text-[10px] font-bold text-slate-400 opacity-50">Keywords</label>
+                             <label className="text-[10px] font-bold text-neutral-400 opacity-50">Keywords</label>
                              <input value={segment.keywords?.join(', ') || ''} onChange={e => {
                                const newSegments = [...profile.customer_segments];
                                newSegments[idx].keywords = e.target.value.split(',').map(s => s.trim());
                                setProfile({...profile, customer_segments: newSegments});
-                             }} className="w-full bg-white border border-slate-200 rounded-lg px-4 py-2 font-bold outline-none focus:border-amber-500 transition-all shadow-sm" />
+                             }} className="w-full bg-white border border-neutral-200 rounded-lg px-4 py-2 font-bold outline-none focus:border-warning-500 transition-all shadow-sm" />
                            </div>
                            <div className="md:col-span-2 space-y-2">
-                             <label className="text-[10px] font-bold text-slate-400 opacity-50">Description</label>
+                             <label className="text-[10px] font-bold text-neutral-400 opacity-50">Description</label>
                              <textarea value={segment.description} onChange={e => {
                                const newSegments = [...profile.customer_segments];
                                newSegments[idx].description = e.target.value;
                                setProfile({...profile, customer_segments: newSegments});
-                             }} className="w-full bg-white border border-slate-200 rounded-lg px-4 py-2 font-medium outline-none focus:border-amber-500 transition-all shadow-sm min-h-[80px]" />
+                             }} className="w-full bg-white border border-neutral-200 rounded-lg px-4 py-2 font-medium outline-none focus:border-warning-500 transition-all shadow-sm min-h-[80px]" />
                            </div>
                          </div>
                        </div>
                      ))}
-                     <button onClick={() => setProfile({...profile, customer_segments: [...(profile.customer_segments || []), { name: 'New Segment', description: '', keywords: [] }]})} className="w-full py-4 border-2 border-dashed border-slate-200 rounded-2xl text-slate-400 font-bold hover:border-amber-500 hover:text-amber-500 transition-all flex items-center justify-center gap-2"><Plus size={20} /> Add segment</button>
+                     <button onClick={() => setProfile({...profile, customer_segments: [...(profile.customer_segments || []), { name: 'New Segment', description: '', keywords: [] }]})} className="w-full py-4 border-2 border-dashed border-neutral-200 rounded-2xl text-neutral-400 font-bold hover:border-warning-500 hover:text-warning-500 transition-all flex items-center justify-center gap-2"><Plus size={20} /> Add segment</button>
                    </div>
                  ) : (
                    <>
                      <div className="w-full max-w-[1100px] mx-auto px-10 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-                        <div className="space-y-8 animate-fadeIn" key={currentAudienceIndex}>
-                          <div className="text-sm font-bold text-slate-400 opacity-50">Audience {String(currentAudienceIndex + 1).padStart(2, '0')}</div>
-                          <h3 className="text-5xl font-black text-slate-900 leading-tight">{profile.customer_segments?.[currentAudienceIndex]?.name}</h3>
-                          <p className="text-xl text-slate-700 leading-relaxed font-medium">{profile.customer_segments?.[currentAudienceIndex]?.description}</p>
+                        <div className="space-y-8 animate-slide-up" key={currentAudienceIndex}>
+                          <div className="text-sm font-bold text-neutral-400 opacity-50">Audience {String(currentAudienceIndex + 1).padStart(2, '0')}</div>
+                          <h3 className="text-5xl font-black text-neutral-900 leading-tight">{profile.customer_segments?.[currentAudienceIndex]?.name}</h3>
+                          <p className="text-xl text-neutral-700 leading-relaxed font-medium">{profile.customer_segments?.[currentAudienceIndex]?.description}</p>
                           <div className="flex flex-wrap gap-2">
                             {profile.customer_segments?.[currentAudienceIndex]?.keywords?.map((kw, i) => (
-                              <span key={kw} className="px-4 py-2 rounded-full text-xs font-bold bg-blue-100 text-blue-700 shadow-sm">{kw}</span>
+                              <span key={kw} className="px-4 py-2 rounded-full text-xs font-bold bg-info-100 text-info-700 shadow-sm">{kw}</span>
                             ))}
                           </div>
                         </div>
@@ -1229,11 +1213,11 @@ const BrandProfile = () => {
                           </div>
                         </div>
                      </div>
-                     <button onClick={prevAudience} className="absolute left-6 top-1/2 -translate-y-1/2 w-14 h-14 rounded-full bg-white/80 backdrop-blur shadow-lg flex items-center justify-center text-slate-900 hover:scale-110 transition-all z-30 shadow-slate-900/5"><ChevronLeft size={28} /></button>
-                     <button onClick={nextAudience} className="absolute right-6 top-1/2 -translate-y-1/2 w-14 h-14 rounded-full bg-white/80 backdrop-blur shadow-lg flex items-center justify-center text-slate-900 hover:scale-110 transition-all z-30 shadow-slate-900/5"><ChevronRight size={28} /></button>
+                     <button onClick={prevAudience} className="absolute left-6 top-1/2 -translate-y-1/2 w-14 h-14 rounded-full bg-white/80 backdrop-blur shadow-lg flex items-center justify-center text-neutral-900 hover:scale-110 transition-all z-30 shadow-neutral-900/5"><ChevronLeft size={28} /></button>
+                     <button onClick={nextAudience} className="absolute right-6 top-1/2 -translate-y-1/2 w-14 h-14 rounded-full bg-white/80 backdrop-blur shadow-lg flex items-center justify-center text-neutral-900 hover:scale-110 transition-all z-30 shadow-neutral-900/5"><ChevronRight size={28} /></button>
                      <div className="absolute bottom-12 left-1/2 -translate-x-1/2 flex gap-3 z-30">
                         {profile.customer_segments?.map((_, i) => (
-                          <div key={i} onClick={() => setCurrentAudienceIndex(i)} className={`h-2 transition-all duration-300 cursor-pointer rounded-full ${i === currentAudienceIndex ? 'w-10 bg-slate-900' : 'w-2 bg-slate-300'}`} />
+                          <div key={i} onClick={() => setCurrentAudienceIndex(i)} className={`h-2 transition-all duration-300 cursor-pointer rounded-full ${i === currentAudienceIndex ? 'w-10 bg-neutral-900' : 'w-2 bg-neutral-300'}`} />
                         ))}
                      </div>
                    </>
@@ -1241,18 +1225,18 @@ const BrandProfile = () => {
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <div className="lg:col-span-2 bg-white rounded-3xl p-10 border border-slate-200 shadow-sm space-y-8">
-                  <div className="flex items-center gap-4"><div className="w-12 h-12 rounded-2xl bg-orange-50 flex items-center justify-center text-orange-600 border border-orange-100 shadow-orange-500/5"><Swords size={24} /></div><h2 className="text-xl font-black text-slate-900">Competitors</h2></div>
+                <div className="lg:col-span-2 bg-white rounded-2xl p-10 border border-neutral-200 shadow-sm space-y-8">
+                  <div className="flex items-center gap-4"><div className="w-12 h-12 rounded-2xl bg-warning-50 flex items-center justify-center text-warning-600 border border-warning-100 shadow-warning-500/5"><Swords size={24} /></div><h2 className="text-xl font-black text-neutral-900">Competitors</h2></div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {profile.competitors?.map((comp, idx) => (
-                      <div key={comp.name} className={`rounded-2xl p-6 border group transition-all relative ${isEditMode ? 'bg-white border-amber-100 ring-2 ring-amber-500/5 shadow-lg' : 'bg-slate-50 border-slate-100 hover:bg-white hover:border-amber-200 shadow-sm'}`}>
+                      <div key={comp.name} className={`rounded-2xl p-6 border group transition-all relative ${isEditMode ? 'bg-white border-warning-100 ring-2 ring-warning-500/5 shadow-lg' : 'bg-neutral-50 border-neutral-100 hover:bg-white hover:border-warning-200 shadow-sm'}`}>
                         {isEditMode && <button onClick={() => {
                           const newComps = [...profile.competitors];
                           newComps.splice(idx, 1);
                           setProfile({...profile, competitors: newComps});
-                        }} className="absolute top-4 right-4 text-slate-300 hover:text-red-500"><Trash2 size={14} /></button>}
+                        }} className="absolute top-4 right-4 text-neutral-300 hover:text-danger-500"><Trash2 size={14} /></button>}
                         <div className="flex items-center gap-4 mb-3">
-                          <div className={`w-12 h-12 rounded-xl text-white flex items-center justify-center font-black text-lg shadow-sm ${['bg-cyan-500', 'bg-blue-500', 'bg-emerald-500', 'bg-rose-500', 'bg-purple-500', 'bg-amber-500', 'bg-indigo-500', 'bg-teal-500'][idx % 8]}`}>{comp.name?.charAt(0)}</div>
+                          <div className={`w-12 h-12 rounded-xl text-white flex items-center justify-center font-black text-lg shadow-sm ${['bg-info-500', 'bg-info-500', 'bg-success-500', 'bg-danger-500', 'bg-primary-500', 'bg-warning-500', 'bg-primary-500', 'bg-info-500'][idx % 8]}`}>{comp.name?.charAt(0)}</div>
                           <div className="flex-1 min-w-0">
                             {isEditMode ? (
                               <div className="space-y-2">
@@ -1260,17 +1244,17 @@ const BrandProfile = () => {
                                   const newComps = [...profile.competitors];
                                   newComps[idx].name = e.target.value;
                                   setProfile({...profile, competitors: newComps});
-                                }} className="w-full font-bold text-slate-900 bg-transparent border-b border-slate-200 outline-none focus:border-amber-500 transition-all text-sm" />
+                                }} className="w-full font-bold text-neutral-900 bg-transparent border-b border-neutral-200 outline-none focus:border-warning-500 transition-all text-sm" />
                                 <input value={comp.url} onChange={e => {
                                   const newComps = [...profile.competitors];
                                   newComps[idx].url = e.target.value;
                                   setProfile({...profile, competitors: newComps});
-                                }} className="w-full text-[10px] text-slate-400 bg-transparent outline-none focus:text-amber-500 transition-all" />
+                                }} className="w-full text-[10px] text-neutral-400 bg-transparent outline-none focus:text-warning-500 transition-all" />
                               </div>
                             ) : (
                               <>
-                                <h4 className="font-bold text-slate-900 group-hover:text-amber-600 transition-colors text-base truncate">{comp.name}</h4>
-                                <a href={comp.url} target="_blank" rel="noreferrer" className="text-[10px] text-slate-400 font-bold flex items-center gap-1 hover:text-amber-500 transition-colors">
+                                <h4 className="font-bold text-neutral-900 group-hover:text-warning-600 transition-colors text-base truncate">{comp.name}</h4>
+                                <a href={comp.url} target="_blank" rel="noreferrer" className="text-[10px] text-neutral-400 font-bold flex items-center gap-1 hover:text-warning-500 transition-colors">
                                   <ExternalLink size={10} /> 
                                   <span className="truncate">{comp.url ? new URL(comp.url).hostname : ''}</span>
                                 </a>
@@ -1283,34 +1267,34 @@ const BrandProfile = () => {
                             const newComps = [...profile.competitors];
                             newComps[idx].description = e.target.value;
                             setProfile({...profile, competitors: newComps});
-                          }} className="w-full text-xs text-slate-500 bg-transparent outline-none resize-none min-h-[60px] focus:bg-slate-50/50 rounded transition-all" />
+                          }} className="w-full text-xs text-neutral-500 bg-transparent outline-none resize-none min-h-[60px] focus:bg-neutral-50/50 rounded transition-all" />
                         ) : (
-                          <p className="text-xs text-slate-500 leading-relaxed line-clamp-3 h-[4.5em] overflow-hidden">{highlightText(comp.description)}</p>
+                          <p className="text-xs text-neutral-500 leading-relaxed line-clamp-3 h-[4.5em] overflow-hidden">{highlightText(comp.description)}</p>
                         )}
                       </div>
                     ))}
-                    {isEditMode && <button onClick={() => setProfile({...profile, competitors: [...(profile.competitors || []), { name: 'New Competitor', url: 'https://example.com', description: '' }]})} className="py-6 border-2 border-dashed border-slate-200 rounded-2xl text-slate-400 font-bold hover:border-amber-500 hover:text-amber-500 transition-all flex items-center justify-center gap-2 shadow-sm"><Plus size={20} /> Add competitor</button>}
+                    {isEditMode && <button onClick={() => setProfile({...profile, competitors: [...(profile.competitors || []), { name: 'New Competitor', url: 'https://example.com', description: '' }]})} className="py-6 border-2 border-dashed border-neutral-200 rounded-2xl text-neutral-400 font-bold hover:border-warning-500 hover:text-warning-500 transition-all flex items-center justify-center gap-2 shadow-sm"><Plus size={20} /> Add competitor</button>}
                   </div>
                 </div>
 
                 {/* Reach & Ecosystem Card - Matched to Image */}
-                <div className="lg:col-span-1 bg-white rounded-[40px] p-10 border border-slate-200 shadow-sm space-y-10 relative">
+                <div className="lg:col-span-1 bg-white rounded-2xl p-10 border border-neutral-200 shadow-sm space-y-10 relative">
                   <div className="flex items-center gap-4 mb-4">
-                    <div className="w-12 h-12 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600 border border-indigo-100 shadow-indigo-500/5">
+                    <div className="w-12 h-12 rounded-2xl bg-primary-50 flex items-center justify-center text-primary-600 border border-primary-100 shadow-primary-500/5">
                       <RadioTower size={24} />
                     </div>
-                    <h2 className="text-xl font-black text-slate-900 tracking-tight">Reach & Ecosystem</h2>
+                    <h2 className="text-xl font-black text-neutral-900 tracking-tight">Reach & Ecosystem</h2>
                   </div>
                   <div className="space-y-6">
-                    <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
-                      <Megaphone size={16} className="text-slate-400" />
-                      <h3 className="text-sm font-bold text-slate-400">营销渠道</h3>
+                    <div className="flex items-center gap-2 pb-2 border-b border-neutral-100">
+                      <Megaphone size={16} className="text-neutral-400" />
+                      <h3 className="text-sm font-bold text-neutral-400">营销渠道</h3>
                     </div>
                     {isEditMode ? (
                       <textarea 
                         value={profile.marketing_channels?.join(', ') || ''} 
                         onChange={e => setProfile({...profile, marketing_channels: e.target.value.split(',').map(s => s.trim())})}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-5 text-sm font-bold text-slate-600 outline-none focus:bg-white focus:border-amber-500 transition-all min-h-[150px]"
+                        className="w-full bg-neutral-50 border border-neutral-200 rounded-2xl p-5 text-sm font-bold text-neutral-600 outline-none focus:bg-white focus:border-warning-500 transition-all min-h-[150px]"
                         placeholder="Enter channels (comma separated, e.g. Name (Description), ...)"
                       />
                     ) : (
@@ -1318,13 +1302,13 @@ const BrandProfile = () => {
                       {profile.marketing_channels?.map((chanStr, idx) => {
                         const { title, desc } = parseItem(chanStr);
                         return (
-                          <div key={idx} className="flex items-center gap-2.5 p-2 bg-white border border-slate-100 rounded-xl hover:border-blue-200 hover:shadow-sm transition-all group">
-                            <div className="w-8 h-8 shrink-0 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-blue-50 group-hover:text-blue-500 transition-colors">
+                          <div key={idx} className="flex items-center gap-2.5 p-2 bg-white border border-neutral-100 rounded-xl hover:border-info-200 hover:shadow-sm transition-all group">
+                            <div className="w-8 h-8 shrink-0 rounded-lg bg-neutral-50 flex items-center justify-center text-neutral-400 group-hover:bg-info-50 group-hover:text-info-500 transition-colors">
                               {idx % 3 === 0 ? <Search size={14} /> : idx % 3 === 1 ? <Radio size={14} /> : <ImageIcon size={14} />}
                             </div>
                             <div className="flex-1">
-                              <p className="text-slate-800 font-bold leading-normal text-xs break-words">
-                                {title} <span className="text-slate-400 font-medium ml-0.5">({desc})</span>
+                              <p className="text-neutral-800 font-bold leading-normal text-xs break-words">
+                                {title} <span className="text-neutral-400 font-medium ml-0.5">({desc})</span>
                               </p>
                             </div>
                           </div>
@@ -1334,15 +1318,15 @@ const BrandProfile = () => {
                     )}
                   </div>
                   <div className="space-y-6">
-                    <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
-                      <Users size={16} className="text-slate-400" />
-                      <h3 className="text-sm font-bold text-slate-400">客户聚集地</h3>
+                    <div className="flex items-center gap-2 pb-2 border-b border-neutral-100">
+                      <Users size={16} className="text-neutral-400" />
+                      <h3 className="text-sm font-bold text-neutral-400">客户聚集地</h3>
                     </div>
                     {isEditMode ? (
                       <textarea 
                         value={profile.customer_hangouts?.join(', ') || ''} 
                         onChange={e => setProfile({...profile, customer_hangouts: e.target.value.split(',').map(s => s.trim())})}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-5 text-sm font-bold text-slate-600 outline-none focus:bg-white focus:border-amber-500 transition-all min-h-[150px]"
+                        className="w-full bg-neutral-50 border border-neutral-200 rounded-2xl p-5 text-sm font-bold text-neutral-600 outline-none focus:bg-white focus:border-warning-500 transition-all min-h-[150px]"
                         placeholder="Enter hangouts (comma separated, e.g. Name (Description), ...)"
                       />
                     ) : (
@@ -1351,12 +1335,12 @@ const BrandProfile = () => {
                           const { title, desc } = parseItem(placeStr);
                           return (
                             <div key={idx} className="flex items-start gap-4 group">
-                              <div className="mt-1 w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-purple-50 group-hover:text-purple-500 transition-colors">
+                              <div className="mt-1 w-8 h-8 rounded-full bg-neutral-50 flex items-center justify-center text-neutral-400 group-hover:bg-primary-50 group-hover:text-primary-500 transition-colors">
                                 <MapPin size={16} />
                               </div>
                               <div className="flex-1 pt-1">
-                                <p className="text-sm font-bold text-slate-700 leading-relaxed">
-                                  {title} {desc && <span className="text-slate-400 font-medium ml-1 text-xs">({desc})</span>}
+                                <p className="text-sm font-bold text-neutral-700 leading-relaxed">
+                                  {title} {desc && <span className="text-neutral-400 font-medium ml-1 text-xs">({desc})</span>}
                                 </p>
                               </div>
                             </div>
@@ -1368,30 +1352,30 @@ const BrandProfile = () => {
                 </div>
               </div>
 
-              <div className="bg-white rounded-[40px] p-10 border border-slate-200 shadow-sm space-y-10 pb-16">
+              <div className="bg-white rounded-2xl p-10 border border-neutral-200 shadow-sm space-y-10 pb-16">
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-600 border border-emerald-100 shadow-emerald-500/5">
+                  <div className="w-12 h-12 rounded-2xl bg-success-50 flex items-center justify-center text-success-600 border border-success-100 shadow-success-500/5">
                     <TrendingUp size={24} />
                   </div>
-                  <h2 className="text-2xl font-black text-slate-900 tracking-tight">Impact Analysis</h2>
+                  <h2 className="text-2xl font-black text-neutral-900 tracking-tight">Impact Analysis</h2>
                 </div>
                 <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 ${isEditMode ? 'bg-transparent' : ''}`}>
                   {['收入端', '成本端', '政策端', '技术端'].map((cat) => (
-                    <div key={cat} className={`space-y-4 p-6 rounded-3xl transition-all ${isEditMode ? 'bg-slate-50 border border-slate-100' : 'bg-white'}`}>
-                      <div className="flex items-center gap-2.5 pb-3 border-b border-slate-100">
+                    <div key={cat} className={`space-y-4 p-6 rounded-2xl transition-all ${isEditMode ? 'bg-neutral-50 border border-neutral-100' : 'bg-white'}`}>
+                      <div className="flex items-center gap-2.5 pb-3 border-b border-neutral-100">
                         <div className={`w-2.5 h-2.5 rounded-full shadow-sm ${
-                          cat === '收入端' ? 'bg-emerald-500' : 
-                          cat === '成本端' ? 'bg-amber-500' : 
-                          cat === '政策端' ? 'bg-blue-500' : 
-                          'bg-orange-500'
+                          cat === '收入端' ? 'bg-success-500' : 
+                          cat === '成本端' ? 'bg-warning-500' : 
+                          cat === '政策端' ? 'bg-info-500' : 
+                          'bg-warning-500'
                         }`} />
-                        <h4 className="text-sm font-black text-slate-800 tracking-tight">{cat}</h4>
+                        <h4 className="text-sm font-black text-neutral-800 tracking-tight">{cat}</h4>
                       </div>
                       {isEditMode ? (
                         <textarea 
                           value={getFactorsText(cat)} 
                           onChange={e => handleFactorsChange(cat, e.target.value)}
-                          className="w-full bg-white border border-slate-200 rounded-xl p-4 text-xs font-bold text-slate-600 outline-none focus:border-amber-500 transition-all min-h-[120px] resize-none"
+                          className="w-full bg-white border border-neutral-200 rounded-xl p-4 text-xs font-bold text-neutral-600 outline-none focus:border-warning-500 transition-all min-h-[120px] resize-none"
                           placeholder="Factor (高), Factor, ..."
                         />
                       ) : (
@@ -1403,8 +1387,8 @@ const BrandProfile = () => {
                                 key={idx} 
                                 className={`text-xs leading-normal px-3 py-2 rounded-lg transition-all ${
                                   factor.importance === '高' 
-                                    ? 'bg-slate-50 text-slate-800 font-bold border border-slate-100/50 shadow-sm' 
-                                    : 'text-slate-400 font-bold opacity-70'
+                                    ? 'bg-neutral-50 text-neutral-800 font-bold border border-neutral-100/50 shadow-sm' 
+                                    : 'text-neutral-400 font-bold opacity-70'
                                 }`}
                               >
                                 {factor.factor}
@@ -1422,34 +1406,34 @@ const BrandProfile = () => {
       )}
 
       {!isUpdating && (
-        <button onClick={scrollToTop} className={`fixed bottom-8 right-8 w-14 h-14 bg-slate-900 text-white rounded-full flex items-center justify-center shadow-2xl z-[100] transition-all duration-300 no-print ${showBackToTop ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0'} hover:scale-110 active:scale-95`}><ArrowUp size={24} /></button>
+        <button onClick={scrollToTop} className={`fixed bottom-8 right-8 w-14 h-14 bg-neutral-900 text-white rounded-full flex items-center justify-center shadow-2xl z-[100] transition-all duration-300 no-print ${showBackToTop ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0'} hover:scale-110 active:scale-95`}><ArrowUp size={24} /></button>
       )}
 
       {/* One-click Update Modal */}
       {isUpdateModalOpen && (
-        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[100] flex items-center justify-center animate-in fade-in duration-300">
-          <div className="bg-white rounded-[32px] overflow-hidden shadow-2xl w-full max-w-[500px] flex flex-col animate-in zoom-in-95 duration-300">
-            <div className="p-8 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+        <div className="fixed inset-0 bg-neutral-900/40 backdrop-blur-sm z-[100] flex items-center justify-center animate-in fade-in duration-300">
+          <div className="bg-white rounded-2xl overflow-hidden shadow-2xl w-full max-w-[500px] flex flex-col animate-in zoom-in-95 duration-300">
+            <div className="p-8 border-b border-neutral-100 flex items-center justify-between bg-neutral-50/50">
               <div className="flex items-center gap-3">
-                <div className="p-2.5 bg-indigo-600 text-white rounded-xl shadow-lg shadow-indigo-200">
+                <div className="p-2.5 bg-primary-600 text-white rounded-xl shadow-lg shadow-primary-200">
                   <Sparkles size={20} />
                 </div>
-                <h4 className="font-bold text-slate-900 text-lg">Create Brand Profile</h4>
+                <h4 className="font-bold text-neutral-900 text-lg">Create Brand Profile</h4>
               </div>
             </div>
             
             <div className="p-10 space-y-8">
-              <div className="bg-indigo-50/50 p-6 rounded-2xl border border-indigo-100 flex gap-4">
+              <div className="bg-primary-50/50 p-6 rounded-2xl border border-primary-100 flex gap-4">
                 <div className="shrink-0 mt-1">
-                  <Info size={18} className="text-indigo-600" />
+                  <Info size={18} className="text-primary-600" />
                 </div>
-                <p className="text-sm font-bold text-indigo-900 leading-relaxed">
+                <p className="text-sm font-bold text-primary-900 leading-relaxed">
                   AI预计需要2-3分钟后自动完成品牌画像的分析创建
                 </p>
               </div>
 
               <div className="space-y-4">
-                <label className="text-[11px] font-black text-slate-400 flex items-center gap-2">
+                <label className="text-[11px] font-black text-neutral-400 flex items-center gap-2">
                   <Globe size={12} />
                   Brand Url
                 </label>
@@ -1460,14 +1444,14 @@ const BrandProfile = () => {
                     onChange={(e) => setUpdateDomain(e.target.value)}
                     disabled={!!profile.domain}
                     placeholder="e.g. https://www.adsgo.ai"
-                    className={`w-full bg-slate-50 border border-slate-200 rounded-2xl px-6 py-4 text-sm font-bold transition-all ${
+                    className={`w-full bg-neutral-50 border border-neutral-200 rounded-2xl px-6 py-4 text-sm font-bold transition-all ${
                       !!profile.domain 
-                        ? 'text-slate-400 cursor-not-allowed bg-slate-100' 
-                        : 'text-slate-700 focus:ring-4 focus:ring-indigo-500/5 focus:border-indigo-400 focus:bg-white'
+                        ? 'text-neutral-400 cursor-not-allowed bg-neutral-100' 
+                        : 'text-neutral-700 focus:ring-4 focus:ring-primary-500/5 focus:border-primary-400 focus:bg-white'
                     }`}
                   />
                   {!!profile.domain && (
-                    <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 bg-white/50 px-2 py-1 rounded text-[10px] font-bold border border-slate-100">
+                    <div className="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-400 bg-white/50 px-2 py-1 rounded text-[10px] font-bold border border-neutral-100">
                       Read Only
                     </div>
                   )}
@@ -1477,7 +1461,7 @@ const BrandProfile = () => {
               <div className="flex gap-4 pt-4">
                 <button 
                   onClick={handleStartUpdate}
-                  className="w-full py-4 bg-indigo-600 text-white rounded-2xl font-bold text-sm hover:bg-indigo-700 shadow-xl shadow-indigo-100 transition-all flex items-center justify-center gap-2 hover:translate-y-[-2px] active:translate-y-0"
+                  className="w-full py-4 bg-primary-600 text-white rounded-2xl font-bold text-sm hover:bg-primary-700 shadow-xl shadow-primary-100 transition-all flex items-center justify-center gap-2 hover:translate-y-[-2px] active:translate-y-0"
                 >
                   <Check size={18} strokeWidth={3} />
                   Start Analysis

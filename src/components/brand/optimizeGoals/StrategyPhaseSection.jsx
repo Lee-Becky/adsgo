@@ -123,33 +123,33 @@ const StrategyPhaseSection = ({ strategy, onChange }) => {
   const hasDataSources = totalDataSources > 0
 
   return (
-    <div className="bg-white rounded-[32px] border border-slate-200 shadow-[0_4px_24px_rgba(0,0,0,0.04)]">
-      <div className="px-8 py-6 border-b border-slate-100 flex items-center gap-3">
+    <div className="bg-white rounded-2xl border border-neutral-200 shadow-[0_4px_24px_rgba(0,0,0,0.04)]">
+      <div className="px-8 py-6 border-b border-neutral-100 flex items-center gap-3">
         <div className="w-8 h-8 rounded-xl bg-violet-50 flex items-center justify-center">
           <Compass size={16} className="text-violet-500" />
         </div>
         <div>
-          <h3 className="text-sm font-black text-slate-900">Strategy Phase</h3>
-          <p className="text-[11px] text-slate-400 mt-0.5">Define strategy lifecycle, execution cadence, and data sources</p>
+          <h3 className="text-sm font-black text-neutral-900">Strategy Phase</h3>
+          <p className="text-[11px] text-neutral-400 mt-0.5">Define strategy lifecycle, execution cadence, and data sources</p>
         </div>
       </div>
 
       <div className="px-8 py-6 space-y-7">
         {/* Expired Banner */}
         {isExpired && (
-          <div className="flex items-center gap-3 p-4 bg-amber-50 border border-amber-200 rounded-2xl">
-            <AlertTriangle size={18} className="text-amber-500 flex-shrink-0" />
+          <div className="flex items-center gap-3 p-4 bg-warning-50 border border-warning-200 rounded-2xl">
+            <AlertTriangle size={18} className="text-warning-500 flex-shrink-0" />
             <div>
-              <p className="text-xs font-bold text-amber-700">Previous strategy period has expired.</p>
-              <p className="text-[11px] text-amber-600 mt-0.5">Historical config has been archived. Please fill in new strategy.</p>
+              <p className="text-xs font-bold text-warning-700">Previous strategy period has expired.</p>
+              <p className="text-[11px] text-warning-600 mt-0.5">Historical config has been archived. Please fill in new strategy.</p>
             </div>
           </div>
         )}
 
         {/* Phase Selection */}
         <div>
-          <label className="text-xs font-black text-slate-700 mb-2 block">
-            Phase <span className="text-red-500">*</span>
+          <label className="text-xs font-black text-neutral-700 mb-2 block">
+            Phase <span className="text-danger-500">*</span>
           </label>
           <div className="flex flex-wrap gap-2">
             {PHASE_OPTIONS.map(p => (
@@ -159,7 +159,7 @@ const StrategyPhaseSection = ({ strategy, onChange }) => {
                 className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
                   strategy.phase === p.id
                     ? 'bg-violet-600 text-white shadow-lg shadow-violet-200'
-                    : 'bg-slate-50 text-slate-500 hover:bg-slate-100'
+                    : 'bg-neutral-50 text-neutral-500 hover:bg-neutral-100'
                 }`}
               >
                 {p.label}
@@ -168,58 +168,58 @@ const StrategyPhaseSection = ({ strategy, onChange }) => {
           </div>
           {strategy.phase === 'custom' && (
             <input
-              className="mt-3 w-full max-w-xs px-4 py-2.5 border border-slate-200 rounded-xl text-sm font-medium text-slate-900 outline-none focus:border-violet-400"
+              className="mt-3 w-full max-w-xs px-4 py-2.5 border border-neutral-200 rounded-xl text-sm font-medium text-neutral-900 outline-none focus:border-violet-400"
               placeholder="Enter custom phase name..."
               value={strategy.customPhase}
               onChange={(e) => update('customPhase', e.target.value)}
             />
           )}
           {!hasPhase && (
-            <p className="text-[11px] text-red-500 mt-1.5">Please select a strategy phase</p>
+            <p className="text-[11px] text-danger-500 mt-1.5">Please select a strategy phase</p>
           )}
         </div>
 
         {/* Validity Period */}
         <div>
-          <label className="text-xs font-black text-slate-700 mb-2 flex items-center gap-1.5">
-            <Calendar size={13} className="text-slate-400" />
-            Validity Period <span className="text-red-500">*</span>
+          <label className="text-xs font-black text-neutral-700 mb-2 flex items-center gap-1.5">
+            <Calendar size={13} className="text-neutral-400" />
+            Validity Period <span className="text-danger-500">*</span>
           </label>
           <div className="flex items-center gap-3">
             <input
               type="date"
-              className="px-4 py-2.5 border border-slate-200 rounded-xl text-sm font-medium text-slate-900 outline-none focus:border-violet-400"
+              className="px-4 py-2.5 border border-neutral-200 rounded-xl text-sm font-medium text-neutral-900 outline-none focus:border-violet-400"
               value={strategy.validFrom}
               onChange={(e) => update('validFrom', e.target.value)}
             />
-            <span className="text-xs text-slate-400 font-bold">to</span>
+            <span className="text-xs text-neutral-400 font-bold">to</span>
             <input
               type="date"
-              className="px-4 py-2.5 border border-slate-200 rounded-xl text-sm font-medium text-slate-900 outline-none focus:border-violet-400"
+              className="px-4 py-2.5 border border-neutral-200 rounded-xl text-sm font-medium text-neutral-900 outline-none focus:border-violet-400"
               value={strategy.validTo}
               onChange={(e) => update('validTo', e.target.value)}
             />
           </div>
           {!hasValidity && (
-            <p className="text-[11px] text-red-500 mt-1.5">Please set both start and end dates</p>
+            <p className="text-[11px] text-danger-500 mt-1.5">Please set both start and end dates</p>
           )}
         </div>
 
         {/* Strategy Cycle */}
         <div>
-          <label className="text-xs font-black text-slate-700 mb-2 flex items-center gap-1.5">
-            <Clock size={13} className="text-slate-400" />
+          <label className="text-xs font-black text-neutral-700 mb-2 flex items-center gap-1.5">
+            <Clock size={13} className="text-neutral-400" />
             Strategy Cycle
           </label>
-          <div className="flex items-center gap-1 p-1 bg-slate-100 rounded-xl w-fit">
+          <div className="flex items-center gap-1 p-1 bg-neutral-100 rounded-xl w-fit">
             {CYCLE_OPTIONS.map(c => (
               <button
                 key={c.id}
                 onClick={() => update('cycleType', c.id)}
                 className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${
                   strategy.cycleType === c.id
-                    ? 'bg-white text-slate-900 shadow-sm'
-                    : 'text-slate-500 hover:text-slate-700'
+                    ? 'bg-white text-neutral-900 shadow-sm'
+                    : 'text-neutral-500 hover:text-neutral-700'
                 }`}
               >
                 {c.label}
@@ -230,15 +230,15 @@ const StrategyPhaseSection = ({ strategy, onChange }) => {
 
         {/* Execution Time */}
         <div>
-          <label className="text-xs font-black text-slate-700 mb-2 flex items-center gap-1.5">
-            <Zap size={13} className="text-slate-400" />
+          <label className="text-xs font-black text-neutral-700 mb-2 flex items-center gap-1.5">
+            <Zap size={13} className="text-neutral-400" />
             Execution Time
           </label>
           <div className="flex items-center gap-3 flex-wrap">
             {showMonthInQuarter && (
               <div className="relative">
                 <select
-                  className="appearance-none pl-3 pr-8 py-2.5 border border-slate-200 rounded-xl text-sm font-medium text-slate-900 outline-none focus:border-violet-400 bg-white"
+                  className="appearance-none pl-3 pr-8 py-2.5 border border-neutral-200 rounded-xl text-sm font-medium text-neutral-900 outline-none focus:border-violet-400 bg-white"
                   value={strategy.monthInQuarter}
                   onChange={(e) => update('monthInQuarter', +e.target.value)}
                 >
@@ -246,13 +246,13 @@ const StrategyPhaseSection = ({ strategy, onChange }) => {
                   <option value={2}>2nd month</option>
                   <option value={3}>3rd month</option>
                 </select>
-                <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-neutral-400 pointer-events-none" />
               </div>
             )}
             {showDayOfWeek && (
               <div className="relative">
                 <select
-                  className="appearance-none pl-3 pr-8 py-2.5 border border-slate-200 rounded-xl text-sm font-medium text-slate-900 outline-none focus:border-violet-400 bg-white"
+                  className="appearance-none pl-3 pr-8 py-2.5 border border-neutral-200 rounded-xl text-sm font-medium text-neutral-900 outline-none focus:border-violet-400 bg-white"
                   value={strategy.dayOfWeek}
                   onChange={(e) => update('dayOfWeek', +e.target.value)}
                 >
@@ -260,13 +260,13 @@ const StrategyPhaseSection = ({ strategy, onChange }) => {
                     <option key={d.value} value={d.value}>{d.label}</option>
                   ))}
                 </select>
-                <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-neutral-400 pointer-events-none" />
               </div>
             )}
             {showDayOfMonth && (
               <div className="relative">
                 <select
-                  className="appearance-none pl-3 pr-8 py-2.5 border border-slate-200 rounded-xl text-sm font-medium text-slate-900 outline-none focus:border-violet-400 bg-white"
+                  className="appearance-none pl-3 pr-8 py-2.5 border border-neutral-200 rounded-xl text-sm font-medium text-neutral-900 outline-none focus:border-violet-400 bg-white"
                   value={strategy.dayOfMonth}
                   onChange={(e) => update('dayOfMonth', +e.target.value)}
                 >
@@ -274,29 +274,29 @@ const StrategyPhaseSection = ({ strategy, onChange }) => {
                     <option key={d} value={d}>Day {d}</option>
                   ))}
                 </select>
-                <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-neutral-400 pointer-events-none" />
               </div>
             )}
             <div className="flex items-center gap-1">
               <input
                 type="time"
-                className="px-3 py-2.5 border border-slate-200 rounded-xl text-sm font-medium text-slate-900 outline-none focus:border-violet-400"
+                className="px-3 py-2.5 border border-neutral-200 rounded-xl text-sm font-medium text-neutral-900 outline-none focus:border-violet-400"
                 value={`${String(strategy.executionHour).padStart(2, '0')}:${String(strategy.executionMinute).padStart(2, '0')}`}
                 onChange={(e) => {
                   const [h, m] = e.target.value.split(':').map(Number)
                   onChange({ ...strategy, executionHour: h || 0, executionMinute: m || 0 })
                 }}
               />
-              <span className="text-[10px] text-slate-400 font-bold ml-1">Beijing Time</span>
+              <span className="text-[10px] text-neutral-400 font-bold ml-1">Beijing Time</span>
             </div>
           </div>
         </div>
 
         {/* Auto Execute */}
-        <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl">
+        <div className="flex items-center justify-between p-4 bg-neutral-50 rounded-2xl">
           <div>
-            <p className="text-xs font-black text-slate-700">Auto Execute</p>
-            <p className="text-[11px] text-slate-400 mt-0.5">
+            <p className="text-xs font-black text-neutral-700">Auto Execute</p>
+            <p className="text-[11px] text-neutral-400 mt-0.5">
               {strategy.autoExecute
                 ? 'Strategy will execute automatically at the scheduled time'
                 : 'You will be notified and can manually approve each execution'}
@@ -305,7 +305,7 @@ const StrategyPhaseSection = ({ strategy, onChange }) => {
           <button
             onClick={() => update('autoExecute', !strategy.autoExecute)}
             className={`relative w-11 h-6 rounded-full transition-colors ${
-              strategy.autoExecute ? 'bg-violet-500' : 'bg-slate-300'
+              strategy.autoExecute ? 'bg-violet-500' : 'bg-neutral-300'
             }`}
           >
             <div className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-transform ${
@@ -316,9 +316,9 @@ const StrategyPhaseSection = ({ strategy, onChange }) => {
 
         {/* Next Execution Hint */}
         {nextExecution && (
-          <div className="flex items-center gap-2 px-4 py-2.5 bg-indigo-50 border border-indigo-100 rounded-xl -mt-4">
-            <Clock size={13} className="text-indigo-500" />
-            <span className="text-[11px] font-bold text-indigo-600">
+          <div className="flex items-center gap-2 px-4 py-2.5 bg-primary-50 border border-primary-100 rounded-xl -mt-4">
+            <Clock size={13} className="text-primary-500" />
+            <span className="text-[11px] font-bold text-primary-600">
               Next execution: {nextExecution} (Beijing Time)
             </span>
           </div>
@@ -326,13 +326,13 @@ const StrategyPhaseSection = ({ strategy, onChange }) => {
 
         {/* Core Objectives */}
         <div>
-          <label className="text-xs font-black text-slate-700 mb-2 flex items-center gap-1.5">
-            <FileText size={13} className="text-slate-400" />
-            Core Objectives <span className="text-red-500">*</span>
+          <label className="text-xs font-black text-neutral-700 mb-2 flex items-center gap-1.5">
+            <FileText size={13} className="text-neutral-400" />
+            Core Objectives <span className="text-danger-500">*</span>
           </label>
           <textarea
-            className={`w-full px-4 py-3 border rounded-2xl text-sm font-medium text-slate-900 outline-none focus:border-violet-400 resize-none ${
-              !hasObjectives ? 'border-slate-200' : 'border-slate-200'
+            className={`w-full px-4 py-3 border rounded-2xl text-sm font-medium text-neutral-900 outline-none focus:border-violet-400 resize-none ${
+              !hasObjectives ? 'border-neutral-200' : 'border-neutral-200'
             }`}
             rows={4}
             placeholder="Describe background info for this cycle: strategy goals (e.g., reduce CPA below $80), KPI priorities (ROAS > scale), current test direction (video vs. image), key markets or audiences, risks to avoid..."
@@ -340,32 +340,32 @@ const StrategyPhaseSection = ({ strategy, onChange }) => {
             onChange={(e) => update('coreObjectives', e.target.value)}
           />
           {!hasObjectives && (
-            <p className="text-[11px] text-red-500 mt-1.5">Please describe the core objectives for this strategy phase</p>
+            <p className="text-[11px] text-danger-500 mt-1.5">Please describe the core objectives for this strategy phase</p>
           )}
         </div>
 
         {/* Data Sources */}
         <div>
-          <label className="text-xs font-black text-slate-700 mb-3 flex items-center gap-1.5">
-            <Database size={13} className="text-slate-400" />
-            Data Sources <span className="text-red-500">*</span>
+          <label className="text-xs font-black text-neutral-700 mb-3 flex items-center gap-1.5">
+            <Database size={13} className="text-neutral-400" />
+            Data Sources <span className="text-danger-500">*</span>
           </label>
           {!hasDataSources && (
-            <p className="text-[11px] text-red-500 -mt-1 mb-2">Please select at least one data source</p>
+            <p className="text-[11px] text-danger-500 -mt-1 mb-2">Please select at least one data source</p>
           )}
           <div className="space-y-2">
             {DATA_SOURCE_CATEGORIES.map(cat => {
               const selected = strategy.dataSources[cat.key] || []
               const isExpanded = expandedSources.includes(cat.key)
               return (
-                <div key={cat.key} className="border border-slate-100 rounded-2xl overflow-hidden">
+                <div key={cat.key} className="border border-neutral-100 rounded-2xl overflow-hidden">
                   <button
                     onClick={() => toggleSourceExpand(cat.key)}
-                    className="w-full flex items-center justify-between px-4 py-3 hover:bg-slate-50 transition-colors"
+                    className="w-full flex items-center justify-between px-4 py-3 hover:bg-neutral-50 transition-colors"
                   >
                     <div className="flex items-center gap-2">
-                      <cat.icon size={14} className="text-slate-400" />
-                      <span className="text-xs font-bold text-slate-700">{cat.label}</span>
+                      <cat.icon size={14} className="text-neutral-400" />
+                      <span className="text-xs font-bold text-neutral-700">{cat.label}</span>
                       {selected.length > 0 && (
                         <span className="px-2 py-0.5 text-[10px] font-bold bg-violet-100 text-violet-600 rounded-full">
                           {selected.length}
@@ -374,7 +374,7 @@ const StrategyPhaseSection = ({ strategy, onChange }) => {
                     </div>
                     <ChevronDown
                       size={14}
-                      className={`text-slate-400 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+                      className={`text-neutral-400 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
                     />
                   </button>
                   {isExpanded && (
@@ -388,11 +388,11 @@ const StrategyPhaseSection = ({ strategy, onChange }) => {
                             className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-left text-xs font-medium transition-all ${
                               isSelected
                                 ? 'bg-violet-50 text-violet-700 border border-violet-200'
-                                : 'text-slate-600 hover:bg-slate-50 border border-transparent'
+                                : 'text-neutral-600 hover:bg-neutral-50 border border-transparent'
                             }`}
                           >
                             <div className={`w-4 h-4 rounded border-2 flex items-center justify-center transition-all ${
-                              isSelected ? 'bg-violet-500 border-violet-500' : 'border-slate-300'
+                              isSelected ? 'bg-violet-500 border-violet-500' : 'border-neutral-300'
                             }`}>
                               {isSelected && (
                                 <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
@@ -422,7 +422,7 @@ const StrategyPhaseSection = ({ strategy, onChange }) => {
                     {ds.name}
                     <button
                       onClick={() => updateDataSources(catKey, ds.id, ds.name)}
-                      className="hover:text-red-500 ml-0.5"
+                      className="hover:text-danger-500 ml-0.5"
                     >
                       ×
                     </button>

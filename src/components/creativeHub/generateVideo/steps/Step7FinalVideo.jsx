@@ -22,20 +22,20 @@ export default function Step7FinalVideo() {
   return (
     <StepTransition>
       <div className="space-y-5">
-        <h2 className="text-xl font-bold text-gray-900 mb-1">最终成片</h2>
+        <h2 className="text-xl font-bold text-neutral-900 mb-1">最终成片</h2>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Left: Video player + scene thumbnails */}
           <div className="space-y-4">
-            <div className="rounded-2xl bg-gradient-to-br from-gray-900 via-primary-900/30 to-gray-900 overflow-hidden flex items-center justify-center p-8 min-h-[400px] relative ring-1 ring-primary-500/10">
-              <div className="w-full max-w-[260px] aspect-[9/16] rounded-xl bg-black border border-gray-700/50 flex flex-col items-center justify-center text-white gap-4 relative group cursor-pointer">
+            <div className="rounded-2xl bg-gradient-to-br from-neutral-900 via-primary-900/30 to-neutral-900 overflow-hidden flex items-center justify-center p-8 min-h-[400px] relative ring-1 ring-primary-500/10">
+              <div className="w-full max-w-[260px] aspect-[9/16] rounded-xl bg-black border border-neutral-700/50 flex flex-col items-center justify-center text-white gap-4 relative group cursor-pointer">
                 <div className="w-16 h-16 rounded-full bg-white/15 backdrop-blur-sm flex items-center justify-center group-hover:bg-white/25 group-hover:scale-110 transition-all duration-300 ring-2 ring-white/10">
                   <Play className="w-8 h-8 opacity-90 ml-1" />
                 </div>
-                <p className="text-xs text-gray-400 px-4 text-center">
+                <p className="text-xs text-neutral-400 px-4 text-center">
                   点击播放成片视频
                 </p>
-                <p className="text-[10px] text-gray-600 px-4 text-center break-all">
+                <p className="text-[10px] text-neutral-600 px-4 text-center break-all">
                   {finalVideoUrl}
                 </p>
               </div>
@@ -56,7 +56,7 @@ export default function Step7FinalVideo() {
                     alt={sc.label}
                     className="w-full aspect-video object-cover"
                   />
-                  <p className="text-[10px] text-gray-500 text-center py-1.5 font-medium bg-gray-50">
+                  <p className="text-[10px] text-neutral-500 text-center py-1.5 font-medium bg-neutral-50">
                     {sc.label}
                   </p>
                 </div>
@@ -71,7 +71,7 @@ export default function Step7FinalVideo() {
             </AlertSuccess>
 
             {finalGeneratedAt && (
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-neutral-500">
                 生成时间：{finalGeneratedAt.toLocaleString('zh-CN')}
               </p>
             )}
@@ -85,7 +85,7 @@ export default function Step7FinalVideo() {
 
             {sourceUrl && (
               <div className="text-xs">
-                <span className="text-gray-500">来源：</span>
+                <span className="text-neutral-500">来源：</span>
                 <a
                   href={sourceUrl}
                   className="text-primary-600 hover:text-primary-700 font-medium break-all"
@@ -98,11 +98,11 @@ export default function Step7FinalVideo() {
             )}
 
             {/* Voiceover review with brand accent */}
-            <div className="bg-gray-50 rounded-lg p-4 border border-gray-100">
-              <h4 className="text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wider">
+            <div className="bg-neutral-50 rounded-lg p-4 border border-neutral-100">
+              <h4 className="text-xs font-semibold text-neutral-500 mb-2 tracking-wider">
                 口播文案
               </h4>
-              <p className="text-sm text-gray-800 leading-relaxed">{step5.voiceover}</p>
+              <p className="text-sm text-neutral-800 leading-relaxed">{step5.voiceover}</p>
             </div>
 
           </div>

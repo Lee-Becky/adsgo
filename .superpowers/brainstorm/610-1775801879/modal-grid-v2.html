@@ -1,0 +1,298 @@
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+
+  .split { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .split-label {
+    font-size: 11px; font-weight: 700; color: #6b7280;
+    text-transform: uppercase; letter-spacing: 0.06em;
+    margin-bottom: 8px; display: flex; align-items: center; gap-6px;
+  }
+  .badge-state {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 2px 8px; border-radius: 99px; font-size: 10px; font-weight: 700;
+    text-transform: none; letter-spacing: 0;
+  }
+  .badge-all { background: #111827; color: #fff; }
+  .badge-group { background: #ede9fe; color: #5b21b6; }
+
+  .modal-wrap {
+    background: #fff;
+    border-radius: 14px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 6px 28px rgba(0,0,0,0.1);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .modal-header {
+    padding: 14px 18px 12px;
+    border-bottom: 1px solid #f3f4f6;
+    display: flex; align-items: flex-start; justify-content: space-between;
+  }
+  .modal-title { font-size: 13px; font-weight: 700; color: #111827; }
+  .modal-sub { font-size: 10px; color: #9ca3af; margin-top: 2px; }
+  .close-btn {
+    width: 24px; height: 24px; border-radius: 99px;
+    background: #f3f4f6; border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    color: #9ca3af; font-size: 12px; flex-shrink: 0;
+  }
+
+  /* Tabs */
+  .tabs-bar {
+    padding: 8px 16px; background: #f9fafb;
+    border-bottom: 1px solid #f3f4f6;
+    display: flex; gap: 5px; flex-wrap: wrap;
+  }
+  .tab {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 3px 10px; border-radius: 99px; font-size: 10px; font-weight: 600;
+    border: 1.5px solid; cursor: pointer; white-space: nowrap;
+  }
+  .tab-active-all  { background: #111827; color: #fff;    border-color: #111827; }
+  .tab-active-g1   { background: #ede9fe; color: #5b21b6; border-color: #c4b5fd; }
+  .tab-inactive    { background: #fff; color: #9ca3af; border-color: #e5e7eb; }
+  .tab-cnt { opacity: 0.6; font-weight: 500; }
+  .dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+  .d1{background:#6366f1} .d2{background:#9333ea} .d3{background:#f59e0b} .d4{background:#16a34a}
+
+  /* Grid */
+  .creative-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    padding: 12px 16px;
+    overflow-y: auto;
+    max-height: 260px;
+  }
+  .creative-cell {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    cursor: pointer; border-radius: 8px; padding: 5px; transition: background 0.1s;
+    position: relative;
+  }
+  .creative-cell:hover { background: #f9fafb; }
+  .creative-cell.selected { background: #ede9fe; }
+
+  .thumb-wrap {
+    width: 100%; aspect-ratio: 4/5;
+    border-radius: 7px; overflow: hidden; position: relative;
+    border: 2px solid #e5e7eb; transition: border-color 0.15s;
+  }
+  .creative-cell.selected .thumb-wrap { border-color: #6366f1; box-shadow: 0 0 0 2px #c7d2fe; }
+  .thumb-img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+  .t1{background:linear-gradient(135deg,#ddd6fe,#a5b4fc)}
+  .t2{background:linear-gradient(135deg,#fde68a,#fca5a5)}
+  .t3{background:linear-gradient(135deg,#a7f3d0,#6ee7b7)}
+  .t4{background:linear-gradient(135deg,#fbcfe8,#f9a8d4)}
+  .t5{background:linear-gradient(135deg,#bae6fd,#7dd3fc)}
+  .t6{background:linear-gradient(135deg,#fed7aa,#fdba74)}
+
+  .check-overlay {
+    position: absolute; top: 5px; left: 5px;
+    width: 15px; height: 15px; border-radius: 4px;
+    border: 1.5px solid rgba(255,255,255,0.9);
+    background: rgba(255,255,255,0.25); backdrop-filter: blur(2px);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .creative-cell.selected .check-overlay {
+    background: #6366f1; border-color: #6366f1;
+  }
+  .creative-cell.selected .check-overlay::after { content:'✓'; color:#fff; font-size:9px; font-weight:700; }
+
+  .creative-name {
+    font-size: 9.5px; color: #6b7280; font-weight: 500;
+    text-align: center; width: 100%;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+
+  /* Group tag below name */
+  .group-tag {
+    display: inline-flex; align-items: center; gap: 3px;
+    padding: 1.5px 6px; border-radius: 99px;
+    font-size: 9.5px; font-weight: 600; border: 1px solid; white-space: nowrap;
+  }
+  .gt1 { background:#ede9fe; color:#5b21b6; border-color:#ddd6fe; }
+  .gt2 { background:#fdf4ff; color:#9333ea; border-color:#e9d5ff; }
+  .gt3 { background:#fffbeb; color:#b45309; border-color:#fde68a; }
+
+  /* Footer */
+  .modal-footer {
+    padding: 10px 16px;
+    background: #111827;
+    display: flex; align-items: center; gap: 8px;
+    border-top: 1px solid #1f2937;
+  }
+  .footer-label { font-size: 11px; font-weight: 700; color: #fff; white-space: nowrap; flex-shrink: 0; }
+  .footer-hint  { font-size: 11px; color: rgba(255,255,255,0.3); }
+  .pills-fade { position: relative; flex: 1; overflow: hidden; }
+  .pills-fade::after {
+    content:''; position:absolute; right:0; top:0; bottom:0; width:24px;
+    background:linear-gradient(to right,transparent,#111827); pointer-events:none;
+  }
+  .pills-scroll { display:flex; gap:6px; overflow-x:auto; scrollbar-width:none; }
+  .pills-scroll::-webkit-scrollbar { display:none; }
+
+  .fpill {
+    display:inline-flex; align-items:center; gap:5px;
+    padding:4px 11px; border-radius:7px; font-size:11px; font-weight:600;
+    cursor:pointer; border:none; white-space:nowrap; flex-shrink:0;
+  }
+  .fpill-new { background:rgba(255,255,255,0.1); color:#fff; border:1.5px solid rgba(255,255,255,0.2); }
+  .fp1 { background:rgba(99,102,241,0.9); color:#fff; }
+  .fp2 { background:rgba(147,51,234,0.85); color:#fff; }
+  .fp3 { background:rgba(245,158,11,0.85); color:#fff; }
+  .fp4 { background:rgba(22,163,74,0.85);  color:#fff; }
+
+  .white-dot { width:5px; height:5px; border-radius:50%; background:rgba(255,255,255,0.55); display:inline-block; }
+
+  /* Annotation arrows */
+  .annotation {
+    font-size: 10px; color: #6b7280; line-height: 1.5;
+    background: #f9fafb; border-radius: 8px; padding: 8px 12px;
+    border: 1px solid #f3f4f6; margin-top: 8px;
+  }
+  .annotation b { color: #374151; }
+  .annotation .diff { color: #6366f1; font-weight: 600; }
+</style>
+
+<h2>Modal 设计 — 「全部」vs「具体组」Tab 状态对比</h2>
+<p class="subtitle">底部 pill 去掉数量；切换到具体组时，缩略图下的组标签自动隐藏</p>
+
+<div class="split">
+
+  <!-- LEFT: 全部 Tab -->
+  <div>
+    <div class="split-label">
+      状态 1 &nbsp;<span class="badge-state badge-all">全部 Tab</span>
+    </div>
+    <div class="modal-wrap">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title">素材分组管理</div>
+          <div class="modal-sub">点击素材可多选</div>
+        </div>
+        <button class="close-btn">✕</button>
+      </div>
+      <div class="tabs-bar">
+        <button class="tab tab-active-all">全部 <span class="tab-cnt">10</span></button>
+        <button class="tab tab-inactive"><span class="dot d1"></span>素材组 1 <span class="tab-cnt">5</span></button>
+        <button class="tab tab-inactive"><span class="dot d2"></span>素材组 2 <span class="tab-cnt">3</span></button>
+        <button class="tab tab-inactive"><span class="dot d3"></span>素材组 3 <span class="tab-cnt">2</span></button>
+      </div>
+      <div class="creative-grid">
+        <!-- selected -->
+        <div class="creative-cell selected">
+          <div class="thumb-wrap"><div class="thumb-img t1"></div><div class="check-overlay"></div></div>
+          <div class="creative-name">春季主图.jpg</div>
+          <div class="group-tag gt1"><span class="dot d1"></span>素材组 1</div>
+        </div>
+        <div class="creative-cell selected">
+          <div class="thumb-wrap"><div class="thumb-img t2"></div><div class="check-overlay"></div></div>
+          <div class="creative-name">Banner_v2.png</div>
+          <div class="group-tag gt1"><span class="dot d1"></span>素材组 1</div>
+        </div>
+        <div class="creative-cell">
+          <div class="thumb-wrap"><div class="thumb-img t3"></div><div class="check-overlay"></div></div>
+          <div class="creative-name">产品展示.mp4</div>
+          <div class="group-tag gt2"><span class="dot d2"></span>素材组 2</div>
+        </div>
+        <div class="creative-cell">
+          <div class="thumb-wrap"><div class="thumb-img t4"></div><div class="check-overlay"></div></div>
+          <div class="creative-name">夏季新品.jpg</div>
+          <div class="group-tag gt3"><span class="dot d3"></span>素材组 3</div>
+        </div>
+        <div class="creative-cell">
+          <div class="thumb-wrap"><div class="thumb-img t5"></div><div class="check-overlay"></div></div>
+          <div class="creative-name">模特大图.jpg</div>
+          <div class="group-tag gt2"><span class="dot d2"></span>素材组 2</div>
+        </div>
+        <div class="creative-cell">
+          <div class="thumb-wrap"><div class="thumb-img t6"></div><div class="check-overlay"></div></div>
+          <div class="creative-name">活动海报.png</div>
+          <div class="group-tag gt1"><span class="dot d1"></span>素材组 1</div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <span class="footer-label">已选 2 个</span>
+        <div class="pills-fade">
+          <div class="pills-scroll">
+            <button class="fpill fp1"><span class="white-dot"></span>素材组 1</button>
+            <button class="fpill fp2"><span class="white-dot"></span>素材组 2</button>
+            <button class="fpill fp3"><span class="white-dot"></span>素材组 3</button>
+          </div>
+        </div>
+        <button class="fpill fpill-new" style="margin-left:4px">＋ 新增组</button>
+      </div>
+    </div>
+    <div class="annotation">
+      <b>全部 Tab：</b>混合展示所有组的素材，<span class="diff">每个缩略图下方显示归属组标签</span>（必要，否则无法区分哪个素材在哪组）。底部 pill 只显示组名，无数量。
+    </div>
+  </div>
+
+  <!-- RIGHT: 素材组 1 Tab -->
+  <div>
+    <div class="split-label">
+      状态 2 &nbsp;<span class="badge-state badge-group">素材组 1 Tab</span>
+    </div>
+    <div class="modal-wrap">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title">素材分组管理</div>
+          <div class="modal-sub">点击素材可多选</div>
+        </div>
+        <button class="close-btn">✕</button>
+      </div>
+      <div class="tabs-bar">
+        <button class="tab tab-inactive">全部 <span class="tab-cnt">10</span></button>
+        <button class="tab tab-active-g1"><span class="dot d1"></span>素材组 1 <span class="tab-cnt">5</span></button>
+        <button class="tab tab-inactive"><span class="dot d2"></span>素材组 2 <span class="tab-cnt">3</span></button>
+        <button class="tab tab-inactive"><span class="dot d3"></span>素材组 3 <span class="tab-cnt">2</span></button>
+      </div>
+      <div class="creative-grid">
+        <!-- 只展示素材组1的素材，无组标签 -->
+        <div class="creative-cell selected">
+          <div class="thumb-wrap"><div class="thumb-img t1"></div><div class="check-overlay"></div></div>
+          <div class="creative-name">春季主图.jpg</div>
+          <!-- 无组标签 -->
+        </div>
+        <div class="creative-cell selected">
+          <div class="thumb-wrap"><div class="thumb-img t2"></div><div class="check-overlay"></div></div>
+          <div class="creative-name">Banner_v2.png</div>
+        </div>
+        <div class="creative-cell">
+          <div class="thumb-wrap"><div class="thumb-img t6"></div><div class="check-overlay"></div></div>
+          <div class="creative-name">活动海报.png</div>
+        </div>
+        <div class="creative-cell">
+          <div class="thumb-wrap"><div class="thumb-img t4"></div><div class="check-overlay"></div></div>
+          <div class="creative-name">夏季新品.jpg</div>
+        </div>
+        <div class="creative-cell">
+          <div class="thumb-wrap"><div class="thumb-img t5"></div><div class="check-overlay"></div></div>
+          <div class="creative-name">限定款KV.jpg</div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <span class="footer-label">已选 2 个</span>
+        <div class="pills-fade">
+          <div class="pills-scroll">
+            <button class="fpill fp1"><span class="white-dot"></span>素材组 1</button>
+            <button class="fpill fp2"><span class="white-dot"></span>素材组 2</button>
+            <button class="fpill fp3"><span class="white-dot"></span>素材组 3</button>
+          </div>
+        </div>
+        <button class="fpill fpill-new" style="margin-left:4px">＋ 新增组</button>
+      </div>
+    </div>
+    <div class="annotation">
+      <b>具体组 Tab：</b>当前视图全是素材组 1 的素材，<span class="diff">组标签消失，缩略图更干净</span>。底部 pill 仍显示所有组（用于将选中素材移出），「素材组 1」pill 可设置为当前组高亮或保持同等权重。
+    </div>
+  </div>
+
+</div>
+
+<div style="margin-top:16px;padding:12px 16px;background:#eff6ff;border-radius:10px;border:1px solid #bfdbfe;font-size:11px;color:#1e40af;line-height:1.7">
+  <b>总结：两个状态的差异只在一个地方</b> — 缩略图下方的组标签。「全部」显示（需要辨识），具体组隐藏（无需重复）。底部操作区两个状态完全一致，不增加用户认知负担。
+</div>

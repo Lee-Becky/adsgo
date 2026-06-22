@@ -1,0 +1,163 @@
+<h2>两种布局方案对比</h2>
+<p class="subtitle">请选择你偏好的方向</p>
+
+<div class="split" style="margin-top:24px; gap:28px; align-items:flex-start;">
+
+  <!-- 方案 1：一行三列 + 变量行 -->
+  <div class="mockup" style="flex:1;">
+    <div class="mockup-header">方案 1 · 三列输入 + 底部变量行</div>
+    <div class="mockup-body" style="padding:18px; background:#fafbff;">
+
+      <div style="font-size:10px; color:#6b7280; font-weight:500; margin-bottom:12px;">广告结构命名策略</div>
+
+      <!-- 三列输入 -->
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:12px;">
+
+        <!-- Campaign -->
+        <div style="background:white; border:1.5px solid #6366f1; border-radius:8px; padding:11px 13px; box-shadow:0 0 0 3px rgba(99,102,241,0.07);">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:7px;">
+            <span style="font-size:10px; font-weight:700; color:#4f46e5;">Campaign 命名</span>
+            <span style="font-size:9px; color:#9ca3af; cursor:pointer; white-space:nowrap;">↺ 历史</span>
+          </div>
+          <div style="background:#f5f3ff; border:1px solid #c4b5fd; border-radius:4px; padding:5px 8px; font-size:10px; font-family:monospace; color:#1e1b4b; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{Brand}-{location}-{date}</div>
+          <div style="font-size:9px; color:#9ca3af; margin-top:4px; font-family:monospace; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">MyBrand-US-20260415</div>
+        </div>
+
+        <!-- Adset -->
+        <div style="background:white; border:1px solid #e5e7eb; border-radius:8px; padding:11px 13px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:7px;">
+            <span style="font-size:10px; font-weight:600; color:#374151;">Adset 命名</span>
+            <span style="font-size:9px; color:#9ca3af; cursor:pointer; white-space:nowrap;">↺ 历史</span>
+          </div>
+          <div style="background:#f9fafb; border:1px solid #e5e7eb; border-radius:4px; padding:5px 8px; font-size:10px; font-family:monospace; color:#374151; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{location}-{audience_type}-{date}</div>
+          <div style="font-size:9px; color:#9ca3af; margin-top:4px; font-family:monospace; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">US-LAL-20260415</div>
+        </div>
+
+        <!-- Ad -->
+        <div style="background:white; border:1px solid #e5e7eb; border-radius:8px; padding:11px 13px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:7px;">
+            <span style="font-size:10px; font-weight:600; color:#374151;">Ad 命名</span>
+            <span style="font-size:9px; color:#9ca3af; cursor:pointer; white-space:nowrap;">↺ 历史</span>
+          </div>
+          <div style="background:#f9fafb; border:1px solid #e5e7eb; border-radius:4px; padding:5px 8px; font-size:10px; font-family:monospace; color:#374151; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{Brand}-{creative_type}-{number}</div>
+          <div style="font-size:9px; color:#9ca3af; margin-top:4px; font-family:monospace; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">MyBrand-Video-001</div>
+        </div>
+      </div>
+
+      <!-- 底部变量行 -->
+      <div style="background:white; border:1.5px solid #e0e7ff; border-radius:8px; padding:10px 13px;">
+        <div style="font-size:9px; color:#6366f1; font-weight:600; margin-bottom:7px; display:flex; align-items:center; gap:5px;">
+          <span style="width:5px; height:5px; background:#6366f1; border-radius:50%; display:inline-block;"></span>
+          插入到：Campaign 命名
+        </div>
+        <div style="display:flex; flex-wrap:wrap; gap:5px;">
+          <span style="background:#ede9fe; color:#5b21b6; font-size:10px; padding:2px 8px; border-radius:4px; border:1px solid #ddd6fe;">{Brand}</span>
+          <span style="background:#ede9fe; color:#5b21b6; font-size:10px; padding:2px 8px; border-radius:4px; border:1px solid #ddd6fe;">{location}</span>
+          <span style="background:#ede9fe; color:#5b21b6; font-size:10px; padding:2px 8px; border-radius:4px; border:1px solid #ddd6fe;">{budget}</span>
+          <span style="background:#ede9fe; color:#5b21b6; font-size:10px; padding:2px 8px; border-radius:4px; border:1px solid #ddd6fe;">{device}</span>
+          <span style="background:#ede9fe; color:#5b21b6; font-size:10px; padding:2px 8px; border-radius:4px; border:1px solid #ddd6fe;">{date}</span>
+          <span style="background:#ede9fe; color:#5b21b6; font-size:10px; padding:2px 8px; border-radius:4px; border:1px solid #ddd6fe;">{goal}</span>
+          <span style="background:#ede9fe; color:#5b21b6; font-size:10px; padding:2px 8px; border-radius:4px; border:1px solid #ddd6fe;">{audience_type}</span>
+          <span style="background:#ede9fe; color:#5b21b6; font-size:10px; padding:2px 8px; border-radius:4px; border:1px solid #ddd6fe;">{creative_type}</span>
+          <span style="background:#ede9fe; color:#5b21b6; font-size:10px; padding:2px 8px; border-radius:4px; border:1px solid #ddd6fe;">{theme}</span>
+          <span style="background:#ede9fe; color:#5b21b6; font-size:10px; padding:2px 8px; border-radius:4px; border:1px solid #ddd6fe;">{number}</span>
+          <span style="background:#f3f4f6; color:#6b7280; font-size:10px; padding:2px 8px; border-radius:4px; border:1px solid #e5e7eb;">自定义(...)</span>
+        </div>
+      </div>
+
+    </div>
+    <div style="padding:10px 16px; font-size:11px; color:#6b7280; background:#f9fafb; border-top:1px solid #eee; line-height:1.5;">
+      ⚠ 命名框较窄，长模板（如 {location}-{audience_type}-{creative_type}-{date}）会被截断，hover 才能看全
+    </div>
+  </div>
+
+  <!-- 方案 2：左右分栏 -->
+  <div class="mockup" style="flex:1;">
+    <div class="mockup-header">方案 2 · 左侧输入 + 右侧变量面板</div>
+    <div class="mockup-body" style="padding:18px; background:#fafbff;">
+
+      <div style="font-size:10px; color:#6b7280; font-weight:500; margin-bottom:12px;">广告结构命名策略</div>
+
+      <div style="display:flex; gap:12px; align-items:stretch;">
+
+        <!-- 左：三个输入行 -->
+        <div style="flex:1; display:flex; flex-direction:column; gap:8px;">
+
+          <!-- Campaign -->
+          <div style="background:white; border:1.5px solid #6366f1; border-radius:8px; padding:10px 13px; box-shadow:0 0 0 3px rgba(99,102,241,0.07);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+              <span style="font-size:10px; font-weight:700; color:#4f46e5;">Campaign 命名</span>
+              <span style="font-size:9px; color:#9ca3af; cursor:pointer;">↺ 历史</span>
+            </div>
+            <div style="background:#f5f3ff; border:1px solid #c4b5fd; border-radius:4px; padding:5px 8px; font-size:10px; font-family:monospace; color:#1e1b4b;">{Brand}-{location}-{date}</div>
+            <div style="font-size:9px; color:#9ca3af; margin-top:4px; font-family:monospace;">MyBrand-US-20260415</div>
+          </div>
+
+          <!-- Adset -->
+          <div style="background:white; border:1px solid #e5e7eb; border-radius:8px; padding:10px 13px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+              <span style="font-size:10px; font-weight:600; color:#374151;">Adset 命名</span>
+              <span style="font-size:9px; color:#9ca3af; cursor:pointer;">↺ 历史</span>
+            </div>
+            <div style="background:#f9fafb; border:1px solid #e5e7eb; border-radius:4px; padding:5px 8px; font-size:10px; font-family:monospace; color:#374151;">{location}-{audience_type}-{creative_type}-{date}</div>
+            <div style="font-size:9px; color:#9ca3af; margin-top:4px; font-family:monospace;">US-LAL-Video-20260415</div>
+          </div>
+
+          <!-- Ad -->
+          <div style="background:white; border:1px solid #e5e7eb; border-radius:8px; padding:10px 13px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+              <span style="font-size:10px; font-weight:600; color:#374151;">Ad 命名</span>
+              <span style="font-size:9px; color:#9ca3af; cursor:pointer;">↺ 历史</span>
+            </div>
+            <div style="background:#f9fafb; border:1px solid #e5e7eb; border-radius:4px; padding:5px 8px; font-size:10px; font-family:monospace; color:#374151;">{Brand}-{creative_type}-{number}-{date}</div>
+            <div style="font-size:9px; color:#9ca3af; margin-top:4px; font-family:monospace;">MyBrand-Video-001-20260415</div>
+          </div>
+
+        </div>
+
+        <!-- 右：变量面板贯穿 -->
+        <div style="width:160px; flex-shrink:0; background:white; border:1.5px solid #e0e7ff; border-radius:8px; padding:11px 12px; display:flex; flex-direction:column;">
+          <div style="font-size:9px; color:#6366f1; font-weight:600; margin-bottom:8px; display:flex; align-items:center; gap:4px;">
+            <span style="width:5px; height:5px; background:#6366f1; border-radius:50%; display:inline-block;"></span>
+            插入到：Campaign
+          </div>
+          <div style="display:flex; flex-direction:column; gap:4px; flex:1;">
+            <span style="background:#ede9fe; color:#5b21b6; font-size:10px; padding:3px 8px; border-radius:4px; border:1px solid #ddd6fe; text-align:center; cursor:pointer;">{Brand}</span>
+            <span style="background:#ede9fe; color:#5b21b6; font-size:10px; padding:3px 8px; border-radius:4px; border:1px solid #ddd6fe; text-align:center; cursor:pointer;">{location}</span>
+            <span style="background:#ede9fe; color:#5b21b6; font-size:10px; padding:3px 8px; border-radius:4px; border:1px solid #ddd6fe; text-align:center; cursor:pointer;">{budget}</span>
+            <span style="background:#ede9fe; color:#5b21b6; font-size:10px; padding:3px 8px; border-radius:4px; border:1px solid #ddd6fe; text-align:center; cursor:pointer;">{device}</span>
+            <span style="background:#ede9fe; color:#5b21b6; font-size:10px; padding:3px 8px; border-radius:4px; border:1px solid #ddd6fe; text-align:center; cursor:pointer;">{date}</span>
+            <span style="background:#ede9fe; color:#5b21b6; font-size:10px; padding:3px 8px; border-radius:4px; border:1px solid #ddd6fe; text-align:center; cursor:pointer;">{goal}</span>
+            <span style="background:#ede9fe; color:#5b21b6; font-size:10px; padding:3px 8px; border-radius:4px; border:1px solid #ddd6fe; text-align:center; cursor:pointer;">{audience_type}</span>
+            <span style="background:#ede9fe; color:#5b21b6; font-size:10px; padding:3px 8px; border-radius:4px; border:1px solid #ddd6fe; text-align:center; cursor:pointer;">{creative_type}</span>
+            <span style="background:#ede9fe; color:#5b21b6; font-size:10px; padding:3px 8px; border-radius:4px; border:1px solid #ddd6fe; text-align:center; cursor:pointer;">{theme}</span>
+            <span style="background:#ede9fe; color:#5b21b6; font-size:10px; padding:3px 8px; border-radius:4px; border:1px solid #ddd6fe; text-align:center; cursor:pointer;">{number}</span>
+            <span style="background:#f3f4f6; color:#6b7280; font-size:10px; padding:3px 8px; border-radius:4px; border:1px solid #e5e7eb; text-align:center; cursor:pointer;">自定义(...)</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <div style="padding:10px 16px; font-size:11px; color:#6b7280; background:#f9fafb; border-top:1px solid #eee; line-height:1.5;">
+      ✓ 命名框全宽展示，长模板不截断；变量面板始终可见，与三行等高
+    </div>
+  </div>
+
+</div>
+
+<div class="options" style="margin-top:24px;">
+  <div class="option" data-choice="layout1" onclick="toggleSelect(this)">
+    <div class="letter">1</div>
+    <div class="content">
+      <h3>三列输入 + 底部变量行</h3>
+      <p>整体最紧凑，但命名框宽度受限，长模板会截断</p>
+    </div>
+  </div>
+  <div class="option" data-choice="layout2" onclick="toggleSelect(this)">
+    <div class="letter">2</div>
+    <div class="content">
+      <h3>左侧输入 + 右侧变量面板</h3>
+      <p>变量面板固定侧边，输入框全宽不截断，视觉分区明确</p>
+    </div>
+  </div>
+</div>

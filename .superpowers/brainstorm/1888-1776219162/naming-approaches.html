@@ -1,0 +1,169 @@
+<h2>广告结构命名策略 · 变量标签交互方案</h2>
+<p class="subtitle">三种方案对比，点击选择你倾向的方向</p>
+
+<div class="cards" style="gap:24px; margin-top:24px;">
+
+  <!-- 方案 A -->
+  <div class="card" data-choice="a" onclick="toggleSelect(this)" style="padding:0; overflow:hidden; border-radius:12px;">
+    <div class="card-image" style="background:#f8f9ff; padding:20px 20px 12px; border-bottom:1px solid #eee;">
+      <div style="font-size:11px; font-weight:700; color:#6366f1; text-transform:uppercase; letter-spacing:.08em; margin-bottom:14px;">方案 A · 焦点感应共享变量池</div>
+
+      <!-- Campaign row -->
+      <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+        <span style="font-size:11px; color:#888; width:72px; flex-shrink:0;">Campaign</span>
+        <div style="flex:1; background:white; border:1.5px solid #6366f1; border-radius:6px; padding:6px 10px; font-size:12px; font-family:monospace; color:#1e1b4b;">
+          {Brand}-{location}-{date}
+          <span style="display:inline-block; width:1px; height:12px; background:#6366f1; margin-left:1px; vertical-align:middle; animation:blink 1s step-end infinite;"></span>
+        </div>
+        <span style="font-size:10px; color:#6366f1; flex-shrink:0;">← 当前激活</span>
+      </div>
+
+      <!-- Adset row -->
+      <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+        <span style="font-size:11px; color:#888; width:72px; flex-shrink:0;">Adset</span>
+        <div style="flex:1; background:white; border:1.5px solid #e5e7eb; border-radius:6px; padding:6px 10px; font-size:12px; font-family:monospace; color:#374151;">{location}-{audience_type}-{date}</div>
+      </div>
+
+      <!-- Ad row -->
+      <div style="display:flex; align-items:center; gap:8px; margin-bottom:14px;">
+        <span style="font-size:11px; color:#888; width:72px; flex-shrink:0;">Ad</span>
+        <div style="flex:1; background:white; border:1.5px solid #e5e7eb; border-radius:6px; padding:6px 10px; font-size:12px; font-family:monospace; color:#374151;">{Brand}-{creative_type}-{number}</div>
+      </div>
+
+      <!-- 共享变量池 -->
+      <div style="background:white; border:1px solid #e0e7ff; border-radius:8px; padding:10px 12px;">
+        <div style="font-size:10px; color:#6366f1; font-weight:600; margin-bottom:7px;">点击插入到当前激活的输入框</div>
+        <div style="display:flex; flex-wrap:wrap; gap:5px;">
+          <span style="background:#ede9fe; color:#5b21b6; font-size:11px; padding:3px 8px; border-radius:4px; cursor:pointer;">{Brand}</span>
+          <span style="background:#ede9fe; color:#5b21b6; font-size:11px; padding:3px 8px; border-radius:4px; cursor:pointer;">{location}</span>
+          <span style="background:#ede9fe; color:#5b21b6; font-size:11px; padding:3px 8px; border-radius:4px; cursor:pointer;">{budget}</span>
+          <span style="background:#ede9fe; color:#5b21b6; font-size:11px; padding:3px 8px; border-radius:4px; cursor:pointer;">{device}</span>
+          <span style="background:#ede9fe; color:#5b21b6; font-size:11px; padding:3px 8px; border-radius:4px; cursor:pointer;">{date}</span>
+          <span style="background:#ede9fe; color:#5b21b6; font-size:11px; padding:3px 8px; border-radius:4px; cursor:pointer;">{goal}</span>
+          <span style="background:#ede9fe; color:#5b21b6; font-size:11px; padding:3px 8px; border-radius:4px; cursor:pointer;">{audience_type}</span>
+          <span style="background:#ede9fe; color:#5b21b6; font-size:11px; padding:3px 8px; border-radius:4px; cursor:pointer;">{creative_type}</span>
+          <span style="background:#ede9fe; color:#5b21b6; font-size:11px; padding:3px 8px; border-radius:4px; cursor:pointer;">{theme}</span>
+          <span style="background:#ede9fe; color:#5b21b6; font-size:11px; padding:3px 8px; border-radius:4px; cursor:pointer;">{number}</span>
+          <span style="background:#f3f4f6; color:#6b7280; font-size:11px; padding:3px 8px; border-radius:4px; cursor:pointer;">自定义(...)</span>
+        </div>
+      </div>
+    </div>
+    <div class="card-body" style="padding:14px 20px;">
+      <h3 style="font-size:13px; margin-bottom:6px;">方案 A · 焦点感应共享变量池</h3>
+      <p style="font-size:12px; color:#6b7280; line-height:1.5; margin:0;">变量只出现一次，放在底部。点击任意输入框激活（高亮边框），再点变量即插入到该框。与当前逻辑改动最小，直觉清晰。</p>
+      <div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap;">
+        <span style="font-size:10px; background:#dcfce7; color:#166534; padding:2px 7px; border-radius:4px;">变量仅出现1次</span>
+        <span style="font-size:10px; background:#dcfce7; color:#166534; padding:2px 7px; border-radius:4px;">视觉清晰</span>
+        <span style="font-size:10px; background:#fef9c3; color:#854d0e; padding:2px 7px; border-radius:4px;">需要激活态提示</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 方案 B -->
+  <div class="card" data-choice="b" onclick="toggleSelect(this)" style="padding:0; overflow:hidden; border-radius:12px;">
+    <div class="card-image" style="background:#f8f9ff; padding:20px 20px 12px; border-bottom:1px solid #eee;">
+      <div style="font-size:11px; font-weight:700; color:#0891b2; text-transform:uppercase; letter-spacing:.08em; margin-bottom:14px;">方案 B · 输入框内联 + 变量按钮</div>
+
+      <!-- Campaign -->
+      <div style="background:white; border:1px solid #e5e7eb; border-radius:8px; padding:10px 12px; margin-bottom:8px;">
+        <div style="font-size:11px; color:#888; margin-bottom:5px;">Campaign 命名</div>
+        <div style="display:flex; align-items:center; gap:6px;">
+          <div style="flex:1; background:#f9fafb; border:1px solid #e5e7eb; border-radius:5px; padding:5px 9px; font-size:12px; font-family:monospace; color:#374151;">{Brand}-{location}-{date}</div>
+          <button style="display:flex; align-items:center; gap:3px; background:#e0f2fe; color:#0369a1; border:none; border-radius:5px; padding:5px 8px; font-size:11px; cursor:pointer; white-space:nowrap;">+ 变量 ▾</button>
+        </div>
+      </div>
+
+      <!-- Adset -->
+      <div style="background:white; border:1px solid #e5e7eb; border-radius:8px; padding:10px 12px; margin-bottom:8px;">
+        <div style="font-size:11px; color:#888; margin-bottom:5px;">Adset 命名</div>
+        <div style="display:flex; align-items:center; gap:6px;">
+          <div style="flex:1; background:#f9fafb; border:1px solid #e5e7eb; border-radius:5px; padding:5px 9px; font-size:12px; font-family:monospace; color:#374151;">{location}-{audience_type}-{date}</div>
+          <!-- Dropdown open state -->
+          <div style="position:relative;">
+            <button style="display:flex; align-items:center; gap:3px; background:#0891b2; color:white; border:none; border-radius:5px; padding:5px 8px; font-size:11px; cursor:pointer; white-space:nowrap;">+ 变量 ▴</button>
+            <div style="position:absolute; right:0; top:calc(100% + 4px); background:white; border:1px solid #e5e7eb; border-radius:8px; box-shadow:0 4px 16px rgba(0,0,0,.1); padding:8px; width:220px; z-index:10; display:flex; flex-wrap:wrap; gap:5px;">
+              <span style="background:#ede9fe; color:#5b21b6; font-size:11px; padding:3px 8px; border-radius:4px;">{Brand}</span>
+              <span style="background:#ede9fe; color:#5b21b6; font-size:11px; padding:3px 8px; border-radius:4px;">{location}</span>
+              <span style="background:#ede9fe; color:#5b21b6; font-size:11px; padding:3px 8px; border-radius:4px;">{budget}</span>
+              <span style="background:#ede9fe; color:#5b21b6; font-size:11px; padding:3px 8px; border-radius:4px;">{date}</span>
+              <span style="background:#ede9fe; color:#5b21b6; font-size:11px; padding:3px 8px; border-radius:4px;">{audience_type}</span>
+              <span style="background:#ede9fe; color:#5b21b6; font-size:11px; padding:3px 8px; border-radius:4px;">{creative_type}</span>
+              <span style="background:#f3f4f6; color:#6b7280; font-size:11px; padding:3px 8px; border-radius:4px;">自定义(...)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ad -->
+      <div style="background:white; border:1px solid #e5e7eb; border-radius:8px; padding:10px 12px; margin-bottom:6px;">
+        <div style="font-size:11px; color:#888; margin-bottom:5px;">Ad 命名</div>
+        <div style="display:flex; align-items:center; gap:6px;">
+          <div style="flex:1; background:#f9fafb; border:1px solid #e5e7eb; border-radius:5px; padding:5px 9px; font-size:12px; font-family:monospace; color:#374151;">{Brand}-{creative_type}-{number}</div>
+          <button style="display:flex; align-items:center; gap:3px; background:#e0f2fe; color:#0369a1; border:none; border-radius:5px; padding:5px 8px; font-size:11px; cursor:pointer; white-space:nowrap;">+ 变量 ▾</button>
+        </div>
+      </div>
+    </div>
+    <div class="card-body" style="padding:14px 20px;">
+      <h3 style="font-size:13px; margin-bottom:6px;">方案 B · 按需弹出 Popover</h3>
+      <p style="font-size:12px; color:#6b7280; line-height:1.5; margin:0;">每行右侧"+ 变量"按钮触发 Popover。变量列表按需展示，默认不可见，UI 最简洁，但发现性低。</p>
+      <div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap;">
+        <span style="font-size:10px; background:#dcfce7; color:#166534; padding:2px 7px; border-radius:4px;">UI 最简洁</span>
+        <span style="font-size:10px; background:#fef9c3; color:#854d0e; padding:2px 7px; border-radius:4px;">发现性弱</span>
+        <span style="font-size:10px; background:#fef9c3; color:#854d0e; padding:2px 7px; border-radius:4px;">每行仍有重复按钮</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 方案 C -->
+  <div class="card" data-choice="c" onclick="toggleSelect(this)" style="padding:0; overflow:hidden; border-radius:12px;">
+    <div class="card-image" style="background:#f8f9ff; padding:20px 20px 12px; border-bottom:1px solid #eee;">
+      <div style="font-size:11px; font-weight:700; color:#059669; text-transform:uppercase; letter-spacing:.08em; margin-bottom:14px;">方案 C · 侧边变量面板（抽屉式）</div>
+
+      <div style="display:flex; gap:10px;">
+        <!-- 左：三层输入 -->
+        <div style="flex:1;">
+          <div style="background:white; border:1px solid #e5e7eb; border-radius:8px; padding:10px 12px; margin-bottom:8px;">
+            <div style="font-size:11px; color:#888; margin-bottom:4px;">Campaign</div>
+            <div style="background:#f9fafb; border:1.5px solid #10b981; border-radius:5px; padding:5px 9px; font-size:12px; font-family:monospace; color:#374151;">{Brand}-{location}-{date}</div>
+          </div>
+          <div style="background:white; border:1px solid #e5e7eb; border-radius:8px; padding:10px 12px; margin-bottom:8px;">
+            <div style="font-size:11px; color:#888; margin-bottom:4px;">Adset</div>
+            <div style="background:#f9fafb; border:1px solid #d1fae5; border-radius:5px; padding:5px 9px; font-size:12px; font-family:monospace; color:#374151;">{location}-{audience_type}-{date}</div>
+          </div>
+          <div style="background:white; border:1px solid #e5e7eb; border-radius:8px; padding:10px 12px;">
+            <div style="font-size:11px; color:#888; margin-bottom:4px;">Ad</div>
+            <div style="background:#f9fafb; border:1px solid #d1fae5; border-radius:5px; padding:5px 9px; font-size:12px; font-family:monospace; color:#374151;">{Brand}-{creative_type}-{number}</div>
+          </div>
+        </div>
+
+        <!-- 右：变量面板 -->
+        <div style="width:108px; background:white; border:1px solid #d1fae5; border-radius:8px; padding:10px;">
+          <div style="font-size:10px; color:#059669; font-weight:600; margin-bottom:8px; text-align:center;">变量库</div>
+          <div style="display:flex; flex-direction:column; gap:4px;">
+            <span style="background:#d1fae5; color:#065f46; font-size:10px; padding:3px 6px; border-radius:4px; text-align:center;">{Brand}</span>
+            <span style="background:#d1fae5; color:#065f46; font-size:10px; padding:3px 6px; border-radius:4px; text-align:center;">{location}</span>
+            <span style="background:#d1fae5; color:#065f46; font-size:10px; padding:3px 6px; border-radius:4px; text-align:center;">{budget}</span>
+            <span style="background:#d1fae5; color:#065f46; font-size:10px; padding:3px 6px; border-radius:4px; text-align:center;">{date}</span>
+            <span style="background:#d1fae5; color:#065f46; font-size:10px; padding:3px 6px; border-radius:4px; text-align:center;">{audience_type}</span>
+            <span style="background:#d1fae5; color:#065f46; font-size:10px; padding:3px 6px; border-radius:4px; text-align:center;">{creative_type}</span>
+            <span style="background:#f3f4f6; color:#6b7280; font-size:10px; padding:3px 6px; border-radius:4px; text-align:center;">自定义</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body" style="padding:14px 20px;">
+      <h3 style="font-size:13px; margin-bottom:6px;">方案 C · 侧边变量面板</h3>
+      <p style="font-size:12px; color:#6b7280; line-height:1.5; margin:0;">三层输入在左，变量面板固定在右侧。点击输入框激活，点击变量插入。视觉上明确分区，适合频繁配置命名的专业用户。</p>
+      <div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap;">
+        <span style="font-size:10px; background:#dcfce7; color:#166534; padding:2px 7px; border-radius:4px;">专业感强</span>
+        <span style="font-size:10px; background:#dcfce7; color:#166534; padding:2px 7px; border-radius:4px;">分区清晰</span>
+        <span style="font-size:10px; background:#fef9c3; color:#854d0e; padding:2px 7px; border-radius:4px;">横向宽度增加</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<style>
+@keyframes blink { 50% { opacity: 0; } }
+</style>

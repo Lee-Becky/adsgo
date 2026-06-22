@@ -21,7 +21,7 @@ const BaseModal = ({ children, isOpen, onClose, className = "" }) => {
 
   return createPortal(
     <div 
-      className={`fixed inset-0 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300 ${className}`}
+      className={`fixed inset-0 flex items-center justify-center bg-neutral-900/40 backdrop-blur-sm animate-in fade-in duration-300 ${className}`}
       style={{ zIndex }}
       onClick={onClose}
     >

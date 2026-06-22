@@ -66,7 +66,7 @@ export default function Step6ClipPreview() {
                 )}
                 style={{ animationDelay: `${i * 100}ms` }}
               >
-                <div className="relative aspect-[9/16] max-h-[320px] bg-gray-100 overflow-hidden">
+                <div className="relative aspect-[9/16] max-h-[320px] bg-neutral-100 overflow-hidden">
                   <img src={c.thumb} alt="" className="w-full h-full object-cover" />
                   <div className="absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 hover:opacity-100 transition-opacity duration-300">
                     <span className="w-12 h-12 rounded-full bg-white/95 flex items-center justify-center text-primary-600 shadow-lg">
@@ -84,17 +84,17 @@ export default function Step6ClipPreview() {
                 </div>
 
                 {/* Bottom controls */}
-                <div className="px-3 py-2.5 flex items-center justify-between gap-2 border-t border-gray-100">
+                <div className="px-3 py-2.5 flex items-center justify-between gap-2 border-t border-neutral-100">
                   <div className="flex items-center gap-2 min-w-0">
-                    <GripVertical className="w-3.5 h-3.5 text-gray-400 shrink-0" />
-                    <span className="text-xs font-semibold text-gray-800 truncate">
+                    <GripVertical className="w-3.5 h-3.5 text-neutral-400 shrink-0" />
+                    <span className="text-xs font-semibold text-neutral-800 truncate">
                       {c.title}
                     </span>
                   </div>
                   <div className="flex items-center gap-1">
                     <button
                       type="button"
-                      className="w-7 h-7 rounded-lg bg-gray-50 hover:bg-primary-50 text-gray-400 hover:text-primary-600 flex items-center justify-center transition-all"
+                      className="w-7 h-7 rounded-lg bg-neutral-50 hover:bg-primary-50 text-neutral-400 hover:text-primary-600 flex items-center justify-center transition-all"
                       aria-label="上移"
                       onClick={() =>
                         dispatch({ type: 'MOVE_CLIP', payload: { index: i, dir: -1 } })
@@ -104,7 +104,7 @@ export default function Step6ClipPreview() {
                     </button>
                     <button
                       type="button"
-                      className="w-7 h-7 rounded-lg bg-gray-50 hover:bg-primary-50 text-gray-400 hover:text-primary-600 flex items-center justify-center transition-all"
+                      className="w-7 h-7 rounded-lg bg-neutral-50 hover:bg-primary-50 text-neutral-400 hover:text-primary-600 flex items-center justify-center transition-all"
                       aria-label="下移"
                       onClick={() =>
                         dispatch({ type: 'MOVE_CLIP', payload: { index: i, dir: 1 } })
@@ -128,7 +128,7 @@ export default function Step6ClipPreview() {
             {/* Add clip placeholder */}
             <BtnDashed
               onClick={addClipPlaceholder}
-              className="min-h-[200px] w-full flex flex-col items-center justify-center gap-3 py-8 rounded-xl border-2 border-primary-200 hover:border-primary-400 text-gray-400 hover:text-primary-500 group"
+              className="min-h-[200px] w-full flex flex-col items-center justify-center gap-3 py-8 rounded-xl border-2 border-primary-200 hover:border-primary-400 text-neutral-400 hover:text-primary-500 group"
             >
               <div className="w-12 h-12 rounded-full bg-primary-50 group-hover:bg-primary-100 flex items-center justify-center transition-colors">
                 <Plus className="w-6 h-6" />
@@ -142,7 +142,7 @@ export default function Step6ClipPreview() {
           left={
             clips.length > 0
               ? <span className="text-xs">{clips.length} 个片段就绪</span>
-              : <span className="text-xs text-gray-400">等待片段生成…</span>
+              : <span className="text-xs text-neutral-400">等待片段生成…</span>
           }
         >
           <BtnPrimary

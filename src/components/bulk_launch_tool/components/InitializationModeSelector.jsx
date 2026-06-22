@@ -47,7 +47,7 @@ const InitializationModeSelector = ({ value, onChange }) => (
           onClick={() => onChange?.(opt.id)}
           className={[
             'relative text-left bg-white p-5 rounded-2xl border-2 transition-all overflow-hidden',
-            sel ? `border-primary-500 shadow-md ${accent.ring}` : 'border-gray-100 hover:border-gray-200 hover:shadow-sm',
+            sel ? `border-primary-500 shadow-md ${accent.ring}` : 'border-neutral-100 hover:border-neutral-200 hover:shadow-sm',
           ].join(' ')}
         >
           {sel && (
@@ -60,10 +60,10 @@ const InitializationModeSelector = ({ value, onChange }) => (
               <Icon size={22} strokeWidth={2.2} />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-base font-semibold text-gray-900 leading-tight">{opt.titleZh}</p>
-              <p className="text-[11px] uppercase tracking-wider text-gray-400 mt-0.5">{opt.title}</p>
-              <p className="text-xs text-gray-500 mt-2 leading-relaxed">{opt.desc}</p>
-              <div className={`inline-flex items-center gap-1 text-xs font-medium mt-3 ${sel ? accent.text : 'text-gray-400'}`}>
+              <p className="text-base font-semibold text-neutral-900 leading-tight">{opt.titleZh}</p>
+              <p className="text-[11px] tracking-wider text-neutral-400 mt-0.5">{opt.title}</p>
+              <p className="text-xs text-neutral-500 mt-2 leading-relaxed">{opt.desc}</p>
+              <div className={`inline-flex items-center gap-1 text-xs font-medium mt-3 ${sel ? accent.text : 'text-neutral-400'}`}>
                 {sel ? '已选择' : '选择'}
                 <ArrowRight size={12} strokeWidth={2.5} />
               </div>

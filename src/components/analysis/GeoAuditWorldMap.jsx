@@ -173,10 +173,10 @@ export function GeoAuditWorldMap({ tierFilter = 'all', onTierFilterChange }) {
 
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#eef2f7]/90 via-transparent to-transparent" />
 
-      <div className="absolute right-3 top-3 flex flex-col gap-1 rounded-lg border border-gray-200 bg-white/95 p-1 shadow-sm pointer-events-auto">
+      <div className="absolute right-3 top-3 flex flex-col gap-1 rounded-lg border border-neutral-200 bg-white/95 p-1 shadow-sm pointer-events-auto">
         <button
           type="button"
-          className="rounded p-1.5 text-gray-600 transition-colors hover:bg-gray-50"
+          className="rounded p-1.5 text-neutral-600 transition-colors hover:bg-neutral-50"
           aria-label="Zoom in"
           onClick={() => bumpZoom(0.25)}
         >
@@ -184,7 +184,7 @@ export function GeoAuditWorldMap({ tierFilter = 'all', onTierFilterChange }) {
         </button>
         <button
           type="button"
-          className="rounded p-1.5 text-gray-600 transition-colors hover:bg-gray-50"
+          className="rounded p-1.5 text-neutral-600 transition-colors hover:bg-neutral-50"
           aria-label="Zoom out"
           onClick={() => bumpZoom(-0.25)}
         >
@@ -201,7 +201,7 @@ export function GeoAuditWorldMap({ tierFilter = 'all', onTierFilterChange }) {
             className={`rounded-md border px-3 py-1.5 text-xs font-semibold shadow-sm transition-all ${
               tierFilter === t.id
                 ? 'border-primary-500 bg-primary-50 text-primary-700'
-                : 'border-gray-200 bg-white text-primary-600 hover:bg-primary-50'
+                : 'border-neutral-200 bg-white text-primary-600 hover:bg-primary-50'
             }`}
           >
             {t.label}

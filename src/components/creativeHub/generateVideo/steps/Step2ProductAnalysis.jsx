@@ -46,9 +46,9 @@ export default function Step2ProductAnalysis() {
         <div>
           <div className="flex items-center gap-3 mb-1">
             <div className="w-1.5 h-7 rounded-full bg-gradient-to-b from-primary-500 to-primary-400 shrink-0" />
-            <h2 className="text-xl font-bold text-gray-900">请确认生成的视频内容</h2>
+            <h2 className="text-xl font-bold text-neutral-900">请确认生成的视频内容</h2>
           </div>
-          <p className="text-sm text-gray-500 ml-[18px]">
+          <p className="text-sm text-neutral-500 ml-[18px]">
             确认商品信息与视频参数后，将基于当前配置生成 3 套创意脚本。
           </p>
         </div>
@@ -71,8 +71,8 @@ export default function Step2ProductAnalysis() {
                 {/* Left form area */}
                 <div className="lg:col-span-2 space-y-6">
                   {/* Section 1: Product Info — left color bar */}
-                  <div className="bg-gray-50 rounded-lg p-5 space-y-4">
-                    <h4 className="text-base font-bold text-gray-900 flex items-center gap-2">
+                  <div className="bg-neutral-50 rounded-lg p-5 space-y-4">
+                    <h4 className="text-base font-bold text-neutral-900 flex items-center gap-2">
                       <span className="w-1 h-4 rounded-full bg-primary-500 shrink-0" />
                       商品信息
                     </h4>
@@ -160,8 +160,8 @@ export default function Step2ProductAnalysis() {
                   </div>
 
                   {/* Section 2: Script & Video Parameters — lighter color bar */}
-                  <div className="bg-gray-50 rounded-lg p-5 space-y-4">
-                    <h4 className="text-base font-bold text-gray-900 flex items-center gap-2">
+                  <div className="bg-neutral-50 rounded-lg p-5 space-y-4">
+                    <h4 className="text-base font-bold text-neutral-900 flex items-center gap-2">
                       <span className="w-1 h-4 rounded-full bg-primary-300 shrink-0" />
                       脚本与视频参数
                     </h4>
@@ -261,19 +261,19 @@ export default function Step2ProductAnalysis() {
                 <div className="lg:col-span-1">
                   <div
                     className={cn(
-                      'lg:sticky lg:top-6 rounded-xl border border-primary-100/80 bg-gray-50 overflow-hidden max-h-[calc(100vh-12rem)] overflow-y-auto',
+                      'lg:sticky lg:top-6 rounded-xl border border-primary-100/80 bg-neutral-50 overflow-hidden max-h-[calc(100vh-12rem)] overflow-y-auto',
                       CARD_SHADOW,
                     )}
                   >
                     {/* Panel header with gradient */}
-                    <div className="px-4 py-3 border-b border-[#F5F5F5] bg-gray-50/50 flex items-center gap-2">
+                    <div className="px-4 py-3 border-b border-[#F5F5F5] bg-neutral-50/50 flex items-center gap-2">
                       <Image className="w-4 h-4 text-primary-600" />
-                      <span className="text-sm font-semibold text-gray-900">素材库</span>
+                      <span className="text-sm font-semibold text-neutral-900">素材库</span>
                       <span className={cn(
                         'ml-auto inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold',
                         selectedAssets.size >= 3
                           ? 'bg-primary-100 text-primary-700'
-                          : 'bg-gray-100 text-gray-500',
+                          : 'bg-neutral-100 text-neutral-500',
                       )}>
                         {selectedAssets.size} / 5
                       </span>
@@ -304,12 +304,12 @@ export default function Step2ProductAnalysis() {
                       key={i}
                       className={cn(
                         'w-2 h-2 rounded-full transition-colors',
-                        i < filledCount ? 'bg-primary-500' : 'bg-gray-200',
+                        i < filledCount ? 'bg-primary-500' : 'bg-neutral-200',
                       )}
                     />
                   ))}
                 </div>
-                <span className="text-xs text-gray-500">
+                <span className="text-xs text-neutral-500">
                   已完成 {filledCount}/3 必填项
                 </span>
                 {selectedAssets.size >= 3 && (

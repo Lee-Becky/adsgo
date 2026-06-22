@@ -82,15 +82,15 @@ const AdAccounts = () => {
   return (
     <div className="space-y-8">
       {/* Connect Methods */}
-      <div className="bg-white rounded-[32px] border border-slate-200 shadow-[0_4px_24px_rgba(0,0,0,0.04)]">
-        <header className="px-10 py-6 bg-slate-100 border-b border-slate-200 flex items-center justify-between rounded-t-[32px]">
+      <div className="bg-white rounded-2xl border border-neutral-200 shadow-[0_4px_24px_rgba(0,0,0,0.04)]">
+        <header className="px-10 py-6 bg-neutral-100 border-b border-neutral-200 flex items-center justify-between rounded-t-2xl">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-xl bg-slate-900 flex items-center justify-center text-white shadow-sm">
+            <div className="w-8 h-8 rounded-xl bg-neutral-900 flex items-center justify-center text-white shadow-sm">
               <Link2 size={16} />
             </div>
-            <h2 className="text-sm font-black text-slate-900">Connect Ad Accounts</h2>
+            <h2 className="text-sm font-black text-neutral-900">Connect Ad Accounts</h2>
           </div>
-          <span className="px-3 py-1 bg-indigo-50 text-indigo-600 text-xs font-bold rounded-full">
+          <span className="px-3 py-1 bg-primary-50 text-primary-600 text-xs font-bold rounded-full">
             {totalAccounts} connected
           </span>
         </header>
@@ -107,22 +107,22 @@ const AdAccounts = () => {
                   disabled={isConnecting}
                   className={`group relative flex flex-col items-center justify-center p-6 rounded-2xl border-2 transition-all duration-300 ${
                     isConnecting
-                      ? 'border-indigo-300 bg-indigo-50 opacity-70'
-                      : 'border-slate-100 bg-slate-50/50 hover:border-indigo-200 hover:bg-white hover:shadow-md'
+                      ? 'border-primary-300 bg-primary-50 opacity-70'
+                      : 'border-neutral-100 bg-neutral-50/50 hover:border-primary-200 hover:bg-white hover:shadow-md'
                   }`}
                 >
-                  <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-3 bg-white shadow-sm border border-slate-100">
+                  <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-3 bg-white shadow-sm border border-neutral-100">
                     {method.id === 'cybermedia' ? (
-                      <Database size={22} className="text-indigo-500" />
+                      <Database size={22} className="text-primary-500" />
                     ) : (
                       <img src={platformInfo?.icon} alt={method.label} className="w-6 h-6" />
                     )}
                   </div>
-                  <p className="text-xs font-black text-slate-900 mb-1">{method.label}</p>
-                  <p className="text-[10px] text-slate-400 text-center leading-tight">{method.description}</p>
+                  <p className="text-xs font-black text-neutral-900 mb-1">{method.label}</p>
+                  <p className="text-[10px] text-neutral-400 text-center leading-tight">{method.description}</p>
                   {isConnecting && (
                     <div className="absolute inset-0 flex items-center justify-center bg-white/80 rounded-2xl">
-                      <div className="w-5 h-5 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+                      <div className="w-5 h-5 border-2 border-primary-500 border-t-transparent rounded-full animate-spin" />
                     </div>
                   )}
                 </button>
@@ -133,19 +133,19 @@ const AdAccounts = () => {
       </div>
 
       {/* Linked Accounts by Platform */}
-      <div className="bg-white rounded-[32px] border border-slate-200 shadow-[0_4px_24px_rgba(0,0,0,0.04)]">
-        <header className="px-10 py-6 bg-slate-100 border-b border-slate-200 flex items-center justify-between rounded-t-[32px]">
+      <div className="bg-white rounded-2xl border border-neutral-200 shadow-[0_4px_24px_rgba(0,0,0,0.04)]">
+        <header className="px-10 py-6 bg-neutral-100 border-b border-neutral-200 flex items-center justify-between rounded-t-2xl">
           <div className="flex items-center gap-3">
-            <h2 className="text-sm font-black text-slate-900">Linked Accounts</h2>
+            <h2 className="text-sm font-black text-neutral-900">Linked Accounts</h2>
           </div>
         </header>
 
         <div className="p-10">
           {Object.keys(groupedAccounts).length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-16 text-slate-400">
-              <Link2 size={40} className="text-slate-200 mb-4" />
-              <p className="text-sm font-bold text-slate-500 mb-1">No accounts connected</p>
-              <p className="text-xs text-slate-400">Choose a connection method above to get started</p>
+            <div className="flex flex-col items-center justify-center py-16 text-neutral-400">
+              <Link2 size={40} className="text-neutral-200 mb-4" />
+              <p className="text-sm font-bold text-neutral-500 mb-1">No accounts connected</p>
+              <p className="text-xs text-neutral-400">Choose a connection method above to get started</p>
             </div>
           ) : (
             <div className="space-y-4">
@@ -153,25 +153,25 @@ const AdAccounts = () => {
                 const items = groupedAccounts[platform.id]
                 const isExpanded = expandedPlatforms[platform.id] !== false
                 return (
-                  <div key={platform.id} className="border border-slate-100 rounded-2xl overflow-hidden">
+                  <div key={platform.id} className="border border-neutral-100 rounded-2xl overflow-hidden">
                     {/* Platform header */}
                     <button
                       onClick={() => togglePlatform(platform.id)}
-                      className="w-full flex items-center gap-3 px-6 py-4 bg-slate-50 hover:bg-slate-100 transition-colors"
+                      className="w-full flex items-center gap-3 px-6 py-4 bg-neutral-50 hover:bg-neutral-100 transition-colors"
                     >
                       <img src={platform.icon} alt={platform.name} className="w-5 h-5" />
-                      <span className="text-sm font-black text-slate-900">{platform.name}</span>
-                      <span className="px-2 py-0.5 bg-white text-slate-500 text-[10px] font-bold rounded-full border border-slate-200">
+                      <span className="text-sm font-black text-neutral-900">{platform.name}</span>
+                      <span className="px-2 py-0.5 bg-white text-neutral-500 text-[10px] font-bold rounded-full border border-neutral-200">
                         {items.length}
                       </span>
                       <div className="ml-auto">
-                        {isExpanded ? <ChevronDown size={16} className="text-slate-400" /> : <ChevronRight size={16} className="text-slate-400" />}
+                        {isExpanded ? <ChevronDown size={16} className="text-neutral-400" /> : <ChevronRight size={16} className="text-neutral-400" />}
                       </div>
                     </button>
 
                     {/* Account list */}
                     {isExpanded && (
-                      <div className="divide-y divide-slate-50">
+                      <div className="divide-y divide-neutral-50">
                         {items.map((account, idx) => (
                           <div
                             key={account.id}
@@ -179,23 +179,23 @@ const AdAccounts = () => {
                             onDragStart={() => handleDragStart(platform.id, idx)}
                             onDragOver={handleDragOver}
                             onDrop={() => handleDrop(platform.id, idx)}
-                            className="flex items-center gap-3 px-6 py-3 hover:bg-slate-50/50 group transition-colors"
+                            className="flex items-center gap-3 px-6 py-3 hover:bg-neutral-50/50 group transition-colors"
                           >
-                            <GripVertical size={14} className="text-slate-200 cursor-grab opacity-0 group-hover:opacity-100 transition-opacity" />
+                            <GripVertical size={14} className="text-neutral-200 cursor-grab opacity-0 group-hover:opacity-100 transition-opacity" />
                             <div className="flex-1 min-w-0">
-                              <p className="text-sm font-semibold text-slate-800 truncate">{account.name}</p>
-                              <p className="text-[11px] text-slate-400 font-mono">{account.id}</p>
+                              <p className="text-sm font-semibold text-neutral-800 truncate">{account.name}</p>
+                              <p className="text-[11px] text-neutral-400 font-mono">{account.id}</p>
                             </div>
                             <span className={`px-2 py-0.5 text-[10px] font-bold rounded-full ${
                               account.source === 'cybermedia'
-                                ? 'bg-indigo-50 text-indigo-500'
-                                : 'bg-emerald-50 text-emerald-500'
+                                ? 'bg-primary-50 text-primary-500'
+                                : 'bg-success-50 text-success-500'
                             }`}>
                               {account.source === 'cybermedia' ? 'CyberMedia' : 'Direct'}
                             </span>
                             <button
                               onClick={() => handleRemoveAccount(account.id)}
-                              className="p-1.5 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all opacity-0 group-hover:opacity-100"
+                              className="p-1.5 text-neutral-300 hover:text-danger-500 hover:bg-danger-50 rounded-lg transition-all opacity-0 group-hover:opacity-100"
                             >
                               <Trash2 size={14} />
                             </button>

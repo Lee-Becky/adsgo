@@ -1,98 +1,183 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useCallback } from 'react'
 import { createPortal } from 'react-dom'
 import { X } from 'lucide-react'
 
 const sizeMap = {
-  sm:   'max-w-[400px]',
-  md:   'max-w-[540px]',
-  lg:   'max-w-[720px]',
-  xl:   'max-w-[960px]',
-  full: 'max-w-[1200px]',
+  sm:   'max-w-modal-sm',   // 400px
+  md:   'max-w-modal-md',   // 560px
+  lg:   'max-w-modal-lg',   // 720px
+  xl:   'max-w-modal-xl',   // 960px
+  full: 'max-w-[90vw]',
 }
 
+/* ── Focus trap helper ────────────────────────────────────── */
+const FOCUSABLE = 'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
+
 const Modal = ({
-  open = false,
+  isOpen = false,
+  // Backward compat: accept "open" prop as alias
+  open,
   onClose,
-  size = 'md',
-  category,
   title,
   subtitle,
-  footer,
+  category,
+  size = 'md',
+  showClose = true,
   children,
+  footer,
   className = '',
 }) => {
-  const overlayRef = useRef(null)
+  // Support both "isOpen" and legacy "open" prop
+  const visible = isOpen || open || false
+  const panelRef = useRef(null)
+  const previousFocusRef = useRef(null)
 
+  /* ── Escape key + body scroll lock ──────────────────────── */
   useEffect(() => {
-    if (!open) return
+    if (!visible) return
+
+    // Save currently focused element to restore later
+    previousFocusRef.current = document.activeElement
+
     const handleEsc = (e) => {
       if (e.key === 'Escape') onClose?.()
     }
     document.addEventListener('keydown', handleEsc)
     document.body.style.overflow = 'hidden'
+
+    // Focus first focusable or the panel itself
+    requestAnimationFrame(() => {
+      const first = panelRef.current?.querySelector(FOCUSABLE)
+      if (first) first.focus()
+      else panelRef.current?.focus()
+    })
+
     return () => {
       document.removeEventListener('keydown', handleEsc)
       document.body.style.overflow = ''
+      // Restore previous focus
+      previousFocusRef.current?.focus?.()
     }
-  }, [open, onClose])
+  }, [visible, onClose])
 
-  if (!open) return null
+  /* ── Focus trap ─────────────────────────────────────────── */
+  const handleTabTrap = useCallback((e) => {
+    if (e.key !== 'Tab' || !panelRef.current) return
+
+    const focusable = panelRef.current.querySelectorAll(FOCUSABLE)
+    if (focusable.length === 0) return
+
+    const first = focusable[0]
+    const last = focusable[focusable.length - 1]
+
+    if (e.shiftKey) {
+      if (document.activeElement === first) {
+        e.preventDefault()
+        last.focus()
+      }
+    } else {
+      if (document.activeElement === last) {
+        e.preventDefault()
+        first.focus()
+      }
+    }
+  }, [])
+
+  /* ── Backdrop click ─────────────────────────────────────── */
+  const handleBackdropClick = useCallback((e) => {
+    if (e.target === e.currentTarget) onClose?.()
+  }, [onClose])
+
+  if (!visible) return null
 
   return createPortal(
     <div
-      ref={overlayRef}
       className="fixed inset-0 z-[9998] flex items-center justify-center p-4"
-      onClick={(e) => {
-        if (e.target === overlayRef.current) onClose?.()
-      }}
+      onClick={handleBackdropClick}
+      onKeyDown={handleTabTrap}
     >
-      {/* Overlay — glassmorphism */}
-      <div className="absolute inset-0 bg-gray-950/40 backdrop-blur-[12px] animate-[fadeIn_200ms_ease-out]" />
-
-      {/* Container — spring animation */}
+      {/* Backdrop with blur */}
       <div
+        className="
+          absolute inset-0
+          bg-neutral-950/40 backdrop-blur-lg
+          animate-fade-in
+        "
+        aria-hidden="true"
+      />
+
+      {/* Modal panel */}
+      <div
+        ref={panelRef}
+        tabIndex={-1}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={title ? 'modal-title' : undefined}
         className={`
-          relative bg-white rounded-xl shadow-2xl w-full
-          animate-spring-in
+          relative w-full
+          bg-surface rounded-lg shadow-xl
+          animate-scale-in
+          outline-none
+          flex flex-col max-h-[90vh]
           ${sizeMap[size] || sizeMap.md}
           ${className}
-        `.trim()}
+        `.replace(/\s+/g, ' ').trim()}
       >
         {/* Close button */}
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:bg-gray-50 hover:text-gray-600 transition-colors z-10"
-        >
-          <X size={16} />
-        </button>
+        {showClose && (
+          <button
+            type="button"
+            onClick={onClose}
+            className="
+              absolute top-4 right-4 z-10
+              w-8 h-8 rounded-md
+              flex items-center justify-center
+              text-neutral-400
+              hover:bg-neutral-100 hover:text-neutral-600
+              transition-colors duration-fast
+            "
+            aria-label="Close"
+          >
+            <X size={16} />
+          </button>
+        )}
 
         {/* Header */}
         {(title || category) && (
-          <div className="px-6 py-5">
+          <div className="px-6 pt-6 pb-0 shrink-0">
             {category && (
-              <p className="text-[10px] font-bold uppercase tracking-[0.08em] text-primary-500 mb-1">
+              <p className="text-overline text-primary-500 mb-1 tracking-wide">
                 {category}
               </p>
             )}
             {title && (
-              <h2 className="font-display text-2xl font-bold text-gray-900 pr-8">
+              <h2
+                id="modal-title"
+                className="font-heading text-h2 text-neutral-900 pr-8"
+              >
                 {title}
               </h2>
             )}
             {subtitle && (
-              <p className="text-sm text-gray-500 mt-1">{subtitle}</p>
+              <p className="text-body text-neutral-500 mt-1">{subtitle}</p>
             )}
           </div>
         )}
 
-        {/* Body */}
-        <div className="px-6 pb-6">
+        {/* Body — scrollable */}
+        <div className="px-6 py-5 overflow-y-auto custom-scrollbar flex-1">
           {children}
         </div>
 
         {/* Footer */}
         {footer && (
-          <div className="px-6 py-4 border-t border-gray-200 bg-surface-2 rounded-b-xl flex items-center justify-end gap-2">
+          <div className="
+            px-6 py-4
+            border-t border-neutral-200
+            surface-nested rounded-b-lg
+            flex items-center justify-end gap-2
+            shrink-0
+          ">
             {footer}
           </div>
         )}

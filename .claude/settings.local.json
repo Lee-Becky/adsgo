@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(netstat -ano)",
+      "Bash(findstr :5174)",
+      "Bash(taskkill //PID 28620 //F)",
+      "Bash(grep -r \"auto.*apply\\\\|auto.*publish\\\\|AUTO_APPLY\\\\|AUTO_PUBLISH\" '/d/AdsGo_test/AdsGo-留存 - git/src' --include=*.jsx --include=*.js -l)",
+      "Bash(xargs grep:*)"
+    ]
+  }
+}

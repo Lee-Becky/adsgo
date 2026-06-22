@@ -140,7 +140,7 @@ const FUNNEL_ROWS = [
 const barClass = {
   green: 'bg-success-500',
   pink: 'bg-pink-500',
-  blue: 'bg-blue-500',
+  blue: 'bg-info-500',
   purple: 'bg-primary-500'
 }
 
@@ -205,7 +205,7 @@ function MetaColHeader({ label }) {
         f
       </span>
       <span className="truncate">{label}</span>
-      <ChevronDown className="h-3.5 w-3.5 shrink-0 text-gray-400" aria-hidden />
+      <ChevronDown className="h-3.5 w-3.5 shrink-0 text-neutral-400" aria-hidden />
     </div>
   )
 }
@@ -741,9 +741,9 @@ function InsightTabPanel({ tabId }) {
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
         {config.kpis.map((k) => (
           <div key={k.label} className="rounded-xl border border-[#F0F0F0] bg-white p-4 shadow-[-2px_2px_16px_rgba(14,0,45,0.06)]">
-            <p className="text-xs font-medium text-gray-500">{k.label}</p>
-            <p className="mt-1 text-lg font-bold text-gray-900">{k.value}</p>
-            <p className="text-xs text-gray-400">{k.sub}</p>
+            <p className="text-xs font-medium text-neutral-500">{k.label}</p>
+            <p className="mt-1 text-lg font-bold text-neutral-900">{k.value}</p>
+            <p className="text-xs text-neutral-400">{k.sub}</p>
           </div>
         ))}
       </div>
@@ -751,15 +751,15 @@ function InsightTabPanel({ tabId }) {
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-4">
         <div className="xl:col-span-2 rounded-xl border border-[#F0F0F0] bg-white p-5 shadow-[-2px_2px_16px_rgba(14,0,45,0.06)] min-h-[340px]">
           <div className="mb-3 flex items-center justify-between">
-            <h3 className="text-base font-semibold text-gray-900">{config.title} Score Trend</h3>
-            <div className="inline-flex items-center rounded-lg border border-gray-200 bg-white p-0.5">
+            <h3 className="text-base font-semibold text-neutral-900">{config.title} Score Trend</h3>
+            <div className="inline-flex items-center rounded-lg border border-neutral-200 bg-white p-0.5">
               {SCORE_METRICS.map((metric) => (
                 <button
                   key={metric}
                   type="button"
                   onClick={() => setScoreMetric(metric)}
                   className={`rounded-md px-2 py-1 text-xs font-medium transition-all ${
-                    scoreMetric === metric ? 'bg-primary-50 text-primary-600' : 'text-gray-500 hover:text-gray-700'
+                    scoreMetric === metric ? 'bg-primary-50 text-primary-600' : 'text-neutral-500 hover:text-neutral-700'
                   }`}
                 >
                   {metric}
@@ -781,11 +781,11 @@ function InsightTabPanel({ tabId }) {
         </div>
         <div className="xl:col-span-1 rounded-xl border border-[#F0F0F0] bg-white p-5 shadow-[-2px_2px_16px_rgba(14,0,45,0.06)] min-h-[340px]">
           <div className="mb-3 flex items-center justify-between">
-            <h3 className="text-base font-semibold text-gray-900">{config.barTitle}</h3>
+            <h3 className="text-base font-semibold text-neutral-900">{config.barTitle}</h3>
             <select
               value={barMetric}
               onChange={(e) => setBarMetric(e.target.value)}
-              className="rounded-md border border-gray-300 bg-white px-2 py-1 text-xs font-medium text-gray-600 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
+              className="rounded-md border border-neutral-300 bg-white px-2 py-1 text-xs font-medium text-neutral-600 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
             >
               {BAR_METRICS.map((metric) => (
                 <option key={metric} value={metric}>
@@ -808,8 +808,8 @@ function InsightTabPanel({ tabId }) {
         </div>
         <div className="xl:col-span-1 rounded-xl border border-[#F0F0F0] bg-white p-5 shadow-[-2px_2px_16px_rgba(14,0,45,0.06)] min-h-[340px]">
           <div className="mb-3 flex items-center justify-between">
-            <h3 className="text-base font-semibold text-gray-900">Budget Quality</h3>
-            <span className="text-xs text-gray-500">Split</span>
+            <h3 className="text-base font-semibold text-neutral-900">Budget Quality</h3>
+            <span className="text-xs text-neutral-500">Split</span>
           </div>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
@@ -826,11 +826,11 @@ function InsightTabPanel({ tabId }) {
           <div className="mt-2 space-y-1">
             {config.pieData.map((entry) => (
               <div key={entry.name} className="flex items-center justify-between text-xs">
-                <span className="inline-flex items-center gap-2 text-gray-600">
+                <span className="inline-flex items-center gap-2 text-neutral-600">
                   <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: entry.color }} />
                   {entry.name}
                 </span>
-                <span className="font-semibold text-gray-900">{entry.value}%</span>
+                <span className="font-semibold text-neutral-900">{entry.value}%</span>
               </div>
             ))}
           </div>
@@ -839,17 +839,17 @@ function InsightTabPanel({ tabId }) {
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
         <div className="overflow-hidden rounded-xl border border-[#F0F0F0] bg-white shadow-[-2px_2px_16px_rgba(14,0,45,0.06)] min-h-[430px]">
-          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#F5F5F5] bg-gray-50/50 px-5 py-4">
-            <h3 className="text-base font-semibold text-gray-900">{config.title} Breakdown</h3>
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#F5F5F5] bg-neutral-50/50 px-5 py-4">
+            <h3 className="text-base font-semibold text-neutral-900">{config.title} Breakdown</h3>
             <div className="flex flex-wrap items-center gap-2">
-              <div className="inline-flex items-center rounded-lg border border-gray-200 bg-white p-0.5">
+              <div className="inline-flex items-center rounded-lg border border-neutral-200 bg-white p-0.5">
                 {TABLE_MODES.map((mode) => (
                   <button
                     key={mode.id}
                     type="button"
                     onClick={() => setPrimaryMode(mode.id)}
                     className={`rounded-md px-2.5 py-1 text-xs font-medium transition-all ${
-                      primaryMode === mode.id ? 'bg-primary-50 text-primary-600' : 'text-gray-500 hover:text-gray-700'
+                      primaryMode === mode.id ? 'bg-primary-50 text-primary-600' : 'text-neutral-500 hover:text-neutral-700'
                     }`}
                   >
                     {mode.label}
@@ -858,7 +858,7 @@ function InsightTabPanel({ tabId }) {
               </div>
               <button
                 type="button"
-                className="rounded-md border border-gray-300 bg-white px-2.5 py-1 text-xs font-medium text-gray-600 transition-all hover:border-primary-500 hover:text-primary-600"
+                className="rounded-md border border-neutral-300 bg-white px-2.5 py-1 text-xs font-medium text-neutral-600 transition-all hover:border-primary-500 hover:text-primary-600"
               >
                 Columns
               </button>
@@ -867,17 +867,17 @@ function InsightTabPanel({ tabId }) {
           <div className="overflow-x-auto">
             <table className="w-full min-w-[520px] text-[13px]">
               <thead>
-                <tr className="border-b border-gray-100">
+                <tr className="border-b border-neutral-100">
                   {headers.map((h) => (
-                    <th key={h} className="px-5 py-3 text-left text-[11px] font-semibold text-gray-500">{h}</th>
+                    <th key={h} className="px-5 py-3 text-left text-[11px] font-semibold text-neutral-500">{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {primaryRows.map((row) => (
-                  <tr key={row[0]} className="border-b border-gray-50 hover:bg-primary-50/30">
+                  <tr key={row[0]} className="border-b border-neutral-50 hover:bg-primary-50/30">
                     {row.map((cell, idx) => (
-                      <td key={`${row[0]}-${idx}`} className={`px-5 py-2.5 ${idx === 0 ? 'font-medium text-gray-900' : 'text-gray-700'}`}>
+                      <td key={`${row[0]}-${idx}`} className={`px-5 py-2.5 ${idx === 0 ? 'font-medium text-neutral-900' : 'text-neutral-700'}`}>
                         {cell}
                       </td>
                     ))}
@@ -888,16 +888,16 @@ function InsightTabPanel({ tabId }) {
           </div>
         </div>
         <div className="overflow-hidden rounded-xl border border-[#F0F0F0] bg-white shadow-[-2px_2px_16px_rgba(14,0,45,0.06)] min-h-[430px]">
-          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#F5F5F5] bg-gray-50/50 px-5 py-4">
-            <h3 className="text-base font-semibold text-gray-900">Secondary Breakdown</h3>
-            <div className="inline-flex items-center rounded-lg border border-gray-200 bg-white p-0.5">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#F5F5F5] bg-neutral-50/50 px-5 py-4">
+            <h3 className="text-base font-semibold text-neutral-900">Secondary Breakdown</h3>
+            <div className="inline-flex items-center rounded-lg border border-neutral-200 bg-white p-0.5">
               {TABLE_MODES.map((mode) => (
                 <button
                   key={mode.id}
                   type="button"
                   onClick={() => setSecondaryMode(mode.id)}
                   className={`rounded-md px-2.5 py-1 text-xs font-medium transition-all ${
-                    secondaryMode === mode.id ? 'bg-primary-50 text-primary-600' : 'text-gray-500 hover:text-gray-700'
+                    secondaryMode === mode.id ? 'bg-primary-50 text-primary-600' : 'text-neutral-500 hover:text-neutral-700'
                   }`}
                 >
                   {mode.label}
@@ -908,17 +908,17 @@ function InsightTabPanel({ tabId }) {
           <div className="overflow-x-auto">
             <table className="w-full min-w-[520px] text-[13px]">
               <thead>
-                <tr className="border-b border-gray-100">
+                <tr className="border-b border-neutral-100">
                   {secondaryHeaders.map((h) => (
-                    <th key={h} className="px-5 py-3 text-left text-[11px] font-semibold text-gray-500">{h}</th>
+                    <th key={h} className="px-5 py-3 text-left text-[11px] font-semibold text-neutral-500">{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {secondaryRows.map((row) => (
-                  <tr key={row[0]} className="border-b border-gray-50 hover:bg-primary-50/30">
+                  <tr key={row[0]} className="border-b border-neutral-50 hover:bg-primary-50/30">
                     {row.map((cell, idx) => (
-                      <td key={`${row[0]}-2-${idx}`} className={`px-5 py-2.5 ${idx === 0 ? 'font-medium text-gray-900' : 'text-gray-700'}`}>
+                      <td key={`${row[0]}-2-${idx}`} className={`px-5 py-2.5 ${idx === 0 ? 'font-medium text-neutral-900' : 'text-neutral-700'}`}>
                         {cell}
                       </td>
                     ))}
@@ -981,7 +981,7 @@ function TargetingTabPanel() {
   const metaH = (t) => (
     <span className="inline-flex items-center gap-1">
       <span className="inline-flex h-4 w-4 items-center justify-center rounded bg-[#1877F2] text-[9px] font-bold text-white">f</span>
-      {t} <ChevronDown className="h-3 w-3 text-gray-400" />
+      {t} <ChevronDown className="h-3 w-3 text-neutral-400" />
     </span>
   )
 
@@ -991,33 +991,33 @@ function TargetingTabPanel() {
         <button type="button" className="inline-flex items-center gap-2 rounded-lg border-2 border-primary-500 bg-white px-4 py-2 text-sm font-semibold text-primary-600 shadow-sm transition-all hover:bg-primary-50"><Filter className="h-4 w-4" />Filter Data</button>
         <div className="flex flex-wrap items-center gap-2">
           <button type="button" className="inline-flex items-center gap-2 rounded-lg border border-primary-500 bg-white px-4 py-2 text-sm font-semibold text-primary-600 transition-all hover:bg-primary-50"><SlidersHorizontal className="h-4 w-4" />Smart Filter</button>
-          <input placeholder="Load filter preset" className="h-10 w-[176px] rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-700 placeholder:text-gray-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20" />
-          <button type="button" disabled className="h-10 rounded-lg border border-gray-200 bg-gray-100 px-4 text-sm font-semibold text-gray-400">Save this view</button>
+          <input placeholder="Load filter preset" className="h-10 w-[176px] rounded-lg border border-neutral-300 bg-white px-3 text-sm text-neutral-700 placeholder:text-neutral-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20" />
+          <button type="button" disabled className="h-10 rounded-lg border border-neutral-200 bg-neutral-100 px-4 text-sm font-semibold text-neutral-400">Save this view</button>
         </div>
       </div>
 
       <div className="grid grid-cols-1 gap-5 xl:grid-cols-2">
         <div className="overflow-hidden rounded-xl border border-[#F0F0F0] bg-white shadow-[-2px_2px_16px_rgba(14,0,45,0.06)]">
           <div className="flex items-center justify-between border-b border-[#F5F5F5] px-4 py-3">
-            <h3 className="text-lg font-semibold text-gray-800">Top Landing Pages <HelpCircle className="ml-1 inline h-3.5 w-3.5 text-gray-400" /></h3>
+            <h3 className="text-lg font-semibold text-neutral-800">Top Landing Pages <HelpCircle className="ml-1 inline h-3.5 w-3.5 text-neutral-400" /></h3>
             <button type="button" className="rounded-lg border border-primary-500 px-3 py-1.5 text-xs font-semibold text-primary-600 transition-all hover:bg-primary-50">See all 1 Landing Pages</button>
           </div>
           <div className="overflow-x-auto p-4">
             <table className="w-full text-[13px]">
-              <thead><tr className="border-b border-gray-100 text-gray-500"><th className="px-2 py-2 text-left font-semibold">Link</th><th className="px-2 py-2 text-left">{metaH('Amount Sp...')}</th><th className="px-2 py-2 text-left">{metaH('ROAS (All)')}</th></tr></thead>
-              <tbody><tr className="border-b border-gray-50"><td className="px-2 py-2"><p className="text-xs font-medium text-gray-700">https://www.adsgo.ai/</p><button type="button" className="text-xs font-semibold text-primary-500">39 Ads</button></td><td className="px-2 py-2 font-semibold text-gray-800">US$775</td><td className="px-2 py-2 font-semibold text-gray-800">0.00</td></tr></tbody>
+              <thead><tr className="border-b border-neutral-100 text-neutral-500"><th className="px-2 py-2 text-left font-semibold">Link</th><th className="px-2 py-2 text-left">{metaH('Amount Sp...')}</th><th className="px-2 py-2 text-left">{metaH('ROAS (All)')}</th></tr></thead>
+              <tbody><tr className="border-b border-neutral-50"><td className="px-2 py-2"><p className="text-xs font-medium text-neutral-700">https://www.adsgo.ai/</p><button type="button" className="text-xs font-semibold text-primary-500">39 Ads</button></td><td className="px-2 py-2 font-semibold text-neutral-800">US$775</td><td className="px-2 py-2 font-semibold text-neutral-800">0.00</td></tr></tbody>
             </table>
           </div>
         </div>
 
         <div className="overflow-hidden rounded-xl border border-[#F0F0F0] bg-white shadow-[-2px_2px_16px_rgba(14,0,45,0.06)]">
           <div className="flex items-center justify-between border-b border-[#F5F5F5] px-4 py-3">
-            <h3 className="text-lg font-semibold text-gray-800">Expand Interest &amp; Lookalike Expansion <HelpCircle className="ml-1 inline h-3.5 w-3.5 text-gray-400" /></h3>
-            <span className="inline-flex items-center gap-1 text-xs font-semibold text-gray-700"><span className="inline-flex h-4 w-4 items-center justify-center rounded bg-[#1877F2] text-[9px] font-bold text-white">f</span>ROAS (All) <ChevronDown className="h-3 w-3 text-gray-400" /></span>
+            <h3 className="text-lg font-semibold text-neutral-800">Expand Interest &amp; Lookalike Expansion <HelpCircle className="ml-1 inline h-3.5 w-3.5 text-neutral-400" /></h3>
+            <span className="inline-flex items-center gap-1 text-xs font-semibold text-neutral-700"><span className="inline-flex h-4 w-4 items-center justify-center rounded bg-[#1877F2] text-[9px] font-bold text-white">f</span>ROAS (All) <ChevronDown className="h-3 w-3 text-neutral-400" /></span>
           </div>
-          <div className="grid grid-cols-2 gap-px bg-gray-100 p-px">
-            <div className="bg-white p-3"><p className="text-sm font-semibold text-success-500">✓ Expand Interest</p><p className="mt-1 text-sm font-semibold text-success-500">✓ Lookalike Expansion</p><p className="mt-2 text-sm text-gray-600">100% of Spend</p><button type="button" className="text-xs font-semibold text-primary-500">17 Ad Sets</button><p className="mt-1 text-3xl font-bold text-gray-900">0.00</p></div>
-            <div className="bg-white p-3"><p className="text-sm font-semibold text-error-500">✗ Expand Interest</p><p className="mt-1 text-sm font-semibold text-success-500">✓ Lookalike Expansion</p><p className="mt-2 text-sm text-gray-500">You haven't launched these audiences yet</p></div>
+          <div className="grid grid-cols-2 gap-px bg-neutral-100 p-px">
+            <div className="bg-white p-3"><p className="text-sm font-semibold text-success-500">✓ Expand Interest</p><p className="mt-1 text-sm font-semibold text-success-500">✓ Lookalike Expansion</p><p className="mt-2 text-sm text-neutral-600">100% of Spend</p><button type="button" className="text-xs font-semibold text-primary-500">17 Ad Sets</button><p className="mt-1 text-3xl font-bold text-neutral-900">0.00</p></div>
+            <div className="bg-white p-3"><p className="text-sm font-semibold text-error-500">✗ Expand Interest</p><p className="mt-1 text-sm font-semibold text-success-500">✓ Lookalike Expansion</p><p className="mt-2 text-sm text-neutral-500">You haven't launched these audiences yet</p></div>
             <div className="bg-white p-3"><p className="text-sm font-semibold text-success-500">✓ Expand Interest</p><p className="mt-1 text-sm font-semibold text-error-500">✗ Lookalike Expansion</p><p className="mt-2 text-xs text-primary-500">2 Ad Sets</p><p className="text-xs text-primary-500">2 Ad Sets</p><p className="text-xs text-primary-500">13 Ad Sets</p></div>
             <div className="bg-white p-3"><p className="text-sm font-semibold text-error-500">✗ Expand Interest</p><p className="mt-1 text-sm font-semibold text-error-500">✗ Lookalike Expansion</p><button type="button" className="mt-2 rounded-lg border border-primary-500 px-3 py-1.5 text-xs font-semibold text-primary-600">Go to Madgicx Audiences</button></div>
           </div>
@@ -1027,13 +1027,13 @@ function TargetingTabPanel() {
       <div className="grid grid-cols-1 gap-5 xl:grid-cols-2">
         <div className="overflow-hidden rounded-xl border border-[#F0F0F0] bg-white shadow-[-2px_2px_16px_rgba(14,0,45,0.06)]">
           <div className="flex items-center justify-between border-b border-[#F5F5F5] px-4 py-3">
-            <h3 className="text-lg font-semibold text-gray-800">Audience Size &amp; Potential Reach <HelpCircle className="ml-1 inline h-3.5 w-3.5 text-gray-400" /></h3>
+            <h3 className="text-lg font-semibold text-neutral-800">Audience Size &amp; Potential Reach <HelpCircle className="ml-1 inline h-3.5 w-3.5 text-neutral-400" /></h3>
           </div>
-          <div className="border-b border-gray-200 px-4"><div className="flex gap-4">{[{id:'size',l:'Audience Size'},{id:'reach',l:'Potential Reach'}].map(t=>(<button key={t.id} type="button" onClick={()=>setAudTab(t.id)} className={`border-b-2 pb-2 pt-2 text-xs font-semibold transition-all ${audTab===t.id?'border-primary-500 text-primary-600':'border-transparent text-gray-500 hover:text-gray-700'}`}>{t.l}</button>))}</div></div>
+          <div className="border-b border-neutral-200 px-4"><div className="flex gap-4">{[{id:'size',l:'Audience Size'},{id:'reach',l:'Potential Reach'}].map(t=>(<button key={t.id} type="button" onClick={()=>setAudTab(t.id)} className={`border-b-2 pb-2 pt-2 text-xs font-semibold transition-all ${audTab===t.id?'border-primary-500 text-primary-600':'border-transparent text-neutral-500 hover:text-neutral-700'}`}>{t.l}</button>))}</div></div>
           <div className="overflow-x-auto p-4">
-            <table className="w-full text-[13px] text-gray-700">
-              <thead><tr className="border-b border-gray-100 text-left text-gray-500"><th className="pb-2">Audience Size</th><th className="pb-2">{metaH('Amount Sp...')}</th><th className="pb-2">{metaH('ROAS (All)')}</th><th className="pb-2">{metaH('Registration...')}</th></tr></thead>
-              <tbody>{audSizeRows.map(r=>(<tr key={r[0]} className="border-b border-gray-50 last:border-0"><td className="py-2"><span className="font-semibold">{r[0]}</span><br/><span className="text-xs text-primary-500">{r[1]}</span></td><td className="py-2">{r[2]}</td><td className="py-2">{r[3]}</td><td className="py-2">{r[4]}</td></tr>))}</tbody>
+            <table className="w-full text-[13px] text-neutral-700">
+              <thead><tr className="border-b border-neutral-100 text-left text-neutral-500"><th className="pb-2">Audience Size</th><th className="pb-2">{metaH('Amount Sp...')}</th><th className="pb-2">{metaH('ROAS (All)')}</th><th className="pb-2">{metaH('Registration...')}</th></tr></thead>
+              <tbody>{audSizeRows.map(r=>(<tr key={r[0]} className="border-b border-neutral-50 last:border-0"><td className="py-2"><span className="font-semibold">{r[0]}</span><br/><span className="text-xs text-primary-500">{r[1]}</span></td><td className="py-2">{r[2]}</td><td className="py-2">{r[3]}</td><td className="py-2">{r[4]}</td></tr>))}</tbody>
             </table>
           </div>
         </div>
@@ -1041,24 +1041,24 @@ function TargetingTabPanel() {
         <div className="space-y-5">
           <div className="overflow-hidden rounded-xl border border-[#F0F0F0] bg-white shadow-[-2px_2px_16px_rgba(14,0,45,0.06)]">
             <div className="flex items-center justify-between border-b border-[#F5F5F5] px-4 py-3">
-              <h3 className="text-lg font-semibold text-gray-800">WiFi <HelpCircle className="ml-1 inline h-3.5 w-3.5 text-gray-400" /></h3>
-              <span className="inline-flex items-center gap-1 text-xs font-semibold text-gray-700"><span className="inline-flex h-4 w-4 items-center justify-center rounded bg-[#1877F2] text-[9px] font-bold text-white">f</span>ROAS (All) <ChevronDown className="h-3 w-3 text-gray-400" /></span>
+              <h3 className="text-lg font-semibold text-neutral-800">WiFi <HelpCircle className="ml-1 inline h-3.5 w-3.5 text-neutral-400" /></h3>
+              <span className="inline-flex items-center gap-1 text-xs font-semibold text-neutral-700"><span className="inline-flex h-4 w-4 items-center justify-center rounded bg-[#1877F2] text-[9px] font-bold text-white">f</span>ROAS (All) <ChevronDown className="h-3 w-3 text-neutral-400" /></span>
             </div>
-            <div className="grid grid-cols-2 gap-px bg-gray-100 p-px">
-              <div className="bg-white p-4 text-center"><p className="text-sm font-semibold text-gray-800">WiFi Only</p><p className="text-xs text-gray-500">0% of Spend</p><p className="text-xs text-gray-400">0 Ad Sets</p><p className="mt-2 text-3xl font-bold text-gray-300">-</p></div>
-              <div className="bg-white p-4 text-center"><p className="text-sm font-semibold text-gray-800">Any Internet Connection</p><p className="text-xs text-gray-500">100% of Spend</p><button type="button" className="text-xs font-semibold text-primary-500">17 Ad Sets</button><p className="mt-2 text-3xl font-bold text-gray-900">0.00</p></div>
+            <div className="grid grid-cols-2 gap-px bg-neutral-100 p-px">
+              <div className="bg-white p-4 text-center"><p className="text-sm font-semibold text-neutral-800">WiFi Only</p><p className="text-xs text-neutral-500">0% of Spend</p><p className="text-xs text-neutral-400">0 Ad Sets</p><p className="mt-2 text-3xl font-bold text-neutral-300">-</p></div>
+              <div className="bg-white p-4 text-center"><p className="text-sm font-semibold text-neutral-800">Any Internet Connection</p><p className="text-xs text-neutral-500">100% of Spend</p><button type="button" className="text-xs font-semibold text-primary-500">17 Ad Sets</button><p className="mt-2 text-3xl font-bold text-neutral-900">0.00</p></div>
             </div>
           </div>
 
           <div className="overflow-hidden rounded-xl border border-[#F0F0F0] bg-white shadow-[-2px_2px_16px_rgba(14,0,45,0.06)]">
             <div className="flex items-center justify-between border-b border-[#F5F5F5] px-4 py-3">
-              <h3 className="text-lg font-semibold text-gray-800">Lookalike &amp; Recency <HelpCircle className="ml-1 inline h-3.5 w-3.5 text-gray-400" /></h3>
+              <h3 className="text-lg font-semibold text-neutral-800">Lookalike &amp; Recency <HelpCircle className="ml-1 inline h-3.5 w-3.5 text-neutral-400" /></h3>
             </div>
-            <div className="border-b border-gray-200 px-4"><div className="flex gap-4">{[{id:'pct',l:'Lookalike %'},{id:'rec',l:'Recency'},{id:'both',l:'Lookalike & Recency'}].map(t=>(<button key={t.id} type="button" onClick={()=>setLalTab(t.id)} className={`border-b-2 pb-2 pt-2 text-xs font-semibold transition-all ${lalTab===t.id?'border-primary-500 text-primary-600':'border-transparent text-gray-500 hover:text-gray-700'}`}>{t.l}</button>))}</div></div>
+            <div className="border-b border-neutral-200 px-4"><div className="flex gap-4">{[{id:'pct',l:'Lookalike %'},{id:'rec',l:'Recency'},{id:'both',l:'Lookalike & Recency'}].map(t=>(<button key={t.id} type="button" onClick={()=>setLalTab(t.id)} className={`border-b-2 pb-2 pt-2 text-xs font-semibold transition-all ${lalTab===t.id?'border-primary-500 text-primary-600':'border-transparent text-neutral-500 hover:text-neutral-700'}`}>{t.l}</button>))}</div></div>
             <div className="overflow-x-auto p-4">
-              <table className="w-full text-[13px] text-gray-700">
-                <thead><tr className="border-b border-gray-100 text-left text-gray-500"><th className="pb-2">Lookalike %</th><th className="pb-2">{metaH('Amount Sp...')}</th><th className="pb-2">{metaH('ROAS (All)')}</th><th className="pb-2">{metaH('Registration...')}</th></tr></thead>
-                <tbody>{lalRows.map(r=>(<tr key={r[0]} className="border-b border-gray-50 last:border-0"><td className="py-2"><span className="font-semibold">{r[0]}</span><br/><span className="text-xs text-primary-500">{r[1]}</span></td><td className="py-2">{r[2]}</td><td className="py-2">{r[3]}</td><td className="py-2">{r[4]}</td></tr>))}</tbody>
+              <table className="w-full text-[13px] text-neutral-700">
+                <thead><tr className="border-b border-neutral-100 text-left text-neutral-500"><th className="pb-2">Lookalike %</th><th className="pb-2">{metaH('Amount Sp...')}</th><th className="pb-2">{metaH('ROAS (All)')}</th><th className="pb-2">{metaH('Registration...')}</th></tr></thead>
+                <tbody>{lalRows.map(r=>(<tr key={r[0]} className="border-b border-neutral-50 last:border-0"><td className="py-2"><span className="font-semibold">{r[0]}</span><br/><span className="text-xs text-primary-500">{r[1]}</span></td><td className="py-2">{r[2]}</td><td className="py-2">{r[3]}</td><td className="py-2">{r[4]}</td></tr>))}</tbody>
               </table>
             </div>
           </div>
@@ -1067,23 +1067,23 @@ function TargetingTabPanel() {
 
       <div className="overflow-hidden rounded-xl border border-[#F0F0F0] bg-white shadow-[-2px_2px_16px_rgba(14,0,45,0.06)]">
         <div className="flex items-center justify-between border-b border-[#F5F5F5] px-4 py-3">
-          <h3 className="text-lg font-semibold text-gray-800">Targeting Insights Across the Full Funnel <HelpCircle className="ml-1 inline h-3.5 w-3.5 text-gray-400" /></h3>
+          <h3 className="text-lg font-semibold text-neutral-800">Targeting Insights Across the Full Funnel <HelpCircle className="ml-1 inline h-3.5 w-3.5 text-neutral-400" /></h3>
           <button type="button" className="rounded-lg border border-primary-500 px-3 py-1.5 text-xs font-semibold text-primary-600">Go to Madgicx Audiences</button>
         </div>
         <div className="overflow-x-auto p-4">
-          <table className="w-full min-w-[920px] text-[13px] text-gray-700">
-            <thead><tr className="border-b border-gray-100 text-left text-gray-500"><th className="pb-2 w-16">% of spend</th><th className="pb-2">Audience Type</th><th className="pb-2">Live / Created</th><th className="pb-2">Amount Spent</th><th className="pb-2">{metaH('ROAS (All)')}</th><th className="pb-2">{metaH('Registrations...')}</th><th className="pb-2">{metaH('Cost per Pur...')}</th><th className="pb-2">Performance Overview <HelpCircle className="ml-0.5 inline h-3 w-3 text-gray-400" /></th></tr></thead>
+          <table className="w-full min-w-[920px] text-[13px] text-neutral-700">
+            <thead><tr className="border-b border-neutral-100 text-left text-neutral-500"><th className="pb-2 w-16">% of spend</th><th className="pb-2">Audience Type</th><th className="pb-2">Live / Created</th><th className="pb-2">Amount Spent</th><th className="pb-2">{metaH('ROAS (All)')}</th><th className="pb-2">{metaH('Registrations...')}</th><th className="pb-2">{metaH('Cost per Pur...')}</th><th className="pb-2">Performance Overview <HelpCircle className="ml-0.5 inline h-3 w-3 text-neutral-400" /></th></tr></thead>
             <tbody>
               {funnelRows.map((r,i) => (
-                <tr key={`${r.label}-${i}`} className={`border-b border-gray-50 last:border-0 ${r.bold ? 'bg-gray-50/50' : ''}`}>
-                  <td className="py-2 text-xs text-gray-500">{r.pct}</td>
-                  <td className={`py-2 ${r.bold ? 'font-bold text-gray-900' : 'pl-4'}`}>{r.label}</td>
+                <tr key={`${r.label}-${i}`} className={`border-b border-neutral-50 last:border-0 ${r.bold ? 'bg-neutral-50/50' : ''}`}>
+                  <td className="py-2 text-xs text-neutral-500">{r.pct}</td>
+                  <td className={`py-2 ${r.bold ? 'font-bold text-neutral-900' : 'pl-4'}`}>{r.label}</td>
                   <td className="py-2"><span className="text-primary-500">•</span> {r.live}</td>
                   <td className="py-2">{r.spent}</td>
                   <td className="py-2">{r.roas}</td>
                   <td className="py-2">{r.reg}</td>
                   <td className="py-2">{r.cpp}</td>
-                  <td className="py-2"><div className="h-1.5 w-full rounded bg-gray-200"><div className="h-full rounded bg-primary-400" style={{ width: r.bold && r.spent !== '-' ? '60%' : '0%' }} /></div></td>
+                  <td className="py-2"><div className="h-1.5 w-full rounded bg-neutral-200"><div className="h-full rounded bg-primary-400" style={{ width: r.bold && r.spent !== '-' ? '60%' : '0%' }} /></div></td>
                 </tr>
               ))}
             </tbody>
@@ -1105,19 +1105,19 @@ function GeoDemoTabPanel() {
   const metaH = (t) => (
     <span className="inline-flex items-center gap-1">
       <span className="inline-flex h-4 w-4 items-center justify-center rounded bg-[#1877F2] text-[9px] font-bold text-white">f</span>
-      {t} <ChevronDown className="h-3 w-3 text-gray-400" />
+      {t} <ChevronDown className="h-3 w-3 text-neutral-400" />
     </span>
   )
 
   const sortTh = (label) => (
     <span className="inline-flex items-center gap-1">
-      <ArrowUpDown className="h-3 w-3 text-gray-400" />
+      <ArrowUpDown className="h-3 w-3 text-neutral-400" />
       {label}
     </span>
   )
 
   const WastedIcon = ({ kind }) => {
-    if (kind === 'help') return <HelpCircle className="h-5 w-5 shrink-0 text-gray-400" aria-hidden />
+    if (kind === 'help') return <HelpCircle className="h-5 w-5 shrink-0 text-neutral-400" aria-hidden />
     if (kind === 'down') return <ThumbsDown className="h-5 w-5 shrink-0 text-orange-500" aria-hidden />
     return <ThumbsUp className="h-5 w-5 shrink-0 text-success-500" aria-hidden />
   }
@@ -1138,9 +1138,9 @@ function GeoDemoTabPanel() {
         <div className="flex flex-wrap items-center gap-2">
           <input
             placeholder="Load filter preset"
-            className="h-10 w-[200px] rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-700 placeholder:text-gray-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
+            className="h-10 w-[200px] rounded-lg border border-neutral-300 bg-white px-3 text-sm text-neutral-700 placeholder:text-neutral-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
           />
-          <button type="button" disabled className="h-10 rounded-lg border border-gray-200 bg-gray-100 px-4 text-sm font-semibold text-gray-400">
+          <button type="button" disabled className="h-10 rounded-lg border border-neutral-200 bg-neutral-100 px-4 text-sm font-semibold text-neutral-400">
             Save this view
           </button>
         </div>
@@ -1149,7 +1149,7 @@ function GeoDemoTabPanel() {
       <div className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1.6fr)_minmax(280px,1fr)]">
         <div className="overflow-hidden rounded-xl border border-[#F0F0F0] bg-white shadow-[-2px_2px_16px_rgba(14,0,45,0.06)]">
           <div className="border-b border-[#F5F5F5] px-4 py-3">
-            <h3 className="text-base font-semibold text-gray-900">Wasted Spend</h3>
+            <h3 className="text-base font-semibold text-neutral-900">Wasted Spend</h3>
           </div>
           <div className="p-4">
             <div className="relative mx-auto mb-6 h-[200px] w-[200px]">
@@ -1164,8 +1164,8 @@ function GeoDemoTabPanel() {
                 </PieChart>
               </ResponsiveContainer>
               <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center">
-                <p className="text-xl font-bold text-gray-900">{ws.centerTotal}</p>
-                <p className="text-xs font-medium text-gray-500">{ws.centerLabel}</p>
+                <p className="text-xl font-bold text-neutral-900">{ws.centerTotal}</p>
+                <p className="text-xs font-medium text-neutral-500">{ws.centerLabel}</p>
               </div>
             </div>
             <ul className="space-y-3 text-[13px]">
@@ -1173,39 +1173,39 @@ function GeoDemoTabPanel() {
                 <li key={row.key} className="flex items-start justify-between gap-3">
                   <div className="flex min-w-0 items-start gap-2">
                     <WastedIcon kind={row.icon} />
-                    <span className="font-medium leading-snug text-gray-800">
+                    <span className="font-medium leading-snug text-neutral-800">
                       {row.label}
-                      <Info className="ml-1 inline h-3.5 w-3.5 text-gray-400" />
+                      <Info className="ml-1 inline h-3.5 w-3.5 text-neutral-400" />
                     </span>
                   </div>
                   <div className="flex shrink-0 items-center gap-2">
-                    <div className="hidden h-1.5 w-16 rounded bg-gray-100 sm:block" />
-                    <span className="font-semibold tabular-nums text-gray-900">{row.value}</span>
+                    <div className="hidden h-1.5 w-16 rounded bg-neutral-100 sm:block" />
+                    <span className="font-semibold tabular-nums text-neutral-900">{row.value}</span>
                   </div>
                 </li>
               ))}
             </ul>
           </div>
-          <div className="flex items-center gap-2 border-t border-gray-100 bg-gray-50 px-4 py-3 text-sm text-gray-700">
+          <div className="flex items-center gap-2 border-t border-neutral-100 bg-neutral-50 px-4 py-3 text-sm text-neutral-700">
             <span className="font-medium">{ws.upliftLine}</span>
-            <Info className="h-4 w-4 shrink-0 text-gray-400" />
+            <Info className="h-4 w-4 shrink-0 text-neutral-400" />
           </div>
         </div>
 
         <div className="overflow-hidden rounded-xl border border-[#F0F0F0] bg-white shadow-[-2px_2px_16px_rgba(14,0,45,0.06)]">
           <div className="border-b border-[#F5F5F5] px-4 py-3">
-            <h3 className="text-base font-semibold text-gray-900">Trending Countries</h3>
+            <h3 className="text-base font-semibold text-neutral-900">Trending Countries</h3>
           </div>
           <div className="overflow-x-auto p-4">
-            <table className="w-full text-[13px] text-gray-800">
+            <table className="w-full text-[13px] text-neutral-800">
               <thead>
-                <tr className="border-b border-gray-100 text-left text-gray-500">
+                <tr className="border-b border-neutral-100 text-left text-neutral-500">
                   <th className="pb-2">{sortTh('Country')}</th>
                 </tr>
               </thead>
               <tbody>
                 {cfg.trendingCountries.map((c) => (
-                  <tr key={c.key} className="border-b border-gray-50 bg-gray-50/60 last:border-0">
+                  <tr key={c.key} className="border-b border-neutral-50 bg-neutral-50/60 last:border-0">
                     <td className="py-3">
                       <span className="mr-2 text-lg" aria-hidden>
                         {c.flag}
@@ -1222,7 +1222,7 @@ function GeoDemoTabPanel() {
 
       <div className="overflow-hidden rounded-xl border border-[#F0F0F0] bg-white shadow-[-2px_2px_16px_rgba(14,0,45,0.06)]">
         <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#F5F5F5] px-4 py-3">
-          <h3 className="text-base font-semibold text-gray-900">Maps</h3>
+          <h3 className="text-base font-semibold text-neutral-900">Maps</h3>
           <button
             type="button"
             className="rounded-lg border border-primary-500 bg-white px-4 py-2 text-sm font-semibold text-primary-600 transition-all hover:bg-primary-50"
@@ -1236,16 +1236,16 @@ function GeoDemoTabPanel() {
       <div className="overflow-hidden rounded-xl border border-[#F0F0F0] bg-white shadow-[-2px_2px_16px_rgba(14,0,45,0.06)]">
         <div className="flex items-center gap-3 px-4 py-3">
           <div className="h-2 min-w-0 flex-1 rounded-full bg-gradient-to-r from-pink-300 via-violet-400 to-teal-400" />
-          <Info className="h-4 w-4 shrink-0 text-gray-400" />
+          <Info className="h-4 w-4 shrink-0 text-neutral-400" />
         </div>
       </div>
 
       <div className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)]">
         <div className="overflow-hidden rounded-xl border border-[#F0F0F0] bg-white shadow-[-2px_2px_16px_rgba(14,0,45,0.06)]">
           <div className="border-b border-[#F5F5F5] px-4 py-3">
-            <h3 className="text-base font-semibold text-gray-900">International scaling</h3>
+            <h3 className="text-base font-semibold text-neutral-900">International scaling</h3>
           </div>
-          <div className="border-b border-gray-200 px-4">
+          <div className="border-b border-neutral-200 px-4">
             <div className="flex gap-6">
               {[
                 { id: 'tiers', label: 'Tiers' },
@@ -1256,7 +1256,7 @@ function GeoDemoTabPanel() {
                   type="button"
                   onClick={() => setIntlTab(t.id)}
                   className={`border-b-2 pb-2 pt-2 text-xs font-semibold transition-all ${
-                    intlTab === t.id ? 'border-primary-500 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700'
+                    intlTab === t.id ? 'border-primary-500 text-primary-600' : 'border-transparent text-neutral-500 hover:text-neutral-700'
                   }`}
                 >
                   {t.label}
@@ -1267,7 +1267,7 @@ function GeoDemoTabPanel() {
           <div className="overflow-x-auto p-4">
             <table className="w-full min-w-[640px] text-[13px]">
               <thead>
-                <tr className="border-b border-gray-100 text-left text-xs font-semibold text-gray-500">
+                <tr className="border-b border-neutral-100 text-left text-xs font-semibold text-neutral-500">
                   <th className="pb-2 pr-2">Type</th>
                   <th className="pb-2 pr-2">Change Overtime</th>
                   <th className="pb-2 pr-2">{metaH('Amount spent')}</th>
@@ -1275,26 +1275,26 @@ function GeoDemoTabPanel() {
                   <th className="pb-2">{metaH('Results')}</th>
                 </tr>
               </thead>
-              <tbody className="text-gray-800">
+              <tbody className="text-neutral-800">
                 {(intlTab === 'tiers' ? cfg.internationalTiers : cfg.internationalRegions).map((row, i) => (
-                  <tr key={`${row.type}-${i}`} className={i % 2 === 1 ? 'bg-gray-50/70' : ''}>
+                  <tr key={`${row.type}-${i}`} className={i % 2 === 1 ? 'bg-neutral-50/70' : ''}>
                     <td className="py-2.5 pr-2">
                       <div className="flex items-center gap-2">
                         {row.copy && (
-                          <button type="button" className="text-gray-400 hover:text-primary-600" aria-label="Copy">
+                          <button type="button" className="text-neutral-400 hover:text-primary-600" aria-label="Copy">
                             <Copy className="h-3.5 w-3.5" />
                           </button>
                         )}
                         <span className="inline-flex items-center gap-1 font-semibold">
                           {row.type}
-                          <Info className="h-3 w-3 text-gray-400" />
+                          <Info className="h-3 w-3 text-neutral-400" />
                         </span>
                       </div>
                     </td>
                     <td className="py-2.5 pr-2">
                       <span className="inline-flex items-center gap-1.5">
                         {row.flag && <span className="text-base">{row.flag}</span>}
-                        <span className="text-gray-700">{row.change}</span>
+                        <span className="text-neutral-700">{row.change}</span>
                       </span>
                     </td>
                     <td className="py-2.5 pr-2 font-medium">{row.spent}</td>
@@ -1309,9 +1309,9 @@ function GeoDemoTabPanel() {
 
         <div className="overflow-hidden rounded-xl border border-[#F0F0F0] bg-white shadow-[-2px_2px_16px_rgba(14,0,45,0.06)]">
           <div className="border-b border-[#F5F5F5] px-4 py-3">
-            <h3 className="text-base font-semibold text-gray-900">Age &amp; Gender</h3>
+            <h3 className="text-base font-semibold text-neutral-900">Age &amp; Gender</h3>
           </div>
-          <div className="border-b border-gray-200 px-4">
+          <div className="border-b border-neutral-200 px-4">
             <div className="flex flex-wrap gap-4">
               {[
                 { id: 'age', label: 'Age' },
@@ -1323,7 +1323,7 @@ function GeoDemoTabPanel() {
                   type="button"
                   onClick={() => setDemoTab(t.id)}
                   className={`border-b-2 pb-2 pt-2 text-xs font-semibold transition-all ${
-                    demoTab === t.id ? 'border-primary-500 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700'
+                    demoTab === t.id ? 'border-primary-500 text-primary-600' : 'border-transparent text-neutral-500 hover:text-neutral-700'
                   }`}
                 >
                   {t.label}
@@ -1335,14 +1335,14 @@ function GeoDemoTabPanel() {
             {demoTab === 'age' && (
               <table className="w-full min-w-[280px] text-[13px]">
                 <thead>
-                  <tr className="border-b border-gray-100 text-left text-gray-500">
+                  <tr className="border-b border-neutral-100 text-left text-neutral-500">
                     <th className="pb-2">{sortTh('Age')}</th>
                     <th className="pb-2 text-right">{sortTh('Amount Sp.')}</th>
                   </tr>
                 </thead>
-                <tbody className="text-gray-800">
+                <tbody className="text-neutral-800">
                   {cfg.ageRows.map((r) => (
-                    <tr key={r.age} className="border-b border-gray-50 last:border-0">
+                    <tr key={r.age} className="border-b border-neutral-50 last:border-0">
                       <td className="py-2.5 font-semibold">{r.age}</td>
                       <td className="py-2.5 text-right font-medium">{r.spent}</td>
                     </tr>
@@ -1353,14 +1353,14 @@ function GeoDemoTabPanel() {
             {demoTab === 'gender' && (
               <table className="w-full min-w-[280px] text-[13px]">
                 <thead>
-                  <tr className="border-b border-gray-100 text-left text-gray-500">
+                  <tr className="border-b border-neutral-100 text-left text-neutral-500">
                     <th className="pb-2">{sortTh('Gender')}</th>
                     <th className="pb-2 text-right">{sortTh('Amount Sp.')}</th>
                   </tr>
                 </thead>
-                <tbody className="text-gray-800">
+                <tbody className="text-neutral-800">
                   {cfg.genderRows.map((r) => (
-                    <tr key={r.gender} className="border-b border-gray-50 last:border-0">
+                    <tr key={r.gender} className="border-b border-neutral-50 last:border-0">
                       <td className="py-2.5 font-semibold">{r.gender}</td>
                       <td className="py-2.5 text-right font-medium">{r.spent}</td>
                     </tr>
@@ -1371,14 +1371,14 @@ function GeoDemoTabPanel() {
             {demoTab === 'both' && (
               <table className="w-full min-w-[280px] text-[13px]">
                 <thead>
-                  <tr className="border-b border-gray-100 text-left text-gray-500">
+                  <tr className="border-b border-neutral-100 text-left text-neutral-500">
                     <th className="pb-2">{sortTh('Age & Gender')}</th>
                     <th className="pb-2 text-right">{sortTh('Amount Sp.')}</th>
                   </tr>
                 </thead>
-                <tbody className="text-gray-800">
+                <tbody className="text-neutral-800">
                   {cfg.ageGenderRows.map((r) => (
-                    <tr key={r.cell} className="border-b border-gray-50 last:border-0">
+                    <tr key={r.cell} className="border-b border-neutral-50 last:border-0">
                       <td className="py-2.5 font-semibold">{r.cell}</td>
                       <td className="py-2.5 text-right font-medium">{r.spent}</td>
                     </tr>
@@ -1392,23 +1392,23 @@ function GeoDemoTabPanel() {
 
       <div className="overflow-hidden rounded-xl border border-[#F0F0F0] bg-white shadow-[-2px_2px_16px_rgba(14,0,45,0.06)]">
         <div className="border-b border-[#F5F5F5] px-4 py-3">
-          <h3 className="text-base font-semibold text-gray-900">Language</h3>
+          <h3 className="text-base font-semibold text-neutral-900">Language</h3>
         </div>
-        <div className="grid grid-cols-1 gap-3 border-b border-gray-100 p-4 sm:grid-cols-3">
-          <div className="rounded-lg border border-gray-100 bg-white p-4 text-center shadow-sm">
-            <p className="text-xs font-medium text-gray-500">Best Targeting Language</p>
-            <p className="mt-2 text-4xl font-bold tabular-nums text-gray-900">{cfg.languageKpis.bestTargeting}</p>
+        <div className="grid grid-cols-1 gap-3 border-b border-neutral-100 p-4 sm:grid-cols-3">
+          <div className="rounded-lg border border-neutral-100 bg-white p-4 text-center shadow-sm">
+            <p className="text-xs font-medium text-neutral-500">Best Targeting Language</p>
+            <p className="mt-2 text-4xl font-bold tabular-nums text-neutral-900">{cfg.languageKpis.bestTargeting}</p>
           </div>
-          <div className="rounded-lg border border-gray-100 bg-white p-4 text-center shadow-sm">
-            <p className="text-xs font-medium text-gray-500">Best Copy Language</p>
-            <p className="mt-2 text-4xl font-bold tabular-nums text-gray-900">{cfg.languageKpis.bestCopy}</p>
+          <div className="rounded-lg border border-neutral-100 bg-white p-4 text-center shadow-sm">
+            <p className="text-xs font-medium text-neutral-500">Best Copy Language</p>
+            <p className="mt-2 text-4xl font-bold tabular-nums text-neutral-900">{cfg.languageKpis.bestCopy}</p>
           </div>
-          <div className="rounded-lg border border-gray-100 bg-white p-4 text-center shadow-sm">
-            <p className="text-xs font-medium text-gray-500">Best Spoken Country Language</p>
-            <p className="mt-2 text-4xl font-bold tabular-nums text-gray-900">{cfg.languageKpis.bestSpoken}</p>
+          <div className="rounded-lg border border-neutral-100 bg-white p-4 text-center shadow-sm">
+            <p className="text-xs font-medium text-neutral-500">Best Spoken Country Language</p>
+            <p className="mt-2 text-4xl font-bold tabular-nums text-neutral-900">{cfg.languageKpis.bestSpoken}</p>
           </div>
         </div>
-        <div className="border-b border-gray-200 px-4">
+        <div className="border-b border-neutral-200 px-4">
           <div className="flex flex-wrap gap-6">
             {[
               { id: 'targeting', label: 'Targeting Language' },
@@ -1420,7 +1420,7 @@ function GeoDemoTabPanel() {
                 type="button"
                 onClick={() => setLangSubTab(t.id)}
                 className={`border-b-2 pb-2 pt-2 text-xs font-semibold transition-all ${
-                  langSubTab === t.id ? 'border-primary-500 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700'
+                  langSubTab === t.id ? 'border-primary-500 text-primary-600' : 'border-transparent text-neutral-500 hover:text-neutral-700'
                 }`}
               >
                 {t.label}
@@ -1431,17 +1431,17 @@ function GeoDemoTabPanel() {
         <div className="overflow-x-auto p-4">
           <table className="w-full min-w-[400px] text-[13px]">
             <thead>
-              <tr className="border-b border-gray-100 text-left text-gray-500">
+              <tr className="border-b border-neutral-100 text-left text-neutral-500">
                 <th className="pb-2">{sortTh('Language')}</th>
                 <th className="pb-2">{sortTh('Number of ads')}</th>
                 <th className="pb-2">{metaH('Amount Spent')}</th>
               </tr>
             </thead>
-            <tbody className="text-gray-800">
+            <tbody className="text-neutral-800">
               {langRows.map((r) => (
-                <tr key={`${langSubTab}-${r.lang}`} className="border-b border-gray-50 bg-gray-50/50 last:border-0">
+                <tr key={`${langSubTab}-${r.lang}`} className="border-b border-neutral-50 bg-neutral-50/50 last:border-0">
                   <td className="py-3">
-                    <span className="mr-2 inline-flex text-gray-500">
+                    <span className="mr-2 inline-flex text-neutral-500">
                       <Globe className="h-4 w-4" aria-hidden />
                     </span>
                     <span className="font-semibold">{r.lang}</span>
@@ -1474,7 +1474,7 @@ function CreativeTabPanel() {
   }
 
   const FormatKindIcon = ({ kind }) => {
-    const cls = 'h-5 w-5 shrink-0 text-gray-500'
+    const cls = 'h-5 w-5 shrink-0 text-neutral-500'
     if (kind === 'image') return <ImageIcon className={cls} aria-hidden />
     if (kind === 'video') return <Video className={cls} aria-hidden />
     if (kind === 'carousel') return <LayoutGrid className={cls} aria-hidden />
@@ -1484,14 +1484,14 @@ function CreativeTabPanel() {
   const metricRow = (label, value) => (
     <button
       type="button"
-      className="flex w-full items-center justify-between rounded-md border border-gray-100 bg-gray-50/80 px-2 py-1.5 text-left text-[11px] font-medium text-gray-700 transition-colors hover:bg-gray-100"
+      className="flex w-full items-center justify-between rounded-md border border-neutral-100 bg-neutral-50/80 px-2 py-1.5 text-left text-[11px] font-medium text-neutral-700 transition-colors hover:bg-neutral-100"
     >
-      <span className="inline-flex items-center gap-1 text-gray-600">
+      <span className="inline-flex items-center gap-1 text-neutral-600">
         <span className="inline-flex h-3.5 w-3.5 items-center justify-center rounded bg-[#1877F2] text-[7px] font-bold text-white">f</span>
         {label}
-        <ChevronDown className="h-3 w-3 text-gray-400" aria-hidden />
+        <ChevronDown className="h-3 w-3 text-neutral-400" aria-hidden />
       </span>
-      <span className="font-semibold tabular-nums text-gray-900">{value}</span>
+      <span className="font-semibold tabular-nums text-neutral-900">{value}</span>
     </button>
   )
 
@@ -1530,7 +1530,7 @@ function CreativeTabPanel() {
             <button
               key={label}
               type="button"
-              className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-xs font-semibold text-gray-700 shadow-sm hover:border-gray-400"
+              className="rounded-lg border border-neutral-300 bg-white px-3 py-2 text-xs font-semibold text-neutral-700 shadow-sm hover:border-neutral-400"
             >
               {label}
             </button>
@@ -1553,20 +1553,20 @@ function CreativeTabPanel() {
           >
             <div className="mb-2 flex items-start gap-2">
               <FormatKindIcon kind={c.icon} />
-              <h4 className="text-base font-semibold leading-tight text-gray-900">
+              <h4 className="text-base font-semibold leading-tight text-neutral-900">
                 {c.title}{' '}
-                <span className="text-xs font-normal text-gray-400">
+                <span className="text-xs font-normal text-neutral-400">
                   ({c.count})
                 </span>
               </h4>
             </div>
             {c.empty ? (
-              <div className="flex flex-1 flex-col items-center justify-center rounded-lg border border-dashed border-gray-200 bg-gray-50/80 px-2 py-4 text-center">
-                <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-sm ring-1 ring-gray-100">
-                  <Video className="h-6 w-6 text-gray-300" aria-hidden />
+              <div className="flex flex-1 flex-col items-center justify-center rounded-lg border border-dashed border-neutral-200 bg-neutral-50/80 px-2 py-4 text-center">
+                <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-sm ring-1 ring-neutral-100">
+                  <Video className="h-6 w-6 text-neutral-300" aria-hidden />
                 </div>
-                <p className="text-sm font-semibold text-gray-800">Missing format</p>
-                <p className="mt-1 text-[11px] leading-snug text-gray-500">
+                <p className="text-sm font-semibold text-neutral-800">Missing format</p>
+                <p className="mt-1 text-[11px] leading-snug text-neutral-500">
                   You&apos;re not using this format in your ads. Test it to diversify performance.
                 </p>
                 <button
@@ -1585,21 +1585,21 @@ function CreativeTabPanel() {
                   {metricRow('Conversion Rate (Purchases / Landing Page Views)', c.conv)}
                 </div>
                 <div className="mt-3 space-y-1.5">
-                  <div className="flex h-2 w-full overflow-hidden rounded-full bg-gray-100">
+                  <div className="flex h-2 w-full overflow-hidden rounded-full bg-neutral-100">
                     <div
                       className="bg-pink-400 transition-all"
                       style={{ width: `${Math.min(100, c.revenuePct + c.spendPct) > 0 ? (c.revenuePct / Math.max(0.01, c.revenuePct + c.spendPct)) * 100 : 0}%` }}
                     />
                     <div
-                      className="bg-gray-400 transition-all"
+                      className="bg-neutral-400 transition-all"
                       style={{
                         width: `${Math.min(100, c.revenuePct + c.spendPct) > 0 ? (c.spendPct / Math.max(0.01, c.revenuePct + c.spendPct)) * 100 : 0}%`
                       }}
                     />
                   </div>
-                  <div className="flex justify-between text-[10px] font-semibold text-gray-600">
+                  <div className="flex justify-between text-[10px] font-semibold text-neutral-600">
                     <span className="text-pink-500">{c.revenuePct}% Revenue</span>
-                    <span className="text-gray-600">{c.spendPct}% Spend</span>
+                    <span className="text-neutral-600">{c.spendPct}% Spend</span>
                   </div>
                 </div>
               </>
@@ -1611,29 +1611,29 @@ function CreativeTabPanel() {
       {/* Graded by + spend sliders + actions */}
       <div className="flex flex-col gap-3 rounded-xl border border-[#F0F0F0] bg-white px-4 py-3 shadow-[-2px_2px_16px_rgba(14,0,45,0.06)] lg:flex-row lg:flex-wrap lg:items-center lg:justify-between">
         <div className="flex flex-wrap items-center gap-3">
-          <span className="text-xs font-semibold text-gray-600">Graded by:</span>
+          <span className="text-xs font-semibold text-neutral-600">Graded by:</span>
           <button
             type="button"
-            className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-800 shadow-sm"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-neutral-200 bg-white px-3 py-1.5 text-xs font-semibold text-neutral-800 shadow-sm"
           >
             <span className="inline-flex h-4 w-4 items-center justify-center rounded bg-[#1877F2] text-[8px] font-bold text-white">f</span>
             Revenue
-            <ChevronDown className="h-3.5 w-3.5 text-gray-400" aria-hidden />
+            <ChevronDown className="h-3.5 w-3.5 text-neutral-400" aria-hidden />
           </button>
-          <label className="inline-flex items-center gap-1.5 text-xs font-medium text-gray-600">
+          <label className="inline-flex items-center gap-1.5 text-xs font-medium text-neutral-600">
             <span className="whitespace-nowrap">Min. Spend:</span>
             <input
               type="number"
               defaultValue={cfg.minSpendDefault}
-              className="h-9 w-20 rounded-lg border border-gray-300 px-2 text-xs font-semibold tabular-nums text-gray-900"
+              className="h-9 w-20 rounded-lg border border-neutral-300 px-2 text-xs font-semibold tabular-nums text-neutral-900"
             />
           </label>
-          <label className="inline-flex items-center gap-1.5 text-xs font-medium text-gray-600">
+          <label className="inline-flex items-center gap-1.5 text-xs font-medium text-neutral-600">
             <span className="whitespace-nowrap">Max. Spend:</span>
             <input
               type="number"
               defaultValue={cfg.maxSpendDefault}
-              className="h-9 w-20 rounded-lg border border-gray-300 px-2 text-xs font-semibold tabular-nums text-gray-900"
+              className="h-9 w-20 rounded-lg border border-neutral-300 px-2 text-xs font-semibold tabular-nums text-neutral-900"
             />
           </label>
         </div>
@@ -1658,7 +1658,7 @@ function CreativeTabPanel() {
         <button
           type="button"
           disabled
-          className="rounded-lg border border-gray-200 bg-gray-100 px-4 py-2 text-xs font-semibold text-gray-400"
+          className="rounded-lg border border-neutral-200 bg-neutral-100 px-4 py-2 text-xs font-semibold text-neutral-400"
         >
           Open selected in Ads Launcher
         </button>
@@ -1667,8 +1667,8 @@ function CreativeTabPanel() {
       {/* Creative matrix — spend vs revenue */}
       <div className="overflow-hidden rounded-xl border border-[#F0F0F0] bg-white shadow-[-2px_2px_16px_rgba(14,0,45,0.06)]">
         <div className="relative border-b border-[#F5F5F5] px-4 py-3">
-          <h3 className="text-base font-semibold text-gray-900">Creative performance</h3>
-          <p className="text-xs text-gray-500">Revenue vs amount spent — hover creatives below to highlight</p>
+          <h3 className="text-base font-semibold text-neutral-900">Creative performance</h3>
+          <p className="text-xs text-neutral-500">Revenue vs amount spent — hover creatives below to highlight</p>
         </div>
         <div className="relative p-4">
           <div className="pointer-events-none absolute left-[12%] top-14 z-10 flex h-[calc(100%-5rem)] w-8 items-center justify-center">
@@ -1723,16 +1723,16 @@ function CreativeTabPanel() {
       {/* Creatives gallery */}
       <div className="overflow-hidden rounded-xl border border-[#F0F0F0] bg-white shadow-[-2px_2px_16px_rgba(14,0,45,0.06)]">
         <div className="flex flex-col gap-2 border-b border-[#F5F5F5] px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
-          <h5 className="text-sm font-semibold text-gray-900">
+          <h5 className="text-sm font-semibold text-neutral-900">
             Creatives ({cfg.creativesTotal})
           </h5>
           <div className="flex flex-wrap items-center gap-3">
-            <label className="inline-flex items-center gap-2 text-xs font-medium text-gray-600">
+            <label className="inline-flex items-center gap-2 text-xs font-medium text-neutral-600">
               Sort by:
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="rounded-lg border border-gray-300 bg-white px-2 py-1.5 text-xs font-semibold text-gray-800"
+                className="rounded-lg border border-neutral-300 bg-white px-2 py-1.5 text-xs font-semibold text-neutral-800"
               >
                 <option>Revenue (high first)</option>
                 <option>Revenue (low first)</option>
@@ -1740,7 +1740,7 @@ function CreativeTabPanel() {
                 <option>Amount spent (low first)</option>
               </select>
             </label>
-            <span className="text-xs font-semibold text-gray-500">{selectedCount} selected</span>
+            <span className="text-xs font-semibold text-neutral-500">{selectedCount} selected</span>
           </div>
         </div>
         <div className="overflow-x-auto p-4 pb-2">
@@ -1753,10 +1753,10 @@ function CreativeTabPanel() {
                   type="button"
                   onClick={() => toggleCreativeSel(cr.rank)}
                   className={`relative w-[132px] shrink-0 rounded-lg border bg-white p-2 text-left shadow-sm transition-all ${
-                    sel ? 'border-primary-500 ring-2 ring-primary-100' : 'border-gray-200 hover:border-gray-300'
+                    sel ? 'border-primary-500 ring-2 ring-primary-100' : 'border-neutral-200 hover:border-neutral-300'
                   }`}
                 >
-                  <div className="relative mb-2 aspect-square w-full overflow-hidden rounded-md bg-gradient-to-br from-gray-100 to-gray-200">
+                  <div className="relative mb-2 aspect-square w-full overflow-hidden rounded-md bg-gradient-to-br from-neutral-100 to-neutral-200">
                     <span className="absolute right-1 top-1 flex h-6 w-6 items-center justify-center rounded-full bg-pink-500 text-[11px] font-bold text-white shadow">
                       {cr.rank}
                     </span>
@@ -1765,18 +1765,18 @@ function CreativeTabPanel() {
                     <span className="text-pink-500">{cr.revPct}%</span>
                     <span className="text-teal-500">{cr.spendPct}%</span>
                   </div>
-                  <div className="mb-2 flex items-center justify-between text-gray-400">
-                    <span className="inline-flex h-7 w-7 items-center justify-center rounded border border-dashed border-gray-300 text-[9px] font-semibold text-gray-500">
+                  <div className="mb-2 flex items-center justify-between text-neutral-400">
+                    <span className="inline-flex h-7 w-7 items-center justify-center rounded border border-dashed border-neutral-300 text-[9px] font-semibold text-neutral-500">
                       {cr.ratio}
                     </span>
                     {cr.video ? (
-                      <Video className="h-4 w-4 text-gray-500" aria-hidden />
+                      <Video className="h-4 w-4 text-neutral-500" aria-hidden />
                     ) : (
-                      <ImageIcon className="h-4 w-4 text-gray-500" aria-hidden />
+                      <ImageIcon className="h-4 w-4 text-neutral-500" aria-hidden />
                     )}
                   </div>
                   <span className="text-[11px] font-semibold text-primary-600">Creative Preview</span>
-                  <span className="absolute bottom-2 right-2 text-gray-400">
+                  <span className="absolute bottom-2 right-2 text-neutral-400">
                     <Search className="h-3.5 w-3.5" aria-hidden />
                   </span>
                 </button>
@@ -1789,24 +1789,24 @@ function CreativeTabPanel() {
       {/* Creative Performance Trends */}
       <div className="overflow-hidden rounded-xl border border-[#F0F0F0] bg-white shadow-[-2px_2px_16px_rgba(14,0,45,0.06)]">
         <div className="flex items-center justify-between border-b border-[#F5F5F5] px-4 py-3">
-          <h3 className="text-base font-semibold text-gray-900">Creative Performance Trends</h3>
+          <h3 className="text-base font-semibold text-neutral-900">Creative Performance Trends</h3>
           <div className="flex items-center gap-3">
-            <label className="inline-flex cursor-pointer items-center gap-2 text-xs font-semibold text-gray-700">
+            <label className="inline-flex cursor-pointer items-center gap-2 text-xs font-semibold text-neutral-700">
               <input
                 type="checkbox"
                 checked={trendsOpen}
                 onChange={() => setTrendsOpen((v) => !v)}
-                className="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                className="h-4 w-4 rounded border-neutral-300 text-primary-600 focus:ring-primary-500"
               />
             </label>
-            <button type="button" className="text-gray-400 hover:text-gray-600" aria-label="Collapse section">
+            <button type="button" className="text-neutral-400 hover:text-neutral-600" aria-label="Collapse section">
               <span className="block h-0.5 w-4 bg-current" />
             </button>
           </div>
         </div>
         {trendsOpen && (
           <div className="grid grid-cols-1 gap-4 p-4 lg:grid-cols-[1fr_190px]">
-            <div className="h-64 rounded-lg border border-gray-100 p-3">
+            <div className="h-64 rounded-lg border border-neutral-100 p-3">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={cfg.trendData}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#eef0f4" />
@@ -1819,15 +1819,15 @@ function CreativeTabPanel() {
               </ResponsiveContainer>
             </div>
             <div>
-              <p className="mb-2 text-xs font-semibold text-gray-500">Compare creatives</p>
-              <div className="max-h-56 space-y-2 overflow-y-auto text-sm text-gray-700">
+              <p className="mb-2 text-xs font-semibold text-neutral-500">Compare creatives</p>
+              <div className="max-h-56 space-y-2 overflow-y-auto text-sm text-neutral-700">
                 {cfg.trendCreativePick.map((name) => (
-                  <label key={name} className="flex cursor-pointer items-center justify-between rounded-md border border-gray-100 px-2 py-1.5 hover:bg-gray-50">
+                  <label key={name} className="flex cursor-pointer items-center justify-between rounded-md border border-neutral-100 px-2 py-1.5 hover:bg-neutral-50">
                     <span className="inline-flex items-center gap-2">
-                      <input type="checkbox" defaultChecked={name === 'Creative 1'} className="rounded border-gray-300 text-primary-600" />
+                      <input type="checkbox" defaultChecked={name === 'Creative 1'} className="rounded border-neutral-300 text-primary-600" />
                       {name}
                     </span>
-                    <span className="h-6 w-6 shrink-0 rounded bg-gray-200" />
+                    <span className="h-6 w-6 shrink-0 rounded bg-neutral-200" />
                   </label>
                 ))}
               </div>
@@ -1839,7 +1839,7 @@ function CreativeTabPanel() {
       {/* AI Tags — revenue (green) + spend (gray) */}
       <div className="overflow-hidden rounded-xl border border-[#F0F0F0] bg-white shadow-[-2px_2px_16px_rgba(14,0,45,0.06)]">
         <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#F5F5F5] px-4 py-3">
-          <h3 className="text-base font-semibold text-gray-900">AI Tags</h3>
+          <h3 className="text-base font-semibold text-neutral-900">AI Tags</h3>
           <div className="flex flex-wrap gap-2">
             <button
               type="button"
@@ -1856,21 +1856,21 @@ function CreativeTabPanel() {
           </div>
         </div>
         <div className="p-4">
-          <table className="w-full text-[13px] text-gray-700">
+          <table className="w-full text-[13px] text-neutral-700">
             <tbody>
               {cfg.aiTags.map((row) => (
-                <tr key={row.name} className="border-b border-gray-100 last:border-0">
-                  <td className="py-2.5 font-medium text-gray-900">{row.name}</td>
+                <tr key={row.name} className="border-b border-neutral-100 last:border-0">
+                  <td className="py-2.5 font-medium text-neutral-900">{row.name}</td>
                   <td className="py-2.5">
-                    <div className="flex h-2 w-full overflow-hidden rounded bg-gray-200">
+                    <div className="flex h-2 w-full overflow-hidden rounded bg-neutral-200">
                       <div className="bg-success-500" style={{ width: `${Math.min(100, row.revenuePct)}%` }} />
-                      <div className="bg-gray-300" style={{ width: `${Math.min(100, row.spendPct)}%` }} />
+                      <div className="bg-neutral-300" style={{ width: `${Math.min(100, row.spendPct)}%` }} />
                     </div>
                   </td>
                   <td className="py-2.5 text-right">
                     <span className="font-semibold text-success-600">{row.revenuePct}%</span>
-                    <span className="mx-1 text-gray-300">|</span>
-                    <span className="font-medium text-gray-500">{row.spendPct}%</span>
+                    <span className="mx-1 text-neutral-300">|</span>
+                    <span className="font-medium text-neutral-500">{row.spendPct}%</span>
                   </td>
                 </tr>
               ))}
@@ -1893,20 +1893,20 @@ function AuctionTabPanel() {
   const metaH = (t) => (
     <span className="inline-flex items-center gap-1">
       <span className="inline-flex h-4 w-4 items-center justify-center rounded bg-[#1877F2] text-[9px] font-bold text-white">f</span>
-      {t} <ChevronDown className="h-3 w-3 text-gray-400" />
+      {t} <ChevronDown className="h-3 w-3 text-neutral-400" />
     </span>
   )
 
   const sortableTh = (children) => (
     <span className="inline-flex items-center gap-1">
       {children}
-      <ArrowUpDown className="h-3 w-3 text-gray-400" />
+      <ArrowUpDown className="h-3 w-3 text-neutral-400" />
     </span>
   )
 
   const SysIcon = ({ kind }) => {
-    if (kind === 'monitor') return <Monitor className="h-5 w-5 text-gray-600" aria-hidden />
-    if (kind === 'phone') return <Smartphone className="h-5 w-5 text-gray-600" aria-hidden />
+    if (kind === 'monitor') return <Monitor className="h-5 w-5 text-neutral-600" aria-hidden />
+    if (kind === 'phone') return <Smartphone className="h-5 w-5 text-neutral-600" aria-hidden />
     if (kind === 'apple') return <span className="text-lg" aria-hidden></span>
     if (kind === 'android')
       return (
@@ -1920,11 +1920,11 @@ function AuctionTabPanel() {
   const AuctionDonutCard = ({ title, centerSpend, pie, legendRows, view, setView, tableRows, tableFirstColLabel = 'Objective' }) => (
     <div className="overflow-hidden rounded-xl border border-[#F0F0F0] bg-white shadow-[-2px_2px_16px_rgba(14,0,45,0.06)]">
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#F5F5F5] px-4 py-3">
-        <h3 className="text-base font-semibold text-gray-900">
-          {title} <Info className="ml-0.5 inline h-3.5 w-3.5 text-gray-400" />
+        <h3 className="text-base font-semibold text-neutral-900">
+          {title} <Info className="ml-0.5 inline h-3.5 w-3.5 text-neutral-400" />
         </h3>
       </div>
-      <div className="border-b border-gray-200 px-4">
+      <div className="border-b border-neutral-200 px-4">
         <div className="flex gap-6">
           {[
             { id: 'dashboard', label: 'Dashboard' },
@@ -1935,7 +1935,7 @@ function AuctionTabPanel() {
               type="button"
               onClick={() => setView(t.id)}
               className={`border-b-2 pb-2 pt-2 text-xs font-semibold transition-all ${
-                view === t.id ? 'border-primary-500 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700'
+                view === t.id ? 'border-primary-500 text-primary-600' : 'border-transparent text-neutral-500 hover:text-neutral-700'
               }`}
             >
               {t.label}
@@ -1958,38 +1958,38 @@ function AuctionTabPanel() {
                 </PieChart>
               </ResponsiveContainer>
               <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center">
-                <p className="text-lg font-bold leading-tight text-gray-900">{centerSpend}</p>
-                <p className="text-[11px] font-medium text-gray-500">Amount Spent</p>
+                <p className="text-lg font-bold leading-tight text-neutral-900">{centerSpend}</p>
+                <p className="text-[11px] font-medium text-neutral-500">Amount Spent</p>
               </div>
             </div>
             <div className="min-w-0 flex-1 space-y-3">
-              <div className="flex flex-wrap items-center justify-between gap-2 text-xs font-semibold text-gray-700">
+              <div className="flex flex-wrap items-center justify-between gap-2 text-xs font-semibold text-neutral-700">
                 <span>Amount Spent</span>
-                <span className="inline-flex items-center gap-1 rounded-md border border-gray-200 bg-white px-2 py-1">
+                <span className="inline-flex items-center gap-1 rounded-md border border-neutral-200 bg-white px-2 py-1">
                   <span className="inline-flex h-4 w-4 items-center justify-center rounded bg-[#1877F2] text-[9px] font-bold text-white">f</span>
-                  ROAS (All) <ChevronDown className="h-3 w-3 text-gray-400" />
+                  ROAS (All) <ChevronDown className="h-3 w-3 text-neutral-400" />
                 </span>
               </div>
               {legendRows.map((row) => (
                 <div
                   key={row.name}
-                  className="flex flex-wrap items-center gap-2 rounded-lg border border-gray-100 bg-gray-50/80 px-3 py-2 text-xs text-gray-700"
+                  className="flex flex-wrap items-center gap-2 rounded-lg border border-neutral-100 bg-neutral-50/80 px-3 py-2 text-xs text-neutral-700"
                 >
                   <span className="h-2 w-2 shrink-0 rounded-sm" style={{ backgroundColor: pie[0]?.color }} />
-                  <span className="font-semibold text-gray-900">
+                  <span className="font-semibold text-neutral-900">
                     {row.pct} ({row.spend})
                   </span>
                   <span>{row.name}</span>
-                  <span className="font-bold text-gray-900">{row.roas}</span>
+                  <span className="font-bold text-neutral-900">{row.roas}</span>
                 </div>
               ))}
             </div>
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[360px] text-[13px] text-gray-700">
+            <table className="w-full min-w-[360px] text-[13px] text-neutral-700">
               <thead>
-                <tr className="border-b border-gray-100 text-left text-gray-500">
+                <tr className="border-b border-neutral-100 text-left text-neutral-500">
                   <th className="pb-2">{sortableTh(tableFirstColLabel)}</th>
                   <th className="pb-2">{metaH('Amount Sp...')}</th>
                   <th className="pb-2">% of spend</th>
@@ -1998,7 +1998,7 @@ function AuctionTabPanel() {
               </thead>
               <tbody>
                 {tableRows.map((r) => (
-                  <tr key={r.name} className="border-b border-gray-50 last:border-0">
+                  <tr key={r.name} className="border-b border-neutral-50 last:border-0">
                     <td className="py-2 font-semibold">{r.name}</td>
                     <td className="py-2">{r.spend}</td>
                     <td className="py-2">{r.pct}</td>
@@ -2033,7 +2033,7 @@ function AuctionTabPanel() {
             <SlidersHorizontal className="h-4 w-4" />
             Smart Filter
           </button>
-          <button type="button" disabled className="h-10 rounded-lg border border-gray-200 bg-gray-100 px-4 text-sm font-semibold text-gray-400">
+          <button type="button" disabled className="h-10 rounded-lg border border-neutral-200 bg-neutral-100 px-4 text-sm font-semibold text-neutral-400">
             Save this view
           </button>
         </div>
@@ -2043,13 +2043,13 @@ function AuctionTabPanel() {
         {/* Placement & Device — Madgicx */}
         <div className="overflow-hidden rounded-xl border border-[#F0F0F0] bg-white shadow-[-2px_2px_16px_rgba(14,0,45,0.06)]">
           <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#F5F5F5] px-4 py-3">
-            <h3 className="text-base font-semibold text-gray-900">Placement &amp; Device</h3>
-            <span className="inline-flex items-center gap-1 text-xs font-semibold text-gray-700">
+            <h3 className="text-base font-semibold text-neutral-900">Placement &amp; Device</h3>
+            <span className="inline-flex items-center gap-1 text-xs font-semibold text-neutral-700">
               <span className="inline-flex h-4 w-4 items-center justify-center rounded bg-[#1877F2] text-[9px] font-bold text-white">f</span>
-              ROAS (All) <ChevronDown className="h-3 w-3 text-gray-400" />
+              ROAS (All) <ChevronDown className="h-3 w-3 text-neutral-400" />
             </span>
           </div>
-          <div className="border-b border-gray-200 px-4">
+          <div className="border-b border-neutral-200 px-4">
             <div className="flex gap-6">
               {[
                 { id: 'dashboard', label: 'Dashboard View' },
@@ -2060,7 +2060,7 @@ function AuctionTabPanel() {
                   type="button"
                   onClick={() => setPlacementView(t.id)}
                   className={`border-b-2 pb-2 pt-2 text-xs font-semibold transition-all ${
-                    placementView === t.id ? 'border-primary-500 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700'
+                    placementView === t.id ? 'border-primary-500 text-primary-600' : 'border-transparent text-neutral-500 hover:text-neutral-700'
                   }`}
                 >
                   {t.label}
@@ -2072,48 +2072,48 @@ function AuctionTabPanel() {
             {placementView === 'dashboard' ? (
               <div className="space-y-5">
                 <div>
-                  <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">Devices</p>
+                  <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-neutral-500">Devices</p>
                   <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                     {pd.devices.map((d) => (
                       <div
                         key={d.key}
-                        className="flex items-center justify-between gap-3 rounded-lg border border-gray-100 bg-gray-50/60 px-3 py-3"
+                        className="flex items-center justify-between gap-3 rounded-lg border border-neutral-100 bg-neutral-50/60 px-3 py-3"
                       >
                         <div className="flex min-w-0 items-center gap-2">
                           <SysIcon kind={d.icon} />
                           <div className="min-w-0">
-                            <p className="text-sm font-semibold text-gray-900">{d.label}</p>
-                            <p className="text-xs text-gray-600">{d.spend}</p>
-                            <p className="text-[11px] text-gray-500">{d.spendPct}</p>
+                            <p className="text-sm font-semibold text-neutral-900">{d.label}</p>
+                            <p className="text-xs text-neutral-600">{d.spend}</p>
+                            <p className="text-[11px] text-neutral-500">{d.spendPct}</p>
                           </div>
                         </div>
                         <div className="shrink-0 text-right">
-                          <p className="text-[10px] font-medium text-gray-400">{d.small}</p>
-                          <p className="text-2xl font-bold tabular-nums text-gray-900">{d.roas}</p>
+                          <p className="text-[10px] font-medium text-neutral-400">{d.small}</p>
+                          <p className="text-2xl font-bold tabular-nums text-neutral-900">{d.roas}</p>
                         </div>
                       </div>
                     ))}
                   </div>
                 </div>
                 <div>
-                  <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">System</p>
+                  <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-neutral-500">System</p>
                   <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                     {pd.systems.map((d) => (
                       <div
                         key={d.key}
-                        className="flex items-center justify-between gap-3 rounded-lg border border-gray-100 bg-gray-50/60 px-3 py-3"
+                        className="flex items-center justify-between gap-3 rounded-lg border border-neutral-100 bg-neutral-50/60 px-3 py-3"
                       >
                         <div className="flex min-w-0 items-center gap-2">
                           <SysIcon kind={d.icon} />
                           <div className="min-w-0">
-                            <p className="text-sm font-semibold text-gray-900">{d.label}</p>
-                            <p className="text-xs text-gray-600">{d.spend}</p>
-                            <p className="text-[11px] text-gray-500">{d.spendPct}</p>
+                            <p className="text-sm font-semibold text-neutral-900">{d.label}</p>
+                            <p className="text-xs text-neutral-600">{d.spend}</p>
+                            <p className="text-[11px] text-neutral-500">{d.spendPct}</p>
                           </div>
                         </div>
                         <div className="shrink-0 text-right">
-                          <p className="text-[10px] font-medium text-gray-400">{d.small}</p>
-                          <p className="text-2xl font-bold tabular-nums text-gray-900">{d.roas}</p>
+                          <p className="text-[10px] font-medium text-neutral-400">{d.small}</p>
+                          <p className="text-2xl font-bold tabular-nums text-neutral-900">{d.roas}</p>
                         </div>
                       </div>
                     ))}
@@ -2122,9 +2122,9 @@ function AuctionTabPanel() {
               </div>
             ) : (
               <div className="overflow-x-auto">
-                <table className="w-full min-w-[480px] text-[13px] text-gray-700">
+                <table className="w-full min-w-[480px] text-[13px] text-neutral-700">
                   <thead>
-                    <tr className="border-b border-gray-100 text-left text-gray-500">
+                    <tr className="border-b border-neutral-100 text-left text-neutral-500">
                       <th className="pb-2">Placement</th>
                       <th className="pb-2">{metaH('Amount Sp...')}</th>
                       <th className="pb-2">% of spend</th>
@@ -2133,7 +2133,7 @@ function AuctionTabPanel() {
                   </thead>
                   <tbody>
                     {cfg.placementBreakdown.map((r) => (
-                      <tr key={r.placement} className="border-b border-gray-50 last:border-0">
+                      <tr key={r.placement} className="border-b border-neutral-50 last:border-0">
                         <td className="py-2 font-semibold">{r.placement}</td>
                         <td className="py-2">{r.spend}</td>
                         <td className="py-2">{r.spendPct}</td>
@@ -2150,41 +2150,41 @@ function AuctionTabPanel() {
         {/* Campaign Type & Budget */}
         <div className="overflow-hidden rounded-xl border border-[#F0F0F0] bg-white shadow-[-2px_2px_16px_rgba(14,0,45,0.06)]">
           <div className="border-b border-[#F5F5F5] px-4 py-3">
-            <h3 className="text-base font-semibold text-gray-900">Campaign Type &amp; Budget</h3>
+            <h3 className="text-base font-semibold text-neutral-900">Campaign Type &amp; Budget</h3>
           </div>
           <div className="space-y-4 p-4">
-            <div className="rounded-lg border border-gray-100 bg-gray-50/70 px-4 py-3">
-              <p className="text-sm font-semibold text-gray-900">{cfg.campaignBudget.cbo.label}</p>
-              <p className="mt-1 text-lg font-bold text-gray-900">{cfg.campaignBudget.cbo.spend}</p>
-              <p className="text-xs text-gray-500">{cfg.campaignBudget.cbo.spendPct}</p>
+            <div className="rounded-lg border border-neutral-100 bg-neutral-50/70 px-4 py-3">
+              <p className="text-sm font-semibold text-neutral-900">{cfg.campaignBudget.cbo.label}</p>
+              <p className="mt-1 text-lg font-bold text-neutral-900">{cfg.campaignBudget.cbo.spend}</p>
+              <p className="text-xs text-neutral-500">{cfg.campaignBudget.cbo.spendPct}</p>
             </div>
-            <div className="rounded-lg border border-gray-100 bg-gray-50/70 px-4 py-3">
-              <p className="text-sm font-semibold text-gray-900">{cfg.campaignBudget.abo.label}</p>
-              <p className="mt-1 text-lg font-bold text-gray-900">{cfg.campaignBudget.abo.spend}</p>
-              <p className="text-xs text-gray-500">{cfg.campaignBudget.abo.spendPct}</p>
+            <div className="rounded-lg border border-neutral-100 bg-neutral-50/70 px-4 py-3">
+              <p className="text-sm font-semibold text-neutral-900">{cfg.campaignBudget.abo.label}</p>
+              <p className="mt-1 text-lg font-bold text-neutral-900">{cfg.campaignBudget.abo.spend}</p>
+              <p className="text-xs text-neutral-500">{cfg.campaignBudget.abo.spendPct}</p>
             </div>
-            <div className="border-b border-gray-200">
+            <div className="border-b border-neutral-200">
               <div className="flex gap-4">
                 <button
                   type="button"
                   onClick={() => setCboBreakdownTab('cbo')}
                   className={`border-b-2 pb-2 text-xs font-semibold transition-all ${
-                    cboBreakdownTab === 'cbo' ? 'border-primary-500 text-primary-600' : 'border-transparent text-gray-500'
+                    cboBreakdownTab === 'cbo' ? 'border-primary-500 text-primary-600' : 'border-transparent text-neutral-500'
                   }`}
                 >
                   CBO Budget Breakdown
                 </button>
               </div>
             </div>
-            <div className="space-y-2 text-[13px] text-gray-700">
-              <div className="mb-2 flex items-center gap-2 text-xs font-semibold text-gray-500">
+            <div className="space-y-2 text-[13px] text-neutral-700">
+              <div className="mb-2 flex items-center gap-2 text-xs font-semibold text-neutral-500">
                 <span className="inline-flex h-4 w-4 items-center justify-center rounded bg-[#1877F2] text-[9px] font-bold text-white">f</span>
                 Amount
               </div>
               {cfg.campaignBudget.cboTiers.map((tier) => (
-                <div key={tier.label} className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-gray-100 px-3 py-2">
-                  <span className="font-medium text-gray-800">{tier.label}</span>
-                  <span className="text-xs text-gray-500">
+                <div key={tier.label} className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-neutral-100 px-3 py-2">
+                  <span className="font-medium text-neutral-800">{tier.label}</span>
+                  <span className="text-xs text-neutral-500">
                     {tier.campaigns} Campaigns · {tier.adSets} Ad Sets
                   </span>
                 </div>
@@ -2220,10 +2220,10 @@ function AuctionTabPanel() {
       <div className="grid grid-cols-1 gap-5 xl:grid-cols-2">
         <div className="overflow-hidden rounded-xl border border-[#F0F0F0] bg-white shadow-[-2px_2px_16px_rgba(14,0,45,0.06)]">
           <div className="border-b border-[#F5F5F5] px-4 py-3">
-            <h3 className="text-base font-semibold text-gray-900">Learning Phase</h3>
+            <h3 className="text-base font-semibold text-neutral-900">Learning Phase</h3>
           </div>
           <div className="p-4">
-            <div className="mb-3 hidden min-w-[520px] grid-cols-[1fr_5rem_4rem_4rem] gap-2 border-b border-gray-100 pb-2 text-left text-xs font-semibold text-gray-500 sm:grid">
+            <div className="mb-3 hidden min-w-[520px] grid-cols-[1fr_5rem_4rem_4rem] gap-2 border-b border-neutral-100 pb-2 text-left text-xs font-semibold text-neutral-500 sm:grid">
               <div>{sortableTh('Status')}</div>
               <div className="text-right">{metaH('Amount Sp...')}</div>
               <div className="text-right">{metaH('ROAS (All)')}</div>
@@ -2231,17 +2231,17 @@ function AuctionTabPanel() {
             </div>
             <div className="space-y-2">
               {cfg.learningPhase.map((row) => (
-                <div key={row.status} className="flex flex-wrap items-center gap-3 rounded-lg border border-gray-100 bg-gray-50 px-3 py-3">
+                <div key={row.status} className="flex flex-wrap items-center gap-3 rounded-lg border border-neutral-100 bg-neutral-50 px-3 py-3">
                   <div className="flex shrink-0 items-center justify-center">
                     {row.tone === 'outline' && <Circle className="h-5 w-5 text-success-500" strokeWidth={2} />}
                     {row.tone === 'solid' && <span className="block h-4 w-4 rounded-full bg-success-500" />}
-                    {row.tone === 'warn' && <AlertTriangle className="h-5 w-5 text-amber-500" />}
+                    {row.tone === 'warn' && <AlertTriangle className="h-5 w-5 text-warning-500" />}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm font-bold text-gray-900">{row.status}</p>
-                    <p className="text-xs text-gray-500">{row.sub}</p>
+                    <p className="text-sm font-bold text-neutral-900">{row.status}</p>
+                    <p className="text-xs text-neutral-500">{row.sub}</p>
                   </div>
-                  <div className="flex w-full gap-4 text-sm text-gray-400 sm:w-auto sm:justify-end">
+                  <div className="flex w-full gap-4 text-sm text-neutral-400 sm:w-auto sm:justify-end">
                     <span className="sm:w-20 sm:text-right">{row.spent}</span>
                     <span className="sm:w-16 sm:text-right">{row.roas}</span>
                     <span className="sm:w-16 sm:text-right">{row.reg}</span>
@@ -2254,15 +2254,15 @@ function AuctionTabPanel() {
 
         <div className="overflow-hidden rounded-xl border border-[#F0F0F0] bg-white shadow-[-2px_2px_16px_rgba(14,0,45,0.06)]">
           <div className="border-b border-[#F5F5F5] px-4 py-3">
-            <h3 className="text-base font-semibold text-gray-900">Automatic Bid vs Manual Bid</h3>
+            <h3 className="text-base font-semibold text-neutral-900">Automatic Bid vs Manual Bid</h3>
           </div>
           <div className="p-4">
-            <div className="mb-4 rounded-lg border border-gray-100 bg-gray-50 px-4 py-3">
-              <p className="text-sm font-semibold text-gray-900">{cfg.automaticBid.summary.label}</p>
-              <p className="mt-1 text-lg font-bold text-gray-900">{cfg.automaticBid.summary.spend}</p>
-              <p className="text-xs text-gray-500">{cfg.automaticBid.summary.spendPct}</p>
+            <div className="mb-4 rounded-lg border border-neutral-100 bg-neutral-50 px-4 py-3">
+              <p className="text-sm font-semibold text-neutral-900">{cfg.automaticBid.summary.label}</p>
+              <p className="mt-1 text-lg font-bold text-neutral-900">{cfg.automaticBid.summary.spend}</p>
+              <p className="text-xs text-neutral-500">{cfg.automaticBid.summary.spendPct}</p>
             </div>
-            <div className="border-b border-gray-200">
+            <div className="border-b border-neutral-200">
               <div className="flex gap-6">
                 {[
                   { id: 'all', label: 'All Bids' },
@@ -2273,7 +2273,7 @@ function AuctionTabPanel() {
                     type="button"
                     onClick={() => setBidTab(t.id)}
                     className={`border-b-2 pb-2 text-xs font-semibold transition-all ${
-                      bidTab === t.id ? 'border-primary-500 text-primary-600' : 'border-transparent text-gray-500'
+                      bidTab === t.id ? 'border-primary-500 text-primary-600' : 'border-transparent text-neutral-500'
                     }`}
                   >
                     {t.label}
@@ -2282,23 +2282,23 @@ function AuctionTabPanel() {
               </div>
             </div>
             <div className="mt-4 overflow-x-auto">
-              <table className="w-full min-w-[320px] text-[13px] text-gray-700">
+              <table className="w-full min-w-[320px] text-[13px] text-neutral-700">
                 <thead>
-                  <tr className="border-b border-gray-100 text-left text-gray-500">
+                  <tr className="border-b border-neutral-100 text-left text-neutral-500">
                     <th className="pb-2">Bid Type</th>
                     <th className="pb-2">{metaH('Amount Sp...')}</th>
                   </tr>
                 </thead>
                 <tbody>
                   {(bidTab === 'all' ? cfg.automaticBid.bidRows : []).map((r) => (
-                    <tr key={r.type} className="border-b border-gray-50 last:border-0">
+                    <tr key={r.type} className="border-b border-neutral-50 last:border-0">
                       <td className="py-2 font-medium">{r.type}</td>
                       <td className="py-2 font-semibold">{r.spent}</td>
                     </tr>
                   ))}
                   {bidTab === 'manual' && (
                     <tr>
-                      <td colSpan={2} className="py-6 text-center text-sm text-gray-500">
+                      <td colSpan={2} className="py-6 text-center text-sm text-neutral-500">
                         No manual bid rows in this period
                       </td>
                     </tr>
@@ -2313,14 +2313,14 @@ function AuctionTabPanel() {
       <div className="grid grid-cols-1 gap-5 xl:grid-cols-2">
         <div className="overflow-hidden rounded-xl border border-[#F0F0F0] bg-white shadow-[-2px_2px_16px_rgba(14,0,45,0.06)]">
           <div className="border-b border-[#F5F5F5] px-4 py-3">
-            <h3 className="text-base font-semibold text-gray-900">
-              Quality Ranking Rate <Info className="ml-0.5 inline h-3.5 w-3.5 text-gray-400" />
+            <h3 className="text-base font-semibold text-neutral-900">
+              Quality Ranking Rate <Info className="ml-0.5 inline h-3.5 w-3.5 text-neutral-400" />
             </h3>
           </div>
           <div className="overflow-x-auto p-0">
             <table className="w-full min-w-[560px] text-[13px]">
               <thead>
-                <tr className="border-b border-gray-100 bg-gray-50/80 text-left text-xs font-semibold text-gray-500">
+                <tr className="border-b border-neutral-100 bg-neutral-50/80 text-left text-xs font-semibold text-neutral-500">
                   <th className="px-4 py-2">{sortableTh('Status')}</th>
                   <th className="px-4 py-2">{metaH('Amount S...')}</th>
                   <th className="px-4 py-2">{metaH('ROAS (All)')}</th>
@@ -2329,14 +2329,14 @@ function AuctionTabPanel() {
               </thead>
               <tbody>
                 {cfg.qualityRanking.map((row, i) => (
-                  <tr key={row.status} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}>
+                  <tr key={row.status} className={i % 2 === 0 ? 'bg-white' : 'bg-neutral-50/50'}>
                     <td className="px-4 py-2.5">
-                      <span className="font-semibold text-gray-900">{row.status}</span>
-                      <span className="ml-2 text-xs text-gray-500">{row.ads}</span>
+                      <span className="font-semibold text-neutral-900">{row.status}</span>
+                      <span className="ml-2 text-xs text-neutral-500">{row.ads}</span>
                     </td>
-                    <td className="px-4 py-2.5 text-gray-400">{row.spent}</td>
-                    <td className="px-4 py-2.5 text-gray-400">{row.roas}</td>
-                    <td className="px-4 py-2.5 text-gray-400">{row.reg}</td>
+                    <td className="px-4 py-2.5 text-neutral-400">{row.spent}</td>
+                    <td className="px-4 py-2.5 text-neutral-400">{row.roas}</td>
+                    <td className="px-4 py-2.5 text-neutral-400">{row.reg}</td>
                   </tr>
                 ))}
               </tbody>
@@ -2346,30 +2346,30 @@ function AuctionTabPanel() {
 
         <div className="overflow-hidden rounded-xl border border-[#F0F0F0] bg-white shadow-[-2px_2px_16px_rgba(14,0,45,0.06)]">
           <div className="border-b border-[#F5F5F5] px-4 py-3">
-            <h3 className="text-base font-semibold text-gray-900">Ad Type</h3>
+            <h3 className="text-base font-semibold text-neutral-900">Ad Type</h3>
           </div>
           <div className="overflow-x-auto p-4">
             <table className="w-full min-w-[320px] text-[13px]">
               <thead>
-                <tr className="border-b border-gray-100 text-left text-gray-500">
+                <tr className="border-b border-neutral-100 text-left text-neutral-500">
                   <th className="pb-2">{sortableTh('Type')}</th>
                   <th className="pb-2">{metaH('A...')}</th>
                 </tr>
               </thead>
-              <tbody className="text-gray-800">
+              <tbody className="text-neutral-800">
                 {cfg.adTypes.map((row) => (
-                  <tr key={row.key} className="border-b border-gray-50 last:border-0">
+                  <tr key={row.key} className="border-b border-neutral-50 last:border-0">
                     <td className="py-3">
                       <div className="flex items-center gap-2">
-                        {row.key === 'normal' && <LayoutTemplate className="h-4 w-4 text-gray-500" />}
-                        {row.key === 'dco' && <Layers2 className="h-4 w-4 text-gray-500" />}
-                        {row.key === 'mto' && <Type className="h-4 w-4 text-gray-500" />}
-                        {row.key === 'dpa' && <ShoppingBag className="h-4 w-4 text-gray-500" />}
+                        {row.key === 'normal' && <LayoutTemplate className="h-4 w-4 text-neutral-500" />}
+                        {row.key === 'dco' && <Layers2 className="h-4 w-4 text-neutral-500" />}
+                        {row.key === 'mto' && <Type className="h-4 w-4 text-neutral-500" />}
+                        {row.key === 'dpa' && <ShoppingBag className="h-4 w-4 text-neutral-500" />}
                         <span className="font-medium">{row.label}</span>
-                        {row.info && <Info className="h-3.5 w-3.5 text-gray-400" />}
+                        {row.info && <Info className="h-3.5 w-3.5 text-neutral-400" />}
                       </div>
                     </td>
-                    <td className="py-3 text-gray-500">{row.ads}</td>
+                    <td className="py-3 text-neutral-500">{row.ads}</td>
                   </tr>
                 ))}
               </tbody>
@@ -2381,25 +2381,25 @@ function AuctionTabPanel() {
       {/* Hour × Day heatmap */}
       <div className="overflow-hidden rounded-xl border border-[#F0F0F0] bg-white shadow-[-2px_2px_16px_rgba(14,0,45,0.06)]">
         <div className="border-b border-[#F5F5F5] px-4 py-3">
-          <h3 className="text-base font-semibold text-gray-900">Performance by hour &amp; day</h3>
+          <h3 className="text-base font-semibold text-neutral-900">Performance by hour &amp; day</h3>
         </div>
         <div className="overflow-x-auto p-4">
           <div className="min-w-[720px]">
             <div className="mb-1 grid gap-0.5" style={{ gridTemplateColumns: '48px repeat(24, minmax(0, 1fr))' }}>
               <div />
               {cfg.heatmapHours.map((h) => (
-                <div key={h} className="text-center text-[9px] font-medium text-gray-400">
+                <div key={h} className="text-center text-[9px] font-medium text-neutral-400">
                   {h}
                 </div>
               ))}
             </div>
             {cfg.heatmapDays.map((day) => (
               <div key={day} className="mb-0.5 grid gap-0.5" style={{ gridTemplateColumns: '48px repeat(24, minmax(0, 1fr))' }}>
-                <div className="flex items-center text-xs font-semibold text-gray-600">{day}</div>
+                <div className="flex items-center text-xs font-semibold text-neutral-600">{day}</div>
                 {cfg.heatmapHours.map((h) => (
                   <div
                     key={`${day}-${h}`}
-                    className="h-4 rounded-sm bg-gray-100"
+                    className="h-4 rounded-sm bg-neutral-100"
                     title={`${day} ${h}:00`}
                   />
                 ))}
@@ -2412,19 +2412,19 @@ function AuctionTabPanel() {
       {/* Frequency Breakdown */}
       <div className="overflow-hidden rounded-xl border border-[#F0F0F0] bg-white shadow-[-2px_2px_16px_rgba(14,0,45,0.06)]">
         <div className="border-b border-[#F5F5F5] px-4 py-3">
-          <h3 className="text-base font-semibold text-gray-900">
-            Frequency Breakdown <HelpCircle className="ml-0.5 inline h-3.5 w-3.5 text-gray-400" />
+          <h3 className="text-base font-semibold text-neutral-900">
+            Frequency Breakdown <HelpCircle className="ml-0.5 inline h-3.5 w-3.5 text-neutral-400" />
           </h3>
         </div>
         <div className="overflow-x-auto p-4">
           <table className="w-full min-w-[640px] border-separate border-spacing-2 text-[13px]">
             <thead>
               <tr>
-                <th className="w-48 rounded-lg bg-gray-100 px-3 py-2 text-left text-xs font-semibold text-gray-600">
+                <th className="w-48 rounded-lg bg-neutral-100 px-3 py-2 text-left text-xs font-semibold text-neutral-600">
                   Number of times people have seen your ads
                 </th>
                 {cfg.frequencyColumns.map((c) => (
-                  <th key={c.key} className="rounded-lg bg-gray-100 px-2 py-2 text-center text-xs font-semibold text-gray-600">
+                  <th key={c.key} className="rounded-lg bg-neutral-100 px-2 py-2 text-center text-xs font-semibold text-neutral-600">
                     {c.label}
                   </th>
                 ))}
@@ -2432,9 +2432,9 @@ function AuctionTabPanel() {
             </thead>
             <tbody>
               <tr>
-                <td className="rounded-lg border border-gray-100 bg-white px-3 py-2 font-semibold text-gray-900">Reach</td>
+                <td className="rounded-lg border border-neutral-100 bg-white px-3 py-2 font-semibold text-neutral-900">Reach</td>
                 {cfg.frequencyReach.map((v, i) => (
-                  <td key={i} className="rounded-lg border border-gray-100 bg-white px-2 py-2 text-center font-semibold text-gray-800">
+                  <td key={i} className="rounded-lg border border-neutral-100 bg-white px-2 py-2 text-center font-semibold text-neutral-800">
                     {v}
                   </td>
                 ))}
@@ -2466,21 +2466,21 @@ function AdCopyTabPanel() {
   const metaMetricBtn = (label, value) => (
     <button
       type="button"
-      className="flex w-full items-center justify-between rounded-md border border-gray-100 bg-gray-50/80 px-2 py-1.5 text-left text-[11px] font-medium text-gray-700 transition-colors hover:bg-gray-100"
+      className="flex w-full items-center justify-between rounded-md border border-neutral-100 bg-neutral-50/80 px-2 py-1.5 text-left text-[11px] font-medium text-neutral-700 transition-colors hover:bg-neutral-100"
     >
-      <span className="inline-flex items-center gap-1 text-gray-600">
+      <span className="inline-flex items-center gap-1 text-neutral-600">
         <span className="inline-flex h-3.5 w-3.5 items-center justify-center rounded bg-[#1877F2] text-[7px] font-bold text-white">f</span>
         {label}
-        <ChevronDown className="h-3 w-3 text-gray-400" aria-hidden />
+        <ChevronDown className="h-3 w-3 text-neutral-400" aria-hidden />
       </span>
-      <span className="font-semibold tabular-nums text-gray-900">{value}</span>
+      <span className="font-semibold tabular-nums text-neutral-900">{value}</span>
     </button>
   )
 
   const sortTh = (label) => (
     <span className="inline-flex items-center gap-1">
       {label}
-      <ArrowUpDown className="h-3 w-3 text-gray-400" aria-hidden />
+      <ArrowUpDown className="h-3 w-3 text-neutral-400" aria-hidden />
     </span>
   )
 
@@ -2514,9 +2514,9 @@ function AdCopyTabPanel() {
             <input
               type="search"
               placeholder="Load filter preset"
-              className="h-10 w-[200px] rounded-lg border border-gray-300 bg-white px-3 text-sm placeholder:text-gray-400"
+              className="h-10 w-[200px] rounded-lg border border-neutral-300 bg-white px-3 text-sm placeholder:text-neutral-400"
             />
-            <button type="button" disabled className="h-10 rounded-lg border border-gray-200 bg-gray-100 px-4 text-sm font-semibold text-gray-400">
+            <button type="button" disabled className="h-10 rounded-lg border border-neutral-200 bg-neutral-100 px-4 text-sm font-semibold text-neutral-400">
               Save this view
             </button>
           </div>
@@ -2526,7 +2526,7 @@ function AdCopyTabPanel() {
             <button
               key={label}
               type="button"
-              className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-xs font-semibold text-gray-700 shadow-sm hover:border-gray-400"
+              className="rounded-lg border border-neutral-300 bg-white px-3 py-2 text-xs font-semibold text-neutral-700 shadow-sm hover:border-neutral-400"
             >
               {label}
             </button>
@@ -2542,16 +2542,16 @@ function AdCopyTabPanel() {
             className="flex min-h-[200px] flex-col rounded-xl border border-[#F0F0F0] bg-white p-3 shadow-[-2px_2px_16px_rgba(14,0,45,0.06)]"
           >
             <div className="mb-2 flex items-start gap-2">
-              <Type className="mt-0.5 h-5 w-5 shrink-0 text-gray-500" aria-hidden />
-              <h4 className="text-base font-semibold text-gray-900">
+              <Type className="mt-0.5 h-5 w-5 shrink-0 text-neutral-500" aria-hidden />
+              <h4 className="text-base font-semibold text-neutral-900">
                 {c.title}{' '}
-                <span className="text-xs font-normal text-gray-400">({c.count})</span>
+                <span className="text-xs font-normal text-neutral-400">({c.count})</span>
               </h4>
             </div>
             {c.empty ? (
-              <div className="flex flex-1 flex-col justify-center rounded-lg border border-dashed border-amber-200 bg-amber-50/40 px-3 py-4 text-center">
-                <p className="text-sm font-semibold text-amber-900">Limited data</p>
-                <p className="mt-1 text-[11px] leading-snug text-amber-800/90">{c.hint}</p>
+              <div className="flex flex-1 flex-col justify-center rounded-lg border border-dashed border-warning-200 bg-warning-50/40 px-3 py-4 text-center">
+                <p className="text-sm font-semibold text-warning-900">Limited data</p>
+                <p className="mt-1 text-[11px] leading-snug text-warning-800/90">{c.hint}</p>
               </div>
             ) : (
               <>
@@ -2563,7 +2563,7 @@ function AdCopyTabPanel() {
                   {metaMetricBtn('Outbound CTR', c.outboundCtr)}
                 </div>
                 <div className="mt-3 space-y-1.5">
-                  <div className="flex h-2 w-full overflow-hidden rounded-full bg-gray-100">
+                  <div className="flex h-2 w-full overflow-hidden rounded-full bg-neutral-100">
                     <div
                       className="bg-success-500 transition-all"
                       style={{
@@ -2571,13 +2571,13 @@ function AdCopyTabPanel() {
                       }}
                     />
                     <div
-                      className="bg-gray-400 transition-all"
+                      className="bg-neutral-400 transition-all"
                       style={{
                         width: `${(c.spendPct / Math.max(0.01, c.revenuePct + c.spendPct)) * 100}%`
                       }}
                     />
                   </div>
-                  <div className="flex justify-between text-[10px] font-semibold text-gray-600">
+                  <div className="flex justify-between text-[10px] font-semibold text-neutral-600">
                     <span className="text-success-600">{c.revenuePct}% Revenue</span>
                     <span>{c.spendPct}% Spend</span>
                   </div>
@@ -2591,29 +2591,29 @@ function AdCopyTabPanel() {
       {/* Graded by + spend + Smart Filter + All pieces of copy */}
       <div className="flex flex-col gap-3 rounded-xl border border-[#F0F0F0] bg-white px-4 py-3 shadow-[-2px_2px_16px_rgba(14,0,45,0.06)] lg:flex-row lg:flex-wrap lg:items-center lg:justify-between">
         <div className="flex flex-wrap items-center gap-3">
-          <span className="text-xs font-semibold text-gray-600">Graded by:</span>
+          <span className="text-xs font-semibold text-neutral-600">Graded by:</span>
           <button
             type="button"
-            className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-800 shadow-sm"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-neutral-200 bg-white px-3 py-1.5 text-xs font-semibold text-neutral-800 shadow-sm"
           >
             <span className="inline-flex h-4 w-4 items-center justify-center rounded bg-[#1877F2] text-[8px] font-bold text-white">f</span>
             Revenue
-            <ChevronDown className="h-3.5 w-3.5 text-gray-400" aria-hidden />
+            <ChevronDown className="h-3.5 w-3.5 text-neutral-400" aria-hidden />
           </button>
-          <label className="inline-flex items-center gap-1.5 text-xs font-medium text-gray-600">
+          <label className="inline-flex items-center gap-1.5 text-xs font-medium text-neutral-600">
             <span className="whitespace-nowrap">Min. Spend:</span>
             <input
               type="number"
               defaultValue={cfg.minSpendDefault}
-              className="h-9 w-20 rounded-lg border border-gray-300 px-2 text-xs font-semibold tabular-nums"
+              className="h-9 w-20 rounded-lg border border-neutral-300 px-2 text-xs font-semibold tabular-nums"
             />
           </label>
-          <label className="inline-flex items-center gap-1.5 text-xs font-medium text-gray-600">
+          <label className="inline-flex items-center gap-1.5 text-xs font-medium text-neutral-600">
             <span className="whitespace-nowrap">Max. Spend:</span>
             <input
               type="number"
               defaultValue={cfg.maxSpendDefault}
-              className="h-9 w-20 rounded-lg border border-gray-300 px-2 text-xs font-semibold tabular-nums"
+              className="h-9 w-20 rounded-lg border border-neutral-300 px-2 text-xs font-semibold tabular-nums"
             />
           </label>
         </div>
@@ -2635,7 +2635,7 @@ function AdCopyTabPanel() {
       </div>
 
       <div className="flex flex-wrap items-center justify-end gap-2">
-        <button type="button" disabled className="rounded-lg border border-gray-200 bg-gray-100 px-4 py-2 text-xs font-semibold text-gray-400">
+        <button type="button" disabled className="rounded-lg border border-neutral-200 bg-neutral-100 px-4 py-2 text-xs font-semibold text-neutral-400">
           Open selected in Ads Launcher
         </button>
       </div>
@@ -2643,8 +2643,8 @@ function AdCopyTabPanel() {
       {/* Assets chart — quadrants */}
       <div className="overflow-hidden rounded-xl border border-[#F0F0F0] bg-white shadow-[-2px_2px_16px_rgba(14,0,45,0.06)]">
         <div className="border-b border-[#F5F5F5] px-4 py-3">
-          <h3 className="text-base font-semibold text-gray-900">Assets chart</h3>
-          <p className="text-xs text-gray-500">Revenue vs amount spent — scalable (top left), core performers (top right), getting started (bottom left), overspend (bottom right)</p>
+          <h3 className="text-base font-semibold text-neutral-900">Assets chart</h3>
+          <p className="text-xs text-neutral-500">Revenue vs amount spent — scalable (top left), core performers (top right), getting started (bottom left), overspend (bottom right)</p>
         </div>
         <div className="relative p-4">
           <div className="pointer-events-none absolute left-[18%] top-[22%] z-10 text-[9px] font-bold uppercase leading-tight text-success-600">
@@ -2653,7 +2653,7 @@ function AdCopyTabPanel() {
           <div className="pointer-events-none absolute right-[14%] top-[22%] z-10 text-[9px] font-bold uppercase leading-tight text-teal-600">
             Core performers
           </div>
-          <div className="pointer-events-none absolute bottom-[28%] left-[16%] z-10 text-[9px] font-bold uppercase leading-tight text-gray-500">
+          <div className="pointer-events-none absolute bottom-[28%] left-[16%] z-10 text-[9px] font-bold uppercase leading-tight text-neutral-500">
             Getting started
           </div>
           <div className="pointer-events-none absolute bottom-[28%] right-[12%] z-10 text-[9px] font-bold uppercase leading-tight text-pink-500">
@@ -2686,12 +2686,12 @@ function AdCopyTabPanel() {
                     const p = payload[0]?.payload
                     if (!p) return null
                     return (
-                      <div className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs shadow-md">
-                        <p className="font-semibold text-gray-900">{p.label}</p>
-                        <p className="mt-1 text-gray-600">
+                      <div className="rounded-lg border border-neutral-200 bg-white px-3 py-2 text-xs shadow-md">
+                        <p className="font-semibold text-neutral-900">{p.label}</p>
+                        <p className="mt-1 text-neutral-600">
                           Amount spent: <span className="font-semibold tabular-nums">US${p.spend}</span>
                         </p>
-                        <p className="text-gray-600">
+                        <p className="text-neutral-600">
                           Revenue: <span className="font-semibold tabular-nums">US${p.revenue}</span>
                         </p>
                       </div>
@@ -2721,14 +2721,14 @@ function AdCopyTabPanel() {
       {/* Copy assets strip */}
       <div className="overflow-hidden rounded-xl border border-[#F0F0F0] bg-white shadow-[-2px_2px_16px_rgba(14,0,45,0.06)]">
         <div className="flex flex-col gap-2 border-b border-[#F5F5F5] px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
-          <h5 className="text-sm font-semibold text-gray-900">Copy assets ({cfg.copyAssetsTotal})</h5>
+          <h5 className="text-sm font-semibold text-neutral-900">Copy assets ({cfg.copyAssetsTotal})</h5>
           <div className="flex flex-wrap items-center gap-3">
-            <label className="inline-flex items-center gap-2 text-xs font-medium text-gray-600">
+            <label className="inline-flex items-center gap-2 text-xs font-medium text-neutral-600">
               Sort by:
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="rounded-lg border border-gray-300 bg-white px-2 py-1.5 text-xs font-semibold text-gray-800"
+                className="rounded-lg border border-neutral-300 bg-white px-2 py-1.5 text-xs font-semibold text-neutral-800"
               >
                 <option>Revenue (high first)</option>
                 <option>Revenue (low first)</option>
@@ -2737,7 +2737,7 @@ function AdCopyTabPanel() {
                 <option>Order of creation</option>
               </select>
             </label>
-            <span className="text-xs font-semibold text-gray-500">{selectedCount} selected</span>
+            <span className="text-xs font-semibold text-neutral-500">{selectedCount} selected</span>
           </div>
         </div>
         <div className="overflow-x-auto p-4 pb-2">
@@ -2750,20 +2750,20 @@ function AdCopyTabPanel() {
                   type="button"
                   onClick={() => toggleSel(row.rank)}
                   className={`relative w-[200px] shrink-0 rounded-lg border bg-white p-3 text-left shadow-sm transition-all ${
-                    sel ? 'border-primary-500 ring-2 ring-primary-100' : 'border-gray-200 hover:border-gray-300'
+                    sel ? 'border-primary-500 ring-2 ring-primary-100' : 'border-neutral-200 hover:border-neutral-300'
                   }`}
                 >
                   <span className="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-primary-500 text-[11px] font-bold text-white shadow">
                     {row.rank}
                   </span>
-                  <p className="line-clamp-3 pr-8 text-[11px] font-medium leading-snug text-gray-800">{row.preview}</p>
+                  <p className="line-clamp-3 pr-8 text-[11px] font-medium leading-snug text-neutral-800">{row.preview}</p>
                   <div className="mt-2 flex justify-between text-[11px] font-bold tabular-nums">
                     <span className="text-pink-500">{row.revPct}%</span>
                     <span className="text-teal-600">{row.spendPct}%</span>
                   </div>
-                  <p className="mt-1 text-[10px] text-gray-500">Used in {row.ads}</p>
+                  <p className="mt-1 text-[10px] text-neutral-500">Used in {row.ads}</p>
                   <span className="mt-2 inline-block text-[11px] font-semibold text-primary-600">View breakdown</span>
-                  <Search className="absolute bottom-3 right-3 h-3.5 w-3.5 text-gray-400" aria-hidden />
+                  <Search className="absolute bottom-3 right-3 h-3.5 w-3.5 text-neutral-400" aria-hidden />
                 </button>
               )
             })}
@@ -2774,7 +2774,7 @@ function AdCopyTabPanel() {
       {/* All pieces of copy — table */}
       <div className="overflow-hidden rounded-xl border border-[#F0F0F0] bg-white shadow-[-2px_2px_16px_rgba(14,0,45,0.06)]">
         <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#F5F5F5] px-4 py-3">
-          <h3 className="text-base font-semibold text-gray-900">All pieces of copy</h3>
+          <h3 className="text-base font-semibold text-neutral-900">All pieces of copy</h3>
           <div className="flex items-center gap-2">
             <button
               type="button"
@@ -2787,9 +2787,9 @@ function AdCopyTabPanel() {
         </div>
         {allCopyOpen && (
           <div className="overflow-x-auto p-4">
-            <table className="w-full min-w-[720px] text-[13px] text-gray-700">
+            <table className="w-full min-w-[720px] text-[13px] text-neutral-700">
               <thead>
-                <tr className="border-b border-gray-100 text-left text-gray-500">
+                <tr className="border-b border-neutral-100 text-left text-neutral-500">
                   <th className="pb-2 pr-4">{sortTh('Copy snippet')}</th>
                   <th className="pb-2">{sortTh('ROAS (All)')}</th>
                   <th className="pb-2">{sortTh('Amount Spent')}</th>
@@ -2799,14 +2799,14 @@ function AdCopyTabPanel() {
               </thead>
               <tbody>
                 {cfg.allCopyTable.map((r) => (
-                  <tr key={r.snippet} className="border-b border-gray-50 last:border-0">
-                    <td className="max-w-[280px] py-2.5 font-semibold text-gray-900">
+                  <tr key={r.snippet} className="border-b border-neutral-50 last:border-0">
+                    <td className="max-w-[280px] py-2.5 font-semibold text-neutral-900">
                       <span className="line-clamp-2">{r.snippet}</span>
                     </td>
                     <td className="py-2.5 font-medium tabular-nums">{r.roas}</td>
                     <td className="py-2.5 tabular-nums">{r.spent}</td>
                     <td className="py-2.5 tabular-nums">{r.revenue}</td>
-                    <td className="py-2.5 text-gray-600">{r.usage}</td>
+                    <td className="py-2.5 text-neutral-600">{r.usage}</td>
                   </tr>
                 ))}
               </tbody>
@@ -2819,13 +2819,13 @@ function AdCopyTabPanel() {
       <div className="grid grid-cols-1 gap-5 xl:grid-cols-2">
         <div className="overflow-hidden rounded-xl border border-[#F0F0F0] bg-white shadow-[-2px_2px_16px_rgba(14,0,45,0.06)]">
           <div className="flex items-center gap-2 border-b border-[#F5F5F5] px-4 py-3">
-            <Smile className="h-4 w-4 text-gray-500" aria-hidden />
-            <h3 className="text-base font-semibold text-gray-900">Emoji performance</h3>
+            <Smile className="h-4 w-4 text-neutral-500" aria-hidden />
+            <h3 className="text-base font-semibold text-neutral-900">Emoji performance</h3>
           </div>
           <div className="p-4">
-            <table className="w-full text-[13px] text-gray-700">
+            <table className="w-full text-[13px] text-neutral-700">
               <thead>
-                <tr className="border-b border-gray-100 text-left text-gray-500">
+                <tr className="border-b border-neutral-100 text-left text-neutral-500">
                   <th className="pb-2">Emoji</th>
                   <th className="pb-2">Revenue / Spend</th>
                   <th className="pb-2 text-right">Ads</th>
@@ -2833,19 +2833,19 @@ function AdCopyTabPanel() {
               </thead>
               <tbody>
                 {cfg.emojiRows.map((r) => (
-                  <tr key={r.label} className="border-b border-gray-50 last:border-0">
+                  <tr key={r.label} className="border-b border-neutral-50 last:border-0">
                     <td className="py-2.5">
                       <span className="text-lg" aria-hidden>
                         {r.emoji}
                       </span>{' '}
-                      <span className="font-semibold text-gray-900">{r.label}</span>
+                      <span className="font-semibold text-neutral-900">{r.label}</span>
                     </td>
                     <td className="py-2.5">
-                      <div className="flex h-2 max-w-[200px] overflow-hidden rounded bg-gray-200">
+                      <div className="flex h-2 max-w-[200px] overflow-hidden rounded bg-neutral-200">
                         <div className="bg-success-500" style={{ width: `${Math.min(100, r.revenuePct)}%` }} />
-                        <div className="bg-gray-400" style={{ width: `${Math.min(100, r.spendPct)}%` }} />
+                        <div className="bg-neutral-400" style={{ width: `${Math.min(100, r.spendPct)}%` }} />
                       </div>
-                      <p className="mt-1 text-[11px] text-gray-500">
+                      <p className="mt-1 text-[11px] text-neutral-500">
                         {r.revenuePct}% rev · {r.spendPct}% spend
                       </p>
                     </td>
@@ -2858,13 +2858,13 @@ function AdCopyTabPanel() {
         </div>
         <div className="overflow-hidden rounded-xl border border-[#F0F0F0] bg-white shadow-[-2px_2px_16px_rgba(14,0,45,0.06)]">
           <div className="flex items-center gap-2 border-b border-[#F5F5F5] px-4 py-3">
-            <Link2 className="h-4 w-4 text-gray-500" aria-hidden />
-            <h3 className="text-base font-semibold text-gray-900">Link performance</h3>
+            <Link2 className="h-4 w-4 text-neutral-500" aria-hidden />
+            <h3 className="text-base font-semibold text-neutral-900">Link performance</h3>
           </div>
           <div className="p-4">
-            <table className="w-full text-[13px] text-gray-700">
+            <table className="w-full text-[13px] text-neutral-700">
               <thead>
-                <tr className="border-b border-gray-100 text-left text-gray-500">
+                <tr className="border-b border-neutral-100 text-left text-neutral-500">
                   <th className="pb-2">Primary text</th>
                   <th className="pb-2">Share</th>
                   <th className="pb-2 text-right">Note</th>
@@ -2872,18 +2872,18 @@ function AdCopyTabPanel() {
               </thead>
               <tbody>
                 {cfg.linkRows.map((r) => (
-                  <tr key={r.label} className="border-b border-gray-50 last:border-0">
-                    <td className="py-2.5 font-semibold text-gray-900">{r.label}</td>
+                  <tr key={r.label} className="border-b border-neutral-50 last:border-0">
+                    <td className="py-2.5 font-semibold text-neutral-900">{r.label}</td>
                     <td className="py-2.5">
-                      <div className="flex h-2 max-w-[220px] overflow-hidden rounded bg-gray-200">
+                      <div className="flex h-2 max-w-[220px] overflow-hidden rounded bg-neutral-200">
                         <div className="bg-primary-500/80" style={{ width: `${Math.min(100, r.revenuePct)}%` }} />
-                        <div className="bg-gray-400" style={{ width: `${Math.min(100, r.spendPct)}%` }} />
+                        <div className="bg-neutral-400" style={{ width: `${Math.min(100, r.spendPct)}%` }} />
                       </div>
-                      <p className="mt-1 text-[11px] text-gray-500">
+                      <p className="mt-1 text-[11px] text-neutral-500">
                         {r.revenuePct}% rev · {r.spendPct}% spend
                       </p>
                     </td>
-                    <td className="py-2.5 text-right text-gray-500">{r.note}</td>
+                    <td className="py-2.5 text-right text-neutral-500">{r.note}</td>
                   </tr>
                 ))}
               </tbody>
@@ -2895,15 +2895,15 @@ function AdCopyTabPanel() {
       {/* Top phrases */}
       <div className="overflow-hidden rounded-xl border border-[#F0F0F0] bg-white shadow-[-2px_2px_16px_rgba(14,0,45,0.06)]">
         <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#F5F5F5] px-4 py-3">
-          <h3 className="text-base font-semibold text-gray-900">Top phrases</h3>
+          <h3 className="text-base font-semibold text-neutral-900">Top phrases</h3>
           <button type="button" className="text-xs font-semibold text-primary-600 hover:text-primary-700">
             See All Tags
           </button>
         </div>
         <div className="overflow-x-auto p-4">
-          <table className="w-full min-w-[560px] text-[13px] text-gray-700">
+          <table className="w-full min-w-[560px] text-[13px] text-neutral-700">
             <thead>
-              <tr className="border-b border-gray-100 text-left text-gray-500">
+              <tr className="border-b border-neutral-100 text-left text-neutral-500">
                 <th className="pb-2">{sortTh('Phrase')}</th>
                 <th className="pb-2">{sortTh('ROAS (All)')}</th>
                 <th className="pb-2">Revenue / Spend mix</th>
@@ -2911,15 +2911,15 @@ function AdCopyTabPanel() {
             </thead>
             <tbody>
               {cfg.topPhrases.map((r) => (
-                <tr key={r.phrase} className="border-b border-gray-50 last:border-0">
-                  <td className="py-2.5 font-semibold text-gray-900">&ldquo;{r.phrase}&rdquo;</td>
+                <tr key={r.phrase} className="border-b border-neutral-50 last:border-0">
+                  <td className="py-2.5 font-semibold text-neutral-900">&ldquo;{r.phrase}&rdquo;</td>
                   <td className="py-2.5 font-medium tabular-nums">{r.roas}</td>
                   <td className="py-2.5">
-                    <div className="flex h-2 max-w-[240px] overflow-hidden rounded bg-gray-200">
+                    <div className="flex h-2 max-w-[240px] overflow-hidden rounded bg-neutral-200">
                       <div className="bg-success-500" style={{ width: `${Math.min(100, r.revenuePct)}%` }} />
-                      <div className="bg-gray-400" style={{ width: `${Math.min(100, r.spendPct)}%` }} />
+                      <div className="bg-neutral-400" style={{ width: `${Math.min(100, r.spendPct)}%` }} />
                     </div>
-                    <p className="mt-1 text-[11px] text-gray-500">
+                    <p className="mt-1 text-[11px] text-neutral-500">
                       {r.revenuePct}% revenue · {r.spendPct}% spend
                     </p>
                   </td>
@@ -2933,19 +2933,19 @@ function AdCopyTabPanel() {
       {/* Copy performance trends */}
       <div className="overflow-hidden rounded-xl border border-[#F0F0F0] bg-white shadow-[-2px_2px_16px_rgba(14,0,45,0.06)]">
         <div className="flex items-center justify-between border-b border-[#F5F5F5] px-4 py-3">
-          <h3 className="text-base font-semibold text-gray-900">Ad copy performance trends</h3>
-          <label className="inline-flex cursor-pointer items-center gap-2 text-xs font-semibold text-gray-700">
+          <h3 className="text-base font-semibold text-neutral-900">Ad copy performance trends</h3>
+          <label className="inline-flex cursor-pointer items-center gap-2 text-xs font-semibold text-neutral-700">
             <input
               type="checkbox"
               checked={trendsOpen}
               onChange={() => setTrendsOpen((v) => !v)}
-              className="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+              className="h-4 w-4 rounded border-neutral-300 text-primary-600 focus:ring-primary-500"
             />
           </label>
         </div>
         {trendsOpen && (
           <div className="grid grid-cols-1 gap-4 p-4 lg:grid-cols-[1fr_190px]">
-            <div className="h-64 rounded-lg border border-gray-100 p-3">
+            <div className="h-64 rounded-lg border border-neutral-100 p-3">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={cfg.trendData}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#eef0f4" />
@@ -2958,15 +2958,15 @@ function AdCopyTabPanel() {
               </ResponsiveContainer>
             </div>
             <div>
-              <p className="mb-2 text-xs font-semibold text-gray-500">Compare copy assets</p>
-              <div className="max-h-56 space-y-2 overflow-y-auto text-sm text-gray-700">
+              <p className="mb-2 text-xs font-semibold text-neutral-500">Compare copy assets</p>
+              <div className="max-h-56 space-y-2 overflow-y-auto text-sm text-neutral-700">
                 {cfg.trendPick.map((name) => (
-                  <label key={name} className="flex cursor-pointer items-center justify-between rounded-md border border-gray-100 px-2 py-1.5 hover:bg-gray-50">
+                  <label key={name} className="flex cursor-pointer items-center justify-between rounded-md border border-neutral-100 px-2 py-1.5 hover:bg-neutral-50">
                     <span className="inline-flex items-center gap-2">
-                      <input type="checkbox" defaultChecked={name === 'Copy asset 1'} className="rounded border-gray-300 text-primary-600" />
+                      <input type="checkbox" defaultChecked={name === 'Copy asset 1'} className="rounded border-neutral-300 text-primary-600" />
                       {name}
                     </span>
-                    <span className="h-6 w-6 shrink-0 rounded bg-gray-200" />
+                    <span className="h-6 w-6 shrink-0 rounded bg-neutral-200" />
                   </label>
                 ))}
               </div>
@@ -2978,7 +2978,7 @@ function AdCopyTabPanel() {
       {/* AI Tags — language */}
       <div className="overflow-hidden rounded-xl border border-[#F0F0F0] bg-white shadow-[-2px_2px_16px_rgba(14,0,45,0.06)]">
         <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#F5F5F5] px-4 py-3">
-          <h3 className="text-base font-semibold text-gray-900">AI Tags</h3>
+          <h3 className="text-base font-semibold text-neutral-900">AI Tags</h3>
           <div className="flex flex-wrap gap-2">
             <button type="button" className="rounded-lg border border-primary-500 bg-white px-3 py-1.5 text-xs font-semibold text-primary-600 hover:bg-primary-50">
               See All Tags
@@ -2989,21 +2989,21 @@ function AdCopyTabPanel() {
           </div>
         </div>
         <div className="p-4">
-          <table className="w-full text-[13px] text-gray-700">
+          <table className="w-full text-[13px] text-neutral-700">
             <tbody>
               {cfg.aiTags.map((row) => (
-                <tr key={row.name} className="border-b border-gray-100 last:border-0">
-                  <td className="py-2.5 font-medium text-gray-900">{row.name}</td>
+                <tr key={row.name} className="border-b border-neutral-100 last:border-0">
+                  <td className="py-2.5 font-medium text-neutral-900">{row.name}</td>
                   <td className="py-2.5">
-                    <div className="flex h-2 w-full overflow-hidden rounded bg-gray-200">
+                    <div className="flex h-2 w-full overflow-hidden rounded bg-neutral-200">
                       <div className="bg-success-500" style={{ width: `${Math.min(100, row.revenuePct)}%` }} />
-                      <div className="bg-gray-300" style={{ width: `${Math.min(100, row.spendPct)}%` }} />
+                      <div className="bg-neutral-300" style={{ width: `${Math.min(100, row.spendPct)}%` }} />
                     </div>
                   </td>
                   <td className="py-2.5 text-right">
                     <span className="font-semibold text-success-600">{row.revenuePct}%</span>
-                    <span className="mx-1 text-gray-300">|</span>
-                    <span className="font-medium text-gray-500">{row.spendPct}%</span>
+                    <span className="mx-1 text-neutral-300">|</span>
+                    <span className="font-medium text-neutral-500">{row.spendPct}%</span>
                   </td>
                 </tr>
               ))}
@@ -3015,13 +3015,13 @@ function AdCopyTabPanel() {
       {/* CTA breakdown — retained from original mock */}
       <div className="overflow-hidden rounded-xl border border-[#F0F0F0] bg-white shadow-[-2px_2px_16px_rgba(14,0,45,0.06)]">
         <div className="border-b border-[#F5F5F5] px-4 py-3">
-          <h3 className="text-base font-semibold text-gray-900">CTA breakdown</h3>
-          <p className="text-xs text-gray-500">Performance by call-to-action text</p>
+          <h3 className="text-base font-semibold text-neutral-900">CTA breakdown</h3>
+          <p className="text-xs text-neutral-500">Performance by call-to-action text</p>
         </div>
         <div className="overflow-x-auto p-4">
-          <table className="w-full min-w-[480px] text-[13px] text-gray-700">
+          <table className="w-full min-w-[480px] text-[13px] text-neutral-700">
             <thead>
-              <tr className="border-b border-gray-100 text-left text-gray-500">
+              <tr className="border-b border-neutral-100 text-left text-neutral-500">
                 <th className="pb-2">{sortTh('CTA')}</th>
                 <th className="pb-2">{sortTh('Spend')}</th>
                 <th className="pb-2">{sortTh('CTR')}</th>
@@ -3030,7 +3030,7 @@ function AdCopyTabPanel() {
             </thead>
             <tbody>
               {cfg.secondaryTable.slice(1).map((r) => (
-                <tr key={r[0]} className="border-b border-gray-50 last:border-0">
+                <tr key={r[0]} className="border-b border-neutral-50 last:border-0">
                   <td className="py-2 font-semibold">{r[0]}</td>
                   <td className="py-2">{r[1]}</td>
                   <td className="py-2">{r[2]}</td>
@@ -3110,9 +3110,9 @@ const Audit360 = () => {
 
   const tabLabel = MAIN_TABS.find((t) => t.id === activeTab)?.label ?? ''
   return (
-    <div className="relative min-h-full rounded-[20px] bg-[#F7F8FA] p-6">
+    <div className="relative min-h-full rounded-2xl bg-[#F7F8FA] p-6">
       {toast && (
-        <div className="fixed top-20 right-8 z-50 rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white shadow-lg">
+        <div className="fixed top-20 right-8 z-50 rounded-lg bg-neutral-900 px-4 py-2 text-sm font-medium text-white shadow-lg">
           {toast}
         </div>
       )}
@@ -3124,17 +3124,17 @@ const Audit360 = () => {
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-2xl font-bold text-gray-900">360° Meta Audit</h1>
+              <h1 className="text-2xl font-bold text-neutral-900">360° Meta Audit</h1>
               <button
                 type="button"
                 onClick={() => pushToast('Context help')}
-                className="rounded-lg p-1 text-gray-400 transition-all hover:bg-gray-100 hover:text-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
+                className="rounded-lg p-1 text-neutral-400 transition-all hover:bg-neutral-100 hover:text-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
                 aria-label="Help"
               >
                 <HelpCircle className="h-5 w-5" />
               </button>
             </div>
-            <p className="mt-0.5 text-sm text-gray-500">Funnel &amp; delivery audit</p>
+            <p className="mt-0.5 text-sm text-neutral-500">Funnel &amp; delivery audit</p>
           </div>
         </div>
 
@@ -3142,7 +3142,7 @@ const Audit360 = () => {
           <button
             type="button"
             onClick={handleRefresh}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-600 transition-all hover:border-primary-500 hover:text-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-neutral-200 bg-white text-neutral-600 transition-all hover:border-primary-500 hover:text-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
             aria-label="Refresh"
           >
             <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin text-primary-500' : ''}`} />
@@ -3152,17 +3152,17 @@ const Audit360 = () => {
             <button
               type="button"
               onClick={() => setShowRangeMenu((v) => !v)}
-              className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 transition-all hover:border-primary-500 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
+              className="inline-flex items-center gap-2 rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm font-medium text-neutral-700 transition-all hover:border-primary-500 hover:bg-neutral-50 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
             >
-              <Calendar className="h-4 w-4 text-gray-500" />
+              <Calendar className="h-4 w-4 text-neutral-500" />
               <span className="hidden sm:inline">
                 {rangeLabel} {dateRangeText}
               </span>
               <span className="sm:hidden">{rangeLabel}</span>
-              <ChevronDown className={`h-4 w-4 text-gray-500 transition-transform ${showRangeMenu ? 'rotate-180' : ''}`} />
+              <ChevronDown className={`h-4 w-4 text-neutral-500 transition-transform ${showRangeMenu ? 'rotate-180' : ''}`} />
             </button>
             {showRangeMenu && (
-              <div className="absolute right-0 z-30 mt-2 w-52 rounded-lg border border-gray-200 bg-white p-1 shadow-lg">
+              <div className="absolute right-0 z-30 mt-2 w-52 rounded-lg border border-neutral-200 bg-white p-1 shadow-lg">
                 {RANGE_OPTIONS.map((opt) => (
                   <button
                     key={opt.id}
@@ -3172,7 +3172,7 @@ const Audit360 = () => {
                       setShowRangeMenu(false)
                     }}
                     className={`w-full rounded-md px-3 py-2 text-left text-sm transition-colors ${
-                      rangeId === opt.id ? 'bg-primary-50 font-medium text-primary-600' : 'text-gray-700 hover:bg-gray-50'
+                      rangeId === opt.id ? 'bg-primary-50 font-medium text-primary-600' : 'text-neutral-700 hover:bg-neutral-50'
                     }`}
                   >
                     {opt.label}
@@ -3184,7 +3184,7 @@ const Audit360 = () => {
         </div>
       </div>
 
-      <div className="border-b border-gray-200">
+      <div className="border-b border-neutral-200">
         <nav className="-mb-px flex flex-wrap gap-x-1 gap-y-1 overflow-x-auto pb-px" aria-label="Audit sections">
           {MAIN_TABS.map((t) => {
             const active = activeTab === t.id
@@ -3196,7 +3196,7 @@ const Audit360 = () => {
                 className={`whitespace-nowrap border-b-2 px-3 py-3 text-sm font-medium transition-all focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:ring-offset-2 ${
                   active
                     ? 'border-primary-500 text-primary-600'
-                    : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-800'
+                    : 'border-transparent text-neutral-500 hover:border-neutral-300 hover:text-neutral-800'
                 }`}
               >
                 {t.label}
@@ -3245,10 +3245,10 @@ const Audit360 = () => {
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[880px] border-collapse text-sm">
                   <thead>
-                    <tr className="border-b border-gray-100 bg-gray-50/80">
-                      <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500" />
+                    <tr className="border-b border-neutral-100 bg-neutral-50/80">
+                      <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-neutral-500" />
                       {FUNNEL_COLUMNS.map((col) => (
-                        <th key={col.key} className="px-3 py-3 text-right text-xs font-semibold text-gray-700">
+                        <th key={col.key} className="px-3 py-3 text-right text-xs font-semibold text-neutral-700">
                           <MetaColHeader label={col.label} />
                         </th>
                       ))}
@@ -3256,19 +3256,19 @@ const Audit360 = () => {
                   </thead>
                   <tbody>
                     {FUNNEL_ROWS.map((row) => (
-                      <tr key={row.id} className="border-b border-gray-100 last:border-0 hover:bg-gray-50/60">
+                      <tr key={row.id} className="border-b border-neutral-100 last:border-0 hover:bg-neutral-50/60">
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-3">
                             {row.bar ? (
                               <span className={`h-8 w-1 shrink-0 rounded-full ${barClass[row.bar]}`} aria-hidden />
                             ) : (
-                              <span className="h-8 w-1 shrink-0 rounded-full bg-gray-200" aria-hidden />
+                              <span className="h-8 w-1 shrink-0 rounded-full bg-neutral-200" aria-hidden />
                             )}
-                            <span className="font-medium text-gray-900">{row.label}</span>
+                            <span className="font-medium text-neutral-900">{row.label}</span>
                           </div>
                         </td>
                         {FUNNEL_COLUMNS.map((col) => (
-                          <td key={col.key} className="px-3 py-3 text-right tabular-nums text-gray-800">
+                          <td key={col.key} className="px-3 py-3 text-right tabular-nums text-neutral-800">
                             {row[col.key]}
                           </td>
                         ))}
@@ -3280,9 +3280,9 @@ const Audit360 = () => {
             </div>
 
             <div className="overflow-hidden rounded-xl border border-[#F0F0F0] bg-white shadow-[-2px_2px_16px_rgba(14,0,45,0.06)]">
-              <div className="flex flex-col gap-3 border-b border-[#F5F5F5] bg-gray-50/50 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex flex-col gap-3 border-b border-[#F5F5F5] bg-neutral-50/50 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex flex-wrap items-center gap-2">
-                  <h3 className="text-base font-semibold text-gray-900">Strategy Status Overview</h3>
+                  <h3 className="text-base font-semibold text-neutral-900">Strategy Status Overview</h3>
                   <button
                     type="button"
                     onClick={() => pushToast('Dashboard guide')}
@@ -3296,7 +3296,7 @@ const Audit360 = () => {
                   <select
                     value={metaMetricA}
                     onChange={(e) => setMetaMetricA(e.target.value)}
-                    className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-xs font-medium text-gray-700 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
+                    className="rounded-lg border border-neutral-300 bg-white px-3 py-2 text-xs font-medium text-neutral-700 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
                   >
                     {META_METRICS.map((metric) => (
                       <option key={metric}>{metric}</option>
@@ -3305,7 +3305,7 @@ const Audit360 = () => {
                   <select
                     value={metaMetricB}
                     onChange={(e) => setMetaMetricB(e.target.value)}
-                    className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-xs font-medium text-gray-700 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
+                    className="rounded-lg border border-neutral-300 bg-white px-3 py-2 text-xs font-medium text-neutral-700 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
                   >
                     {META_METRICS.map((metric) => (
                       <option key={metric}>{metric}</option>
@@ -3315,7 +3315,7 @@ const Audit360 = () => {
               </div>
               <div className="grid grid-cols-1 gap-4 p-5 md:grid-cols-3">
                 {STRATEGY_DRILL_TABS.map((stage) => (
-                  <div key={stage.id} className="rounded-lg border border-gray-100 bg-white p-3">
+                  <div key={stage.id} className="rounded-lg border border-neutral-100 bg-white p-3">
                     <div className="h-40">
                       <ResponsiveContainer width="100%" height="100%">
                         <LineChart data={STRATEGY_DRILL_DATA[stage.id]}>
@@ -3329,16 +3329,16 @@ const Audit360 = () => {
                         </LineChart>
                       </ResponsiveContainer>
                     </div>
-                    <p className="mt-2 text-center text-sm font-semibold text-gray-800">{stage.label}</p>
+                    <p className="mt-2 text-center text-sm font-semibold text-neutral-800">{stage.label}</p>
                   </div>
                 ))}
               </div>
             </div>
 
             <div className="overflow-hidden rounded-xl border border-[#F0F0F0] bg-white shadow-[-2px_2px_16px_rgba(14,0,45,0.06)]">
-              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#F5F5F5] bg-gray-50/50 px-5 py-4">
+              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#F5F5F5] bg-neutral-50/50 px-5 py-4">
                 <div className="flex items-center gap-2">
-                  <h3 className="text-base font-semibold text-gray-900">Strategy Status Drilldown</h3>
+                  <h3 className="text-base font-semibold text-neutral-900">Strategy Status Drilldown</h3>
                   <button
                     type="button"
                     onClick={() => pushToast('What is the Marketing Funnel?')}
@@ -3348,14 +3348,14 @@ const Audit360 = () => {
                     What is the Marketing Funnel?
                   </button>
                 </div>
-                <div className="inline-flex items-center rounded-lg border border-gray-200 bg-white p-0.5">
+                <div className="inline-flex items-center rounded-lg border border-neutral-200 bg-white p-0.5">
                   {STRATEGY_DRILL_TABS.map((t) => (
                     <button
                       key={t.id}
                       type="button"
                       onClick={() => setDrillTab(t.id)}
                       className={`rounded-md px-3 py-1.5 text-xs font-semibold transition-all ${
-                        drillTab === t.id ? 'bg-primary-50 text-primary-600' : 'text-gray-500 hover:text-gray-700'
+                        drillTab === t.id ? 'bg-primary-50 text-primary-600' : 'text-neutral-500 hover:text-neutral-700'
                       }`}
                     >
                       {t.label}
@@ -3364,7 +3364,7 @@ const Audit360 = () => {
                 </div>
               </div>
               <div className="grid grid-cols-1 gap-4 p-5 lg:grid-cols-[1fr_180px]">
-                <div className="h-72 rounded-lg border border-gray-100 bg-white p-3">
+                <div className="h-72 rounded-lg border border-neutral-100 bg-white p-3">
                   <ResponsiveContainer width="100%" height="100%">
                     <AreaChart data={STRATEGY_DRILL_DATA[drillTab]}>
                       <defs>
@@ -3394,13 +3394,13 @@ const Audit360 = () => {
                     <button
                       key={item.key}
                       type="button"
-                      className="flex w-full items-center justify-between rounded-md px-2 py-1.5 text-xs font-semibold text-gray-700 transition-all hover:bg-gray-50"
+                      className="flex w-full items-center justify-between rounded-md px-2 py-1.5 text-xs font-semibold text-neutral-700 transition-all hover:bg-neutral-50"
                     >
                       <span className="inline-flex items-center gap-2">
                         <span className="h-1.5 w-4 rounded-full" style={{ backgroundColor: item.color }} />
                         {item.label}
                       </span>
-                      <ChevronDown className="h-3.5 w-3.5 text-gray-400" />
+                      <ChevronDown className="h-3.5 w-3.5 text-neutral-400" />
                     </button>
                   ))}
                 </div>
@@ -3408,19 +3408,19 @@ const Audit360 = () => {
             </div>
 
             <div className="overflow-hidden rounded-xl border border-[#F0F0F0] bg-white shadow-[-2px_2px_16px_rgba(14,0,45,0.06)]">
-              <div className="flex items-center justify-between border-b border-[#F5F5F5] bg-gray-50/50 px-5 py-4">
+              <div className="flex items-center justify-between border-b border-[#F5F5F5] bg-neutral-50/50 px-5 py-4">
                 <span className="inline-flex rounded-md bg-orange-100 px-2 py-1 text-sm font-semibold text-orange-700">Total Revenue</span>
-                <div className="flex flex-wrap items-center gap-4 text-xs font-semibold text-gray-700">
+                <div className="flex flex-wrap items-center gap-4 text-xs font-semibold text-neutral-700">
                   <span className="inline-flex items-center gap-1.5">
                     <span className="h-1.5 w-3 rounded-full bg-teal-500" />
                     Acquisition
                   </span>
                   <span className="inline-flex items-center gap-1.5">
-                    <span className="h-1.5 w-3 rounded-full bg-blue-500" />
+                    <span className="h-1.5 w-3 rounded-full bg-info-500" />
                     Retargeting
                   </span>
                   <span className="inline-flex items-center gap-1.5">
-                    <span className="h-1.5 w-3 rounded-full bg-indigo-500" />
+                    <span className="h-1.5 w-3 rounded-full bg-primary-500" />
                     Retention
                   </span>
                   <span className="inline-flex items-center gap-1.5">
@@ -3468,36 +3468,36 @@ const Audit360 = () => {
       </button>
 
       {showFilterModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/30 p-4 backdrop-blur-[1px]">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-neutral-900/30 p-4 backdrop-blur-[1px]">
           <div className="w-full max-w-lg overflow-hidden rounded-2xl border border-[#F0F0F0] bg-white shadow-2xl">
-            <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
-              <h4 className="text-base font-semibold text-gray-900">Filter Data</h4>
+            <div className="flex items-center justify-between border-b border-neutral-100 px-5 py-4">
+              <h4 className="text-base font-semibold text-neutral-900">Filter Data</h4>
               <button
                 type="button"
                 onClick={() => setShowFilterModal(false)}
-                className="rounded-md p-1 text-gray-400 transition-all hover:bg-gray-100 hover:text-gray-700"
+                className="rounded-md p-1 text-neutral-400 transition-all hover:bg-neutral-100 hover:text-neutral-700"
               >
                 <X className="h-4 w-4" />
               </button>
             </div>
             <div className="space-y-4 p-5">
               <label className="block space-y-1.5">
-                <span className="text-xs font-semibold text-gray-500">Ad account</span>
-                <select className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20">
+                <span className="text-xs font-semibold text-neutral-500">Ad account</span>
+                <select className="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20">
                   <option>All connected</option>
                   <option>Primary account</option>
                 </select>
               </label>
               <label className="block space-y-1.5">
-                <span className="text-xs font-semibold text-gray-500">Campaign status</span>
-                <select className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20">
+                <span className="text-xs font-semibold text-neutral-500">Campaign status</span>
+                <select className="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20">
                   <option>Active</option>
                   <option>All</option>
                 </select>
               </label>
               <label className="block space-y-1.5">
-                <span className="text-xs font-semibold text-gray-500">Funnel stage</span>
-                <select className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20">
+                <span className="text-xs font-semibold text-neutral-500">Funnel stage</span>
+                <select className="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20">
                   <option>All stages</option>
                   <option>Acquisition</option>
                   <option>Retargeting</option>
@@ -3505,11 +3505,11 @@ const Audit360 = () => {
                 </select>
               </label>
             </div>
-            <div className="flex justify-end gap-2 border-t border-gray-100 px-5 py-4">
+            <div className="flex justify-end gap-2 border-t border-neutral-100 px-5 py-4">
               <button
                 type="button"
                 onClick={() => setShowFilterModal(false)}
-                className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-all hover:border-primary-500 hover:bg-gray-50 hover:text-primary-600"
+                className="rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-700 transition-all hover:border-primary-500 hover:bg-neutral-50 hover:text-primary-600"
               >
                 Cancel
               </button>
@@ -3529,44 +3529,44 @@ const Audit360 = () => {
       )}
 
       {showReportingModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/30 p-4 backdrop-blur-[1px]">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-neutral-900/30 p-4 backdrop-blur-[1px]">
           <div className="w-full max-w-lg overflow-hidden rounded-2xl border border-[#F0F0F0] bg-white shadow-2xl">
-            <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
-              <h4 className="text-base font-semibold text-gray-900">Automated Reporting</h4>
+            <div className="flex items-center justify-between border-b border-neutral-100 px-5 py-4">
+              <h4 className="text-base font-semibold text-neutral-900">Automated Reporting</h4>
               <button
                 type="button"
                 onClick={() => setShowReportingModal(false)}
-                className="rounded-md p-1 text-gray-400 transition-all hover:bg-gray-100 hover:text-gray-700"
+                className="rounded-md p-1 text-neutral-400 transition-all hover:bg-neutral-100 hover:text-neutral-700"
               >
                 <X className="h-4 w-4" />
               </button>
             </div>
             <div className="grid grid-cols-1 gap-4 p-5 sm:grid-cols-2">
               <label className="space-y-1.5">
-                <span className="text-xs font-semibold text-gray-500">Send at (hour)</span>
+                <span className="text-xs font-semibold text-neutral-500">Send at (hour)</span>
                 <input
                   defaultValue="09"
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
+                  className="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
                 />
               </label>
               <label className="space-y-1.5">
-                <span className="text-xs font-semibold text-gray-500">Frequency</span>
-                <select className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20">
+                <span className="text-xs font-semibold text-neutral-500">Frequency</span>
+                <select className="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20">
                   <option>Daily</option>
                   <option>Weekly</option>
                 </select>
               </label>
               <label className="space-y-1.5 sm:col-span-2">
-                <span className="text-xs font-semibold text-gray-500">Email</span>
+                <span className="text-xs font-semibold text-neutral-500">Email</span>
                 <input
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@company.com"
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
+                  className="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
                 />
               </label>
             </div>
-            <div className="flex flex-wrap items-center justify-between gap-2 border-t border-gray-100 px-5 py-4">
+            <div className="flex flex-wrap items-center justify-between gap-2 border-t border-neutral-100 px-5 py-4">
               <button
                 type="button"
                 disabled={!email.trim()}
@@ -3574,7 +3574,7 @@ const Audit360 = () => {
                   setSendTestDone(true)
                   setTimeout(() => setSendTestDone(false), 1600)
                 }}
-                className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-all hover:border-primary-500 hover:bg-gray-50 hover:text-primary-600 disabled:cursor-not-allowed disabled:opacity-50"
+                className="rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-700 transition-all hover:border-primary-500 hover:bg-neutral-50 hover:text-primary-600 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 Send a test email
               </button>
@@ -3582,7 +3582,7 @@ const Audit360 = () => {
                 <button
                   type="button"
                   onClick={() => setShowReportingModal(false)}
-                  className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-all hover:border-primary-500 hover:bg-gray-50"
+                  className="rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-700 transition-all hover:border-primary-500 hover:bg-neutral-50"
                 >
                   Cancel
                 </button>
@@ -3600,7 +3600,7 @@ const Audit360 = () => {
               </div>
             </div>
             {sendTestDone && (
-              <div className="border-t border-gray-100 px-5 pb-4 text-xs text-success-700">Test email sent.</div>
+              <div className="border-t border-neutral-100 px-5 pb-4 text-xs text-success-700">Test email sent.</div>
             )}
           </div>
         </div>

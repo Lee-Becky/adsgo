@@ -88,11 +88,11 @@ const AdDatasetWizard = ({ onClose, onCreate, defaultPlatform = 'meta' }) => {
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center">
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative w-full max-w-3xl bg-white rounded-3xl shadow-2xl border border-slate-100 max-h-[85vh] flex flex-col">
-        <div className="flex items-center justify-between px-8 py-5 border-b border-slate-100">
-          <h3 className="text-sm font-black text-slate-900">New Ad Dataset</h3>
-          <button onClick={onClose} className="p-1.5 hover:bg-slate-100 rounded-lg">
-            <X size={18} className="text-slate-400" />
+      <div className="relative w-full max-w-3xl bg-white rounded-2xl shadow-2xl border border-neutral-100 max-h-[85vh] flex flex-col">
+        <div className="flex items-center justify-between px-8 py-5 border-b border-neutral-100">
+          <h3 className="text-sm font-black text-neutral-900">New Ad Dataset</h3>
+          <button onClick={onClose} className="p-1.5 hover:bg-neutral-100 rounded-lg">
+            <X size={18} className="text-neutral-400" />
           </button>
         </div>
 
@@ -109,9 +109,9 @@ const AdDatasetWizard = ({ onClose, onCreate, defaultPlatform = 'meta' }) => {
             {step === 0 && (
               <div className="px-8 py-6 space-y-5">
                 <div>
-                  <label className="text-xs font-black text-slate-700 mb-1.5 block">Dataset Name</label>
+                  <label className="text-xs font-black text-neutral-700 mb-1.5 block">Dataset Name</label>
                   <input
-                    className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm font-medium text-slate-900 outline-none focus:border-indigo-400"
+                    className="w-full px-4 py-2.5 border border-neutral-200 rounded-xl text-sm font-medium text-neutral-900 outline-none focus:border-primary-400"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="e.g., Meta US Campaigns Q2"
@@ -119,16 +119,16 @@ const AdDatasetWizard = ({ onClose, onCreate, defaultPlatform = 'meta' }) => {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="text-xs font-black text-slate-700 mb-1.5 block">Data Start Date</label>
+                    <label className="text-xs font-black text-neutral-700 mb-1.5 block">Data Start Date</label>
                     <input
                       type="date"
-                      className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm font-medium text-slate-900 outline-none focus:border-indigo-400"
+                      className="w-full px-4 py-2.5 border border-neutral-200 rounded-xl text-sm font-medium text-neutral-900 outline-none focus:border-primary-400"
                       value={dataStartDate}
                       onChange={(e) => setDataStartDate(e.target.value)}
                     />
                   </div>
                   <div>
-                    <label className="text-xs font-black text-slate-700 mb-1.5 block">Platform</label>
+                    <label className="text-xs font-black text-neutral-700 mb-1.5 block">Platform</label>
                     <div className="flex items-center gap-2">
                       {MEDIA_PLATFORMS.map(p => (
                         <button
@@ -136,8 +136,8 @@ const AdDatasetWizard = ({ onClose, onCreate, defaultPlatform = 'meta' }) => {
                           onClick={() => { setPlatform(p.id); setSelectedAccountIds([]) }}
                           className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-[11px] font-bold transition-all ${
                             platform === p.id
-                              ? 'bg-slate-900 text-white'
-                              : 'bg-slate-50 text-slate-500 hover:bg-slate-100'
+                              ? 'bg-neutral-900 text-white'
+                              : 'bg-neutral-50 text-neutral-500 hover:bg-neutral-100'
                           }`}
                         >
                           <img src={p.icon} alt={p.name} className="w-3.5 h-3.5" />
@@ -150,26 +150,26 @@ const AdDatasetWizard = ({ onClose, onCreate, defaultPlatform = 'meta' }) => {
 
                 {/* Granularity Selector */}
                 <div>
-                  <label className="text-xs font-black text-slate-700 mb-1.5 flex items-center gap-1.5">
-                    <Layers size={12} className="text-slate-400" />
+                  <label className="text-xs font-black text-neutral-700 mb-1.5 flex items-center gap-1.5">
+                    <Layers size={12} className="text-neutral-400" />
                     Granularity
                   </label>
-                  <div className="flex items-center gap-1 p-1 bg-slate-100 rounded-xl w-fit">
+                  <div className="flex items-center gap-1 p-1 bg-neutral-100 rounded-xl w-fit">
                     {GRANULARITY_OPTIONS.map(g => (
                       <button
                         key={g.id}
                         onClick={() => setGranularity(g.id)}
                         className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${
                           granularity === g.id
-                            ? 'bg-white text-slate-900 shadow-sm'
-                            : 'text-slate-500 hover:text-slate-700'
+                            ? 'bg-white text-neutral-900 shadow-sm'
+                            : 'text-neutral-500 hover:text-neutral-700'
                         }`}
                       >
                         {g.label}
                       </button>
                     ))}
                   </div>
-                  <p className="text-[10px] text-slate-400 mt-1">
+                  <p className="text-[10px] text-neutral-400 mt-1">
                     {granularity === 'campaign' && 'Data aggregated at campaign level'}
                     {granularity === 'adset' && 'Data includes adset-level breakdowns'}
                     {granularity === 'ad' && 'Data includes individual ad-level breakdowns'}
@@ -177,11 +177,11 @@ const AdDatasetWizard = ({ onClose, onCreate, defaultPlatform = 'meta' }) => {
                 </div>
 
                 <div>
-                  <label className="text-xs font-black text-slate-700 mb-1.5 block">Select Accounts</label>
+                  <label className="text-xs font-black text-neutral-700 mb-1.5 block">Select Accounts</label>
                   <div className="relative mb-2">
-                    <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-300" />
+                    <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-300" />
                     <input
-                      className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium outline-none focus:border-indigo-400"
+                      className="w-full pl-9 pr-4 py-2 bg-neutral-50 border border-neutral-200 rounded-lg text-xs font-medium outline-none focus:border-primary-400"
                       placeholder="Search accounts..."
                       value={accountSearch}
                       onChange={(e) => setAccountSearch(e.target.value)}
@@ -192,9 +192,9 @@ const AdDatasetWizard = ({ onClose, onCreate, defaultPlatform = 'meta' }) => {
                       {selectedAccountIds.map(id => {
                         const acc = mockAccountsForDataset.find(a => a.id === id)
                         return (
-                          <span key={id} className="px-2.5 py-1 text-[10px] font-bold bg-indigo-50 text-indigo-600 rounded-full flex items-center gap-1">
+                          <span key={id} className="px-2.5 py-1 text-[10px] font-bold bg-primary-50 text-primary-600 rounded-full flex items-center gap-1">
                             {acc?.name || id}
-                            <button onClick={() => toggleAccount(id)} className="hover:text-red-500 ml-0.5">×</button>
+                            <button onClick={() => toggleAccount(id)} className="hover:text-danger-500 ml-0.5">×</button>
                           </span>
                         )
                       })}
@@ -208,13 +208,13 @@ const AdDatasetWizard = ({ onClose, onCreate, defaultPlatform = 'meta' }) => {
                           key={acc.id}
                           onClick={() => toggleAccount(acc.id)}
                           className={`w-full flex items-center gap-2 px-3 py-2.5 rounded-lg text-left transition-all ${
-                            isSelected ? 'bg-indigo-50 border border-indigo-200' : 'hover:bg-slate-50 border border-transparent'
+                            isSelected ? 'bg-primary-50 border border-primary-200' : 'hover:bg-neutral-50 border border-transparent'
                           }`}
                         >
-                          {isSelected ? <CheckSquare size={13} className="text-indigo-500" /> : <Square size={13} className="text-slate-300" />}
+                          {isSelected ? <CheckSquare size={13} className="text-primary-500" /> : <Square size={13} className="text-neutral-300" />}
                           <div className="flex-1 min-w-0">
-                            <p className="text-xs font-semibold text-slate-700 truncate">{acc.name}</p>
-                            <p className="text-[10px] text-slate-400 font-mono">{acc.id}</p>
+                            <p className="text-xs font-semibold text-neutral-700 truncate">{acc.name}</p>
+                            <p className="text-[10px] text-neutral-400 font-mono">{acc.id}</p>
                           </div>
                         </button>
                       )
@@ -226,8 +226,8 @@ const AdDatasetWizard = ({ onClose, onCreate, defaultPlatform = 'meta' }) => {
 
             {step === 1 && (
               <div className="px-8 py-6">
-                <h4 className="text-xs font-black text-slate-900 mb-1">Campaign Name Split</h4>
-                <p className="text-[11px] text-slate-400 mb-4">Configure how to parse campaign names into dimensions.</p>
+                <h4 className="text-xs font-black text-neutral-900 mb-1">Campaign Name Split</h4>
+                <p className="text-[11px] text-neutral-400 mb-4">Configure how to parse campaign names into dimensions.</p>
                 <SplitPatternConfig
                   config={splitConfig}
                   onChange={setSplitConfig}
@@ -247,12 +247,12 @@ const AdDatasetWizard = ({ onClose, onCreate, defaultPlatform = 'meta' }) => {
                 />
 
                 {/* Event Metrics */}
-                <div className="border-t border-slate-200 pt-5">
-                  <h4 className="text-xs font-black text-slate-900 mb-1 flex items-center gap-1.5">
-                    <Zap size={12} className="text-amber-500" />
+                <div className="border-t border-neutral-200 pt-5">
+                  <h4 className="text-xs font-black text-neutral-900 mb-1 flex items-center gap-1.5">
+                    <Zap size={12} className="text-warning-500" />
                     Event Metrics
                   </h4>
-                  <p className="text-[11px] text-slate-400 mb-3">
+                  <p className="text-[11px] text-neutral-400 mb-3">
                     Select conversion events and their metric types to include in the dataset.
                   </p>
 
@@ -264,10 +264,10 @@ const AdDatasetWizard = ({ onClose, onCreate, defaultPlatform = 'meta' }) => {
                         <div
                           key={event.key}
                           className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all ${
-                            isAnySelected ? 'bg-amber-50 border border-amber-200' : 'bg-slate-50 border border-transparent hover:border-slate-200'
+                            isAnySelected ? 'bg-warning-50 border border-warning-200' : 'bg-neutral-50 border border-transparent hover:border-neutral-200'
                           }`}
                         >
-                          <span className={`text-xs font-bold flex-1 ${isAnySelected ? 'text-amber-700' : 'text-slate-600'}`}>
+                          <span className={`text-xs font-bold flex-1 ${isAnySelected ? 'text-warning-700' : 'text-neutral-600'}`}>
                             {event.label}
                           </span>
                           {EVENT_METRIC_TYPES.map(mt => {
@@ -278,8 +278,8 @@ const AdDatasetWizard = ({ onClose, onCreate, defaultPlatform = 'meta' }) => {
                                 onClick={() => toggleEventMetric(event.key, mt.id)}
                                 className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-bold transition-all ${
                                   isOn
-                                    ? 'bg-amber-500 text-white'
-                                    : 'bg-white text-slate-400 border border-slate-200 hover:border-amber-300'
+                                    ? 'bg-warning-500 text-white'
+                                    : 'bg-white text-neutral-400 border border-neutral-200 hover:border-warning-300'
                                 }`}
                               >
                                 {isOn ? <CheckSquare size={10} /> : <Square size={10} />}
@@ -293,7 +293,7 @@ const AdDatasetWizard = ({ onClose, onCreate, defaultPlatform = 'meta' }) => {
                   </div>
 
                   {Object.keys(eventMetrics).length > 0 && (
-                    <p className="text-[10px] text-amber-600 mt-2 font-bold">
+                    <p className="text-[10px] text-warning-600 mt-2 font-bold">
                       {Object.keys(eventMetrics).length} event(s) selected
                     </p>
                   )}

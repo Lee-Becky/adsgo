@@ -1,0 +1,193 @@
+<h2>命名框布局优化</h2>
+<p class="subtitle">变量区下沉后，三个命名字段的排列方式对比</p>
+
+<div class="cards" style="gap:20px; margin-top:24px;">
+
+  <!-- 方案 A：横向3列 -->
+  <div class="card" data-choice="a" onclick="toggleSelect(this)" style="padding:0; overflow:hidden; border-radius:12px; flex:1; min-width:260px;">
+    <div class="card-image" style="background:#fafbff; padding:18px; border-bottom:1px solid #eee;">
+      <div style="font-size:10px; font-weight:700; color:#6366f1; text-transform:uppercase; letter-spacing:.08em; margin-bottom:14px;">方案 A · 横向 3 列</div>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:14px;">
+        <!-- Campaign -->
+        <div style="background:white; border:1px solid #e5e7eb; border-radius:7px; padding:10px 11px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <span style="font-size:10px; font-weight:600; color:#374151;">Campaign</span>
+            <span style="font-size:9px; color:#9ca3af;">↺ 历史</span>
+          </div>
+          <div style="background:#f5f3ff; border:1.5px solid #6366f1; border-radius:4px; padding:4px 7px; font-size:10px; font-family:monospace; color:#1e1b4b; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{Brand}-{location}-{date}</div>
+          <div style="font-size:9px; color:#9ca3af; margin-top:4px; font-family:monospace; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">MyBrand-US-20260415</div>
+        </div>
+        <!-- Adset -->
+        <div style="background:white; border:1px solid #e5e7eb; border-radius:7px; padding:10px 11px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <span style="font-size:10px; font-weight:600; color:#374151;">Adset</span>
+            <span style="font-size:9px; color:#9ca3af;">↺ 历史</span>
+          </div>
+          <div style="background:#f9fafb; border:1px solid #e5e7eb; border-radius:4px; padding:4px 7px; font-size:10px; font-family:monospace; color:#374151; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{location}-{audience_type}-{date}</div>
+          <div style="font-size:9px; color:#9ca3af; margin-top:4px; font-family:monospace; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">US-LAL-20260415</div>
+        </div>
+        <!-- Ad -->
+        <div style="background:white; border:1px solid #e5e7eb; border-radius:7px; padding:10px 11px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <span style="font-size:10px; font-weight:600; color:#374151;">Ad</span>
+            <span style="font-size:9px; color:#9ca3af;">↺ 历史</span>
+          </div>
+          <div style="background:#f9fafb; border:1px solid #e5e7eb; border-radius:4px; padding:4px 7px; font-size:10px; font-family:monospace; color:#374151; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{Brand}-{creative_type}-{number}</div>
+          <div style="font-size:9px; color:#9ca3af; margin-top:4px; font-family:monospace; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">MyBrand-Video-001</div>
+        </div>
+      </div>
+
+      <!-- 底部变量库 -->
+      <div style="border:1.5px solid #e0e7ff; background:white; border-radius:7px; padding:9px 12px;">
+        <div style="font-size:9px; color:#6366f1; font-weight:600; margin-bottom:6px;">● 插入到：Campaign 命名</div>
+        <div style="display:flex; flex-wrap:wrap; gap:4px;">
+          <span style="background:#ede9fe; color:#5b21b6; font-size:10px; padding:2px 7px; border-radius:3px;">{Brand}</span>
+          <span style="background:#ede9fe; color:#5b21b6; font-size:10px; padding:2px 7px; border-radius:3px;">{location}</span>
+          <span style="background:#ede9fe; color:#5b21b6; font-size:10px; padding:2px 7px; border-radius:3px;">{budget}</span>
+          <span style="background:#ede9fe; color:#5b21b6; font-size:10px; padding:2px 7px; border-radius:3px;">{date}</span>
+          <span style="background:#ede9fe; color:#5b21b6; font-size:10px; padding:2px 7px; border-radius:3px;">{audience_type}</span>
+          <span style="background:#ede9fe; color:#5b21b6; font-size:10px; padding:2px 7px; border-radius:3px;">{creative_type}</span>
+          <span style="background:#f3f4f6; color:#6b7280; font-size:10px; padding:2px 7px; border-radius:3px;">自定义(...)</span>
+        </div>
+      </div>
+    </div>
+    <div class="card-body" style="padding:12px 18px;">
+      <h3 style="font-size:12px; margin-bottom:4px;">横向 3 列</h3>
+      <p style="font-size:11px; color:#6b7280; margin:0; line-height:1.5;">三个字段并排，整体高度大幅压缩。命名框内容较长时会省略，需要 tooltip 展示完整内容。</p>
+      <div style="margin-top:8px; display:flex; gap:6px; flex-wrap:wrap;">
+        <span style="font-size:10px; background:#dcfce7; color:#166534; padding:2px 6px; border-radius:3px;">最节省垂直空间</span>
+        <span style="font-size:10px; background:#fef9c3; color:#854d0e; padding:2px 6px; border-radius:3px;">长模板会被截断</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 方案 B：紧凑表格行 -->
+  <div class="card" data-choice="b" onclick="toggleSelect(this)" style="padding:0; overflow:hidden; border-radius:12px; flex:1; min-width:260px;">
+    <div class="card-image" style="background:#fafbff; padding:18px; border-bottom:1px solid #eee;">
+      <div style="font-size:10px; font-weight:700; color:#0891b2; text-transform:uppercase; letter-spacing:.08em; margin-bottom:14px;">方案 B · 紧凑行（无卡片）</div>
+
+      <div style="background:white; border:1px solid #e5e7eb; border-radius:8px; overflow:hidden; margin-bottom:12px;">
+        <!-- Campaign row -->
+        <div style="display:grid; grid-template-columns:90px 1fr auto; align-items:center; gap:10px; padding:9px 12px; border-bottom:1px solid #f3f4f6;">
+          <span style="font-size:10px; font-weight:600; color:#374151;">Campaign</span>
+          <div>
+            <div style="background:#f5f3ff; border:1.5px solid #6366f1; border-radius:4px; padding:4px 8px; font-size:10px; font-family:monospace; color:#1e1b4b;">{Brand}-{location}-{date}</div>
+            <div style="font-size:9px; color:#9ca3af; margin-top:3px; font-family:monospace;">MyBrand-US-20260415</div>
+          </div>
+          <span style="font-size:9px; color:#9ca3af; white-space:nowrap;">↺ 历史</span>
+        </div>
+        <!-- Adset row -->
+        <div style="display:grid; grid-template-columns:90px 1fr auto; align-items:center; gap:10px; padding:9px 12px; border-bottom:1px solid #f3f4f6;">
+          <span style="font-size:10px; font-weight:600; color:#374151;">Adset</span>
+          <div>
+            <div style="background:#f9fafb; border:1px solid #e5e7eb; border-radius:4px; padding:4px 8px; font-size:10px; font-family:monospace; color:#374151;">{location}-{audience_type}-{creative_type}-{date}</div>
+            <div style="font-size:9px; color:#9ca3af; margin-top:3px; font-family:monospace;">US-LAL-Video-20260415</div>
+          </div>
+          <span style="font-size:9px; color:#9ca3af; white-space:nowrap;">↺ 历史</span>
+        </div>
+        <!-- Ad row -->
+        <div style="display:grid; grid-template-columns:90px 1fr auto; align-items:center; gap:10px; padding:9px 12px;">
+          <span style="font-size:10px; font-weight:600; color:#374151;">Ad</span>
+          <div>
+            <div style="background:#f9fafb; border:1px solid #e5e7eb; border-radius:4px; padding:4px 8px; font-size:10px; font-family:monospace; color:#374151;">{Brand}-{creative_type}-{number}-{date}</div>
+            <div style="font-size:9px; color:#9ca3af; margin-top:3px; font-family:monospace;">MyBrand-Video-001-20260415</div>
+          </div>
+          <span style="font-size:9px; color:#9ca3af; white-space:nowrap;">↺ 历史</span>
+        </div>
+      </div>
+
+      <!-- 底部变量库 -->
+      <div style="border:1.5px solid #e0e7ff; background:white; border-radius:7px; padding:9px 12px;">
+        <div style="font-size:9px; color:#6366f1; font-weight:600; margin-bottom:6px;">● 插入到：Campaign 命名</div>
+        <div style="display:flex; flex-wrap:wrap; gap:4px;">
+          <span style="background:#ede9fe; color:#5b21b6; font-size:10px; padding:2px 7px; border-radius:3px;">{Brand}</span>
+          <span style="background:#ede9fe; color:#5b21b6; font-size:10px; padding:2px 7px; border-radius:3px;">{location}</span>
+          <span style="background:#ede9fe; color:#5b21b6; font-size:10px; padding:2px 7px; border-radius:3px;">{budget}</span>
+          <span style="background:#ede9fe; color:#5b21b6; font-size:10px; padding:2px 7px; border-radius:3px;">{date}</span>
+          <span style="background:#ede9fe; color:#5b21b6; font-size:10px; padding:2px 7px; border-radius:3px;">{audience_type}</span>
+          <span style="background:#ede9fe; color:#5b21b6; font-size:10px; padding:2px 7px; border-radius:3px;">{creative_type}</span>
+          <span style="background:#f3f4f6; color:#6b7280; font-size:10px; padding:2px 7px; border-radius:3px;">自定义(...)</span>
+        </div>
+      </div>
+    </div>
+    <div class="card-body" style="padding:12px 18px;">
+      <h3 style="font-size:12px; margin-bottom:4px;">紧凑行（无独立卡片）</h3>
+      <p style="font-size:11px; color:#6b7280; margin:0; line-height:1.5;">三行共用一张容器卡片，左侧固定标签列，中间输入框全宽展示，长模板不截断。</p>
+      <div style="margin-top:8px; display:flex; gap:6px; flex-wrap:wrap;">
+        <span style="font-size:10px; background:#dcfce7; color:#166534; padding:2px 6px; border-radius:3px;">模板完整可见</span>
+        <span style="font-size:10px; background:#dcfce7; color:#166534; padding:2px 6px; border-radius:3px;">结构清晰</span>
+        <span style="font-size:10px; background:#dcfce7; color:#166534; padding:2px 6px; border-radius:3px;">节省空间</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 方案 C：保持纵向但去掉卡片边框 -->
+  <div class="card" data-choice="c" onclick="toggleSelect(this)" style="padding:0; overflow:hidden; border-radius:12px; flex:1; min-width:260px;">
+    <div class="card-image" style="background:#fafbff; padding:18px; border-bottom:1px solid #eee;">
+      <div style="font-size:10px; font-weight:700; color:#059669; text-transform:uppercase; letter-spacing:.08em; margin-bottom:14px;">方案 C · 纵向紧凑（微改）</div>
+
+      <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:12px;">
+        <!-- Campaign -->
+        <div style="display:flex; align-items:flex-start; gap:10px;">
+          <div style="width:68px; flex-shrink:0; padding-top:8px;">
+            <div style="font-size:10px; font-weight:600; color:#374151;">Campaign</div>
+            <div style="font-size:9px; color:#9ca3af; margin-top:2px;">↺ 历史</div>
+          </div>
+          <div style="flex:1;">
+            <div style="background:#f5f3ff; border:1.5px solid #6366f1; border-radius:5px; padding:6px 9px; font-size:10px; font-family:monospace; color:#1e1b4b;">{Brand}-{location}-{date}</div>
+            <div style="font-size:9px; color:#9ca3af; margin-top:3px; font-family:monospace;">MyBrand-US-20260415</div>
+          </div>
+        </div>
+        <div style="height:1px; background:#f3f4f6;"></div>
+        <!-- Adset -->
+        <div style="display:flex; align-items:flex-start; gap:10px;">
+          <div style="width:68px; flex-shrink:0; padding-top:8px;">
+            <div style="font-size:10px; font-weight:600; color:#374151;">Adset</div>
+            <div style="font-size:9px; color:#9ca3af; margin-top:2px;">↺ 历史</div>
+          </div>
+          <div style="flex:1;">
+            <div style="background:#f9fafb; border:1px solid #e5e7eb; border-radius:5px; padding:6px 9px; font-size:10px; font-family:monospace; color:#374151;">{location}-{audience_type}-{creative_type}-{date}</div>
+            <div style="font-size:9px; color:#9ca3af; margin-top:3px; font-family:monospace;">US-LAL-Video-20260415</div>
+          </div>
+        </div>
+        <div style="height:1px; background:#f3f4f6;"></div>
+        <!-- Ad -->
+        <div style="display:flex; align-items:flex-start; gap:10px;">
+          <div style="width:68px; flex-shrink:0; padding-top:8px;">
+            <div style="font-size:10px; font-weight:600; color:#374151;">Ad</div>
+            <div style="font-size:9px; color:#9ca3af; margin-top:2px;">↺ 历史</div>
+          </div>
+          <div style="flex:1;">
+            <div style="background:#f9fafb; border:1px solid #e5e7eb; border-radius:5px; padding:6px 9px; font-size:10px; font-family:monospace; color:#374151;">{Brand}-{creative_type}-{number}-{date}</div>
+            <div style="font-size:9px; color:#9ca3af; margin-top:3px; font-family:monospace;">MyBrand-Video-001-20260415</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 底部变量库 -->
+      <div style="border:1.5px solid #e0e7ff; background:white; border-radius:7px; padding:9px 12px;">
+        <div style="font-size:9px; color:#6366f1; font-weight:600; margin-bottom:6px;">● 插入到：Campaign 命名</div>
+        <div style="display:flex; flex-wrap:wrap; gap:4px;">
+          <span style="background:#ede9fe; color:#5b21b6; font-size:10px; padding:2px 7px; border-radius:3px;">{Brand}</span>
+          <span style="background:#ede9fe; color:#5b21b6; font-size:10px; padding:2px 7px; border-radius:3px;">{location}</span>
+          <span style="background:#ede9fe; color:#5b21b6; font-size:10px; padding:2px 7px; border-radius:3px;">{budget}</span>
+          <span style="background:#ede9fe; color:#5b21b6; font-size:10px; padding:2px 7px; border-radius:3px;">{date}</span>
+          <span style="background:#ede9fe; color:#5b21b6; font-size:10px; padding:2px 7px; border-radius:3px;">{audience_type}</span>
+          <span style="background:#ede9fe; color:#5b21b6; font-size:10px; padding:2px 7px; border-radius:3px;">{creative_type}</span>
+          <span style="background:#f3f4f6; color:#6b7280; font-size:10px; padding:2px 7px; border-radius:3px;">自定义(...)</span>
+        </div>
+      </div>
+    </div>
+    <div class="card-body" style="padding:12px 18px;">
+      <h3 style="font-size:12px; margin-bottom:4px;">纵向紧凑（去独立卡片）</h3>
+      <p style="font-size:11px; color:#6b7280; margin:0; line-height:1.5;">保持纵向阅读，去掉三个独立卡片，改为分隔线分组，左标签右输入框。改动最保守。</p>
+      <div style="margin-top:8px; display:flex; gap:6px; flex-wrap:wrap;">
+        <span style="font-size:10px; background:#dcfce7; color:#166534; padding:2px 6px; border-radius:3px;">改动最小</span>
+        <span style="font-size:10px; background:#dcfce7; color:#166534; padding:2px 6px; border-radius:3px;">节省空间</span>
+        <span style="font-size:10px; background:#fef9c3; color:#854d0e; padding:2px 6px; border-radius:3px;">纵向仍偏长</span>
+      </div>
+    </div>
+  </div>
+
+</div>

@@ -1,0 +1,337 @@
+<style>
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; }
+
+  .section-label {
+    font-size:10px; font-weight:700; color:#9ca3af;
+    text-transform:uppercase; letter-spacing:.06em;
+    margin:24px 0 10px;
+  }
+  .approach-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
+  .approach-card {
+    border:1.5px solid #e5e7eb; border-radius:14px; overflow:hidden;
+    cursor:pointer; transition:border-color .15s,box-shadow .15s;
+    background:#fff;
+  }
+  .approach-card:hover { border-color:#a5b4fc; box-shadow:0 0 0 3px #e0e7ff; }
+  .approach-card.selected { border-color:#6366f1; box-shadow:0 0 0 3px #c7d2fe; }
+  .approach-header {
+    padding:12px 16px; background:#f9fafb; border-bottom:1px solid #f3f4f6;
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .approach-title { font-size:12px; font-weight:700; color:#111827; }
+  .approach-badge {
+    font-size:9px; font-weight:600; padding:2px 8px; border-radius:99px;
+    background:#ede9fe; color:#7c3aed;
+  }
+  .approach-preview { padding:16px; }
+
+  /* Mini architecture diagram */
+  .mini-arch { display:flex; flex-direction:column; align-items:center; gap:6px; }
+  .camp-node {
+    width:32px; height:32px; background:#111827; border-radius:8px;
+    display:flex; align-items:center; justify-content:center;
+    color:#fff; font-size:13px; flex-shrink:0;
+  }
+  .camp-line { width:1px; height:10px; background:#e5e7eb; }
+  .adset-row { display:flex; gap:8px; align-items:flex-start; }
+  .adset-col { display:flex; flex-direction:column; align-items:center; gap:4px; }
+
+  /* Audience button styles */
+  .aud-btn {
+    width:32px; height:32px; border-radius:8px;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    font-size:8px; font-weight:700; border:none; cursor:pointer;
+    position:relative; transition:transform .1s;
+  }
+  .aud-btn.adv { background:#ede9fe; color:#6d28d9; border:1.5px solid #ddd6fe; }
+  .aud-btn.lal { background:#f5f3ff; color:#7c3aed; border:1.5px solid #ddd6fe; }
+  .aud-btn.int { background:#fffbeb; color:#b45309; border:1.5px solid #fde68a; }
+  .aud-btn.active { transform:scale(1.1); }
+  .aud-btn .idx {
+    position:absolute; top:-4px; right:-4px; width:14px; height:14px;
+    background:#111827; color:#fff; font-size:7px; font-weight:700;
+    border-radius:99px; display:flex; align-items:center; justify-content:center;
+    border:1.5px solid #fff;
+  }
+  .aud-btn .dot {
+    position:absolute; bottom:-2px; right:-2px; width:8px; height:8px;
+    border-radius:99px; border:1.5px solid #fff;
+  }
+  .dot-green { background:#22c55e; }
+  .dot-orange { background:#f97316; }
+
+  .adset-name { font-size:8px; color:#9ca3af; font-weight:500; white-space:nowrap; }
+
+  /* Thumbnail row */
+  .thumb-row { display:flex; gap:2px; flex-wrap:wrap; justify-content:center; max-width:72px; }
+  .mini-thumb {
+    width:16px; height:20px; border-radius:3px;
+    border:1.5px solid #fff; overflow:hidden; box-shadow:0 1px 2px rgba(0,0,0,.1);
+  }
+  .t1{background:linear-gradient(135deg,#ddd6fe,#a5b4fc)}
+  .t2{background:linear-gradient(135deg,#fde68a,#fca5a5)}
+  .t3{background:linear-gradient(135deg,#a7f3d0,#6ee7b7)}
+  .t4{background:linear-gradient(135deg,#fbcfe8,#f9a8d4)}
+
+  /* Approach A: Inline Expand */
+  .inline-expand-panel {
+    background:#f5f3ff; border:1px solid #ddd6fe; border-radius:8px;
+    padding:10px; margin-top:4px; width:100%; max-width:72px;
+    font-size:8px;
+  }
+  .type-pills { display:flex; gap:3px; margin-bottom:6px; }
+  .type-pill {
+    padding:2px 6px; border-radius:99px; font-size:7px; font-weight:700;
+    cursor:pointer; border:1px solid;
+  }
+  .type-pill.active { background:#6366f1; color:#fff; border-color:#6366f1; }
+  .type-pill.inactive { background:#fff; color:#9ca3af; border-color:#e5e7eb; }
+  .seed-item { display:flex; align-items:center; gap:3px; padding:2px 0; }
+  .seed-check { width:8px; height:8px; border-radius:2px; border:1px solid #ddd6fe; flex-shrink:0; }
+  .seed-check.checked { background:#6366f1; border-color:#6366f1; }
+  .seed-text { font-size:7px; color:#6b7280; line-height:1.2; }
+
+  /* Approach B: Side Panel */
+  .side-panel-layout { display:flex; gap:8px; }
+  .side-panel-arch { flex:1; }
+  .side-panel {
+    width:100px; background:#f5f3ff; border:1px solid #ddd6fe; border-radius:8px;
+    padding:8px; font-size:8px; flex-shrink:0;
+  }
+  .side-panel-title { font-size:8px; font-weight:700; color:#6d28d9; margin-bottom:5px; }
+
+  /* Approach C: Bottom tray */
+  .bottom-tray-wrap { position:relative; }
+  .bottom-tray {
+    background:#1f2937; border-radius:8px; padding:8px 10px;
+    margin-top:8px; font-size:8px;
+  }
+  .tray-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:5px; }
+  .tray-title { font-size:8px; font-weight:700; color:#fff; }
+  .tray-adset-tag {
+    font-size:7px; padding:1px 6px; border-radius:99px;
+    background:rgba(255,255,255,.15); color:rgba(255,255,255,.8);
+  }
+  .tray-pills { display:flex; gap:3px; margin-bottom:5px; }
+  .tray-pill {
+    padding:2px 7px; border-radius:99px; font-size:7px; font-weight:700;
+    border:1px solid;
+  }
+  .tray-pill.active { background:#6366f1; color:#fff; border-color:#6366f1; }
+  .tray-pill.inactive { color:rgba(255,255,255,.4); border-color:rgba(255,255,255,.2); }
+  .tray-seed { display:flex; align-items:center; gap:3px; padding:2px 0; }
+  .tray-check { width:8px; height:8px; border-radius:2px; flex-shrink:0; }
+  .tray-check.checked { background:#6366f1; }
+  .tray-check.unchecked { border:1px solid rgba(255,255,255,.3); }
+  .tray-text { font-size:7px; color:rgba(255,255,255,.7); }
+
+  /* Pros/cons */
+  .mini-pros-cons { display:flex; gap:6px; margin-top:10px; padding-top:8px; border-top:1px solid #f3f4f6; }
+  .mini-pro, .mini-con { font-size:8px; flex:1; }
+  .mini-pro b { color:#059669; }
+  .mini-con b { color:#dc2626; }
+
+  /* Save bar */
+  .save-bar {
+    display:flex; align-items:center; justify-content:flex-end; gap:4px;
+    margin-top:5px;
+  }
+  .btn-save-mini {
+    padding:2px 8px; border-radius:4px; font-size:7px; font-weight:700;
+    background:#6366f1; color:#fff; border:none;
+  }
+  .btn-cancel-mini {
+    padding:2px 8px; border-radius:4px; font-size:7px; font-weight:700;
+    background:#f3f4f6; color:#6b7280; border:none;
+  }
+</style>
+
+<h2>每 Adset 独立受众 — 非弹窗方案对比</h2>
+<p class="subtitle">三种交互方式，点选你偏好的方案</p>
+
+<div class="cards" style="grid-template-columns:repeat(3,1fr)">
+
+  <!-- 方案 A: Inline Expand -->
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding:16px;background:#fafafa;min-height:320px">
+
+      <div style="font-size:9px;font-weight:700;color:#6366f1;margin-bottom:10px;text-transform:uppercase;letter-spacing:.05em">方案 A · 节点内联展开</div>
+
+      <div class="mini-arch">
+        <div class="camp-node">📁</div>
+        <div class="camp-line"></div>
+        <div class="adset-row" style="align-items:flex-start">
+
+          <!-- Adset 1 - active, LAL, expanded -->
+          <div class="adset-col">
+            <div class="aud-btn lal active" style="width:36px;height:36px">
+              LAL<div class="idx">1</div>
+              <div class="dot dot-green"></div>
+            </div>
+            <div class="adset-name">素材组 1</div>
+            <div class="thumb-row"><div class="mini-thumb t1"></div><div class="mini-thumb t2"></div><div class="mini-thumb t3"></div></div>
+            <!-- Inline expand panel -->
+            <div class="inline-expand-panel">
+              <div style="font-size:7px;color:#6d28d9;font-weight:700;margin-bottom:4px">LAL 种子受众</div>
+              <div class="seed-item"><div class="seed-check checked"></div><div class="seed-text">US Purchase 1%</div></div>
+              <div class="seed-item"><div class="seed-check checked"></div><div class="seed-text">US Cart 5%</div></div>
+              <div class="seed-item"><div class="seed-check"></div><div class="seed-text">US Register</div></div>
+              <div class="save-bar"><button class="btn-cancel-mini">取消</button><button class="btn-save-mini">保存</button></div>
+            </div>
+          </div>
+
+          <!-- Adset 2 - ADV, collapsed -->
+          <div class="adset-col">
+            <div class="aud-btn adv" style="width:36px;height:36px">
+              Adv+<div class="idx">2</div>
+            </div>
+            <div class="adset-name">素材组 2</div>
+            <div class="thumb-row"><div class="mini-thumb t2"></div><div class="mini-thumb t4"></div></div>
+          </div>
+
+          <!-- Adset 3 - INT, configured -->
+          <div class="adset-col">
+            <div class="aud-btn int" style="width:36px;height:36px">
+              INT<div class="idx">3</div>
+              <div class="dot dot-green"></div>
+            </div>
+            <div class="adset-name">素材组 3</div>
+            <div class="thumb-row"><div class="mini-thumb t1"></div><div class="mini-thumb t3"></div></div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>内联展开</h3>
+      <p>点击受众按钮后，配置面板直接在该 adset 节点正下方展开；其余 adset 保持原样</p>
+      <div class="mini-pros-cons">
+        <div class="mini-pro"><b>✓</b> 直觉性强，配置与节点强关联<br><b>✓</b> 无页面层级跳转</div>
+        <div class="mini-con"><b>↑</b> Adset 多时列很宽，展开后纵向很高<br><b>↑</b> 横向 overflow 时面板可能被截断</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 方案 B: Side Panel -->
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding:16px;background:#fafafa;min-height:320px">
+
+      <div style="font-size:9px;font-weight:700;color:#6366f1;margin-bottom:10px;text-transform:uppercase;letter-spacing:.05em">方案 B · 架构图右侧面板</div>
+
+      <div class="mini-arch" style="align-items:flex-start">
+        <div style="display:flex;flex-direction:column;align-items:center;width:100%">
+          <div class="camp-node">📁</div>
+          <div class="camp-line"></div>
+        </div>
+        <div class="side-panel-layout" style="width:100%">
+          <div class="side-panel-arch">
+            <div class="adset-row" style="justify-content:flex-start">
+              <!-- Adset 1 - active/selected -->
+              <div class="adset-col">
+                <div class="aud-btn lal active" style="width:32px;height:32px;box-shadow:0 0 0 2px #6366f1">
+                  LAL<div class="idx">1</div>
+                  <div class="dot dot-green"></div>
+                </div>
+                <div class="adset-name">素材 1</div>
+                <div class="thumb-row"><div class="mini-thumb t1"></div><div class="mini-thumb t2"></div></div>
+              </div>
+              <div class="adset-col">
+                <div class="aud-btn adv" style="width:32px;height:32px">Adv+<div class="idx">2</div></div>
+                <div class="adset-name">素材 2</div>
+                <div class="thumb-row"><div class="mini-thumb t3"></div><div class="mini-thumb t4"></div></div>
+              </div>
+              <div class="adset-col">
+                <div class="aud-btn int" style="width:32px;height:32px">INT<div class="idx">3</div><div class="dot dot-orange"></div></div>
+                <div class="adset-name">素材 3</div>
+                <div class="thumb-row"><div class="mini-thumb t2"></div></div>
+              </div>
+            </div>
+          </div>
+          <!-- Side Panel -->
+          <div class="side-panel">
+            <div class="side-panel-title">素材组 1 · 受众</div>
+            <div class="type-pills">
+              <div class="type-pill inactive">Adv+</div>
+              <div class="type-pill active">LAL</div>
+              <div class="type-pill inactive">INT</div>
+            </div>
+            <div style="font-size:7px;color:#9ca3af;margin-bottom:4px">种子受众</div>
+            <div class="seed-item"><div class="seed-check checked"></div><div class="seed-text">US Purchase 1%</div></div>
+            <div class="seed-item"><div class="seed-check checked"></div><div class="seed-text">US Cart 5%</div></div>
+            <div class="seed-item"><div class="seed-check"></div><div class="seed-text">US Register</div></div>
+            <div class="save-bar" style="margin-top:6px"><button class="btn-save-mini">保存</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>右侧固定面板</h3>
+      <p>架构图左边不变，点击任意 adset 受众按钮后，右侧出现固定宽度的配置面板（类似 inspector）</p>
+      <div class="mini-pros-cons">
+        <div class="mini-pro"><b>✓</b> 空间固定可预测，不撑高页面<br><b>✓</b> 可快速切换查看不同 adset 配置</div>
+        <div class="mini-con"><b>↑</b> 架构图列变窄，adset 多时拥挤<br><b>↑</b> 关联感比内联弱一些</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 方案 C: Bottom Tray -->
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding:16px;background:#fafafa;min-height:320px">
+
+      <div style="font-size:9px;font-weight:700;color:#6366f1;margin-bottom:10px;text-transform:uppercase;letter-spacing:.05em">方案 C · 架构图底部配置栏</div>
+
+      <div class="mini-arch">
+        <div class="camp-node">📁</div>
+        <div class="camp-line"></div>
+        <div class="adset-row">
+          <div class="adset-col">
+            <div class="aud-btn lal active" style="width:32px;height:32px;box-shadow:0 0 0 2px #6366f1">
+              LAL<div class="idx">1</div><div class="dot dot-green"></div>
+            </div>
+            <div class="adset-name">素材 1</div>
+            <div class="thumb-row"><div class="mini-thumb t1"></div><div class="mini-thumb t2"></div></div>
+          </div>
+          <div class="adset-col">
+            <div class="aud-btn adv" style="width:32px;height:32px">Adv+<div class="idx">2</div></div>
+            <div class="adset-name">素材 2</div>
+            <div class="thumb-row"><div class="mini-thumb t3"></div><div class="mini-thumb t4"></div></div>
+          </div>
+          <div class="adset-col">
+            <div class="aud-btn int" style="width:32px;height:32px">INT<div class="idx">3</div><div class="dot dot-orange"></div></div>
+            <div class="adset-name">素材 3</div>
+            <div class="thumb-row"><div class="mini-thumb t2"></div></div>
+          </div>
+        </div>
+        <!-- Bottom Tray -->
+        <div class="bottom-tray" style="width:100%">
+          <div class="tray-header">
+            <span class="tray-title">受众配置</span>
+            <span class="tray-adset-tag">素材组 1</span>
+          </div>
+          <div class="tray-pills">
+            <div class="tray-pill inactive">Adv+</div>
+            <div class="tray-pill active">LAL</div>
+            <div class="tray-pill inactive">INT</div>
+          </div>
+          <div class="tray-seed"><div class="tray-check checked"></div><div class="tray-text">US Purchase 1%</div></div>
+          <div class="tray-seed"><div class="tray-check checked"></div><div class="tray-text">US Add to Cart 5%</div></div>
+          <div class="tray-seed"><div class="tray-check unchecked"></div><div class="tray-text">US Register 30d</div></div>
+          <div class="save-bar" style="margin-top:5px">
+            <button class="btn-cancel-mini" style="color:#9ca3af;background:rgba(255,255,255,.1)">取消</button>
+            <button class="btn-save-mini">保存</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>底部配置栏</h3>
+      <p>点击 adset 受众按钮后，架构图底部滑出深色配置栏（类似视频编辑器的属性栏），上方 adset 节点保持完整可见</p>
+      <div class="mini-pros-cons">
+        <div class="mini-pro"><b>✓</b> 不压缩架构图宽度<br><b>✓</b> 深色背景区分度高，"正在编辑"感强</div>
+        <div class="mini-con"><b>↑</b> 底部和 adset 节点距离远，关联感需引导线加强</div>
+      </div>
+    </div>
+  </div>
+
+</div>

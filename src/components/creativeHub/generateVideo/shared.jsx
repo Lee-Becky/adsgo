@@ -15,11 +15,11 @@ export function Pill({ active, children, onClick, disabled }) {
         'inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium border transition-all',
         'focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500',
         disabled
-          ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
+          ? 'bg-neutral-100 text-neutral-400 border-neutral-200 cursor-not-allowed'
           : 'cursor-pointer',
         !disabled && active
           ? 'bg-primary-50 text-primary-700 border-primary-300 shadow-sm'
-          : !disabled && 'bg-white text-gray-700 border-gray-200 hover:bg-primary-50/30 hover:border-primary-200 hover:text-primary-600',
+          : !disabled && 'bg-white text-neutral-700 border-neutral-200 hover:bg-primary-50/30 hover:border-primary-200 hover:text-primary-600',
       )}
     >
       {children}
@@ -33,7 +33,7 @@ export function FormField({ label, hint, children }) {
     <div className="space-y-1.5">
       <div className="flex items-end justify-between gap-3">
         <FieldLabel>{label}</FieldLabel>
-        {hint ? <span className="text-xs text-gray-500 shrink-0">{hint}</span> : null}
+        {hint ? <span className="text-xs text-neutral-500 shrink-0">{hint}</span> : null}
       </div>
       {children}
     </div>
@@ -47,8 +47,8 @@ export function StepPageHeader({ title, description, children }) {
       <div className="flex items-start gap-3 min-w-0">
         <div className="w-1.5 h-7 rounded-full bg-gradient-to-b from-primary-500 to-primary-400 shrink-0 mt-0.5" />
         <div className="min-w-0">
-          <h2 className="text-xl font-bold text-gray-900 mb-1">{title}</h2>
-          {description && <p className="text-sm text-gray-500">{description}</p>}
+          <h2 className="text-xl font-bold text-neutral-900 mb-1">{title}</h2>
+          {description && <p className="text-sm text-neutral-500">{description}</p>}
         </div>
       </div>
       {children}
@@ -61,17 +61,17 @@ export function AssetGrid({ selectedAssets, onToggle, compact = false }) {
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <h4 className="text-sm font-semibold text-gray-900">创意素材资源</h4>
+        <h4 className="text-sm font-semibold text-neutral-900">创意素材资源</h4>
         <span className={cn(
           'inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold',
           selectedAssets.size >= 3
             ? 'bg-primary-50 text-primary-600'
-            : 'bg-gray-100 text-gray-500',
+            : 'bg-neutral-100 text-neutral-500',
         )}>
           {selectedAssets.size} / 5
         </span>
       </div>
-      <p className="text-xs text-gray-500 leading-relaxed">
+      <p className="text-xs text-neutral-500 leading-relaxed">
         选择 3–5 张不同角度图片，生成效果会更好。若包含人物模特图，生成时将优先参考。
       </p>
       <div
@@ -83,8 +83,8 @@ export function AssetGrid({ selectedAssets, onToggle, compact = false }) {
         <button
           type="button"
           className={cn(
-            'aspect-square rounded-lg border-2 border-dashed border-gray-300 flex flex-col items-center justify-center gap-1.5 transition-all',
-            'hover:border-primary-300 hover:bg-primary-50/30 text-gray-400 hover:text-primary-500',
+            'aspect-square rounded-lg border-2 border-dashed border-neutral-300 flex flex-col items-center justify-center gap-1.5 transition-all',
+            'hover:border-primary-300 hover:bg-primary-50/30 text-neutral-400 hover:text-primary-500',
             'focus:outline-none focus:ring-2 focus:ring-primary-500/20',
           )}
         >
@@ -104,10 +104,10 @@ export function AssetGrid({ selectedAssets, onToggle, compact = false }) {
                 'focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500',
                 checked
                   ? 'border-primary-300 ring-1 ring-primary-200'
-                  : 'border-gray-200 hover:border-gray-300',
+                  : 'border-neutral-200 hover:border-neutral-300',
               )}
             >
-              <div className="aspect-square bg-gray-100 overflow-hidden">
+              <div className="aspect-square bg-neutral-100 overflow-hidden">
                 <img
                   src={a.src}
                   alt=""
@@ -127,7 +127,7 @@ export function AssetGrid({ selectedAssets, onToggle, compact = false }) {
                     compact && 'w-3.5 h-3.5',
                     checked
                       ? 'bg-primary-500 border-primary-500 shadow-sm'
-                      : 'bg-white/90 border-gray-300',
+                      : 'bg-white/90 border-neutral-300',
                   )}
                 >
                   {checked && (
@@ -142,8 +142,8 @@ export function AssetGrid({ selectedAssets, onToggle, compact = false }) {
           );
         })}
       </div>
-      <p className="text-xs text-gray-500">
-        已选 <span className="font-semibold text-gray-800">{selectedAssets.size}</span> / 5（至少 3 张可生成脚本）
+      <p className="text-xs text-neutral-500">
+        已选 <span className="font-semibold text-neutral-800">{selectedAssets.size}</span> / 5（至少 3 张可生成脚本）
       </p>
     </div>
   );

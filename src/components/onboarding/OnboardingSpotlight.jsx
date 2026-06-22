@@ -148,20 +148,20 @@ export default function OnboardingSpotlight({ targetRef, title, body, onSkip, on
           pointerEvents: 'auto',
           transition: 'top 200ms ease, left 200ms ease',
         }}
-        className="bg-white rounded-xl shadow-2xl border border-gray-100 p-4"
+        className="bg-white rounded-xl shadow-2xl border border-neutral-100 p-4"
       >
         {stepLabel && (
           <div className="text-[10px] font-bold text-primary uppercase tracking-widest mb-1.5">
             步骤 {stepLabel}
           </div>
         )}
-        <p className="text-sm font-semibold text-gray-900 mb-1">{title}</p>
-        <p className="text-xs text-gray-500 leading-relaxed mb-4">{body}</p>
+        <p className="text-sm font-semibold text-neutral-900 mb-1">{title}</p>
+        <p className="text-xs text-neutral-500 leading-relaxed mb-4">{body}</p>
         {renderActions ? renderActions() : (
           <div className="flex items-center justify-between">
             <button
               onClick={onSkip}
-              className="text-xs text-gray-400 hover:text-gray-600 transition-colors"
+              className="text-xs text-neutral-400 hover:text-neutral-600 transition-colors"
             >
               跳过引导
             </button>

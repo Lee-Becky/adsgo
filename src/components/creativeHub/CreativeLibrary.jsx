@@ -59,7 +59,7 @@ const CreativeLibrary = () => {
           <button
             ref={libraryHeaderRef}
             onClick={() => setIsUploadModalOpen(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-sm font-medium"
+            className="flex items-center gap-2 px-4 py-2 bg-info-600 text-white rounded-lg hover:bg-info-700 transition-colors shadow-sm font-medium"
           >
             <Plus size={18} />
             Add Creatives
@@ -70,7 +70,7 @@ const CreativeLibrary = () => {
           {selectedIds.length > 0 && (
             <button
               onClick={handleDeleteSelected}
-              className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors shadow-sm text-sm animate-in fade-in slide-in-from-right-2 duration-200"
+              className="flex items-center gap-2 px-4 py-2 bg-danger-600 text-white rounded-lg hover:bg-danger-700 transition-colors shadow-sm text-sm animate-in fade-in slide-in-from-right-2 duration-200"
             >
               <Trash2 size={16} />
               Delete ({selectedIds.length})
@@ -86,11 +86,11 @@ const CreativeLibrary = () => {
               key={creative.id}
               className={`group relative bg-white rounded-xl border-2 transition-all overflow-hidden ${
                 selectedIds.includes(creative.id) 
-                ? 'border-blue-500 ring-2 ring-blue-500/10' 
-                : 'border-transparent hover:border-gray-200'
+                ? 'border-info-500 ring-2 ring-info-500/10' 
+                : 'border-transparent hover:border-neutral-200'
               } shadow-sm hover:shadow-md`}
             >
-              <div className="aspect-[1/1] relative bg-gray-50 overflow-hidden">
+              <div className="aspect-[1/1] relative bg-neutral-50 overflow-hidden">
                 <img 
                   src={creative.url} 
                   alt={creative.name}
@@ -104,8 +104,8 @@ const CreativeLibrary = () => {
                 >
                   <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
                     selectedIds.includes(creative.id)
-                    ? 'bg-blue-600 border-blue-600 text-white shadow-md'
-                    : 'bg-white/80 border-gray-300 group-hover/check:border-blue-400'
+                    ? 'bg-info-600 border-info-600 text-white shadow-md'
+                    : 'bg-white/80 border-neutral-300 group-hover/check:border-info-400'
                   }`}>
                     {selectedIds.includes(creative.id) ? (
                       <Check size={12} strokeWidth={3} />
@@ -119,14 +119,14 @@ const CreativeLibrary = () => {
                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3 z-10">
                   <button
                     onClick={(e) => handlePreview(e, creative)}
-                    className="p-2.5 bg-white rounded-full text-blue-600 shadow-xl hover:bg-blue-50 hover:scale-110 transition-all active:scale-95"
+                    className="p-2.5 bg-white rounded-full text-info-600 shadow-xl hover:bg-info-50 hover:scale-110 transition-all active:scale-95"
                     title="Preview creative"
                   >
                     <Eye size={20} />
                   </button>
                   <button
                     onClick={(e) => handleDeleteSingle(e, creative.id)}
-                    className="p-2.5 bg-white rounded-full text-red-500 shadow-xl hover:bg-red-50 hover:scale-110 transition-all active:scale-95"
+                    className="p-2.5 bg-white rounded-full text-danger-500 shadow-xl hover:bg-danger-50 hover:scale-110 transition-all active:scale-95"
                     title="Delete creative"
                   >
                     <Trash2 size={20} />
@@ -135,19 +135,19 @@ const CreativeLibrary = () => {
 
                 {/* Selection Overlay (subtle) */}
                 <div className={`absolute inset-0 transition-colors pointer-events-none ${
-                  selectedIds.includes(creative.id) ? 'bg-blue-500/5' : 'bg-transparent'
+                  selectedIds.includes(creative.id) ? 'bg-info-500/5' : 'bg-transparent'
                 }`} />
               </div>
               
-              <div className="p-2 border-t border-gray-50 bg-white">
-                <p className="text-[11px] font-medium text-gray-600 truncate">{creative.name}</p>
+              <div className="p-2 border-t border-neutral-50 bg-white">
+                <p className="text-[11px] font-medium text-neutral-600 truncate">{creative.name}</p>
               </div>
             </div>
           ))}
         </div>
         
         {creatives.length === 0 && (
-          <div className="h-64 flex flex-col items-center justify-center text-gray-500">
+          <div className="h-64 flex flex-col items-center justify-center text-neutral-500">
             <Trash2 size={40} className="mb-3 opacity-20" />
             <p className="text-base">No creatives found</p>
           </div>

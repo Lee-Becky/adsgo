@@ -113,45 +113,45 @@ const BudgetEditModal = ({ isOpen, onClose, campaign, onSave, onUpdateBudgetStat
         />
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg bg-white rounded-xl shadow-2xl max-h-[90vh] overflow-y-auto">
           <div className="px-6 py-4 border-b border-border flex items-center justify-between sticky top-0 bg-white z-10">
-            <h2 className="text-lg font-bold text-gray-900">
+            <h2 className="text-lg font-bold text-neutral-900">
               {currentEditMode === 'campaign' ? 'Edit Campaign Budget' : 
                currentEditMode === 'single-adset' ? 'Edit Adset Budget' : 
                'Edit Adset Budgets'}
             </h2>
             <button
               onClick={onClose}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              className="p-2 hover:bg-neutral-100 rounded-lg transition-colors"
             >
-              <X size={20} className="text-gray-500" />
+              <X size={20} className="text-neutral-500" />
             </button>
           </div>
 
           <form onSubmit={handleSubmit} className="p-6">
             <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-neutral-700 mb-2">
                 {currentEditMode === 'campaign' || currentEditMode === 'all-adsets' ? 'Campaign' : 'Adset'}
               </label>
-              <p className="text-gray-900 font-medium">{campaign.campaign || campaign.name}</p>
+              <p className="text-neutral-900 font-medium">{campaign.campaign || campaign.name}</p>
             </div>
 
             {currentEditMode === 'campaign' ? (
               // 预算在 campaign 层：编辑单个 campaign 预算
               <>
                 <div className="mb-6">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-neutral-700 mb-2">
                     Current Daily Budget
                   </label>
-                  <p className="text-gray-900 font-medium">{formatCurrency(campaign.dailyBudget)}</p>
+                  <p className="text-neutral-900 font-medium">{formatCurrency(campaign.dailyBudget)}</p>
                 </div>
 
                 <div className="mb-6">
                   <div className="flex gap-3 items-start">
                     <div className="w-[140px]">
-                      <label htmlFor="budget" className="block text-sm font-medium text-gray-700 mb-2">
+                      <label htmlFor="budget" className="block text-sm font-medium text-neutral-700 mb-2">
                         New Daily Budget
                       </label>
                       <div className="relative">
-                        <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+                        <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" size={20} />
                         <input
                           type="number"
                           id="budget"
@@ -165,7 +165,7 @@ const BudgetEditModal = ({ isOpen, onClose, campaign, onSave, onUpdateBudgetStat
                       </div>
                     </div>
                     <div className="flex-1">
-                      <label htmlFor="reason" className="block text-xs text-gray-600 mb-2">
+                      <label htmlFor="reason" className="block text-xs text-neutral-600 mb-2">
                         Reason for manual modification (optional)
                       </label>
                       <textarea
@@ -190,20 +190,20 @@ const BudgetEditModal = ({ isOpen, onClose, campaign, onSave, onUpdateBudgetStat
               // 编辑单个 adset 预算
               <>
                 <div className="mb-6">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-neutral-700 mb-2">
                     Current Daily Budget
                   </label>
-                  <p className="text-gray-900 font-medium">{formatCurrency(campaign.dailyBudget)}</p>
+                  <p className="text-neutral-900 font-medium">{formatCurrency(campaign.dailyBudget)}</p>
                 </div>
 
                 <div className="mb-6">
                   <div className="flex gap-3 items-start">
                     <div className="w-[140px]">
-                      <label htmlFor={`budget-${campaign.id}`} className="block text-sm font-medium text-gray-700 mb-2">
+                      <label htmlFor={`budget-${campaign.id}`} className="block text-sm font-medium text-neutral-700 mb-2">
                         New Daily Budget
                       </label>
                       <div className="relative">
-                        <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+                        <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" size={20} />
                         <input
                           type="number"
                           id={`budget-${campaign.id}`}
@@ -217,7 +217,7 @@ const BudgetEditModal = ({ isOpen, onClose, campaign, onSave, onUpdateBudgetStat
                       </div>
                     </div>
                     <div className="flex-1">
-                      <label htmlFor="reason" className="block text-xs text-gray-600 mb-2">
+                      <label htmlFor="reason" className="block text-xs text-neutral-600 mb-2">
                         Reason for manual modification (optional)
                       </label>
                       <textarea
@@ -242,30 +242,30 @@ const BudgetEditModal = ({ isOpen, onClose, campaign, onSave, onUpdateBudgetStat
               // 编辑 campaign 下所有 adsets 的预算
               <>
                 <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-neutral-700 mb-2">
                     Current Total Daily Budget
                   </label>
-                  <p className="text-gray-900 font-medium">{formatCurrency(campaign.dailyBudget)}</p>
+                  <p className="text-neutral-900 font-medium">{formatCurrency(campaign.dailyBudget)}</p>
                 </div>
 
                 <div className="space-y-4 mb-6">
                   {campaign.adsets.map((adset, index) => (
-                    <div key={adset.id} className="p-4 bg-gray-50 rounded-lg border border-border">
+                    <div key={adset.id} className="p-4 bg-neutral-50 rounded-lg border border-border">
                       <div className="mb-3">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-sm font-medium text-neutral-700 mb-1">
                           {adset.name}
                         </label>
-                        <p className="text-xs text-gray-500">Current: {formatCurrency(adset.dailyBudget)}</p>
+                        <p className="text-xs text-neutral-500">Current: {formatCurrency(adset.dailyBudget)}</p>
                       </div>
 
                       <div className="mb-3">
                         <div className="flex gap-3 items-start">
                           <div className="w-[140px]">
-                            <label htmlFor={`budget-all-${adset.id}`} className="block text-sm font-medium text-gray-700 mb-2">
+                            <label htmlFor={`budget-all-${adset.id}`} className="block text-sm font-medium text-neutral-700 mb-2">
                               New Daily Budget
                             </label>
                             <div className="relative">
-                              <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                              <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" size={18} />
                               <input
                                 type="number"
                                 id={`budget-all-${adset.id}`}
@@ -279,7 +279,7 @@ const BudgetEditModal = ({ isOpen, onClose, campaign, onSave, onUpdateBudgetStat
                             </div>
                           </div>
                           <div className="flex-1">
-                            <label htmlFor={`reason-${adset.id}`} className="block text-xs text-gray-600 mb-2">
+                            <label htmlFor={`reason-${adset.id}`} className="block text-xs text-neutral-600 mb-2">
                               Reason for manual modification (optional)
                             </label>
                             <textarea
@@ -308,7 +308,7 @@ const BudgetEditModal = ({ isOpen, onClose, campaign, onSave, onUpdateBudgetStat
               <button
                 type="button"
                 onClick={onClose}
-                className="flex-1 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                className="flex-1 px-4 py-2 text-sm font-medium text-neutral-700 bg-neutral-100 rounded-lg hover:bg-neutral-200 transition-colors"
               >
                 Cancel
               </button>

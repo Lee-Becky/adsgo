@@ -48,13 +48,13 @@ const BasicInfo = ({ onSave, onCancel }) => {
   }
 
   return (
-    <div className="min-h-screen bg-[#FDFDFD] flex flex-col font-sans text-slate-900 selection:bg-indigo-100 selection:text-indigo-900 relative">
+    <div className="min-h-screen bg-[#FDFDFD] flex flex-col font-sans text-neutral-900 selection:bg-primary-100 selection:text-primary-900 relative">
       {/* Top Floating Save Area */}
       <div className="sticky top-0 z-50 py-3 px-10 pointer-events-none">
         <div className="max-w-[1400px] mx-auto flex justify-end">
           <button 
             onClick={handleSave} 
-            className="pointer-events-auto bg-slate-900 text-white px-8 py-2.5 rounded-xl font-bold text-sm hover:bg-black transition-all active:scale-95 shadow-lg shadow-slate-200"
+            className="pointer-events-auto bg-neutral-900 text-white px-8 py-2.5 rounded-xl font-bold text-sm hover:bg-black transition-all active:scale-95 shadow-lg shadow-neutral-200"
           >
             Save Info
           </button>

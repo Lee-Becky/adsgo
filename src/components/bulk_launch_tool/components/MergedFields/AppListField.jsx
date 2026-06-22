@@ -17,11 +17,11 @@ const AppListField = ({ channel, value, onChange, required }) => {
   return (
     <div className="flex flex-col gap-1.5 col-span-full">
       <div className="flex items-center gap-1.5">
-        <label className="text-xs font-medium text-gray-700">
+        <label className="text-xs font-medium text-neutral-700">
           推广应用（可多选）
           {required && <span className="text-rose-500 ml-0.5">*</span>}
         </label>
-        <span title="每个应用将生成 1 个 AdSet。" className="text-gray-300 cursor-help"><Info size={11} /></span>
+        <span title="每个应用将生成 1 个 AdSet。" className="text-neutral-300 cursor-help"><Info size={11} /></span>
       </div>
       <MultiSelect
         value={Array.isArray(value) ? value : []}
@@ -29,7 +29,7 @@ const AppListField = ({ channel, value, onChange, required }) => {
         options={opts}
         placeholder="选择推广的应用..."
       />
-      <span className="text-[10px] text-gray-300 font-mono truncate">_app_list · 派生 → adsets</span>
+      <span className="text-[10px] text-neutral-300 font-mono truncate">_app_list · 派生 → adsets</span>
     </div>
   );
 };

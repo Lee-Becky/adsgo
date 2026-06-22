@@ -31,27 +31,27 @@ const DynamicFieldGroup = ({
   const errorCount = Object.keys(errors).length;
 
   return (
-    <div className="border border-gray-100 rounded-inner bg-white mb-3 overflow-hidden">
+    <div className="border border-neutral-100 rounded-inner bg-white mb-3 overflow-hidden">
       <button
         type="button"
         onClick={() => setCollapsed(c => !c)}
-        className="w-full flex items-center justify-between px-3 py-2 hover:bg-gray-50 transition-colors"
+        className="w-full flex items-center justify-between px-3 py-2 hover:bg-neutral-50 transition-colors"
       >
         <div className="flex items-center gap-2">
-          <span className="text-xs font-semibold text-gray-700 uppercase tracking-wider">
+          <span className="text-xs font-semibold text-neutral-700 uppercase tracking-wider">
             {FIELD_GROUP_LABELS[groupKey] || groupKey}
           </span>
-          <span className="text-[10px] text-gray-400">
+          <span className="text-[10px] text-neutral-400">
             {visibleFields.length} 字段
             {errorCount > 0 && (
               <span className="ml-2 text-rose-500 font-medium">· {errorCount} 项待修</span>
             )}
           </span>
         </div>
-        <ChevronDown size={14} className={`text-gray-400 transition-transform ${collapsed ? '' : 'rotate-180'}`} />
+        <ChevronDown size={14} className={`text-neutral-400 transition-transform ${collapsed ? '' : 'rotate-180'}`} />
       </button>
       {!collapsed && (
-        <div className="px-3 py-3 border-t border-gray-100 grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-3">
+        <div className="px-3 py-3 border-t border-neutral-100 grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-3">
           {fields.map(def => (
             <DynamicFieldRenderer
               key={def.name}

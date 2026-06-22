@@ -35,9 +35,9 @@ export default function Step5StoryboardDesign() {
         <div>
           <div className="flex items-center gap-3 mb-1">
             <div className="w-1.5 h-7 rounded-full bg-gradient-to-b from-primary-500 to-primary-400 shrink-0" />
-            <h2 className="text-xl font-bold text-gray-900">分镜与关键帧设计</h2>
+            <h2 className="text-xl font-bold text-neutral-900">分镜与关键帧设计</h2>
           </div>
-          <p className="text-sm text-gray-500 ml-[18px]">
+          <p className="text-sm text-neutral-500 ml-[18px]">
             选择各个分镜图片，以确保最终视频效果。
             {selectedActor ? ` · 演员：${selectedActor.name}` : ''}
           </p>
@@ -53,7 +53,7 @@ export default function Step5StoryboardDesign() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Left 2/3: Storyboard keyframes */}
             <div className="lg:col-span-2 space-y-4">
-              <div className="bg-gray-50 rounded-xl p-5 border border-gray-100">
+              <div className="bg-neutral-50 rounded-xl p-5 border border-neutral-100">
                 <PillTabs
                   tabs={[
                     { id: 'k1', label: '分镜 1 · 0–8s' },
@@ -75,7 +75,7 @@ export default function Step5StoryboardDesign() {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* Required keyframe — semantic error color */}
                         <div className="space-y-3">
-                          <h4 className="text-xs font-semibold text-gray-800 flex items-center gap-1.5">
+                          <h4 className="text-xs font-semibold text-neutral-800 flex items-center gap-1.5">
                             <span className="w-2 h-2 rounded-full bg-error-500" />
                             首帧图（必选）
                           </h4>
@@ -99,10 +99,10 @@ export default function Step5StoryboardDesign() {
                                       'hover:-translate-y-0.5',
                                       sel
                                         ? 'border-primary-500 border-2 ring-2 ring-primary-500/20 shadow-md'
-                                        : 'border-gray-200 hover:border-gray-300',
+                                        : 'border-neutral-200 hover:border-neutral-300',
                                     )}
                                   >
-                                    <div className="aspect-[3/4] bg-gray-200 overflow-hidden">
+                                    <div className="aspect-[3/4] bg-neutral-200 overflow-hidden">
                                       <img
                                         src={k.src}
                                         alt=""
@@ -131,7 +131,7 @@ export default function Step5StoryboardDesign() {
 
                         {/* Optional keyframe — semantic warning color */}
                         <div className="space-y-3">
-                          <h4 className="text-xs font-semibold text-gray-800 flex items-center gap-1.5">
+                          <h4 className="text-xs font-semibold text-neutral-800 flex items-center gap-1.5">
                             <span className="w-2 h-2 rounded-full bg-warning-500" />
                             尾帧图（可选）
                           </h4>
@@ -158,10 +158,10 @@ export default function Step5StoryboardDesign() {
                                       'hover:-translate-y-0.5',
                                       sel
                                         ? 'border-primary-500 border-2 ring-2 ring-primary-500/20 shadow-md'
-                                        : 'border-gray-200 hover:border-gray-300',
+                                        : 'border-neutral-200 hover:border-neutral-300',
                                     )}
                                   >
-                                    <div className="aspect-[3/4] bg-gray-200 overflow-hidden">
+                                    <div className="aspect-[3/4] bg-neutral-200 overflow-hidden">
                                       <img
                                         src={k.src}
                                         alt=""
@@ -205,14 +205,14 @@ export default function Step5StoryboardDesign() {
             <div className="lg:col-span-1 self-start">
               <div
                 className={cn(
-                  'lg:sticky lg:top-6 rounded-xl border border-primary-100/80 bg-gray-50 overflow-hidden',
+                  'lg:sticky lg:top-6 rounded-xl border border-primary-100/80 bg-neutral-50 overflow-hidden',
                   CARD_SHADOW,
                 )}
               >
                 {/* Panel header */}
-                <div className="px-4 py-3 border-b border-[#F5F5F5] bg-gray-50/50 flex items-center gap-2">
+                <div className="px-4 py-3 border-b border-[#F5F5F5] bg-neutral-50/50 flex items-center gap-2">
                   <Settings2 className="w-4 h-4 text-primary-600" />
-                  <span className="text-sm font-semibold text-gray-900">配置面板</span>
+                  <span className="text-sm font-semibold text-neutral-900">配置面板</span>
                 </div>
 
                 <div className="p-5 space-y-4">
@@ -239,7 +239,7 @@ export default function Step5StoryboardDesign() {
                       }
                       placeholder="输入口播文案..."
                     />
-                    <p className="text-[10px] text-gray-400 text-right">
+                    <p className="text-[10px] text-neutral-400 text-right">
                       {voiceoverLen} 字
                     </p>
                   </div>
@@ -258,7 +258,7 @@ export default function Step5StoryboardDesign() {
                     />
                   </FormField>
 
-                  <div className="rounded-lg border border-gray-200 bg-white px-4 py-3">
+                  <div className="rounded-lg border border-neutral-200 bg-white px-4 py-3">
                     <ToggleAdsgo
                       checked={step5.autoVoice}
                       onChange={(v) =>
@@ -272,12 +272,12 @@ export default function Step5StoryboardDesign() {
                   </div>
 
                   {/* Condition status */}
-                  <div className="text-[11px] text-gray-400 space-y-1">
+                  <div className="text-[11px] text-neutral-400 space-y-1">
                     <div className="flex items-center gap-1.5">
                       <span
                         className={cn(
                           'w-1.5 h-1.5 rounded-full',
-                          step5.requiredKeyframeId ? 'bg-success-500' : 'bg-gray-300',
+                          step5.requiredKeyframeId ? 'bg-success-500' : 'bg-neutral-300',
                         )}
                       />
                       首帧图 {step5.requiredKeyframeId ? '已选' : '未选'}
@@ -294,7 +294,7 @@ export default function Step5StoryboardDesign() {
           <StickyFooter
             left={
               <span className="text-xs">
-                首帧图：{step5.requiredKeyframeId ? <span className="text-primary-600 font-medium">已选</span> : <span className="text-gray-400">未选</span>}
+                首帧图：{step5.requiredKeyframeId ? <span className="text-primary-600 font-medium">已选</span> : <span className="text-neutral-400">未选</span>}
               </span>
             }
           >

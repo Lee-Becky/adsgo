@@ -336,7 +336,7 @@ const Drafts = () => {
           </svg>
         )
       default:
-        return <span className="text-xs text-gray-600">{platform}</span>
+        return <span className="text-xs text-neutral-600">{platform}</span>
     }
   }
 
@@ -344,7 +344,7 @@ const Drafts = () => {
     switch (type) {
       case 'image':
         return (
-          <div className="w-8 h-8 bg-gray-100 rounded flex items-center justify-center">
+          <div className="w-8 h-8 bg-neutral-100 rounded flex items-center justify-center">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
               <circle cx="8.5" cy="8.5" r="1.5"/>
@@ -354,7 +354,7 @@ const Drafts = () => {
         )
       case 'video':
         return (
-          <div className="w-8 h-8 bg-gray-100 rounded flex items-center justify-center">
+          <div className="w-8 h-8 bg-neutral-100 rounded flex items-center justify-center">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <polygon points="5 3 19 12 5 21 5 3"/>
             </svg>
@@ -362,7 +362,7 @@ const Drafts = () => {
         )
       case 'carousel':
         return (
-          <div className="w-8 h-8 bg-gray-100 rounded flex items-center justify-center">
+          <div className="w-8 h-8 bg-neutral-100 rounded flex items-center justify-center">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <rect x="3" y="3" width="7" height="7" rx="1"/>
               <rect x="14" y="3" width="7" height="7" rx="1"/>
@@ -373,7 +373,7 @@ const Drafts = () => {
         )
       default:
         return (
-          <div className="w-8 h-8 bg-gray-100 rounded flex items-center justify-center">
+          <div className="w-8 h-8 bg-neutral-100 rounded flex items-center justify-center">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/>
               <polyline points="13 2 13 9 20 9"/>
@@ -388,14 +388,14 @@ const Drafts = () => {
       {/* Filter Section */}
       <div className="mb-6 bg-white rounded-xl border border-border shadow-sm p-4">
         <div className="flex items-center gap-2 mb-4">
-          <Filter size={18} className="text-gray-500" />
-          <h3 className="font-semibold text-gray-900">Filters</h3>
+          <Filter size={18} className="text-neutral-500" />
+          <h3 className="font-semibold text-neutral-900">Filters</h3>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           {/* Update Time Filter */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-neutral-700 mb-2">
               Update Time
             </label>
             <div className="relative">
@@ -404,7 +404,7 @@ const Drafts = () => {
                 className="w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none text-sm text-left flex items-center justify-between"
               >
                 <span>{customStartDate && customEndDate ? `${formatDate(customStartDate)} - ${formatDate(customEndDate)}` : dataPeriod}</span>
-                <Calendar size={16} className="text-gray-400" />
+                <Calendar size={16} className="text-neutral-400" />
               </button>
 
               {showCalendar && (
@@ -419,7 +419,7 @@ const Drafts = () => {
                           className={`px-3 py-2 text-xs rounded-lg text-left transition-colors ${
                             dataPeriod === option.value
                               ? 'bg-primary text-white'
-                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                              : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
                           }`}
                         >
                           {option.label}
@@ -432,17 +432,17 @@ const Drafts = () => {
                       {/* Calendar Grid */}
                       <div>
                         <div className="flex items-center justify-between mb-2">
-                          <button className="p-1 hover:bg-gray-100 rounded">
+                          <button className="p-1 hover:bg-neutral-100 rounded">
                             <ChevronLeft size={16} />
                           </button>
                           <span className="font-medium text-sm">
                             {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
                           </span>
-                          <button className="p-1 hover:bg-gray-100 rounded">
+                          <button className="p-1 hover:bg-neutral-100 rounded">
                             <ChevronRight size={16} />
                           </button>
                         </div>
-                        <div className="grid grid-cols-7 gap-1 text-center text-xs text-gray-500 mb-1">
+                        <div className="grid grid-cols-7 gap-1 text-center text-xs text-neutral-500 mb-1">
                           <div>Su</div>
                           <div>Mo</div>
                           <div>Tu</div>
@@ -462,7 +462,7 @@ const Drafts = () => {
                   <div className="flex gap-2 mt-4 pt-4 border-t border-border">
                     <button
                       onClick={() => setShowCalendar(false)}
-                      className="flex-1 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                      className="flex-1 px-4 py-2 text-sm font-medium text-neutral-700 bg-neutral-100 rounded-lg hover:bg-neutral-200 transition-colors"
                     >
                       Cancel
                     </button>
@@ -484,40 +484,40 @@ const Drafts = () => {
       <div className="bg-white rounded-xl border border-border shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-gray-50">
+            <thead className="bg-neutral-50">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 min-w-[180px]">
+                <th className="px-4 py-3 text-left text-xs font-medium text-neutral-600 min-w-[180px]">
                   Campaign
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 min-w-[120px]">
+                <th className="px-4 py-3 text-left text-xs font-medium text-neutral-600 min-w-[120px]">
                   Daily Budget
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 min-w-[200px]">
+                <th className="px-4 py-3 text-left text-xs font-medium text-neutral-600 min-w-[200px]">
                   Audience
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 min-w-[150px]">
+                <th className="px-4 py-3 text-left text-xs font-medium text-neutral-600 min-w-[150px]">
                   Creatives
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 min-w-[100px]">
+                <th className="px-4 py-3 text-left text-xs font-medium text-neutral-600 min-w-[100px]">
                   Product
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 min-w-[180px]">
+                <th className="px-4 py-3 text-left text-xs font-medium text-neutral-600 min-w-[180px]">
                   Update Time
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 min-w-[150px]">
+                <th className="px-4 py-3 text-left text-xs font-medium text-neutral-600 min-w-[150px]">
                   Actions
                 </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
               {draftCampaigns.map((campaign) => (
-                <tr key={campaign.id} className="hover:bg-gray-50 transition-colors">
+                <tr key={campaign.id} className="hover:bg-neutral-50 transition-colors">
                   <td className="px-4 py-4">
                     <div>
                       <div className="flex items-center gap-2 mb-1">
                         {getPlatformLogo(campaign.platform)}
                       </div>
-                      <div className="font-medium text-gray-900 text-sm mb-1">
+                      <div className="font-medium text-neutral-900 text-sm mb-1">
                         {campaign.campaignName}
                       </div>
                       <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-primary/10 text-primary text-[10px] font-medium rounded-full">
@@ -538,25 +538,25 @@ const Drafts = () => {
                         />
                         <button
                           onClick={() => handleBudgetSave(campaign.id)}
-                          className="text-green-600 hover:text-green-700 transition-colors"
+                          className="text-success-600 hover:text-success-700 transition-colors"
                         >
                           <Check size={16} />
                         </button>
                         <button
                           onClick={handleBudgetCancel}
-                          className="text-gray-400 hover:text-gray-600 transition-colors"
+                          className="text-neutral-400 hover:text-neutral-600 transition-colors"
                         >
                           <X size={16} />
                         </button>
                       </div>
                     ) : (
                       <div className="flex items-center gap-2">
-                        <span className="font-medium text-gray-900 text-sm">
+                        <span className="font-medium text-neutral-900 text-sm">
                           {formatCurrency(campaign.dailyBudget)}
                         </span>
                         <button
                           onClick={() => handleBudgetEditStart(campaign.id, campaign.dailyBudget)}
-                          className="text-gray-400 hover:text-primary transition-colors"
+                          className="text-neutral-400 hover:text-primary transition-colors"
                         >
                           <Edit size={14} />
                         </button>
@@ -564,7 +564,7 @@ const Drafts = () => {
                     )}
                   </td>
                   <td className="px-4 py-4">
-                    <div className="text-sm text-gray-600">
+                    <div className="text-sm text-neutral-600">
                       {campaign.audience}
                     </div>
                   </td>
@@ -573,13 +573,13 @@ const Drafts = () => {
                       {campaign.creatives.slice(0, 3).map((creative) => (
                         <div key={creative.id} className="relative group">
                           {getCreativeIcon(creative.type)}
-                          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-1 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
+                          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-1 px-2 py-1 bg-neutral-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
                             {creative.name}
                           </div>
                         </div>
                       ))}
                       {campaign.creatives.length > 3 && (
-                        <div className="text-xs text-gray-500">
+                        <div className="text-xs text-neutral-500">
                           +{campaign.creatives.length - 3} more
                         </div>
                       )}
@@ -597,18 +597,18 @@ const Drafts = () => {
                           {campaign.product.value}
                         </a>
                       ) : (
-                        <span className="text-sm text-gray-600">
+                        <span className="text-sm text-neutral-600">
                           Feeds: {campaign.product.name}
                         </span>
                       )
                     ) : (
-                      <span className="text-sm text-gray-600">
+                      <span className="text-sm text-neutral-600">
                         {campaign.product}
                       </span>
                     )}
                   </td>
                   <td className="px-4 py-4">
-                    <div className="text-sm text-gray-600">
+                    <div className="text-sm text-neutral-600">
                       {campaign.updateTime}
                     </div>
                   </td>
@@ -616,7 +616,7 @@ const Drafts = () => {
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => handleEdit(campaign.id)}
-                        className="flex items-center gap-1.5 px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-300 hover:text-primary transition-all duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary/20"
+                        className="flex items-center gap-1.5 px-3 py-2 bg-white border border-neutral-200 rounded-lg text-sm font-medium text-neutral-700 hover:bg-neutral-50 hover:border-neutral-300 hover:text-primary transition-all duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary/20"
                         aria-label="Edit campaign"
                       >
                         <Edit size={14} />
@@ -632,7 +632,7 @@ const Drafts = () => {
                       </button>
                       <button
                         onClick={() => handleDelete(campaign.id)}
-                        className="flex items-center justify-center p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 hover:text-red-700 transition-all duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-red-500/20"
+                        className="flex items-center justify-center p-2 bg-danger-50 text-danger-600 rounded-lg hover:bg-danger-100 hover:text-danger-700 transition-all duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-danger-500/20"
                         aria-label="Delete campaign"
                         title="Delete campaign"
                       >
@@ -649,7 +649,7 @@ const Drafts = () => {
         {/* Empty State */}
         {draftCampaigns.length === 0 && (
           <div className="p-12 text-center">
-            <div className="text-gray-400 mb-4">
+            <div className="text-neutral-400 mb-4">
               <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
                 <polyline points="14 2 14 9 20 9"/>
@@ -657,8 +657,8 @@ const Drafts = () => {
                 <line x1="9" y1="15" x2="15" y2="15"/>
               </svg>
             </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No drafts found</h3>
-            <p className="text-sm text-gray-500">You haven't created any draft campaigns yet.</p>
+            <h3 className="text-lg font-medium text-neutral-900 mb-2">No drafts found</h3>
+            <p className="text-sm text-neutral-500">You haven't created any draft campaigns yet.</p>
           </div>
         )}
       </div>
@@ -668,18 +668,18 @@ const Drafts = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="absolute inset-0 bg-black/50" onClick={handleDeleteCancel}></div>
           <div className="relative bg-white rounded-xl shadow-lg p-6 w-full max-w-md mx-4">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Delete campaign draft</h3>
-            <p className="text-gray-600 mb-6">Once deleted, it cannot be recovered. Confirm deletion?</p>
+            <h3 className="text-lg font-semibold text-neutral-900 mb-4">Delete campaign draft</h3>
+            <p className="text-neutral-600 mb-6">Once deleted, it cannot be recovered. Confirm deletion?</p>
             <div className="flex justify-end gap-3">
               <button
                 onClick={handleDeleteCancel}
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-border rounded-lg hover:bg-gray-50 transition-colors"
+                className="px-4 py-2 text-sm font-medium text-neutral-700 bg-white border border-border rounded-lg hover:bg-neutral-50 transition-colors"
               >
                 No
               </button>
               <button
                 onClick={handleDeleteConfirm}
-                className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors"
+                className="px-4 py-2 text-sm font-medium text-white bg-danger-600 rounded-lg hover:bg-danger-700 transition-colors"
               >
                 Yes
               </button>

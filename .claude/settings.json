@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(powershell -Command \"Get-Content 'Dashboard.jsx' | Select-Object -First 446 | Out-File 'Dashboard.jsx.tmp' -Encoding UTF8NoBOM; Copy-Item -Force 'Dashboard.jsx.tmp' 'Dashboard.jsx'; Remove-Item 'Dashboard.jsx.tmp'\")",
+      "Bash(powershell -Command \"Get-Content 'Dashboard.jsx' | Select-Object -First 446 | Set-Content 'Dashboard_new.jsx' -Encoding UTF8; Copy-Item -Force 'Dashboard_new.jsx' 'Dashboard.jsx'; Remove-Item 'Dashboard_new.jsx'\")",
+      "WebFetch(domain:business-api.tiktok.com)",
+      "Read(//d:/**)",
+      "Read(//c/Users/lee.li4/AppData/Local/Temp/tt-docs/**)",
+      "Bash(head -20 __TRACKED_VAR__.txt)",
+      "Edit(/.claude/skills/media-plan/**)",
+      "Read(//c/Users/lee.li4/.claude/skills/AdsGo-new-ui-skill/references/**)",
+      "Read(//tmp/**)",
+      "Read(//d/tmp/**)",
+      "Read(//d/d/AdsGo_test/AdsGo-留存 - git/.claude/skills/media-plan/references/**)",
+      "Read(//c/temp/tiktok_pdf_pages/**)",
+      "mcp__tavily__tavily_search",
+      "mcp__tavily__tavily_extract",
+      "Read(//d/AdsGo_test/**)"
+    ]
+  }
+}

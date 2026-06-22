@@ -266,7 +266,7 @@ function FishboneView() {
                       <Icon style={{ width: 8, height: 8 }} className={s.iconText} />
                     </div>
                     <span
-                      className="text-center font-semibold text-gray-700"
+                      className="text-center font-semibold text-neutral-700"
                       style={{ fontSize: 6.5, lineHeight: 1.25, maxWidth: LW - 4 }}
                     >
                       {EVENT_TYPE_LABELS[ev.type] || ev.title}
@@ -319,7 +319,7 @@ function TimelineEvent({ ev, isEstimate = false, isLast = false }) {
   return (
     <div className="relative flex gap-3 pb-4">
       {!isLast && (
-        <div className={`absolute left-[7px] top-[18px] bottom-0 w-[2px] ${isEstimate ? 'border-l-2 border-dashed border-gray-200' : 'bg-gray-200'}`} />
+        <div className={`absolute left-[7px] top-[18px] bottom-0 w-[2px] ${isEstimate ? 'border-l-2 border-dashed border-neutral-200' : 'bg-neutral-200'}`} />
       )}
       <div className="relative z-10 flex-shrink-0 mt-[5px]">
         {isEstimate
@@ -332,10 +332,10 @@ function TimelineEvent({ ev, isEstimate = false, isLast = false }) {
           <div className={`w-5 h-5 rounded flex items-center justify-center flex-shrink-0 ${iconBg}`}>
             <Icon className={`w-3 h-3 ${iconText}`} />
           </div>
-          <span className={`text-xs font-semibold truncate ${isEstimate ? 'text-gray-600' : 'text-gray-800'}`}>{ev.title}</span>
-          <span className={`text-[11px] flex-shrink-0 ${isEstimate ? 'text-gray-300' : 'text-gray-400'}`}>{time}</span>
+          <span className={`text-xs font-semibold truncate ${isEstimate ? 'text-neutral-600' : 'text-neutral-800'}`}>{ev.title}</span>
+          <span className={`text-[11px] flex-shrink-0 ${isEstimate ? 'text-neutral-300' : 'text-neutral-400'}`}>{time}</span>
         </div>
-        <p className={`text-xs mt-0.5 ml-7 truncate ${isEstimate ? 'text-gray-400' : 'text-gray-500'}`}>{ev.description}</p>
+        <p className={`text-xs mt-0.5 ml-7 truncate ${isEstimate ? 'text-neutral-400' : 'text-neutral-500'}`}>{ev.description}</p>
       </div>
     </div>
   )
@@ -346,10 +346,10 @@ function ListView() {
   return (
     <div className="grid grid-cols-2 gap-4">
       <div>
-        <div className="text-[11px] font-semibold text-gray-500 tracking-wider mb-2">Past 36 Hours</div>
+        <div className="text-[11px] font-semibold text-neutral-500 tracking-wider mb-2">Past 36 Hours</div>
         {historyGroups.map(group => (
           <div key={group.label}>
-            <div className="text-[11px] font-medium text-gray-400 mb-1.5 mt-2 first:mt-0">{group.label}</div>
+            <div className="text-[11px] font-medium text-neutral-400 mb-1.5 mt-2 first:mt-0">{group.label}</div>
             {group.events.map((ev, idx) => (
               <TimelineEvent
                 key={ev.id}
@@ -359,11 +359,11 @@ function ListView() {
             ))}
           </div>
         ))}
-        {historyGroups.length === 0 && <p className="text-xs text-gray-400 italic">No events in the past 36 hours</p>}
+        {historyGroups.length === 0 && <p className="text-xs text-neutral-400 italic">No events in the past 36 hours</p>}
       </div>
       <div className="opacity-80">
-        <div className="text-[11px] font-semibold text-gray-500 tracking-wider mb-2">Next 12 Hours</div>
-        <div className="text-[11px] font-medium text-gray-400 mb-1.5">Upcoming</div>
+        <div className="text-[11px] font-semibold text-neutral-500 tracking-wider mb-2">Next 12 Hours</div>
+        <div className="text-[11px] font-medium text-neutral-400 mb-1.5">Upcoming</div>
         {OPERATIONS_UPCOMING.map((ev, idx) => (
           <TimelineEvent key={ev.id} ev={ev} isEstimate isLast={idx === OPERATIONS_UPCOMING.length - 1} />
         ))}
@@ -382,19 +382,19 @@ export default function AdsGoOperations({ campaigns }) {
     <div>
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
-        <h4 className="text-sm font-semibold text-gray-900">AdsGo Operations</h4>
+        <h4 className="text-sm font-semibold text-neutral-900">AdsGo Operations</h4>
         <div className="flex items-center gap-2">
-          <div className="flex items-center bg-gray-100 rounded-lg p-0.5">
+          <div className="flex items-center bg-neutral-100 rounded-lg p-0.5">
             <button
               onClick={() => setViewMode('fishbone')}
-              className={`flex items-center gap-1 px-2 py-1 rounded-md text-[11px] font-medium transition-all ${viewMode === 'fishbone' ? 'bg-white text-primary-500 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}
+              className={`flex items-center gap-1 px-2 py-1 rounded-md text-[11px] font-medium transition-all ${viewMode === 'fishbone' ? 'bg-white text-primary-500 shadow-sm' : 'text-neutral-400 hover:text-neutral-600'}`}
             >
               <GitBranch className="w-3 h-3" />
               Timeline
             </button>
             <button
               onClick={() => setViewMode('list')}
-              className={`flex items-center gap-1 px-2 py-1 rounded-md text-[11px] font-medium transition-all ${viewMode === 'list' ? 'bg-white text-primary-500 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}
+              className={`flex items-center gap-1 px-2 py-1 rounded-md text-[11px] font-medium transition-all ${viewMode === 'list' ? 'bg-white text-primary-500 shadow-sm' : 'text-neutral-400 hover:text-neutral-600'}`}
             >
               <List className="w-3 h-3" />
               List
@@ -407,12 +407,12 @@ export default function AdsGoOperations({ campaigns }) {
       {/* Summary Stats */}
       <div className="grid grid-cols-3 gap-2 mb-3">
         {SUMMARY_STATS.map(({ key, label, Icon, iconBg, iconText }) => (
-          <div key={key} className="bg-gray-50 rounded-lg p-2.5 text-center">
+          <div key={key} className="bg-neutral-50 rounded-lg p-2.5 text-center">
             <div className={`w-7 h-7 rounded-full ${iconBg} flex items-center justify-center mx-auto mb-1`}>
               <Icon className={`w-3.5 h-3.5 ${iconText}`} />
             </div>
-            <div className="text-lg font-bold text-gray-900 leading-tight">{stats[key]}</div>
-            <div className="text-[10px] text-gray-500 leading-tight mt-0.5">{label}</div>
+            <div className="text-lg font-bold text-neutral-900 leading-tight">{stats[key]}</div>
+            <div className="text-[10px] text-neutral-500 leading-tight mt-0.5">{label}</div>
           </div>
         ))}
       </div>

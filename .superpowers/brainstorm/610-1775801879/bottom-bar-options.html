@@ -1,0 +1,272 @@
+<style>
+  .demo-modal {
+    background: #fff;
+    border-radius: 16px;
+    border: 1px solid #e5e7eb;
+    overflow: hidden;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    margin-bottom: 8px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+  .demo-header {
+    padding: 14px 20px;
+    border-bottom: 1px solid #f3f4f6;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .demo-header-title { font-size: 13px; font-weight: 600; color: #111827; }
+  .demo-header-sub { font-size: 11px; color: #9ca3af; margin-top: 1px; }
+  .demo-list {
+    padding: 8px 16px;
+    background: #f9fafb;
+    border-bottom: 1px solid #f3f4f6;
+  }
+  .demo-list-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 0;
+    border-bottom: 1px solid #f3f4f6;
+    font-size: 12px;
+    color: #374151;
+  }
+  .demo-list-row:last-child { border-bottom: none; }
+  .demo-thumb {
+    width: 28px;
+    height: 34px;
+    border-radius: 5px;
+    background: linear-gradient(135deg, #ddd6fe, #c7d2fe);
+    flex-shrink: 0;
+  }
+  .demo-thumb.t2 { background: linear-gradient(135deg, #fde68a, #fca5a5); }
+  .demo-thumb.t3 { background: linear-gradient(135deg, #a7f3d0, #6ee7b7); }
+  .demo-check {
+    width: 14px; height: 14px;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+  .demo-check.checked { background: #6366f1; border: 1.5px solid #6366f1; display: flex; align-items: center; justify-content: center; }
+  .demo-check.checked::after { content: '✓'; color: white; font-size: 9px; }
+  .demo-check.unchecked { border: 1.5px solid #d1d5db; background: #fff; }
+  .demo-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 2px 8px; border-radius: 99px; font-size: 10px; font-weight: 500;
+    border: 1px solid; margin-left: auto;
+  }
+  .badge-g1 { background: #ede9fe; color: #7c3aed; border-color: #ddd6fe; }
+  .badge-g2 { background: #fdf4ff; color: #9333ea; border-color: #f0abfc; }
+  .dot { width: 6px; height: 6px; border-radius: 50%; }
+  .dot-g1 { background: #6366f1; }
+  .dot-g2 { background: #9333ea; }
+  .dot-g3 { background: #f59e0b; }
+  .dot-new { background: #10b981; }
+  /* Footer variants */
+  .footer-a, .footer-b, .footer-c {
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .footer-a { background: #111827; }
+  .footer-b { background: #111827; flex-wrap: wrap; }
+  .footer-c { background: #111827; }
+  .footer-label { font-size: 11px; font-weight: 600; color: #fff; flex-shrink: 0; }
+  .footer-spacer { flex: 1; }
+  /* Buttons */
+  .btn-white { background: #fff; color: #111827; border: none; border-radius: 7px; padding: 6px 14px; font-size: 11px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 5px; }
+  .btn-outline-white { background: transparent; color: #fff; border: 1.5px solid rgba(255,255,255,0.25); border-radius: 7px; padding: 6px 14px; font-size: 11px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 5px; }
+  .btn-outline-white:hover { border-color: rgba(255,255,255,0.5); }
+  .btn-primary-dark { background: #6366f1; color: #fff; border: none; border-radius: 7px; padding: 6px 14px; font-size: 11px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 5px; }
+  .btn-disabled { background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.3); border: 1.5px solid rgba(255,255,255,0.1); border-radius: 7px; padding: 6px 14px; font-size: 11px; font-weight: 500; cursor: not-allowed; }
+  /* Select-style */
+  .select-dark { background: rgba(255,255,255,0.1); color: #fff; border: 1.5px solid rgba(255,255,255,0.2); border-radius: 7px; padding: 6px 12px; font-size: 11px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+  .select-dark .caret { color: rgba(255,255,255,0.4); font-size: 9px; }
+  /* Group pills */
+  .group-pill {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 5px 11px; border-radius: 7px; font-size: 11px; font-weight: 600;
+    cursor: pointer; border: none; transition: opacity 0.15s;
+  }
+  .group-pill:hover { opacity: 0.85; }
+  .pill-g1 { background: rgba(99,102,241,0.9); color: #fff; }
+  .pill-g2 { background: rgba(147,51,234,0.9); color: #fff; }
+  .pill-new { background: rgba(255,255,255,0.15); color: #fff; border: 1.5px solid rgba(255,255,255,0.3); }
+  /* Selector activated state */
+  .select-dark.activated { background: rgba(99,102,241,0.5); border-color: rgba(99,102,241,0.8); }
+  .btn-confirm-active { background: #6366f1; color: #fff; border: none; border-radius: 7px; padding: 6px 14px; font-size: 11px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 5px; white-space: nowrap; }
+  /* Option card override */
+  .option { padding: 0 !important; overflow: hidden; }
+  .option .content { padding: 16px !important; }
+  .option-label {
+    background: #f9fafb; border-bottom: 1px solid #f3f4f6;
+    padding: 8px 16px; font-size: 11px; font-weight: 700;
+    color: #6b7280; letter-spacing: 0.05em; text-transform: uppercase;
+  }
+  .tradeoff-row { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+  .tag-pro { background: #d1fae5; color: #065f46; border-radius: 4px; padding: 2px 7px; font-size: 10px; font-weight: 600; }
+  .tag-con { background: #fee2e2; color: #991b1b; border-radius: 4px; padding: 2px 7px; font-size: 10px; font-weight: 600; }
+  .tag-neutral { background: #e0e7ff; color: #3730a3; border-radius: 4px; padding: 2px 7px; font-size: 10px; font-weight: 600; }
+  .option-desc { font-size: 12px; color: #6b7280; margin-top: 4px; line-height: 1.5; }
+</style>
+
+<h2>底部操作栏交互方案对比</h2>
+<p class="subtitle">3 个素材被勾选后，底部浮现操作栏。以下三种方案对比「明确性 vs 误触风险 vs 效率」</p>
+
+<div class="options">
+
+  <!-- 方案 A -->
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="option-label">方案 A &nbsp;·&nbsp; 两步操作：先选目标 → 再确认</div>
+    <div class="content">
+      <div class="demo-modal">
+        <div class="demo-header">
+          <div><div class="demo-header-title">素材分组管理</div><div class="demo-header-sub">勾选素材后可批量操作</div></div>
+        </div>
+        <div class="demo-list">
+          <div class="demo-list-row">
+            <div class="demo-check checked"></div>
+            <div class="demo-thumb"></div>
+            <span>素材1.jpg</span>
+            <span class="demo-badge badge-g1"><span class="dot dot-g1"></span>素材组 1</span>
+          </div>
+          <div class="demo-list-row">
+            <div class="demo-check checked"></div>
+            <div class="demo-thumb t2"></div>
+            <span>素材2.png</span>
+            <span class="demo-badge badge-g1"><span class="dot dot-g1"></span>素材组 1</span>
+          </div>
+          <div class="demo-list-row">
+            <div class="demo-check unchecked"></div>
+            <div class="demo-thumb t3"></div>
+            <span>素材3.mp4</span>
+            <span class="demo-badge badge-g2"><span class="dot dot-g2"></span>素材组 2</span>
+          </div>
+        </div>
+        <!-- Footer A: dropdown to select, then click confirm button -->
+        <div class="footer-a">
+          <span class="footer-label">已选 2 个</span>
+          <div class="footer-spacer"></div>
+          <!-- Step 1: dropdown (select only, no execute) -->
+          <div class="select-dark activated">
+            <span class="dot dot-g2"></span>
+            <span>素材组 2</span>
+            <span class="caret">▾</span>
+          </div>
+          <!-- Step 2: confirm button (active after selection) -->
+          <button class="btn-confirm-active">移至素材组 2 →</button>
+          <button class="btn-white"><span>＋</span> 新增组</button>
+        </div>
+      </div>
+      <p class="option-desc">下拉只负责<b>选择目标</b>，不执行。选定后"移至素材组 N →"按钮激活（按钮文案包含目标名），点击才执行移动。操作意图明确，两步动作防误触。</p>
+      <div class="tradeoff-row">
+        <span class="tag-pro">✓ 无误触风险</span>
+        <span class="tag-pro">✓ 按钮文案自描述</span>
+        <span class="tag-con">↑ 需要 2 步</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 方案 B -->
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="option-label">方案 B &nbsp;·&nbsp; 直接显示各分组按钮（一步执行）</div>
+    <div class="content">
+      <div class="demo-modal">
+        <div class="demo-header">
+          <div><div class="demo-header-title">素材分组管理</div><div class="demo-header-sub">勾选素材后可批量操作</div></div>
+        </div>
+        <div class="demo-list">
+          <div class="demo-list-row">
+            <div class="demo-check checked"></div>
+            <div class="demo-thumb"></div>
+            <span>素材1.jpg</span>
+            <span class="demo-badge badge-g1"><span class="dot dot-g1"></span>素材组 1</span>
+          </div>
+          <div class="demo-list-row">
+            <div class="demo-check checked"></div>
+            <div class="demo-thumb t2"></div>
+            <span>素材2.png</span>
+            <span class="demo-badge badge-g1"><span class="dot dot-g1"></span>素材组 1</span>
+          </div>
+          <div class="demo-list-row">
+            <div class="demo-check unchecked"></div>
+            <div class="demo-thumb t3"></div>
+            <span>素材3.mp4</span>
+            <span class="demo-badge badge-g2"><span class="dot dot-g2"></span>素材组 2</span>
+          </div>
+        </div>
+        <!-- Footer B: group pills directly -->
+        <div class="footer-b">
+          <span class="footer-label">移至：</span>
+          <button class="group-pill pill-g1"><span class="dot" style="background:#fff;opacity:0.6"></span>素材组 1</button>
+          <button class="group-pill pill-g2"><span class="dot" style="background:#fff;opacity:0.6"></span>素材组 2</button>
+          <button class="group-pill pill-new">＋ 新增组</button>
+        </div>
+      </div>
+      <p class="option-desc">底部直接展示所有分组按钮，点击即执行。操作最快，视觉上每个分组的颜色和名称一目了然，无需额外步骤。组数较少（≤4）时体验极佳；组数多时按钮会换行。</p>
+      <div class="tradeoff-row">
+        <span class="tag-pro">✓ 最简洁高效</span>
+        <span class="tag-pro">✓ 一步操作</span>
+        <span class="tag-con">↑ 组多时换行</span>
+        <span class="tag-con">↑ 仍有单步误触</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 方案 C -->
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="option-label">方案 C &nbsp;·&nbsp; 下拉仅选择，确认按钮初始禁用</div>
+    <div class="content">
+      <div class="demo-modal">
+        <div class="demo-header">
+          <div><div class="demo-header-title">素材分组管理</div><div class="demo-header-sub">勾选素材后可批量操作</div></div>
+        </div>
+        <div class="demo-list">
+          <div class="demo-list-row">
+            <div class="demo-check checked"></div>
+            <div class="demo-thumb"></div>
+            <span>素材1.jpg</span>
+            <span class="demo-badge badge-g1"><span class="dot dot-g1"></span>素材组 1</span>
+          </div>
+          <div class="demo-list-row">
+            <div class="demo-check checked"></div>
+            <div class="demo-thumb t2"></div>
+            <span>素材2.png</span>
+            <span class="demo-badge badge-g1"><span class="dot dot-g1"></span>素材组 1</span>
+          </div>
+          <div class="demo-list-row">
+            <div class="demo-check unchecked"></div>
+            <div class="demo-thumb t3"></div>
+            <span>素材3.mp4</span>
+            <span class="demo-badge badge-g2"><span class="dot dot-g2"></span>素材组 2</span>
+          </div>
+        </div>
+        <!-- Footer C: dropdown + disabled confirm (not yet selected target) -->
+        <div class="footer-c">
+          <span class="footer-label">已选 2 个</span>
+          <div class="footer-spacer"></div>
+          <div class="select-dark">
+            <span style="color:rgba(255,255,255,0.4);font-size:11px">选择目标组</span>
+            <span class="caret">▾</span>
+          </div>
+          <!-- Confirm button: disabled until target selected -->
+          <div class="btn-disabled">确认移动</div>
+          <button class="btn-white">＋ 新增组</button>
+        </div>
+      </div>
+      <p class="option-desc">下拉选目标（不执行），"确认移动"按钮初始灰色禁用，选了目标后才激活。与方案 A 的区别：按钮文案是固定的"确认移动"，不动态更新。用户需要先读下拉再读按钮才能理解当前状态。</p>
+      <div class="tradeoff-row">
+        <span class="tag-pro">✓ 无误触</span>
+        <span class="tag-con">↑ 按钮文案不自描述</span>
+        <span class="tag-con">↑ 禁用态容易被忽视</span>
+        <span class="tag-neutral">~ 需 2 步</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div style="margin-top:16px;padding:12px 16px;background:#f0fdf4;border-radius:10px;border:1px solid #bbf7d0;">
+  <p style="font-size:12px;color:#166534;font-weight:600;margin:0 0 4px">推荐：方案 A</p>
+  <p style="font-size:11px;color:#166534;margin:0;line-height:1.6">操作不可逆 → 两步防误触是必要的。方案 A 的"移至素材组 N →"按钮文案自带目标，用户在点击前就能完整理解操作，体验最清晰。方案 B 适合组数少（≤3）且用户对操作很熟悉的场景，可作为后续优化选项。</p>
+</div>

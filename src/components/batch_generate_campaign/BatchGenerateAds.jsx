@@ -87,9 +87,9 @@ const PLATFORMS = [
 
 const CAMPAIGN_OBJECTIVES = [
   { value: 'awareness_engagement', label: 'Awareness & Engagement', icon: Megaphone, color: 'text-rose-500', bg: 'bg-rose-50', description: 'Reach more people' },
-  { value: 'traffic', label: 'Traffic', icon: MousePointer2, color: 'text-blue-500', bg: 'bg-blue-50', description: 'Drive site visits' },
-  { value: 'leads', label: 'Leads', icon: Users, color: 'text-amber-500', bg: 'bg-amber-50', description: 'Find prospects' },
-  { value: 'sales_conversions', label: 'Sales & Conversions', icon: ShoppingBag, color: 'text-emerald-500', bg: 'bg-emerald-50', description: 'Drive transactions' },
+  { value: 'traffic', label: 'Traffic', icon: MousePointer2, color: 'text-info-500', bg: 'bg-info-50', description: 'Drive site visits' },
+  { value: 'leads', label: 'Leads', icon: Users, color: 'text-warning-500', bg: 'bg-warning-50', description: 'Find prospects' },
+  { value: 'sales_conversions', label: 'Sales & Conversions', icon: ShoppingBag, color: 'text-success-500', bg: 'bg-success-50', description: 'Drive transactions' },
   { value: 'app_promotion', label: 'App Promotion', icon: Smartphone, color: 'text-primary-500', bg: 'bg-primary-50', description: 'Install & usage' }
 ];
 
@@ -149,16 +149,16 @@ export const IncludeExcludeAudienceDropdown = ({
   return (
     <>
       <div ref={triggerRef} onClick={onToggle}
-        className={`bg-white rounded-inner p-4 border border-gray-100 shadow-sm flex flex-col gap-2 group cursor-pointer hover:border-primary-500/20 transition-all h-full ${triggerClassName}`}>
-        <span className="text-xs font-medium text-gray-500">{triggerLabel}</span>
+        className={`bg-white rounded-inner p-4 border border-neutral-100 shadow-sm flex flex-col gap-2 group cursor-pointer hover:border-primary-500/20 transition-all h-full ${triggerClassName}`}>
+        <span className="text-xs font-medium text-neutral-500">{triggerLabel}</span>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2.5 min-w-0">
             <Users size={16} className="text-primary-500 shrink-0" />
-            <span className={`text-sm font-bold truncate ${total > 0 ? 'text-gray-700' : 'text-gray-300'}`}>
+            <span className={`text-sm font-bold truncate ${total > 0 ? 'text-neutral-700' : 'text-neutral-300'}`}>
               {total > 0 ? `已选 ${total} 项` : '不限制'}
             </span>
           </div>
-          <ChevronDown size={14} className={`text-gray-300 transition-transform shrink-0 ${open ? 'rotate-180' : ''}`} />
+          <ChevronDown size={14} className={`text-neutral-300 transition-transform shrink-0 ${open ? 'rotate-180' : ''}`} />
         </div>
       </div>
       <Popover
@@ -166,11 +166,11 @@ export const IncludeExcludeAudienceDropdown = ({
         anchorRef={triggerRef}
         placement={align === 'left' ? 'bottom-start' : 'bottom-end'}
         onClose={() => onToggle?.()}
-        className="w-[320px] bg-white rounded-base shadow-xl border border-gray-100 overflow-hidden"
+        className="w-[320px] bg-white rounded-base shadow-xl border border-neutral-100 overflow-hidden"
       >
         {!isAuthed ? (
             <div className="p-4 space-y-3 text-center">
-              <p className="text-xs font-medium text-gray-500">需要连接 {platformName} 以加载受众</p>
+              <p className="text-xs font-medium text-neutral-500">需要连接 {platformName} 以加载受众</p>
               <button
                 onClick={async (e) => {
                   e.stopPropagation();
@@ -188,7 +188,7 @@ export const IncludeExcludeAudienceDropdown = ({
             </div>
           ) : !selectedAccount ? (
             <div className="p-4 space-y-3 text-center">
-              <p className="text-xs font-medium text-gray-500">请先选择广告账户</p>
+              <p className="text-xs font-medium text-neutral-500">请先选择广告账户</p>
               <button
                 onClick={(e) => { e.stopPropagation(); onPickAccount?.(); }}
                 className="w-full py-2.5 bg-primary-500 text-white rounded-base text-sm font-medium hover:bg-primary-600 transition-all flex items-center justify-center gap-2"
@@ -198,15 +198,15 @@ export const IncludeExcludeAudienceDropdown = ({
             </div>
           ) : (
             <>
-              <div className="flex border-b border-gray-100 bg-gray-50/50">
+              <div className="flex border-b border-neutral-100 bg-neutral-50/50">
                 {[
                   { id: 'lal',    label: 'Lookalike', count: lalSelected.length },
                   { id: 'custom', label: 'Custom',    count: customSelected.length },
                 ].map(t => (
                   <button key={t.id} onClick={() => setActiveTab(t.id)}
-                    className={`flex-1 px-3 py-2.5 text-xs font-semibold transition-colors flex items-center justify-center gap-1.5 ${activeTab === t.id ? 'text-primary-600 border-b-2 border-primary-500 bg-white' : 'text-gray-500 hover:text-gray-700'}`}>
+                    className={`flex-1 px-3 py-2.5 text-xs font-semibold transition-colors flex items-center justify-center gap-1.5 ${activeTab === t.id ? 'text-primary-600 border-b-2 border-primary-500 bg-white' : 'text-neutral-500 hover:text-neutral-700'}`}>
                     {t.label}
-                    {t.count > 0 && <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${activeTab === t.id ? 'bg-primary-50' : 'bg-gray-200/60'}`}>{t.count}</span>}
+                    {t.count > 0 && <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${activeTab === t.id ? 'bg-primary-50' : 'bg-neutral-200/60'}`}>{t.count}</span>}
                   </button>
                 ))}
               </div>
@@ -216,7 +216,7 @@ export const IncludeExcludeAudienceDropdown = ({
                       const sel = lalSelected.includes(la.id);
                       return (
                         <button key={la.id} onClick={() => onToggleLal?.(la.id)}
-                          className={`w-full flex items-center justify-between px-2.5 py-2 rounded-base text-xs font-medium transition-all ${sel ? 'bg-purple-50 text-purple-700' : 'text-gray-600 hover:bg-gray-50'}`}>
+                          className={`w-full flex items-center justify-between px-2.5 py-2 rounded-base text-xs font-medium transition-all ${sel ? 'bg-purple-50 text-purple-700' : 'text-neutral-600 hover:bg-neutral-50'}`}>
                           <span className="truncate">{la.name}</span>
                           {sel && <Check size={12} className="shrink-0" />}
                         </button>
@@ -226,7 +226,7 @@ export const IncludeExcludeAudienceDropdown = ({
                       const sel = customSelected.includes(ca.id);
                       return (
                         <button key={ca.id} onClick={() => onToggleCustom?.(ca.id)}
-                          className={`w-full flex items-center justify-between px-2.5 py-2 rounded-base text-xs font-medium transition-all ${sel ? 'bg-primary-50 text-primary-600' : 'text-gray-600 hover:bg-gray-50'}`}>
+                          className={`w-full flex items-center justify-between px-2.5 py-2 rounded-base text-xs font-medium transition-all ${sel ? 'bg-primary-50 text-primary-600' : 'text-neutral-600 hover:bg-neutral-50'}`}>
                           <span className="truncate">{ca.name}</span>
                           {sel && <Check size={12} className="shrink-0" />}
                         </button>
@@ -367,26 +367,26 @@ const Stepper = ({ label, value, onChange, min = 1, max = 99, step = 1, hint }) 
   const atMin = value <= min;
   const atMax = value >= max;
   return (
-    <div className="bg-white rounded-inner p-4 border border-gray-100 shadow-sm flex flex-col gap-2 h-full">
+    <div className="bg-white rounded-inner p-4 border border-neutral-100 shadow-sm flex flex-col gap-2 h-full">
       <div className="flex items-center justify-between gap-2">
-        <span className="text-xs font-medium text-gray-500 truncate">{label}</span>
-        {hint && <span className="text-[10px] font-medium text-gray-400 truncate">{hint}</span>}
+        <span className="text-xs font-medium text-neutral-500 truncate">{label}</span>
+        {hint && <span className="text-[10px] font-medium text-neutral-400 truncate">{hint}</span>}
       </div>
       <div className="flex items-center justify-between gap-2">
         <button
           type="button"
           disabled={atMin}
           onClick={dec}
-          className={`w-6 h-6 rounded-full flex items-center justify-center transition-all shrink-0 ${atMin ? 'bg-gray-50 text-gray-200 cursor-not-allowed' : 'bg-gray-50 text-gray-600 hover:bg-primary-50 hover:text-primary-500'}`}
+          className={`w-6 h-6 rounded-full flex items-center justify-center transition-all shrink-0 ${atMin ? 'bg-neutral-50 text-neutral-200 cursor-not-allowed' : 'bg-neutral-50 text-neutral-600 hover:bg-primary-50 hover:text-primary-500'}`}
         >
           <span className="text-sm font-bold leading-none">−</span>
         </button>
-        <span className="text-base font-bold tabular-nums flex-1 text-center text-gray-700">{value}</span>
+        <span className="text-base font-bold tabular-nums flex-1 text-center text-neutral-700">{value}</span>
         <button
           type="button"
           disabled={atMax}
           onClick={inc}
-          className={`w-6 h-6 rounded-full flex items-center justify-center transition-all shrink-0 ${atMax ? 'bg-gray-50 text-gray-200 cursor-not-allowed' : 'bg-gray-50 text-gray-600 hover:bg-primary-50 hover:text-primary-500'}`}
+          className={`w-6 h-6 rounded-full flex items-center justify-center transition-all shrink-0 ${atMax ? 'bg-neutral-50 text-neutral-200 cursor-not-allowed' : 'bg-neutral-50 text-neutral-600 hover:bg-primary-50 hover:text-primary-500'}`}
         >
           <span className="text-sm font-bold leading-none">+</span>
         </button>
@@ -418,17 +418,17 @@ const ChannelPickerHero = ({ platforms, onPick, platform, objective, onPickObjec
         <div className="w-14 h-14 bg-primary-500 rounded-xl flex items-center justify-center text-white shadow-[0_8px_24px_rgba(112,51,245,0.25)] mb-5 ring-4 ring-primary-50">
           <Monitor className="w-7 h-7" />
         </div>
-        <h1 className="text-2xl font-bold text-gray-900 tracking-tight mb-2">Get your campaign started</h1>
-        <p className="text-sm text-gray-500 font-medium">先选择投放媒体，再确定 Campaign 目标 · 系统将基于此自动匹配版位与素材规范</p>
+        <h1 className="text-2xl font-bold text-neutral-900 tracking-tight mb-2">Get your campaign started</h1>
+        <p className="text-sm text-neutral-500 font-medium">先选择投放媒体，再确定 Campaign 目标 · 系统将基于此自动匹配版位与素材规范</p>
         <div className="mt-6 inline-flex items-center gap-3">
           <div className="flex items-center gap-2 text-xs">
-            <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold transition-all ${stage >= 1 ? 'bg-primary-500 text-white shadow-sm shadow-primary-500/30' : 'bg-gray-200 text-gray-500'}`}>{platform ? <Check className="w-3 h-3" strokeWidth={3} /> : '1'}</span>
-            <span className={`font-semibold ${stage >= 1 ? 'text-gray-900' : 'text-gray-400'}`}>媒体</span>
+            <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold transition-all ${stage >= 1 ? 'bg-primary-500 text-white shadow-sm shadow-primary-500/30' : 'bg-neutral-200 text-neutral-500'}`}>{platform ? <Check className="w-3 h-3" strokeWidth={3} /> : '1'}</span>
+            <span className={`font-semibold ${stage >= 1 ? 'text-neutral-900' : 'text-neutral-400'}`}>媒体</span>
           </div>
-          <span className={`block w-12 h-px ${platform ? 'bg-primary-500' : 'bg-gray-200'}`} />
+          <span className={`block w-12 h-px ${platform ? 'bg-primary-500' : 'bg-neutral-200'}`} />
           <div className="flex items-center gap-2 text-xs">
-            <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold transition-all ${objective ? 'bg-primary-500 text-white shadow-sm shadow-primary-500/30' : stage === 2 ? 'bg-gray-900 text-white' : 'bg-gray-200 text-gray-500'}`}>{objective ? <Check className="w-3 h-3" strokeWidth={3} /> : '2'}</span>
-            <span className={`font-semibold ${objective ? 'text-gray-900' : stage === 2 ? 'text-gray-700' : 'text-gray-400'}`}>目标</span>
+            <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold transition-all ${objective ? 'bg-primary-500 text-white shadow-sm shadow-primary-500/30' : stage === 2 ? 'bg-neutral-900 text-white' : 'bg-neutral-200 text-neutral-500'}`}>{objective ? <Check className="w-3 h-3" strokeWidth={3} /> : '2'}</span>
+            <span className={`font-semibold ${objective ? 'text-neutral-900' : stage === 2 ? 'text-neutral-700' : 'text-neutral-400'}`}>目标</span>
           </div>
         </div>
       </header>
@@ -437,10 +437,10 @@ const ChannelPickerHero = ({ platforms, onPick, platform, objective, onPickObjec
       <section className="space-y-4 mb-10">
         <div className="flex items-baseline justify-between px-1">
           <div className="flex items-baseline gap-2">
-            <h2 className="text-base font-semibold text-gray-900 tracking-tight">投放媒体</h2>
-            <span className="text-xs text-gray-400 font-medium">Media Channel</span>
+            <h2 className="text-base font-semibold text-neutral-900 tracking-tight">投放媒体</h2>
+            <span className="text-xs text-neutral-400 font-medium">Media Channel</span>
           </div>
-          <span className="text-xs text-gray-400">选择 1 个 · 决定后续可用目标与素材规范</span>
+          <span className="text-xs text-neutral-400">选择 1 个 · 决定后续可用目标与素材规范</span>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {platforms.map(p => {
@@ -449,14 +449,14 @@ const ChannelPickerHero = ({ platforms, onPick, platform, objective, onPickObjec
             if (p.disabled) {
               return (
                 <div key={p.id} className="relative flex flex-col gap-3 p-5 bg-white rounded-xl border border-[#F0F0F0] opacity-50 cursor-not-allowed select-none">
-                  <div className="w-11 h-11 rounded-lg bg-gray-50 border border-[#F0F0F0] flex items-center justify-center shrink-0 overflow-hidden">
+                  <div className="w-11 h-11 rounded-lg bg-neutral-50 border border-[#F0F0F0] flex items-center justify-center shrink-0 overflow-hidden">
                     <img src={p.logo} alt="" className="w-7 h-7 object-contain grayscale" />
                   </div>
                   <div className="min-w-0">
-                    <p className="text-sm font-semibold text-gray-500 truncate">{p.name}</p>
-                    <p className="text-xs text-gray-400 truncate mt-0.5">{tagline}</p>
+                    <p className="text-sm font-semibold text-neutral-500 truncate">{p.name}</p>
+                    <p className="text-xs text-neutral-400 truncate mt-0.5">{tagline}</p>
                   </div>
-                  <span className="absolute top-3 right-3 bg-gray-900 text-white text-[10px] font-bold px-2 py-0.5 rounded-full tracking-wider">COMING SOON</span>
+                  <span className="absolute top-3 right-3 bg-neutral-900 text-white text-[10px] font-bold px-2 py-0.5 rounded-full tracking-wider">COMING SOON</span>
                 </div>
               );
             }
@@ -474,16 +474,16 @@ const ChannelPickerHero = ({ platforms, onPick, platform, objective, onPickObjec
                 }`}
               >
                 <div className="flex items-start justify-between">
-                  <div className={`w-11 h-11 rounded-lg flex items-center justify-center shrink-0 overflow-hidden border transition-colors ${isPicked ? 'bg-white border-primary-500/30' : 'bg-gray-50 border-[#F0F0F0] group-hover:border-primary-500/30 group-hover:bg-white'}`}>
+                  <div className={`w-11 h-11 rounded-lg flex items-center justify-center shrink-0 overflow-hidden border transition-colors ${isPicked ? 'bg-white border-primary-500/30' : 'bg-neutral-50 border-[#F0F0F0] group-hover:border-primary-500/30 group-hover:bg-white'}`}>
                     <img src={p.logo} alt="" className="w-7 h-7 object-contain" />
                   </div>
                   {isPicked
                     ? <CheckCircle2 className="w-5 h-5 text-primary-500 shrink-0" strokeWidth={2.5} />
-                    : <ArrowRight className="w-4 h-4 text-gray-300 shrink-0 group-hover:text-primary-500 group-hover:translate-x-0.5 transition-all mt-1" />}
+                    : <ArrowRight className="w-4 h-4 text-neutral-300 shrink-0 group-hover:text-primary-500 group-hover:translate-x-0.5 transition-all mt-1" />}
                 </div>
                 <div className="min-w-0">
-                  <p className={`text-sm font-semibold truncate transition-colors ${isPicked ? 'text-primary-600' : 'text-gray-900 group-hover:text-primary-500'}`}>{p.name}</p>
-                  <p className="text-xs text-gray-500 truncate mt-1">{tagline}</p>
+                  <p className={`text-sm font-semibold truncate transition-colors ${isPicked ? 'text-primary-600' : 'text-neutral-900 group-hover:text-primary-500'}`}>{p.name}</p>
+                  <p className="text-xs text-neutral-500 truncate mt-1">{tagline}</p>
                 </div>
               </button>
             );
@@ -496,10 +496,10 @@ const ChannelPickerHero = ({ platforms, onPick, platform, objective, onPickObjec
         <section className="space-y-4 animate-in fade-in slide-in-from-top-4 duration-300">
           <div className="flex items-baseline justify-between px-1">
             <div className="flex items-baseline gap-2">
-              <h2 className="text-base font-semibold text-gray-900 tracking-tight">Campaign 目标</h2>
-              <span className="text-xs text-gray-400 font-medium">Campaign Objective</span>
+              <h2 className="text-base font-semibold text-neutral-900 tracking-tight">Campaign 目标</h2>
+              <span className="text-xs text-neutral-400 font-medium">Campaign Objective</span>
             </div>
-            <span className="text-xs text-gray-400">
+            <span className="text-xs text-neutral-400">
               {availableObjectives.length > 0
                 ? `${availableObjectives.length} 个可用 · 来自 ${platform.name}`
                 : '该平台暂无可用目标'}
@@ -526,11 +526,11 @@ const ChannelPickerHero = ({ platforms, onPick, platform, objective, onPickObjec
                     </div>
                     {isPicked
                       ? <CheckCircle2 className="w-5 h-5 text-primary-500 shrink-0" strokeWidth={2.5} />
-                      : <ArrowRight className="w-4 h-4 text-gray-300 shrink-0 group-hover:text-primary-500 group-hover:translate-x-0.5 transition-all mt-1" />}
+                      : <ArrowRight className="w-4 h-4 text-neutral-300 shrink-0 group-hover:text-primary-500 group-hover:translate-x-0.5 transition-all mt-1" />}
                   </div>
                   <div className="min-w-0">
-                    <p className={`text-sm font-semibold truncate transition-colors ${isPicked ? 'text-primary-600' : 'text-gray-900 group-hover:text-primary-500'}`}>{obj.label}</p>
-                    <p className="text-xs text-gray-500 line-clamp-2 mt-1">{obj.description}</p>
+                    <p className={`text-sm font-semibold truncate transition-colors ${isPicked ? 'text-primary-600' : 'text-neutral-900 group-hover:text-primary-500'}`}>{obj.label}</p>
+                    <p className="text-xs text-neutral-500 line-clamp-2 mt-1">{obj.description}</p>
                   </div>
                 </button>
               );
@@ -540,7 +540,7 @@ const ChannelPickerHero = ({ platforms, onPick, platform, objective, onPickObjec
       )}
 
       {/* 底部辅助提示 — 三段渐进式文案 */}
-      <p className="text-xs text-gray-400 text-center mt-10 font-medium">
+      <p className="text-xs text-neutral-400 text-center mt-10 font-medium">
         {!platform
           ? '选择媒体后将解锁该平台可投放的 Campaign 目标'
           : !objective
@@ -598,14 +598,14 @@ const ChannelHeaderCard = ({
   };
 
   return (
-    <div className={`bg-gray-900/95 text-white rounded-section shadow-xl border border-gray-800 backdrop-blur-md animate-in fade-in slide-in-from-top-2 ${
+    <div className={`bg-neutral-900/95 text-white rounded-section shadow-xl border border-neutral-800 backdrop-blur-md animate-in fade-in slide-in-from-top-2 ${
       isVertical ? 'p-5 flex flex-col gap-3' : 'px-8 py-5 flex items-center gap-6 flex-wrap'
     }`}>
       <div className={isVertical ? 'flex items-center gap-3' : 'flex items-center gap-3 shrink-0'}>
         <div className="w-10 h-10 bg-primary-500 rounded-xl flex items-center justify-center text-white shrink-0"><Monitor size={20} /></div>
         <div className={isVertical ? 'min-w-0' : 'min-w-[180px]'}>
           <h3 className="text-base font-semibold text-white">投放渠道媒体</h3>
-          <p className="text-xs text-gray-400 font-medium mt-0.5">{isVertical ? '平台 · 目标 · 账号' : '选择媒体平台与关联广告账号'}</p>
+          <p className="text-xs text-neutral-400 font-medium mt-0.5">{isVertical ? '平台 · 目标 · 账号' : '选择媒体平台与关联广告账号'}</p>
         </div>
       </div>
       {!isVertical && <div className="flex-1 min-w-[20px]" />}
@@ -613,13 +613,13 @@ const ChannelHeaderCard = ({
       {/* Platform dropdown */}
       <div ref={platformTriggerRef} className={isVertical ? 'w-full' : 'shrink-0 min-w-[200px]'}>
         <div onClick={() => setOpenDropdown(openDropdown === 'platform' ? null : 'platform')}
-          className="bg-gray-800 rounded-inner px-4 py-2.5 border border-gray-700 flex items-center justify-between gap-3 cursor-pointer hover:border-primary-500/50 transition-all">
+          className="bg-neutral-800 rounded-inner px-4 py-2.5 border border-neutral-700 flex items-center justify-between gap-3 cursor-pointer hover:border-primary-500/50 transition-all">
           <div className="flex items-center gap-2.5 min-w-0">
             {platform ? (
               <><img src={platform.logo} className="w-5 h-5 rounded object-contain shrink-0" alt="" /><span className="text-sm font-bold text-white truncate">{platform.name}</span></>
-            ) : (<><Monitor size={16} className="text-primary-400 shrink-0" /><span className="text-sm font-bold text-gray-500">请选择渠道...</span></>)}
+            ) : (<><Monitor size={16} className="text-primary-400 shrink-0" /><span className="text-sm font-bold text-neutral-500">请选择渠道...</span></>)}
           </div>
-          <ChevronDown size={14} className={`text-gray-500 transition-transform shrink-0 ${openDropdown === 'platform' ? 'rotate-180' : ''}`} />
+          <ChevronDown size={14} className={`text-neutral-500 transition-transform shrink-0 ${openDropdown === 'platform' ? 'rotate-180' : ''}`} />
         </div>
       </div>
       <Popover
@@ -628,21 +628,21 @@ const ChannelHeaderCard = ({
         placement="bottom-end"
         matchWidth
         onClose={() => setOpenDropdown(null)}
-        className="bg-gray-900 rounded-base shadow-xl border border-gray-700 p-2 space-y-1 min-w-[200px]"
+        className="bg-neutral-900 rounded-base shadow-xl border border-neutral-700 p-2 space-y-1 min-w-[200px]"
       >
         {PLATFORMS.map(p => (
           <div key={p.id} className="relative group">
             <button disabled={p.disabled}
               onClick={() => { if (!p.disabled) { handleChangePlatformWithConfirm(p); setOpenDropdown(null); } }}
               className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-base transition-all ${
-                p.disabled ? 'opacity-40 cursor-not-allowed text-gray-500' : platform?.id === p.id ? 'bg-primary-500/15 text-primary-300' : 'hover:bg-gray-800 text-gray-200'}`}>
+                p.disabled ? 'opacity-40 cursor-not-allowed text-neutral-500' : platform?.id === p.id ? 'bg-primary-500/15 text-primary-300' : 'hover:bg-neutral-800 text-neutral-200'}`}>
               <img src={p.logo} className="w-5 h-5 rounded object-contain shrink-0" alt="" />
               <span className="text-xs font-bold">{p.name}</span>
               {!p.disabled && platform?.id === p.id && <Check size={12} className="ml-auto" />}
             </button>
             {p.disabled && (
               <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                <div className="bg-gray-900 text-white text-xs font-medium px-2 py-1 rounded shadow-lg">COMING SOON</div>
+                <div className="bg-neutral-900 text-white text-xs font-medium px-2 py-1 rounded shadow-lg">COMING SOON</div>
               </div>
             )}
           </div>
@@ -655,15 +655,15 @@ const ChannelHeaderCard = ({
       <div ref={objectiveTriggerRef} className={isVertical ? 'w-full' : 'shrink-0 min-w-[220px]'}>
         <div
           onClick={() => { if (!objectiveDisabled) setOpenDropdown(openDropdown === 'campaignObjective' ? null : 'campaignObjective'); }}
-          className={`bg-gray-800 rounded-inner px-4 py-2.5 border border-gray-700 flex items-center justify-between gap-3 transition-all ${
+          className={`bg-neutral-800 rounded-inner px-4 py-2.5 border border-neutral-700 flex items-center justify-between gap-3 transition-all ${
             objectiveDisabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:border-primary-500/50'
           }`}
         >
           <div className="flex items-center gap-2.5 min-w-0">
             {objectiveDisabled ? (
               <>
-                <Target size={16} className="text-gray-500 shrink-0" />
-                <span className="text-sm font-bold text-gray-500 truncate">请先选择渠道...</span>
+                <Target size={16} className="text-neutral-500 shrink-0" />
+                <span className="text-sm font-bold text-neutral-500 truncate">请先选择渠道...</span>
               </>
             ) : currentObjectiveObj ? (
               <>
@@ -673,11 +673,11 @@ const ChannelHeaderCard = ({
             ) : (
               <>
                 <Target size={16} className="text-primary-400 shrink-0" />
-                <span className="text-sm font-bold text-gray-400 truncate">请选择目标 <span className="text-rose-400">*</span></span>
+                <span className="text-sm font-bold text-neutral-400 truncate">请选择目标 <span className="text-rose-400">*</span></span>
               </>
             )}
           </div>
-          <ChevronDown size={14} className={`text-gray-500 transition-transform shrink-0 ${openDropdown === 'campaignObjective' ? 'rotate-180' : ''}`} />
+          <ChevronDown size={14} className={`text-neutral-500 transition-transform shrink-0 ${openDropdown === 'campaignObjective' ? 'rotate-180' : ''}`} />
         </div>
       </div>
       <Popover
@@ -686,7 +686,7 @@ const ChannelHeaderCard = ({
         placement="bottom-end"
         matchWidth
         onClose={() => setOpenDropdown(null)}
-        className="bg-gray-900 rounded-base shadow-xl border border-gray-700 p-2 space-y-1 min-w-[260px]"
+        className="bg-neutral-900 rounded-base shadow-xl border border-neutral-700 p-2 space-y-1 min-w-[260px]"
       >
         {availableObjectives.map(obj => {
           const Icon = obj.icon;
@@ -696,7 +696,7 @@ const ChannelHeaderCard = ({
               key={obj.value}
               onClick={() => { onChangeObjective?.(obj.value); setOpenDropdown(null); }}
               className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-base transition-all text-left ${
-                isActive ? 'bg-primary-500/15 text-primary-300' : 'hover:bg-gray-800 text-gray-200'
+                isActive ? 'bg-primary-500/15 text-primary-300' : 'hover:bg-neutral-800 text-neutral-200'
               }`}
             >
               <div className={`w-6 h-6 rounded-base flex items-center justify-center ${isActive ? 'bg-primary-500 text-white' : `${obj.bg} ${obj.color}`}`}>
@@ -704,7 +704,7 @@ const ChannelHeaderCard = ({
               </div>
               <div className="min-w-0">
                 <p className="text-xs font-bold truncate">{obj.label}</p>
-                <p className="text-[10px] text-gray-400 truncate">{obj.description}</p>
+                <p className="text-[10px] text-neutral-400 truncate">{obj.description}</p>
               </div>
               {isActive && <Check size={12} className="ml-auto text-primary-300 shrink-0" />}
             </button>
@@ -716,7 +716,7 @@ const ChannelHeaderCard = ({
       <div ref={accountTriggerRef} className={isVertical ? 'w-full' : 'shrink-0 min-w-[260px]'}>
         <div
           onClick={handleTriggerClick}
-          className={`bg-gray-800 rounded-inner px-4 py-2.5 border border-gray-700 flex items-center justify-between gap-3 transition-all ${
+          className={`bg-neutral-800 rounded-inner px-4 py-2.5 border border-neutral-700 flex items-center justify-between gap-3 transition-all ${
             triggerDisabled
               ? 'opacity-50 cursor-not-allowed'
               : 'cursor-pointer hover:border-primary-500/50'
@@ -725,14 +725,14 @@ const ChannelHeaderCard = ({
           <div className="flex items-center gap-2.5 min-w-0">
             {accountState === 'NO_PLATFORM' && (
               <>
-                <Briefcase size={16} className="text-gray-500 shrink-0" />
-                <span className="text-sm font-bold text-gray-500 truncate">请先选择渠道...</span>
+                <Briefcase size={16} className="text-neutral-500 shrink-0" />
+                <span className="text-sm font-bold text-neutral-500 truncate">请先选择渠道...</span>
               </>
             )}
             {(accountState === 'NEED_AUTH' || accountState === 'NEED_PICK') && (
               <>
                 <Briefcase size={16} className="text-primary-400 shrink-0" />
-                <span className="text-sm font-bold text-gray-400 truncate">未选择 {platform.name} 账号（选填）</span>
+                <span className="text-sm font-bold text-neutral-400 truncate">未选择 {platform.name} 账号（选填）</span>
               </>
             )}
             {accountState === 'PICKED' && (
@@ -740,12 +740,12 @@ const ChannelHeaderCard = ({
                 <Briefcase size={16} className="text-primary-400 shrink-0" />
                 <div className="min-w-0">
                   <p className="text-sm font-bold text-white truncate">{selectedAccount.name}</p>
-                  <p className="text-xs text-gray-400 font-medium truncate mt-0.5">{selectedAccount.id}</p>
+                  <p className="text-xs text-neutral-400 font-medium truncate mt-0.5">{selectedAccount.id}</p>
                 </div>
               </>
             )}
           </div>
-          <ChevronDown size={14} className={`text-gray-500 transition-transform shrink-0 ${openDropdown === 'account' ? 'rotate-180' : ''}`} />
+          <ChevronDown size={14} className={`text-neutral-500 transition-transform shrink-0 ${openDropdown === 'account' ? 'rotate-180' : ''}`} />
         </div>
       </div>
       <Popover
@@ -754,11 +754,11 @@ const ChannelHeaderCard = ({
         placement="bottom-end"
         matchWidth
         onClose={() => setOpenDropdown(null)}
-        className="bg-gray-900 rounded-base shadow-xl border border-gray-700 overflow-hidden min-w-[280px]"
+        className="bg-neutral-900 rounded-base shadow-xl border border-neutral-700 overflow-hidden min-w-[280px]"
       >
         {accountState === 'NEED_AUTH' ? (
           <div className="p-4 space-y-3">
-            <p className="text-xs text-gray-300 font-medium leading-relaxed">
+            <p className="text-xs text-neutral-300 font-medium leading-relaxed">
               使用 {platform?.name} 广告账户前，请先连接您的 {platform?.name} Ads 账号。
             </p>
             <button
@@ -774,7 +774,7 @@ const ChannelHeaderCard = ({
           <div className="p-2 space-y-1 max-h-[280px] overflow-y-auto custom-scrollbar">
             {availableAccounts.length === 0 ? (
               <div className="px-4 py-6 text-center">
-                <p className="text-xs text-gray-400 font-medium">该渠道暂无可用账户</p>
+                <p className="text-xs text-neutral-400 font-medium">该渠道暂无可用账户</p>
               </div>
             ) : (
               availableAccounts.map(acc => {
@@ -784,12 +784,12 @@ const ChannelHeaderCard = ({
                     key={acc.id}
                     onClick={() => { handleSelectAccountWithConfirm(acc); setOpenDropdown(null); }}
                     className={`w-full text-left px-3 py-2.5 rounded-base transition-all flex items-center justify-between gap-3 ${
-                      isSelected ? 'bg-primary-500/15 text-primary-300' : 'hover:bg-gray-800 text-gray-200'
+                      isSelected ? 'bg-primary-500/15 text-primary-300' : 'hover:bg-neutral-800 text-neutral-200'
                     }`}
                   >
                     <div className="min-w-0">
                       <p className={`text-sm font-bold truncate ${isSelected ? 'text-primary-300' : 'text-white'}`}>{acc.name}</p>
-                      <p className="text-xs text-gray-400 font-medium truncate mt-0.5">{acc.id}</p>
+                      <p className="text-xs text-neutral-400 font-medium truncate mt-0.5">{acc.id}</p>
                     </div>
                     {isSelected && <Check size={14} className="text-primary-300 shrink-0" />}
                   </button>
@@ -856,30 +856,30 @@ const TargetingChannelCard = ({
     <div className="bg-white rounded-section p-10 adsgo-card-shadow animate-in fade-in slide-in-from-top-4 flex flex-col gap-10">
       <div className="flex items-center gap-3" style={{ order: 0 }}>
         <div className="w-10 h-10 bg-primary-500 rounded-xl flex items-center justify-center text-white"><Target size={20} /></div>
-        <h3 className="text-xl font-semibold text-gray-900">广告结构初始化设置</h3>
+        <h3 className="text-xl font-semibold text-neutral-900">广告结构初始化设置</h3>
       </div>
 
       {/* Section A: 优化目标与预算 — 现 02，视觉位于 Campaign 架构之下 */}
-      <section className="border-t border-gray-100 pt-10" style={{ order: 2 }}>
+      <section className="border-t border-neutral-100 pt-10" style={{ order: 2 }}>
         <div className="flex items-baseline gap-3 mb-5 px-1">
           <span className="text-xs font-bold text-primary-500/60 tabular-nums">02</span>
-          <h4 className="text-base font-semibold text-gray-900 tracking-tight">优化目标与预算</h4>
+          <h4 className="text-base font-semibold text-neutral-900 tracking-tight">优化目标与预算</h4>
         </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 relative z-[10]">
         {/* Location Selector */}
         <div>
           <div ref={locationTriggerRef}>
             <div onClick={() => setOpenDropdown(openDropdown === 'location' ? null : 'location')}
-              className="bg-white rounded-inner p-4 border border-gray-100 shadow-sm flex flex-col gap-2 group cursor-pointer hover:border-primary-500/20 transition-all h-full">
-              <span className="text-xs font-medium text-gray-500">投放国家/地区</span>
+              className="bg-white rounded-inner p-4 border border-neutral-100 shadow-sm flex flex-col gap-2 group cursor-pointer hover:border-primary-500/20 transition-all h-full">
+              <span className="text-xs font-medium text-neutral-500">投放国家/地区</span>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2.5 min-w-0">
                   <MapPin size={16} className="text-primary-500 shrink-0" />
-                  <span className="text-sm font-bold text-gray-700 truncate">
-                    {selectedLocations.length > 0 ? (<>{selectedLocations[0]?.name}{selectedLocations.length > 1 && '...'}</>) : <span className="text-gray-300">待选择...</span>}
+                  <span className="text-sm font-bold text-neutral-700 truncate">
+                    {selectedLocations.length > 0 ? (<>{selectedLocations[0]?.name}{selectedLocations.length > 1 && '...'}</>) : <span className="text-neutral-300">待选择...</span>}
                   </span>
                 </div>
-                <ChevronDown size={14} className={`text-gray-300 transition-transform ${openDropdown === 'location' ? 'rotate-180' : ''}`} />
+                <ChevronDown size={14} className={`text-neutral-300 transition-transform ${openDropdown === 'location' ? 'rotate-180' : ''}`} />
               </div>
             </div>
           </div>
@@ -888,13 +888,13 @@ const TargetingChannelCard = ({
             anchorRef={locationTriggerRef}
             placement="bottom-start"
             onClose={() => setOpenDropdown(null)}
-            className="w-[500px] bg-white rounded-base shadow-xl border border-gray-100 overflow-hidden flex"
+            className="w-[500px] bg-white rounded-base shadow-xl border border-neutral-100 overflow-hidden flex"
           >
-            <div className="w-1/2 border-r border-gray-50 flex flex-col">
-              <div className="p-4 border-b border-gray-50">
+            <div className="w-1/2 border-r border-neutral-50 flex flex-col">
+              <div className="p-4 border-b border-neutral-50">
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300 w-3.5 h-3.5" />
-                  <input className="w-full pl-9 pr-3 py-2 bg-gray-50 border-none rounded-base text-xs font-bold text-gray-900 focus:ring-2 focus:ring-primary-500/10"
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-300 w-3.5 h-3.5" />
+                  <input className="w-full pl-9 pr-3 py-2 bg-neutral-50 border-none rounded-base text-xs font-bold text-neutral-900 focus:ring-2 focus:ring-primary-500/10"
                     placeholder="Search locations..." value={locationSearch} onChange={(e) => setLocationSearch(e.target.value)} autoFocus />
                 </div>
               </div>
@@ -902,22 +902,22 @@ const TargetingChannelCard = ({
                 {filteredCountries.map(c => (
                   <button key={c.code} onClick={() => toggleLocation(c)}
                     className={`w-full text-left px-3 py-2 rounded-base text-xs font-bold transition-all flex items-center justify-between ${
-                      selectedLocations.some(l => l.code === c.code) ? 'bg-primary-50 text-primary-500' : 'text-gray-600 hover:bg-gray-50'}`}>
+                      selectedLocations.some(l => l.code === c.code) ? 'bg-primary-50 text-primary-500' : 'text-neutral-600 hover:bg-neutral-50'}`}>
                     {c.name}
                     {selectedLocations.some(l => l.code === c.code) && <Check size={12} />}
                   </button>
                 ))}
               </div>
             </div>
-            <div className="w-1/2 bg-gray-50/30 flex flex-col">
-              <div className="p-4 border-b border-gray-50 flex items-center justify-between">
-                <span className="text-xs font-medium text-gray-500">Selected ({selectedLocations.length})</span>
+            <div className="w-1/2 bg-neutral-50/30 flex flex-col">
+              <div className="p-4 border-b border-neutral-50 flex items-center justify-between">
+                <span className="text-xs font-medium text-neutral-500">Selected ({selectedLocations.length})</span>
               </div>
               <div className="flex-1 max-h-[300px] overflow-y-auto custom-scrollbar p-4 flex flex-wrap gap-2 content-start">
                 {selectedLocations.map(l => (
-                  <div key={l.code} className="flex items-center gap-1.5 px-2.5 py-1.5 bg-white border border-gray-100 rounded-tag shadow-sm animate-in zoom-in">
-                    <span className="text-xs font-medium text-gray-700">{l.code}</span>
-                    <button onClick={() => toggleLocation(l)} className="text-gray-300 hover:text-rose-500 transition-colors"><X size={10} strokeWidth={3} /></button>
+                  <div key={l.code} className="flex items-center gap-1.5 px-2.5 py-1.5 bg-white border border-neutral-100 rounded-tag shadow-sm animate-in zoom-in">
+                    <span className="text-xs font-medium text-neutral-700">{l.code}</span>
+                    <button onClick={() => toggleLocation(l)} className="text-neutral-300 hover:text-rose-500 transition-colors"><X size={10} strokeWidth={3} /></button>
                   </div>
                 ))}
               </div>
@@ -929,16 +929,16 @@ const TargetingChannelCard = ({
         <div>
           <div ref={languageTriggerRef}>
             <div onClick={() => setOpenDropdown(openDropdown === 'language' ? null : 'language')}
-              className="bg-white rounded-inner p-4 border border-gray-100 shadow-sm flex flex-col gap-2 group cursor-pointer hover:border-primary-500/20 transition-all h-full">
-              <span className="text-xs font-medium text-gray-500">Language</span>
+              className="bg-white rounded-inner p-4 border border-neutral-100 shadow-sm flex flex-col gap-2 group cursor-pointer hover:border-primary-500/20 transition-all h-full">
+              <span className="text-xs font-medium text-neutral-500">Language</span>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2.5 min-w-0">
                   <Globe size={16} className="text-primary-500 shrink-0" />
-                  <span className="text-sm font-bold text-gray-700 truncate">
-                    {selectedLanguage ? selectedLanguage.name : <span className="text-gray-300">Auto...</span>}
+                  <span className="text-sm font-bold text-neutral-700 truncate">
+                    {selectedLanguage ? selectedLanguage.name : <span className="text-neutral-300">Auto...</span>}
                   </span>
                 </div>
-                <ChevronDown size={14} className={`text-gray-300 transition-transform ${openDropdown === 'language' ? 'rotate-180' : ''}`} />
+                <ChevronDown size={14} className={`text-neutral-300 transition-transform ${openDropdown === 'language' ? 'rotate-180' : ''}`} />
               </div>
             </div>
           </div>
@@ -947,12 +947,12 @@ const TargetingChannelCard = ({
             anchorRef={languageTriggerRef}
             placement="bottom-start"
             onClose={() => setOpenDropdown(null)}
-            className="w-[260px] bg-white rounded-base shadow-xl border border-gray-100 overflow-hidden"
+            className="w-[260px] bg-white rounded-base shadow-xl border border-neutral-100 overflow-hidden"
           >
-            <div className="p-3 border-b border-gray-50">
+            <div className="p-3 border-b border-neutral-50">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300 w-3.5 h-3.5" />
-                <input className="w-full pl-9 pr-3 py-2 bg-gray-50 border-none rounded-base text-xs font-bold text-gray-900 focus:ring-2 focus:ring-primary-500/10"
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-300 w-3.5 h-3.5" />
+                <input className="w-full pl-9 pr-3 py-2 bg-neutral-50 border-none rounded-base text-xs font-bold text-neutral-900 focus:ring-2 focus:ring-primary-500/10"
                   placeholder="Search languages..." value={languageSearch} onChange={(e) => setLanguageSearch(e.target.value)} autoFocus />
               </div>
             </div>
@@ -960,7 +960,7 @@ const TargetingChannelCard = ({
               {filteredLanguages.map(lang => (
                 <button key={lang.code} onClick={() => { setSelectedLanguage(lang); setOpenDropdown(null); }}
                   className={`w-full text-left px-3 py-2 rounded-base text-xs font-bold transition-all flex items-center justify-between ${
-                    selectedLanguage?.code === lang.code ? 'bg-primary-50 text-primary-500' : 'text-gray-600 hover:bg-gray-50'}`}>
+                    selectedLanguage?.code === lang.code ? 'bg-primary-50 text-primary-500' : 'text-neutral-600 hover:bg-neutral-50'}`}>
                   {lang.name}
                   {selectedLanguage?.code === lang.code && <Check size={12} />}
                 </button>
@@ -979,21 +979,21 @@ const TargetingChannelCard = ({
                 setOpenDropdown(openDropdown === 'objective' ? null : 'objective');
                 setObjectiveStage('goal');
               }}
-              className={`bg-white rounded-inner p-4 border border-gray-100 shadow-sm flex flex-col gap-2 group transition-all h-full ${
+              className={`bg-white rounded-inner p-4 border border-neutral-100 shadow-sm flex flex-col gap-2 group transition-all h-full ${
                 objective ? 'cursor-pointer hover:border-primary-500/20' : 'opacity-60 cursor-not-allowed'
               }`}
             >
-              <span className="text-xs font-medium text-gray-500">Conversion Event</span>
+              <span className="text-xs font-medium text-neutral-500">Conversion Event</span>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2.5 min-w-0">
                   <Target size={16} className="text-primary-500 shrink-0" />
-                  <span className="text-sm font-bold text-gray-700 truncate">
+                  <span className="text-sm font-bold text-neutral-700 truncate">
                     {!objective
-                      ? <span className="text-gray-300">请先在顶部选择 Campaign Objective</span>
-                      : (event || currentGoalObj?.label || <span className="text-gray-300">Select...</span>)}
+                      ? <span className="text-neutral-300">请先在顶部选择 Campaign Objective</span>
+                      : (event || currentGoalObj?.label || <span className="text-neutral-300">Select...</span>)}
                   </span>
                 </div>
-                <ChevronDown size={14} className={`text-gray-300 transition-transform shrink-0 ${openDropdown === 'objective' ? 'rotate-180' : ''}`} />
+                <ChevronDown size={14} className={`text-neutral-300 transition-transform shrink-0 ${openDropdown === 'objective' ? 'rotate-180' : ''}`} />
               </div>
             </div>
           </div>
@@ -1002,18 +1002,18 @@ const TargetingChannelCard = ({
             anchorRef={conversionEventTriggerRef}
             placement="bottom-end"
             onClose={() => setOpenDropdown(null)}
-            className="w-[320px] bg-white rounded-base shadow-xl border border-gray-100 p-3"
+            className="w-[320px] bg-white rounded-base shadow-xl border border-neutral-100 p-3"
           >
             {objectiveStage === 'goal' && (
               <div className="space-y-1">
-                <p className="text-[10px] font-bold text-gray-400 tracking-widest mb-2 px-2">Conversion Goal</p>
+                <p className="text-[10px] font-bold text-neutral-400 tracking-widest mb-2 px-2">Conversion Goal</p>
                 <div className="grid grid-cols-1 gap-1">
                   {availableGoals.map(goal => (
                     <button key={goal.value} onClick={() => {
                       setAdsetGoal(goal.value);
                       if (goal.needsEvent) { setObjectiveStage('event'); } else { setEvent(''); setOpenDropdown(null); }
                     }} className={`w-full text-left px-3 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-between group ${
-                      adsetGoal === goal.value ? 'bg-gray-900 text-white shadow-md' : 'hover:bg-gray-50 text-gray-600'
+                      adsetGoal === goal.value ? 'bg-neutral-900 text-white shadow-md' : 'hover:bg-neutral-50 text-neutral-600'
                     }`}>
                       <span>{goal.label}</span>
                       {goal.needsEvent ? <ArrowRight size={12} className="opacity-30 group-hover:opacity-100" /> : (adsetGoal === goal.value && <CheckCircle2 size={12} />)}
@@ -1025,19 +1025,19 @@ const TargetingChannelCard = ({
             {objectiveStage === 'event' && (
               <div className="space-y-2">
                 <div className="flex items-center gap-2 px-1">
-                  <button onClick={() => setObjectiveStage('goal')} className="p-1 hover:bg-gray-100 rounded-md transition-colors text-gray-400"><ChevronLeft size={14} /></button>
-                  <p className="text-[10px] font-bold text-gray-400 tracking-widest">Pixel Event</p>
+                  <button onClick={() => setObjectiveStage('goal')} className="p-1 hover:bg-neutral-100 rounded-md transition-colors text-neutral-400"><ChevronLeft size={14} /></button>
+                  <p className="text-[10px] font-bold text-neutral-400 tracking-widest">Pixel Event</p>
                 </div>
                 <div className="relative px-1">
-                  <Search size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300" />
-                  <input className="w-full pl-9 pr-3 py-2 bg-gray-50 border-none rounded-base text-xs font-bold text-gray-900 focus:ring-2 focus:ring-primary-500/20"
+                  <Search size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-300" />
+                  <input className="w-full pl-9 pr-3 py-2 bg-neutral-50 border-none rounded-base text-xs font-bold text-neutral-900 focus:ring-2 focus:ring-primary-500/20"
                     placeholder="Search events..." value={eventSearch} onChange={(e) => setEventSearch(e.target.value)} autoFocus />
                 </div>
                 <div className="max-h-48 overflow-y-auto custom-scrollbar space-y-0.5 pr-1">
                   {filteredEvents.map(ev => (
                     <button key={ev} onClick={() => { setEvent(ev); setOpenDropdown(null); }}
                       className={`w-full text-left px-3 py-2 rounded-base text-xs font-bold transition-all flex items-center justify-between ${
-                        event === ev ? 'bg-primary-500 text-white shadow-md' : 'hover:bg-gray-50 text-gray-600'
+                        event === ev ? 'bg-primary-500 text-white shadow-md' : 'hover:bg-neutral-50 text-neutral-600'
                       }`}>
                       {ev}
                       {event === ev && <CheckCircle2 size={12} />}
@@ -1051,22 +1051,22 @@ const TargetingChannelCard = ({
 
         {/* Daily Budget — 4th column, matches dropdown card visual */}
         <div>
-          <div className="bg-white rounded-inner p-4 border border-gray-100 shadow-sm flex flex-col gap-2 group focus-within:border-primary-500/30 transition-all h-full">
+          <div className="bg-white rounded-inner p-4 border border-neutral-100 shadow-sm flex flex-col gap-2 group focus-within:border-primary-500/30 transition-all h-full">
             <div className="flex items-center justify-between gap-2">
-              <span className="text-xs font-medium text-gray-500">每日预算</span>
-              <div className="inline-flex items-center bg-gray-100 rounded-base p-0.5">
+              <span className="text-xs font-medium text-neutral-500">每日预算</span>
+              <div className="inline-flex items-center bg-neutral-100 rounded-base p-0.5">
                 <button
                   type="button"
                   onClick={() => setBudgetType('CBO')}
                   className={`px-2.5 py-0.5 rounded-base text-[10px] font-medium transition-all ${
-                    budgetType === 'CBO' ? 'bg-white text-primary-500 shadow-adsgo-card' : 'text-gray-500'
+                    budgetType === 'CBO' ? 'bg-white text-primary-500 shadow-adsgo-card' : 'text-neutral-500'
                   }`}
                 >CBO</button>
                 <button
                   type="button"
                   onClick={() => setBudgetType('ABO')}
                   className={`px-2.5 py-0.5 rounded-base text-[10px] font-medium transition-all ${
-                    budgetType === 'ABO' ? 'bg-white text-primary-500 shadow-adsgo-card' : 'text-gray-500'
+                    budgetType === 'ABO' ? 'bg-white text-primary-500 shadow-adsgo-card' : 'text-neutral-500'
                   }`}
                 >ABO</button>
               </div>
@@ -1078,9 +1078,9 @@ const TargetingChannelCard = ({
                 min={0}
                 value={dailyBudget}
                 onChange={(e) => setDailyBudget(Number(e.target.value))}
-                className="flex-1 min-w-0 bg-transparent border-none outline-none text-sm font-bold text-gray-700 tabular-nums"
+                className="flex-1 min-w-0 bg-transparent border-none outline-none text-sm font-bold text-neutral-700 tabular-nums"
               />
-              <span className="text-xs font-medium text-gray-400 whitespace-nowrap shrink-0">USD/day</span>
+              <span className="text-xs font-medium text-neutral-400 whitespace-nowrap shrink-0">USD/day</span>
             </div>
           </div>
         </div>
@@ -1096,28 +1096,28 @@ const TargetingChannelCard = ({
                 if (!selectedAccount) { onPickAccount?.(); return; }
                 setCatalogDropdownOpen(prev => !prev);
               }}
-              className="bg-white rounded-inner p-4 border border-gray-100 shadow-sm flex flex-col gap-2 group cursor-pointer hover:border-primary-500/20 transition-all"
+              className="bg-white rounded-inner p-4 border border-neutral-100 shadow-sm flex flex-col gap-2 group cursor-pointer hover:border-primary-500/20 transition-all"
             >
-              <span className="text-xs font-medium text-gray-500">Catalog（产品目录）</span>
+              <span className="text-xs font-medium text-neutral-500">Catalog（产品目录）</span>
               <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2.5 min-w-0">
                   <Database size={16} className="text-primary-500 shrink-0" />
                   {!authStatus?.tiktok ? (
-                    <span className="text-sm font-bold text-gray-400 truncate">请连接 TikTok 加载 catalog</span>
+                    <span className="text-sm font-bold text-neutral-400 truncate">请连接 TikTok 加载 catalog</span>
                   ) : !selectedAccount ? (
-                    <span className="text-sm font-bold text-gray-400 truncate">请选择 TikTok 账号</span>
+                    <span className="text-sm font-bold text-neutral-400 truncate">请选择 TikTok 账号</span>
                   ) : tiktokCatalogLoading.isLoading ? (
-                    <span className="text-sm font-bold text-gray-400 flex items-center gap-2"><Loader2 size={14} className="animate-spin" /> 加载 catalog 中…</span>
+                    <span className="text-sm font-bold text-neutral-400 flex items-center gap-2"><Loader2 size={14} className="animate-spin" /> 加载 catalog 中…</span>
                   ) : selectedCatalog ? (
                     <div className="min-w-0">
-                      <p className="text-sm font-bold text-gray-700 truncate">{selectedCatalog.name}</p>
-                      <p className="text-[11px] text-gray-400 font-medium truncate">ID {selectedCatalog.id} · {selectedCatalog.productCount} 件商品</p>
+                      <p className="text-sm font-bold text-neutral-700 truncate">{selectedCatalog.name}</p>
+                      <p className="text-[11px] text-neutral-400 font-medium truncate">ID {selectedCatalog.id} · {selectedCatalog.productCount} 件商品</p>
                     </div>
                   ) : (
-                    <span className="text-sm font-bold text-gray-300">请选择 catalog</span>
+                    <span className="text-sm font-bold text-neutral-300">请选择 catalog</span>
                   )}
                 </div>
-                <ChevronDown size={14} className={`text-gray-300 transition-transform shrink-0 ${catalogDropdownOpen ? 'rotate-180' : ''}`} />
+                <ChevronDown size={14} className={`text-neutral-300 transition-transform shrink-0 ${catalogDropdownOpen ? 'rotate-180' : ''}`} />
               </div>
             </div>
           </div>
@@ -1127,7 +1127,7 @@ const TargetingChannelCard = ({
             placement="bottom-start"
             matchWidth
             onClose={() => setCatalogDropdownOpen(false)}
-            className="bg-white border border-gray-100 rounded-base shadow-xl overflow-hidden p-1"
+            className="bg-white border border-neutral-100 rounded-base shadow-xl overflow-hidden p-1"
           >
             {MOCK_CATALOGS.map(c => {
               const isSel = selectedCatalog?.id === c.id;
@@ -1135,16 +1135,16 @@ const TargetingChannelCard = ({
                 <button
                   key={c.id}
                   onClick={() => { onSelectCatalog?.(c); setCatalogDropdownOpen(false); }}
-                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-base transition-all text-left ${isSel ? 'bg-primary-50' : 'hover:bg-gray-50'}`}
+                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-base transition-all text-left ${isSel ? 'bg-primary-50' : 'hover:bg-neutral-50'}`}
                 >
                   <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${isSel ? 'bg-primary-500 text-white' : 'bg-primary-50 text-primary-500'}`}>
                     <Database size={16} />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className={`text-xs font-bold truncate ${isSel ? 'text-primary-600' : 'text-gray-800'}`}>{c.name}</p>
-                    <p className="text-[10px] text-gray-400 font-medium truncate">ID {c.id}</p>
+                    <p className={`text-xs font-bold truncate ${isSel ? 'text-primary-600' : 'text-neutral-800'}`}>{c.name}</p>
+                    <p className="text-[10px] text-neutral-400 font-medium truncate">ID {c.id}</p>
                   </div>
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-tag bg-emerald-50 text-emerald-600 border border-emerald-100 shrink-0">{c.productCount} 件</span>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-tag bg-success-50 text-success-600 border border-success-100 shrink-0">{c.productCount} 件</span>
                   {isSel && <Check size={14} className="text-primary-500 shrink-0" />}
                 </button>
               );
@@ -1177,16 +1177,16 @@ const TargetingChannelCard = ({
               <>
               <div ref={bidStrategyTriggerRef}>
                 <div onClick={() => setOpenDropdown(openDropdown === 'bidStrategy' ? null : 'bidStrategy')}
-                  className="bg-white rounded-inner p-4 border border-gray-100 shadow-sm flex flex-col gap-2 group cursor-pointer hover:border-primary-500/20 transition-all h-full">
-                  <span className="text-xs font-medium text-gray-500">竞价策略</span>
+                  className="bg-white rounded-inner p-4 border border-neutral-100 shadow-sm flex flex-col gap-2 group cursor-pointer hover:border-primary-500/20 transition-all h-full">
+                  <span className="text-xs font-medium text-neutral-500">竞价策略</span>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2.5 min-w-0">
                       <Target size={16} className="text-primary-500 shrink-0" />
-                      <span className="text-sm font-bold text-gray-700 truncate">
-                        {currentBidStrategyObj?.label || <span className="text-gray-300">Select...</span>}
+                      <span className="text-sm font-bold text-neutral-700 truncate">
+                        {currentBidStrategyObj?.label || <span className="text-neutral-300">Select...</span>}
                       </span>
                     </div>
-                    <ChevronDown size={14} className={`text-gray-300 transition-transform shrink-0 ${openDropdown === 'bidStrategy' ? 'rotate-180' : ''}`} />
+                    <ChevronDown size={14} className={`text-neutral-300 transition-transform shrink-0 ${openDropdown === 'bidStrategy' ? 'rotate-180' : ''}`} />
                   </div>
                 </div>
               </div>
@@ -1195,14 +1195,14 @@ const TargetingChannelCard = ({
                 anchorRef={bidStrategyTriggerRef}
                 placement="bottom-end"
                 onClose={() => setOpenDropdown(null)}
-                className="w-[300px] bg-white rounded-base shadow-xl border border-gray-100 p-2"
+                className="w-[300px] bg-white rounded-base shadow-xl border border-neutral-100 p-2"
               >
                 {BID_STRATEGIES.map(s => (
                   <button key={s.value} onClick={() => { onChangeBidStrategy?.(s.value); setOpenDropdown(null); }}
-                    className={`w-full text-left px-3 py-2.5 rounded-base transition-all flex items-center justify-between gap-3 ${bidStrategy === s.value ? 'bg-gray-900 text-white' : 'hover:bg-gray-50 text-gray-600'}`}>
+                    className={`w-full text-left px-3 py-2.5 rounded-base transition-all flex items-center justify-between gap-3 ${bidStrategy === s.value ? 'bg-neutral-900 text-white' : 'hover:bg-neutral-50 text-neutral-600'}`}>
                     <div className="min-w-0">
                       <p className="text-xs font-bold truncate">{s.label}</p>
-                      <p className={`text-[10px] truncate ${bidStrategy === s.value ? 'text-gray-300' : 'text-gray-400'}`}>{s.desc}</p>
+                      <p className={`text-[10px] truncate ${bidStrategy === s.value ? 'text-neutral-300' : 'text-neutral-400'}`}>{s.desc}</p>
                     </div>
                     {bidStrategy === s.value && <Check size={12} className="shrink-0" />}
                   </button>
@@ -1211,8 +1211,8 @@ const TargetingChannelCard = ({
               </>
             )}
             <div>
-              <div className={`bg-white rounded-inner p-4 border border-gray-100 shadow-sm flex flex-col gap-2 transition-all h-full ${amountDisabled ? 'opacity-60' : 'focus-within:border-primary-500/30'}`}>
-                <span className="text-xs font-medium text-gray-500">{amountLabel}</span>
+              <div className={`bg-white rounded-inner p-4 border border-neutral-100 shadow-sm flex flex-col gap-2 transition-all h-full ${amountDisabled ? 'opacity-60' : 'focus-within:border-primary-500/30'}`}>
+                <span className="text-xs font-medium text-neutral-500">{amountLabel}</span>
                 <div className="flex items-center gap-2.5 min-w-0">
                   {valueType !== 'roas' && !isTikTok ? (
                     <DollarSign size={16} className="text-primary-500 shrink-0" />
@@ -1227,10 +1227,10 @@ const TargetingChannelCard = ({
                     value={bidAmount ?? ''}
                     onChange={(e) => setBidAmount?.(e.target.value)}
                     placeholder={placeholder}
-                    className="flex-1 min-w-0 bg-transparent border-none outline-none text-sm font-bold text-gray-700 tabular-nums disabled:cursor-not-allowed"
+                    className="flex-1 min-w-0 bg-transparent border-none outline-none text-sm font-bold text-neutral-700 tabular-nums disabled:cursor-not-allowed"
                   />
                   {amountSuffix && (
-                    <span className="text-xs font-medium text-gray-400 whitespace-nowrap shrink-0">{amountSuffix}</span>
+                    <span className="text-xs font-medium text-neutral-400 whitespace-nowrap shrink-0">{amountSuffix}</span>
                   )}
                 </div>
               </div>
@@ -1273,7 +1273,7 @@ const TargetingChannelCard = ({
       <section className="space-y-6" style={{ order: 1 }}>
         <div className="flex items-baseline gap-3 px-1">
           <span className="text-xs font-bold text-primary-500/60 tabular-nums">01</span>
-          <h4 className="text-base font-semibold text-gray-900 tracking-tight">Campaign 架构</h4>
+          <h4 className="text-base font-semibold text-neutral-900 tracking-tight">Campaign 架构</h4>
         </div>
 
         {/* 一行 4 列：架构策略 + Campaign / Adset / Ads 数量（CATALOG 隐藏策略列，改 3 列） */}
@@ -1283,16 +1283,16 @@ const TargetingChannelCard = ({
             <div>
               <div ref={strategyTriggerRef}>
                 <div onClick={() => setOpenDropdown(openDropdown === 'strategy' ? null : 'strategy')}
-                  className="bg-white rounded-inner p-4 border border-gray-100 shadow-sm flex flex-col gap-2 group cursor-pointer hover:border-primary-500/20 transition-all h-full">
-                  <span className="text-xs font-medium text-gray-500">架构策略</span>
+                  className="bg-white rounded-inner p-4 border border-neutral-100 shadow-sm flex flex-col gap-2 group cursor-pointer hover:border-primary-500/20 transition-all h-full">
+                  <span className="text-xs font-medium text-neutral-500">架构策略</span>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2.5 min-w-0">
                       <Layers size={16} className="text-primary-500 shrink-0" />
-                      <span className="text-sm font-bold text-gray-700 truncate">
+                      <span className="text-sm font-bold text-neutral-700 truncate">
                         {STRATEGY_OPTIONS.find(o => o.id === structure.strategy)?.label || 'Product 测试'}
                       </span>
                     </div>
-                    <ChevronDown size={14} className={`text-gray-300 transition-transform shrink-0 ${openDropdown === 'strategy' ? 'rotate-180' : ''}`} />
+                    <ChevronDown size={14} className={`text-neutral-300 transition-transform shrink-0 ${openDropdown === 'strategy' ? 'rotate-180' : ''}`} />
                   </div>
                 </div>
               </div>
@@ -1302,7 +1302,7 @@ const TargetingChannelCard = ({
                 placement="bottom-start"
                 matchWidth
                 onClose={() => setOpenDropdown(null)}
-                className="bg-white rounded-base shadow-xl border border-gray-100 overflow-hidden"
+                className="bg-white rounded-base shadow-xl border border-neutral-100 overflow-hidden"
               >
                 {STRATEGY_OPTIONS.map(opt => {
                   const active = structure.strategy === opt.id;
@@ -1310,11 +1310,11 @@ const TargetingChannelCard = ({
                     <button
                       key={opt.id}
                       onClick={() => { onStructureChange({ ...structure, strategy: opt.id }); setOpenDropdown(null); }}
-                      className={`w-full text-left px-4 py-3 transition-colors flex items-start justify-between gap-3 ${active ? 'bg-primary-50' : 'hover:bg-gray-50'}`}
+                      className={`w-full text-left px-4 py-3 transition-colors flex items-start justify-between gap-3 ${active ? 'bg-primary-50' : 'hover:bg-neutral-50'}`}
                     >
                       <div className="min-w-0">
-                        <p className={`text-sm font-semibold ${active ? 'text-primary-500' : 'text-gray-700'}`}>{opt.label}</p>
-                        <p className="text-xs text-gray-400 font-medium mt-0.5">{opt.desc}</p>
+                        <p className={`text-sm font-semibold ${active ? 'text-primary-500' : 'text-neutral-700'}`}>{opt.label}</p>
+                        <p className="text-xs text-neutral-400 font-medium mt-0.5">{opt.desc}</p>
                       </div>
                       {active && <Check size={14} className="text-primary-500 shrink-0 mt-1" />}
                     </button>
@@ -1338,10 +1338,10 @@ const TargetingChannelCard = ({
             max={50}
             step={1}
           />
-          <div className="bg-gray-50/60 rounded-inner p-4 border border-gray-100 flex flex-col gap-2 h-full">
-            <span className="text-xs font-medium text-gray-500 truncate">Ads 数量（per adset）</span>
+          <div className="bg-neutral-50/60 rounded-inner p-4 border border-neutral-100 flex flex-col gap-2 h-full">
+            <span className="text-xs font-medium text-neutral-500 truncate">Ads 数量（per adset）</span>
             <div className="flex items-center justify-center flex-1">
-              <span className="text-xs font-semibold text-gray-400 italic">根据创意数量自动</span>
+              <span className="text-xs font-semibold text-neutral-400 italic">根据创意数量自动</span>
             </div>
           </div>
         </div>
@@ -1350,68 +1350,68 @@ const TargetingChannelCard = ({
       </section>
 
       {/* Section C: 高级设置 inline collapsible (含版位 / 命名 / 落地页 / 文案 / 排期) */}
-      <section className="border-t border-gray-100 pt-6" style={{ order: 3 }}>
+      <section className="border-t border-neutral-100 pt-6" style={{ order: 3 }}>
         <button
           onClick={() => setAdvancedOpen(!advancedOpen)}
           className="w-full flex items-baseline justify-between gap-3 px-1 py-3 group hover:opacity-80 transition-opacity"
         >
           <div className="flex items-baseline gap-3 min-w-0">
             <span className="text-xs font-bold text-primary-500/60 tabular-nums">03</span>
-            <h4 className="text-base font-semibold text-gray-900 tracking-tight">高级设置</h4>
-            <span className="text-xs text-gray-400 font-medium truncate">版位与排期 / 命名 / 落地页 / Ad 策略</span>
+            <h4 className="text-base font-semibold text-neutral-900 tracking-tight">高级设置</h4>
+            <span className="text-xs text-neutral-400 font-medium truncate">版位与排期 / 命名 / 落地页 / Ad 策略</span>
           </div>
-          <ChevronDown size={16} className={`text-gray-400 transition-transform shrink-0 self-center ${advancedOpen ? 'rotate-180' : ''}`} />
+          <ChevronDown size={16} className={`text-neutral-400 transition-transform shrink-0 self-center ${advancedOpen ? 'rotate-180' : ''}`} />
         </button>
         {advancedOpen && (
           <div className="pt-6 space-y-12 animate-in fade-in slide-in-from-top-2 duration-200">
             {/* 版位与排期 — 高级设置的第一个子模块（合并原版位 + 投放排期），两列布局 */}
             <div className="space-y-6">
               <div className="flex items-center gap-2 px-1">
-                <label className="text-xs font-medium text-gray-500">版位与排期</label>
-                <Info size={12} className="text-gray-300" />
+                <label className="text-xs font-medium text-neutral-500">版位与排期</label>
+                <Info size={12} className="text-neutral-300" />
               </div>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* 左：版位 */}
-                <div className="bg-gray-50/50 border border-gray-100 rounded-inner p-6 space-y-4">
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400 px-1 block">版位</span>
-                  <div className="flex p-1 bg-gray-100/80 rounded-base border border-gray-100 w-fit">
+                <div className="bg-neutral-50/50 border border-neutral-100 rounded-inner p-6 space-y-4">
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 px-1 block">版位</span>
+                  <div className="flex p-1 bg-neutral-100/80 rounded-base border border-neutral-100 w-fit">
                     <button
                       onClick={() => setPlacementMode('AUTO')}
-                      className={`px-6 py-2.5 rounded-base text-xs font-medium transition-all ${placementMode === 'AUTO' ? 'bg-white text-primary-500 shadow-adsgo-card' : 'text-gray-500 hover:text-gray-700'}`}
+                      className={`px-6 py-2.5 rounded-base text-xs font-medium transition-all ${placementMode === 'AUTO' ? 'bg-white text-primary-500 shadow-adsgo-card' : 'text-neutral-500 hover:text-neutral-700'}`}
                     >
                       Auto Placement
                     </button>
                     <button
                       onClick={() => setPlacementMode('MANUAL')}
                       disabled={!platformId || !PLATFORM_PLACEMENTS[platformId]}
-                      className={`px-6 py-2.5 rounded-base text-xs font-medium transition-all ${placementMode === 'MANUAL' ? 'bg-white text-primary-500 shadow-adsgo-card' : 'text-gray-500 hover:text-gray-700 disabled:opacity-40 disabled:cursor-not-allowed'}`}
+                      className={`px-6 py-2.5 rounded-base text-xs font-medium transition-all ${placementMode === 'MANUAL' ? 'bg-white text-primary-500 shadow-adsgo-card' : 'text-neutral-500 hover:text-neutral-700 disabled:opacity-40 disabled:cursor-not-allowed'}`}
                     >
                       Manual
                     </button>
                   </div>
                   {placementMode === 'AUTO' ? (
-                    <p className="text-xs text-gray-400 leading-relaxed px-1">
+                    <p className="text-xs text-neutral-400 leading-relaxed px-1">
                       系统将根据广告目标和受众智能分发到 {platform?.name || '所选平台'} 的最优版位组合。
                     </p>
                   ) : (
                     <div className="grid grid-cols-2 gap-2">
                       {placementOptions.length === 0 ? (
-                        <p className="col-span-full text-xs text-gray-400 px-1">请先在顶部选择渠道。</p>
+                        <p className="col-span-full text-xs text-neutral-400 px-1">请先在顶部选择渠道。</p>
                       ) : placementOptions.map(p => {
                         const checked = currentSelected.includes(p.id);
                         return (
                           <button
                             key={p.id}
                             onClick={() => togglePlacement(p.id)}
-                            className={`flex items-center gap-2 px-3 py-2.5 rounded-base border text-xs font-medium transition-all ${checked ? 'bg-primary-50 border-primary-500 text-primary-500' : 'bg-white border-gray-100 text-gray-600 hover:border-gray-200'}`}
+                            className={`flex items-center gap-2 px-3 py-2.5 rounded-base border text-xs font-medium transition-all ${checked ? 'bg-primary-50 border-primary-500 text-primary-500' : 'bg-white border-neutral-100 text-neutral-600 hover:border-neutral-200'}`}
                           >
-                            <div className={`w-4 h-4 rounded-sm flex items-center justify-center transition-all shrink-0 ${checked ? 'bg-primary-500 text-white' : 'border border-gray-300 bg-white'}`}>
+                            <div className={`w-4 h-4 rounded-sm flex items-center justify-center transition-all shrink-0 ${checked ? 'bg-primary-500 text-white' : 'border border-neutral-300 bg-white'}`}>
                               {checked && <Check size={10} strokeWidth={3} />}
                             </div>
                             <div className="min-w-0 flex-1 text-left">
                               <span className="block truncate">{p.label}</span>
                               {p.sublabels && (
-                                <span className="block text-[10px] font-medium text-gray-400 truncate mt-0.5">
+                                <span className="block text-[10px] font-medium text-neutral-400 truncate mt-0.5">
                                   {p.sublabels.join(' · ')}
                                 </span>
                               )}
@@ -1424,30 +1424,30 @@ const TargetingChannelCard = ({
                 </div>
 
                 {/* 右：排期 */}
-                <div className="bg-gray-50/50 border border-gray-100 rounded-inner p-6 space-y-4">
+                <div className="bg-neutral-50/50 border border-neutral-100 rounded-inner p-6 space-y-4">
                   <div className="flex items-center justify-between px-1">
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">排期</span>
-                    <span className="text-[11px] text-gray-400">结束时间留空 = 不限期</span>
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-neutral-400">排期</span>
+                    <span className="text-[11px] text-neutral-400">结束时间留空 = 不限期</span>
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <div className="space-y-2">
-                      <label className="text-[11px] font-medium text-gray-500 px-1">开始时间</label>
+                      <label className="text-[11px] font-medium text-neutral-500 px-1">开始时间</label>
                       <input
                         type="datetime-local"
                         step="1"
                         value={startDate}
                         onChange={(e) => setStartDate(e.target.value)}
-                        className="w-full h-12 px-3 bg-white border border-gray-200 rounded-base outline-none text-xs text-gray-700 focus:border-primary-500 focus:shadow-primary-focus transition-all duration-200"
+                        className="w-full h-12 px-3 bg-white border border-neutral-200 rounded-base outline-none text-xs text-neutral-700 focus:border-primary-500 focus:shadow-primary-focus transition-all duration-200"
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-[11px] font-medium text-gray-500 px-1">结束时间</label>
+                      <label className="text-[11px] font-medium text-neutral-500 px-1">结束时间</label>
                       <input
                         type="datetime-local"
                         step="1"
                         value={endDate}
                         onChange={(e) => setEndDate(e.target.value)}
-                        className="w-full h-12 px-3 bg-white border border-gray-200 rounded-base outline-none text-xs text-gray-700 focus:border-primary-500 focus:shadow-primary-focus transition-all duration-200"
+                        className="w-full h-12 px-3 bg-white border border-neutral-200 rounded-base outline-none text-xs text-neutral-700 focus:border-primary-500 focus:shadow-primary-focus transition-all duration-200"
                       />
                     </div>
                   </div>
@@ -1456,7 +1456,7 @@ const TargetingChannelCard = ({
                       <button
                         key={days}
                         onClick={() => onQuickSchedule?.(days)}
-                        className="flex-1 py-2 bg-white border border-gray-200 rounded-base text-xs font-medium text-gray-600 hover:border-primary-500 hover:text-primary-500 transition-all duration-200"
+                        className="flex-1 py-2 bg-white border border-neutral-200 rounded-base text-xs font-medium text-neutral-600 hover:border-primary-500 hover:text-primary-500 transition-all duration-200"
                       >
                         {days} 天
                       </button>
@@ -1552,14 +1552,14 @@ const NameField = ({
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between px-1">
-        <label className="text-xs font-medium text-gray-500">{label}</label>
+        <label className="text-xs font-medium text-neutral-500">{label}</label>
         <div className="relative">
           <button
             onClick={() => setOpenHistoryFor(openHistoryFor === fieldKey ? null : fieldKey)}
             className={`flex items-center gap-1 text-[11px] font-medium transition-colors px-2 py-0.5 rounded-md border ${
               openHistoryFor === fieldKey
                 ? 'bg-primary-50 border-primary-200 text-primary-600'
-                : 'border-gray-200 text-gray-400 hover:text-gray-600 hover:bg-gray-50'
+                : 'border-neutral-200 text-neutral-400 hover:text-neutral-600 hover:bg-neutral-50'
             }`}
           >
             <RefreshCw size={10} />
@@ -1567,22 +1567,22 @@ const NameField = ({
             <ChevronDown size={10} className={`transition-transform ${openHistoryFor === fieldKey ? 'rotate-180' : ''}`} />
           </button>
           {openHistoryFor === fieldKey && (
-            <div className="absolute right-0 top-full mt-1 w-64 bg-white rounded-base border border-gray-100 shadow-xl z-50 py-1 animate-in fade-in zoom-in-95 duration-150">
+            <div className="absolute right-0 top-full mt-1 w-64 bg-white rounded-base border border-neutral-100 shadow-xl z-50 py-1 animate-in fade-in zoom-in-95 duration-150">
               {history.map((item, i) => (
                 <button
                   key={i}
                   onClick={() => { setTemplate(item.template); setOpenHistoryFor(null); }}
-                  className={`w-full text-left px-3 py-2 transition-colors hover:bg-gray-50 ${
+                  className={`w-full text-left px-3 py-2 transition-colors hover:bg-neutral-50 ${
                     item.template === template ? 'bg-primary-50' : ''
                   }`}
                 >
                   <div className="flex items-center gap-1 mb-0.5">
                     {item.template === template && <Check size={9} className="shrink-0 text-primary-500" />}
-                    <span className="text-[11px] font-medium text-gray-700">{item.label}</span>
+                    <span className="text-[11px] font-medium text-neutral-700">{item.label}</span>
                   </div>
                   <div className="relative group">
-                    <p className="text-[10px] text-gray-400 font-mono truncate">{item.template}</p>
-                    <div className="absolute bottom-full left-0 hidden group-hover:block bg-gray-800 text-white text-[10px] font-mono rounded px-2 py-1 whitespace-nowrap z-[350] shadow-lg pointer-events-none">
+                    <p className="text-[10px] text-neutral-400 font-mono truncate">{item.template}</p>
+                    <div className="absolute bottom-full left-0 hidden group-hover:block bg-neutral-800 text-white text-[10px] font-mono rounded px-2 py-1 whitespace-nowrap z-[350] shadow-lg pointer-events-none">
                       {item.template}
                     </div>
                   </div>
@@ -1599,10 +1599,10 @@ const NameField = ({
         onChange={e => setTemplate(e.target.value)}
         onBlur={() => addToHistory(template)}
         onFocus={() => onActivate(fieldKey)}
-        className="w-full h-11 px-4 bg-white border border-gray-200 rounded-base outline-none text-xs text-gray-700 font-mono focus:border-primary-500 focus:shadow-primary-focus transition-all"
+        className="w-full h-11 px-4 bg-white border border-neutral-200 rounded-base outline-none text-xs text-neutral-700 font-mono focus:border-primary-500 focus:shadow-primary-focus transition-all"
       />
-      <p className="text-[11px] text-gray-400 px-1 font-mono truncate" title={preview}>
-        预览: <span className="text-gray-600">{preview}</span>
+      <p className="text-[11px] text-neutral-400 px-1 font-mono truncate" title={preview}>
+        预览: <span className="text-neutral-600">{preview}</span>
       </p>
     </div>
   );
@@ -1693,11 +1693,11 @@ const NamingStrategySection = ({
   return (
     <div className="space-y-6 pt-10" onClick={() => openHistoryFor && setOpenHistoryFor(null)}>
       <div className="flex items-center gap-2 px-1">
-        <label className="text-xs font-medium text-gray-500">广告结构命名策略</label>
-        <Info size={12} className="text-gray-300" />
+        <label className="text-xs font-medium text-neutral-500">广告结构命名策略</label>
+        <Info size={12} className="text-neutral-300" />
       </div>
       <div
-        className="bg-gray-50/50 border border-gray-100 rounded-inner p-6"
+        className="bg-neutral-50/50 border border-neutral-100 rounded-inner p-6"
         onClick={e => e.stopPropagation()}
         onMouseDown={e => e.stopPropagation()}
       >
@@ -1705,7 +1705,7 @@ const NamingStrategySection = ({
           {/* 左侧：三层命名卡片 */}
           <div className="flex flex-col gap-4 flex-1 min-w-0">
             {fields.map((f) => (
-              <div key={f.key} className="bg-white border border-gray-100 rounded-base p-5 shadow-sm flex-1">
+              <div key={f.key} className="bg-white border border-neutral-100 rounded-base p-5 shadow-sm flex-1">
                 <NameField
                   fieldKey={f.key}
                   label={f.label}
@@ -1726,13 +1726,13 @@ const NamingStrategySection = ({
           {/* 右侧：变量面板（贯穿三行等高） */}
           <div className={`w-44 flex-shrink-0 rounded-base flex flex-col transition-all ${
             activeField === null
-              ? 'border border-dashed border-gray-300 opacity-60'
+              ? 'border border-dashed border-neutral-300 opacity-60'
               : 'border border-primary-200 bg-white'
           }`}>
             {/* 状态标题 */}
-            <div className="px-3 pt-3 pb-2 border-b border-gray-100">
+            <div className="px-3 pt-3 pb-2 border-b border-neutral-100">
               {activeField === null ? (
-                <p className="text-[10px] text-gray-400 leading-relaxed">请先点击左侧命名框，再选择变量插入</p>
+                <p className="text-[10px] text-neutral-400 leading-relaxed">请先点击左侧命名框，再选择变量插入</p>
               ) : (
                 <div className="flex items-center gap-1.5">
                   <span className="inline-block w-1.5 h-1.5 rounded-full bg-primary-500 flex-shrink-0" />
@@ -1744,8 +1744,8 @@ const NamingStrategySection = ({
             </div>
 
             {/* 分隔符模块 */}
-            <div className={`px-3 pt-2.5 pb-2.5 border-b border-dashed border-gray-200 ${activeField === null ? 'pointer-events-none' : ''}`}>
-              <p className="text-[10px] text-gray-400 mb-1.5 font-medium">分隔符</p>
+            <div className={`px-3 pt-2.5 pb-2.5 border-b border-dashed border-neutral-200 ${activeField === null ? 'pointer-events-none' : ''}`}>
+              <p className="text-[10px] text-neutral-400 mb-1.5 font-medium">分隔符</p>
               <div className="flex flex-wrap gap-1 relative">
                 {SEP_OPTIONS.map(opt => {
                   const isSelected = separator === opt.value && !isCustomSep;
@@ -1759,8 +1759,8 @@ const NamingStrategySection = ({
                         isSelected
                           ? 'bg-primary-500 text-white border-primary-500'
                           : activeField === null
-                            ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
-                            : 'border-gray-200 text-gray-500 hover:border-primary-300 hover:text-primary-600'
+                            ? 'bg-neutral-100 text-neutral-400 border-neutral-200 cursor-not-allowed'
+                            : 'border-neutral-200 text-neutral-500 hover:border-primary-300 hover:text-primary-600'
                       }`}
                     >
                       {opt.label}
@@ -1775,8 +1775,8 @@ const NamingStrategySection = ({
                     isCustomSep
                       ? 'bg-primary-500 text-white border-primary-500'
                       : activeField === null
-                        ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
-                        : 'border-gray-200 text-gray-500 hover:border-primary-300 hover:text-primary-600'
+                        ? 'bg-neutral-100 text-neutral-400 border-neutral-200 cursor-not-allowed'
+                        : 'border-neutral-200 text-neutral-500 hover:border-primary-300 hover:text-primary-600'
                   }`}
                 >
                   {isCustomSep ? `自定义(${separator})` : '自定义'}
@@ -1786,10 +1786,10 @@ const NamingStrategySection = ({
                   <>
                     <div className="fixed inset-0 z-[290]" onClick={() => setShowCustomSepPopover(false)} />
                     <div
-                      className="absolute right-full top-0 mr-1 w-52 bg-white rounded-base border border-gray-200 shadow-xl z-[300] p-3 animate-in fade-in zoom-in-95 duration-150"
+                      className="absolute right-full top-0 mr-1 w-52 bg-white rounded-base border border-neutral-200 shadow-xl z-[300] p-3 animate-in fade-in zoom-in-95 duration-150"
                       onMouseDown={e => e.stopPropagation()}
                     >
-                      <p className="text-[11px] font-medium text-gray-500 mb-2">输入分隔符</p>
+                      <p className="text-[11px] font-medium text-neutral-500 mb-2">输入分隔符</p>
                       <input
                         autoFocus
                         type="text"
@@ -1801,10 +1801,10 @@ const NamingStrategySection = ({
                           if (e.key === 'Escape') setShowCustomSepPopover(false);
                         }}
                         placeholder="如 :: 或 |"
-                        className="w-full h-8 px-2 text-xs font-mono bg-gray-50 border border-gray-200 rounded-md outline-none focus:border-primary-500 mb-3"
+                        className="w-full h-8 px-2 text-xs font-mono bg-neutral-50 border border-neutral-200 rounded-md outline-none focus:border-primary-500 mb-3"
                       />
                       <div className="flex gap-2 justify-end">
-                        <button onClick={() => setShowCustomSepPopover(false)} className="px-2 py-1 text-[11px] text-gray-400 hover:text-gray-600">取消</button>
+                        <button onClick={() => setShowCustomSepPopover(false)} className="px-2 py-1 text-[11px] text-neutral-400 hover:text-neutral-600">取消</button>
                         <button
                           onClick={handleConfirmCustomSep}
                           disabled={!customSepDraft}
@@ -1824,7 +1824,7 @@ const NamingStrategySection = ({
               {NAMING_VARS.map(v => (
                 <div key={v.key}>
                   {activeField === null ? (
-                    <span className="block w-full px-2 py-1 text-[11px] font-semibold rounded-md border text-center bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed">
+                    <span className="block w-full px-2 py-1 text-[11px] font-semibold rounded-md border text-center bg-neutral-100 text-neutral-400 border-neutral-200 cursor-not-allowed">
                       {`{${v.key}}`}
                     </span>
                   ) : (
@@ -1867,32 +1867,32 @@ const MinimizedPublishIndicator = ({ campaignStatus, adsetProgress, onExpand, on
       shadow: '-2px 2px 24px rgba(112,51,245,0.18)',
       Icon: Loader2,
       iconCls: 'animate-spin',
-      barGrad: 'from-primary-500 via-purple-500 to-indigo-500',
+      barGrad: 'from-primary-500 via-purple-500 to-primary-500',
       title: '广告发布中',
       subtitle: currentAdset ? `正在发布 ${currentAdset.name}` : '准备中…',
       percentCls: 'text-primary-600',
     },
     success: {
-      grad: 'from-emerald-500 to-teal-600',
-      glow: 'shadow-emerald-500/30',
+      grad: 'from-success-500 to-teal-600',
+      glow: 'shadow-success-500/30',
       shadow: '-2px 2px 24px rgba(16,185,129,0.18)',
       Icon: Check,
       iconCls: '',
-      barGrad: 'from-emerald-500 via-emerald-400 to-teal-500',
+      barGrad: 'from-success-500 via-success-400 to-teal-500',
       title: '广告发布完成',
       subtitle: '全部广告已成功发布',
-      percentCls: 'text-emerald-600',
+      percentCls: 'text-success-600',
     },
     partial: {
-      grad: 'from-amber-500 to-orange-600',
-      glow: 'shadow-amber-500/30',
+      grad: 'from-warning-500 to-orange-600',
+      glow: 'shadow-warning-500/30',
       shadow: '-2px 2px 24px rgba(245,158,11,0.2)',
       Icon: AlertCircle,
       iconCls: '',
-      barGrad: 'from-amber-500 via-amber-400 to-orange-500',
+      barGrad: 'from-warning-500 via-warning-400 to-orange-500',
       title: '发布部分完成',
       subtitle: `${successCount} 成功 · ${failureCount} 失败`,
-      percentCls: 'text-amber-600',
+      percentCls: 'text-warning-600',
     },
   };
   const t = toneMap[tone];
@@ -1925,7 +1925,7 @@ const MinimizedPublishIndicator = ({ campaignStatus, adsetProgress, onExpand, on
         }
       `}</style>
       <div
-        className={`fixed top-4 right-4 z-[860] w-[320px] bg-white rounded-2xl ring-1 ring-slate-900/5 p-4 space-y-3 ${
+        className={`fixed top-4 right-4 z-[860] w-[320px] bg-white rounded-2xl ring-1 ring-neutral-900/5 p-4 space-y-3 ${
           isClosing
             ? 'animate-out fade-out slide-out-to-top-4 duration-300'
             : 'animate-in fade-in slide-in-from-top-4 duration-400'
@@ -1941,7 +1941,7 @@ const MinimizedPublishIndicator = ({ campaignStatus, adsetProgress, onExpand, on
             )}
             {tone === 'success' && (
               <span
-                className="absolute inset-0 rounded-xl ring-4 ring-emerald-400/40 animate-ping [animation-iteration-count:1] [animation-duration:600ms]"
+                className="absolute inset-0 rounded-xl ring-4 ring-success-400/40 animate-ping [animation-iteration-count:1] [animation-duration:600ms]"
                 aria-hidden
               />
             )}
@@ -1955,10 +1955,10 @@ const MinimizedPublishIndicator = ({ campaignStatus, adsetProgress, onExpand, on
           </div>
 
           <div className="flex-1 min-w-0 pt-0.5">
-            <p className="text-sm font-semibold text-slate-900 tracking-tight leading-tight truncate">
+            <p className="text-sm font-semibold text-neutral-900 tracking-tight leading-tight truncate">
               {t.title}
             </p>
-            <p className="text-[11px] text-slate-500 mt-0.5 truncate">{t.subtitle}</p>
+            <p className="text-[11px] text-neutral-500 mt-0.5 truncate">{t.subtitle}</p>
           </div>
 
           <div className="flex items-center gap-1 shrink-0">
@@ -1966,7 +1966,7 @@ const MinimizedPublishIndicator = ({ campaignStatus, adsetProgress, onExpand, on
               <button
                 onClick={onExpand}
                 aria-label="展开查看详情"
-                className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/40"
+                className="w-7 h-7 rounded-lg flex items-center justify-center text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/40"
               >
                 <ChevronRight size={14} />
               </button>
@@ -1974,7 +1974,7 @@ const MinimizedPublishIndicator = ({ campaignStatus, adsetProgress, onExpand, on
             <button
               onClick={handleManualClose}
               aria-label="关闭"
-              className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/40"
+              className="w-7 h-7 rounded-lg flex items-center justify-center text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/40"
             >
               <X size={14} />
             </button>
@@ -1982,7 +1982,7 @@ const MinimizedPublishIndicator = ({ campaignStatus, adsetProgress, onExpand, on
         </div>
 
         <div className="space-y-1.5">
-          <div className="h-1.5 rounded-full bg-slate-100 overflow-hidden">
+          <div className="h-1.5 rounded-full bg-neutral-100 overflow-hidden">
             <div
               className={`h-full rounded-full bg-gradient-to-r ${t.barGrad} transition-[width] duration-700 ease-out relative overflow-hidden`}
               style={{ width: `${percent}%` }}
@@ -1998,7 +1998,7 @@ const MinimizedPublishIndicator = ({ campaignStatus, adsetProgress, onExpand, on
           </div>
           <div className="flex items-center justify-between">
             <span className={`text-[11px] font-semibold tabular-nums ${t.percentCls}`}>{percent}%</span>
-            <span className="text-[11px] text-slate-400 tabular-nums">
+            <span className="text-[11px] text-neutral-400 tabular-nums">
               {done} of {total} adsets
             </span>
           </div>
@@ -2660,16 +2660,16 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
         style={{ zIndex }}
       >
         <div className="bg-white w-full max-w-xl rounded-section shadow-xl overflow-hidden animate-in slide-in-from-bottom-8">
-          <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-            <h3 className="text-base font-semibold text-gray-900">选择已有投放系列</h3>
-            <button onClick={() => setShowCampaignModal(false)} className="p-2 hover:bg-gray-50 rounded-full text-gray-300"><X size={24} /></button>
+          <div className="px-6 py-4 border-b border-neutral-200 flex items-center justify-between">
+            <h3 className="text-base font-semibold text-neutral-900">选择已有投放系列</h3>
+            <button onClick={() => setShowCampaignModal(false)} className="p-2 hover:bg-neutral-50 rounded-full text-neutral-300"><X size={24} /></button>
           </div>
-          <div className="p-6 bg-gray-50/50 border-b border-gray-100">
+          <div className="p-6 bg-neutral-50/50 border-b border-neutral-100">
             <div className="relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400" size={18} />
               <input 
                 type="text" autoFocus placeholder="搜索系列名称或 ID..." 
-                className="w-full pl-12 pr-4 h-9 bg-white border border-gray-200 rounded-base outline-none text-sm font-medium focus:border-primary-500 focus:shadow-primary-focus transition-all duration-200"
+                className="w-full pl-12 pr-4 h-9 bg-white border border-neutral-200 rounded-base outline-none text-sm font-medium focus:border-primary-500 focus:shadow-primary-focus transition-all duration-200"
                 value={search} onChange={(e) => setSearch(e.target.value)}
               />
             </div>
@@ -2677,16 +2677,16 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
           <div className="max-h-80 overflow-y-auto p-4 no-scrollbar">
             <div 
               onClick={() => { setSelectedCampaignId(null); setShowCampaignModal(false); }}
-              className="p-4 rounded-base hover:bg-gray-50 cursor-pointer flex items-center justify-between group border border-transparent hover:border-primary-500/15"
+              className="p-4 rounded-base hover:bg-neutral-50 cursor-pointer flex items-center justify-between group border border-transparent hover:border-primary-500/15"
             >
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-primary-50 text-primary-500/70 rounded-lg flex items-center justify-center"><Plus size={20}/></div>
-                <span className="text-sm font-semibold text-gray-400">创建全新系列 (Default)</span>
+                <span className="text-sm font-semibold text-neutral-400">创建全新系列 (Default)</span>
               </div>
               {!selectedCampaignId && <Check size={18} className="text-primary-500" />}
             </div>
 
-            <div className="mt-4 pt-4 border-t border-gray-50 space-y-2">
+            <div className="mt-4 pt-4 border-t border-neutral-50 space-y-2">
               {!isMetaConnected ? (
                 <div className="p-4">
                   <button
@@ -2720,7 +2720,7 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
               ) : campaignListLoading.isLoading ? (
                 <div className="p-6 flex flex-col items-center justify-center gap-2">
                   <Loader2 size={20} className="animate-spin text-primary-500/70" />
-                  <p className="text-xs font-medium text-gray-400 animate-pulse">Loading campaigns...</p>
+                  <p className="text-xs font-medium text-neutral-400 animate-pulse">Loading campaigns...</p>
                 </div>
               ) : (
                 filtered.map(c => (
@@ -2730,8 +2730,8 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
                     className="p-4 rounded-base hover:bg-primary-50 cursor-pointer flex items-center justify-between group transition-colors"
                   >
                     <div>
-                      <p className="text-sm font-semibold text-gray-800">{c.name}</p>
-                      <p className="text-xs font-medium text-gray-400">ID: {c.id} • {c.budgetType}</p>
+                      <p className="text-sm font-semibold text-neutral-800">{c.name}</p>
+                      <p className="text-xs font-medium text-neutral-400">ID: {c.id} • {c.budgetType}</p>
                     </div>
                     {selectedCampaignId === c.id && <Check size={18} className="text-primary-500" />}
                   </div>
@@ -2857,10 +2857,10 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
       const triggerRef = useRef(null);
       return (
         <div className="space-y-2">
-          <label className="text-xs font-medium text-gray-500">{label}</label>
-          <div ref={triggerRef} onClick={onToggle} className={`w-full h-12 px-4 bg-white border rounded-base flex items-center justify-between cursor-pointer transition-all duration-200 ${isOpen ? 'border-primary-500 ring-2 ring-primary-500/10' : 'border-gray-200 hover:border-gray-300'}`}>
-            <span className={`text-sm font-bold ${selectedOption ? 'text-gray-900' : 'text-gray-400'}`}>{selectedOption ? selectedOption.label : placeholder}</span>
-            <ChevronDown size={16} className={`text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+          <label className="text-xs font-medium text-neutral-500">{label}</label>
+          <div ref={triggerRef} onClick={onToggle} className={`w-full h-12 px-4 bg-white border rounded-base flex items-center justify-between cursor-pointer transition-all duration-200 ${isOpen ? 'border-primary-500 ring-2 ring-primary-500/10' : 'border-neutral-200 hover:border-neutral-300'}`}>
+            <span className={`text-sm font-bold ${selectedOption ? 'text-neutral-900' : 'text-neutral-400'}`}>{selectedOption ? selectedOption.label : placeholder}</span>
+            <ChevronDown size={16} className={`text-neutral-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
           </div>
           <Popover
             open={isOpen}
@@ -2869,16 +2869,16 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
             matchWidth
             onClose={onToggle}
             zIndex={Z_INDEX.MODAL_BASE + 500}
-            className="bg-white border border-gray-100 rounded-base shadow-xl py-2"
+            className="bg-white border border-neutral-100 rounded-base shadow-xl py-2"
           >
             {isLoading ? (
               <div className="p-6 flex flex-col items-center justify-center gap-2">
                 <Loader2 size={18} className="animate-spin text-primary-500/70" />
-                <p className="text-xs font-medium text-gray-400 animate-pulse">Loading...</p>
+                <p className="text-xs font-medium text-neutral-400 animate-pulse">Loading...</p>
               </div>
             ) : (
               options.map((opt) => (
-                <div key={opt.value} onClick={() => { onChange(opt.value); onToggle(); }} className={`rounded-base px-3 py-2 text-sm font-bold cursor-pointer transition-colors ${value === opt.value ? 'bg-primary-50 text-primary-500' : 'hover:bg-gray-50 text-gray-600'}`}>{opt.label}</div>
+                <div key={opt.value} onClick={() => { onChange(opt.value); onToggle(); }} className={`rounded-base px-3 py-2 text-sm font-bold cursor-pointer transition-colors ${value === opt.value ? 'bg-primary-50 text-primary-500' : 'hover:bg-neutral-50 text-neutral-600'}`}>{opt.label}</div>
               ))
             )}
           </Popover>
@@ -2906,18 +2906,18 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
               <div className="w-5 h-5 rounded-full bg-primary-50 flex items-center justify-center">
                 <div className="w-2 h-2 rounded-full bg-primary-500" />
               </div>
-              <span className="text-sm font-semibold text-gray-700">{stepPlatformName} Connection</span>
+              <span className="text-sm font-semibold text-neutral-700">{stepPlatformName} Connection</span>
             </div>
 
-            <div className="relative overflow-hidden group bg-white rounded-inner border border-gray-100 shadow-sm flex items-center transition-all h-16 hover:border-primary-500/15">
+            <div className="relative overflow-hidden group bg-white rounded-inner border border-neutral-100 shadow-sm flex items-center transition-all h-16 hover:border-primary-500/15">
               <div className="flex items-center gap-4 px-6 flex-1 min-w-0">
-                <div className="w-8 h-8 shrink-0 bg-gray-50 rounded-lg p-1.5 border border-gray-100"><img src={stepLogo} alt={stepPlatformName} className="w-full h-full object-contain" /></div>
+                <div className="w-8 h-8 shrink-0 bg-neutral-50 rounded-lg p-1.5 border border-neutral-100"><img src={stepLogo} alt={stepPlatformName} className="w-full h-full object-contain" /></div>
                 <div className="flex items-center gap-10 w-full">
-                  <span className="text-sm font-semibold text-gray-800 shrink-0">{stepPlatformName} Ads</span>
+                  <span className="text-sm font-semibold text-neutral-800 shrink-0">{stepPlatformName} Ads</span>
                   {stepConnected ? (
-                    <span className="text-sm font-bold text-gray-400 truncate">{stepEmail.split('@')[0]}</span>
+                    <span className="text-sm font-bold text-neutral-400 truncate">{stepEmail.split('@')[0]}</span>
                   ) : (
-                    <span className="text-sm font-bold text-gray-200">Not connected</span>
+                    <span className="text-sm font-bold text-neutral-200">Not connected</span>
                   )}
                 </div>
               </div>
@@ -2980,7 +2980,7 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
       const showPhone = !!selections.event;
       return (
         <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
-          <div className="bg-gray-50 rounded-inner p-6 space-y-6">
+          <div className="bg-neutral-50 rounded-inner p-6 space-y-6">
             <CustomDropdown label="Select ad account" options={options.adAccount} value={selections.adAccount} onChange={(val) => setSelections({...selections, adAccount: val})} placeholder="Select an account..." isOpen={activeDropdown === 'adAccount'} onToggle={() => handleToggle('adAccount')} isLoading={pubAdAccountLoading.isLoading} />
             {usesIdentityFlow ? (
               <>{selections.adAccount && (<div className="animate-in fade-in slide-in-from-top-2 duration-300"><CustomDropdown label={identityLabel} options={options.fbPage} value={selections.fbPage} onChange={(val) => { setSelections({...selections, fbPage: val}); if (!isTikTok) setShowTosModal(true); }} placeholder={identityPlaceholder} isOpen={activeDropdown === 'fbPage'} onToggle={() => handleToggle('fbPage')} isLoading={pubFbPageLoading.isLoading} /></div>)}{selections.fbPage && (<div className="animate-in fade-in slide-in-from-top-2 duration-300"><CustomDropdown label="Tracking pixel" options={options.pixel} value={selections.pixel} onChange={(val) => setSelections({...selections, pixel: val})} placeholder="Select a pixel..." isOpen={activeDropdown === 'pixel'} onToggle={() => handleToggle('pixel')} isLoading={pubPixelLoading.isLoading} /></div>)}{selections.pixel && (<div className="animate-in fade-in slide-in-from-top-2 duration-300"><CustomDropdown label="Event" options={options.metaEvent} value={selections.event} onChange={(val) => setSelections({...selections, event: val})} placeholder="Select an event..." isOpen={activeDropdown === 'metaEvent'} onToggle={() => handleToggle('metaEvent')} isLoading={pubEventLoading.isLoading} /></div>)}</>
@@ -2990,16 +2990,16 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
             {showPhone && (
               <div className="animate-in fade-in slide-in-from-top-2 duration-300">
                 <div className="space-y-2">
-                  <label className="text-xs font-semibold text-gray-700">Contact Phone</label>
+                  <label className="text-xs font-semibold text-neutral-700">Contact Phone</label>
                   <div className="flex gap-2">
                     <div className="shrink-0">
                       <button
                         ref={phoneCodeBtnRef}
                         onClick={() => setIsPhoneCodeOpen(!isPhoneCodeOpen)}
-                        className={`h-12 px-3 flex items-center gap-2 bg-white border rounded-base text-sm font-medium transition-all min-w-[100px] ${isPhoneCodeOpen ? 'border-primary-500 shadow-sm' : 'border-gray-200 hover:border-gray-300'}`}
+                        className={`h-12 px-3 flex items-center gap-2 bg-white border rounded-base text-sm font-medium transition-all min-w-[100px] ${isPhoneCodeOpen ? 'border-primary-500 shadow-sm' : 'border-neutral-200 hover:border-neutral-300'}`}
                       >
-                        <span className="text-gray-900">{selections.phoneCountryCode}</span>
-                        <ChevronDown size={14} className={`text-gray-300 transition-transform ${isPhoneCodeOpen ? 'rotate-180' : ''}`} />
+                        <span className="text-neutral-900">{selections.phoneCountryCode}</span>
+                        <ChevronDown size={14} className={`text-neutral-300 transition-transform ${isPhoneCodeOpen ? 'rotate-180' : ''}`} />
                       </button>
                       <Popover
                         open={isPhoneCodeOpen}
@@ -3007,18 +3007,18 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
                         placement="bottom-start"
                         onClose={() => setIsPhoneCodeOpen(false)}
                         zIndex={Z_INDEX.MODAL_BASE + 500}
-                        className="w-64 bg-white border border-gray-100 rounded-base shadow-xl max-h-48 overflow-y-auto custom-scrollbar"
+                        className="w-64 bg-white border border-neutral-100 rounded-base shadow-xl max-h-48 overflow-y-auto custom-scrollbar"
                       >
                         {PHONE_COUNTRY_CODES.map(cc => (
                           <button
                             key={cc.code}
                             onClick={() => { setSelections({...selections, phoneCountryCode: cc.code}); setIsPhoneCodeOpen(false); setPhoneError(''); }}
                             className={`w-full text-left px-4 py-2.5 text-xs font-medium transition-all flex items-center justify-between ${
-                              selections.phoneCountryCode === cc.code ? 'bg-primary-50 text-primary-500' : 'text-gray-600 hover:bg-gray-50'
+                              selections.phoneCountryCode === cc.code ? 'bg-primary-50 text-primary-500' : 'text-neutral-600 hover:bg-neutral-50'
                             }`}
                           >
                             <span>{cc.country}</span>
-                            <span className="text-gray-400 font-bold">{cc.code}</span>
+                            <span className="text-neutral-400 font-bold">{cc.code}</span>
                           </button>
                         ))}
                       </Popover>
@@ -3037,7 +3037,7 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
                       }}
                       placeholder="Enter phone number..."
                       className={`flex-1 h-12 px-4 bg-white border rounded-base text-sm font-medium outline-none transition-all ${
-                        phoneError ? 'border-rose-400 focus:border-rose-500 focus:ring-2 focus:ring-rose-500/10' : 'border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/10'
+                        phoneError ? 'border-rose-400 focus:border-rose-500 focus:ring-2 focus:ring-rose-500/10' : 'border-neutral-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/10'
                       }`}
                     />
                   </div>
@@ -3057,16 +3057,16 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
 
     const renderStep3 = () => (
       <div className="space-y-6 animate-in fade-in duration-500">
-        <div className="bg-gray-50 rounded-section p-8 border border-gray-100">
+        <div className="bg-neutral-50 rounded-section p-8 border border-neutral-100">
           {/* Campaign Header */}
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-3">
-              <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${campaignStatus === 'Success' ? 'bg-emerald-50 text-emerald-600' : campaignStatus === 'Partial' ? 'bg-amber-50 text-amber-600' : 'bg-primary-50 text-primary-500'}`}>
+              <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${campaignStatus === 'Success' ? 'bg-success-50 text-success-600' : campaignStatus === 'Partial' ? 'bg-warning-50 text-warning-600' : 'bg-primary-50 text-primary-500'}`}>
                 {campaignStatus === 'Publishing' ? <Loader2 size={20} className="animate-spin" /> : campaignStatus === 'Success' ? <Check size={20} /> : <AlertCircle size={20} />}
               </div>
               <div>
-                <h3 className="text-base font-semibold text-gray-900 tracking-tight">{publishCampaignName}</h3>
-                <p className="text-[11px] font-bold text-gray-400 mt-0.5">
+                <h3 className="text-base font-semibold text-neutral-900 tracking-tight">{publishCampaignName}</h3>
+                <p className="text-[11px] font-bold text-neutral-400 mt-0.5">
                   {adsetProgress.filter(a => a.status === 'Success').length}/{adsetProgress.length} Adsets · {adsetProgress.reduce((s, a) => s + a.completedAds, 0)}/{adsetProgress.reduce((s, a) => s + a.totalAds, 0)} Ads
                 </p>
               </div>
@@ -3076,21 +3076,21 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
           {/* Adset Progress List */}
           <div className="space-y-2.5 mt-5">
             {adsetProgress.map((a) => (
-              <div key={a.id} className="bg-white rounded-inner p-3.5 border border-gray-100 flex items-center justify-between group transition-all duration-300">
+              <div key={a.id} className="bg-white rounded-inner p-3.5 border border-neutral-100 flex items-center justify-between group transition-all duration-300">
                 <div className="flex items-center gap-3">
-                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${a.status === 'Success' ? 'bg-emerald-50 text-emerald-600' : a.status === 'Failure' ? 'bg-red-50 text-red-600' : a.status === 'Publishing' ? 'bg-primary-50 text-primary-500' : 'bg-gray-50 text-gray-300'}`}>
+                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${a.status === 'Success' ? 'bg-success-50 text-success-600' : a.status === 'Failure' ? 'bg-danger-50 text-danger-600' : a.status === 'Publishing' ? 'bg-primary-50 text-primary-500' : 'bg-neutral-50 text-neutral-300'}`}>
                     {a.status === 'Success' ? <Check size={16} /> : a.status === 'Failure' ? <AlertCircle size={16} /> : a.status === 'Publishing' ? <Loader2 size={16} className="animate-spin" /> : <Layout size={14} />}
                   </div>
                   <div>
-                    <h4 className="text-sm font-bold text-gray-800">{a.name}</h4>
-                    <p className={`text-[11px] font-medium ${a.status === 'Success' ? 'text-emerald-500' : a.status === 'Failure' ? 'text-red-500' : a.status === 'Publishing' ? 'text-primary-500' : 'text-gray-400'}`}>{a.status}</p>
+                    <h4 className="text-sm font-bold text-neutral-800">{a.name}</h4>
+                    <p className={`text-[11px] font-medium ${a.status === 'Success' ? 'text-success-500' : a.status === 'Failure' ? 'text-danger-500' : a.status === 'Publishing' ? 'text-primary-500' : 'text-neutral-400'}`}>{a.status}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${a.status === 'Success' ? 'bg-emerald-50 text-emerald-600' : a.status === 'Publishing' ? 'bg-primary-50 text-primary-500' : a.status === 'Failure' ? 'bg-red-50 text-red-500' : 'bg-gray-100 text-gray-400'}`}>
+                  <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${a.status === 'Success' ? 'bg-success-50 text-success-600' : a.status === 'Publishing' ? 'bg-primary-50 text-primary-500' : a.status === 'Failure' ? 'bg-danger-50 text-danger-500' : 'bg-neutral-100 text-neutral-400'}`}>
                     {a.completedAds}/{a.totalAds} Ads
                   </span>
-                  {a.status === 'Failure' && (<button className="p-1.5 hover:bg-red-50 text-red-400 rounded-lg transition-colors"><RefreshCw size={12} /></button>)}
+                  {a.status === 'Failure' && (<button className="p-1.5 hover:bg-danger-50 text-danger-400 rounded-lg transition-colors"><RefreshCw size={12} /></button>)}
                 </div>
               </div>
             ))}
@@ -3101,7 +3101,7 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
             setIsPublishMinimized(true);
             if (onPublishSuccess) onPublishSuccess();
           }}
-          className="mt-2 w-full py-3 rounded-xl bg-slate-100 text-slate-700 text-sm font-semibold hover:bg-slate-200 transition-colors"
+          className="mt-2 w-full py-3 rounded-xl bg-neutral-100 text-neutral-700 text-sm font-semibold hover:bg-neutral-200 transition-colors"
         >
           完成，后台继续发布
         </button>
@@ -3132,9 +3132,9 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
           <div className="relative bg-white w-full max-w-xl rounded-section shadow-xl flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-300 overflow-hidden">
             <div className="px-10 pt-10 pb-6 flex items-start justify-between shrink-0">
               <div>
-                <h2 className="text-2xl font-semibold text-gray-900 tracking-tight">Publishing status</h2>
+                <h2 className="text-2xl font-semibold text-neutral-900 tracking-tight">Publishing status</h2>
               </div>
-              <button onClick={() => setShowPublishModal(false)} className="p-2 hover:bg-gray-100 rounded-base text-gray-400 transition-colors"><X size={20} /></button>
+              <button onClick={() => setShowPublishModal(false)} className="p-2 hover:bg-neutral-100 rounded-base text-neutral-400 transition-colors"><X size={20} /></button>
             </div>
             <div className="flex-1 overflow-y-auto px-10 pb-10 custom-scrollbar">{renderStep3()}</div>
           </div>
@@ -3155,20 +3155,20 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
           <div className="fixed inset-0 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in" style={{ zIndex: tosZIndex }}>
             <div className="bg-white w-full max-w-lg rounded-section shadow-2xl p-10 space-y-8 animate-in zoom-in-95 duration-300">
               <div className="space-y-2">
-                <h4 className="text-lg font-semibold text-gray-900 leading-snug">请确认您的账户已同意Meta ads的广告条款或政策</h4>
+                <h4 className="text-lg font-semibold text-neutral-900 leading-snug">请确认您的账户已同意Meta ads的广告条款或政策</h4>
               </div>
               <div className="space-y-5">
-                <div className="flex gap-3 p-4 bg-amber-50 border border-amber-100 rounded-xl">
-                  <AlertCircle size={18} className="text-amber-500 shrink-0 mt-0.5" />
-                  <p className="text-sm text-gray-700 leading-relaxed">
+                <div className="flex gap-3 p-4 bg-warning-50 border border-warning-100 rounded-xl">
+                  <AlertCircle size={18} className="text-warning-500 shrink-0 mt-0.5" />
+                  <p className="text-sm text-neutral-700 leading-relaxed">
                     Meta ads严格要求投放leads广告的主页必须同意《潜在客户广告条款》，请前往{' '}
                     <a href="https://www.facebook.com/legal/leadgen/tos/" target="_blank" rel="noopener noreferrer" className="text-primary-500 font-semibold hover:underline">meta ads tos</a>
                     {' '}确认同意后，回到本页面继续发布；【给开发的备注说明：仅目标为leads广告时出现，】
                   </p>
                 </div>
-                <div className="flex gap-3 p-4 bg-amber-50 border border-amber-100 rounded-xl">
-                  <AlertCircle size={18} className="text-amber-500 shrink-0 mt-0.5" />
-                  <p className="text-sm text-gray-700 leading-relaxed">
+                <div className="flex gap-3 p-4 bg-warning-50 border border-warning-100 rounded-xl">
+                  <AlertCircle size={18} className="text-warning-500 shrink-0 mt-0.5" />
+                  <p className="text-sm text-neutral-700 leading-relaxed">
                     Meta ads严格要求特殊行业广告投放必须同意《无歧视政策》，请前往{' '}
                     <a href="https://www.facebook.com/certification/nondiscrimination" target="_blank" rel="noopener noreferrer" className="text-primary-500 font-semibold hover:underline">meta ads nondiscrimination</a>
                     {' '}同意后，回到本页面继续发布；【给开发的备注说明：仅目标为特殊行业广告时出现】
@@ -3215,7 +3215,7 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
   ) : null;
 
   return (
-    <div className="bg-gray-50/50 min-h-full">
+    <div className="bg-neutral-50/50 min-h-full">
       {/* 仅渲染一份 ChannelHeader：sm 顶部 sticky；lg+ 左侧 sidebar */}
       {channelHeaderShared && !isLgUp && (
         <div className="sticky top-0 w-full px-4 md:px-8 pt-4 animate-in slide-in-from-top-full duration-500" style={{ zIndex: Z_INDEX.HEADER }}>
@@ -3253,7 +3253,7 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
               <div className="bg-white rounded-section p-10 adsgo-card-shadow">
                 <div className="flex items-center gap-3 mb-8">
                    <div className="w-10 h-10 bg-primary-500 rounded-xl flex items-center justify-center text-white"><ShoppingBag size={20} /></div>
-                   <h3 className="text-xl font-semibold text-gray-900">添加投放产品</h3>
+                   <h3 className="text-xl font-semibold text-neutral-900">添加投放产品</h3>
                 </div>
                 <ProductSelector
                   platform={platform}
@@ -3311,11 +3311,11 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
               {/* Reminder Component when creatives are missing */}
               {allProductsReady && isAnyProductMissingCreatives && campaignType !== 'CATALOG' && selectedProducts.length > 0 && (
                 <div className="bg-white rounded-section p-16 adsgo-card-shadow flex flex-col items-center justify-center text-center animate-in fade-in slide-in-from-top-4">
-                  <div className="w-20 h-20 bg-gray-50 border-2 border-dashed border-gray-200 rounded-xl flex items-center justify-center text-gray-200 mb-8">
+                  <div className="w-20 h-20 bg-neutral-50 border-2 border-dashed border-neutral-200 rounded-xl flex items-center justify-center text-neutral-200 mb-8">
                     <Plus size={40} />
                   </div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-4">请先添加至少一个素材</h3>
-                  <p className="text-sm text-gray-400 font-bold leading-relaxed max-w-md">
+                  <h3 className="text-xl font-semibold text-neutral-900 mb-4">请先添加至少一个素材</h3>
+                  <p className="text-sm text-neutral-400 font-bold leading-relaxed max-w-md">
                     点击上方产品的 “AI” 或 “上传” 按钮填充创意资产。完成后系统将自动开启 Campaign 架构生成模块。
                   </p>
                 </div>
@@ -3378,10 +3378,10 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
                   {/* Landing Page Strategy */}
                   <div className="space-y-6">
                     <div className="flex items-center gap-2 px-1">
-                      <label className="text-xs font-medium text-gray-500">投放落地页策略</label>
-                      <Info size={12} className="text-gray-300" />
+                      <label className="text-xs font-medium text-neutral-500">投放落地页策略</label>
+                      <Info size={12} className="text-neutral-300" />
                     </div>
-                    <div className="bg-gray-50/50 border border-gray-100 rounded-inner p-10 flex flex-col md:flex-row gap-10">
+                    <div className="bg-neutral-50/50 border border-neutral-100 rounded-inner p-10 flex flex-col md:flex-row gap-10">
                       <div className="flex flex-col gap-3 w-full md:w-80">
                         {[
                           { id: 'PRODUCT', label: '投放单品落地页', desc: 'Direct Product SKU', icon: <Tag size={18} /> },
@@ -3393,15 +3393,15 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
                             className={`flex items-center gap-4 p-5 rounded-base border-2 transition-all ${
                               lpType === opt.id
                                 ? 'bg-white border-primary-500 shadow-primary-focus'
-                                : 'bg-transparent border-gray-100 hover:border-gray-200'
+                                : 'bg-transparent border-neutral-100 hover:border-neutral-200'
                             }`}
                           >
-                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${lpType === opt.id ? 'bg-primary-500 text-white' : 'bg-white text-gray-400'}`}>
+                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${lpType === opt.id ? 'bg-primary-500 text-white' : 'bg-white text-neutral-400'}`}>
                               {opt.icon}
                             </div>
                             <div className="text-left">
-                              <p className={`text-xs font-semibold ${lpType === opt.id ? 'text-gray-900' : 'text-gray-500'}`}>{opt.label}</p>
-                              <p className="text-xs text-gray-400 font-bold mt-0.5">{opt.desc}</p>
+                              <p className={`text-xs font-semibold ${lpType === opt.id ? 'text-neutral-900' : 'text-neutral-500'}`}>{opt.label}</p>
+                              <p className="text-xs text-neutral-400 font-bold mt-0.5">{opt.desc}</p>
                             </div>
                           </button>
                         ))}
@@ -3415,17 +3415,17 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
                                   <Target size={20} />
                                 </div>
                                 <div>
-                                  <h4 className="text-xs font-semibold text-gray-900 tracking-tight">自动路由至产品单页</h4>
-                                  <p className="text-xs text-gray-500 font-medium leading-relaxed mt-1">
+                                  <h4 className="text-xs font-semibold text-neutral-900 tracking-tight">自动路由至产品单页</h4>
+                                  <p className="text-xs text-neutral-500 font-medium leading-relaxed mt-1">
                                     系统将使用所选产品的原始落地页。您可以在下方为所有单品 URL 统一增加 UTM 追踪参数。
                                   </p>
                                 </div>
                               </div>
                             </div>
                             <div className="space-y-3">
-                              <label className="text-xs font-medium text-gray-500 px-1">统一 UTM 追踪参数</label>
+                              <label className="text-xs font-medium text-neutral-500 px-1">统一 UTM 追踪参数</label>
                               <div className="relative group">
-                                <div className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-primary-500 transition-colors">
+                                <div className="absolute left-6 top-1/2 -translate-y-1/2 text-neutral-300 group-focus-within:text-primary-500 transition-colors">
                                   <Settings size={22} />
                                 </div>
                                 <input
@@ -3433,7 +3433,7 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
                                   value={productLpUtm}
                                   onChange={(e) => setProductLpUtm(e.target.value)}
                                   placeholder="utm_source=meta&utm_medium=paid&utm_campaign={{product_id}}"
-                                  className="w-full h-14 pl-16 pr-6 bg-white border border-gray-200 rounded-base outline-none text-sm text-gray-700 focus:border-primary-500 focus:shadow-primary-focus transition-all duration-200"
+                                  className="w-full h-14 pl-16 pr-6 bg-white border border-neutral-200 rounded-base outline-none text-sm text-neutral-700 focus:border-primary-500 focus:shadow-primary-focus transition-all duration-200"
                                 />
                               </div>
                             </div>
@@ -3441,9 +3441,9 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
                         ) : (
                           <div className="space-y-6 animate-in fade-in slide-in-from-left-4">
                             <div className="space-y-3">
-                              <label className="text-xs font-medium text-gray-500 px-1">落地页模板 URL (支持动态参数)</label>
+                              <label className="text-xs font-medium text-neutral-500 px-1">落地页模板 URL (支持动态参数)</label>
                               <div className="relative group">
-                                <div className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-primary-500 transition-colors">
+                                <div className="absolute left-6 top-1/2 -translate-y-1/2 text-neutral-300 group-focus-within:text-primary-500 transition-colors">
                                   <Link2 size={24} />
                                 </div>
                                 <input
@@ -3451,7 +3451,7 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
                                   value={lpTemplateUrl}
                                   onChange={(e) => setLpTemplateUrl(e.target.value)}
                                   placeholder="https://example.com/collections/{{product_name}}"
-                                  className="w-full h-16 pl-16 pr-24 bg-white border border-gray-200 rounded-base outline-none text-sm text-gray-700 focus:border-primary-500 focus:shadow-primary-focus transition-all duration-200"
+                                  className="w-full h-16 pl-16 pr-24 bg-white border border-neutral-200 rounded-base outline-none text-sm text-neutral-700 focus:border-primary-500 focus:shadow-primary-focus transition-all duration-200"
                                 />
                               </div>
                             </div>
@@ -3464,38 +3464,38 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
                   {/* Ad 策略：父级 section 标题；下辖 Ad Format + 广告文案与标题 两个 sub-field（用 eyebrow 标签压低视觉权重，建立层级） */}
                   <div className="space-y-6">
                     <div className="flex items-center gap-2 px-1">
-                      <label className="text-xs font-medium text-gray-500">Ad 策略</label>
-                      <Info size={12} className="text-gray-300" />
+                      <label className="text-xs font-medium text-neutral-500">Ad 策略</label>
+                      <Info size={12} className="text-neutral-300" />
                     </div>
 
-                    <div className="border-l-2 border-gray-100 pl-5 space-y-6">
+                    <div className="border-l-2 border-neutral-100 pl-5 space-y-6">
                       {/* Ad Format — 仅在 sales_conversions / app_promotion 目标下显示；TikTok 强制 SINGLE，整段隐藏 */}
                       {(objective === 'sales_conversions' || objective === 'app_promotion') && platform?.id !== 'tiktok' && (
                         <div className="space-y-3">
-                          <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400 px-1 block">Ad Format</span>
-                          <div className="flex p-1 bg-gray-100/80 rounded-base border border-gray-100 w-fit">
+                          <span className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 px-1 block">Ad Format</span>
+                          <div className="flex p-1 bg-neutral-100/80 rounded-base border border-neutral-100 w-fit">
                             <button
                               onClick={() => setAdType('FLEXIBLE')}
-                              className={`px-6 py-2.5 rounded-base text-xs font-medium transition-all ${adType === 'FLEXIBLE' ? 'bg-white text-primary-500 shadow-adsgo-card' : 'text-gray-500 hover:text-gray-700'}`}
+                              className={`px-6 py-2.5 rounded-base text-xs font-medium transition-all ${adType === 'FLEXIBLE' ? 'bg-white text-primary-500 shadow-adsgo-card' : 'text-neutral-500 hover:text-neutral-700'}`}
                             >
                               Flexible Ad
                             </button>
                             <button
                               onClick={() => setAdType('SINGLE')}
-                              className={`px-6 py-2.5 rounded-base text-xs font-medium transition-all ${adType === 'SINGLE' ? 'bg-white text-primary-500 shadow-adsgo-card' : 'text-gray-500 hover:text-gray-700'}`}
+                              className={`px-6 py-2.5 rounded-base text-xs font-medium transition-all ${adType === 'SINGLE' ? 'bg-white text-primary-500 shadow-adsgo-card' : 'text-neutral-500 hover:text-neutral-700'}`}
                             >
                               Single Ad
                             </button>
                             <button
                               onClick={() => setAdType('CAROUSEL')}
-                              className={`px-6 py-2.5 rounded-base text-xs font-medium transition-all ${adType === 'CAROUSEL' ? 'bg-white text-primary-500 shadow-adsgo-card' : 'text-gray-500 hover:text-gray-700'}`}
+                              className={`px-6 py-2.5 rounded-base text-xs font-medium transition-all ${adType === 'CAROUSEL' ? 'bg-white text-primary-500 shadow-adsgo-card' : 'text-neutral-500 hover:text-neutral-700'}`}
                             >
                               Carousel Ad
                             </button>
                           </div>
                           {(adType === 'FLEXIBLE' || adType === 'CAROUSEL') && (
                             <div className="flex items-center gap-3 pt-1 animate-in slide-in-from-top-2 fade-in duration-200">
-                              <label className="text-xs font-medium text-gray-500 shrink-0">每 Ad 的 creative 数量</label>
+                              <label className="text-xs font-medium text-neutral-500 shrink-0">每 Ad 的 creative 数量</label>
                               <input
                                 type="number"
                                 min={1}
@@ -3514,9 +3514,9 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
                                   if (!Number.isFinite(n) || n < 1) setCreativesPerAd(1);
                                   else if (n > 10) setCreativesPerAd(10);
                                 }}
-                                className="w-20 h-9 px-3 bg-white border border-gray-200 rounded-base outline-none text-xs font-semibold text-gray-700 tabular-nums focus:border-primary-500 focus:shadow-primary-focus transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                className="w-20 h-9 px-3 bg-white border border-neutral-200 rounded-base outline-none text-xs font-semibold text-neutral-700 tabular-nums focus:border-primary-500 focus:shadow-primary-focus transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                               />
-                              <span className="text-[11px] text-gray-400 font-medium">取值 1 ~ 10</span>
+                              <span className="text-[11px] text-neutral-400 font-medium">取值 1 ~ 10</span>
                             </div>
                           )}
                         </div>
@@ -3524,18 +3524,18 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
 
                       {platform?.id === 'meta' && (
                         <div className="space-y-3">
-                          <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400 px-1 block">合创广告 (Branded Content)</span>
-                          <div className="bg-gray-50/50 border border-gray-100 rounded-inner p-4">
+                          <span className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 px-1 block">合创广告 (Branded Content)</span>
+                          <div className="bg-neutral-50/50 border border-neutral-100 rounded-inner p-4">
                             <div className="flex items-center justify-between gap-4">
                               <div className="min-w-0">
-                                <p className="text-sm font-semibold text-gray-900">启用合创广告</p>
-                                <p className="text-xs text-gray-400 mt-0.5">未填或格式错误将按非合创广告发布</p>
+                                <p className="text-sm font-semibold text-neutral-900">启用合创广告</p>
+                                <p className="text-xs text-neutral-400 mt-0.5">未填或格式错误将按非合创广告发布</p>
                               </div>
                               <button
                                 type="button"
                                 onClick={() => setIsCollabAd(!isCollabAd)}
                                 aria-pressed={isCollabAd}
-                                className={`relative inline-flex items-center w-11 h-6 rounded-full transition-colors shrink-0 ${isCollabAd ? 'bg-primary-500' : 'bg-gray-300'}`}
+                                className={`relative inline-flex items-center w-11 h-6 rounded-full transition-colors shrink-0 ${isCollabAd ? 'bg-primary-500' : 'bg-neutral-300'}`}
                               >
                                 <span
                                   className="inline-block w-5 h-5 bg-white rounded-full shadow transition-transform"
@@ -3550,7 +3550,7 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
                                   value={collabValue}
                                   onChange={e => setCollabValue(e.target.value)}
                                   placeholder="请粘贴合创广告 code 或合作帖子 URL"
-                                  className="w-full px-3 py-2 text-xs bg-white border border-gray-200 rounded-base focus:border-primary-500 focus:shadow-primary-focus outline-none transition-all"
+                                  className="w-full px-3 py-2 text-xs bg-white border border-neutral-200 rounded-base focus:border-primary-500 focus:shadow-primary-focus outline-none transition-all"
                                 />
                               </div>
                             )}
@@ -3559,8 +3559,8 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
                       )}
 
                       <div className="space-y-3">
-                        <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400 px-1 block">广告文案与标题</span>
-                    <div className="bg-gray-50/50 border border-gray-100 rounded-inner p-10 flex flex-col md:flex-row gap-10">
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 px-1 block">广告文案与标题</span>
+                    <div className="bg-neutral-50/50 border border-neutral-100 rounded-inner p-10 flex flex-col md:flex-row gap-10">
                       <div className="flex flex-col gap-3 w-full md:w-80">
                         {[
                           { id: 'AI_CUSTOM', label: 'AI 为每个产品定制', desc: 'Custom per SKU', icon: <Sparkles size={18} /> },
@@ -3572,15 +3572,15 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
                             className={`flex items-center gap-4 p-5 rounded-base border-2 transition-all ${
                               copyStrategy === opt.id
                                 ? 'bg-white border-primary-500 shadow-primary-focus'
-                                : 'bg-transparent border-gray-100 hover:border-gray-200'
+                                : 'bg-transparent border-neutral-100 hover:border-neutral-200'
                             }`}
                           >
-                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${copyStrategy === opt.id ? 'bg-primary-500 text-white' : 'bg-white text-gray-400'}`}>
+                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${copyStrategy === opt.id ? 'bg-primary-500 text-white' : 'bg-white text-neutral-400'}`}>
                               {opt.icon}
                             </div>
                             <div className="text-left">
-                              <p className={`text-xs font-semibold ${copyStrategy === opt.id ? 'text-gray-900' : 'text-gray-500'}`}>{opt.label}</p>
-                              <p className="text-xs text-gray-400 font-bold mt-0.5">{opt.desc}</p>
+                              <p className={`text-xs font-semibold ${copyStrategy === opt.id ? 'text-neutral-900' : 'text-neutral-500'}`}>{opt.label}</p>
+                              <p className="text-xs text-neutral-400 font-bold mt-0.5">{opt.desc}</p>
                             </div>
                           </button>
                         ))}
@@ -3593,8 +3593,8 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
                                 <Sparkles size={24} />
                               </div>
                               <div>
-                                <h4 className="text-sm font-semibold text-gray-900 tracking-tight">AI 智能深度定制文案</h4>
-                                <p className="text-xs text-gray-500 font-medium leading-relaxed mt-2">
+                                <h4 className="text-sm font-semibold text-neutral-900 tracking-tight">AI 智能深度定制文案</h4>
+                                <p className="text-xs text-neutral-500 font-medium leading-relaxed mt-2">
                                   基于落地页分析报告，Agent 将为每一个产品自动撰写差异化的广告标题和正文，最大化转化率。
                                 </p>
                               </div>
@@ -3604,8 +3604,8 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
                           <div className="space-y-6 animate-in fade-in slide-in-from-left-4">
                             <div className="space-y-3">
                               <div className="flex items-center gap-2 px-1">
-                                <label className="text-xs font-medium text-gray-500">应用方式</label>
-                                <Info size={12} className="text-gray-300" />
+                                <label className="text-xs font-medium text-neutral-500">应用方式</label>
+                                <Info size={12} className="text-neutral-300" />
                               </div>
                               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 {[
@@ -3618,15 +3618,15 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
                                     className={`flex items-center gap-3 p-4 rounded-base border-2 transition-all text-left ${
                                       unifiedCopyApplyMode === opt.id
                                         ? 'bg-white border-primary-500 shadow-primary-focus'
-                                        : 'bg-transparent border-gray-100 hover:border-gray-200'
+                                        : 'bg-transparent border-neutral-100 hover:border-neutral-200'
                                     }`}
                                   >
-                                    <div className={`w-9 h-9 rounded-base flex items-center justify-center transition-colors ${unifiedCopyApplyMode === opt.id ? 'bg-primary-500 text-white' : 'bg-white text-gray-400'}`}>
+                                    <div className={`w-9 h-9 rounded-base flex items-center justify-center transition-colors ${unifiedCopyApplyMode === opt.id ? 'bg-primary-500 text-white' : 'bg-white text-neutral-400'}`}>
                                       {opt.icon}
                                     </div>
                                     <div className="min-w-0">
-                                      <p className={`text-xs font-semibold ${unifiedCopyApplyMode === opt.id ? 'text-gray-900' : 'text-gray-500'}`}>{opt.label}</p>
-                                      <p className="text-xs text-gray-400 font-medium truncate">{opt.desc}</p>
+                                      <p className={`text-xs font-semibold ${unifiedCopyApplyMode === opt.id ? 'text-neutral-900' : 'text-neutral-500'}`}>{opt.label}</p>
+                                      <p className="text-xs text-neutral-400 font-medium truncate">{opt.desc}</p>
                                     </div>
                                   </button>
                                 ))}
@@ -3634,9 +3634,9 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
                             </div>
                             <div className="space-y-3">
                               <div className="flex items-center justify-between px-1">
-                                <label className="text-xs font-medium text-gray-500">文案组（标题 + 正文）</label>
+                                <label className="text-xs font-medium text-neutral-500">文案组（标题 + 正文）</label>
                                 {platform?.id === 'tiktok' && (
-                                  <span className="text-xs text-gray-400 font-medium">TikTok 每组仅 1 条标题 + 1 条正文</span>
+                                  <span className="text-xs text-neutral-400 font-medium">TikTok 每组仅 1 条标题 + 1 条正文</span>
                                 )}
                               </div>
                               {(() => {
@@ -3671,8 +3671,8 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
 
                                 if (isSequentialApply && allCreativeGroupsForCopy.length === 0) {
                                   return (
-                                    <div className="text-center py-8 px-4 bg-gray-50 border border-dashed border-gray-200 rounded-inner">
-                                      <p className="text-xs font-medium text-gray-400 leading-relaxed">
+                                    <div className="text-center py-8 px-4 bg-neutral-50 border border-dashed border-neutral-200 rounded-inner">
+                                      <p className="text-xs font-medium text-neutral-400 leading-relaxed">
                                         请先在上方添加产品并配置素材组，<br/>文案组将自动按素材组数量与顺序生成。
                                       </p>
                                     </div>
@@ -3682,8 +3682,8 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
                                 return (
                                   <>
                                     {isSequentialApply && (
-                                      <p className="text-[11px] text-gray-400 font-medium px-1 leading-relaxed flex items-start gap-1">
-                                        <Info size={10} className="text-gray-300 shrink-0 mt-0.5" />
+                                      <p className="text-[11px] text-neutral-400 font-medium px-1 leading-relaxed flex items-start gap-1">
+                                        <Info size={10} className="text-neutral-300 shrink-0 mt-0.5" />
                                         <span>已按素材组数量与顺序自动展开 — 每个文案组对应一个素材组，可独立定制内容</span>
                                       </p>
                                     )}
@@ -3694,16 +3694,16 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
                                       const bodies = entry.bodies;
                                       const updateGroup = entry._onUpdate;
                                       return (
-                                        <div key={entry.id} className="bg-white border border-gray-100 rounded-inner p-5 space-y-4">
+                                        <div key={entry.id} className="bg-white border border-neutral-100 rounded-inner p-5 space-y-4">
                                           <div className="flex items-center justify-between">
                                             <div className="flex items-center gap-2 min-w-0">
                                               <FileText size={14} className="text-primary-500/70 shrink-0" />
-                                              <span className="text-xs font-semibold text-gray-700 truncate">{entry.displayName}</span>
+                                              <span className="text-xs font-semibold text-neutral-700 truncate">{entry.displayName}</span>
                                             </div>
                                             {entry._canDelete && entry._onDelete && (
                                               <button
                                                 onClick={entry._onDelete}
-                                                className="w-7 h-7 flex items-center justify-center rounded-full text-gray-400 hover:text-rose-500 hover:bg-rose-50 transition-colors shrink-0"
+                                                className="w-7 h-7 flex items-center justify-center rounded-full text-neutral-400 hover:text-rose-500 hover:bg-rose-50 transition-colors shrink-0"
                                                 title="删除该文案组"
                                               >
                                                 <X size={14} />
@@ -3714,9 +3714,9 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
                                           {/* 标题列表 */}
                                           <div className="space-y-2">
                                             <div className="flex items-center justify-between px-1">
-                                              <label className="text-xs font-medium text-gray-400">统一广告标题</label>
+                                              <label className="text-xs font-medium text-neutral-400">统一广告标题</label>
                                               {!isTikTok && (
-                                                <span className="text-xs text-gray-400">{headlines.length}/{maxItemsPerGroup}</span>
+                                                <span className="text-xs text-neutral-400">{headlines.length}/{maxItemsPerGroup}</span>
                                               )}
                                             </div>
                                             {headlines.map((h, hi) => (
@@ -3730,12 +3730,12 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
                                                     updateGroup({ headlines: next });
                                                   }}
                                                   placeholder={`请输入广告标题${headlines.length > 1 ? ` ${hi + 1}` : ''}...`}
-                                                  className="flex-1 h-12 px-4 bg-gray-50 border border-gray-100 rounded-base outline-none text-sm text-gray-700 focus:border-primary-500 focus:bg-white focus:shadow-primary-focus transition-all"
+                                                  className="flex-1 h-12 px-4 bg-neutral-50 border border-neutral-100 rounded-base outline-none text-sm text-neutral-700 focus:border-primary-500 focus:bg-white focus:shadow-primary-focus transition-all"
                                                 />
                                                 {!isTikTok && headlines.length > 1 && (
                                                   <button
                                                     onClick={() => updateGroup({ headlines: headlines.filter((_, j) => j !== hi) })}
-                                                    className="w-9 h-9 shrink-0 flex items-center justify-center rounded-full text-gray-400 hover:text-rose-500 hover:bg-rose-50 transition-colors"
+                                                    className="w-9 h-9 shrink-0 flex items-center justify-center rounded-full text-neutral-400 hover:text-rose-500 hover:bg-rose-50 transition-colors"
                                                     title="删除该标题"
                                                   >
                                                     <X size={14} />
@@ -3756,9 +3756,9 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
                                           {/* 正文列表 */}
                                           <div className="space-y-2">
                                             <div className="flex items-center justify-between px-1">
-                                              <label className="text-xs font-medium text-gray-400">统一广告正文</label>
+                                              <label className="text-xs font-medium text-neutral-400">统一广告正文</label>
                                               {!isTikTok && (
-                                                <span className="text-xs text-gray-400">{bodies.length}/{maxItemsPerGroup}</span>
+                                                <span className="text-xs text-neutral-400">{bodies.length}/{maxItemsPerGroup}</span>
                                               )}
                                             </div>
                                             {bodies.map((b, bi) => (
@@ -3771,12 +3771,12 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
                                                     updateGroup({ bodies: next });
                                                   }}
                                                   placeholder={`请输入广告正文${bodies.length > 1 ? ` ${bi + 1}` : ''}...`}
-                                                  className="flex-1 p-4 bg-gray-50 border border-gray-100 rounded-base outline-none text-sm text-gray-700 h-24 focus:border-primary-500 focus:bg-white focus:shadow-primary-focus transition-all resize-none"
+                                                  className="flex-1 p-4 bg-neutral-50 border border-neutral-100 rounded-base outline-none text-sm text-neutral-700 h-24 focus:border-primary-500 focus:bg-white focus:shadow-primary-focus transition-all resize-none"
                                                 />
                                                 {!isTikTok && bodies.length > 1 && (
                                                   <button
                                                     onClick={() => updateGroup({ bodies: bodies.filter((_, j) => j !== bi) })}
-                                                    className="w-9 h-9 shrink-0 flex items-center justify-center rounded-full text-gray-400 hover:text-rose-500 hover:bg-rose-50 transition-colors mt-1"
+                                                    className="w-9 h-9 shrink-0 flex items-center justify-center rounded-full text-neutral-400 hover:text-rose-500 hover:bg-rose-50 transition-colors mt-1"
                                                     title="删除该正文"
                                                   >
                                                     <X size={14} />
@@ -3828,7 +3828,7 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
                  <div className="bg-white rounded-section p-10 adsgo-card-shadow animate-in fade-in slide-in-from-top-8">
                     <div className="flex items-center gap-3 mb-8">
                        <div className="w-10 h-10 bg-primary-500 rounded-xl flex items-center justify-center text-white"><Layers size={20} /></div>
-                       <h3 className="text-xl font-semibold text-gray-900">Campaign 结构预览</h3>
+                       <h3 className="text-xl font-semibold text-neutral-900">Campaign 结构预览</h3>
                     </div>
                     <CampaignPlanView
                       ref={campaignPlanRef}
@@ -3929,7 +3929,7 @@ const BatchGenerateAds = ({ onPageChange, onPublishSuccess }) => {
             )
           ) : (
             // Preview View Wrapper - Keeping the original card style for the preview page
-            <div className="bg-white rounded-section shadow-xl border border-gray-100 overflow-hidden relative mb-20 animate-fade-in">
+            <div className="bg-white rounded-section shadow-xl border border-neutral-100 overflow-hidden relative mb-20 animate-fade-in">
               <div className="p-10 md:p-14">
                 <CampaignPreviewView
                   structure={structure}
@@ -4044,10 +4044,10 @@ const AccountChoiceModal = ({ onSelect, onClose, selectedAccountType, setSelecte
         <div className="px-10 pt-10 pb-8 space-y-6 flex-1 overflow-y-auto custom-scrollbar">
           <div className="flex items-start justify-between">
             <div className="space-y-1">
-              <h2 className="text-2xl font-semibold text-gray-900 tracking-tight">
+              <h2 className="text-2xl font-semibold text-neutral-900 tracking-tight">
                 {selectedAccountType === 'own' ? 'Account Connection Needed' : 'Let AdsGo Handle Everything'}
               </h2>
-              <p className="text-sm font-medium text-gray-500 leading-relaxed max-w-md">
+              <p className="text-sm font-medium text-neutral-500 leading-relaxed max-w-md">
                 {selectedAccountType === 'own'
                   ? `Please connect your ${platformLabel} account, and select a valid ad account and ${identityLabel} to publish your ads.`
                   : `We've prepped everything for you : Stable ad accounts, professional ${identityPlural}.`}
@@ -4066,32 +4066,32 @@ const AccountChoiceModal = ({ onSelect, onClose, selectedAccountType, setSelecte
             <div className="animate-in fade-in slide-in-from-top-2 duration-500">
               {renderStep1()}
               {connectedPlatform && (
-                <div className="pt-6 border-t border-gray-50 animate-in slide-in-from-bottom-4 duration-500">
-                  <div className="mb-6"><h4 className="text-sm font-semibold text-gray-900 mb-1">Select your assets</h4><p className="text-xs font-medium text-gray-500">Configure the ad account and tracking for this campaign</p></div>
+                <div className="pt-6 border-t border-neutral-50 animate-in slide-in-from-bottom-4 duration-500">
+                  <div className="mb-6"><h4 className="text-sm font-semibold text-neutral-900 mb-1">Select your assets</h4><p className="text-xs font-medium text-neutral-500">Configure the ad account and tracking for this campaign</p></div>
                   {renderStep2()}
                 </div>
               )}
             </div>
           ) : (
             <div className="mt-6 p-1 relative group overflow-hidden rounded-xl">
-              <div className="absolute inset-0 bg-gradient-to-br from-emerald-400/20 via-teal-500/10 to-primary-500/20 animate-pulse" />
-              <div className="relative bg-white/80 backdrop-blur-xl border border-white/50 rounded-xl p-12 flex flex-col items-center text-center space-y-6 shadow-xl shadow-emerald-100/50 animate-in zoom-in-95">
+              <div className="absolute inset-0 bg-gradient-to-br from-success-400/20 via-teal-500/10 to-primary-500/20 animate-pulse" />
+              <div className="relative bg-white/80 backdrop-blur-xl border border-white/50 rounded-xl p-12 flex flex-col items-center text-center space-y-6 shadow-xl shadow-success-100/50 animate-in zoom-in-95">
                 <div className="relative">
-                  <div className="absolute inset-0 bg-emerald-400 blur-2xl opacity-20 animate-pulse" />
-                  <div className="w-20 h-20 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center text-white shadow-xl shadow-emerald-200 relative z-10">
+                  <div className="absolute inset-0 bg-success-400 blur-2xl opacity-20 animate-pulse" />
+                  <div className="w-20 h-20 bg-gradient-to-br from-success-500 to-teal-600 rounded-xl flex items-center justify-center text-white shadow-xl shadow-success-200 relative z-10">
                     <Briefcase size={36} />
                   </div>
                 </div>
                 <div className="space-y-3">
-                  <p className="text-sm font-bold text-emerald-600/80 tracking-wide">Let AdsGo manage your advertising setup</p>
+                  <p className="text-sm font-bold text-success-600/80 tracking-wide">Let AdsGo manage your advertising setup</p>
                 </div>
               </div>
             </div>
           )}
         </div>
 
-        <div className="px-10 py-8 border-t border-gray-50 flex items-center justify-between bg-gray-50/50 shrink-0">
-          <button onClick={onClose} className="text-xs font-bold text-gray-400 hover:text-gray-600 px-6 py-2 transition-colors font-sans">Cancel</button>
+        <div className="px-10 py-8 border-t border-neutral-50 flex items-center justify-between bg-neutral-50/50 shrink-0">
+          <button onClick={onClose} className="text-xs font-bold text-neutral-400 hover:text-neutral-600 px-6 py-2 transition-colors font-sans">Cancel</button>
           <button 
             onClick={() => onSelect(selectedAccountType)} 
             disabled={selectedAccountType === 'own' ? !canProceed : false} 
@@ -4112,8 +4112,8 @@ const AdsGoReminderModal = ({ onClose, setShowPublishModal }) => {
     <div className="fixed inset-0 flex items-center justify-center px-4 animate-in fade-in duration-300" style={{ zIndex }}>
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm animate-in fade-in duration-300" />
       <div className="relative bg-white w-full max-w-md rounded-section shadow-xl flex flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-300 overflow-hidden p-10">
-        <button onClick={onClose} className="absolute top-6 right-6 p-2 hover:bg-gray-100 rounded-base text-gray-400 transition-colors"><X size={20} /></button>
-        <div className="flex flex-col items-center text-center space-y-6 pt-4"><div className="w-20 h-20 bg-gradient-to-br from-emerald-100 to-teal-100 rounded-full flex items-center justify-center animate-bounce"><Loader2 size={40} className="text-emerald-600 animate-spin" /></div><div className="space-y-3"><h3 className="text-lg font-semibold text-gray-900 tracking-tight">Setting up your dedicated ad account</h3><p className="text-sm font-medium text-gray-600 leading-relaxed">An advertising specialist will contact you at your registered email address shortly; please check your email. you can republish from the <button onClick={() => { setShowPublishModal(false); window.location.href = '/ai-optimize/autoRegeneration'; }} className="text-primary-500 hover:text-primary-600 underline transition-colors bg-transparent border-0 p-0 cursor-pointer">Draft & Recom.</button> page.</p><p className="text-xs font-bold text-gray-500">Contact us at<br/><a href="mailto:support@adsgo.ai" className="text-primary-500 hover:text-primary-600 transition-colors">support@adsgo.ai</a> for real-time updates</p></div></div>
+        <button onClick={onClose} className="absolute top-6 right-6 p-2 hover:bg-neutral-100 rounded-base text-neutral-400 transition-colors"><X size={20} /></button>
+        <div className="flex flex-col items-center text-center space-y-6 pt-4"><div className="w-20 h-20 bg-gradient-to-br from-success-100 to-teal-100 rounded-full flex items-center justify-center animate-bounce"><Loader2 size={40} className="text-success-600 animate-spin" /></div><div className="space-y-3"><h3 className="text-lg font-semibold text-neutral-900 tracking-tight">Setting up your dedicated ad account</h3><p className="text-sm font-medium text-neutral-600 leading-relaxed">An advertising specialist will contact you at your registered email address shortly; please check your email. you can republish from the <button onClick={() => { setShowPublishModal(false); window.location.href = '/ai-optimize/autoRegeneration'; }} className="text-primary-500 hover:text-primary-600 underline transition-colors bg-transparent border-0 p-0 cursor-pointer">Draft & Recom.</button> page.</p><p className="text-xs font-bold text-neutral-500">Contact us at<br/><a href="mailto:support@adsgo.ai" className="text-primary-500 hover:text-primary-600 transition-colors">support@adsgo.ai</a> for real-time updates</p></div></div>
       </div>
     </div>
   );
@@ -4131,17 +4131,17 @@ const AccountSelectorModal = ({ selectedAccount, onSelect, onClose, isLoading })
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 bg-primary-500 rounded-xl flex items-center justify-center text-white shadow-lg"><Briefcase size={24} /></div>
             <div>
-              <h4 className="text-xl font-semibold text-gray-900">切换广告账户</h4>
-              <p className="text-gray-400 text-xs font-bold mt-1">Select an active ad account</p>
+              <h4 className="text-xl font-semibold text-neutral-900">切换广告账户</h4>
+              <p className="text-neutral-400 text-xs font-bold mt-1">Select an active ad account</p>
             </div>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-gray-50 rounded-full text-gray-300 transition-colors"><X size={24} /></button>
+          <button onClick={onClose} className="p-2 hover:bg-neutral-50 rounded-full text-neutral-300 transition-colors"><X size={24} /></button>
         </div>
         <div className="space-y-3">
           {isLoading ? (
             <div className="p-8 flex flex-col items-center justify-center gap-3">
               <Loader2 size={24} className="animate-spin text-primary-500/70" />
-              <p className="text-xs font-medium text-gray-400 animate-pulse">Loading accounts...</p>
+              <p className="text-xs font-medium text-neutral-400 animate-pulse">Loading accounts...</p>
             </div>
           ) : (
             MOCK_ACCOUNTS.map(acc => (
@@ -4152,14 +4152,14 @@ const AccountSelectorModal = ({ selectedAccount, onSelect, onClose, isLoading })
                   onClose();
                 }}
                 className={`w-full p-6 rounded-inner border-2 flex items-center justify-between transition-all ${
-                  selectedAccount?.id === acc.id ? 'border-primary-500 bg-primary-50 shadow-primary-focus' : 'border-gray-100 bg-white hover:border-gray-200'
+                  selectedAccount?.id === acc.id ? 'border-primary-500 bg-primary-50 shadow-primary-focus' : 'border-neutral-100 bg-white hover:border-neutral-200'
                 }`}
               >
                 <div className="flex items-center gap-4 text-left">
-                  <div className={`p-2 rounded-lg ${selectedAccount?.id === acc.id ? 'bg-primary-500 text-white' : 'bg-gray-50 text-gray-400'}`}><Briefcase size={16} /></div>
+                  <div className={`p-2 rounded-lg ${selectedAccount?.id === acc.id ? 'bg-primary-500 text-white' : 'bg-neutral-50 text-neutral-400'}`}><Briefcase size={16} /></div>
                   <div>
-                    <p className={`text-sm font-semibold ${selectedAccount?.id === acc.id ? 'text-primary-700' : 'text-gray-600'}`}>{acc.name}</p>
-                    <p className="text-xs text-gray-400 font-bold">ID: {acc.id}</p>
+                    <p className={`text-sm font-semibold ${selectedAccount?.id === acc.id ? 'text-primary-700' : 'text-neutral-600'}`}>{acc.name}</p>
+                    <p className="text-xs text-neutral-400 font-bold">ID: {acc.id}</p>
                   </div>
                 </div>
                 {selectedAccount?.id === acc.id && <Check size={20} className="text-primary-500" />}
@@ -4184,17 +4184,17 @@ const MetaAccountPickerModal = ({ selectedAccount, onSelect, onClose, isLoading 
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 bg-primary-500 rounded-xl flex items-center justify-center text-white shadow-lg"><Facebook size={24} /></div>
             <div>
-              <h4 className="text-xl font-semibold text-gray-900">选择 Meta 广告账户</h4>
-              <p className="text-gray-400 text-xs font-bold mt-1">Select a Meta ad account to continue</p>
+              <h4 className="text-xl font-semibold text-neutral-900">选择 Meta 广告账户</h4>
+              <p className="text-neutral-400 text-xs font-bold mt-1">Select a Meta ad account to continue</p>
             </div>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-gray-50 rounded-full text-gray-300 transition-colors"><X size={24} /></button>
+          <button onClick={onClose} className="p-2 hover:bg-neutral-50 rounded-full text-neutral-300 transition-colors"><X size={24} /></button>
         </div>
         <div className="space-y-3">
           {isLoading ? (
             <div className="p-8 flex flex-col items-center justify-center gap-3">
               <Loader2 size={24} className="animate-spin text-primary-500/70" />
-              <p className="text-xs font-medium text-gray-400 animate-pulse">Loading accounts...</p>
+              <p className="text-xs font-medium text-neutral-400 animate-pulse">Loading accounts...</p>
             </div>
           ) : (
             MOCK_ACCOUNTS.map(acc => (
@@ -4202,14 +4202,14 @@ const MetaAccountPickerModal = ({ selectedAccount, onSelect, onClose, isLoading 
                 key={acc.id}
                 onClick={() => onSelect(acc)}
                 className={`w-full p-6 rounded-inner border-2 flex items-center justify-between transition-all ${
-                  selectedAccount?.id === acc.id ? 'border-primary-500 bg-primary-50 shadow-primary-focus' : 'border-gray-100 bg-white hover:border-gray-200'
+                  selectedAccount?.id === acc.id ? 'border-primary-500 bg-primary-50 shadow-primary-focus' : 'border-neutral-100 bg-white hover:border-neutral-200'
                 }`}
               >
                 <div className="flex items-center gap-4 text-left">
-                  <div className={`p-2 rounded-lg ${selectedAccount?.id === acc.id ? 'bg-primary-500 text-white' : 'bg-gray-50 text-gray-400'}`}><Briefcase size={16} /></div>
+                  <div className={`p-2 rounded-lg ${selectedAccount?.id === acc.id ? 'bg-primary-500 text-white' : 'bg-neutral-50 text-neutral-400'}`}><Briefcase size={16} /></div>
                   <div>
-                    <p className={`text-sm font-semibold ${selectedAccount?.id === acc.id ? 'text-primary-700' : 'text-gray-600'}`}>{acc.name}</p>
-                    <p className="text-xs text-gray-400 font-bold">ID: {acc.id}</p>
+                    <p className={`text-sm font-semibold ${selectedAccount?.id === acc.id ? 'text-primary-700' : 'text-neutral-600'}`}>{acc.name}</p>
+                    <p className="text-xs text-neutral-400 font-bold">ID: {acc.id}</p>
                   </div>
                 </div>
                 {selectedAccount?.id === acc.id && <Check size={20} className="text-primary-500" />}

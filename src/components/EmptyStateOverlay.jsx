@@ -15,12 +15,12 @@ const EmptyStateOverlay = ({ onConnectAccount }) => {
         </div>
 
         {/* Title */}
-        <h2 className="text-4xl font-bold text-gray-900 mb-4">
+        <h2 className="text-4xl font-bold text-neutral-900 mb-4">
           Ready to Optimize Your Campaigns?
         </h2>
 
         {/* Subtitle */}
-        <p className="text-xl text-gray-600 mb-8 leading-relaxed">
+        <p className="text-xl text-neutral-600 mb-8 leading-relaxed">
           Connect your ad accounts to unlock AI-powered budget optimizations, 
           real-time performance insights, and automated recommendations.
         </p>
@@ -29,20 +29,20 @@ const EmptyStateOverlay = ({ onConnectAccount }) => {
         <div className="grid grid-cols-3 gap-6 mb-10">
           <div className="bg-gradient-to-br from-primary/10 to-purple-100/30 p-6 rounded-xl border border-primary/20">
             <Zap size={32} className="text-primary mb-3 mx-auto" />
-            <h3 className="font-semibold text-gray-900 mb-2">AI Insights</h3>
-            <p className="text-sm text-gray-600">Get intelligent budget suggestions based on performance data</p>
+            <h3 className="font-semibold text-neutral-900 mb-2">AI Insights</h3>
+            <p className="text-sm text-neutral-600">Get intelligent budget suggestions based on performance data</p>
           </div>
           
           <div className="bg-gradient-to-br from-primary/10 to-purple-100/30 p-6 rounded-xl border border-primary/20">
             <Sparkles size={32} className="text-primary mb-3 mx-auto" />
-            <h3 className="font-semibold text-gray-900 mb-2">Real-time Analytics</h3>
-            <p className="text-sm text-gray-600">Monitor your campaigns with live performance metrics</p>
+            <h3 className="font-semibold text-neutral-900 mb-2">Real-time Analytics</h3>
+            <p className="text-sm text-neutral-600">Monitor your campaigns with live performance metrics</p>
           </div>
           
           <div className="bg-gradient-to-br from-primary/10 to-purple-100/30 p-6 rounded-xl border border-primary/20">
             <Link size={32} className="text-primary mb-3 mx-auto" />
-            <h3 className="font-semibold text-gray-900 mb-2">Easy Integration</h3>
-            <p className="text-sm text-gray-600">Connect Google, Meta, and TikTok in minutes</p>
+            <h3 className="font-semibold text-neutral-900 mb-2">Easy Integration</h3>
+            <p className="text-sm text-neutral-600">Connect Google, Meta, and TikTok in minutes</p>
           </div>
         </div>
 
@@ -55,13 +55,13 @@ const EmptyStateOverlay = ({ onConnectAccount }) => {
             Connect Ad Account
           </button>
           
-          <button className="px-8 py-4 bg-white text-gray-700 text-lg font-semibold rounded-xl border-2 border-gray-200 hover:border-primary hover:text-primary transition-all">
+          <button className="px-8 py-4 bg-white text-neutral-700 text-lg font-semibold rounded-xl border-2 border-neutral-200 hover:border-primary hover:text-primary transition-all">
             Create New Campaign
           </button>
         </div>
 
         {/* Demo Notice */}
-        <div className="mt-8 text-sm text-gray-500">
+        <div className="mt-8 text-sm text-neutral-500">
           <p>Preview Mode: Data shown above is for demonstration purposes</p>
         </div>
       </div>

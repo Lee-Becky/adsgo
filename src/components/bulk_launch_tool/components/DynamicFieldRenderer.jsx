@@ -122,9 +122,9 @@ const DynamicFieldRenderer = ({
           maxLength={def.validation?.maxLength}
           className={[
             'w-full px-3 py-2 text-sm bg-white border rounded-base outline-none resize-y transition-all',
-            disabled ? 'border-gray-100 bg-gray-50 text-gray-400 cursor-not-allowed' :
+            disabled ? 'border-neutral-100 bg-neutral-50 text-neutral-400 cursor-not-allowed' :
             error ? 'border-rose-400 focus:border-rose-500' :
-            'border-gray-200 hover:border-gray-300 focus:border-primary-500 focus:shadow-primary-focus',
+            'border-neutral-200 hover:border-neutral-300 focus:border-primary-500 focus:shadow-primary-focus',
           ].join(' ')}
         />
       );
@@ -202,9 +202,9 @@ const DynamicFieldRenderer = ({
           disabled={disabled}
           className={[
             'w-full px-3 py-2 text-[11px] font-mono bg-white border rounded-base outline-none resize-y transition-all',
-            disabled ? 'border-gray-100 bg-gray-50 text-gray-400 cursor-not-allowed' :
+            disabled ? 'border-neutral-100 bg-neutral-50 text-neutral-400 cursor-not-allowed' :
             error ? 'border-rose-400' :
-            'border-gray-200 hover:border-gray-300 focus:border-primary-500',
+            'border-neutral-200 hover:border-neutral-300 focus:border-primary-500',
           ].join(' ')}
         />
       );
@@ -219,12 +219,12 @@ const DynamicFieldRenderer = ({
       data-field-name={`${def.level}::${def.name}`}
     >
       <div className={`flex items-center gap-x-1.5 ${compact ? 'flex-wrap gap-y-1' : ''}`}>
-        <label className="text-xs font-medium text-gray-700">
+        <label className="text-xs font-medium text-neutral-700">
           {def.label}
           {isRequired && <span className="text-rose-500 ml-0.5">*</span>}
         </label>
         {def.helpText && (
-          <span title={def.helpText} className="text-gray-300 cursor-help">
+          <span title={def.helpText} className="text-neutral-300 cursor-help">
             <Info size={11} />
           </span>
         )}
@@ -239,7 +239,7 @@ const DynamicFieldRenderer = ({
           </div>
         )}
         {disabled && (
-          <span className="ml-auto text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-gray-100 text-gray-400 font-semibold">
+          <span className="ml-auto text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-neutral-100 text-neutral-400 font-semibold">
             Coming Soon
           </span>
         )}
@@ -254,7 +254,7 @@ const DynamicFieldRenderer = ({
                 type="button"
                 onClick={onReset}
                 title="清除覆盖，恢复继承自模板"
-                className="w-5 h-5 inline-flex items-center justify-center rounded text-gray-400 hover:text-violet-600 hover:bg-violet-50 transition-colors"
+                className="w-5 h-5 inline-flex items-center justify-center rounded text-neutral-400 hover:text-violet-600 hover:bg-violet-50 transition-colors"
               >
                 <RotateCcw size={11} />
               </button>
@@ -263,14 +263,14 @@ const DynamicFieldRenderer = ({
         )}
         {!isOverridden && onReset !== undefined && (
           // Detail panel 模式但未 override → 显示"继承"灰色 chip（与 onReset 同位）
-          <span className="ml-auto text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-gray-50 text-gray-400 font-semibold border border-gray-100">
+          <span className="ml-auto text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-neutral-50 text-neutral-400 font-semibold border border-neutral-100">
             继承
           </span>
         )}
       </div>
       {control}
       {!compact && !hideSdkPath && def.sdkPath && (
-        <span className="text-[10px] text-gray-300 font-mono truncate">{def.sdkPath}</span>
+        <span className="text-[10px] text-neutral-300 font-mono truncate">{def.sdkPath}</span>
       )}
       {error && <span className="text-[11px] text-rose-500">{error}</span>}
     </div>

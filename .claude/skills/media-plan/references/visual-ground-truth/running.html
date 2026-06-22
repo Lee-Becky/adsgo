@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Media Plan — 24H 后（运行中）</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: { DEFAULT: '#7033F5', 50: '#f3f0ff', 100: '#e5dbff', 500: '#7033F5', 600: '#6741d9', 700: '#5f3dc4' },
+          },
+          fontFamily: { sans: ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'] },
+        },
+      },
+    };
+  </script>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; }
+    @keyframes weekBreathe {
+      0%, 100% { box-shadow: 0 0 20px rgba(112,51,245,0.08); }
+      50%      { box-shadow: 0 0 30px rgba(112,51,245,0.18), 0 0 60px rgba(112,51,245,0.06); }
+    }
+    @keyframes infinityPulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%      { opacity: 0.5; transform: scale(1.25); }
+    }
+    .week-breathe { animation: weekBreathe 3s ease-in-out infinite; }
+    .infinity-pulse { display: inline-block; animation: infinityPulse 2s ease-in-out infinite; font-size: 13px; line-height: 1; }
+    /* Active dim-progress pill: static brand-color fill (no animation — switching is click-driven) */
+    .score-bar-fill { width: 100%; }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-900 min-h-screen">
+  <div class="p-6 space-y-5">
+    <!-- Summary -->
+    <div>
+      <div class="mb-4">
+        <h3 class="text-base font-semibold text-gray-900 flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-[1.125rem] h-[1.125rem]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--mp-primary, #7033F5)"><rect width="7" height="9" x="3" y="3" rx="1" /> <rect width="7" height="5" x="14" y="3" rx="1" /> <rect width="7" height="9" x="14" y="12" rx="1" /> <rect width="7" height="5" x="3" y="16" rx="1" /></svg>
+          Summary
+        </h3>
+      </div>
+      <div class="rounded-xl border border-l-4 border-emerald-200 border-l-emerald-400 bg-emerald-50/60 p-5">
+        <div class="flex flex-col lg:flex-row gap-5">
+          <div class="flex-1 min-w-0 flex items-start gap-4">
+            <div class="w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0 ring-4 bg-emerald-100 text-emerald-600 ring-emerald-100/50">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 7h6v6" /> <path d="m22 7-8.5 8.5-5-5L2 17" /></svg>
+            </div>
+            <div class="flex-1 min-w-0">
+              <h4 class="text-base font-bold text-emerald-800 mb-2">ROAS trending upward — 26% gap to target</h4>
+              <p class="text-xs leading-relaxed">
+                <span class="font-medium text-gray-700">Your ROAS improved +16.1% over the past 7 days, moving from 2.85x to 3.31x.</span>
+                <span class="text-gray-500"> We're still 26% below the 4.5x target, but the trajectory is clearly positive. This improvement aligns with: Approved budget suggestions on 03-25. Cost-per-acquisition improved 30% as we concentrated budget on top performers. The biggest opportunity for further improvement is in KPI target — the platform is already working on this. This week's focus: scale winning audiences while maintaining cpa efficiency. Your next recommended action: review weekly performance summary.</span>
+              </p>
+            </div>
+          </div>
+          <div class="lg:w-[35%] flex-shrink-0">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-medium text-gray-500">Past 7 days</span>
+              <div class="flex items-center gap-2">
+                <span class="text-xs text-gray-600">2.85x</span>
+                <span class="text-gray-300">→</span>
+                <span class="text-xs font-semibold text-gray-700">3.31x</span>
+              </div>
+            </div>
+            <!-- 与 Recharts 一致：仅用 SVG 画曲线与参考线；日期与 Target 标签用 HTML，避免 preserveAspectRatio=none 拉扁文字 -->
+            <div class="w-full">
+              <div class="relative h-[72px] w-full">
+                <svg viewBox="0 0 300 72" class="absolute inset-0 h-full w-full" preserveAspectRatio="xMidYMid meet">
+                  <defs>
+                    <linearGradient id="summaryGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stop-color="#10b981" stop-opacity="0.2" />
+                      <stop offset="100%" stop-color="#10b981" stop-opacity="0.02" />
+                    </linearGradient>
+                  </defs>
+                  <!-- Y 域含 0：ROAS∈[0,5]，y=62 为 0、y=10 为 5；与 App 内 Recharts domain={[0,yMax]} 一致，避免 0 被画在可视区外导致“断线” -->
+                  <line x1="20" y1="15.2" x2="280" y2="15.2" stroke="#d1d5db" stroke-dasharray="4 4" stroke-width="1" />
+                  <!-- KPI 7 天：2.85,2.92,3.05,3.18,3.12,3.25,3.31（与 mockData KPI_TREND_DATA）；若某日无数据/为 0，该点 y=62 与底线相接 -->
+                  <path d="M 20,32.36 L 63.33,31.63 L 106.67,30.28 L 150,28.93 L 193.33,29.55 L 236.67,28.2 L 280,27.58 L 280,72 L 20,72 Z" fill="url(#summaryGrad)" />
+                  <path d="M 20,32.36 L 63.33,31.63 L 106.67,30.28 L 150,28.93 L 193.33,29.55 L 236.67,28.2 L 280,27.58" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linejoin="round" />
+                </svg>
+                <span class="pointer-events-none absolute right-0 top-0 text-[9px] leading-none text-gray-400">Target 4.5x</span>
+              </div>
+              <div class="mt-1 flex justify-between px-0.5 text-[9px] leading-none text-gray-400">
+                <span>03-24</span><span>03-25</span><span>03-26</span><span>03-27</span><span>03-28</span><span>03-29</span><span>03-30</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Weekly Strategy + Score -->
+    <div>
+      <div class="mb-4">
+        <h3 class="text-base font-semibold text-gray-900 flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-[1.125rem] h-[1.125rem]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--mp-primary, #7033F5)"><path d="M8 2v4" /> <path d="M16 2v4" /> <rect width="18" height="18" x="3" y="4" rx="2" /> <path d="M3 10h18" /> <path d="M8 14h.01" /> <path d="M12 14h.01" /> <path d="M16 14h.01" /> <path d="M8 18h.01" /> <path d="M12 18h.01" /> <path d="M16 18h.01" /></svg>
+          Weekly Strategy
+        </h3>
+        <p class="text-[11px] text-gray-400 mt-0.5 ml-6 flex items-center gap-1">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 text-amber-400 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5" /> <path d="M9 18h6" /> <path d="M10 22h4" /></svg>
+          每周基于过去表现及当前情况更新后续每周策略
+        </p>
+      </div>
+      <div class="bg-white rounded-xl border border-[#F0F0F0] shadow-[-2px_2px_16px_rgba(14,0,45,0.06)] p-5">
+        <div class="hidden lg:grid lg:grid-cols-4 gap-3">
+          <!-- W-1 — mockData WEEKLY_PLANS「Past Week 2」 -->
+          <div class="rounded-xl border p-3 bg-emerald-50/50 border-emerald-200/60 opacity-65 saturate-[0.6] flex flex-col h-full relative">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700">Completed</span>
+            </div>
+            <p class="text-[11px] font-medium text-gray-700 mb-2">3/17 - 3/23</p>
+            <div class="mb-2">
+              <div class="flex items-center gap-1 mb-1">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" /> <circle cx="12" cy="12" r="6" /> <circle cx="12" cy="12" r="2" /></svg>
+                <span class="text-[9px] font-semibold text-gray-600 tracking-wide">Core Objective</span>
+              </div>
+              <p class="text-[11px] font-medium text-gray-800 leading-snug">Optimize budget allocation based on early winners</p>
+            </div>
+            <div class="mb-2">
+              <div class="flex items-center gap-1 mb-1">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--mp-primary, #7033F5)"><path d="M12 8V4H8" /> <rect width="16" height="12" x="4" y="8" rx="2" /> <path d="M2 14h2" /> <path d="M20 14h2" /> <path d="M15 13v2" /> <path d="M9 13v2" /></svg>
+                <span class="text-[9px] font-semibold tracking-wide" style="color:var(--mp-primary-600, #6741d9)">AI Plan</span>
+              </div>
+              <ul class="space-y-0.5">
+                <li class="text-[11px] text-gray-600 leading-snug flex items-start gap-1"><span class="mt-0.5" style="color:var(--mp-primary-400, #8852ff)">•</span><span>Reallocate budget from underperforming to winning adsets</span></li>
+                <li class="text-[11px] text-gray-600 leading-snug flex items-start gap-1"><span class="mt-0.5" style="color:var(--mp-primary-400, #8852ff)">•</span><span>Pause 3 creatives with CTR below 1%</span></li>
+                <li class="text-[11px] text-gray-600 leading-snug flex items-start gap-1"><span class="mt-0.5" style="color:var(--mp-primary-400, #8852ff)">•</span><span>Generate 5 new AI creatives based on top performers</span></li>
+              </ul>
+            </div>
+            <div class="mt-auto">
+              <div class="mb-1">
+                <span class="text-[9px] font-semibold text-amber-600 tracking-wide">You Need To Do</span>
+              </div>
+              <ul class="list-disc list-outside pl-4 space-y-1 marker:text-amber-500/70">
+                <li class="text-[11px] text-gray-400 line-through">Review and approve budget suggestions</li>
+                <li class="text-[11px] text-gray-400 line-through">Review AI-generated creatives</li>
+                <li class="text-[11px] text-gray-700">Set ROAS target adjustment if needed</li>
+              </ul>
+            </div>
+          </div>
+          <!-- W0 current -->
+          <div class="rounded-xl border p-4 ring-2 bg-gradient-to-br via-white flex flex-col h-full relative week-breathe" style="border-color:var(--mp-primary-300, #a985ff); --tw-ring-color:var(--mp-primary-200, #cbb5ff); background-image:linear-gradient(135deg, var(--mp-primary-50, #f3f0ff) 0%, transparent 100%)">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full" style="background-color:var(--mp-primary-100, #e5dbff); color:var(--mp-primary-700, #5f3dc4)">This Week</span>
+              <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold" style="background-color:var(--mp-primary-100, #e5dbff); color:var(--mp-primary-700, #5f3dc4)">
+                <span class="infinity-pulse">∞</span> Running
+              </span>
+            </div>
+            <p class="text-xs font-medium text-gray-700 mb-2">3/24 - 3/30</p>
+            <div class="mb-2">
+              <div class="flex items-center gap-1 mb-1">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" /> <circle cx="12" cy="12" r="6" /> <circle cx="12" cy="12" r="2" /></svg>
+                <span class="text-[9px] font-semibold text-gray-600 tracking-wide">Core Objective</span>
+              </div>
+              <p class="text-xs font-medium text-gray-800 leading-snug">Scale winning audiences while maintaining CPA efficiency</p>
+            </div>
+            <div class="mb-2">
+              <div class="flex items-center gap-1 mb-1">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--mp-primary, #7033F5)"><path d="M12 8V4H8" /> <rect width="16" height="12" x="4" y="8" rx="2" /> <path d="M2 14h2" /> <path d="M20 14h2" /> <path d="M15 13v2" /> <path d="M9 13v2" /></svg>
+                <span class="text-[9px] font-semibold tracking-wide" style="color:var(--mp-primary-600, #6741d9)">AI Plan</span>
+              </div>
+              <ul class="space-y-0.5">
+                <li class="text-[11px] text-gray-600 leading-snug flex gap-1"><span class="mt-0.5" style="color:var(--mp-primary-400, #8852ff)">•</span><span>Scale LAL 1% audience budget by 25% if CPA stays under target</span></li>
+                <li class="text-[11px] text-gray-600 leading-snug flex gap-1"><span class="mt-0.5" style="color:var(--mp-primary-400, #8852ff)">•</span><span>Test new interest-based audiences (fitness, wellness)</span></li>
+                <li class="text-[11px] text-gray-600 leading-snug flex gap-1"><span class="mt-0.5" style="color:var(--mp-primary-400, #8852ff)">•</span><span>Auto-generate 3 video variants from top static creative</span></li>
+                <li class="text-[11px] text-gray-600 leading-snug flex gap-1"><span class="mt-0.5" style="color:var(--mp-primary-400, #8852ff)">•</span><span>Daily budget optimization across all active campaigns</span></li>
+              </ul>
+            </div>
+            <div class="mt-auto">
+              <div class="mb-1">
+                <span class="text-[9px] font-semibold text-amber-600 tracking-wide">You Need To Do</span>
+              </div>
+              <ul class="list-disc list-outside pl-4 space-y-1 marker:text-amber-500/70">
+                <li class="text-[11px] text-gray-700">Review weekly performance summary</li>
+                <li class="text-[11px] text-gray-700">Approve new audience tests</li>
+                <li class="text-[11px] text-gray-700">Review video creative concepts</li>
+                <li class="text-[11px] text-gray-700">Consider increasing overall budget by 15%</li>
+              </ul>
+            </div>
+            <div class="absolute -bottom-5 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center">
+              <div class="w-6 h-6 rounded-full border flex items-center justify-center shadow-sm" style="background-color:var(--mp-primary-100, #e5dbff); border-color:var(--mp-primary-200, #cbb5ff)">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--mp-primary, #7033F5)"><path d="m6 9 6 6 6-6" /></svg>
+              </div>
+            </div>
+          </div>
+          <!-- W+1 — mockData W+1 -->
+          <div class="rounded-xl border p-3 border-dashed border-gray-200 bg-gray-50/40 opacity-60 flex flex-col h-full">
+            <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 w-fit mb-2">Upcoming</span>
+            <p class="text-[11px] font-medium text-gray-700 mb-2">3/31 - 4/6</p>
+            <div class="mb-2">
+              <div class="flex items-center gap-1 mb-1">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" /> <circle cx="12" cy="12" r="6" /> <circle cx="12" cy="12" r="2" /></svg>
+                <span class="text-[9px] font-semibold text-gray-600 tracking-wide">Core Objective</span>
+              </div>
+              <p class="text-[11px] font-medium text-gray-800 leading-snug">Expand to new channels and test broader audiences</p>
+            </div>
+            <div class="mb-2">
+              <div class="flex items-center gap-1 mb-1">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--mp-primary, #7033F5)"><path d="M12 8V4H8" /> <rect width="16" height="12" x="4" y="8" rx="2" /> <path d="M2 14h2" /> <path d="M20 14h2" /> <path d="M15 13v2" /> <path d="M9 13v2" /></svg>
+                <span class="text-[9px] font-semibold tracking-wide" style="color:var(--mp-primary-600, #6741d9)">AI Plan</span>
+              </div>
+              <ul class="space-y-0.5">
+                <li class="text-[11px] text-gray-600 leading-snug flex gap-1"><span class="mt-0.5" style="color:var(--mp-primary-400, #8852ff)">•</span><span>Launch Google Ads test campaign with $200/day budget</span></li>
+                <li class="text-[11px] text-gray-600 leading-snug flex gap-1"><span class="mt-0.5" style="color:var(--mp-primary-400, #8852ff)">•</span><span>Expand LAL to 5% audience segment</span></li>
+                <li class="text-[11px] text-gray-600 leading-snug flex gap-1"><span class="mt-0.5" style="color:var(--mp-primary-400, #8852ff)">•</span><span>A/B test new landing page variants</span></li>
+              </ul>
+            </div>
+            <div class="mt-auto">
+              <div class="mb-1">
+                <span class="text-[9px] font-semibold text-amber-600 tracking-wide">You Need To Do</span>
+              </div>
+              <ul class="list-disc list-outside pl-4 space-y-1 marker:text-amber-500/70">
+                <li class="text-[11px] text-gray-700">Review and approve Google Ads setup</li>
+                <li class="text-[11px] text-gray-700">Approve landing page A/B test design</li>
+                <li class="text-[11px] text-gray-700">Set weekly budget cap review</li>
+              </ul>
+            </div>
+          </div>
+          <!-- W+2 — mockData W+2 -->
+          <div class="rounded-xl border p-3 border-dashed border-gray-200 bg-gray-50/40 opacity-60 flex flex-col h-full">
+            <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 w-fit mb-2">Upcoming</span>
+            <p class="text-[11px] font-medium text-gray-700 mb-2">4/7 - 4/13</p>
+            <div class="mb-2">
+              <div class="flex items-center gap-1 mb-1">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" /> <circle cx="12" cy="12" r="6" /> <circle cx="12" cy="12" r="2" /></svg>
+                <span class="text-[9px] font-semibold text-gray-600 tracking-wide">Core Objective</span>
+              </div>
+              <p class="text-[11px] font-medium text-gray-800 leading-snug">Achieve target ROAS of 4.5x consistently</p>
+            </div>
+            <div class="mb-2">
+              <div class="flex items-center gap-1 mb-1">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--mp-primary, #7033F5)"><path d="M12 8V4H8" /> <rect width="16" height="12" x="4" y="8" rx="2" /> <path d="M2 14h2" /> <path d="M20 14h2" /> <path d="M15 13v2" /> <path d="M9 13v2" /></svg>
+                <span class="text-[9px] font-semibold tracking-wide" style="color:var(--mp-primary-600, #6741d9)">AI Plan</span>
+              </div>
+              <ul class="space-y-0.5">
+                <li class="text-[11px] text-gray-600 leading-snug flex gap-1"><span class="mt-0.5" style="color:var(--mp-primary-400, #8852ff)">•</span><span>Optimize for ROAS 4.5x+ across all channels</span></li>
+                <li class="text-[11px] text-gray-600 leading-snug flex gap-1"><span class="mt-0.5" style="color:var(--mp-primary-400, #8852ff)">•</span><span>Identify and scale top 3 performing ad combinations</span></li>
+                <li class="text-[11px] text-gray-600 leading-snug flex gap-1"><span class="mt-0.5" style="color:var(--mp-primary-400, #8852ff)">•</span><span>Implement advanced bidding strategies</span></li>
+              </ul>
+            </div>
+            <div class="mt-auto">
+              <div class="mb-1">
+                <span class="text-[9px] font-semibold text-amber-600 tracking-wide">You Need To Do</span>
+              </div>
+              <ul class="list-disc list-outside pl-4 space-y-1 marker:text-amber-500/70">
+                <li class="text-[11px] text-gray-700">Review monthly performance report</li>
+                <li class="text-[11px] text-gray-700">Decide on budget increase for next month</li>
+                <li class="text-[11px] text-gray-700">Plan seasonal creative updates</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <!-- 小屏：与 WeeklyPlanCard 一致横向滚动展示四周 -->
+        <div class="lg:hidden flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory -mx-1 px-1">
+          <div class="min-w-[220px] w-[85%] flex-shrink-0 snap-start rounded-xl border p-3 bg-emerald-50/50 border-emerald-200/60 opacity-65">
+            <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700">Completed</span>
+            <p class="text-[11px] font-medium text-gray-700 mt-2 mb-1">3/17 - 3/23</p>
+            <p class="text-[11px] text-gray-800 font-medium">Optimize budget allocation based on early winners</p>
+          </div>
+          <div class="min-w-[220px] w-[85%] flex-shrink-0 snap-start rounded-xl border p-3 ring-2 bg-gradient-to-br via-white week-breathe" style="border-color:var(--mp-primary-300, #a985ff); --tw-ring-color:var(--mp-primary-200, #cbb5ff); background-image:linear-gradient(135deg, var(--mp-primary-50, #f3f0ff) 0%, transparent 100%)">
+            <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full" style="background-color:var(--mp-primary-100, #e5dbff); color:var(--mp-primary-700, #5f3dc4)">This Week</span>
+            <p class="text-[11px] font-medium text-gray-700 mt-2">3/24 - 3/30 · Scale winning audiences while maintaining CPA efficiency</p>
+          </div>
+          <div class="min-w-[220px] w-[85%] flex-shrink-0 snap-start rounded-xl border p-3 border-dashed border-gray-200 bg-gray-50/40 opacity-60">
+            <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">Upcoming</span>
+            <p class="text-[11px] mt-2 text-gray-800">3/31 - 4/6 · Expand to new channels and test broader audiences</p>
+          </div>
+          <div class="min-w-[220px] w-[85%] flex-shrink-0 snap-start rounded-xl border p-3 border-dashed border-gray-200 bg-gray-50/40 opacity-60">
+            <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">Upcoming</span>
+            <p class="text-[11px] mt-2 text-gray-800">4/7 - 4/13 · Achieve target ROAS of 4.5x consistently</p>
+          </div>
+        </div>
+
+        <div class="pt-5"></div>
+
+        <!-- ScoreCard -->
+        <div id="score-root" class="bg-[#f8f7fc] rounded-xl p-4">
+          <div class="flex items-center mb-4">
+            <div class="lg:w-[calc(50%-20px)] flex-shrink-0">
+              <h4 class="text-sm font-semibold text-gray-800">Multi-dimensional Monitoring</h4>
+            </div>
+            <div class="hidden lg:flex flex-1 items-center pl-10">
+              <h4 class="text-sm font-semibold text-gray-800">Optimize Detail</h4>
+            </div>
+          </div>
+          <div class="flex flex-col lg:flex-row gap-0">
+            <div class="lg:w-[calc(50%-20px)] flex-shrink-0 flex flex-col items-center">
+              <!-- 固定 400:320 宽高比，避免宽屏下 SVG meet 留白而中心文案按外框居中导致与图错位 -->
+              <div class="relative mx-auto w-full max-w-[400px] aspect-[400/320] max-h-[320px]">
+                <svg viewBox="0 0 400 320" class="absolute inset-0 h-full w-full bg-transparent" preserveAspectRatio="xMidYMid meet" aria-label="Multi-dimensional radar">
+                  <g id="radar-grid"></g>
+                  <polygon id="radar-potential" class="radar-layer" fill="rgba(196,181,253,0.06)" stroke="#c4b5fd" stroke-width="1.5" stroke-dasharray="6 4" stroke-linejoin="round" stroke-linecap="round" points="" />
+                  <polygon id="radar-current" class="radar-layer" fill="rgba(112,51,245,0.05)" stroke="#7033F5" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" points="" />
+                  <g id="radar-dots"></g>
+                  <g id="radar-labels"></g>
+                </svg>
+              </div>
+              <!-- 相位说明不与维度标签叠层：放在图下方，与 ScoreCard 信息层次一致且可读 -->
+              <div class="pointer-events-none mt-2 text-center">
+                <span id="phase-label" class="text-sm font-bold" style="color:#7033F5">Optimizing</span>
+                <span class="block text-[9px] text-gray-400 font-medium leading-tight">33% in learning</span>
+              </div>
+              <div class="flex items-center justify-center gap-5 mt-1 mb-3">
+                <div class="flex items-center gap-1.5">
+                  <div class="w-5 h-0 border-t-2 border-[#7033F5]"></div>
+                  <span class="text-[10px] text-gray-500">Current</span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <div class="w-5 h-0 border-t-2 border-dashed border-[#c4b5fd]"></div>
+                  <span class="text-[10px] text-gray-500">After optimization</span>
+                </div>
+              </div>
+              <div id="problem-box" class="w-full rounded-lg px-4 py-3 border-l-[3px] bg-[#f3f0ff]/80" style="border-left-color:#7033F5">
+                <div class="flex items-center gap-2 mb-1.5">
+                  <div class="w-2.5 h-2.5 rounded-full bg-[#7033F5]"></div>
+                  <span id="pb-title" class="text-xs font-bold text-gray-800">Budget Optimization</span>
+                  <span id="pb-score" class="text-xs font-bold ml-auto" style="color:#7033F5">2.8<span class="text-gray-400 font-normal">/5</span></span>
+                </div>
+                <p id="pb-text" class="text-[11px] text-gray-600 leading-relaxed"></p>
+              </div>
+            </div>
+            <div class="hidden lg:flex flex-col items-center justify-center px-3">
+              <div class="w-px flex-1 bg-gradient-to-b from-transparent via-purple-200 to-transparent min-h-[40px]"></div>
+              <div class="w-7 h-7 rounded-full bg-purple-50 border border-purple-200 flex items-center justify-center my-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-purple-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6" /></svg>
+              </div>
+              <div class="w-px flex-1 bg-gradient-to-b from-transparent via-purple-200 to-transparent min-h-[40px]"></div>
+            </div>
+            <div id="detail-panel" class="flex-1 min-w-0 rounded-xl mt-4 lg:mt-0 p-5" style="background:linear-gradient(135deg, rgba(243,240,255,0.5) 0%, transparent 60%)"></div>
+          </div>
+          <div class="flex flex-col items-center gap-2 mt-4 pt-3 border-t border-gray-100">
+            <p class="text-[10px] text-gray-400 flex items-center gap-1">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5" /> <path d="M9 18h6" /> <path d="M10 22h4" /></svg>
+              每日根据历史已执行的动作及现存问题重新分析评估
+            </p>
+            <div id="dim-progress" class="flex items-center justify-center gap-1.5"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Optimization Review -->
+    <div>
+      <h3 class="text-base font-semibold text-gray-900 mb-4 flex items-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-[1.125rem] h-[1.125rem]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--mp-primary, #7033F5)"><rect width="8" height="4" x="8" y="2" rx="1" ry="1" /> <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" /> <path d="m9 14 2 2 4-4" /></svg>
+        Optimization Review
+      </h3>
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div class="bg-white rounded-xl border border-[#F0F0F0] shadow-[-2px_2px_16px_rgba(14,0,45,0.06)] p-5">
+          <div class="mb-3">
+            <h4 class="text-sm font-semibold text-gray-900">AI Operations</h4>
+          </div>
+          <div class="grid grid-cols-3 gap-2 mb-3">
+            <div class="bg-gray-50 rounded-lg p-2.5 text-center">
+              <div class="w-7 h-7 rounded-full bg-blue-50 flex items-center justify-center mx-auto mb-1">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-blue-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="2" y2="22" /> <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" /></svg>
+              </div>
+              <div class="text-lg font-bold text-gray-900 leading-tight">4</div>
+              <div class="text-[10px] text-gray-500 leading-tight mt-0.5">Budget Suggestions</div>
+            </div>
+            <div class="bg-gray-50 rounded-lg p-2.5 text-center">
+              <div class="w-7 h-7 rounded-full bg-purple-50 flex items-center justify-center mx-auto mb-1">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-purple-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z" /> <path d="M20 2v4" /> <path d="M22 4h-4" /> <circle cx="4" cy="20" r="2" /></svg>
+              </div>
+              <div class="text-lg font-bold text-gray-900 leading-tight">5</div>
+              <div class="text-[10px] text-gray-500 leading-tight mt-0.5">Creatives Regenerated</div>
+            </div>
+            <div class="bg-gray-50 rounded-lg p-2.5 text-center">
+              <div class="w-7 h-7 rounded-full bg-amber-50 flex items-center justify-center mx-auto mb-1">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-amber-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z" /> <path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12" /> <path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17" /></svg>
+              </div>
+              <div class="text-lg font-bold text-gray-900 leading-tight">3</div>
+              <div class="text-[10px] text-gray-500 leading-tight mt-0.5">Campaigns Recommended</div>
+            </div>
+          </div>
+          <div style="overflow-x:hidden">
+            <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 460 182" style="display:block;width:100%">
+              <defs>
+                <path id="fb-trans-seg" d="M 230.0,101.5 C 251.1,99.5 272.2,95.8 293.3,93.0" fill="none" />
+              </defs>
+              <path d="M 40.0,93.0 C 50.6,94.4 82.2,99.5 103.3,101.5 C 124.4,103.5 145.6,105.0 166.7,105.0 C 187.8,105.0 219.4,102.1 230.0,101.5" fill="none" stroke="#e5e7eb" stroke-width="1.5" stroke-linecap="round" />
+              <path d="M 230.0,101.5 C 240.6,100.1 272.2,95.8 293.3,93.0 C 314.4,90.2 335.6,86.5 356.7,84.5 C 377.8,82.5 409.4,81.6 420.0,81.0" fill="none" stroke="#d1d5db" stroke-width="1.5" stroke-dasharray="4,4" stroke-linecap="round" />
+              <text x="40" y="106" text-anchor="middle" font-size="6" fill="#9ca3af">4/15</text>
+              <line x1="198.3" y1="98.2" x2="198.3" y2="108.2" stroke="#e5e7eb" stroke-width="1" />
+              <text x="198.3" y="117" text-anchor="middle" font-size="6" fill="#9ca3af">4/16</text>
+              <g opacity="0.9">
+                <polyline points="-5,-4 0,0 -5,4" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <animateMotion dur="1.8s" repeatCount="indefinite" begin="-0.55s" calcMode="linear" rotate="auto">
+                    <mpath xlink:href="#fb-trans-seg" />
+                  </animateMotion>
+                </polyline>
+              </g>
+              <circle r="1.5" fill="#22c55e" opacity="0.85">
+                <animateMotion dur="1.8s" repeatCount="indefinite" begin="0s" calcMode="linear"><mpath xlink:href="#fb-trans-seg" /></animateMotion>
+              </circle>
+              <circle r="1.5" fill="#22c55e" opacity="0.85">
+                <animateMotion dur="1.8s" repeatCount="indefinite" begin="-0.2s" calcMode="linear"><mpath xlink:href="#fb-trans-seg" /></animateMotion>
+              </circle>
+              <circle r="1.5" fill="#22c55e" opacity="0.85">
+                <animateMotion dur="1.8s" repeatCount="indefinite" begin="-0.4s" calcMode="linear"><mpath xlink:href="#fb-trans-seg" /></animateMotion>
+              </circle>
+              <!-- 节点顺序与 mockData 排序一致：past op-4→op-3→op-2→op-1，upcoming up-1→up-2→up-3 -->
+              <g opacity="1">
+                <line x1="40" y1="89" x2="40" y2="78" stroke="#bfdbfe" stroke-width="1" />
+                <circle cx="40" cy="93" r="3" fill="#22c55e" />
+                <foreignObject x="2" y="13" width="76" height="64">
+                  <div xmlns="http://www.w3.org/1999/xhtml" style="display:flex;flex-direction:column;align-items:center;gap:2px;font-family:system-ui,-apple-system,sans-serif;">
+                    <div style="width:14px;height:14px;border-radius:4px;background:#eff6ff;display:flex;align-items:center;justify-content:center;">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                    </div>
+                    <span style="font-size:6.5px;font-weight:600;color:#374151;text-align:center;line-height:1.25;max-width:72px;">Budget optimization</span>
+                    <span style="font-size:6px;color:#6b7280;text-align:center;line-height:1.2;max-width:72px;">4 increase · 2 decrease · 1 pause · 4 maintain</span>
+                    <span style="font-size:6px;color:#9ca3af;">06:00</span>
+                  </div>
+                </foreignObject>
+              </g>
+              <g opacity="1">
+                <line x1="103.3" y1="105.5" x2="103.3" y2="116.5" stroke="#e9d5ff" stroke-width="1" />
+                <circle cx="103.3" cy="101.5" r="3" fill="#22c55e" />
+                <foreignObject x="65.3" y="117.5" width="76" height="64">
+                  <div xmlns="http://www.w3.org/1999/xhtml" style="display:flex;flex-direction:column;align-items:center;gap:2px;font-family:system-ui,-apple-system,sans-serif;">
+                    <div style="width:14px;height:14px;border-radius:4px;background:#faf5ff;display:flex;align-items:center;justify-content:center;">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>
+                    </div>
+                    <span style="font-size:6.5px;font-weight:600;color:#374151;text-align:center;line-height:1.25;max-width:72px;">Regenerate creatives</span>
+                    <span style="font-size:6px;color:#6b7280;text-align:center;line-height:1.2;max-width:72px;">5 creatives to combat ad fatigue</span>
+                    <span style="font-size:6px;color:#9ca3af;">10:00</span>
+                  </div>
+                </foreignObject>
+              </g>
+              <g opacity="1">
+                <line x1="166.7" y1="101" x2="166.7" y2="90" stroke="#fde68a" stroke-width="1" />
+                <circle cx="166.7" cy="105" r="3" fill="#22c55e" />
+                <foreignObject x="128.7" y="25" width="76" height="64">
+                  <div xmlns="http://www.w3.org/1999/xhtml" style="display:flex;flex-direction:column;align-items:center;gap:2px;font-family:system-ui,-apple-system,sans-serif;">
+                    <div style="width:14px;height:14px;border-radius:4px;background:#fffbeb;display:flex;align-items:center;justify-content:center;">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/></svg>
+                    </div>
+                    <span style="font-size:6.5px;font-weight:600;color:#374151;text-align:center;line-height:1.25;max-width:72px;">Recommend ads</span>
+                    <span style="font-size:6px;color:#6b7280;text-align:center;line-height:1.2;max-width:72px;">3 campaigns to amplify top performers</span>
+                    <span style="font-size:6px;color:#9ca3af;">12:00</span>
+                  </div>
+                </foreignObject>
+              </g>
+              <g opacity="1">
+                <line x1="230" y1="105.5" x2="230" y2="116.5" stroke="#bfdbfe" stroke-width="1" />
+                <circle cx="230" cy="101.5" r="3" fill="#22c55e" />
+                <foreignObject x="192" y="117.5" width="76" height="64">
+                  <div xmlns="http://www.w3.org/1999/xhtml" style="display:flex;flex-direction:column;align-items:center;gap:2px;font-family:system-ui,-apple-system,sans-serif;">
+                    <div style="width:14px;height:14px;border-radius:4px;background:#eff6ff;display:flex;align-items:center;justify-content:center;">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                    </div>
+                    <span style="font-size:6.5px;font-weight:600;color:#374151;text-align:center;line-height:1.25;max-width:72px;">Budget optimization</span>
+                    <span style="font-size:6px;color:#6b7280;text-align:center;line-height:1.2;max-width:72px;">5 increase · 3 decrease · 2 pause · 2 maintain</span>
+                    <span style="font-size:6px;color:#9ca3af;">16:00</span>
+                  </div>
+                </foreignObject>
+              </g>
+              <g opacity="0.5">
+                <line x1="293.3" y1="89" x2="293.3" y2="78" stroke="#d1d5db" stroke-width="1" stroke-dasharray="2.5,2.5" />
+                <circle cx="293.3" cy="93" r="3" fill="white" stroke="#d1d5db" stroke-width="1.5" />
+                <foreignObject x="255.3" y="13" width="76" height="64">
+                  <div xmlns="http://www.w3.org/1999/xhtml" style="display:flex;flex-direction:column;align-items:center;gap:2px;font-family:system-ui,-apple-system,sans-serif;">
+                    <div style="width:14px;height:14px;border-radius:4px;background:#eff6ff;display:flex;align-items:center;justify-content:center;">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                    </div>
+                    <span style="font-size:6.5px;font-weight:600;color:#374151;text-align:center;line-height:1.25;max-width:72px;">Budget optimization</span>
+                    <span style="font-size:6px;color:#6b7280;text-align:center;line-height:1.2;max-width:72px;">Daily scheduled run</span>
+                    <span style="font-size:6px;color:#9ca3af;">~20:00</span>
+                  </div>
+                </foreignObject>
+              </g>
+              <g opacity="0.5">
+                <line x1="356.7" y1="88.5" x2="356.7" y2="99.5" stroke="#d1d5db" stroke-width="1" stroke-dasharray="2.5,2.5" />
+                <circle cx="356.7" cy="84.5" r="3" fill="white" stroke="#d1d5db" stroke-width="1.5" />
+                <foreignObject x="318.7" y="100.5" width="76" height="64">
+                  <div xmlns="http://www.w3.org/1999/xhtml" style="display:flex;flex-direction:column;align-items:center;gap:2px;font-family:system-ui,-apple-system,sans-serif;">
+                    <div style="width:14px;height:14px;border-radius:4px;background:#faf5ff;display:flex;align-items:center;justify-content:center;">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>
+                    </div>
+                    <span style="font-size:6.5px;font-weight:600;color:#374151;text-align:center;line-height:1.25;max-width:72px;">Regenerate creatives</span>
+                    <span style="font-size:6px;color:#6b7280;text-align:center;line-height:1.2;max-width:72px;">New creatives to prevent ad fatigue</span>
+                    <span style="font-size:6px;color:#9ca3af;">~00:00</span>
+                  </div>
+                </foreignObject>
+              </g>
+              <g opacity="0.5">
+                <line x1="420" y1="77" x2="420" y2="66" stroke="#d1d5db" stroke-width="1" stroke-dasharray="2.5,2.5" />
+                <circle cx="420" cy="81" r="3" fill="white" stroke="#d1d5db" stroke-width="1.5" />
+                <foreignObject x="382" y="1" width="76" height="64">
+                  <div xmlns="http://www.w3.org/1999/xhtml" style="display:flex;flex-direction:column;align-items:center;gap:2px;font-family:system-ui,-apple-system,sans-serif;">
+                    <div style="width:14px;height:14px;border-radius:4px;background:#fffbeb;display:flex;align-items:center;justify-content:center;">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/></svg>
+                    </div>
+                    <span style="font-size:6.5px;font-weight:600;color:#374151;text-align:center;line-height:1.25;max-width:72px;">Recommend ads</span>
+                    <span style="font-size:6px;color:#6b7280;text-align:center;line-height:1.2;max-width:72px;">New campaigns to amplify your advantage</span>
+                    <span style="font-size:6px;color:#9ca3af;">~04:00</span>
+                  </div>
+                </foreignObject>
+              </g>
+            </svg>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl border border-[#F0F0F0] shadow-[-2px_2px_16px_rgba(14,0,45,0.06)] p-5">
+          <div class="mb-4">
+            <h3 class="text-base font-semibold text-gray-900">Highlights of the Past 7 Days</h3>
+          </div>
+          <div class="mb-6">
+            <div class="flex items-center gap-2 mb-3">
+              <div class="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 7h6v6" /> <path d="m22 7-8.5 8.5-5-5L2 17" /></svg>
+              </div>
+              <div>
+                <h4 class="text-sm font-bold text-gray-900">Action Benefits</h4>
+                <p class="text-[10px] text-gray-500">Impact from completed actions in past 7 days</p>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+              <div class="bg-gradient-to-br from-white to-gray-50 rounded-xl border border-gray-200 p-4 hover:shadow-md transition-shadow">
+                <div class="flex items-center gap-2 mb-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="2" y2="22" /> <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" /></svg>
+                  <span class="text-xs font-semibold text-gray-700">ROAS</span>
+                </div>
+                <div class="flex items-baseline gap-2 mb-1">
+                  <span class="text-lg font-bold text-emerald-600">+18%</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 text-emerald-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 7h6v6" /> <path d="m22 7-8.5 8.5-5-5L2 17" /></svg>
+                </div>
+                <p class="text-[10px] text-gray-500 leading-snug">After approving budget suggestions on 03-25</p>
+              </div>
+              <div class="bg-gradient-to-br from-white to-gray-50 rounded-xl border border-gray-200 p-4 hover:shadow-md transition-shadow">
+                <div class="flex items-center gap-2 mb-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.586 12.586 19 19" /> <path d="M3.688 3.037a.497.497 0 0 0-.651.651l6.5 15.999a.501.501 0 0 0 .947-.062l1.569-6.083a2 2 0 0 1 1.448-1.479l6.124-1.579a.5.5 0 0 0 .063-.947z" /></svg>
+                  <span class="text-xs font-semibold text-gray-700">CTR</span>
+                </div>
+                <div class="flex items-baseline gap-2 mb-1">
+                  <span class="text-lg font-bold text-blue-600">+23%</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 text-emerald-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 7h6v6" /> <path d="m22 7-8.5 8.5-5-5L2 17" /></svg>
+                </div>
+                <p class="text-[10px] text-gray-500 leading-snug">After AI-generated UGC creatives launched on 03-27</p>
+              </div>
+              <div class="bg-gradient-to-br from-white to-gray-50 rounded-xl border border-gray-200 p-4 hover:shadow-md transition-shadow">
+                <div class="flex items-center gap-2 mb-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" /> <circle cx="12" cy="12" r="6" /> <circle cx="12" cy="12" r="2" /></svg>
+                  <span class="text-xs font-semibold text-gray-700">CPA</span>
+                </div>
+                <div class="flex items-baseline gap-2 mb-1"><span class="text-lg font-bold text-emerald-600">-15%</span></div>
+                <p class="text-[10px] text-gray-500 leading-snug">After pausing 3 underperforming adsets on 03-26</p>
+              </div>
+              <div class="bg-gradient-to-br from-white to-gray-50 rounded-xl border border-gray-200 p-4 hover:shadow-md transition-shadow">
+                <div class="flex items-center gap-2 mb-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z" /></svg>
+                  <span class="text-xs font-semibold text-gray-700">Conversions</span>
+                </div>
+                <div class="flex items-baseline gap-2 mb-1">
+                  <span class="text-lg font-bold text-purple-600">+31%</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 text-emerald-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 7h6v6" /> <path d="m22 7-8.5 8.5-5-5L2 17" /></svg>
+                </div>
+                <p class="text-[10px] text-gray-500 leading-snug">Combined impact of all optimizations</p>
+              </div>
+            </div>
+          </div>
+          <div class="border-t border-gray-200 my-4"></div>
+          <div class="flex items-center gap-2 mb-3">
+            <div class="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-amber-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15.477 12.89 1.515 8.526a.5.5 0 0 1-.81.47l-3.58-2.687a1 1 0 0 0-1.197 0l-3.586 2.686a.5.5 0 0 1-.81-.469l1.514-8.526" /> <circle cx="12" cy="8" r="6" /></svg>
+            </div>
+            <div>
+              <h4 class="text-sm font-bold text-gray-900">Highlights</h4>
+              <p class="text-[10px] text-gray-500">Top performers exceeding targets or benchmarks</p>
+            </div>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div class="rounded-lg border border-blue-200 bg-blue-50 p-3 flex gap-3">
+              <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-blue-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" /> <circle cx="12" cy="12" r="6" /> <circle cx="12" cy="12" r="2" /></svg>
+              </div>
+              <div class="min-w-0">
+                <div class="flex justify-between gap-2 mb-1">
+                  <span class="text-xs font-semibold text-gray-800 truncate">LAL 1% - Purchasers</span>
+                  <span class="text-[10px] text-gray-400">03-28</span>
+                </div>
+                <p class="text-xs text-gray-600 leading-snug">ROAS 5.2x (target 4.5x) · $1,240 spend</p>
+              </div>
+            </div>
+            <div class="rounded-lg border border-purple-200 bg-purple-50 p-3 flex gap-3">
+              <div class="w-8 h-8 rounded-lg bg-purple-50 flex items-center justify-center flex-shrink-0">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-purple-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z" /></svg>
+              </div>
+              <div class="min-w-0">
+                <div class="flex justify-between gap-2 mb-1">
+                  <span class="text-xs font-semibold text-gray-800 truncate">UGC Style - Product Demo</span>
+                  <span class="text-[10px] text-gray-400">03-27</span>
+                </div>
+                <p class="text-xs text-gray-600 leading-snug">CTR 3.8% (industry avg 1.5%) · 284 clicks</p>
+              </div>
+            </div>
+            <div class="rounded-lg border border-amber-200 bg-amber-50 p-3 flex gap-3">
+              <div class="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center flex-shrink-0">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-amber-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15.477 12.89 1.515 8.526a.5.5 0 0 1-.81.47l-3.58-2.687a1 1 0 0 0-1.197 0l-3.586 2.686a.5.5 0 0 1-.81-.469l1.514-8.526" /> <circle cx="12" cy="8" r="6" /></svg>
+              </div>
+              <div class="min-w-0">
+                <div class="flex justify-between gap-2 mb-1">
+                  <span class="text-xs font-semibold text-gray-800 truncate">Hero Image - Lifestyle</span>
+                  <span class="text-[10px] text-gray-400">03-29</span>
+                </div>
+                <p class="text-xs text-gray-600 leading-snug">CPC $0.42 (best performer) · 12 conversions</p>
+              </div>
+            </div>
+            <div class="rounded-lg border border-emerald-200 bg-emerald-50 p-3 flex gap-3">
+              <div class="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center flex-shrink-0">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-emerald-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" /> <circle cx="12" cy="12" r="6" /> <circle cx="12" cy="12" r="2" /></svg>
+              </div>
+              <div class="min-w-0">
+                <div class="flex justify-between gap-2 mb-1">
+                  <span class="text-xs font-semibold text-gray-800 truncate">Retargeting - Cart Abandoners</span>
+                  <span class="text-[10px] text-gray-400">03-26</span>
+                </div>
+                <p class="text-xs text-gray-600 leading-snug">CPA $12.50 (target $18) · 45 conversions</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+  <script>
+    lucide.createIcons();
+    const BRAND = '#7033F5';
+    const BRAND_LIGHT = '#f3f0ff';
+    const BRAND_MID = '#c4b5fd';
+    const dims = [
+      { id: 'budget_optimization', label: 'Budget Optimization', current: 2.8, potential: 1.8, problem: "3 adsets with ROAS below 1.5x are consuming 40% of your daily budget ($1,400/day wasted). Meanwhile, your top 2 winners — LAL 1% Purchasers (ROAS 5.2x) and Interest Fitness (ROAS 4.8x) — are budget-capped and cannot scale further. Auto-execute for budget optimization is currently OFF, blocking this week's plan to scale LAL 1% audience budget by 25%.", aiWillDo: ['Execute daily budget optimization: shift $480/day from 3 underperforming adsets to LAL 1% and Interest Fitness winners','Scale LAL 1% audience budget by 25% this week if CPA stays under target (aligned with this week\'s AI plan)','Pause adsets where CPA exceeds target by 30%+ for 48 consecutive hours'], yourActions: ['Consider increasing overall budget by 15% to support scaling (this week\'s recommended action)','Enable auto-execute or manually approve 5 pending budget suggestions'], expectedImpact: 'Unlocks $480/day reallocation to winning audiences — projected to improve overall ROAS by 0.6x within 7 days while supporting this week\'s scaling objective' },
+      { id: 'campaign_recommendation', label: 'Campaign Recommendation', current: 3.5, potential: 1.2, problem: "The platform has generated 3 new campaigns ready to launch this week: a creative A/B test for video variants, a LAL 5% audience expansion to complement the LAL 1% scaling, and a retargeting campaign for cart abandoners. Auto-publish is currently OFF — these campaigns are waiting for your approval, delaying this week's plan to test new interest-based audiences.", aiWillDo: ['Launch LAL 5% expansion and interest-based audience tests (fitness, wellness) as planned for this week','Only recommend campaigns with 85%+ predicted confidence score','Auto-launch approved campaigns at optimal time-of-day for your audience'], yourActions: ['Approve new audience tests — LAL 5% and interest-based segments (this week\'s action item)','Enable auto-publish or manually review and publish 3 pending campaigns'], expectedImpact: 'Launching these 3 campaigns is projected to increase daily conversions by 35% and expand reach to 120K new users — directly supporting this week\'s scaling goal' },
+      { id: 'creative', label: 'Creative Quality', current: 2.5, potential: 2.0, problem: "Creative fatigue detected on 4 of 6 active adsets — CTR has dropped 22% over the past 7 days. You currently have only 8 creatives in rotation (recommended minimum: 20). This week's AI plan includes auto-generating 3 video variants from top static creatives, but more raw assets are needed to maintain testing velocity during the scaling phase.", aiWillDo: ['Auto-generate 3 video variants from your top-performing static creatives (this week\'s AI plan)','Rotate fatigued creatives out and replace with fresh variants automatically','A/B test new hooks, CTAs, and thumbnail combinations on existing winners'], yourActions: ['Review video creative concepts generated this week (pending your approval)','Upload 5–10 new raw images or videos for AI to remix into additional variants'], expectedImpact: 'Fresh video creatives typically recover CTR within 3–5 days — projected to restore the 22% CTR decline and improve CPA by 15%, critical for sustaining this week\'s scaling momentum' },
+      { id: 'landing_page', label: 'Landing Page', current: 3.2, potential: 1.5, problem: 'Your landing page loads in 3.8s on mobile (industry benchmark is under 2s) — every extra second costs ~7% in conversions. Your conversion tracking pixel only fires on 2 of 4 key events (missing "Add to Cart" and "Initiate Checkout"), which limits the system\'s ability to optimize for purchase intent. As audience scaling ramps up this week, these gaps will increasingly waste the additional budget.', aiWillDo: ['Monitor pixel firing status and alert immediately on tracking gaps','Analyze landing page performance and generate optimization recommendations','Track page load speed daily and flag regressions as traffic scales this week'], yourActions: ['Fix missing pixel on "Add to Cart" and "Initiate Checkout" events','Optimize landing page load speed to under 2s on mobile'], expectedImpact: 'Fixing pixel gaps enables full-funnel optimization — projected to reduce CPA by 20%. Critical to fix before this week\'s audience scaling increases traffic volume' },
+      { id: 'kpi', label: 'KPI Target', current: 2.2, potential: 2.5, problem: "Your ROAS target of 4.5x is 80% above the industry benchmark of 2.5x for your vertical. This forces the system to restrict delivery to ~15% of your potential audience, directly conflicting with this week's objective to scale winning audiences. The LAL 1% budget increase and new interest audience tests cannot reach their full potential under this constrained target.", aiWillDo: ['Provide weekly updated industry benchmark data for your vertical','Model projected delivery volume at different KPI targets — showing how scaling this week is limited by 4.5x','Recommend an optimal phased target that balances this week\'s scaling goal with profitability'], yourActions: ['Review weekly performance summary to assess if 4.5x target is realistic at current scale','Consider a phased target: 3.5x during scaling weeks, then increase as efficiency improves'], expectedImpact: 'Adjusting target to 3.5x is projected to double delivery volume and reduce learning period from 14 to 5 days — unlocking the full potential of this week\'s scaling plan' },
+    ];
+    let activeIndex = 0;
+    // Radar geometry: PolarRadiusAxis domain [0,6]; outerRadius ≈ 80% of chart radius (viewBox 400×320 → R≈120)
+    const cx = 200, cy = 160, R = 120;
+    const angles = dims.map((_, i) => -Math.PI / 2 + (i * 2 * Math.PI) / dims.length);
+    function ptFor(val, i) {
+      const t = angles[i];
+      const sc = Math.max(0, Math.min(val, 6)) / 6;
+      return [cx + R * sc * Math.cos(t), cy + R * sc * Math.sin(t)];
+    }
+    function polyPointsFromVals(vals) {
+      return vals.map((v, i) => {
+        const [x, y] = ptFor(v, i);
+        return x.toFixed(2) + ',' + y.toFixed(2);
+      }).join(' ');
+    }
+    function labelAnchor(i, lx) {
+      if (lx < cx - 18) return 'end';
+      if (lx > cx + 18) return 'start';
+      return 'middle';
+    }
+    let radarShellReady = false;
+    function ensureRadarShell() {
+      if (radarShellReady) return;
+      radarShellReady = true;
+      const grid = document.getElementById('radar-grid');
+      grid.innerHTML = '';
+      [2, 4, 6].forEach((ring) => {
+        const poly = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+        poly.setAttribute('fill', 'none');
+        poly.setAttribute('stroke', '#e5e7eb');
+        poly.setAttribute('stroke-width', ring === 6 ? '1.5' : '1');
+        poly.setAttribute('points', polyPointsFromVals(dims.map(() => ring)));
+        grid.appendChild(poly);
+      });
+      const labelG = document.getElementById('radar-labels');
+      labelG.innerHTML = '';
+      const Rlab = R * 1.20;
+      dims.forEach((dim, i) => {
+        const t = angles[i];
+        const lx = cx + Rlab * Math.cos(t);
+        const ly = cy + Rlab * Math.sin(t);
+        const te = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        te.setAttribute('id', 'radar-label-' + i);
+        te.setAttribute('x', lx.toFixed(1));
+        te.setAttribute('y', ly.toFixed(1));
+        te.setAttribute('text-anchor', labelAnchor(i, lx));
+        te.setAttribute('dominant-baseline', 'middle');
+        te.setAttribute('font-size', '10');
+        te.setAttribute('fill', '#9ca3af');
+        te.setAttribute('font-weight', '500');
+        te.setAttribute('style', 'cursor:pointer');
+        te.textContent = dim.label;
+        te.addEventListener('click', () => { activeIndex = i; renderDetail(); });
+        labelG.appendChild(te);
+      });
+    }
+    function updateRadarPolygons() {
+      ensureRadarShell();
+      const curVals = dims.map(d => d.current);
+      const potVals = dims.map(d => Math.min(d.current + d.potential, 5));
+      document.getElementById('radar-current').setAttribute('points', polyPointsFromVals(curVals));
+      document.getElementById('radar-potential').setAttribute('points', polyPointsFromVals(potVals));
+    }
+    function updateRadarLabelStyles() {
+      dims.forEach((_, i) => {
+        const te = document.getElementById('radar-label-' + i);
+        if (!te) return;
+        const active = i === activeIndex;
+        te.setAttribute('fill', active ? BRAND : '#9ca3af');
+        te.setAttribute('font-weight', active ? '700' : '500');
+        te.setAttribute('font-size', active ? '11' : '10');
+      });
+    }
+    function updateDimBars() {
+      const bar = document.getElementById('dim-progress');
+      bar.innerHTML = '';
+      dims.forEach((_, i) => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'relative w-8 h-1.5 rounded-full overflow-hidden';
+        b.style.backgroundColor = i === activeIndex ? BRAND_LIGHT : '#f3f4f6';
+        if (i === activeIndex) {
+          const fill = document.createElement('div');
+          fill.className = 'absolute inset-y-0 left-0 rounded-full score-bar-fill';
+          fill.style.backgroundColor = BRAND;
+          b.appendChild(fill);
+        }
+        b.onclick = () => { activeIndex = i; renderDetail(); };
+        bar.appendChild(b);
+      });
+    }
+    function renderDetail() {
+      ensureRadarShell();
+      updateRadarPolygons();
+      const d = dims[activeIndex];
+      const after = Math.min(d.current + d.potential, 5);
+      document.getElementById('pb-title').textContent = d.label;
+      document.getElementById('pb-score').innerHTML = d.current.toFixed(1) + '<span class="text-gray-400 font-normal">/5</span>';
+      document.getElementById('pb-text').textContent = d.problem;
+      const panel = document.getElementById('detail-panel');
+      panel.innerHTML = `
+        <div class="flex items-center gap-3 mb-5 pb-4 border-b border-gray-100 border-l-[3px] pl-4 -ml-1 rounded-l" style="border-left-color:${BRAND}">
+          <div class="w-11 h-11 rounded-xl flex items-center justify-center" style="background-color:${BRAND_LIGHT}"><span class="text-lg font-bold" style="color:${BRAND}">${d.current.toFixed(1)}</span></div>
+          <div class="flex-1">
+            <h4 class="text-sm font-bold text-gray-900">${d.label}</h4>
+            <p class="text-[11px] text-gray-500 mt-0.5">Current <strong style="color:${BRAND}">${d.current.toFixed(1)}</strong> → After optimization <strong class="text-emerald-600">${after.toFixed(1)}</strong></p>
+          </div>
+        </div>
+        <div class="mb-5"><div class="h-1.5 bg-gray-100 rounded-full overflow-hidden relative">
+          <div class="absolute inset-y-0 left-0 rounded-full" style="width:${(after/5)*100}%;background:${BRAND_LIGHT};border:1px dashed ${BRAND_MID}"></div>
+          <div class="absolute inset-y-0 left-0 rounded-full transition-all duration-500" style="width:${(d.current/5)*100}%;background:${BRAND}"></div>
+        </div></div>
+        <div class="mb-5">
+          <div class="flex items-center gap-1.5 mb-2.5"><svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" style="color:${BRAND}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.106-3.105c.32-.322.863-.22.983.218a6 6 0 0 1-8.259 7.057l-7.91 7.91a1 1 0 0 1-2.999-3l7.91-7.91a6 6 0 0 1 7.057-8.259c.438.12.54.662.219.984z" /></svg><p class="text-[11px] font-semibold tracking-wide" style="color:${BRAND}">AI Will Do</p></div>
+          <ul class="space-y-2.5">${d.aiWillDo.map((a,i)=>`<li class="text-xs text-gray-700 flex gap-2.5 leading-relaxed"><div class="w-5 h-5 rounded-md flex items-center justify-center flex-shrink-0 mt-0.5" style="background:${BRAND_LIGHT}"><span class="text-[10px] font-bold" style="color:${BRAND}">${i+1}</span></div>${a}</li>`).join('')}</ul>
+        </div>
+        <div class="mb-5">
+          <div class="flex items-center gap-1.5 mb-2.5"><svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-amber-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" /> <path d="m9 12 2 2 4-4" /></svg><p class="text-[11px] font-semibold text-amber-600 tracking-wide">Your Actions</p></div>
+          <ul class="space-y-2.5">${d.yourActions.map((a,i)=>`<li class="flex gap-2.5"><div class="w-5 h-5 rounded-md bg-amber-50 border border-amber-200 flex items-center justify-center flex-shrink-0 mt-0.5"><span class="text-[10px] font-bold text-amber-500">${i+1}</span></div><span class="text-xs text-gray-700 leading-relaxed">${a}</span></li>`).join('')}</ul>
+        </div>
+        <div class="rounded-lg px-4 py-3 bg-emerald-50/60 border border-emerald-100">
+          <p class="text-[11px] font-semibold text-emerald-700 tracking-wide mb-1.5">Expected Impact</p>
+          <div class="flex items-center gap-2 mb-1">
+            <span class="text-xs text-gray-600">Score:</span>
+            <span class="text-xs font-bold" style="color:${BRAND}">${d.current.toFixed(1)}</span>
+            <span class="text-xs text-gray-400">→</span>
+            <span class="text-xs font-bold text-emerald-600">${after.toFixed(1)}</span>
+          </div>
+          <p class="text-[11px] text-gray-600 leading-relaxed">${d.expectedImpact}</p>
+        </div>`;
+      lucide.createIcons();
+      const dots = document.getElementById('radar-dots');
+      dots.innerHTML = '';
+      angles.forEach((_, i) => {
+        const [x, y] = ptFor(dims[i].current, i);
+        const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        if (i === activeIndex) {
+          g.innerHTML = `<circle cx="${x}" cy="${y}" r="11" fill="${BRAND}" fill-opacity="0.12"/><circle cx="${x}" cy="${y}" r="6" fill="white" stroke="${BRAND}" stroke-width="2.5"/><circle cx="${x}" cy="${y}" r="2.5" fill="${BRAND}"/>`;
+        } else {
+          g.innerHTML = `<circle cx="${x}" cy="${y}" r="3" fill="white" stroke="#d1d5db" stroke-width="1.5"/>`;
+        }
+        dots.appendChild(g);
+      });
+      updateRadarLabelStyles();
+      updateDimBars();
+    }
+    // Manual switch only — user clicks dim-progress pill or radar axis label.
+    renderDetail();
+  </script>
+</body>
+</html>

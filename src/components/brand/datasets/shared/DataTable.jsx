@@ -49,12 +49,12 @@ const DataTable = ({ columns, data, pageSize: initialPageSize = 20, showSummary 
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
-            <tr className="bg-slate-50 sticky top-0 z-10">
+            <tr className="bg-neutral-50 sticky top-0 z-10">
               {columns.map(col => (
                 <th
                   key={col.key}
                   onClick={() => handleSort(col.key)}
-                  className={`px-4 py-3 text-[11px] font-black text-slate-500 cursor-pointer hover:text-slate-700 transition-colors whitespace-nowrap ${
+                  className={`px-4 py-3 text-[11px] font-black text-neutral-500 cursor-pointer hover:text-neutral-700 transition-colors whitespace-nowrap ${
                     isNumeric(col.key) ? 'text-right' : 'text-left'
                   }`}
                 >
@@ -70,14 +70,14 @@ const DataTable = ({ columns, data, pageSize: initialPageSize = 20, showSummary 
               ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-50">
+          <tbody className="divide-y divide-neutral-50">
             {pageData.map((row, i) => (
-              <tr key={i} className="hover:bg-slate-50/50 transition-colors">
+              <tr key={i} className="hover:bg-neutral-50/50 transition-colors">
                 {columns.map(col => (
                   <td
                     key={col.key}
                     className={`px-4 py-2.5 text-[12px] font-medium whitespace-nowrap ${
-                      isNumeric(col.key) ? 'text-right text-slate-700 font-mono' : 'text-left text-slate-600'
+                      isNumeric(col.key) ? 'text-right text-neutral-700 font-mono' : 'text-left text-neutral-600'
                     }`}
                   >
                     {typeof row[col.key] === 'number' ? row[col.key].toLocaleString() : row[col.key] ?? '—'}
@@ -88,12 +88,12 @@ const DataTable = ({ columns, data, pageSize: initialPageSize = 20, showSummary 
           </tbody>
           {showSummary && data.length > 0 && (
             <tfoot className="sticky bottom-0 z-10">
-              <tr className="bg-slate-100 border-t-2 border-slate-200">
+              <tr className="bg-neutral-100 border-t-2 border-neutral-200">
                 {columns.map((col, idx) => (
                   <td
                     key={col.key}
                     className={`px-4 py-2.5 text-[11px] font-black whitespace-nowrap ${
-                      isNumeric(col.key) ? 'text-right text-slate-800 font-mono' : 'text-left text-slate-500'
+                      isNumeric(col.key) ? 'text-right text-neutral-800 font-mono' : 'text-left text-neutral-500'
                     }`}
                   >
                     {idx === 0 ? 'Total' : isNumeric(col.key) ? columnSums[col.key]?.toLocaleString(undefined, { maximumFractionDigits: 2 }) : ''}
@@ -106,19 +106,19 @@ const DataTable = ({ columns, data, pageSize: initialPageSize = 20, showSummary 
       </div>
 
       {/* Pagination */}
-      <div className="flex items-center justify-between px-4 py-3 border-t border-slate-100">
+      <div className="flex items-center justify-between px-4 py-3 border-t border-neutral-100">
         <div className="flex items-center gap-2">
-          <span className="text-[11px] text-slate-400">Rows per page:</span>
+          <span className="text-[11px] text-neutral-400">Rows per page:</span>
           <select
             value={pageSize}
             onChange={(e) => { setPageSize(Number(e.target.value)); setPage(0) }}
-            className="px-2 py-1 text-[11px] font-medium border border-slate-200 rounded-md bg-white text-slate-700 outline-none"
+            className="px-2 py-1 text-[11px] font-medium border border-neutral-200 rounded-md bg-white text-neutral-700 outline-none"
           >
             {PAGE_SIZE_OPTIONS.map(s => (
               <option key={s} value={s}>{s}</option>
             ))}
           </select>
-          <span className="text-[11px] text-slate-400 ml-2">
+          <span className="text-[11px] text-neutral-400 ml-2">
             {page * pageSize + 1}–{Math.min((page + 1) * pageSize, sortedData.length)} of {sortedData.length}
           </span>
         </div>
@@ -126,15 +126,15 @@ const DataTable = ({ columns, data, pageSize: initialPageSize = 20, showSummary 
           <button
             onClick={() => setPage(p => Math.max(0, p - 1))}
             disabled={page === 0}
-            className="px-3 py-1 text-[11px] font-bold text-slate-500 hover:bg-slate-100 rounded-md disabled:opacity-30 disabled:cursor-not-allowed"
+            className="px-3 py-1 text-[11px] font-bold text-neutral-500 hover:bg-neutral-100 rounded-md disabled:opacity-30 disabled:cursor-not-allowed"
           >
             Prev
           </button>
-          <span className="text-[11px] text-slate-400 px-2">{page + 1} / {totalPages || 1}</span>
+          <span className="text-[11px] text-neutral-400 px-2">{page + 1} / {totalPages || 1}</span>
           <button
             onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
             disabled={page >= totalPages - 1}
-            className="px-3 py-1 text-[11px] font-bold text-slate-500 hover:bg-slate-100 rounded-md disabled:opacity-30 disabled:cursor-not-allowed"
+            className="px-3 py-1 text-[11px] font-bold text-neutral-500 hover:bg-neutral-100 rounded-md disabled:opacity-30 disabled:cursor-not-allowed"
           >
             Next
           </button>

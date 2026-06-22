@@ -62,9 +62,9 @@ function WizardShell() {
 
   return (
     <div className="space-y-6">
-      <div className="bg-white rounded-[20px] p-6 space-y-6">
+      <div className="bg-white rounded-2xl p-6 space-y-6">
         {activeStep > 1 && (
-          <div className="flex items-center gap-3 pb-3 border-b border-gray-100">
+          <div className="flex items-center gap-3 pb-3 border-b border-neutral-100">
             <FlowStepper
               steps={FLOW_STEPS}
               activeStep={activeStep}
@@ -75,7 +75,7 @@ function WizardShell() {
             <button
               type="button"
               onClick={resetAll}
-              className="shrink-0 flex items-center gap-1.5 text-xs text-gray-400 hover:text-primary-500 transition-colors ml-auto"
+              className="shrink-0 flex items-center gap-1.5 text-xs text-neutral-400 hover:text-primary-500 transition-colors ml-auto"
             >
               <RefreshCw className="w-3 h-3" />
               重新创建

@@ -39,7 +39,7 @@ const HistoryNamingDropdown = ({ channel, level, onApply }) => {
         ref={btnRef}
         type="button"
         onClick={(e) => { e.preventDefault(); e.stopPropagation(); setOpen(o => !o); }}
-        className="inline-flex items-center gap-1 h-6 px-1.5 text-[10px] font-medium text-gray-500 hover:text-primary-600 hover:bg-primary-50 rounded-base transition-colors"
+        className="inline-flex items-center gap-1 h-6 px-1.5 text-[10px] font-medium text-neutral-500 hover:text-primary-600 hover:bg-primary-50 rounded-base transition-colors"
         title="使用历史命名策略"
       >
         <History size={10} /> 历史命名 <ChevronDown size={9} />
@@ -50,10 +50,10 @@ const HistoryNamingDropdown = ({ channel, level, onApply }) => {
         anchorRef={btnRef}
         onClose={() => setOpen(false)}
         placement="bottom-end"
-        className="bg-white rounded-xl shadow-2xl border border-gray-100 py-1.5 min-w-[280px] max-w-[400px] max-h-[320px] overflow-auto"
+        className="bg-white rounded-xl shadow-2xl border border-neutral-100 py-1.5 min-w-[280px] max-w-[400px] max-h-[320px] overflow-auto"
       >
         {templates.length === 0 ? (
-          <p className="px-3 py-4 text-xs text-gray-400 text-center">本层级暂无历史命名</p>
+          <p className="px-3 py-4 text-xs text-neutral-400 text-center">本层级暂无历史命名</p>
         ) : (
           templates.map(it => (
             <div
@@ -62,13 +62,13 @@ const HistoryNamingDropdown = ({ channel, level, onApply }) => {
               className="px-3 py-2 hover:bg-primary-50/40 transition-colors cursor-pointer flex items-center gap-2 group"
             >
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-semibold text-gray-800 truncate">{it.name}</p>
-                <p className="text-[10px] text-gray-500 font-mono truncate mt-0.5">{it.template}</p>
+                <p className="text-xs font-semibold text-neutral-800 truncate">{it.name}</p>
+                <p className="text-[10px] text-neutral-500 font-mono truncate mt-0.5">{it.template}</p>
               </div>
               <button
                 type="button"
                 onClick={(e) => handleDelete(it.id, e)}
-                className="shrink-0 p-1 text-gray-300 hover:text-rose-500 rounded-full opacity-0 group-hover:opacity-100 transition-all"
+                className="shrink-0 p-1 text-neutral-300 hover:text-rose-500 rounded-full opacity-0 group-hover:opacity-100 transition-all"
                 title="删除"
               >
                 <Trash2 size={11} />

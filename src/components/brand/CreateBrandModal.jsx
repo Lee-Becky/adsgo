@@ -31,21 +31,21 @@ const ImageCropper = ({ imageSrc, onCrop, onCancel }) => {
   };
 
   return (
-    <BaseModal isOpen={true} onClose={onCancel} className="bg-slate-900/90 backdrop-blur-md p-6">
-      <div className="bg-white rounded-[32px] overflow-hidden shadow-2xl w-full max-w-[500px] flex flex-col">
-        <div className="p-6 border-b border-slate-100 flex items-center justify-between">
+    <BaseModal isOpen={true} onClose={onCancel} className="bg-neutral-900/90 backdrop-blur-md p-6">
+      <div className="bg-white rounded-2xl overflow-hidden shadow-2xl w-full max-w-[500px] flex flex-col">
+        <div className="p-6 border-b border-neutral-100 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-indigo-50 text-indigo-600 rounded-xl">
+            <div className="p-2 bg-primary-50 text-primary-600 rounded-xl">
               <Scissors size={20} />
             </div>
-            <h4 className="font-bold text-slate-900">Crop Logo to 1:1</h4>
+            <h4 className="font-bold text-neutral-900">Crop Logo to 1:1</h4>
           </div>
-          <button onClick={onCancel} className="p-2 hover:bg-slate-100 rounded-full transition-colors">
-            <X size={20} className="text-slate-400" />
+          <button onClick={onCancel} className="p-2 hover:bg-neutral-100 rounded-full transition-colors">
+            <X size={20} className="text-neutral-400" />
           </button>
         </div>
         
-        <div className="relative aspect-square bg-slate-100 overflow-hidden" ref={containerRef}>
+        <div className="relative aspect-square bg-neutral-100 overflow-hidden" ref={containerRef}>
           <img 
             ref={imgRef}
             src={imageSrc} 
@@ -56,14 +56,14 @@ const ImageCropper = ({ imageSrc, onCrop, onCancel }) => {
               transition: 'transform 0.1s ease-out'
             }}
           />
-          <div className="absolute inset-0 border-[40px] border-slate-900/40 pointer-events-none">
+          <div className="absolute inset-0 border-[40px] border-neutral-900/40 pointer-events-none">
             <div className="w-full h-full border-2 border-white/50 shadow-[0_0_0_9999px_rgba(15,23,42,0.4)]" />
           </div>
         </div>
         
         <div className="p-8 space-y-6">
           <div className="space-y-3">
-            <div className="flex justify-between text-[11px] font-bold text-slate-400">
+            <div className="flex justify-between text-[11px] font-bold text-neutral-400">
               <span>Zoom</span>
               <span>{Math.round(zoom * 100)}%</span>
             </div>
@@ -74,20 +74,20 @@ const ImageCropper = ({ imageSrc, onCrop, onCancel }) => {
               step="0.01" 
               value={zoom}
               onChange={(e) => setZoom(parseFloat(e.target.value))}
-              className="w-full h-1.5 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-indigo-600"
+              className="w-full h-1.5 bg-neutral-100 rounded-lg appearance-none cursor-pointer accent-primary-600"
             />
           </div>
           
           <div className="flex gap-4">
             <button 
               onClick={onCancel}
-              className="flex-1 py-4 rounded-2xl text-sm font-bold text-slate-500 hover:bg-slate-50 transition-all"
+              className="flex-1 py-4 rounded-2xl text-sm font-bold text-neutral-500 hover:bg-neutral-50 transition-all"
             >
               Cancel
             </button>
             <button 
               onClick={handleApply}
-              className="flex-1 py-4 bg-indigo-600 text-white rounded-2xl font-bold text-sm hover:bg-indigo-700 shadow-xl shadow-indigo-100 transition-all flex items-center justify-center gap-2"
+              className="flex-1 py-4 bg-primary-600 text-white rounded-2xl font-bold text-sm hover:bg-primary-700 shadow-xl shadow-primary-100 transition-all flex items-center justify-center gap-2"
             >
               <Check size={18} strokeWidth={3} />
               Apply Crop
@@ -113,7 +113,7 @@ const CreateBrandModal = ({ isOpen, onClose, onCreate, initialData, isForceOpen 
     event: '',
     marketGroups: [
       {
-        id: crypto.randomUUID(),
+        id: (crypto.randomUUID?.() ?? `id_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`),
         targetLocations: [],
         budgetMode: 'unified',
         unifiedBudget: '',
@@ -159,7 +159,7 @@ const CreateBrandModal = ({ isOpen, onClose, onCreate, initialData, isForceOpen 
         event: '',
         marketGroups: [
           {
-            id: crypto.randomUUID(),
+            id: (crypto.randomUUID?.() ?? `id_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`),
             targetLocations: [],
             budgetMode: 'unified',
             unifiedBudget: '',
@@ -264,15 +264,15 @@ const CreateBrandModal = ({ isOpen, onClose, onCreate, initialData, isForceOpen 
     <>
       <BaseModal isOpen={isOpen} onClose={onClose}>
         <div 
-          className="w-full max-w-[960px] max-h-[90vh] bg-white rounded-[32px] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 flex flex-col"
+          className="w-full max-w-[960px] max-h-[90vh] bg-white rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 flex flex-col"
         >
           {/* Header */}
           <div className="px-10 pt-10 pb-6 flex items-center justify-between shrink-0">
-            <h3 className="text-2xl font-bold text-slate-900">{initialData ? 'Edit Brand' : 'Create New Brand'}</h3>
+            <h3 className="text-2xl font-bold text-neutral-900">{initialData ? 'Edit Brand' : 'Create New Brand'}</h3>
             {!isForceOpen && (
               <button 
                 onClick={onClose}
-                className="p-2.5 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-full transition-all"
+                className="p-2.5 text-neutral-400 hover:text-neutral-600 hover:bg-neutral-50 rounded-full transition-all"
               >
                 <X size={24} />
               </button>
@@ -282,21 +282,21 @@ const CreateBrandModal = ({ isOpen, onClose, onCreate, initialData, isForceOpen 
           <div className="flex-1 overflow-y-auto custom-scrollbar">
             <form id="create-brand-form" onSubmit={handleSubmit} className="px-10 pb-32 space-y-8">
               {/* Basic Info Section */}
-              <div className="bg-white rounded-[32px] border border-slate-200 shadow-[0_4px_24px_rgba(0,0,0,0.04)] overflow-hidden animate-in fade-in duration-700">
-                <header className="px-10 py-6 bg-slate-100 border-b border-slate-200 flex items-center justify-between">
+              <div className="bg-white rounded-2xl border border-neutral-200 shadow-[0_4px_24px_rgba(0,0,0,0.04)] overflow-hidden animate-in fade-in duration-700">
+                <header className="px-10 py-6 bg-neutral-100 border-b border-neutral-200 flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-xl bg-slate-900 flex items-center justify-center text-white shadow-sm">
+                    <div className="w-8 h-8 rounded-xl bg-neutral-900 flex items-center justify-center text-white shadow-sm">
                       <Fingerprint size={16} />
                     </div>
-                    <h2 className="text-sm font-black text-slate-900">Brand Identity <span className="text-rose-500 ml-1">*</span></h2>
+                    <h2 className="text-sm font-black text-neutral-900">Brand Identity <span className="text-rose-500 ml-1">*</span></h2>
                   </div>
                 </header>
                 <div className="p-10 space-y-8">
                   <div className="flex gap-10">
                     {/* Logo Section */}
                     <div className="space-y-3 shrink-0">
-                      <label className="text-[11px] font-bold text-slate-400 tracking-tight flex items-center gap-2">
-                        <div className="w-1 h-3 bg-indigo-400 rounded-full" />
+                      <label className="text-[11px] font-bold text-neutral-400 tracking-tight flex items-center gap-2">
+                        <div className="w-1 h-3 bg-primary-400 rounded-full" />
                         Brand Logo
                       </label>
                       <div className="relative">
@@ -305,13 +305,13 @@ const CreateBrandModal = ({ isOpen, onClose, onCreate, initialData, isForceOpen 
                             <img 
                               src={brandForm.logo.url} 
                               alt="Logo preview" 
-                              className="w-full h-full object-cover rounded-[24px] border border-slate-100 shadow-sm"
+                              className="w-full h-full object-cover rounded-xl border border-neutral-100 shadow-sm"
                             />
-                            <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-[24px] flex items-center justify-center gap-2">
+                            <div className="absolute inset-0 bg-neutral-900/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-xl flex items-center justify-center gap-2">
                               <button
                                 type="button"
                                 onClick={() => fileInputRef.current?.click()}
-                                className="p-2 bg-white text-indigo-600 rounded-xl shadow-lg hover:scale-110 active:scale-95 transition-all"
+                                className="p-2 bg-white text-primary-600 rounded-xl shadow-lg hover:scale-110 active:scale-95 transition-all"
                               >
                                 <Scissors size={14} />
                               </button>
@@ -328,7 +328,7 @@ const CreateBrandModal = ({ isOpen, onClose, onCreate, initialData, isForceOpen 
                           <button
                             type="button"
                             onClick={() => fileInputRef.current?.click()}
-                            className="w-32 h-32 border-2 border-dashed border-slate-200 rounded-[24px] flex flex-col items-center justify-center text-slate-400 hover:border-indigo-300 hover:text-indigo-500 hover:bg-indigo-50/30 transition-all group"
+                            className="w-32 h-32 border-2 border-dashed border-neutral-200 rounded-xl flex flex-col items-center justify-center text-neutral-400 hover:border-primary-300 hover:text-primary-500 hover:bg-primary-50/30 transition-all group"
                           >
                             <Upload size={24} className="mb-2 group-hover:scale-110 transition-transform" />
                             <span className="text-[11px] font-bold">Upload</span>
@@ -349,8 +349,8 @@ const CreateBrandModal = ({ isOpen, onClose, onCreate, initialData, isForceOpen 
                     <div className="flex-1 space-y-6 flex flex-col justify-center">
                       {/* Brand Name */}
                       <div className="space-y-3">
-                        <label className="text-[11px] font-bold text-slate-400 tracking-tight flex items-center gap-2">
-                          <div className="w-1 h-3 bg-indigo-400 rounded-full" />
+                        <label className="text-[11px] font-bold text-neutral-400 tracking-tight flex items-center gap-2">
+                          <div className="w-1 h-3 bg-primary-400 rounded-full" />
                           Brand Name <span className="text-rose-500">*</span>
                         </label>
                         <input 
@@ -358,15 +358,15 @@ const CreateBrandModal = ({ isOpen, onClose, onCreate, initialData, isForceOpen 
                           value={brandForm.name}
                           onChange={(e) => setBrandForm(prev => ({ ...prev, name: e.target.value }))}
                           placeholder="e.g. AdsGo AI"
-                          className={`w-full bg-white border rounded-2xl px-5 py-4 text-sm font-bold text-slate-700 focus:ring-4 focus:ring-indigo-500/5 focus:outline-none shadow-sm transition-all ${isSubmitted && errors.name ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200 focus:border-indigo-400'}`}
+                          className={`w-full bg-white border rounded-2xl px-5 py-4 text-sm font-bold text-neutral-700 focus:ring-4 focus:ring-primary-500/5 focus:outline-none shadow-sm transition-all ${isSubmitted && errors.name ? 'border-rose-400 focus:border-rose-500' : 'border-neutral-200 focus:border-primary-400'}`}
                         />
                         {isSubmitted && errors.name && <p className="text-[10px] text-rose-500 font-bold mt-1">{errors.name}</p>}
                       </div>
 
                       {/* Brand URL */}
                       <div className="space-y-3">
-                        <label className="text-[11px] font-bold text-slate-400 tracking-tight flex items-center gap-2">
-                          <div className="w-1 h-3 bg-indigo-400 rounded-full" />
+                        <label className="text-[11px] font-bold text-neutral-400 tracking-tight flex items-center gap-2">
+                          <div className="w-1 h-3 bg-primary-400 rounded-full" />
                           Brand URL <span className="text-rose-500">*</span>
                         </label>
                         <input 
@@ -374,7 +374,7 @@ const CreateBrandModal = ({ isOpen, onClose, onCreate, initialData, isForceOpen 
                           value={brandForm.url}
                           onChange={(e) => setBrandForm(prev => ({ ...prev, url: e.target.value }))}
                           placeholder="https://www.example.com"
-                          className={`w-full bg-white border rounded-2xl px-5 py-4 text-sm font-bold text-slate-700 focus:ring-4 focus:ring-indigo-500/5 focus:outline-none shadow-sm transition-all ${isSubmitted && errors.url ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200 focus:border-indigo-400'}`}
+                          className={`w-full bg-white border rounded-2xl px-5 py-4 text-sm font-bold text-neutral-700 focus:ring-4 focus:ring-primary-500/5 focus:outline-none shadow-sm transition-all ${isSubmitted && errors.url ? 'border-rose-400 focus:border-rose-500' : 'border-neutral-200 focus:border-primary-400'}`}
                         />
                         {isSubmitted && errors.url && <p className="text-[10px] text-rose-500 font-bold mt-1">{errors.url}</p>}
                       </div>
@@ -385,7 +385,7 @@ const CreateBrandModal = ({ isOpen, onClose, onCreate, initialData, isForceOpen 
 
               {/* Optimize Goal Sections */}
               <div className="space-y-8 pb-10">
-                <div className={isSubmitted && errors.objective ? 'ring-2 ring-rose-500 rounded-[32px] p-1' : ''}>
+                <div className={isSubmitted && errors.objective ? 'ring-2 ring-rose-500 rounded-2xl p-1' : ''}>
                   <ObjectiveSection 
                     formData={brandForm}
                     updateFormData={updateFormData}
@@ -395,7 +395,7 @@ const CreateBrandModal = ({ isOpen, onClose, onCreate, initialData, isForceOpen 
                   {isSubmitted && errors.objective && <p className="text-xs font-bold text-rose-500 mt-2 ml-4">{errors.objective}</p>}
                 </div>
 
-                <div className={isSubmitted && errors.marketGroups ? 'ring-2 ring-rose-500 rounded-[32px] p-1' : ''}>
+                <div className={isSubmitted && errors.marketGroups ? 'ring-2 ring-rose-500 rounded-2xl p-1' : ''}>
                   <BudgetKPISection 
                     formData={brandForm}
                     updateFormData={updateFormData}
@@ -417,12 +417,12 @@ const CreateBrandModal = ({ isOpen, onClose, onCreate, initialData, isForceOpen 
           </div>
 
           {/* Footer Actions (Sticky) */}
-          <div className="px-10 py-8 bg-white/90 backdrop-blur-md border-t border-slate-50 flex items-center justify-end gap-4 shrink-0">
+          <div className="px-10 py-8 bg-white/90 backdrop-blur-md border-t border-neutral-50 flex items-center justify-end gap-4 shrink-0">
             {!isForceOpen && (
               <button 
                 type="button"
                 onClick={onClose}
-                className="px-8 py-3.5 rounded-2xl text-sm font-bold text-slate-500 hover:text-slate-700 hover:bg-slate-50 transition-all"
+                className="px-8 py-3.5 rounded-2xl text-sm font-bold text-neutral-500 hover:text-neutral-700 hover:bg-neutral-50 transition-all"
               >
                 Cancel
               </button>
@@ -431,7 +431,7 @@ const CreateBrandModal = ({ isOpen, onClose, onCreate, initialData, isForceOpen 
             <button 
               type="submit"
               form="create-brand-form"
-              className="px-10 py-4 bg-indigo-600 text-white rounded-2xl font-bold text-sm hover:bg-indigo-700 shadow-xl shadow-indigo-100 transition-all active:scale-95"
+              className="px-10 py-4 bg-primary-600 text-white rounded-2xl font-bold text-sm hover:bg-primary-700 shadow-xl shadow-primary-100 transition-all active:scale-95"
             >
               {initialData ? 'Save Changes' : 'Create Brand'}
             </button>

@@ -92,10 +92,10 @@ const AssetGrid = ({ title, subtitle, assets = [], onAssetsChange, maxCount = 99
       <div className="flex items-center justify-between">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <div className="w-1 h-3 bg-blue-400 rounded-full" />
-            <h5 className="text-[13px] font-black text-slate-900">{title}</h5>
+            <div className="w-1 h-3 bg-info-400 rounded-full" />
+            <h5 className="text-[13px] font-black text-neutral-900">{title}</h5>
           </div>
-          <p className="text-[10px] text-slate-400 font-medium leading-tight">{subtitle}</p>
+          <p className="text-[10px] text-neutral-400 font-medium leading-tight">{subtitle}</p>
         </div>
       </div>
 
@@ -104,17 +104,17 @@ const AssetGrid = ({ title, subtitle, assets = [], onAssetsChange, maxCount = 99
         {assets.length < maxCount && (
           <div 
             onClick={() => fileInputRef.current?.click()}
-            className="w-[140px] aspect-square bg-slate-50 border-2 border-dashed border-slate-200 rounded-[24px] flex items-center justify-center cursor-pointer hover:bg-indigo-50 hover:border-indigo-300 transition-all group active:scale-[0.97] shrink-0"
+            className="w-[140px] aspect-square bg-neutral-50 border-2 border-dashed border-neutral-200 rounded-xl flex items-center justify-center cursor-pointer hover:bg-primary-50 hover:border-primary-300 transition-all group active:scale-[0.97] shrink-0"
           >
-            <Plus size={32} className="text-slate-300 group-hover:text-indigo-500 transition-colors" />
+            <Plus size={32} className="text-neutral-300 group-hover:text-primary-500 transition-colors" />
           </div>
         )}
 
         {/* Assets List */}
         {displayAssets.map((asset, i) => (
-          <div key={i} className="w-[140px] aspect-square bg-white border border-slate-100 rounded-[24px] relative overflow-hidden group shadow-sm hover:shadow-md transition-all shrink-0">
+          <div key={i} className="w-[140px] aspect-square bg-white border border-neutral-100 rounded-xl relative overflow-hidden group shadow-sm hover:shadow-md transition-all shrink-0">
             <img src={asset.url || `https://picsum.photos/seed/${title}${i}/300/300`} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-            <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+            <div className="absolute inset-0 bg-neutral-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
               <button 
                 onClick={() => removeAsset(i)}
                 className="p-2 bg-white rounded-xl text-rose-500 shadow-lg hover:scale-110 active:scale-90 transition-all"
@@ -129,7 +129,7 @@ const AssetGrid = ({ title, subtitle, assets = [], onAssetsChange, maxCount = 99
         {needsMoreCard && (
           <div 
             onClick={onToggle}
-            className="w-[140px] aspect-square bg-slate-900 rounded-[24px] flex flex-col items-center justify-center cursor-pointer hover:bg-black transition-all shadow-xl group shrink-0"
+            className="w-[140px] aspect-square bg-neutral-900 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:bg-black transition-all shadow-xl group shrink-0"
           >
             <span className="text-lg font-black text-white">{moreCount} more</span>
             <span className="text-[10px] font-bold text-white/60 mt-1">assets</span>
@@ -140,19 +140,19 @@ const AssetGrid = ({ title, subtitle, assets = [], onAssetsChange, maxCount = 99
         {isExpandable && isExpanded && (
           <div 
             onClick={onToggle}
-            className="w-[140px] aspect-square bg-slate-100 border border-slate-200 rounded-[24px] flex flex-col items-center justify-center cursor-pointer hover:bg-slate-200 transition-all group shrink-0"
+            className="w-[140px] aspect-square bg-neutral-100 border border-neutral-200 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:bg-neutral-200 transition-all group shrink-0"
           >
-            <ChevronRight size={24} className="text-slate-400 rotate-180 mb-1" />
-            <span className="text-[10px] font-black text-slate-500">Collapse</span>
+            <ChevronRight size={24} className="text-neutral-400 rotate-180 mb-1" />
+            <span className="text-[10px] font-black text-neutral-500">Collapse</span>
           </div>
         )}
 
         {/* Examples logic for Main Photo */}
         {showExamples && (
-          <div className="flex-1 min-w-[300px] bg-slate-50/80 border border-slate-100 rounded-[24px] p-5 flex gap-6">
+          <div className="flex-1 min-w-[300px] bg-neutral-50/80 border border-neutral-100 rounded-xl p-5 flex gap-6">
             <div className="flex-1 space-y-4">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-xl bg-white border border-slate-100 flex items-center justify-center relative shadow-sm">
+                <div className="w-12 h-12 rounded-xl bg-white border border-neutral-100 flex items-center justify-center relative shadow-sm">
                   <img src="/Transparent image.webp" alt="" className="w-full h-full object-cover rounded-xl" />
                   <div className="absolute -bottom-1.5 -right-1.5 w-6 h-6 bg-[#22C55E] rounded-full flex items-center justify-center shadow-lg border-2 border-white">
                     <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -160,21 +160,21 @@ const AssetGrid = ({ title, subtitle, assets = [], onAssetsChange, maxCount = 99
                     </svg>
                   </div>
                 </div>
-                <span className="text-[11px] font-bold text-slate-500">Transparent image</span>
+                <span className="text-[11px] font-bold text-neutral-500">Transparent image</span>
               </div>
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-xl bg-white border border-slate-100 flex items-center justify-center relative shadow-sm">
+                <div className="w-12 h-12 rounded-xl bg-white border border-neutral-100 flex items-center justify-center relative shadow-sm">
                   <img src="/Blurry image.webp" alt="" className="w-full h-full object-cover rounded-xl" />
                   <div className="absolute -bottom-1.5 -right-1.5 w-6 h-6 bg-[#EF4444] rounded-full flex items-center justify-center shadow-lg border-2 border-white">
                     <X size={12} strokeWidth={3} className="text-white" />
                   </div>
                 </div>
-                <span className="text-[11px] font-bold text-slate-500">Blurry image</span>
+                <span className="text-[11px] font-bold text-neutral-500">Blurry image</span>
               </div>
             </div>
             <div className="flex-1 space-y-4">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-xl bg-white border border-slate-100 flex items-center justify-center relative shadow-sm">
+                <div className="w-12 h-12 rounded-xl bg-white border border-neutral-100 flex items-center justify-center relative shadow-sm">
                   <img src="/Solid Clean background.webp" alt="" className="w-full h-full object-cover rounded-xl" />
                   <div className="absolute -bottom-1.5 -right-1.5 w-6 h-6 bg-[#22C55E] rounded-full flex items-center justify-center shadow-lg border-2 border-white">
                     <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -182,16 +182,16 @@ const AssetGrid = ({ title, subtitle, assets = [], onAssetsChange, maxCount = 99
                     </svg>
                   </div>
                 </div>
-                <span className="text-[11px] font-bold text-slate-500">Solid / Clean background</span>
+                <span className="text-[11px] font-bold text-neutral-500">Solid / Clean background</span>
               </div>
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-xl bg-white border border-slate-100 flex items-center justify-center relative shadow-sm">
+                <div className="w-12 h-12 rounded-xl bg-white border border-neutral-100 flex items-center justify-center relative shadow-sm">
                   <img src="/Messy background.webp" alt="" className="w-full h-full object-cover rounded-xl" />
                   <div className="absolute -bottom-1.5 -right-1.5 w-6 h-6 bg-[#EF4444] rounded-full flex items-center justify-center shadow-lg border-2 border-white">
                     <X size={12} strokeWidth={3} className="text-white" />
                   </div>
                 </div>
-                <span className="text-[11px] font-bold text-slate-500">Messy background</span>
+                <span className="text-[11px] font-bold text-neutral-500">Messy background</span>
               </div>
             </div>
           </div>
@@ -215,19 +215,19 @@ const SearchableSelect = ({ options, value, onChange, placeholder, isSearchable 
     <div className="relative">
       <div 
         onClick={() => setIsOpen(!isOpen)}
-        className={`w-full bg-white border rounded-2xl px-5 py-3.5 text-sm font-bold text-slate-700 flex items-center justify-between cursor-pointer transition-all ${isOpen ? 'border-indigo-400 ring-4 ring-indigo-500/5' : error ? 'border-rose-400' : 'border-slate-200 hover:border-slate-300 shadow-sm'}`}
+        className={`w-full bg-white border rounded-2xl px-5 py-3.5 text-sm font-bold text-neutral-700 flex items-center justify-between cursor-pointer transition-all ${isOpen ? 'border-primary-400 ring-4 ring-primary-500/5' : error ? 'border-rose-400' : 'border-neutral-200 hover:border-neutral-300 shadow-sm'}`}
       >
-        <span className={!value ? 'text-slate-300' : ''}>{selectedOption ? selectedOption.label : placeholder}</span>
-        <ChevronDown size={16} className={`text-slate-400 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
+        <span className={!value ? 'text-neutral-300' : ''}>{selectedOption ? selectedOption.label : placeholder}</span>
+        <ChevronDown size={16} className={`text-neutral-400 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
       </div>
 
       {isOpen && (
-        <div className="absolute z-[200] top-full mt-2 w-full bg-white border border-slate-100 rounded-[24px] shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+        <div className="absolute z-[200] top-full mt-2 w-full bg-white border border-neutral-100 rounded-xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
           {isSearchable && (
-            <div className="p-3 border-b border-slate-50 bg-slate-50/50">
+            <div className="p-3 border-b border-neutral-50 bg-neutral-50/50">
               <input 
                 autoFocus
-                className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2 text-xs font-bold outline-none focus:border-indigo-400"
+                className="w-full bg-white border border-neutral-200 rounded-xl px-4 py-2 text-xs font-bold outline-none focus:border-primary-400"
                 placeholder="Search..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -239,7 +239,7 @@ const SearchableSelect = ({ options, value, onChange, placeholder, isSearchable 
               <div 
                 key={opt.value}
                 onClick={() => { onChange(opt.value); setIsOpen(false); }}
-                className={`px-4 py-3 rounded-xl text-xs font-bold cursor-pointer mb-1 last:mb-0 ${value === opt.value ? 'bg-indigo-50 text-indigo-600' : 'hover:bg-slate-50'}`}
+                className={`px-4 py-3 rounded-xl text-xs font-bold cursor-pointer mb-1 last:mb-0 ${value === opt.value ? 'bg-primary-50 text-primary-600' : 'hover:bg-neutral-50'}`}
               >
                 {opt.label}
               </div>
@@ -290,22 +290,22 @@ const SearchableTreeSelect = ({ options, value, onChange, placeholder, isSearcha
     <div className="relative">
       <div 
         onClick={() => setIsOpen(!isOpen)}
-        className={`w-full bg-white border rounded-2xl px-5 py-3.5 text-sm font-bold text-slate-700 flex items-center justify-between cursor-pointer transition-all ${isOpen ? 'border-indigo-400 ring-4 ring-indigo-500/5' : error ? 'border-rose-400' : 'border-slate-200 hover:border-slate-300 shadow-sm'}`}
+        className={`w-full bg-white border rounded-2xl px-5 py-3.5 text-sm font-bold text-neutral-700 flex items-center justify-between cursor-pointer transition-all ${isOpen ? 'border-primary-400 ring-4 ring-primary-500/5' : error ? 'border-rose-400' : 'border-neutral-200 hover:border-neutral-300 shadow-sm'}`}
       >
-        <span className={!value ? 'text-slate-300' : ''}>{getDisplayValue()}</span>
-        <ChevronDown size={16} className={`text-slate-400 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
+        <span className={!value ? 'text-neutral-300' : ''}>{getDisplayValue()}</span>
+        <ChevronDown size={16} className={`text-neutral-400 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
       </div>
 
       {isOpen && (
-        <div className="absolute z-[200] top-full mt-2 w-[560px] bg-white border border-slate-100 rounded-[24px] shadow-2xl flex overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 h-[380px]">
-          <div className={`w-[240px] border-r border-slate-100 flex flex-col bg-slate-50/30`}>
+        <div className="absolute z-[200] top-full mt-2 w-[560px] bg-white border border-neutral-100 rounded-xl shadow-2xl flex overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 h-[380px]">
+          <div className={`w-[240px] border-r border-neutral-100 flex flex-col bg-neutral-50/30`}>
             {isSearchable && (
-              <div className="p-4 border-b border-slate-100 bg-white sticky top-0 z-10">
+              <div className="p-4 border-b border-neutral-100 bg-white sticky top-0 z-10">
                 <div className="relative">
-                  <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" />
                   <input 
                     autoFocus
-                    className="w-full bg-slate-50 border border-slate-100 rounded-xl pl-9 pr-4 py-2 text-xs font-bold outline-none focus:border-indigo-400 transition-all"
+                    className="w-full bg-neutral-50 border border-neutral-100 rounded-xl pl-9 pr-4 py-2 text-xs font-bold outline-none focus:border-primary-400 transition-all"
                     placeholder="Search..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
@@ -318,7 +318,7 @@ const SearchableTreeSelect = ({ options, value, onChange, placeholder, isSearcha
                 <div 
                   key={parent.value}
                   onMouseEnter={() => setHoveredParent(parent)}
-                  className={`px-4 py-3 rounded-xl text-xs font-bold cursor-pointer transition-all mb-1 flex items-center justify-between group ${hoveredParent?.value === parent.value ? 'bg-white text-indigo-600 shadow-sm border border-slate-100' : 'text-slate-500 hover:text-slate-900 hover:bg-white/50'}`}
+                  className={`px-4 py-3 rounded-xl text-xs font-bold cursor-pointer transition-all mb-1 flex items-center justify-between group ${hoveredParent?.value === parent.value ? 'bg-white text-primary-600 shadow-sm border border-neutral-100' : 'text-neutral-500 hover:text-neutral-900 hover:bg-white/50'}`}
                 >
                   <span className="truncate pr-2">{parent.label}</span>
                   {parent.children?.length > 0 && <ChevronRight size={14} className={`transition-transform ${hoveredParent?.value === parent.value ? 'translate-x-0.5 opacity-100' : 'opacity-30'}`} />}
@@ -328,8 +328,8 @@ const SearchableTreeSelect = ({ options, value, onChange, placeholder, isSearcha
           </div>
 
           <div className="flex-1 bg-white flex flex-col">
-            <div className="p-4 border-b border-slate-50">
-              <h6 className="text-[10px] font-black text-slate-400">
+            <div className="p-4 border-b border-neutral-50">
+              <h6 className="text-[10px] font-black text-neutral-400">
                 {hoveredParent ? hoveredParent.label : 'Select Category'}
               </h6>
             </div>
@@ -344,15 +344,15 @@ const SearchableTreeSelect = ({ options, value, onChange, placeholder, isSearcha
                         setIsOpen(false);
                         setSearchTerm('');
                       }}
-                      className={`px-4 py-3 rounded-xl text-xs font-bold cursor-pointer transition-all ${value === child.value ? 'bg-indigo-50 text-indigo-600' : 'text-slate-600 hover:bg-slate-50'}`}
+                      className={`px-4 py-3 rounded-xl text-xs font-bold cursor-pointer transition-all ${value === child.value ? 'bg-primary-50 text-primary-600' : 'text-neutral-600 hover:bg-neutral-50'}`}
                     >
                       {child.label}
                     </div>
                   ))}
                 </div>
               ) : (
-                <div className="h-full flex flex-col items-center justify-center text-slate-300 p-8 text-center">
-                  <div className="w-12 h-12 rounded-full bg-slate-50 flex items-center justify-center mb-3">
+                <div className="h-full flex flex-col items-center justify-center text-neutral-300 p-8 text-center">
+                  <div className="w-12 h-12 rounded-full bg-neutral-50 flex items-center justify-center mb-3">
                     <Layers size={20} className="opacity-20" />
                   </div>
                   <p className="text-[10px] font-bold opacity-40">
@@ -495,7 +495,7 @@ const SetupProductModal = ({ isOpen, onClose, onCreate, initialData = {} }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="absolute inset-0 z-[100] flex items-center justify-center p-4 bg-white rounded-[40px] animate-in fade-in duration-300">
+    <div className="absolute inset-0 z-[100] flex items-center justify-center p-4 bg-white rounded-2xl animate-in fade-in duration-300">
       <div className="w-full h-full flex flex-col relative overflow-hidden">
         
         {/* Modal Header */}
@@ -503,15 +503,15 @@ const SetupProductModal = ({ isOpen, onClose, onCreate, initialData = {} }) => {
           <div className="flex items-center gap-4">
             <button 
               onClick={onClose}
-              className="p-2.5 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-full transition-all"
+              className="p-2.5 text-neutral-400 hover:text-neutral-600 hover:bg-neutral-50 rounded-full transition-all"
             >
               <ArrowLeft size={20} />
             </button>
-            <h3 className="text-xl font-bold text-slate-900 font-sans">Setup your product</h3>
+            <h3 className="text-xl font-bold text-neutral-900 font-sans">Setup your product</h3>
           </div>
           <button 
             onClick={onClose}
-            className="p-2.5 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-full transition-all"
+            className="p-2.5 text-neutral-400 hover:text-neutral-600 hover:bg-neutral-50 rounded-full transition-all"
           >
             <X size={20} />
           </button>
@@ -522,34 +522,34 @@ const SetupProductModal = ({ isOpen, onClose, onCreate, initialData = {} }) => {
             
             {/* 1. Basic Info Section */}
             <section className="space-y-6">
-              <div className="flex items-center gap-3 border-b border-slate-100 pb-3">
-                <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 shadow-sm">
+              <div className="flex items-center gap-3 border-b border-neutral-100 pb-3">
+                <div className="w-10 h-10 rounded-xl bg-primary-50 flex items-center justify-center text-primary-600 shadow-sm">
                   <Info size={20} />
                 </div>
                 <div>
-                  <h4 className="text-lg font-bold text-slate-900 font-sans">Basic Info</h4>
-                  <p className="text-[10px] text-slate-400 font-medium font-sans">Core details that help us describe and highlight your product.</p>
+                  <h4 className="text-lg font-bold text-neutral-900 font-sans">Basic Info</h4>
+                  <p className="text-[10px] text-neutral-400 font-medium font-sans">Core details that help us describe and highlight your product.</p>
                 </div>
               </div>
               
               <div className="space-y-8">
                 <div className="grid grid-cols-2 gap-8">
                   <div className="space-y-3">
-                    <label className="text-[11px] font-bold text-slate-400 tracking-tight flex items-center gap-2">
-                      <div className="w-1 h-3 bg-indigo-400 rounded-full" />
+                    <label className="text-[11px] font-bold text-neutral-400 tracking-tight flex items-center gap-2">
+                      <div className="w-1 h-3 bg-primary-400 rounded-full" />
                       Product Name <span className="text-rose-500 font-black">*</span>
                     </label>
                     <input 
                       type="text" 
                       value={productForm.name}
                       onChange={(e) => updateForm('name', e.target.value)}
-                      className={`w-full bg-white border rounded-2xl px-5 py-3.5 text-sm font-bold text-slate-700 focus:ring-4 focus:ring-indigo-500/5 focus:outline-none shadow-sm transition-all ${formErrors.name ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200 focus:border-indigo-400'}`}
+                      className={`w-full bg-white border rounded-2xl px-5 py-3.5 text-sm font-bold text-neutral-700 focus:ring-4 focus:ring-primary-500/5 focus:outline-none shadow-sm transition-all ${formErrors.name ? 'border-rose-400 focus:border-rose-500' : 'border-neutral-200 focus:border-primary-400'}`}
                     />
                     {formErrors.name && <p className="text-[10px] text-rose-500 font-bold mt-1 animate-in slide-in-from-top-1">{formErrors.name}</p>}
                   </div>
                   <div className="space-y-3">
-                    <label className="text-[11px] font-bold text-slate-400 tracking-tight flex items-center gap-2">
-                      <div className="w-1 h-3 bg-indigo-400 rounded-full" />
+                    <label className="text-[11px] font-bold text-neutral-400 tracking-tight flex items-center gap-2">
+                      <div className="w-1 h-3 bg-primary-400 rounded-full" />
                       Product URL <span className="text-rose-500 font-black">*</span>
                     </label>
                     <input 
@@ -557,7 +557,7 @@ const SetupProductModal = ({ isOpen, onClose, onCreate, initialData = {} }) => {
                       value={productForm.url}
                       onChange={(e) => updateForm('url', e.target.value)}
                       placeholder="https://example.com/product"
-                      className={`w-full bg-white border rounded-2xl px-5 py-3.5 text-sm font-bold text-slate-700 focus:ring-4 focus:ring-indigo-500/5 focus:outline-none shadow-sm transition-all ${formErrors.url ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200 focus:border-indigo-400'}`}
+                      className={`w-full bg-white border rounded-2xl px-5 py-3.5 text-sm font-bold text-neutral-700 focus:ring-4 focus:ring-primary-500/5 focus:outline-none shadow-sm transition-all ${formErrors.url ? 'border-rose-400 focus:border-rose-500' : 'border-neutral-200 focus:border-primary-400'}`}
                     />
                     {formErrors.url && <p className="text-[10px] text-rose-500 font-bold mt-1 animate-in slide-in-from-top-1">{formErrors.url}</p>}
                   </div>
@@ -565,8 +565,8 @@ const SetupProductModal = ({ isOpen, onClose, onCreate, initialData = {} }) => {
 
                 <div className="grid grid-cols-12 gap-8 items-start">
                   <div className="col-span-5 space-y-3">
-                    <label className="text-[11px] font-bold text-slate-400 tracking-tight flex items-center gap-2">
-                      <div className="w-1 h-3 bg-indigo-400 rounded-full" />
+                    <label className="text-[11px] font-bold text-neutral-400 tracking-tight flex items-center gap-2">
+                      <div className="w-1 h-3 bg-primary-400 rounded-full" />
                       Category <span className="text-rose-500 font-black">*</span>
                     </label>
                     <SearchableTreeSelect 
@@ -594,8 +594,8 @@ const SetupProductModal = ({ isOpen, onClose, onCreate, initialData = {} }) => {
                     {formErrors.category && <p className="text-[10px] text-rose-500 font-bold mt-1 animate-in slide-in-from-top-1">{formErrors.category}</p>}
                   </div>
                   <div className="col-span-4 space-y-3">
-                    <label className="text-[11px] font-bold text-slate-400 tracking-tight flex items-center gap-2">
-                      <div className="w-1 h-3 bg-indigo-400 rounded-full" />
+                    <label className="text-[11px] font-bold text-neutral-400 tracking-tight flex items-center gap-2">
+                      <div className="w-1 h-3 bg-primary-400 rounded-full" />
                       Price Range
                     </label>
                     <input 
@@ -603,12 +603,12 @@ const SetupProductModal = ({ isOpen, onClose, onCreate, initialData = {} }) => {
                       value={productForm.priceRange}
                       onChange={(e) => updateForm('priceRange', e.target.value)}
                       placeholder="e.g. $10 - $50"
-                      className="w-full bg-white border border-slate-200 rounded-2xl px-5 py-3.5 text-sm font-bold text-slate-700 focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/5 focus:outline-none shadow-sm transition-all"
+                      className="w-full bg-white border border-neutral-200 rounded-2xl px-5 py-3.5 text-sm font-bold text-neutral-700 focus:border-primary-400 focus:ring-4 focus:ring-primary-500/5 focus:outline-none shadow-sm transition-all"
                     />
                   </div>
                   <div className="col-span-3 space-y-3">
-                    <label className="text-[11px] font-bold text-slate-400 tracking-tight flex items-center gap-2">
-                      <div className="w-1 h-3 bg-indigo-400 rounded-full" />
+                    <label className="text-[11px] font-bold text-neutral-400 tracking-tight flex items-center gap-2">
+                      <div className="w-1 h-3 bg-primary-400 rounded-full" />
                       Product Type <span className="text-rose-500 font-black">*</span>
                     </label>
                     <SearchableSelect 
@@ -628,18 +628,18 @@ const SetupProductModal = ({ isOpen, onClose, onCreate, initialData = {} }) => {
                 </div>
 
                 <div className="space-y-3">
-                  <label className="text-[11px] font-bold text-slate-400 tracking-tight flex items-center gap-2">
-                    <div className="w-1 h-3 bg-indigo-400 rounded-full" />
+                  <label className="text-[11px] font-bold text-neutral-400 tracking-tight flex items-center gap-2">
+                    <div className="w-1 h-3 bg-primary-400 rounded-full" />
                     Product Description
                   </label>
                   <div className="relative">
                     <textarea 
-                      className="w-full bg-white border border-slate-200 rounded-2xl px-5 py-4 text-sm font-bold text-slate-700 min-h-[140px] resize-none focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/5 focus:outline-none shadow-sm transition-all"
+                      className="w-full bg-white border border-neutral-200 rounded-2xl px-5 py-4 text-sm font-bold text-neutral-700 min-h-[140px] resize-none focus:border-primary-400 focus:ring-4 focus:ring-primary-500/5 focus:outline-none shadow-sm transition-all"
                       value={productForm.description}
                       onChange={(e) => updateForm('description', e.target.value)}
                     />
-                    <div className="absolute bottom-4 right-5 px-2 py-1 bg-slate-50 border border-slate-100 rounded-md">
-                      <span className="text-[10px] text-slate-400 font-black">{productForm.description.length}/5000</span>
+                    <div className="absolute bottom-4 right-5 px-2 py-1 bg-neutral-50 border border-neutral-100 rounded-md">
+                      <span className="text-[10px] text-neutral-400 font-black">{productForm.description.length}/5000</span>
                     </div>
                   </div>
                 </div>
@@ -648,23 +648,23 @@ const SetupProductModal = ({ isOpen, onClose, onCreate, initialData = {} }) => {
 
             {/* 2. Selling Points (USPs) Section */}
             <section className="space-y-6">
-              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div className="flex items-center justify-between border-b border-neutral-100 pb-3">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600 shadow-sm">
+                  <div className="w-10 h-10 rounded-xl bg-warning-50 flex items-center justify-center text-warning-600 shadow-sm">
                     <Sparkles size={20} />
                   </div>
                   <div>
-                    <h4 className="text-lg font-bold text-slate-900 font-sans">Selling Points (USPs)</h4>
-                    <p className="text-[10px] text-slate-400 font-medium font-sans">Highlight the unique benefits of your product (Max 20).</p>
+                    <h4 className="text-lg font-bold text-neutral-900 font-sans">Selling Points (USPs)</h4>
+                    <p className="text-[10px] text-neutral-400 font-medium font-sans">Highlight the unique benefits of your product (Max 20).</p>
                   </div>
                 </div>
-                <span className="text-xs font-bold text-slate-400">{productForm.usps.length}/20</span>
+                <span className="text-xs font-bold text-neutral-400">{productForm.usps.length}/20</span>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 {productForm.usps.map((usp, i) => (
                   <div key={i} className="flex items-center gap-3 group animate-in fade-in slide-in-from-left-2 duration-300">
                     <div className="flex-1 relative group/input">
-                      <div className="absolute left-4 top-1/2 -translate-y-1/2 w-6 h-6 rounded-md bg-slate-100 border border-slate-200 flex items-center justify-center text-[10px] font-black text-slate-400 group-focus-within/input:bg-amber-100 group-focus-within/input:text-amber-600 transition-all">
+                      <div className="absolute left-4 top-1/2 -translate-y-1/2 w-6 h-6 rounded-md bg-neutral-100 border border-neutral-200 flex items-center justify-center text-[10px] font-black text-neutral-400 group-focus-within/input:bg-warning-100 group-focus-within/input:text-warning-600 transition-all">
                         {i + 1}
                       </div>
                       <input 
@@ -676,7 +676,7 @@ const SetupProductModal = ({ isOpen, onClose, onCreate, initialData = {} }) => {
                           updateForm('usps', newUsps);
                         }}
                         placeholder="e.g., AI Auto Management"
-                        className="w-full bg-white border border-slate-200 rounded-xl pl-12 pr-4 py-3 text-sm font-bold text-slate-700 focus:outline-none focus:border-amber-400 focus:ring-4 focus:ring-amber-500/5 placeholder:text-slate-300 transition-all shadow-sm"
+                        className="w-full bg-white border border-neutral-200 rounded-xl pl-12 pr-4 py-3 text-sm font-bold text-neutral-700 focus:outline-none focus:border-warning-400 focus:ring-4 focus:ring-warning-500/5 placeholder:text-neutral-300 transition-all shadow-sm"
                       />
                     </div>
                     <button 
@@ -684,7 +684,7 @@ const SetupProductModal = ({ isOpen, onClose, onCreate, initialData = {} }) => {
                         const newUsps = productForm.usps.filter((_, idx) => idx !== i);
                         updateForm('usps', newUsps.length > 0 ? newUsps : ['']);
                       }}
-                      className="p-2.5 text-slate-300 hover:text-rose-500 hover:bg-rose-50 rounded-xl transition-all opacity-0 group-hover:opacity-100"
+                      className="p-2.5 text-neutral-300 hover:text-rose-500 hover:bg-rose-50 rounded-xl transition-all opacity-0 group-hover:opacity-100"
                     >
                       <Trash2 size={18} strokeWidth={2.5} />
                     </button>
@@ -693,7 +693,7 @@ const SetupProductModal = ({ isOpen, onClose, onCreate, initialData = {} }) => {
                 {productForm.usps.length < 20 && (
                   <button 
                     onClick={() => updateForm('usps', [...productForm.usps, ''])}
-                    className="flex items-center justify-center gap-2 py-3 border-2 border-dashed border-slate-200 rounded-xl text-slate-400 hover:border-amber-300 hover:text-amber-600 hover:bg-amber-50/30 transition-all text-xs font-black shadow-sm"
+                    className="flex items-center justify-center gap-2 py-3 border-2 border-dashed border-neutral-200 rounded-xl text-neutral-400 hover:border-warning-300 hover:text-warning-600 hover:bg-warning-50/30 transition-all text-xs font-black shadow-sm"
                   >
                     <Plus size={16} strokeWidth={3} /> Add Selling Point
                   </button>
@@ -703,19 +703,19 @@ const SetupProductModal = ({ isOpen, onClose, onCreate, initialData = {} }) => {
 
             {/* 3. Product Positioning Section */}
             <section className="space-y-6">
-              <div className="flex items-center gap-3 border-b border-slate-100 pb-3">
+              <div className="flex items-center gap-3 border-b border-neutral-100 pb-3">
                 <div className="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center text-purple-600 shadow-sm">
                   <Target size={20} />
                 </div>
                 <div>
-                  <h4 className="text-lg font-bold text-slate-900 font-sans">Product Positioning</h4>
-                  <p className="text-[10px] text-slate-400 font-medium font-sans">Define your market stance and core value.</p>
+                  <h4 className="text-lg font-bold text-neutral-900 font-sans">Product Positioning</h4>
+                  <p className="text-[10px] text-neutral-400 font-medium font-sans">Define your market stance and core value.</p>
                 </div>
               </div>
               
               <div className="space-y-8">
                 <div className="space-y-3">
-                  <label className="text-[11px] font-bold text-slate-400 tracking-tight flex items-center gap-2">
+                  <label className="text-[11px] font-bold text-neutral-400 tracking-tight flex items-center gap-2">
                     <div className="w-1 h-3 bg-purple-400 rounded-full" />
                     Product Value Proposition
                   </label>
@@ -729,7 +729,7 @@ const SetupProductModal = ({ isOpen, onClose, onCreate, initialData = {} }) => {
 
                 <div className="grid grid-cols-2 gap-8">
                   <div className="space-y-3">
-                    <label className="text-[11px] font-bold text-slate-400 tracking-tight flex items-center gap-2">
+                    <label className="text-[11px] font-bold text-neutral-400 tracking-tight flex items-center gap-2">
                       <div className="w-1 h-3 bg-purple-400 rounded-full" />
                       Product Feature Keywords
                     </label>
@@ -741,7 +741,7 @@ const SetupProductModal = ({ isOpen, onClose, onCreate, initialData = {} }) => {
                     />
                   </div>
                   <div className="space-y-3">
-                    <label className="text-[11px] font-bold text-slate-400 tracking-tight flex items-center gap-2">
+                    <label className="text-[11px] font-bold text-neutral-400 tracking-tight flex items-center gap-2">
                       <div className="w-1 h-3 bg-purple-400 rounded-full" />
                       Product Usage Scenarios
                     </label>
@@ -756,7 +756,7 @@ const SetupProductModal = ({ isOpen, onClose, onCreate, initialData = {} }) => {
 
                 <div className="grid grid-cols-2 gap-8">
                   <div className="space-y-3">
-                    <label className="text-[11px] font-bold text-slate-400 tracking-tight flex items-center gap-2">
+                    <label className="text-[11px] font-bold text-neutral-400 tracking-tight flex items-center gap-2">
                       <div className="w-1 h-3 bg-purple-400 rounded-full" />
                       Audience Pain Points / Needs
                     </label>
@@ -768,7 +768,7 @@ const SetupProductModal = ({ isOpen, onClose, onCreate, initialData = {} }) => {
                     />
                   </div>
                   <div className="space-y-3">
-                    <label className="text-[11px] font-bold text-slate-400 tracking-tight flex items-center gap-2">
+                    <label className="text-[11px] font-bold text-neutral-400 tracking-tight flex items-center gap-2">
                       <div className="w-1 h-3 bg-purple-400 rounded-full" />
                       User Buying Motivations
                     </label>
@@ -785,24 +785,24 @@ const SetupProductModal = ({ isOpen, onClose, onCreate, initialData = {} }) => {
 
             {/* 4. Audience Profile Section */}
             <section className="space-y-6">
-              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div className="flex items-center justify-between border-b border-neutral-100 pb-3">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600 shadow-sm">
+                  <div className="w-10 h-10 rounded-xl bg-success-50 flex items-center justify-center text-success-600 shadow-sm">
                     <User size={20} />
                   </div>
                   <div>
-                    <h4 className="text-lg font-bold text-slate-900 font-sans">Audience Profile</h4>
-                    <p className="text-[10px] text-slate-400 font-medium font-sans">Describe your ideal target customers.</p>
+                    <h4 className="text-lg font-bold text-neutral-900 font-sans">Audience Profile</h4>
+                    <p className="text-[10px] text-neutral-400 font-medium font-sans">Describe your ideal target customers.</p>
                   </div>
                 </div>
               </div>
 
               <div className="space-y-8">
                 {productForm.audience.map((profile, idx) => (
-                  <div key={profile.id} className="p-10 bg-slate-50/50 border border-slate-100 rounded-[40px] space-y-8 relative group animate-in zoom-in-95 duration-300 hover:bg-white hover:shadow-xl hover:border-emerald-100 transition-all">
+                  <div key={profile.id} className="p-10 bg-neutral-50/50 border border-neutral-100 rounded-2xl space-y-8 relative group animate-in zoom-in-95 duration-300 hover:bg-white hover:shadow-xl hover:border-success-100 transition-all">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-5">
-                        <div className="w-14 h-14 rounded-[20px] bg-emerald-100 flex items-center justify-center text-emerald-600 shadow-inner border border-emerald-200/50">
+                        <div className="w-14 h-14 rounded-2xl bg-success-100 flex items-center justify-center text-success-600 shadow-inner border border-success-200/50">
                           <User size={28} strokeWidth={2.5} />
                         </div>
                         <div className="group/name relative">
@@ -816,12 +816,12 @@ const SetupProductModal = ({ isOpen, onClose, onCreate, initialData = {} }) => {
                                 );
                                 updateForm('audience', newAudience);
                               }}
-                              className="bg-transparent border-none p-0 text-xl font-black text-slate-900 focus:ring-0 outline-none w-auto min-w-[150px]"
+                              className="bg-transparent border-none p-0 text-xl font-black text-neutral-900 focus:ring-0 outline-none w-auto min-w-[150px]"
                               placeholder="Audience Name"
                             />
-                            <Edit2 size={16} className="text-slate-300 group-hover/name:text-emerald-500 transition-colors cursor-pointer" />
+                            <Edit2 size={16} className="text-neutral-300 group-hover/name:text-success-500 transition-colors cursor-pointer" />
                           </div>
-                          <p className="text-xs text-slate-400 font-bold tracking-tight mt-0.5">Set specific targeting rules for this audience</p>
+                          <p className="text-xs text-neutral-400 font-bold tracking-tight mt-0.5">Set specific targeting rules for this audience</p>
                         </div>
                       </div>
                       <button 
@@ -829,7 +829,7 @@ const SetupProductModal = ({ isOpen, onClose, onCreate, initialData = {} }) => {
                           const newAudience = productForm.audience.filter(a => a.id !== profile.id);
                           updateForm('audience', newAudience.length > 0 ? newAudience : [{ id: Date.now(), name: 'Audience Name', age: '', gender: 'All', traits: [] }]);
                         }}
-                        className="p-3 text-slate-300 hover:text-rose-500 hover:bg-rose-50 rounded-2xl transition-all opacity-0 group-hover:opacity-100 border border-transparent hover:border-rose-100"
+                        className="p-3 text-neutral-300 hover:text-rose-500 hover:bg-rose-50 rounded-2xl transition-all opacity-0 group-hover:opacity-100 border border-transparent hover:border-rose-100"
                       >
                         <Trash2 size={20} strokeWidth={2.5} />
                       </button>
@@ -838,8 +838,8 @@ const SetupProductModal = ({ isOpen, onClose, onCreate, initialData = {} }) => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                       <div className="grid grid-cols-2 gap-6">
                         <div className="space-y-3">
-                          <label className="text-[11px] font-bold text-slate-400 tracking-tight flex items-center gap-2">
-                            <div className="w-1 h-3 bg-emerald-400 rounded-full" />
+                          <label className="text-[11px] font-bold text-neutral-400 tracking-tight flex items-center gap-2">
+                            <div className="w-1 h-3 bg-success-400 rounded-full" />
                             Age Range
                           </label>
                           <input 
@@ -852,12 +852,12 @@ const SetupProductModal = ({ isOpen, onClose, onCreate, initialData = {} }) => {
                               updateForm('audience', newAudience);
                             }}
                             placeholder="e.g. 25-45"
-                            className="w-full bg-white border border-slate-200 rounded-2xl px-5 py-3.5 text-sm font-bold text-slate-700 focus:border-emerald-400 focus:ring-4 focus:ring-emerald-500/5 focus:outline-none shadow-sm transition-all"
+                            className="w-full bg-white border border-neutral-200 rounded-2xl px-5 py-3.5 text-sm font-bold text-neutral-700 focus:border-success-400 focus:ring-4 focus:ring-success-500/5 focus:outline-none shadow-sm transition-all"
                           />
                         </div>
                         <div className="space-y-3">
-                          <label className="text-[11px] font-bold text-slate-400 tracking-tight flex items-center gap-2">
-                            <div className="w-1 h-3 bg-emerald-400 rounded-full" />
+                          <label className="text-[11px] font-bold text-neutral-400 tracking-tight flex items-center gap-2">
+                            <div className="w-1 h-3 bg-success-400 rounded-full" />
                             Gender
                           </label>
                           <SearchableSelect 
@@ -881,8 +881,8 @@ const SetupProductModal = ({ isOpen, onClose, onCreate, initialData = {} }) => {
                     </div>
 
                     <div className="space-y-3">
-                      <label className="text-[11px] font-bold text-slate-400 tracking-tight flex items-center gap-2">
-                        <div className="w-1 h-3 bg-emerald-400 rounded-full" />
+                      <label className="text-[11px] font-bold text-neutral-400 tracking-tight flex items-center gap-2">
+                        <div className="w-1 h-3 bg-success-400 rounded-full" />
                         Audience Traits / Interests
                       </label>
                       <TagEditor 
@@ -901,7 +901,7 @@ const SetupProductModal = ({ isOpen, onClose, onCreate, initialData = {} }) => {
                 ))}
                 <button 
                   onClick={() => updateForm('audience', [...productForm.audience, { id: Date.now(), name: 'Audience Name', age: '', gender: 'All', traits: [] }])}
-                  className="w-full py-4 border-2 border-dashed border-slate-200 rounded-[32px] text-slate-400 hover:border-emerald-300 hover:text-emerald-600 hover:bg-emerald-50/30 transition-all text-sm font-black flex items-center justify-center gap-2 shadow-sm"
+                  className="w-full py-4 border-2 border-dashed border-neutral-200 rounded-2xl text-neutral-400 hover:border-success-300 hover:text-success-600 hover:bg-success-50/30 transition-all text-sm font-black flex items-center justify-center gap-2 shadow-sm"
                 >
                   <Plus size={18} strokeWidth={3} /> Add Audience Profile
                 </button>
@@ -910,14 +910,14 @@ const SetupProductModal = ({ isOpen, onClose, onCreate, initialData = {} }) => {
 
             {/* 5. Assets Section */}
             <section className="space-y-10">
-              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div className="flex items-center justify-between border-b border-neutral-100 pb-3">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 shadow-sm">
+                  <div className="w-10 h-10 rounded-xl bg-info-50 flex items-center justify-center text-info-600 shadow-sm">
                     <Layers size={20} />
                   </div>
                   <div>
-                    <h4 className="text-lg font-bold text-slate-900 font-sans">Assets</h4>
-                    <p className="text-[10px] text-slate-400 font-medium font-sans">Upload product images or video assets.</p>
+                    <h4 className="text-lg font-bold text-neutral-900 font-sans">Assets</h4>
+                    <p className="text-[10px] text-neutral-400 font-medium font-sans">Upload product images or video assets.</p>
                   </div>
                 </div>
               </div>
@@ -1138,16 +1138,16 @@ const SetupProductModal = ({ isOpen, onClose, onCreate, initialData = {} }) => {
           </div>
 
           {/* Footer Actions */}
-          <div className="absolute bottom-0 left-0 right-0 p-8 pt-6 flex items-center justify-between border-t border-slate-50 bg-white/90 backdrop-blur-md z-20">
+          <div className="absolute bottom-0 left-0 right-0 p-8 pt-6 flex items-center justify-between border-t border-neutral-50 bg-white/90 backdrop-blur-md z-20">
             <button 
               onClick={onClose}
-              className="px-8 py-3 rounded-2xl text-sm font-bold text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition-all font-sans"
+              className="px-8 py-3 rounded-2xl text-sm font-bold text-neutral-400 hover:text-neutral-600 hover:bg-neutral-50 transition-all font-sans"
             >
               Discard
             </button>
             <button 
               onClick={handleCreate}
-              className="px-12 py-4 bg-indigo-600 text-white rounded-2xl font-bold text-sm hover:bg-indigo-700 shadow-xl shadow-indigo-100 transition-all active:scale-95 font-sans"
+              className="px-12 py-4 bg-primary-600 text-white rounded-2xl font-bold text-sm hover:bg-primary-700 shadow-xl shadow-primary-100 transition-all active:scale-95 font-sans"
             >
               Create product
             </button>

@@ -110,9 +110,9 @@ const AudienceTagsField = ({ channel, levelFormData, setField, helpText }) => {
     return (
       <div className="flex flex-col gap-1.5">
         <div className="flex items-center gap-1.5">
-          <label className="text-xs font-medium text-gray-700">受众标签</label>
+          <label className="text-xs font-medium text-neutral-700">受众标签</label>
           <span title="跨兴趣 / 行为 / 家庭 / 人生事件 / 行业 / 学历 / 收入 / 感情，统一搜索选择。每条按维度分类自动写入对应字段。"
-            className="text-gray-300 cursor-help"><Info size={11} /></span>
+            className="text-neutral-300 cursor-help"><Info size={11} /></span>
         </div>
         <MultiSelect
           value={selected}
@@ -121,7 +121,7 @@ const AudienceTagsField = ({ channel, levelFormData, setField, helpText }) => {
           placeholder="搜索兴趣 / 行为 / 家庭 / 学历 / 收入 ..."
           chipColorByOption={chipColorByOption}
         />
-        <span className="text-[10px] text-gray-300 font-mono truncate">
+        <span className="text-[10px] text-neutral-300 font-mono truncate">
           interests · behaviors · family_statuses · life_events · industries · education_statuses · income · relationship_statuses
         </span>
       </div>
@@ -156,8 +156,8 @@ const AudienceTagsField = ({ channel, levelFormData, setField, helpText }) => {
   return (
     <div className="flex flex-col gap-1.5">
       <div className="flex items-center gap-1.5">
-        <label className="text-xs font-medium text-gray-700">兴趣定向</label>
-        <span title="合并兴趣关键词与兴趣类别两个维度。" className="text-gray-300 cursor-help"><Info size={11} /></span>
+        <label className="text-xs font-medium text-neutral-700">兴趣定向</label>
+        <span title="合并兴趣关键词与兴趣类别两个维度。" className="text-neutral-300 cursor-help"><Info size={11} /></span>
       </div>
       <MultiSelect
         value={selected}
@@ -165,7 +165,7 @@ const AudienceTagsField = ({ channel, levelFormData, setField, helpText }) => {
         options={allOptions}
         placeholder="搜索兴趣关键词 / 类别 ..."
       />
-      <span className="text-[10px] text-gray-300 font-mono truncate">interest_keyword_ids · interest_category_ids</span>
+      <span className="text-[10px] text-neutral-300 font-mono truncate">interest_keyword_ids · interest_category_ids</span>
     </div>
   );
 };

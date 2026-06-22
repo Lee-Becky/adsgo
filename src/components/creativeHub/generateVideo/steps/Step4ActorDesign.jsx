@@ -69,7 +69,7 @@ export default function Step4ActorDesign() {
                     }
                     className="w-full text-left focus:outline-none"
                   >
-                    <div className="aspect-[4/3] bg-gray-100 relative overflow-hidden">
+                    <div className="aspect-[4/3] bg-neutral-100 relative overflow-hidden">
                       <img
                         src={a.cover}
                         alt=""
@@ -100,7 +100,7 @@ export default function Step4ActorDesign() {
                               'inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium',
                               i % 2 === 0
                                 ? 'bg-primary-50 text-primary-600'
-                                : 'bg-gray-100 text-gray-600',
+                                : 'bg-neutral-100 text-neutral-600',
                             )}
                           >
                             {trait}
@@ -129,7 +129,7 @@ export default function Step4ActorDesign() {
             left={
               selectedActorId
                 ? <span className="text-xs text-primary-600 font-medium">已选择演员，点击右侧确认</span>
-                : <span className="text-xs text-gray-400">请从上方选择一位演员</span>
+                : <span className="text-xs text-neutral-400">请从上方选择一位演员</span>
             }
           >
             <BtnPrimary

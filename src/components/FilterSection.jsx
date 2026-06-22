@@ -118,14 +118,14 @@ const FilterSection = () => {
   return (
     <div>
       <div className="flex items-center gap-2 mb-4">
-        <Filter size={18} className="text-gray-500" />
-        <h3 className="font-semibold text-gray-900">Filters</h3>
+        <Filter size={18} className="text-neutral-500" />
+        <h3 className="font-semibold text-neutral-900">Filters</h3>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         {/* Account */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-neutral-700 mb-2">
             Account
           </label>
           <select className="w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none text-sm">
@@ -138,7 +138,7 @@ const FilterSection = () => {
 
         {/* Campaign Status */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-neutral-700 mb-2">
             Campaign Status
           </label>
           <select className="w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none text-sm">
@@ -151,7 +151,7 @@ const FilterSection = () => {
 
         {/* Platform */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-neutral-700 mb-2">
             Platform
           </label>
           <select className="w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none text-sm">
@@ -165,7 +165,7 @@ const FilterSection = () => {
 
         {/* Data Period - Last position */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-neutral-700 mb-2">
             Data Period
           </label>
           <div className="relative">
@@ -174,7 +174,7 @@ const FilterSection = () => {
               className="w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none text-sm text-left flex items-center justify-between"
             >
               <span>{customStartDate && customEndDate ? `${formatDate(customStartDate)} - ${formatDate(customEndDate)}` : dataPeriod}</span>
-              <Calendar size={16} className="text-gray-400" />
+              <Calendar size={16} className="text-neutral-400" />
             </button>
 
             {showCalendar && (
@@ -189,7 +189,7 @@ const FilterSection = () => {
                         className={`px-3 py-2 text-xs rounded-lg text-left transition-colors ${
                           dataPeriod === option.value
                             ? 'bg-primary text-white'
-                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                            : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
                         }`}
                       >
                         {option.label}
@@ -202,17 +202,17 @@ const FilterSection = () => {
                     {/* Calendar Grid */}
                     <div>
                       <div className="flex items-center justify-between mb-2">
-                        <button className="p-1 hover:bg-gray-100 rounded">
+                        <button className="p-1 hover:bg-neutral-100 rounded">
                           <ChevronLeft size={16} />
                         </button>
                         <span className="font-medium text-sm">
                           {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
                         </span>
-                        <button className="p-1 hover:bg-gray-100 rounded">
+                        <button className="p-1 hover:bg-neutral-100 rounded">
                           <ChevronRight size={16} />
                         </button>
                       </div>
-                      <div className="grid grid-cols-7 gap-1 text-center text-xs text-gray-500 mb-1">
+                      <div className="grid grid-cols-7 gap-1 text-center text-xs text-neutral-500 mb-1">
                         <div>Su</div>
                         <div>Mo</div>
                         <div>Tu</div>
@@ -232,7 +232,7 @@ const FilterSection = () => {
                 <div className="flex gap-2 mt-4 pt-4 border-t border-border">
                   <button
                     onClick={() => setShowCalendar(false)}
-                    className="flex-1 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                    className="flex-1 px-4 py-2 text-sm font-medium text-neutral-700 bg-neutral-100 rounded-lg hover:bg-neutral-200 transition-colors"
                   >
                     Cancel
                   </button>

@@ -183,8 +183,8 @@ const Dashboard = ({ selectedBrand, onPageChange, onEditBrandConfig }) => {
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-white rounded-lg shadow-xl border border-gray-200 p-4">
-          <p className="text-xs font-semibold text-gray-600 mb-3 pb-2 border-b border-gray-200">
+        <div className="bg-white rounded-lg shadow-xl border border-neutral-200 p-4">
+          <p className="text-xs font-semibold text-neutral-600 mb-3 pb-2 border-b border-neutral-200">
             {label}
           </p>
           <div className="space-y-2">
@@ -194,8 +194,8 @@ const Dashboard = ({ selectedBrand, onPageChange, onEditBrandConfig }) => {
                   className="w-2 h-2 rounded-full"
                   style={{ backgroundColor: entry.color }}
                 />
-                <span className="text-sm font-medium text-gray-700">{entry.name}:</span>
-                <span className="text-sm font-bold text-gray-900">
+                <span className="text-sm font-medium text-neutral-700">{entry.name}:</span>
+                <span className="text-sm font-bold text-neutral-900">
                   {entry.name === 'Spend' || entry.name === 'CPM' || entry.name === 'Cost/conv.' 
                     ? `$${entry.value}` 
                     : entry.name === 'CTR'
@@ -217,13 +217,13 @@ const Dashboard = ({ selectedBrand, onPageChange, onEditBrandConfig }) => {
 
   return (
     <div className="space-y-6">
-      <div className="bg-white rounded-2xl border border-border shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-6 flex flex-col">
+      <div className="bg-white rounded-2xl border border-neutral-200/80 shadow-sm p-6 flex flex-col transition-shadow duration-normal hover:shadow-md">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-primary/10 rounded-lg">
                   <BarChart3 className="text-primary" size={24} />
                 </div>
-                <h2 className="text-xl font-bold text-gray-900">Ad Performance</h2>
+                <h2 className="text-xl font-bold text-neutral-900">Ad Performance</h2>
               </div>
               
               {/* Data Period Selector */}
@@ -232,10 +232,10 @@ const Dashboard = ({ selectedBrand, onPageChange, onEditBrandConfig }) => {
                   onClick={() => setShowCalendar(!showCalendar)}
                   className="px-4 py-3 border-2 border-border rounded-xl focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-sm text-left flex items-center justify-between bg-white min-w-[280px]"
                 >
-                  <span className="font-medium text-gray-900">
+                  <span className="font-medium text-neutral-900">
                     {customStartDate && customEndDate ? `${formatDate(customStartDate)} - ${formatDate(customEndDate)}` : dataPeriod}
                   </span>
-                  <Calendar size={18} className="text-gray-400" />
+                  <Calendar size={18} className="text-neutral-400" />
                 </button>
 
                 {showCalendar && (
@@ -250,7 +250,7 @@ const Dashboard = ({ selectedBrand, onPageChange, onEditBrandConfig }) => {
                             className={`px-3 py-2.5 text-sm rounded-xl text-left transition-all font-medium ${
                               dataPeriod === option.value
                                 ? 'bg-gradient-to-r from-primary to-primary/80 text-white shadow-md'
-                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
                             }`}
                           >
                             {option.label}
@@ -263,17 +263,17 @@ const Dashboard = ({ selectedBrand, onPageChange, onEditBrandConfig }) => {
                         {/* Calendar Grid */}
                         <div>
                           <div className="flex items-center justify-between mb-3">
-                            <button className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors">
+                            <button className="p-1.5 hover:bg-neutral-100 rounded-lg transition-colors">
                               <ChevronLeft size={18} />
                             </button>
                             <span className="font-semibold text-sm">
                               {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
                             </span>
-                            <button className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors">
+                            <button className="p-1.5 hover:bg-neutral-100 rounded-lg transition-colors">
                               <ChevronRight size={18} />
                             </button>
                           </div>
-                          <div className="grid grid-cols-7 gap-1 text-center text-xs text-gray-500 mb-2 font-medium">
+                          <div className="grid grid-cols-7 gap-1 text-center text-xs text-neutral-500 mb-2 font-medium">
                             <div>Su</div>
                             <div>Mo</div>
                             <div>Tu</div>
@@ -293,7 +293,7 @@ const Dashboard = ({ selectedBrand, onPageChange, onEditBrandConfig }) => {
                     <div className="flex gap-2 mt-4 pt-4 border-t border-border">
                       <button
                         onClick={() => setShowCalendar(false)}
-                        className="flex-1 px-4 py-2.5 text-sm font-medium text-gray-700 bg-gray-100 rounded-xl hover:bg-gray-200 transition-colors"
+                        className="flex-1 px-4 py-2.5 text-sm font-medium text-neutral-700 bg-neutral-100 rounded-xl hover:bg-neutral-200 transition-colors"
                       >
                         Cancel
                       </button>
@@ -318,10 +318,10 @@ const Dashboard = ({ selectedBrand, onPageChange, onEditBrandConfig }) => {
                   <button
                     key={metric.key}
                     onClick={() => handleMetricToggle(metric.key)}
-                    className={`p-4 rounded-xl border-2 transition-all relative overflow-hidden ${
+                    className={`p-4 rounded-xl border-2 transition-all duration-fast relative overflow-hidden cursor-pointer ${
                       isSelected
-                        ? 'border-opacity-100 shadow-lg'
-                        : 'border-border bg-white hover:border-gray-300 hover:shadow-md'
+                        ? 'border-opacity-100 shadow-lg -translate-y-0.5'
+                        : 'border-neutral-200 bg-white hover:border-neutral-300 hover:shadow-md hover:-translate-y-px'
                     }`}
                     style={isSelected ? { 
                       borderColor: metric.color,
@@ -330,8 +330,8 @@ const Dashboard = ({ selectedBrand, onPageChange, onEditBrandConfig }) => {
                     } : {}}
                   >
                     <div className="flex items-start justify-between mb-2">
-                      <p className={`text-xs font-semibold uppercase tracking-wide ${
-                        isSelected ? 'text-gray-700' : 'text-gray-500'
+                      <p className={`text-xs font-semibold tracking-wide ${
+                        isSelected ? 'text-neutral-700' : 'text-neutral-500'
                       }`}>
                         {metric.label}
                       </p>
@@ -340,7 +340,7 @@ const Dashboard = ({ selectedBrand, onPageChange, onEditBrandConfig }) => {
                         style={{ backgroundColor: metric.color }}
                       />
                     </div>
-                    <p className="text-2xl font-bold text-gray-900 leading-tight">{metric.value}</p>
+                    <p className="text-2xl font-bold text-neutral-900 leading-tight">{metric.value}</p>
                     {isSelected && (
                       <div 
                         className="absolute top-3 right-3 w-5 h-5 rounded-full flex items-center justify-center shadow-md"
@@ -355,7 +355,7 @@ const Dashboard = ({ selectedBrand, onPageChange, onEditBrandConfig }) => {
             </div>
 
             {/* Chart using Recharts 鈥?explicit height avoids Recharts width/height -1 in flex layout */}
-            <div className="bg-white rounded-xl border border-gray-200 p-6 h-[320px] min-h-[320px] min-w-0">
+            <div className="bg-white rounded-xl border border-neutral-200 p-6 h-[320px] min-h-[320px] min-w-0">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={performanceChartData}>
                   <defs>
@@ -431,7 +431,7 @@ const Dashboard = ({ selectedBrand, onPageChange, onEditBrandConfig }) => {
                         className="w-3 h-3 rounded-full shadow-sm"
                         style={{ backgroundColor: metric.color }}
                       />
-                      <span className="text-xs font-semibold text-gray-700">{metric.label}</span>
+                      <span className="text-xs font-semibold text-neutral-700">{metric.label}</span>
                     </div>
                   )
                 })}

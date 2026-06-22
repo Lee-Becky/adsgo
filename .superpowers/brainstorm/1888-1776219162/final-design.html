@@ -1,0 +1,143 @@
+<h2>命名策略 · 最终设计方案</h2>
+<p class="subtitle">底部常驻变量库 · 两种状态对比</p>
+
+<div class="split" style="margin-top:24px; gap:28px; align-items:flex-start;">
+
+  <!-- 左：未激活态 -->
+  <div class="mockup" style="flex:1;">
+    <div class="mockup-header">状态一：未激活（页面刚进入）</div>
+    <div class="mockup-body" style="padding:16px; background:#fafbff;">
+
+      <div style="font-size:11px; color:#6b7280; font-weight:500; margin-bottom:10px; display:flex; align-items:center; gap:6px;">
+        广告结构命名策略
+        <span style="display:inline-block; width:14px; height:14px; border-radius:50%; background:#e5e7eb; color:#9ca3af; font-size:9px; text-align:center; line-height:14px;">?</span>
+      </div>
+
+      <!-- Campaign -->
+      <div style="background:white; border:1px solid #e5e7eb; border-radius:8px; padding:12px 14px; margin-bottom:8px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+          <span style="font-size:11px; font-weight:600; color:#374151;">Campaign 命名</span>
+          <span style="font-size:10px; color:#9ca3af;">↺ 历史策略</span>
+        </div>
+        <div style="background:#f9fafb; border:1px solid #e5e7eb; border-radius:5px; padding:5px 10px; font-size:12px; font-family:monospace; color:#374151;">{Brand}-{location}-{date}</div>
+        <div style="font-size:10px; color:#9ca3af; margin-top:5px; font-family:monospace;">预览: <span style="color:#6b7280;">MyBrand-US-20260415</span></div>
+      </div>
+
+      <!-- Adset -->
+      <div style="background:white; border:1px solid #e5e7eb; border-radius:8px; padding:12px 14px; margin-bottom:8px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+          <span style="font-size:11px; font-weight:600; color:#374151;">Adset 命名</span>
+          <span style="font-size:10px; color:#9ca3af;">↺ 历史策略</span>
+        </div>
+        <div style="background:#f9fafb; border:1px solid #e5e7eb; border-radius:5px; padding:5px 10px; font-size:12px; font-family:monospace; color:#374151;">{location}-{audience_type}-{creative_type}-{date}</div>
+        <div style="font-size:10px; color:#9ca3af; margin-top:5px; font-family:monospace;">预览: <span style="color:#6b7280;">US-LAL-Video-20260415</span></div>
+      </div>
+
+      <!-- Ad -->
+      <div style="background:white; border:1px solid #e5e7eb; border-radius:8px; padding:12px 14px; margin-bottom:12px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+          <span style="font-size:11px; font-weight:600; color:#374151;">Ad 命名</span>
+          <span style="font-size:10px; color:#9ca3af;">↺ 历史策略</span>
+        </div>
+        <div style="background:#f9fafb; border:1px solid #e5e7eb; border-radius:5px; padding:5px 10px; font-size:12px; font-family:monospace; color:#374151;">{Brand}-{creative_type}-{number}-{date}</div>
+        <div style="font-size:10px; color:#9ca3af; margin-top:5px; font-family:monospace;">预览: <span style="color:#6b7280;">MyBrand-Video-001-20260415</span></div>
+      </div>
+
+      <!-- 底部变量库：禁用态 -->
+      <div style="background:#f9fafb; border:1.5px dashed #d1d5db; border-radius:8px; padding:10px 14px; opacity:0.7;">
+        <div style="font-size:10px; color:#9ca3af; font-weight:500; margin-bottom:7px; display:flex; align-items:center; gap:4px;">
+          <span>🔒</span>
+          <span>请先点击上方命名框，再选择变量插入</span>
+        </div>
+        <div style="display:flex; flex-wrap:wrap; gap:5px; pointer-events:none;">
+          <span style="background:#f3f4f6; color:#9ca3af; font-size:11px; padding:3px 9px; border-radius:4px; border:1px solid #e5e7eb; cursor:not-allowed;">{Brand}</span>
+          <span style="background:#f3f4f6; color:#9ca3af; font-size:11px; padding:3px 9px; border-radius:4px; border:1px solid #e5e7eb; cursor:not-allowed;">{location}</span>
+          <span style="background:#f3f4f6; color:#9ca3af; font-size:11px; padding:3px 9px; border-radius:4px; border:1px solid #e5e7eb; cursor:not-allowed;">{budget}</span>
+          <span style="background:#f3f4f6; color:#9ca3af; font-size:11px; padding:3px 9px; border-radius:4px; border:1px solid #e5e7eb; cursor:not-allowed;">{device}</span>
+          <span style="background:#f3f4f6; color:#9ca3af; font-size:11px; padding:3px 9px; border-radius:4px; border:1px solid #e5e7eb; cursor:not-allowed;">{date}</span>
+          <span style="background:#f3f4f6; color:#9ca3af; font-size:11px; padding:3px 9px; border-radius:4px; border:1px solid #e5e7eb; cursor:not-allowed;">{goal}</span>
+          <span style="background:#f3f4f6; color:#9ca3af; font-size:11px; padding:3px 9px; border-radius:4px; border:1px solid #e5e7eb; cursor:not-allowed;">{audience_type}</span>
+          <span style="background:#f3f4f6; color:#9ca3af; font-size:11px; padding:3px 9px; border-radius:4px; border:1px solid #e5e7eb; cursor:not-allowed;">{creative_type}</span>
+          <span style="background:#f3f4f6; color:#9ca3af; font-size:11px; padding:3px 9px; border-radius:4px; border:1px solid #e5e7eb; cursor:not-allowed;">{theme}</span>
+          <span style="background:#f3f4f6; color:#9ca3af; font-size:11px; padding:3px 9px; border-radius:4px; border:1px solid #e5e7eb; cursor:not-allowed;">{number}</span>
+          <span style="background:#f3f4f6; color:#9ca3af; font-size:11px; padding:3px 9px; border-radius:4px; border:1px solid #e5e7eb; cursor:not-allowed;">自定义(...)</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 右：激活态（Campaign 被点击） -->
+  <div class="mockup" style="flex:1;">
+    <div class="mockup-header">状态二：Campaign 命名框被激活</div>
+    <div class="mockup-body" style="padding:16px; background:#fafbff;">
+
+      <div style="font-size:11px; color:#6b7280; font-weight:500; margin-bottom:10px; display:flex; align-items:center; gap:6px;">
+        广告结构命名策略
+        <span style="display:inline-block; width:14px; height:14px; border-radius:50%; background:#e5e7eb; color:#9ca3af; font-size:9px; text-align:center; line-height:14px;">?</span>
+      </div>
+
+      <!-- Campaign 激活态 -->
+      <div style="background:white; border:1.5px solid #6366f1; border-radius:8px; padding:12px 14px; margin-bottom:8px; box-shadow:0 0 0 3px rgba(99,102,241,0.08);">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+          <span style="font-size:11px; font-weight:600; color:#4f46e5;">Campaign 命名</span>
+          <span style="font-size:10px; color:#9ca3af;">↺ 历史策略</span>
+        </div>
+        <div style="background:#f5f3ff; border:1.5px solid #6366f1; border-radius:5px; padding:5px 10px; font-size:12px; font-family:monospace; color:#1e1b4b;">{Brand}-{location}-{date}<span style="display:inline-block; width:1.5px; height:12px; background:#6366f1; margin-left:1px; vertical-align:middle;"></span></div>
+        <div style="font-size:10px; color:#9ca3af; margin-top:5px; font-family:monospace;">预览: <span style="color:#6b7280;">MyBrand-US-20260415</span></div>
+      </div>
+
+      <!-- Adset 普通态 -->
+      <div style="background:white; border:1px solid #e5e7eb; border-radius:8px; padding:12px 14px; margin-bottom:8px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+          <span style="font-size:11px; font-weight:600; color:#374151;">Adset 命名</span>
+          <span style="font-size:10px; color:#9ca3af;">↺ 历史策略</span>
+        </div>
+        <div style="background:#f9fafb; border:1px solid #e5e7eb; border-radius:5px; padding:5px 10px; font-size:12px; font-family:monospace; color:#374151;">{location}-{audience_type}-{creative_type}-{date}</div>
+        <div style="font-size:10px; color:#9ca3af; margin-top:5px; font-family:monospace;">预览: <span style="color:#6b7280;">US-LAL-Video-20260415</span></div>
+      </div>
+
+      <!-- Ad 普通态 -->
+      <div style="background:white; border:1px solid #e5e7eb; border-radius:8px; padding:12px 14px; margin-bottom:12px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+          <span style="font-size:11px; font-weight:600; color:#374151;">Ad 命名</span>
+          <span style="font-size:10px; color:#9ca3af;">↺ 历史策略</span>
+        </div>
+        <div style="background:#f9fafb; border:1px solid #e5e7eb; border-radius:5px; padding:5px 10px; font-size:12px; font-family:monospace; color:#374151;">{Brand}-{creative_type}-{number}-{date}</div>
+        <div style="font-size:10px; color:#9ca3af; margin-top:5px; font-family:monospace;">预览: <span style="color:#6b7280;">MyBrand-Video-001-20260415</span></div>
+      </div>
+
+      <!-- 底部变量库：激活态 -->
+      <div style="background:white; border:1.5px solid #e0e7ff; border-radius:8px; padding:10px 14px;">
+        <div style="font-size:10px; color:#6366f1; font-weight:600; margin-bottom:7px; display:flex; align-items:center; gap:4px;">
+          <span style="width:6px; height:6px; background:#6366f1; border-radius:50%; display:inline-block;"></span>
+          插入到：<span style="font-weight:700;">Campaign 命名</span>
+        </div>
+        <div style="display:flex; flex-wrap:wrap; gap:5px;">
+          <span style="background:#ede9fe; color:#5b21b6; font-size:11px; padding:3px 9px; border-radius:4px; cursor:pointer; border:1px solid #ddd6fe;">{Brand}</span>
+          <span style="background:#ede9fe; color:#5b21b6; font-size:11px; padding:3px 9px; border-radius:4px; cursor:pointer; border:1px solid #ddd6fe;">{location}</span>
+          <span style="background:#ede9fe; color:#5b21b6; font-size:11px; padding:3px 9px; border-radius:4px; cursor:pointer; border:1px solid #ddd6fe;">{budget}</span>
+          <span style="background:#ede9fe; color:#5b21b6; font-size:11px; padding:3px 9px; border-radius:4px; cursor:pointer; border:1px solid #ddd6fe;">{device}</span>
+          <span style="background:#ede9fe; color:#5b21b6; font-size:11px; padding:3px 9px; border-radius:4px; cursor:pointer; border:1px solid #ddd6fe;">{date}</span>
+          <span style="background:#ede9fe; color:#5b21b6; font-size:11px; padding:3px 9px; border-radius:4px; cursor:pointer; border:1px solid #ddd6fe;">{goal}</span>
+          <span style="background:#ede9fe; color:#5b21b6; font-size:11px; padding:3px 9px; border-radius:4px; cursor:pointer; border:1px solid #ddd6fe;">{audience_type}</span>
+          <span style="background:#ede9fe; color:#5b21b6; font-size:11px; padding:3px 9px; border-radius:4px; cursor:pointer; border:1px solid #ddd6fe;">{creative_type}</span>
+          <span style="background:#ede9fe; color:#5b21b6; font-size:11px; padding:3px 9px; border-radius:4px; cursor:pointer; border:1px solid #ddd6fe;">{theme}</span>
+          <span style="background:#ede9fe; color:#5b21b6; font-size:11px; padding:3px 9px; border-radius:4px; cursor:pointer; border:1px solid #ddd6fe;">{number}</span>
+          <span style="background:#f3f4f6; color:#6b7280; font-size:11px; padding:3px 9px; border-radius:4px; cursor:pointer; border:1px solid #e5e7eb;">自定义(...)</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<div style="margin-top:24px; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:8px; padding:14px 18px; font-size:12px; color:#166534; line-height:1.7;">
+  <strong>完整交互流程：</strong><br>
+  1. 进入区域 → 底部变量库显示但禁用（灰色虚线边框）<br>
+  2. 点击任意命名输入框 → 该框高亮（紫色边框）→ 变量库激活，提示"插入到：XXX 命名"<br>
+  3. 点击变量标签 → 弹出分隔符选择 → 确认后插入到激活框光标位置<br>
+  4. 切换到另一个命名框 → 激活状态随之迁移，提示文字同步更新<br>
+  5. 点击区域外部 → 激活态取消，变量库回到禁用态
+</div>

@@ -24,24 +24,24 @@ const CampaignAnalysisModal = ({ isOpen, onClose, campaign }) => {
         <div className="p-6 overflow-y-auto max-h-[calc(90vh-80px)]">
           {/* Performance Summary */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-            <div className="bg-green-50 rounded-lg p-4 border border-green-200">
+            <div className="bg-success-50 rounded-lg p-4 border border-success-200">
               <div className="flex items-center gap-2 mb-2">
-                <Target size={18} className="text-green-600" />
-                <span className="font-semibold text-gray-700">ROI</span>
+                <Target size={18} className="text-success-600" />
+                <span className="font-semibold text-neutral-700">ROI</span>
               </div>
-              <p className="text-2xl font-bold text-green-600">{campaign.budgetReason?.metrics?.roi || 3.2}</p>
-              <p className="text-sm text-gray-600 mt-1">
+              <p className="text-2xl font-bold text-success-600">{campaign.budgetReason?.metrics?.roi || 3.2}</p>
+              <p className="text-sm text-neutral-600 mt-1">
                 {campaign.budgetReason?.metrics?.change || '+10%'} vs last week
               </p>
             </div>
 
-            <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
+            <div className="bg-info-50 rounded-lg p-4 border border-info-200">
               <div className="flex items-center gap-2 mb-2">
-                <DollarSign size={18} className="text-blue-600" />
-                <span className="font-semibold text-gray-700">Conversion Cost</span>
+                <DollarSign size={18} className="text-info-600" />
+                <span className="font-semibold text-neutral-700">Conversion Cost</span>
               </div>
-              <p className="text-2xl font-bold text-blue-600">¥{campaign.costPerConversion}</p>
-              <p className="text-sm text-gray-600 mt-1">
+              <p className="text-2xl font-bold text-info-600">¥{campaign.costPerConversion}</p>
+              <p className="text-sm text-neutral-600 mt-1">
                 {campaign.budgetReason?.metrics?.costChange || '-5%'} vs last week
               </p>
             </div>
@@ -49,10 +49,10 @@ const CampaignAnalysisModal = ({ isOpen, onClose, campaign }) => {
             <div className="bg-purple-50 rounded-lg p-4 border border-purple-200">
               <div className="flex items-center gap-2 mb-2">
                 <MousePointer size={18} className="text-purple-600" />
-                <span className="font-semibold text-gray-700">CTR</span>
+                <span className="font-semibold text-neutral-700">CTR</span>
               </div>
               <p className="text-2xl font-bold text-purple-600">{campaign.ctr}%</p>
-              <p className="text-sm text-gray-600 mt-1">
+              <p className="text-sm text-neutral-600 mt-1">
                 {campaign.ctr > 2 ? '+0.3% vs last week' : '-0.2% vs last week'}
               </p>
             </div>
@@ -60,10 +60,10 @@ const CampaignAnalysisModal = ({ isOpen, onClose, campaign }) => {
             <div className="bg-orange-50 rounded-lg p-4 border border-orange-200">
               <div className="flex items-center gap-2 mb-2">
                 <TrendingUp size={18} className="text-orange-600" />
-                <span className="font-semibold text-gray-700">Conversion Rate</span>
+                <span className="font-semibold text-neutral-700">Conversion Rate</span>
               </div>
               <p className="text-2xl font-bold text-orange-600">{campaign.cvr}%</p>
-              <p className="text-sm text-gray-600 mt-1">
+              <p className="text-sm text-neutral-600 mt-1">
                 {campaign.cvr > 3 ? '+0.5% vs last week' : '-0.1% vs last week'}
               </p>
             </div>
@@ -71,17 +71,17 @@ const CampaignAnalysisModal = ({ isOpen, onClose, campaign }) => {
 
           {/* AI Insights */}
           <div className="bg-gradient-to-r from-primary/5 to-purple-500/5 rounded-lg p-5 mb-6 border border-primary/20">
-            <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
+            <h3 className="font-bold text-neutral-900 mb-3 flex items-center gap-2">
               <span className="text-2xl">🤖</span>
               AI Deep Analysis
             </h3>
             <div className="space-y-4">
               <div>
-                <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
-                  <CheckCircle size={16} className="text-green-600" />
+                <h4 className="font-semibold text-neutral-800 mb-2 flex items-center gap-2">
+                  <CheckCircle size={16} className="text-success-600" />
                   Strengths Analysis
                 </h4>
-                <ul className="text-sm text-gray-700 space-y-1 ml-6">
+                <ul className="text-sm text-neutral-700 space-y-1 ml-6">
                   <li>• Conversion cost is 15% below industry average</li>
                   <li>• CTR performance is excellent, ad creative appeal is strong</li>
                   <li>• Audience targeting is precise, conversion rate is high</li>
@@ -90,11 +90,11 @@ const CampaignAnalysisModal = ({ isOpen, onClose, campaign }) => {
               </div>
 
               <div>
-                <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
-                  <AlertTriangle size={16} className="text-yellow-600" />
+                <h4 className="font-semibold text-neutral-800 mb-2 flex items-center gap-2">
+                  <AlertTriangle size={16} className="text-warning-600" />
                   Improvement Suggestions
                 </h4>
-                <ul className="text-sm text-gray-700 space-y-1 ml-6">
+                <ul className="text-sm text-neutral-700 space-y-1 ml-6">
                   <li>• Try increasing ad creative diversity, avoid creative fatigue</li>
                   <li>• Consider expanding new audience segments, expand coverage</li>
                   <li>• Optimize landing page load speed, improve conversion rate</li>
@@ -106,8 +106,8 @@ const CampaignAnalysisModal = ({ isOpen, onClose, campaign }) => {
 
           {/* Performance Trend */}
           <div className="mb-6">
-            <h3 className="font-bold text-gray-900 mb-3">Performance Trends</h3>
-            <div className="bg-gray-50 rounded-lg p-4">
+            <h3 className="font-bold text-neutral-900 mb-3">Performance Trends</h3>
+            <div className="bg-neutral-50 rounded-lg p-4">
               <div className="flex items-end justify-between h-40 gap-2">
                 {[65, 72, 68, 75, 80, 78, 85].map((value, index) => (
                   <div key={index} className="flex-1 flex flex-col items-center">
@@ -115,7 +115,7 @@ const CampaignAnalysisModal = ({ isOpen, onClose, campaign }) => {
                       className="w-full bg-primary rounded-t transition-all hover:bg-primary-hover"
                       style={{ height: `${value}%` }}
                     ></div>
-                    <span className="text-xs text-gray-500 mt-2">Day {index + 1}</span>
+                    <span className="text-xs text-neutral-500 mt-2">Day {index + 1}</span>
                   </div>
                 ))}
               </div>
@@ -124,33 +124,33 @@ const CampaignAnalysisModal = ({ isOpen, onClose, campaign }) => {
 
           {/* Detailed Metrics */}
           <div>
-            <h3 className="font-bold text-gray-900 mb-3">Detailed Metrics</h3>
+            <h3 className="font-bold text-neutral-900 mb-3">Detailed Metrics</h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="bg-white border border-border rounded-lg p-4">
-                <p className="text-sm text-gray-600 mb-1">Total Spend</p>
-                <p className="text-xl font-bold text-gray-900">¥{campaign.spend}</p>
+                <p className="text-sm text-neutral-600 mb-1">Total Spend</p>
+                <p className="text-xl font-bold text-neutral-900">¥{campaign.spend}</p>
               </div>
               <div className="bg-white border border-border rounded-lg p-4">
-                <p className="text-sm text-gray-600 mb-1">Impressions</p>
-                <p className="text-xl font-bold text-gray-900">{campaign.impressions.toLocaleString()}</p>
+                <p className="text-sm text-neutral-600 mb-1">Impressions</p>
+                <p className="text-xl font-bold text-neutral-900">{campaign.impressions.toLocaleString()}</p>
               </div>
               <div className="bg-white border border-border rounded-lg p-4">
-                <p className="text-sm text-gray-600 mb-1">Clicks</p>
-                <p className="text-xl font-bold text-gray-900">{Math.round(campaign.impressions * campaign.ctr / 100).toLocaleString()}</p>
+                <p className="text-sm text-neutral-600 mb-1">Clicks</p>
+                <p className="text-xl font-bold text-neutral-900">{Math.round(campaign.impressions * campaign.ctr / 100).toLocaleString()}</p>
               </div>
               <div className="bg-white border border-border rounded-lg p-4">
-                <p className="text-sm text-gray-600 mb-1">Conversions</p>
-                <p className="text-xl font-bold text-gray-900">{campaign.conversions}</p>
+                <p className="text-sm text-neutral-600 mb-1">Conversions</p>
+                <p className="text-xl font-bold text-neutral-900">{campaign.conversions}</p>
               </div>
             </div>
           </div>
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t border-border bg-gray-50 flex justify-end gap-3">
+        <div className="px-6 py-4 border-t border-border bg-neutral-50 flex justify-end gap-3">
           <button
             onClick={onClose}
-            className="px-4 py-2 text-gray-700 hover:bg-gray-200 rounded-lg transition-colors font-medium"
+            className="px-4 py-2 text-neutral-700 hover:bg-neutral-200 rounded-lg transition-colors font-medium"
           >
             Close
           </button>

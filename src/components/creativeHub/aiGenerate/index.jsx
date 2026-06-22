@@ -567,18 +567,18 @@ export default function AIGenerate() {
       {/* Connect platform modal */}
       {chatConnectModal && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neutral-900/50 backdrop-blur-sm"
           onClick={() => setChatConnectModal(null)}
         >
           <div
             className="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden"
             onClick={e => e.stopPropagation()}
           >
-            <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
-              <h3 className="text-base font-semibold text-gray-900">Connect {chatConnectModal}</h3>
+            <div className="px-5 py-4 border-b border-neutral-100 flex items-center justify-between">
+              <h3 className="text-base font-semibold text-neutral-900">Connect {chatConnectModal}</h3>
               <button
                 onClick={() => setChatConnectModal(null)}
-                className="p-2 hover:bg-gray-100 text-gray-400 rounded-full transition-all"
+                className="p-2 hover:bg-neutral-100 text-neutral-400 rounded-full transition-all"
               >
                 ✕
               </button>
@@ -588,8 +588,8 @@ export default function AIGenerate() {
                 <Sparkles size={28} className="text-primary-500" />
               </div>
               <div>
-                <p className="text-base font-semibold text-gray-900">Connect {chatConnectModal} Account</p>
-                <p className="text-sm text-gray-500 mt-1 leading-relaxed">
+                <p className="text-base font-semibold text-neutral-900">Connect {chatConnectModal} Account</p>
+                <p className="text-sm text-neutral-500 mt-1 leading-relaxed">
                   Sync your product catalog to select products directly from your store.
                 </p>
               </div>
@@ -601,7 +601,7 @@ export default function AIGenerate() {
               </button>
               <button
                 onClick={() => setChatConnectModal(null)}
-                className="w-full px-4 py-2 text-gray-500 text-sm font-medium rounded-full hover:bg-gray-50 transition-all"
+                className="w-full px-4 py-2 text-neutral-500 text-sm font-medium rounded-full hover:bg-neutral-50 transition-all"
               >
                 Cancel
               </button>
@@ -627,7 +627,7 @@ export default function AIGenerate() {
             <div className="w-5 h-5 rounded-full flex items-center justify-center shrink-0" style={{ backgroundColor: '#10B981' }}>
               <span className="text-white text-[10px] font-bold">✓</span>
             </div>
-            <span className="text-gray-700">Creative generated successfully!</span>
+            <span className="text-neutral-700">Creative generated successfully!</span>
           </div>
         </div>
       )}

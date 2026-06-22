@@ -30,10 +30,10 @@ export default function Step1Landing() {
             快速生成高转化电商带货视频
           </span>
 
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 text-center leading-snug">
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-neutral-900 text-center leading-snug">
             开启您的 AI 营销视频生成
           </h1>
-          <p className="text-sm text-gray-600 mt-3 text-center max-w-lg leading-relaxed">
+          <p className="text-sm text-neutral-600 mt-3 text-center max-w-lg leading-relaxed">
             输入商品链接，AI 自动分析商品信息、生成脚本、匹配数字人，一键合成短视频。
           </p>
         </div>
@@ -57,7 +57,7 @@ export default function Step1Landing() {
                     : 'border-[#F0F0F0] hover:border-primary-200',
                 )}
               >
-                <div className="aspect-video bg-gray-100 overflow-hidden">
+                <div className="aspect-video bg-neutral-100 overflow-hidden">
                   <img
                     src={vt.cover}
                     alt=""
@@ -70,8 +70,8 @@ export default function Step1Landing() {
                   </div>
                 )}
                 <div className="p-4">
-                  <div className="text-sm font-bold text-gray-900">{vt.title}</div>
-                  <p className="text-xs text-gray-500 mt-1.5 leading-relaxed">{vt.desc}</p>
+                  <div className="text-sm font-bold text-neutral-900">{vt.title}</div>
+                  <p className="text-xs text-neutral-500 mt-1.5 leading-relaxed">{vt.desc}</p>
                 </div>
                 {/* Bottom accent bar */}
                 <div
@@ -79,7 +79,7 @@ export default function Step1Landing() {
                     'h-1 transition-all duration-300',
                     selected
                       ? 'bg-gradient-to-r from-primary-500 to-primary-400'
-                      : 'bg-gradient-to-r from-gray-200 to-gray-100',
+                      : 'bg-gradient-to-r from-neutral-200 to-neutral-100',
                   )}
                 />
               </button>
@@ -102,10 +102,10 @@ export default function Step1Landing() {
         {/* URL input mode — gradient border wrapper */}
         {inputMode === 'url' ? (
           <div className="w-full max-w-3xl bg-gradient-to-r from-primary-300/50 via-primary-200/30 to-primary-300/50 p-px rounded-2xl">
-            <div className="bg-white rounded-[15px] p-5 sm:p-6">
+            <div className="bg-white rounded-xl p-5 sm:p-6">
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
                 <div className="relative flex-1">
-                  <Link2 className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                  <Link2 className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400 pointer-events-none" />
                   <InputAdsgo
                     value={url}
                     onChange={(e) => dispatch({ type: 'SET_URL', payload: e.target.value })}
@@ -140,7 +140,7 @@ export default function Step1Landing() {
         ) : (
           /* Manual input mode — gradient border wrapper */
           <div className="w-full max-w-3xl bg-gradient-to-r from-primary-300/50 via-primary-200/30 to-primary-300/50 p-px rounded-2xl">
-            <div className="bg-white rounded-[15px] p-5 sm:p-6 space-y-5">
+            <div className="bg-white rounded-xl p-5 sm:p-6 space-y-5">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField label="商品名称">
                   <InputAdsgo
@@ -195,10 +195,10 @@ export default function Step1Landing() {
 
         {/* Video examples */}
         <div className="w-full max-w-4xl mt-14">
-          <div className="border-t border-gray-100 pt-8">
+          <div className="border-t border-neutral-100 pt-8">
             <div className="flex items-center justify-between mb-5">
-              <h3 className="text-base font-semibold text-gray-900">视频案例</h3>
-              <span className="text-xs text-gray-500">看看其他商家用 AI 生成的短视频效果</span>
+              <h3 className="text-base font-semibold text-neutral-900">视频案例</h3>
+              <span className="text-xs text-neutral-500">看看其他商家用 AI 生成的短视频效果</span>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
               {VIDEO_EXAMPLES.map((ex, idx) => (
@@ -211,7 +211,7 @@ export default function Step1Landing() {
                   )}
                   style={{ animationDelay: `${idx * 80}ms` }}
                 >
-                  <div className="relative aspect-[9/16] bg-gray-100">
+                  <div className="relative aspect-[9/16] bg-neutral-100">
                     <img src={ex.thumb} alt={ex.title} className="w-full h-full object-cover" />
                     <div className="absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                       <span className="w-10 h-10 rounded-full bg-white/95 flex items-center justify-center text-primary-600 shadow-lg">
@@ -223,7 +223,7 @@ export default function Step1Landing() {
                     </span>
                   </div>
                   <div className="px-3 py-2">
-                    <p className="text-xs font-medium text-gray-800 truncate">{ex.title}</p>
+                    <p className="text-xs font-medium text-neutral-800 truncate">{ex.title}</p>
                   </div>
                 </div>
               ))}

@@ -61,8 +61,8 @@ export default function SetupChecklist({
   return (
     <div>
       <div className="flex items-center justify-between mb-3">
-        <h4 className="text-sm font-semibold text-gray-900">Complete Your Setup</h4>
-        <span className="text-[10px] text-gray-400 font-medium">
+        <h4 className="text-sm font-semibold text-neutral-900">Complete Your Setup</h4>
+        <span className="text-[10px] text-neutral-400 font-medium">
           {completedCount}/{CHECKLIST_ITEMS.filter(i => i.type === 'toggle').length} enabled
         </span>
       </div>
@@ -90,15 +90,15 @@ export default function SetupChecklist({
           return (
             <div
               key={item.id}
-              className="bg-white rounded-lg border border-gray-200 p-4 hover:border-gray-300 transition-colors"
+              className="bg-white rounded-lg border border-neutral-200 p-4 hover:border-neutral-300 transition-colors"
             >
               <div className="flex items-center gap-2 mb-2">
                 <div className={`w-7 h-7 rounded-md ${item.color} flex items-center justify-center flex-shrink-0`}>
                   <Icon className="w-3.5 h-3.5" />
                 </div>
-                <span className="text-xs font-semibold text-gray-800">{item.title}</span>
+                <span className="text-xs font-semibold text-neutral-800">{item.title}</span>
               </div>
-              <p className="text-xs text-gray-500 leading-relaxed mb-3">{item.description}</p>
+              <p className="text-xs text-neutral-500 leading-relaxed mb-3">{item.description}</p>
               <button
                 onClick={() => {
                   if (item.type === 'toggle') handleToggle(item)

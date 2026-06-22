@@ -18,17 +18,17 @@ const MOCK_LOGS = [
 // Status badge for logs
 const LogStatusBadge = ({ status }) => {
   if (status === 'success') return (
-    <span className="flex items-center gap-1 text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
+    <span className="flex items-center gap-1 text-[10px] font-bold text-success-600 bg-success-50 px-2 py-0.5 rounded-full">
       <CheckCircle2 size={10} /> Success
     </span>
   )
   if (status === 'failed') return (
-    <span className="flex items-center gap-1 text-[10px] font-bold text-red-500 bg-red-50 px-2 py-0.5 rounded-full">
+    <span className="flex items-center gap-1 text-[10px] font-bold text-danger-500 bg-danger-50 px-2 py-0.5 rounded-full">
       <XCircle size={10} /> Failed
     </span>
   )
   return (
-    <span className="flex items-center gap-1 text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">
+    <span className="flex items-center gap-1 text-[10px] font-bold text-warning-600 bg-warning-50 px-2 py-0.5 rounded-full">
       <Loader2 size={10} className="animate-spin" /> Running
     </span>
   )
@@ -124,7 +124,7 @@ const OfflineDataTab = () => {
   const usedPivotKeys = new Set([...pivotRows, ...pivotCols, ...pivotValues].map(f => f.key))
 
   return (
-    <div className="bg-white rounded-[32px] border border-slate-200 shadow-[0_4px_24px_rgba(0,0,0,0.04)] overflow-hidden">
+    <div className="bg-white rounded-2xl border border-neutral-200 shadow-[0_4px_24px_rgba(0,0,0,0.04)] overflow-hidden">
       <div className="flex min-h-[500px]">
         {/* Left sidebar */}
         <DatasetListSidebar
@@ -142,14 +142,14 @@ const OfflineDataTab = () => {
               }}
             >
               <div className="flex items-center gap-2">
-                <HardDrive size={12} className={isActive ? 'text-indigo-500' : 'text-slate-400'} />
-                <p className={`text-xs font-bold truncate ${isActive ? 'text-indigo-700' : 'text-slate-700'}`}>{item.name}</p>
+                <HardDrive size={12} className={isActive ? 'text-primary-500' : 'text-neutral-400'} />
+                <p className={`text-xs font-bold truncate ${isActive ? 'text-primary-700' : 'text-neutral-700'}`}>{item.name}</p>
               </div>
-              <div className="flex items-center gap-3 mt-1 text-[10px] text-slate-400">
+              <div className="flex items-center gap-3 mt-1 text-[10px] text-neutral-400">
                 <span>{item.rowCount.toLocaleString()} rows</span>
                 <span>{item.size}</span>
               </div>
-              <p className="text-[9px] text-slate-300 mt-0.5">{item.uploadDate}</p>
+              <p className="text-[9px] text-neutral-300 mt-0.5">{item.uploadDate}</p>
             </div>
           )}
         />
@@ -159,10 +159,10 @@ const OfflineDataTab = () => {
           {selectedDb ? (
             <>
               {/* Toolbar with content tabs */}
-              <div className="flex items-center justify-between px-6 py-3 border-b border-slate-100">
+              <div className="flex items-center justify-between px-6 py-3 border-b border-neutral-100">
                 <div className="flex items-center gap-4">
                   {/* Content Tabs */}
-                  <div className="flex items-center gap-1 p-0.5 bg-slate-100 rounded-lg">
+                  <div className="flex items-center gap-1 p-0.5 bg-neutral-100 rounded-lg">
                     {CONTENT_TABS.map(tab => {
                       const Icon = tab.icon
                       const isActive = contentTab === tab.key
@@ -172,8 +172,8 @@ const OfflineDataTab = () => {
                           onClick={() => setContentTab(tab.key)}
                           className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[11px] font-bold transition-all ${
                             isActive
-                              ? 'bg-white text-slate-900 shadow-sm'
-                              : 'text-slate-500 hover:text-slate-700'
+                              ? 'bg-white text-neutral-900 shadow-sm'
+                              : 'text-neutral-500 hover:text-neutral-700'
                           }`}
                         >
                           <Icon size={12} />
@@ -182,7 +182,7 @@ const OfflineDataTab = () => {
                       )
                     })}
                   </div>
-                  <span className="text-[11px] font-bold text-slate-500">
+                  <span className="text-[11px] font-bold text-neutral-500">
                     {selectedDb.rowCount.toLocaleString()} rows × {selectedDb.columns.length} cols
                   </span>
                 </div>
@@ -201,25 +201,25 @@ const OfflineDataTab = () => {
               {contentTab === 'views' && (
                 <div className="flex-1 flex overflow-hidden">
                   {/* Left: Available fields */}
-                  <div className="w-48 border-r border-slate-100 p-4 flex flex-col gap-3 overflow-auto">
-                    <h4 className="text-[10px] font-black text-slate-400">Available Fields</h4>
+                  <div className="w-48 border-r border-neutral-100 p-4 flex flex-col gap-3 overflow-auto">
+                    <h4 className="text-[10px] font-black text-neutral-400">Available Fields</h4>
                     <div className="space-y-1.5">
                       {PIVOT_FIELDS.filter(f => !usedPivotKeys.has(f.key)).map(field => (
                         <div
                           key={field.key}
-                          className="flex items-center gap-2 px-2.5 py-2 bg-slate-50 rounded-lg border border-slate-100 cursor-grab hover:border-indigo-200 hover:bg-indigo-50/30 transition-all group"
+                          className="flex items-center gap-2 px-2.5 py-2 bg-neutral-50 rounded-lg border border-neutral-100 cursor-grab hover:border-primary-200 hover:bg-primary-50/30 transition-all group"
                         >
-                          <GripVertical size={10} className="text-slate-300 group-hover:text-indigo-400" />
-                          <span className="text-[11px] font-bold text-slate-700 flex-1">{field.label}</span>
+                          <GripVertical size={10} className="text-neutral-300 group-hover:text-primary-400" />
+                          <span className="text-[11px] font-bold text-neutral-700 flex-1">{field.label}</span>
                           <div className="flex gap-0.5">
                             <button
                               onClick={() => addToPivotZone(field, 'rows')}
-                              className="px-1.5 py-0.5 text-[8px] font-bold text-blue-600 bg-blue-50 rounded hover:bg-blue-100"
+                              className="px-1.5 py-0.5 text-[8px] font-bold text-info-600 bg-info-50 rounded hover:bg-info-100"
                               title="Add to Rows"
                             >R</button>
                             <button
                               onClick={() => addToPivotZone(field, 'cols')}
-                              className="px-1.5 py-0.5 text-[8px] font-bold text-emerald-600 bg-emerald-50 rounded hover:bg-emerald-100"
+                              className="px-1.5 py-0.5 text-[8px] font-bold text-success-600 bg-success-50 rounded hover:bg-success-100"
                               title="Add to Columns"
                             >C</button>
                             <button
@@ -231,24 +231,24 @@ const OfflineDataTab = () => {
                         </div>
                       ))}
                       {PIVOT_FIELDS.filter(f => !usedPivotKeys.has(f.key)).length === 0 && (
-                        <p className="text-[10px] text-slate-400 italic">All fields assigned</p>
+                        <p className="text-[10px] text-neutral-400 italic">All fields assigned</p>
                       )}
                     </div>
                   </div>
 
                   {/* Right: Drop zones */}
                   <div className="flex-1 p-5 space-y-4 overflow-auto">
-                    <p className="text-[11px] text-slate-400">Configure a pivot view by assigning fields to Rows, Columns, and Values zones.</p>
+                    <p className="text-[11px] text-neutral-400">Configure a pivot view by assigning fields to Rows, Columns, and Values zones.</p>
 
                     {/* Row zone */}
                     <div>
-                      <h4 className="text-[10px] font-black text-blue-500 mb-2">Rows</h4>
-                      <div className="min-h-[48px] border-2 border-dashed border-blue-200 rounded-xl p-2 flex flex-wrap gap-1.5 bg-blue-50/30">
-                        {pivotRows.length === 0 && <span className="text-[10px] text-blue-300 italic m-auto">Drop dimension fields here</span>}
+                      <h4 className="text-[10px] font-black text-info-500 mb-2">Rows</h4>
+                      <div className="min-h-[48px] border-2 border-dashed border-info-200 rounded-xl p-2 flex flex-wrap gap-1.5 bg-info-50/30">
+                        {pivotRows.length === 0 && <span className="text-[10px] text-info-300 italic m-auto">Drop dimension fields here</span>}
                         {pivotRows.map(f => (
-                          <span key={f.key} className="flex items-center gap-1 px-2.5 py-1 text-[10px] font-bold bg-blue-100 text-blue-700 rounded-md">
+                          <span key={f.key} className="flex items-center gap-1 px-2.5 py-1 text-[10px] font-bold bg-info-100 text-info-700 rounded-md">
                             {f.label}
-                            <button onClick={() => removeFromPivot(f.key, 'rows')} className="hover:text-red-500">×</button>
+                            <button onClick={() => removeFromPivot(f.key, 'rows')} className="hover:text-danger-500">×</button>
                           </span>
                         ))}
                       </div>
@@ -256,13 +256,13 @@ const OfflineDataTab = () => {
 
                     {/* Column zone */}
                     <div>
-                      <h4 className="text-[10px] font-black text-emerald-500 mb-2">Columns</h4>
-                      <div className="min-h-[48px] border-2 border-dashed border-emerald-200 rounded-xl p-2 flex flex-wrap gap-1.5 bg-emerald-50/30">
-                        {pivotCols.length === 0 && <span className="text-[10px] text-emerald-300 italic m-auto">Drop dimension fields here</span>}
+                      <h4 className="text-[10px] font-black text-success-500 mb-2">Columns</h4>
+                      <div className="min-h-[48px] border-2 border-dashed border-success-200 rounded-xl p-2 flex flex-wrap gap-1.5 bg-success-50/30">
+                        {pivotCols.length === 0 && <span className="text-[10px] text-success-300 italic m-auto">Drop dimension fields here</span>}
                         {pivotCols.map(f => (
-                          <span key={f.key} className="flex items-center gap-1 px-2.5 py-1 text-[10px] font-bold bg-emerald-100 text-emerald-700 rounded-md">
+                          <span key={f.key} className="flex items-center gap-1 px-2.5 py-1 text-[10px] font-bold bg-success-100 text-success-700 rounded-md">
                             {f.label}
-                            <button onClick={() => removeFromPivot(f.key, 'cols')} className="hover:text-red-500">×</button>
+                            <button onClick={() => removeFromPivot(f.key, 'cols')} className="hover:text-danger-500">×</button>
                           </span>
                         ))}
                       </div>
@@ -276,7 +276,7 @@ const OfflineDataTab = () => {
                         {pivotValues.map(f => (
                           <span key={f.key} className="flex items-center gap-1 px-2.5 py-1 text-[10px] font-bold bg-violet-100 text-violet-700 rounded-md">
                             {f.label}
-                            <button onClick={() => removeFromPivot(f.key, 'values')} className="hover:text-red-500">×</button>
+                            <button onClick={() => removeFromPivot(f.key, 'values')} className="hover:text-danger-500">×</button>
                           </span>
                         ))}
                       </div>
@@ -284,15 +284,15 @@ const OfflineDataTab = () => {
 
                     {/* Pivot preview placeholder */}
                     {(pivotRows.length > 0 || pivotCols.length > 0) && pivotValues.length > 0 && (
-                      <div className="mt-4 p-4 bg-slate-50 rounded-xl border border-slate-200">
-                        <h4 className="text-[10px] font-black text-slate-500 mb-2">Preview</h4>
-                        <p className="text-[11px] text-slate-400">
+                      <div className="mt-4 p-4 bg-neutral-50 rounded-xl border border-neutral-200">
+                        <h4 className="text-[10px] font-black text-neutral-500 mb-2">Preview</h4>
+                        <p className="text-[11px] text-neutral-400">
                           Rows: {pivotRows.map(f => f.label).join(', ') || '—'} &nbsp;|&nbsp;
                           Columns: {pivotCols.map(f => f.label).join(', ') || '—'} &nbsp;|&nbsp;
                           Values: {pivotValues.map(f => f.label).join(', ')}
                         </p>
-                        <div className="mt-3 bg-white rounded-lg border border-slate-200 p-3">
-                          <p className="text-[10px] text-slate-300 italic text-center py-4">Pivot table preview will render here when connected to live data</p>
+                        <div className="mt-3 bg-white rounded-lg border border-neutral-200 p-3">
+                          <p className="text-[10px] text-neutral-300 italic text-center py-4">Pivot table preview will render here when connected to live data</p>
                         </div>
                       </div>
                     )}
@@ -304,10 +304,10 @@ const OfflineDataTab = () => {
                 <div className="flex-1 overflow-auto p-5">
                   <div className="space-y-2">
                     {MOCK_LOGS.map(log => (
-                      <div key={log.id} className="flex items-center gap-4 px-4 py-3 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors">
-                        <span className="text-[11px] font-mono text-slate-400 w-36 flex-shrink-0">{log.time}</span>
-                        <span className="text-[11px] font-black text-slate-600 w-20 flex-shrink-0">{log.type}</span>
-                        <span className="text-[11px] font-medium text-slate-600 flex-1 truncate">{log.detail}</span>
+                      <div key={log.id} className="flex items-center gap-4 px-4 py-3 bg-neutral-50 rounded-xl hover:bg-neutral-100 transition-colors">
+                        <span className="text-[11px] font-mono text-neutral-400 w-36 flex-shrink-0">{log.time}</span>
+                        <span className="text-[11px] font-black text-neutral-600 w-20 flex-shrink-0">{log.type}</span>
+                        <span className="text-[11px] font-medium text-neutral-600 flex-1 truncate">{log.detail}</span>
                         <LogStatusBadge status={log.status} />
                       </div>
                     ))}
@@ -316,13 +316,13 @@ const OfflineDataTab = () => {
               )}
             </>
           ) : (
-            <div className="flex-1 flex flex-col items-center justify-center text-slate-400 py-16">
-              <FileSpreadsheet size={40} className="text-slate-200 mb-4" />
-              <p className="text-sm font-bold text-slate-500 mb-1">No database selected</p>
-              <p className="text-xs text-slate-400 mb-4">Create a new database to get started</p>
+            <div className="flex-1 flex flex-col items-center justify-center text-neutral-400 py-16">
+              <FileSpreadsheet size={40} className="text-neutral-200 mb-4" />
+              <p className="text-sm font-bold text-neutral-500 mb-1">No database selected</p>
+              <p className="text-xs text-neutral-400 mb-4">Create a new database to get started</p>
               <button
                 onClick={() => setShowUploadModal(true)}
-                className="px-5 py-2.5 text-xs font-bold text-white bg-slate-900 rounded-xl hover:bg-slate-800 transition-all flex items-center gap-2"
+                className="px-5 py-2.5 text-xs font-bold text-white bg-neutral-900 rounded-xl hover:bg-neutral-800 transition-all flex items-center gap-2"
               >
                 <Upload size={14} />
                 New Database
@@ -337,19 +337,19 @@ const OfflineDataTab = () => {
         <>
           <div className="fixed inset-0 z-[9998]" onClick={() => setContextMenu(null)} />
           <div
-            className="fixed z-[9999] bg-white rounded-xl shadow-xl border border-slate-100 py-2 min-w-[140px]"
+            className="fixed z-[9999] bg-white rounded-xl shadow-xl border border-neutral-100 py-2 min-w-[140px]"
             style={{ left: contextMenu.x, top: contextMenu.y }}
           >
             <button
               onClick={() => handleRename(contextMenu.id)}
-              className="w-full flex items-center gap-2 px-4 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
+              className="w-full flex items-center gap-2 px-4 py-2 text-xs font-medium text-neutral-700 hover:bg-neutral-50"
             >
               <Edit3 size={12} />
               Rename
             </button>
             <button
               onClick={() => handleDelete(contextMenu.id)}
-              className="w-full flex items-center gap-2 px-4 py-2 text-xs font-medium text-red-500 hover:bg-red-50"
+              className="w-full flex items-center gap-2 px-4 py-2 text-xs font-medium text-danger-500 hover:bg-danger-50"
             >
               <Trash2 size={12} />
               Delete
@@ -360,34 +360,34 @@ const OfflineDataTab = () => {
 
       {/* Upload progress floating panel */}
       {uploadProgress && (
-        <div className="fixed top-4 right-4 z-[9990] w-72 bg-white rounded-2xl shadow-2xl border border-slate-200 p-4">
+        <div className="fixed top-4 right-4 z-[9990] w-72 bg-white rounded-2xl shadow-2xl border border-neutral-200 p-4">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-[11px] font-black text-slate-700">Upload Progress</span>
+            <span className="text-[11px] font-black text-neutral-700">Upload Progress</span>
             <button
               onClick={() => setUploadProgress(null)}
-              className="p-0.5 hover:bg-slate-100 rounded"
+              className="p-0.5 hover:bg-neutral-100 rounded"
             >
-              <X size={12} className="text-slate-400" />
+              <X size={12} className="text-neutral-400" />
             </button>
           </div>
           <div className="flex items-center gap-2 mb-2">
-            <FileSpreadsheet size={14} className="text-slate-400 flex-shrink-0" />
-            <span className="text-[11px] font-medium text-slate-600 truncate">{uploadProgress.fileName}</span>
+            <FileSpreadsheet size={14} className="text-neutral-400 flex-shrink-0" />
+            <span className="text-[11px] font-medium text-neutral-600 truncate">{uploadProgress.fileName}</span>
           </div>
           {/* Progress bar */}
-          <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+          <div className="w-full bg-neutral-100 rounded-full h-2 overflow-hidden">
             <div
               className={`h-full rounded-full transition-all duration-300 ${
-                uploadProgress.status === 'failed' ? 'bg-red-500' :
-                uploadProgress.status === 'done' ? 'bg-emerald-500' : 'bg-indigo-500'
+                uploadProgress.status === 'failed' ? 'bg-danger-500' :
+                uploadProgress.status === 'done' ? 'bg-success-500' : 'bg-primary-500'
               }`}
               style={{ width: `${uploadProgress.progress}%` }}
             />
           </div>
           <div className="flex items-center justify-between mt-2">
             <span className={`text-[10px] font-bold ${
-              uploadProgress.status === 'failed' ? 'text-red-500' :
-              uploadProgress.status === 'done' ? 'text-emerald-600' : 'text-indigo-600'
+              uploadProgress.status === 'failed' ? 'text-danger-500' :
+              uploadProgress.status === 'done' ? 'text-success-600' : 'text-primary-600'
             }`}>
               {uploadProgress.status === 'running' && `${Math.floor(uploadProgress.progress)}%`}
               {uploadProgress.status === 'done' && 'Complete'}
@@ -395,14 +395,14 @@ const OfflineDataTab = () => {
             </span>
             <div className="flex items-center gap-1.5">
               {uploadProgress.status === 'failed' && (
-                <button className="text-[10px] font-bold text-indigo-600 hover:text-indigo-700 flex items-center gap-0.5">
+                <button className="text-[10px] font-bold text-primary-600 hover:text-primary-700 flex items-center gap-0.5">
                   <RefreshCw size={10} /> Retry
                 </button>
               )}
               {uploadProgress.status === 'running' && (
                 <button
                   onClick={() => setUploadProgress(prev => prev ? { ...prev, status: 'failed' } : null)}
-                  className="text-[10px] font-bold text-red-500 hover:text-red-600"
+                  className="text-[10px] font-bold text-danger-500 hover:text-danger-600"
                 >
                   Cancel
                 </button>

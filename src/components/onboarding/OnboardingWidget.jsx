@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { useNavigate, useLocation } from 'react-router-dom'
+import { useNavigate, useLocation, useParams } from 'react-router-dom'
 import {
   Compass, Megaphone, Target, TrendingUp, Sparkles, Palette, CalendarDays,
   ChevronRight, ChevronDown, ChevronUp, X, Check, CircleCheck, Lock, PartyPopper,
@@ -19,7 +19,7 @@ const STEPS = [
       '智能匹配目标受众，精准触达潜在客户',
     ],
     ctaText: '立即创建Campaign',
-    route: '/batchGenerateAds',
+    route: 'create/campaign-gen',
     icon: Megaphone,
   },
   {
@@ -31,7 +31,7 @@ const STEPS = [
       '选择投放市场和平台，精准定位你的目标',
     ],
     ctaText: '去配置目标',
-    route: '/brandCenter/optimizeGoals',
+    route: 'settings/goals',
     icon: Target,
   },
   {
@@ -43,7 +43,7 @@ const STEPS = [
       '7×24h自动执行，无需人工干预',
     ],
     ctaText: '去开启任一自动优化',
-    route: '/aiOptimize/adManagerV3',
+    route: 'ads/campaigns',
     icon: TrendingUp,
   },
   {
@@ -55,7 +55,7 @@ const STEPS = [
       '全自动执行，始终保持投放竞争力',
     ],
     ctaText: '去查看自动发布',
-    route: '/aiOptimize/autoRegeneration',
+    route: 'create/draft',
     icon: Sparkles,
   },
   {
@@ -67,8 +67,8 @@ const STEPS = [
       '持续补充新素材，规避创意疲劳',
     ],
     ctaText: '去查看创意入口',
-    route: '/creativeHub/creativeLibrary',
-    tourScope: '/creativeHub',
+    route: 'creative/library',
+    tourScope: 'creative/',
     icon: Palette,
   },
   {
@@ -80,7 +80,7 @@ const STEPS = [
       '了解3阶段成长曲线，合理设定投放预期',
     ],
     ctaText: '去查看 Media Plan',
-    route: '/mediaPlan',
+    route: 'plan/media-plan',
     icon: CalendarDays,
   },
 ]
@@ -95,7 +95,17 @@ export default function OnboardingWidget({
 }) {
   const navigate = useNavigate()
   const location = useLocation()
+  const { brandId } = useParams()
   const { startTour, activeTourStep, endTour } = useOnboardingContext()
+
+  // Build full workspace path from relative route
+  const buildPath = (relativePath) => {
+    const bid = brandId || 'default'
+    return `/workspace/${encodeURIComponent(bid)}/${relativePath}`
+  }
+
+  // Extract workspace-relative path from current location
+  const workspacePath = location.pathname.replace(/^\/workspace\/[^/]+\//, '')
   const activeTourStepRef = useRef(activeTourStep)
   useEffect(() => { activeTourStepRef.current = activeTourStep }, [activeTourStep])
   const { hasSeen, markSeen } = useTourSeen()
@@ -131,10 +141,10 @@ export default function OnboardingWidget({
     if (step === null || step === undefined) return
     const scope = STEPS[step]?.tourScope || STEPS[step]?.route
     if (!scope) return
-    if (!location.pathname.startsWith(scope)) {
+    if (!workspacePath.startsWith(scope)) {
       endTour()
     }
-  }, [location.pathname, endTour])
+  }, [workspacePath, endTour])
 
   // Mutex with other floating panels (e.g. SupportBubble): when another panel opens,
   // collapse this one; when this one expands, dispatch so the other one closes.
@@ -170,45 +180,42 @@ export default function OnboardingWidget({
   }, [isExpanded, isClosing])
 
   // First-visit auto-trigger: when a new user lands on an onboarding page directly
-  // (not via the Getting Started CTA), run that step's tour once. Completion state
-  // is not touched here — step progression is governed by useOnboardingState's
-  // ordering rules (the visit-based auto-completes below will only apply to the
-  // user's current step thanks to markStepCompleted's sequential guard).
+  // (not via the Getting Started CTA), run that step's tour once.
   useEffect(() => {
     if (activeTourStep !== null) return
     const idx = STEPS.findIndex(s => {
       const scope = s.tourScope || s.route
-      return scope && location.pathname.startsWith(scope)
+      return scope && workspacePath.startsWith(scope)
     })
     if (idx < 0) return
     if (hasSeen(idx)) return
     markSeen(idx)
     startTour(idx)
-  }, [location.pathname, activeTourStep, hasSeen, markSeen, startTour])
+  }, [workspacePath, activeTourStep, hasSeen, markSeen, startTour])
 
-  // Step 4: visiting autoRegeneration page means user has learned the button location
+  // Step 4: visiting draft page means user has learned the auto-publish location
   useEffect(() => {
     if (activeTourStep !== null) return
-    if (location.pathname.includes('/autoRegeneration')) {
+    if (workspacePath === 'create/draft') {
       markStepCompleted(3)
     }
-  }, [location.pathname, markStepCompleted, activeTourStep])
+  }, [workspacePath, markStepCompleted, activeTourStep])
 
   // Step 5: visiting creative pages means user has learned upload/AI generation entry
   useEffect(() => {
     if (activeTourStep !== null) return
-    if (location.pathname.includes('/aiGenerate') || location.pathname.includes('/creativeLibrary')) {
+    if (workspacePath === 'creative/ai-gen' || workspacePath === 'creative/library') {
       markStepCompleted(4)
     }
-  }, [location.pathname, markStepCompleted, activeTourStep])
+  }, [workspacePath, markStepCompleted, activeTourStep])
 
   // Step 6: visiting mediaPlan means user has learned the media plan overview
   useEffect(() => {
     if (activeTourStep !== null) return
-    if (location.pathname === '/mediaPlan') {
+    if (workspacePath === 'plan/media-plan') {
       markStepCompleted(5)
     }
-  }, [location.pathname, markStepCompleted, activeTourStep])
+  }, [workspacePath, markStepCompleted, activeTourStep])
 
   // Auto-expand to first incomplete step
   useEffect(() => {
@@ -230,7 +237,7 @@ export default function OnboardingWidget({
 
   const handleCTAClick = (index) => {
     markSeen(index)
-    navigate(STEPS[index].route)
+    navigate(buildPath(STEPS[index].route))
     startTour(index)
     handleClose()
   }
@@ -274,15 +281,15 @@ export default function OnboardingWidget({
     }
     if (isStepLocked(index)) {
       return (
-        <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
-          <Lock className="w-3 h-3 text-gray-300" />
+        <div className="w-6 h-6 rounded-full bg-neutral-100 flex items-center justify-center flex-shrink-0">
+          <Lock className="w-3 h-3 text-neutral-300" />
         </div>
       )
     }
     const isActive = expandedStep === index
     return (
       <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold transition-all duration-200 ${
-        isActive ? 'bg-primary text-white ring-2 ring-primary/20' : 'bg-gray-200 text-gray-500'
+        isActive ? 'bg-primary text-white ring-2 ring-primary/20' : 'bg-neutral-200 text-neutral-500'
       }`}>
         {index + 1}
       </div>
@@ -295,13 +302,13 @@ export default function OnboardingWidget({
 
     return (
       <div className="mt-2.5 ml-9 animate-step-enter">
-        <p className="text-xs text-gray-500 leading-relaxed mb-2">{step.description}</p>
+        <p className="text-xs text-neutral-500 leading-relaxed mb-2">{step.description}</p>
 
         <div className="mb-3 space-y-1.5">
           {step.highlights.map((text, i) => (
             <div key={i} className="flex items-start gap-1.5">
               <CircleCheck className="w-3 h-3 text-emerald-500 mt-0.5 flex-shrink-0" />
-              <span className="text-[11px] text-gray-600 leading-relaxed">{text}</span>
+              <span className="text-[11px] text-neutral-600 leading-relaxed">{text}</span>
             </div>
           ))}
         </div>
@@ -318,7 +325,7 @@ export default function OnboardingWidget({
             {index === 2 && (
               <button
                 onClick={handleAcknowledgeStep3}
-                className="w-full text-xs font-medium text-gray-500 hover:text-gray-700 transition-colors"
+                className="w-full text-xs font-medium text-neutral-500 hover:text-neutral-700 transition-colors"
               >
                 已了解功能，暂不需要
               </button>
@@ -334,7 +341,7 @@ export default function OnboardingWidget({
             </div>
             <button
               onClick={() => handleCTAClick(index)}
-              className="text-[11px] text-gray-400 hover:text-primary transition-colors"
+              className="text-[11px] text-neutral-400 hover:text-primary transition-colors"
             >
               重新查看引导
             </button>
@@ -354,18 +361,18 @@ export default function OnboardingWidget({
           }`}
           style={{ zIndex: Z_INDEX.FLOATING_ACTION }}
         >
-          <div className="rounded-xl shadow-xl border border-[#F0F0F0] bg-white overflow-hidden max-h-[80vh] flex flex-col">
+          <div className="rounded-xl shadow-xl border border-neutral-200 bg-white overflow-hidden max-h-[80vh] flex flex-col">
             {/* Header */}
-            <div className="px-4 py-3 bg-gradient-to-r from-primary-50 to-purple-50 border-b border-border flex items-center justify-between flex-shrink-0">
+            <div className="px-4 py-3 bg-gradient-to-r from-primary-50 to-primary-100/50 border-b border-neutral-200 flex items-center justify-between flex-shrink-0">
               <div className="flex items-center gap-2">
                 <Compass className="w-4 h-4 text-primary" />
-                <span className="text-sm font-semibold text-gray-900">Getting Started</span>
+                <span className="text-sm font-semibold text-neutral-900">Getting Started</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-xs text-gray-500">{completedCount}/{totalSteps}</span>
+                <span className="text-xs text-neutral-500">{completedCount}/{totalSteps}</span>
                 <button
                   onClick={handleClose}
-                  className="p-0.5 rounded hover:bg-white/60 text-gray-400 hover:text-gray-600 transition-colors"
+                  className="p-0.5 rounded hover:bg-white/60 text-neutral-400 hover:text-neutral-600 transition-colors"
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
@@ -379,7 +386,7 @@ export default function OnboardingWidget({
                   <div
                     key={i}
                     className={`h-1 flex-1 rounded-full transition-all duration-500 ${
-                      completedSteps.includes(i) ? 'bg-primary' : 'bg-gray-200'
+                      completedSteps.includes(i) ? 'bg-primary' : 'bg-neutral-200'
                     }`}
                   />
                 ))}
@@ -398,33 +405,33 @@ export default function OnboardingWidget({
                       onClick={() => toggleStepExpand(index)}
                       disabled={locked}
                       className={`w-full flex items-center gap-2.5 py-2 text-left rounded-lg px-1 transition-colors ${
-                        locked ? 'cursor-not-allowed opacity-50' : 'hover:bg-gray-50'
+                        locked ? 'cursor-not-allowed opacity-50' : 'hover:bg-neutral-50'
                       }`}
                     >
                       {renderStepIndicator(index)}
                       <span className={`text-xs font-medium flex-1 ${
                         isStepCompleted(index)
-                          ? 'text-gray-900'
+                          ? 'text-neutral-900'
                           : expandedStep === index
-                            ? 'text-gray-900'
+                            ? 'text-neutral-900'
                             : locked
-                              ? 'text-gray-300'
-                              : 'text-gray-400'
+                              ? 'text-neutral-300'
+                              : 'text-neutral-400'
                       }`}>
                         {step.title}
                       </span>
                       {!locked && (
                         expandedStep === index ? (
-                          <ChevronUp className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
+                          <ChevronUp className="w-3.5 h-3.5 text-neutral-400 flex-shrink-0" />
                         ) : (
-                          <ChevronDown className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
+                          <ChevronDown className="w-3.5 h-3.5 text-neutral-400 flex-shrink-0" />
                         )
                       )}
                     </button>
 
                     {renderStepContent(step, index)}
 
-                    {index < totalSteps - 1 && <div className="border-b border-gray-100 mx-1 mt-1" />}
+                    {index < totalSteps - 1 && <div className="border-b border-neutral-100 mx-1 mt-1" />}
                   </div>
                 )
               })}
@@ -435,7 +442,7 @@ export default function OnboardingWidget({
               <div className="px-4 pb-4 flex-shrink-0">
                 <div className="flex items-center gap-2 mb-3 px-1">
                   <PartyPopper className="w-4 h-4 text-amber-500" />
-                  <span className="text-xs font-medium text-gray-700">
+                  <span className="text-xs font-medium text-neutral-700">
                     基础设置已完成，AdsGo 正在全力优化你的广告！
                   </span>
                 </div>

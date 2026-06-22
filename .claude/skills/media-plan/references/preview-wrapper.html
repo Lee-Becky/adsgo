@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Media Plan — Preview</title>
+  <!--
+    PREVIEW WRAPPER — for standalone browser viewing of skill output.
+
+    Used ONLY during skill authoring/iteration. NOT what host projects embed
+    in production.
+
+    The bare fragment is zero-dependency:
+      - Tailwind base utilities are the only assumption. No theme extension
+        is required — `primary-*` Tailwind classes are forbidden in skill
+        output; brand color is delivered via inline
+        `style="...var(--mp-primary*, #hex-fallback)..."`.
+      - All icons are inline SVG with `stroke="currentColor"`. NO lucide
+        or other icon library is required at runtime.
+      - The carousel-driver <script> at the end of <body> is preview-only
+        convenience. The bare fragment itself contains zero <script>; host
+        React/Vue apps replace the carousel logic with state-driven render.
+
+    Why this wrapper still loads Tailwind via CDN: the bare fragment uses
+    Tailwind utility classes (flex, grid, lg:grid-cols-12, rounded-xl, etc.).
+    Hosts already have Tailwind globally; this wrapper provides the same
+    runtime for standalone viewing. The lucide CDN below is a legacy guard
+    in case any older output still has `<i data-lucide>` placeholders;
+    current ground-truth files emit inline SVG only and don't need it.
+
+    Usage:
+      A) Quick view: replace the placeholder <section> below with your
+         <section data-skill="media-plan" ...>...</section> output. Save and
+         open via http://localhost:8000/ (a local HTTP server — file://
+         blocks the CDN).
+      B) Production embedding (host React/Vue): does NOT use this wrapper.
+         Host's Tailwind base utilities are sufficient — inject the bare
+         fragment via dangerouslySetInnerHTML and wire dim-swap interaction
+         in your component (template id="dim-{slug}" + click on
+         [data-role="dim-progress"] [data-nav-dim]).
+  -->
+
+  <!-- Tailwind base utilities only (NO theme extension; bare fragment uses
+       var(--mp-primary*) inline styles for brand color). -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Legacy guard for older skill outputs that still emitted `<i data-lucide>`
+       placeholders. Current ground-truth files emit inline SVG and do not
+       need this. Safe to remove if your fragment has zero data-lucide attrs. -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+
+  <style>
+    body { margin: 0; background: #F7F8FA; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; }
+    /* the reference design demo animation keyframes — copy from references/visual-ground-truth/running.html */
+    @keyframes weekBreathe   { 0%,100% { box-shadow:0 0 20px rgba(112,51,245,0.08); } 50% { box-shadow:0 0 30px rgba(112,51,245,0.18), 0 0 60px rgba(112,51,245,0.06); } }
+    @keyframes infinityPulse { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:0.5; transform:scale(1.25); } }
+    .week-breathe   { animation: weekBreathe 3s ease-in-out infinite; }
+    .infinity-pulse { display:inline-block; animation: infinityPulse 2s ease-in-out infinite; font-size:13px; line-height:1; }
+    /* Active dim-progress pill: static brand-color fill (no animation — switching is click-driven) */
+    .score-bar-fill { width: 100%; }
+  </style>
+</head>
+<body>
+
+  <!-- ╔══════════════════════════════════════════════════════════════════════╗
+       ║  PASTE THE SKILL OUTPUT (the entire <section data-skill="media-plan" ║
+       ║  ...>...</section>) BELOW THIS COMMENT, REPLACING IT.                ║
+       ╚══════════════════════════════════════════════════════════════════════╝ -->
+
+  <section style="padding:48px;text-align:center;color:#9CA3AF;font-family:ui-sans-serif,system-ui,sans-serif;">
+    Paste your <code style="color:#374151;">&lt;section data-skill="media-plan"&gt;...&lt;/section&gt;</code> output here, save, and reload.
+  </section>
+
+  <!-- ╔══════════════════════════════════════════════════════════════════════╗
+       ║  SCORE-CARD CAROUSEL DRIVER — preview only.                            ║
+       ║                                                                        ║
+       ║  Drives the running-phase score-card carousel:                        ║
+       ║   • Reads dim slugs from <template id="dim-{slug}"> blocks            ║
+       ║   • User clicks [data-role="dim-progress"] pill OR [data-axis-id]    ║
+       ║     radar axis label to switch dim (NO auto-rotation)                ║
+       ║   • On switch: clones template into [data-role="active-dim-detail"], ║
+       ║     updates problem-box (pb-title / pb-score / pb-text), updates dim- ║
+       ║     progress fill state, re-runs lucide.createIcons                   ║
+       ║                                                                        ║
+       ║  Production: host React/Vue replaces this with state-driven render.   ║
+       ╚══════════════════════════════════════════════════════════════════════╝ -->
+  <script>
+    (function () {
+      const root = document.querySelector('[data-section="score-card"]');
+      if (!root) return;
+
+      // Source of truth: every dim's full detail panel HTML lives in a <template id="dim-{slug}">
+      const tmpls = root.querySelectorAll('template[id^="dim-"]');
+      if (tmpls.length === 0) return;
+      const slugs = Array.from(tmpls).map(t => t.id.slice(4));
+
+      const slot     = root.querySelector('[data-role="active-dim-detail"]');
+      const progress = root.querySelector('[data-role="dim-progress"]');
+      if (!slot) return;
+
+      const pbTitle = document.getElementById('pb-title');
+      const pbScore = document.getElementById('pb-score');
+      const pbText  = document.getElementById('pb-text');
+
+      let activeIdx = Math.max(0, slugs.indexOf(slot.getAttribute('data-dimension')));
+
+      function applyActive(idx) {
+        activeIdx = ((idx % slugs.length) + slugs.length) % slugs.length;
+        const slug = slugs[activeIdx];
+        const tmpl = document.getElementById('dim-' + slug);
+        if (!tmpl) return;
+
+        // Clone fresh content into the visible detail slot
+        slot.replaceChildren(tmpl.content.cloneNode(true));
+        slot.setAttribute('data-dimension', slug);
+
+        // Update dim-progress pill states
+        if (progress) {
+          const pills = progress.querySelectorAll('[data-nav-dim]');
+          pills.forEach((el, i) => {
+            const isActive = i === activeIdx;
+            el.toggleAttribute('data-active', isActive);
+            // Strip any existing fill child
+            el.querySelectorAll('.score-bar-fill').forEach(n => n.remove());
+            if (isActive) {
+              el.style.background = '#f3f0ff';
+              const fill = document.createElement('div');
+              fill.className = 'absolute inset-y-0 left-0 rounded-full score-bar-fill';
+              fill.style.background = 'var(--mp-primary, #7033F5)';
+              el.appendChild(fill);
+            } else {
+              el.style.background = '#f3f4f6';
+            }
+          });
+        }
+
+        // Update problem-box card (smaller card below the radar)
+        const cloned = tmpl.content;
+        const dimLabel = cloned.querySelector('h4')?.textContent?.trim() || '';
+        const dimScoreEl = cloned.querySelector('.w-11.h-11 span')
+                       || cloned.querySelector('[data-role="dim-score"]');
+        const dimScore = dimScoreEl?.textContent?.trim() || '';
+        // Problem text: optional hidden <p data-role="dim-problem"> inside each template
+        const dimProblem = cloned.querySelector('[data-role="dim-problem"]')?.textContent?.trim() || '';
+        if (pbTitle && dimLabel) pbTitle.textContent = dimLabel;
+        if (pbScore && dimScore) pbScore.innerHTML = dimScore + '<span class="text-gray-400 font-normal">/5</span>';
+        if (pbText && dimProblem) pbText.textContent = dimProblem;
+
+        // Re-init lucide icons inside the cloned content
+        if (window.lucide && typeof window.lucide.createIcons === 'function') {
+          window.lucide.createIcons();
+        }
+      }
+
+      // Click handlers on dim-progress pills (manual switch only — no auto-rotate)
+      if (progress) {
+        progress.addEventListener('click', e => {
+          const btn = e.target.closest('[data-nav-dim]');
+          if (!btn) return;
+          const slug = btn.getAttribute('data-nav-dim');
+          const i = slugs.indexOf(slug);
+          if (i >= 0) applyActive(i);
+        });
+      }
+
+      // Click radar axis labels to switch (agent must emit data-axis-id="{slug}" on each axis label)
+      root.querySelectorAll('[data-axis-id]').forEach(label => {
+        label.style.cursor = 'pointer';
+        label.addEventListener('click', () => {
+          const slug = label.getAttribute('data-axis-id');
+          const i = slugs.indexOf(slug);
+          if (i >= 0) applyActive(i);
+        });
+      });
+
+      // Initial render — ensures dim-progress styling is in sync on first paint
+      applyActive(activeIdx);
+    })();
+  </script>
+
+  <!-- Initialize lucide icons after DOM is ready (the reference design demo pattern) -->
+  <script>
+    if (window.lucide && typeof window.lucide.createIcons === 'function') {
+      window.lucide.createIcons();
+    }
+  </script>
+
+</body>
+</html>

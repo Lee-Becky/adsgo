@@ -1,0 +1,275 @@
+<style>
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; }
+
+  .section-label {
+    font-size:10px; font-weight:700; color:#9ca3af;
+    text-transform:uppercase; letter-spacing:.06em; margin:20px 0 8px;
+  }
+
+  /* Architecture card */
+  .arch-card {
+    background:#fff; border-radius:14px; border:1px solid #e5e7eb;
+    padding:20px 24px; box-shadow:0 2px 12px rgba(0,0,0,.06);
+  }
+
+  /* Campaign node */
+  .camp-row { display:flex; flex-direction:column; align-items:center; margin-bottom:20px; }
+  .camp-node {
+    width:40px; height:40px; background:#111827; border-radius:10px;
+    display:flex; align-items:center; justify-content:center;
+    color:#fff; font-size:18px; box-shadow:0 4px 12px rgba(0,0,0,.2);
+  }
+  .camp-line { width:1px; height:14px; background:#e5e7eb; margin-top:2px; }
+  .camp-label { font-size:9px; color:#9ca3af; font-weight:500; margin-top:-12px; margin-bottom:4px; }
+
+  /* Adset row */
+  .adset-row { display:flex; gap:28px; justify-content:center; align-items:flex-start; }
+  .adset-col { display:flex; flex-direction:column; align-items:center; gap:5px; }
+
+  /* Audience button */
+  .aud-btn {
+    width:38px; height:38px; border-radius:9px;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    font-size:9px; font-weight:700; border:none; cursor:pointer;
+    position:relative; transition:transform .15s, box-shadow .15s;
+    user-select:none;
+  }
+  .aud-btn:hover { transform:scale(1.08); }
+  .aud-btn.adv { background:#ede9fe; color:#6d28d9; border:1.5px solid #ddd6fe; }
+  .aud-btn.lal { background:#ede9fe; color:#6d28d9; border:1.5px solid #6366f1; box-shadow:0 0 0 2px #c7d2fe; }
+  .aud-btn.int { background:#fffbeb; color:#b45309; border:1.5px solid #f59e0b; box-shadow:0 0 0 2px #fde68a; }
+  .aud-btn .idx {
+    position:absolute; top:-4px; right:-4px; width:15px; height:15px;
+    background:#111827; color:#fff; font-size:8px; font-weight:700;
+    border-radius:99px; display:flex; align-items:center; justify-content:center;
+    border:1.5px solid #fff;
+  }
+  .aud-btn .dot {
+    position:absolute; bottom:-2px; right:-2px; width:9px; height:9px;
+    border-radius:99px; border:2px solid #fff;
+  }
+  .dot-green { background:#22c55e; }
+
+  .adset-name { font-size:10px; color:#6b7280; font-weight:500; }
+  .thumb-row { display:flex; gap:2px; flex-wrap:wrap; justify-content:center; max-width:88px; }
+  .mini-thumb { width:20px; height:26px; border-radius:4px; border:1.5px solid #fff; box-shadow:0 1px 3px rgba(0,0,0,.1); }
+  .t1{background:linear-gradient(135deg,#ddd6fe,#a5b4fc)}
+  .t2{background:linear-gradient(135deg,#fde68a,#fca5a5)}
+  .t3{background:linear-gradient(135deg,#a7f3d0,#6ee7b7)}
+  .t4{background:linear-gradient(135deg,#fbcfe8,#f9a8d4)}
+  .t5{background:linear-gradient(135deg,#bae6fd,#7dd3fc)}
+
+  /* Connector line from adset to config panel */
+  .connector { width:1px; height:12px; background:linear-gradient(#6366f1,#a5b4fc); margin:0 auto 0; }
+  .connector-amber { background:linear-gradient(#f59e0b,#fde68a); }
+
+  /* Config panels below architecture */
+  .config-panels { display:flex; gap:12px; margin-top:0; flex-wrap:wrap; }
+  .config-panel {
+    border-radius:12px; padding:14px 16px; flex:1; min-width:180px;
+    animation: slideDown .2s ease;
+  }
+  @keyframes slideDown { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:translateY(0); } }
+  .config-panel.lal-panel { background:#f5f3ff; border:1.5px solid #ddd6fe; }
+  .config-panel.int-panel { background:#fffbeb; border:1.5px solid #fde68a; }
+
+  .panel-header {
+    display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;
+  }
+  .panel-title { font-size:11px; font-weight:700; }
+  .lal-panel .panel-title { color:#6d28d9; }
+  .int-panel .panel-title { color:#b45309; }
+  .panel-tag {
+    font-size:9px; font-weight:600; padding:2px 8px; border-radius:99px;
+  }
+  .lal-panel .panel-tag { background:#ede9fe; color:#7c3aed; }
+  .int-panel .panel-tag { background:#fef3c7; color:#b45309; }
+
+  /* Seed audience list */
+  .seed-list { display:flex; flex-direction:column; gap:4px; margin-bottom:10px; }
+  .seed-item { display:flex; align-items:center; gap:6px; cursor:pointer; }
+  .seed-check {
+    width:14px; height:14px; border-radius:3px; flex-shrink:0;
+    border:1.5px solid #ddd6fe; display:flex; align-items:center; justify-content:center;
+  }
+  .seed-check.checked { background:#6366f1; border-color:#6366f1; }
+  .seed-check.checked::after { content:'✓'; color:#fff; font-size:9px; font-weight:800; }
+  .seed-text { font-size:10px; color:#374151; }
+
+  /* INT interest search */
+  .int-search {
+    width:100%; height:28px; border:1px solid #fde68a; border-radius:6px;
+    background:#fff; padding:0 8px; font-size:10px; color:#374151; margin-bottom:8px;
+    outline:none;
+  }
+  .int-tags { display:flex; flex-wrap:wrap; gap:4px; margin-bottom:8px; }
+  .int-tag {
+    display:inline-flex; align-items:center; gap:3px; padding:2px 8px;
+    background:#fef3c7; border:1px solid #fde68a; border-radius:99px;
+    font-size:9px; font-weight:600; color:#b45309; cursor:pointer;
+  }
+  .int-tag-x { opacity:.6; font-size:9px; }
+  .int-result-list { display:flex; flex-direction:column; gap:3px; }
+  .int-result {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:4px 8px; border-radius:6px; background:#fff;
+    border:1px solid #fde68a; font-size:9px; cursor:pointer;
+  }
+  .int-result-name { color:#374151; font-weight:500; }
+  .int-result-size { color:#9ca3af; }
+  .int-add { font-size:9px; font-weight:700; color:#b45309; }
+
+  /* Save bar */
+  .save-bar {
+    display:flex; align-items:center; justify-content:space-between; padding-top:8px;
+    border-top:1px solid rgba(0,0,0,.06);
+  }
+  .save-hint { font-size:9px; color:#9ca3af; }
+  .save-hint b { color:#374151; }
+  .btn-save {
+    padding:4px 14px; border-radius:6px; background:#6366f1; color:#fff;
+    border:none; font-size:10px; font-weight:600; cursor:pointer;
+  }
+  .btn-save.amber { background:#f59e0b; }
+
+  /* Note callout */
+  .note {
+    font-size:10px; color:#6b7280; background:#f9fafb; border:1px solid #f3f4f6;
+    border-radius:8px; padding:8px 12px; margin-top:12px; line-height:1.6;
+  }
+  .note b { color:#374151; }
+
+  /* Connector area — lines from adset to panel */
+  .connectors-row {
+    display:flex; gap:28px; justify-content:center; margin-top:0;
+    padding-bottom:0;
+  }
+  .conn-col { display:flex; flex-direction:column; align-items:center; min-width:38px; }
+  .conn-line { width:1.5px; height:16px; }
+  .conn-lal { background:linear-gradient(#6366f1,#6366f120); }
+  .conn-int { background:linear-gradient(#f59e0b,#f59e0b20); }
+  .conn-none { background:transparent; }
+</style>
+
+<h2>每 Adset 独立受众 — 切换即配置</h2>
+<p class="subtitle">点击 adset 受众按钮循环切换类型；选中 LAL / INT 时，架构图正下方出现该 adset 的配置区</p>
+
+<div class="section-label">示例：Adset 1 = LAL，Adset 2 = Adv+，Adset 3 = INT</div>
+
+<div class="arch-card">
+  <!-- Campaign node -->
+  <div class="camp-row">
+    <div class="camp-node">📁</div>
+    <div class="camp-label">Target Campaign</div>
+    <div class="camp-line"></div>
+  </div>
+
+  <!-- Adset row -->
+  <div class="adset-row">
+    <!-- Adset 1: LAL, configured -->
+    <div class="adset-col">
+      <div class="aud-btn lal">LAL<div class="idx">1</div><div class="dot dot-green"></div></div>
+      <div class="adset-name">素材组 1</div>
+      <div class="thumb-row">
+        <div class="mini-thumb t1"></div><div class="mini-thumb t2"></div>
+        <div class="mini-thumb t3"></div><div class="mini-thumb t4"></div>
+      </div>
+    </div>
+    <!-- Adset 2: Adv+ -->
+    <div class="adset-col">
+      <div class="aud-btn adv">Adv+<div class="idx">2</div></div>
+      <div class="adset-name">素材组 2</div>
+      <div class="thumb-row">
+        <div class="mini-thumb t2"></div><div class="mini-thumb t5"></div>
+      </div>
+    </div>
+    <!-- Adset 3: INT -->
+    <div class="adset-col">
+      <div class="aud-btn int">INT<div class="idx">3</div></div>
+      <div class="adset-name">素材组 3</div>
+      <div class="thumb-row">
+        <div class="mini-thumb t1"></div><div class="mini-thumb t3"></div>
+        <div class="mini-thumb t4"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Connector lines: only for LAL (1) and INT (3) -->
+  <div class="connectors-row" style="margin-top:8px">
+    <div class="conn-col" style="min-width:38px"><div class="conn-line conn-lal"></div></div>
+    <div class="conn-col" style="min-width:38px"><div class="conn-line conn-none"></div></div>
+    <div class="conn-col" style="min-width:38px"><div class="conn-line conn-int"></div></div>
+  </div>
+
+  <!-- Config panels — appear below, aligned to adset columns -->
+  <div class="config-panels" style="justify-content:center">
+
+    <!-- Panel for Adset 1: LAL -->
+    <div class="config-panel lal-panel" style="flex:0 0 auto;width:220px">
+      <div class="panel-header">
+        <span class="panel-title">LAL 相似受众</span>
+        <span class="panel-tag">素材组 1</span>
+      </div>
+      <div class="seed-list">
+        <div class="seed-item">
+          <div class="seed-check checked"></div>
+          <span class="seed-text">US Purchase 1%</span>
+        </div>
+        <div class="seed-item">
+          <div class="seed-check checked"></div>
+          <span class="seed-text">US Add to Cart 5%</span>
+        </div>
+        <div class="seed-item">
+          <div class="seed-check"></div>
+          <span class="seed-text">US Register Last 30 Days 1–3%</span>
+        </div>
+      </div>
+      <div class="save-bar">
+        <span class="save-hint">已选 <b>2</b> 个种子受众</span>
+        <button class="btn-save">保存</button>
+      </div>
+    </div>
+
+    <!-- Panel for Adset 3: INT -->
+    <div class="config-panel int-panel" style="flex:0 0 auto;width:220px">
+      <div class="panel-header">
+        <span class="panel-title">INT 兴趣受众</span>
+        <span class="panel-tag">素材组 3</span>
+      </div>
+      <input class="int-search" placeholder="搜索兴趣词..." value="fash" />
+      <div class="int-tags">
+        <div class="int-tag">Online shopping <span class="int-tag-x">×</span></div>
+        <div class="int-tag">Lifestyle <span class="int-tag-x">×</span></div>
+      </div>
+      <div class="int-result-list">
+        <div class="int-result">
+          <span class="int-result-name">Fashion accessories</span>
+          <div style="display:flex;align-items:center;gap:6px">
+            <span class="int-result-size">500M–600M</span>
+            <span class="int-add">+ 添加</span>
+          </div>
+        </div>
+        <div class="int-result">
+          <span class="int-result-name">Fast fashion</span>
+          <div style="display:flex;align-items:center;gap:6px">
+            <span class="int-result-size">200M–300M</span>
+            <span class="int-add">+ 添加</span>
+          </div>
+        </div>
+      </div>
+      <div class="save-bar" style="margin-top:8px">
+        <span class="save-hint">已选 <b>2</b> 个兴趣词</span>
+        <button class="btn-save amber">保存</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="note">
+  <b>交互说明：</b><br>
+  · 点击受众按钮 → 循环切换 Adv+ → LAL → INT → Adv+（保留现有 toggle 行为）<br>
+  · 切换到 LAL 或 INT 时，架构图下方即时出现该 adset 的配置卡；切回 Adv+ 则配置卡消失<br>
+  · 多个 adset 同时为 LAL / INT 时，各自的配置卡并排显示在架构图下方<br>
+  · 每个配置卡右上角的「素材组 N」标签指明归属；连接线从对应 adset 节点延伸至配置卡
+</div>

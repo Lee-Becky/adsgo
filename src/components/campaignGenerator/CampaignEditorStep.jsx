@@ -14,10 +14,10 @@ export const CampaignEditorStep = ({ onBack, onPublish }) => {
       </div>
 
       {/* Footer Actions */}
-      <div className="h-20 bg-white border-t border-slate-100 flex items-center justify-between px-12 z-40 shadow-[0_-10px_40px_rgba(0,0,0,0.04)] shrink-0 relative">
+      <div className="h-20 bg-white border-t border-neutral-100 flex items-center justify-between px-12 z-40 shadow-[0_-10px_40px_rgba(0,0,0,0.04)] shrink-0 relative">
         <button 
           onClick={onBack} 
-          className="px-10 py-3 bg-slate-50 text-slate-500 rounded-full text-[11px] font-bold hover:bg-slate-100 transition-all border border-slate-100"
+          className="px-10 py-3 bg-neutral-50 text-neutral-500 rounded-full text-[11px] font-bold hover:bg-neutral-100 transition-all border border-neutral-100"
         >
           Previous
         </button>
@@ -25,11 +25,11 @@ export const CampaignEditorStep = ({ onBack, onPublish }) => {
         <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-4">
           <button 
             onClick={onPublish}
-            className="px-24 py-3.5 bg-gradient-to-r from-indigo-600 to-purple-800 text-white rounded-full text-sm font-bold tracking-wider shadow-2xl shadow-indigo-200 hover:-translate-y-1 active:translate-y-0.5 transition-all"
+            className="px-24 py-3.5 bg-gradient-to-r from-primary-600 to-purple-800 text-white rounded-full text-sm font-bold tracking-wider shadow-2xl shadow-primary-200 hover:-translate-y-1 active:translate-y-0.5 transition-all"
           >
             Publish
           </button>
-          <button className="px-10 py-3 bg-slate-50 text-slate-500 rounded-full text-[11px] font-bold hover:bg-slate-100 transition-all border border-slate-100">
+          <button className="px-10 py-3 bg-neutral-50 text-neutral-500 rounded-full text-[11px] font-bold hover:bg-neutral-100 transition-all border border-neutral-100">
             Save draft
           </button>
         </div>

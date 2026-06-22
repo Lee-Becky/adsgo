@@ -58,8 +58,8 @@ function ActionBenefits({ benefits }) {
           <TrendingUp className="w-4 h-4 text-emerald-600" />
         </div>
         <div>
-          <h4 className="text-sm font-bold text-gray-900">Action Benefits</h4>
-          <p className="text-[10px] text-gray-500">Impact from completed actions in past 7 days</p>
+          <h4 className="text-sm font-bold text-neutral-900">Action Benefits</h4>
+          <p className="text-[10px] text-neutral-500">Impact from completed actions in past 7 days</p>
         </div>
       </div>
 
@@ -72,11 +72,11 @@ function ActionBenefits({ benefits }) {
           return (
             <div
               key={idx}
-              className="bg-gradient-to-br from-white to-gray-50 rounded-xl border border-gray-200 p-4 hover:shadow-md transition-shadow"
+              className="bg-gradient-to-br from-white to-neutral-50 rounded-xl border border-neutral-200 p-4 hover:shadow-md transition-shadow"
             >
               <div className="flex items-center gap-2 mb-2">
-                <Icon className="w-4 h-4 text-gray-400" />
-                <span className="text-xs font-semibold text-gray-700">{benefit.metric}</span>
+                <Icon className="w-4 h-4 text-neutral-400" />
+                <span className="text-xs font-semibold text-neutral-700">{benefit.metric}</span>
               </div>
               <div className="flex items-baseline gap-2 mb-1">
                 <span className={`text-lg font-bold ${colorClass}`}>
@@ -86,7 +86,7 @@ function ActionBenefits({ benefits }) {
                   <TrendingUp className="w-3 h-3 text-emerald-500" />
                 )}
               </div>
-              <p className="text-[10px] text-gray-500 leading-snug">{benefit.attribution}</p>
+              <p className="text-[10px] text-neutral-500 leading-snug">{benefit.attribution}</p>
             </div>
           )
         })}
@@ -106,10 +106,10 @@ function HighlightItem({ highlight }) {
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between gap-2 mb-1">
-          <span className="text-xs font-semibold text-gray-800 truncate">{highlight.name}</span>
-          <span className="text-[10px] text-gray-400 flex-shrink-0">{highlight.date}</span>
+          <span className="text-xs font-semibold text-neutral-800 truncate">{highlight.name}</span>
+          <span className="text-[10px] text-neutral-400 flex-shrink-0">{highlight.date}</span>
         </div>
-        <p className="text-xs text-gray-600 leading-snug">{highlight.achievement}</p>
+        <p className="text-xs text-neutral-600 leading-snug">{highlight.achievement}</p>
       </div>
     </div>
   )
@@ -125,8 +125,8 @@ function Highlights({ highlights }) {
           <Award className="w-4 h-4 text-amber-600" />
         </div>
         <div>
-          <h4 className="text-sm font-bold text-gray-900">Highlights</h4>
-          <p className="text-[10px] text-gray-500">Top performers exceeding targets or benchmarks</p>
+          <h4 className="text-sm font-bold text-neutral-900">Highlights</h4>
+          <p className="text-[10px] text-neutral-500">Top performers exceeding targets or benchmarks</p>
         </div>
       </div>
 
@@ -141,9 +141,9 @@ function Highlights({ highlights }) {
 
 export default function HighlightsCard({ actionBenefits, highlights }) {
   return (
-    <div className="bg-white rounded-xl border border-[#F0F0F0] shadow-[-2px_2px_16px_rgba(14,0,45,0.06)] p-5">
+    <div className="bg-white rounded-xl border border-neutral-200/80 shadow-sm p-5 transition-shadow duration-normal hover:shadow-md">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-base font-semibold text-gray-900">Highlights of the Past 7 Days</h3>
+        <h3 className="text-base font-semibold text-neutral-900">Highlights of the Past 7 Days</h3>
         <DevGuideButton title="Highlights" content={DEV_GUIDES.highlights} />
       </div>
 
@@ -152,7 +152,7 @@ export default function HighlightsCard({ actionBenefits, highlights }) {
 
       {/* Divider */}
       {actionBenefits && actionBenefits.length > 0 && highlights && highlights.length > 0 && (
-        <div className="border-t border-gray-200 my-4" />
+        <div className="border-t border-neutral-200 my-4" />
       )}
 
       {/* Highlights Section */}
@@ -161,9 +161,9 @@ export default function HighlightsCard({ actionBenefits, highlights }) {
       {/* Empty State */}
       {(!actionBenefits || actionBenefits.length === 0) && (!highlights || highlights.length === 0) && (
         <div className="text-center py-8">
-          <Award className="w-8 h-8 text-gray-300 mx-auto mb-2" />
-          <p className="text-sm font-medium text-gray-500">No highlights yet</p>
-          <p className="text-xs text-gray-400 mt-0.5">Keep optimizing — achievements will appear here</p>
+          <Award className="w-8 h-8 text-neutral-300 mx-auto mb-2" />
+          <p className="text-sm font-medium text-neutral-500">No highlights yet</p>
+          <p className="text-xs text-neutral-400 mt-0.5">Keep optimizing — achievements will appear here</p>
         </div>
       )}
     </div>

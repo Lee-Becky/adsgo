@@ -35,11 +35,11 @@ export default function ExpectTimeline({ dailyBudget = 3500 }) {
   return (
     <div>
       {/* Timeline */}
-      <h4 className="text-sm font-semibold text-gray-900 mb-4">What to Expect</h4>
+      <h4 className="text-sm font-semibold text-neutral-900 mb-4">What to Expect</h4>
 
       <div className="relative">
         {/* Horizontal connector line */}
-        <div className="absolute top-3 left-3 right-3 h-px bg-gray-200 hidden sm:block" />
+        <div className="absolute top-3 left-3 right-3 h-px bg-neutral-200 hidden sm:block" />
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {TIMELINE_PHASES.map((phase) => {
@@ -55,9 +55,9 @@ export default function ExpectTimeline({ dailyBudget = 3500 }) {
 
                 {/* Content */}
                 <div>
-                  <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">{phase.period}</span>
-                  <h5 className="text-xs font-semibold text-gray-800 mt-0.5">{phase.label}</h5>
-                  <p className="text-xs text-gray-500 mt-1 leading-relaxed">{phase.description}</p>
+                  <span className="text-[10px] font-semibold text-neutral-400 uppercase tracking-wider">{phase.period}</span>
+                  <h5 className="text-xs font-semibold text-neutral-800 mt-0.5">{phase.label}</h5>
+                  <p className="text-xs text-neutral-500 mt-1 leading-relaxed">{phase.description}</p>
                 </div>
               </div>
             )
@@ -66,16 +66,16 @@ export default function ExpectTimeline({ dailyBudget = 3500 }) {
       </div>
 
       {/* Safety Reassurance */}
-      <div className="mt-5 pt-4 border-t border-gray-100 space-y-2">
+      <div className="mt-5 pt-4 border-t border-neutral-100 space-y-2">
         <div className="flex items-center gap-2">
           <Shield className="w-3.5 h-3.5 text-emerald-500 flex-shrink-0" />
-          <span className="text-xs text-gray-600">
+          <span className="text-xs text-neutral-600">
             Daily budget cap (${dailyBudget.toLocaleString()}) is active — AI never exceeds it.
           </span>
         </div>
         <div className="flex items-center gap-2">
           <Radio className="w-3.5 h-3.5 text-blue-500 flex-shrink-0" />
-          <span className="text-xs text-gray-600">
+          <span className="text-xs text-neutral-600">
             Data syncs every hour — first insights within 24-48 hours.
           </span>
         </div>

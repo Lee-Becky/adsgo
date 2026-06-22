@@ -64,14 +64,14 @@ export default function SupportBubble() {
           }`}
         >
           <div className="rounded-xl bg-white border border-[#F0F0F0] shadow-xl overflow-hidden">
-            <div className="flex items-center justify-between px-4 py-3 border-b border-[#F5F5F5] bg-gray-50/50">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-[#F5F5F5] bg-neutral-50/50">
               <div className="flex items-center gap-2">
                 <MessageCircle className="w-4 h-4 text-primary-500" />
-                <span className="text-base font-semibold text-gray-900">需要帮助？</span>
+                <span className="text-base font-semibold text-neutral-900">需要帮助？</span>
               </div>
               <button
                 onClick={close}
-                className="p-1 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500/20"
+                className="p-1 rounded-md text-neutral-400 hover:text-neutral-600 hover:bg-neutral-100 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500/20"
                 aria-label="关闭"
               >
                 <X className="w-4 h-4" />
@@ -79,14 +79,14 @@ export default function SupportBubble() {
             </div>
 
             <div className="px-4 py-3">
-              <p className="text-sm text-gray-700 leading-relaxed">
+              <p className="text-sm text-neutral-700 leading-relaxed">
                 实时客服功能即将上线。你可以通过以下方式联系我们：
               </p>
 
               <div className="mt-3 space-y-2">
                 <a
                   href="mailto:support@adsgo.ai"
-                  className="flex items-center gap-2.5 px-3 py-2 rounded-lg border border-gray-200 text-sm text-gray-700 hover:text-primary-600 hover:border-primary-500 hover:bg-primary-50/40 transition-all"
+                  className="flex items-center gap-2.5 px-3 py-2 rounded-lg border border-neutral-200 text-sm text-neutral-700 hover:text-primary-600 hover:border-primary-500 hover:bg-primary-50/40 transition-all"
                 >
                   <Mail className="w-4 h-4 flex-shrink-0" />
                   <span className="flex-1">support@adsgo.ai</span>
@@ -95,7 +95,7 @@ export default function SupportBubble() {
                 <a
                   href="#"
                   onClick={(e) => e.preventDefault()}
-                  className="flex items-center gap-2.5 px-3 py-2 rounded-lg border border-gray-200 text-sm text-gray-700 hover:text-primary-600 hover:border-primary-500 hover:bg-primary-50/40 transition-all"
+                  className="flex items-center gap-2.5 px-3 py-2 rounded-lg border border-neutral-200 text-sm text-neutral-700 hover:text-primary-600 hover:border-primary-500 hover:bg-primary-50/40 transition-all"
                 >
                   <BookOpen className="w-4 h-4 flex-shrink-0" />
                   <span className="flex-1">查看帮助文档</span>
@@ -103,8 +103,8 @@ export default function SupportBubble() {
               </div>
             </div>
 
-            <div className="px-4 py-2 border-t border-[#F5F5F5] bg-gray-50/50">
-              <p className="text-[11px] text-gray-400 text-center">Powered by AdsGo Support</p>
+            <div className="px-4 py-2 border-t border-[#F5F5F5] bg-neutral-50/50">
+              <p className="text-[11px] text-neutral-400 text-center">Powered by AdsGo Support</p>
             </div>
           </div>
         </div>

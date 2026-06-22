@@ -8,7 +8,7 @@ const EditAdsetDrawer = ({ isOpen, onClose, onSave }) => {
     <div className="fixed inset-0 z-[700] flex items-end justify-center animate-in fade-in duration-300">
       {/* Backdrop */}
       <div 
-        className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"
+        className="absolute inset-0 bg-neutral-900/40 backdrop-blur-sm"
         onClick={onClose}
       />
       
@@ -18,22 +18,22 @@ const EditAdsetDrawer = ({ isOpen, onClose, onSave }) => {
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="px-10 py-8 border-b border-slate-50 flex items-center justify-between shrink-0">
+        <div className="px-10 py-8 border-b border-neutral-50 flex items-center justify-between shrink-0">
           <div className="space-y-1">
-            <h3 className="text-2xl font-black text-slate-900 leading-tight">Edit adset config</h3>
-            <p className="text-sm font-bold text-slate-400 italic">Adjust audience targeting and adset level settings.</p>
+            <h3 className="text-2xl font-black text-neutral-900 leading-tight">Edit adset config</h3>
+            <p className="text-sm font-bold text-neutral-400 italic">Adjust audience targeting and adset level settings.</p>
           </div>
           <button 
             onClick={onClose}
-            className="p-3 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-full transition-all"
+            className="p-3 text-neutral-400 hover:text-neutral-600 hover:bg-neutral-50 rounded-full transition-all"
           >
             <X size={24} />
           </button>
         </div>
 
         {/* Image Content Area - Height adaptive & scrollable */}
-        <div className="p-10 bg-slate-50/20 flex-1 overflow-y-auto custom-scrollbar">
-          <div className="max-w-[1400px] mx-auto rounded-[2rem] overflow-hidden border border-slate-100 shadow-2xl bg-white group transition-all duration-700 hover:shadow-indigo-100">
+        <div className="p-10 bg-neutral-50/20 flex-1 overflow-y-auto custom-scrollbar">
+          <div className="max-w-[1400px] mx-auto rounded-[2rem] overflow-hidden border border-neutral-100 shadow-2xl bg-white group transition-all duration-700 hover:shadow-primary-100">
             <img 
               src="/adset edit.jpg" 
               className="w-full h-auto transition-transform duration-1000 group-hover:scale-[1.01]" 
@@ -43,16 +43,16 @@ const EditAdsetDrawer = ({ isOpen, onClose, onSave }) => {
         </div>
 
         {/* Footer */}
-        <div className="px-10 py-8 bg-white border-t border-slate-50 flex items-center justify-end gap-4 shrink-0 shadow-[0_-10px_40px_rgba(0,0,0,0.02)]">
+        <div className="px-10 py-8 bg-white border-t border-neutral-50 flex items-center justify-end gap-4 shrink-0 shadow-[0_-10px_40px_rgba(0,0,0,0.02)]">
           <button 
             onClick={onClose}
-            className="px-10 py-4 rounded-2xl text-sm font-black text-slate-500 hover:text-slate-700 hover:bg-slate-50 transition-all"
+            className="px-10 py-4 rounded-2xl text-sm font-black text-neutral-500 hover:text-neutral-700 hover:bg-neutral-50 transition-all"
           >
             Cancel
           </button>
           <button 
             onClick={onSave}
-            className="px-16 py-4 bg-slate-900 text-white rounded-2xl text-sm font-black flex items-center gap-3 hover:bg-black transition-all shadow-xl active:scale-95"
+            className="px-16 py-4 bg-neutral-900 text-white rounded-2xl text-sm font-black flex items-center gap-3 hover:bg-black transition-all shadow-xl active:scale-95"
           >
             Save change
             <Check size={18} strokeWidth={3} />

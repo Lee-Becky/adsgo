@@ -61,9 +61,9 @@ const MultiSelect = ({
         disabled={disabled}
         className={[
           'w-full h-10 px-3 text-sm bg-white border rounded-base outline-none transition-all',
-          disabled ? 'border-gray-100 bg-gray-50 text-gray-400 cursor-not-allowed' :
+          disabled ? 'border-neutral-100 bg-neutral-50 text-neutral-400 cursor-not-allowed' :
           error ? 'border-rose-400 focus:border-rose-500' :
-          'border-gray-200 hover:border-gray-300 focus:border-primary-500',
+          'border-neutral-200 hover:border-neutral-300 focus:border-primary-500',
         ].join(' ')}
       />
     );
@@ -82,15 +82,15 @@ const MultiSelect = ({
         className={[
           'w-full min-h-10 px-2 py-1.5 text-sm bg-white border rounded-base outline-none transition-all',
           'flex items-center gap-2',
-          disabled ? 'border-gray-100 bg-gray-50 text-gray-400 cursor-not-allowed' :
+          disabled ? 'border-neutral-100 bg-neutral-50 text-neutral-400 cursor-not-allowed' :
           error ? 'border-rose-400' :
-          'border-gray-200 hover:border-gray-300',
+          'border-neutral-200 hover:border-neutral-300',
           open && !disabled && !error ? 'border-primary-500 shadow-primary-focus' : '',
         ].join(' ')}
       >
         <div className="flex flex-wrap items-center gap-1.5 flex-1 min-w-0">
           {selectedDefs.length === 0 ? (
-            <span className="text-gray-300 px-1 text-xs">{placeholder}</span>
+            <span className="text-neutral-300 px-1 text-xs">{placeholder}</span>
           ) : (
             <>
               {visibleChips.map(opt => {
@@ -114,39 +114,39 @@ const MultiSelect = ({
                 );
               })}
               {moreCount > 0 && (
-                <span className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded-full text-xs font-medium">
+                <span className="px-2 py-0.5 bg-neutral-100 text-neutral-600 rounded-full text-xs font-medium">
                   +{moreCount}
                 </span>
               )}
             </>
           )}
         </div>
-        <ChevronDown size={14} className={`text-gray-400 shrink-0 transition-transform ${open ? 'rotate-180' : ''}`} />
+        <ChevronDown size={14} className={`text-neutral-400 shrink-0 transition-transform ${open ? 'rotate-180' : ''}`} />
       </button>
       <Popover
         open={open && !disabled}
         anchorRef={triggerRef}
         placement="bottom-start"
         onClose={() => { setOpen(false); setQ(''); }}
-        className="bg-white rounded-base shadow-xl border border-gray-100 overflow-hidden"
+        className="bg-white rounded-base shadow-xl border border-neutral-100 overflow-hidden"
         style={{ minWidth: triggerRef.current?.offsetWidth ?? 240 }}
       >
         {useSearch && (
-          <div className="border-b border-gray-100 px-3 py-2 flex items-center gap-2 bg-gray-50/30">
-            <Search size={12} className="text-gray-400 shrink-0" />
+          <div className="border-b border-neutral-100 px-3 py-2 flex items-center gap-2 bg-neutral-50/30">
+            <Search size={12} className="text-neutral-400 shrink-0" />
             <input
               type="text"
               autoFocus
               value={q}
               onChange={e => setQ(e.target.value)}
               placeholder="搜索..."
-              className="flex-1 bg-transparent text-xs outline-none placeholder:text-gray-300"
+              className="flex-1 bg-transparent text-xs outline-none placeholder:text-neutral-300"
             />
           </div>
         )}
         <div className="max-h-[280px] overflow-y-auto custom-scrollbar p-1">
           {filtered.length === 0 ? (
-            <div className="px-3 py-4 text-center text-xs text-gray-400">无匹配项</div>
+            <div className="px-3 py-4 text-center text-xs text-neutral-400">无匹配项</div>
           ) : filtered.map(opt => {
             const sel = selected.some(v => v === opt.value);
             return (
@@ -156,7 +156,7 @@ const MultiSelect = ({
                 onClick={() => toggleOption(opt.value)}
                 className={[
                   'w-full flex items-center justify-between px-2.5 py-2 rounded-inner text-xs transition-colors text-left',
-                  sel ? 'bg-primary-50 text-primary-600 font-semibold' : 'text-gray-700 hover:bg-gray-50',
+                  sel ? 'bg-primary-50 text-primary-600 font-semibold' : 'text-neutral-700 hover:bg-neutral-50',
                 ].join(' ')}
               >
                 <span className="truncate">{opt.label}</span>
@@ -166,8 +166,8 @@ const MultiSelect = ({
           })}
         </div>
         {selectedDefs.length > 0 && (
-          <div className="border-t border-gray-100 px-3 py-2 flex items-center justify-between bg-gray-50/40">
-            <span className="text-[11px] text-gray-500">已选 {selectedDefs.length}</span>
+          <div className="border-t border-neutral-100 px-3 py-2 flex items-center justify-between bg-neutral-50/40">
+            <span className="text-[11px] text-neutral-500">已选 {selectedDefs.length}</span>
             <button
               type="button"
               onClick={() => onChange?.([])}

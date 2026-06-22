@@ -1,30 +1,45 @@
-import { useState, useEffect, useCallback, createContext, useContext } from 'react'
+import { useState, useEffect, useCallback, useRef, createContext, useContext } from 'react'
 import { createPortal } from 'react-dom'
-import { X, CheckCircle2, AlertCircle, AlertTriangle, Info } from 'lucide-react'
+import { X, CheckCircle2, AlertCircle, AlertTriangle, Info, Sparkles } from 'lucide-react'
 
-const icons = {
-  success: CheckCircle2,
-  error:   AlertCircle,
-  warning: AlertTriangle,
-  info:    Info,
+/* ── Type config ────────────────────────────────────────────── */
+const typeConfig = {
+  success: {
+    Icon: CheckCircle2,
+    border: 'border-l-success-500',
+    icon:   'text-success-500',
+    progress: 'bg-success-500',
+  },
+  error: {
+    Icon: AlertCircle,
+    border: 'border-l-danger-500',
+    icon:   'text-danger-500',
+    progress: 'bg-danger-500',
+  },
+  warning: {
+    Icon: AlertTriangle,
+    border: 'border-l-warning-500',
+    icon:   'text-warning-500',
+    progress: 'bg-warning-500',
+  },
+  info: {
+    Icon: Info,
+    border: 'border-l-info-500',
+    icon:   'text-info-500',
+    progress: 'bg-info-500',
+  },
+  luna: {
+    Icon: Sparkles,
+    border: '', // handled via inline gradient
+    icon:   'text-luna-violet',
+    progress: 'bg-luna-violet',
+  },
 }
 
-const borderColors = {
-  success: 'border-l-emerald-500',
-  error:   'border-l-red-500',
-  warning: 'border-l-amber-500',
-  info:    'border-l-primary-500',
-}
-
-const iconColors = {
-  success: 'text-emerald-500',
-  error:   'text-red-500',
-  warning: 'text-amber-500',
-  info:    'text-primary-500',
-}
-
+/* ── Toast ID counter ───────────────────────────────────────── */
 let toastId = 0
 
+/* ── Context ────────────────────────────────────────────────── */
 const ToastContext = createContext(null)
 
 export const useToast = () => {
@@ -33,12 +48,19 @@ export const useToast = () => {
   return ctx
 }
 
+/* ── Provider ───────────────────────────────────────────────── */
 export const ToastProvider = ({ children }) => {
   const [toasts, setToasts] = useState([])
 
-  const addToast = useCallback(({ type = 'info', title, message, duration = 5000 }) => {
+  const addToast = useCallback(({
+    type = 'info',
+    title,
+    message,
+    duration = 5000,
+    action,
+  }) => {
     const id = ++toastId
-    setToasts(prev => [...prev, { id, type, title, message, duration, createdAt: Date.now() }])
+    setToasts(prev => [...prev, { id, type, title, message, duration, action, createdAt: Date.now() }])
     return id
   }, [])
 
@@ -46,37 +68,46 @@ export const ToastProvider = ({ children }) => {
     setToasts(prev => prev.filter(t => t.id !== id))
   }, [])
 
-  const toast = useCallback((opts) => addToast(typeof opts === 'string' ? { message: opts } : opts), [addToast])
+  /* Convenience API -- backward-compat with existing toast(string) usage */
+  const toast = useCallback(
+    (opts) => addToast(typeof opts === 'string' ? { message: opts } : opts),
+    [addToast],
+  )
   toast.success = (msg) => addToast({ type: 'success', message: msg })
-  toast.error = (msg) => addToast({ type: 'error', message: msg })
+  toast.error   = (msg) => addToast({ type: 'error',   message: msg })
   toast.warning = (msg) => addToast({ type: 'warning', message: msg })
-  toast.info = (msg) => addToast({ type: 'info', message: msg })
+  toast.info    = (msg) => addToast({ type: 'info',    message: msg })
+  toast.luna    = (msg) => addToast({ type: 'luna',    message: msg })
 
   return (
     <ToastContext.Provider value={toast}>
       {children}
       {createPortal(
-        <div className="fixed top-4 right-4 z-[9999] flex flex-col gap-2 pointer-events-none">
-          {toasts.map((t, i) => (
+        <div className="fixed top-4 right-4 z-[600] flex flex-col gap-2 pointer-events-none">
+          {toasts.map((t) => (
             <ToastItem
               key={t.id}
               toast={t}
-              index={i}
-              total={toasts.length}
               onDismiss={() => removeToast(t.id)}
             />
           ))}
         </div>,
-        document.body
+        document.body,
       )}
     </ToastContext.Provider>
   )
 }
 
-const ToastItem = ({ toast, index, total, onDismiss }) => {
+/* ── Single toast item ──────────────────────────────────────── */
+const ToastItem = ({ toast, onDismiss }) => {
   const [exiting, setExiting] = useState(false)
-  const Icon = icons[toast.type] || icons.info
+  const progressRef = useRef(null)
 
+  const cfg = typeConfig[toast.type] || typeConfig.info
+  const Icon = cfg.Icon
+  const isLuna = toast.type === 'luna'
+
+  /* Auto-dismiss */
   useEffect(() => {
     if (toast.duration <= 0) return
     const timer = setTimeout(() => {
@@ -86,40 +117,63 @@ const ToastItem = ({ toast, index, total, onDismiss }) => {
     return () => clearTimeout(timer)
   }, [toast.duration, onDismiss])
 
-  const isStacked = index < total - 1
+  const handleClose = () => {
+    setExiting(true)
+    setTimeout(onDismiss, 200)
+  }
 
   return (
     <div
-      className={`
-        w-[360px] bg-white rounded-xl shadow-lg border-l-4 p-4 pointer-events-auto
-        flex items-start gap-3
-        ${borderColors[toast.type] || borderColors.info}
-        ${exiting ? 'animate-[toastOut_200ms_ease-in_forwards]' : 'animate-[toastIn_250ms_ease-out]'}
-        ${isStacked ? 'scale-[0.98] opacity-80' : ''}
-        transition-all duration-150
-      `}
+      className={[
+        'relative w-[380px] bg-white rounded-lg overflow-hidden pointer-events-auto',
+        'flex items-start gap-3 p-4',
+        'shadow-lg border border-neutral-100',
+        !isLuna ? `border-l-[3px] ${cfg.border}` : '',
+        exiting ? 'animate-slide-out-right' : 'animate-slide-in-right',
+      ].filter(Boolean).join(' ')}
+      style={isLuna ? {
+        borderLeft: '3px solid transparent',
+        borderImage: 'var(--luna-gradient) 1',
+      } : undefined}
     >
-      <Icon size={18} className={`shrink-0 mt-0.5 ${iconColors[toast.type]}`} />
+      {/* Icon */}
+      <Icon size={18} className={`shrink-0 mt-0.5 ${cfg.icon}`} />
+
+      {/* Content */}
       <div className="flex-1 min-w-0">
         {toast.title && (
-          <p className="text-sm font-semibold text-gray-900">{toast.title}</p>
+          <p className="text-body font-semibold text-neutral-900 leading-tight">{toast.title}</p>
         )}
         {toast.message && (
-          <p className="text-sm text-gray-600 mt-0.5">{toast.message}</p>
+          <p className={`text-body text-neutral-600 ${toast.title ? 'mt-0.5' : ''}`}>
+            {toast.message}
+          </p>
+        )}
+        {/* Action button */}
+        {toast.action && (
+          <button
+            onClick={toast.action.onClick}
+            className="mt-2 text-caption font-semibold text-primary-600 hover:text-primary-700 transition-colors duration-fast"
+          >
+            {toast.action.label}
+          </button>
         )}
       </div>
+
+      {/* Close button */}
       <button
-        onClick={() => { setExiting(true); setTimeout(onDismiss, 200) }}
-        className="shrink-0 p-0.5 rounded text-gray-400 hover:text-gray-600 transition-colors"
+        onClick={handleClose}
+        className="shrink-0 p-1 rounded-sm text-neutral-400 hover:text-neutral-600 hover:bg-neutral-50 transition-colors duration-fast"
       >
         <X size={14} />
       </button>
 
       {/* Auto-dismiss progress bar */}
       {toast.duration > 0 && (
-        <div className="absolute bottom-0 left-4 right-4 h-0.5 bg-gray-100 rounded-full overflow-hidden">
+        <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-neutral-100">
           <div
-            className="h-full bg-gray-300 rounded-full"
+            ref={progressRef}
+            className={`h-full rounded-full ${cfg.progress}`}
             style={{
               animation: `toastProgress ${toast.duration}ms linear forwards`,
             }}
@@ -127,18 +181,11 @@ const ToastItem = ({ toast, index, total, onDismiss }) => {
         </div>
       )}
 
+      {/* Inline keyframes (only rendered once per mount, deduplicated by browser) */}
       <style dangerouslySetInnerHTML={{ __html: `
-        @keyframes toastIn {
-          from { opacity: 0; transform: translateX(100%); }
-          to { opacity: 1; transform: translateX(0); }
-        }
-        @keyframes toastOut {
-          from { opacity: 1; transform: translateX(0); }
-          to { opacity: 0; transform: translateX(50%); }
-        }
         @keyframes toastProgress {
           from { width: 100%; }
-          to { width: 0%; }
+          to   { width: 0%; }
         }
       `}} />
     </div>

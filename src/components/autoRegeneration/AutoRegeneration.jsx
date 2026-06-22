@@ -4,7 +4,12 @@ import {
   IMAGE_POOL,
   PLATFORM_LOGOS
 } from './mockData';
-import { Edit, Send, X, Check, Sparkles, Trash2, ChevronDown, Infinity, Clock, RefreshCw, ShieldCheck, GripVertical, AlertCircle } from 'lucide-react';
+import {
+  Edit, Send, X, Check, Sparkles, Trash2, ChevronDown, Infinity, Clock, RefreshCw,
+  ShieldCheck, GripVertical, AlertCircle, Pencil, Cake, User, Target, Asterisk,
+  Globe, CloudUpload, ThumbsUp, MessageSquare, Share2, TrendingUp, ArrowRight,
+  ChevronLeft, ChevronRight, Type, Image, MapPin, ShoppingBag, MousePointer, Users,
+} from 'lucide-react';
 import { useOnboardingTour } from '../onboarding/useOnboardingTour'
 import OnboardingSpotlight from '../onboarding/OnboardingSpotlight'
 
@@ -63,7 +68,7 @@ const RecommendationCard = ({ card, isExpanded, onToggle, onEdit, onPublish, sta
         ) : (
           <div className="external-actions">
             <button className="btn-edit-ghost" onClick={() => onEdit(card.id)}>
-              <i className="fas fa-pen"></i>
+              <Pencil size={14} />
             </button>
             <button 
               className="btn-publish-external"
@@ -82,16 +87,16 @@ const RecommendationCard = ({ card, isExpanded, onToggle, onEdit, onPublish, sta
       >
         {isPublished && (
           <div className="absolute inset-0 z-20 bg-white/90 backdrop-blur-[2px] rounded-2xl flex flex-col items-center justify-center p-6 text-center animate-fade-in">
-            <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-4 text-green-600 shadow-sm">
+            <div className="w-12 h-12 bg-success-100 rounded-full flex items-center justify-center mb-4 text-success-600 shadow-sm">
               <Check size={24} strokeWidth={3} />
             </div>
-            <h4 className="text-lg font-bold text-gray-900 mb-2">Published Successfully!</h4>
-            <p className="text-sm text-gray-600 mb-6 leading-relaxed">
+            <h4 className="text-lg font-bold text-neutral-900 mb-2">Published Successfully!</h4>
+            <p className="text-sm text-neutral-600 mb-6 leading-relaxed">
               This campaign has been published.<br />
               It will disappear in <span className="font-bold text-primary">{countdown}s</span>.<br />
-              You can view it in the <span className="font-medium text-gray-900">Ad Manager</span> later.
+              You can view it in the <span className="font-medium text-neutral-900">Ad Manager</span> later.
             </p>
-            <div className="w-full bg-gray-100 h-1 rounded-full overflow-hidden">
+            <div className="w-full bg-neutral-100 h-1 rounded-full overflow-hidden">
               <div 
                 className="bg-primary h-full transition-all duration-1000 ease-linear"
                 style={{ width: `${(countdown / 5) * 100}%` }}
@@ -119,7 +124,7 @@ const RecommendationCard = ({ card, isExpanded, onToggle, onEdit, onPublish, sta
                   </div>
                 </div>
                 <div onClick={() => onToggle(card.id)} className={`aud-expand-btn ${isExpanded ? 'rotated' : ''}`} style={{ '--hover-color': colors.primary }}>
-                  <i className="fas fa-chevron-down"></i>
+                  <ChevronDown size={14} />
                 </div>
               </div>
             </>
@@ -128,16 +133,16 @@ const RecommendationCard = ({ card, isExpanded, onToggle, onEdit, onPublish, sta
               <div className="flex items-center gap-3 mb-2 flex-wrap">
                 <span className="aud-name">{card.audience}</span>
                 <div className="aud-group">
-                  <i className="fas fa-birthday-cake aud-icon-standalone" style={{ color: colors.icon }}></i>
+                  <Cake size={14} style={{ color: colors.icon }} />
                   <span className="aud-content-tag" style={{ background: colors.lightBg, borderColor: colors.lightBorder, color: colors.primary }}>{card.age}</span>
                 </div>
                 <div className="aud-group">
-                  <i className={`fas fa-${card.gender === 'Male' ? 'mars' : card.gender === 'Female' ? 'venus' : 'venus-mars'} aud-icon-standalone`} style={{ color: colors.icon }}></i>
+                  <User size={14} style={{ color: colors.icon }} />
                   <span className="aud-content-tag" style={{ background: colors.lightBg, borderColor: colors.lightBorder, color: colors.primary }}>{card.gender}</span>
                 </div>
               </div>
               <div className="aud-row-2">
-                <i className="fas fa-bullseye aud-icon-interest"></i>
+                <Target size={14} className="aud-icon-interest" />
                 <div className={`aud-tags-wrapper ${isExpanded ? 'expanded' : 'collapsed'}`}>
                   <div className="aud-tags-container">
                     {tagsArr.map((tag, idx) => (
@@ -147,7 +152,7 @@ const RecommendationCard = ({ card, isExpanded, onToggle, onEdit, onPublish, sta
                 </div>
                 {showExpandArrow && (
                   <div onClick={() => onToggle(card.id)} className={`aud-expand-btn ${isExpanded ? 'rotated' : ''}`} style={{ '--hover-color': colors.primary }}>
-                    <i className="fas fa-chevron-down"></i>
+                    <ChevronDown size={14} />
                   </div>
                 )}
               </div>
@@ -158,11 +163,11 @@ const RecommendationCard = ({ card, isExpanded, onToggle, onEdit, onPublish, sta
         <div className="ad-header">
           <div className="ad-user-info">
             <div className="ad-avatar" style={{ background: colors.lightBg, color: colors.primary }}>
-              <i className="fas fa-asterisk"></i>
+              <Asterisk size={16} />
             </div>
             <div className="ad-text-box">
               <h4>AdsGo.ai</h4>
-              <p>Sponsored · <i className="fas fa-globe-americas"></i></p>
+              <p className="flex items-center gap-1">Sponsored · <Globe size={12} /></p>
             </div>
           </div>
         </div>
@@ -178,7 +183,7 @@ const RecommendationCard = ({ card, isExpanded, onToggle, onEdit, onPublish, sta
           </div>
         ) : (
           <div className="media-empty">
-            <i className="fas fa-cloud-upload-alt text-2xl mb-2"></i>
+            <CloudUpload size={24} className="mb-2" />
             <div className="text-[10px]">Click to upload</div>
           </div>
         )}
@@ -194,9 +199,9 @@ const RecommendationCard = ({ card, isExpanded, onToggle, onEdit, onPublish, sta
         </div>
 
         <div className="ad-social">
-          <span className="social-item"><i className="far fa-thumbs-up"></i> Like</span>
-          <span className="social-item"><i className="far fa-comment-alt"></i> Comment</span>
-          <span className="social-item"><i className="fas fa-share"></i> Share</span>
+          <span className="social-item"><ThumbsUp size={14} /> Like</span>
+          <span className="social-item"><MessageSquare size={14} /> Comment</span>
+          <span className="social-item"><Share2 size={14} /> Share</span>
         </div>
       </div>
     </div>
@@ -804,7 +809,7 @@ const AutoRegeneration = ({ onPageChange, autoRegenEnabled, onAutoRegenChange })
           </svg>
         );
       default:
-        return <span className="text-xs text-gray-600">{platform}</span>;
+        return <span className="text-xs text-neutral-600">{platform}</span>;
     }
   };
 
@@ -812,7 +817,7 @@ const AutoRegeneration = ({ onPageChange, autoRegenEnabled, onAutoRegenChange })
     switch (type) {
       case 'image':
         return (
-          <div className="w-8 h-8 bg-gray-100 rounded flex items-center justify-center">
+          <div className="w-8 h-8 bg-neutral-100 rounded flex items-center justify-center">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
               <circle cx="8.5" cy="8.5" r="1.5"/>
@@ -822,7 +827,7 @@ const AutoRegeneration = ({ onPageChange, autoRegenEnabled, onAutoRegenChange })
         );
       case 'video':
         return (
-          <div className="w-8 h-8 bg-gray-100 rounded flex items-center justify-center">
+          <div className="w-8 h-8 bg-neutral-100 rounded flex items-center justify-center">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <polygon points="5 3 19 12 5 21 5 3"/>
             </svg>
@@ -830,7 +835,7 @@ const AutoRegeneration = ({ onPageChange, autoRegenEnabled, onAutoRegenChange })
         );
       case 'carousel':
         return (
-          <div className="w-8 h-8 bg-gray-100 rounded flex items-center justify-center">
+          <div className="w-8 h-8 bg-neutral-100 rounded flex items-center justify-center">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <rect x="3" y="3" width="7" height="7" rx="1"/>
               <rect x="14" y="3" width="7" height="7" rx="1"/>
@@ -841,7 +846,7 @@ const AutoRegeneration = ({ onPageChange, autoRegenEnabled, onAutoRegenChange })
         );
       default:
         return (
-          <div className="w-8 h-8 bg-gray-100 rounded flex items-center justify-center">
+          <div className="w-8 h-8 bg-neutral-100 rounded flex items-center justify-center">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
               <polyline points="13 2 13 9 20 9"/>
@@ -856,17 +861,17 @@ const AutoRegeneration = ({ onPageChange, autoRegenEnabled, onAutoRegenChange })
     <div className="min-h-screen bg-background font-sans p-6">
       <div className="flex-1 flex flex-col gap-4">
         {/* Platform Selector Card */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-4 transition-all">
-          <div className="bg-gray-50 p-1 rounded-[20px] flex gap-1 w-fit border border-gray-100/50">
+        <div className="bg-white rounded-2xl border border-neutral-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-4 transition-all">
+          <div className="bg-neutral-50 p-1 rounded-2xl flex gap-1 w-fit border border-neutral-100/50">
             {['Meta', 'Google', 'TikTok', 'Bing'].map(p => (
               <div key={p} className="relative group">
                 <button
                   onClick={() => (p === 'Meta' || p === 'Google') && setSelectedPlatform(p)}
                   className={`
-                    relative px-7 py-2 rounded-[16px] text-sm font-black transition-all duration-300 flex items-center gap-3
+                    relative px-7 py-2 rounded-xl text-sm font-black transition-all duration-300 flex items-center gap-3
                     ${selectedPlatform === p 
-                      ? 'bg-white shadow-[0_4px_12px_rgba(0,0,0,0.08)] text-gray-900 scale-[1.02] translate-y-[-1px]' 
-                      : 'text-gray-400 opacity-60 grayscale hover:grayscale-0 hover:opacity-100 hover:bg-white/60 hover:translate-y-[-1px]'
+                      ? 'bg-white shadow-[0_4px_12px_rgba(0,0,0,0.08)] text-neutral-900 scale-[1.02] translate-y-[-1px]' 
+                      : 'text-neutral-400 opacity-60 grayscale hover:grayscale-0 hover:opacity-100 hover:bg-white/60 hover:translate-y-[-1px]'
                     }
                     ${(p !== 'Meta' && p !== 'Google') ? 'cursor-not-allowed' : 'cursor-pointer active:scale-95'}
                   `}
@@ -883,9 +888,9 @@ const AutoRegeneration = ({ onPageChange, autoRegenEnabled, onAutoRegenChange })
                 </button>
                 
                 {(p !== 'Meta' && p !== 'Google') && (
-                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-3 px-3 py-2 bg-gray-900 text-white text-[10px] font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0 whitespace-nowrap z-10 shadow-xl pointer-events-none">
+                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-3 px-3 py-2 bg-neutral-900 text-white text-[10px] font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0 whitespace-nowrap z-10 shadow-xl pointer-events-none">
                     Coming soon
-                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1.5 w-3 h-3 bg-gray-900 rotate-45 rounded-sm"></div>
+                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1.5 w-3 h-3 bg-neutral-900 rotate-45 rounded-sm"></div>
                   </div>
                 )}
               </div>
@@ -902,37 +907,37 @@ const AutoRegeneration = ({ onPageChange, autoRegenEnabled, onAutoRegenChange })
                 
                 <div className="flex flex-col">
                   <div className="flex items-center gap-3">
-                    <h2 className="text-xl font-bold text-gray-900 leading-none">
+                    <h2 className="text-xl font-bold text-neutral-900 leading-none">
                       Recommended publish waitlists
                     </h2>
-                    <div className={`flex items-center gap-2 px-2.5 py-1 rounded-lg border shadow-sm transition-all ${isRefreshDisabled ? 'bg-gray-50 border-gray-200 cursor-not-allowed' : 'bg-gray-100 border-gray-200 hover:bg-gray-200 group/time cursor-default'}`}>
-                      <Clock size={12} className="text-blue-500" />
-                      <span className="text-[11px] font-black text-gray-600">2026-01-21 19:25</span>
-                      <div className="w-px h-3 bg-gray-300 mx-0.5"></div>
+                    <div className={`flex items-center gap-2 px-2.5 py-1 rounded-lg border shadow-sm transition-all ${isRefreshDisabled ? 'bg-neutral-50 border-neutral-200 cursor-not-allowed' : 'bg-neutral-100 border-neutral-200 hover:bg-neutral-200 group/time cursor-default'}`}>
+                      <Clock size={12} className="text-info-500" />
+                      <span className="text-[11px] font-black text-neutral-600">2026-01-21 19:25</span>
+                      <div className="w-px h-3 bg-neutral-300 mx-0.5"></div>
                     <div className="relative group/tooltip">
                       <RefreshCw 
                         size={12} 
-                        className={`${aiRegenerationCount >= 10 ? 'text-gray-300 cursor-not-allowed' : 'text-gray-400 group-hover/tooltip:text-blue-500 group-hover/tooltip:rotate-180 transition-all duration-500 cursor-pointer'}`} 
+                        className={`${aiRegenerationCount >= 10 ? 'text-neutral-300 cursor-not-allowed' : 'text-neutral-400 group-hover/tooltip:text-info-500 group-hover/tooltip:rotate-180 transition-all duration-500 cursor-pointer'}`} 
                         onClick={handleRefresh}
                       />
                       {aiRegenerationCount >= 10 ? (
-                        <div className="absolute top-full right-0 mt-2 w-72 bg-gray-900 text-white text-xs font-medium rounded-lg p-3 opacity-0 group-hover/tooltip:opacity-100 transition-opacity duration-200 pointer-events-none z-20 shadow-xl">
+                        <div className="absolute top-full right-0 mt-2 w-72 bg-neutral-900 text-white text-xs font-medium rounded-lg p-3 opacity-0 group-hover/tooltip:opacity-100 transition-opacity duration-200 pointer-events-none z-20 shadow-xl">
                           <div className="flex items-start gap-2">
-                            <AlertCircle size={14} className="text-yellow-400 flex-shrink-0 mt-0.5" />
+                            <AlertCircle size={14} className="text-warning-400 flex-shrink-0 mt-0.5" />
                             <span>AI has recommended 10 campaigns. You can delete some and then refresh to get new recommendations.</span>
                           </div>
-                          <div className="absolute top-0 right-4 -mt-1 w-2 h-2 bg-gray-900 rotate-45"></div>
+                          <div className="absolute top-0 right-4 -mt-1 w-2 h-2 bg-neutral-900 rotate-45"></div>
                         </div>
                       ) : (
-                        <div className="absolute top-full right-0 mt-2 bg-gray-900 text-white text-[10px] font-black px-2 py-1 rounded opacity-0 group-hover/tooltip:opacity-100 transition-opacity duration-200 pointer-events-none z-20 shadow-lg whitespace-nowrap">
+                        <div className="absolute top-full right-0 mt-2 bg-neutral-900 text-white text-[10px] font-black px-2 py-1 rounded opacity-0 group-hover/tooltip:opacity-100 transition-opacity duration-200 pointer-events-none z-20 shadow-lg whitespace-nowrap">
                           Get more AI recommendations
-                          <div className="absolute top-0 right-4 -mt-1 w-1.5 h-1.5 bg-gray-900 rotate-45"></div>
+                          <div className="absolute top-0 right-4 -mt-1 w-1.5 h-1.5 bg-neutral-900 rotate-45"></div>
                         </div>
                       )}
                     </div>
                     </div>
                   </div>
-                  <p className="text-sm text-gray-500 mt-2 leading-none">
+                  <p className="text-sm text-neutral-500 mt-2 leading-none">
                     Showcasing the top 3 campaigns for auto-publish order.
                   </p>
                 </div>
@@ -957,15 +962,15 @@ const AutoRegeneration = ({ onPageChange, autoRegenEnabled, onAutoRegenChange })
                 
                 <div key="empty-placeholder" className="campaign-wrapper">
                   <div className="campaign-external-header">
-                    <div className="bg-[#f0f7ff] border border-blue-100 rounded-xl px-3 py-1.5 flex items-center gap-2.5 shadow-sm">
-                      <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center border border-blue-50">
+                    <div className="bg-[#f0f7ff] border border-info-100 rounded-xl px-3 py-1.5 flex items-center gap-2.5 shadow-sm">
+                      <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center border border-info-50">
                         <img src="https://www.adsgo.ai/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Frobot-active.7003b4d8.png&w=256&q=75" alt="AI Robot" className="w-5 h-5" />
                       </div>
-                      <span className="text-[14px] font-black text-blue-600 tracking-tight">AI-Scaling Control Center</span>
+                      <span className="text-[14px] font-black text-info-600 tracking-tight">AI-Scaling Control Center</span>
                     </div>
                   </div>
-                  <div className="ad-card flex flex-col items-stretch p-0 bg-gray-50/30 border-dashed border-2 border-gray-200 min-h-[550px] relative group shadow-sm hover:shadow-md transition-shadow">
-                      <div className="h-[240px] relative bg-white border-b border-dashed border-gray-200">
+                  <div className="ad-card flex flex-col items-stretch p-0 bg-neutral-50/30 border-dashed border-2 border-neutral-200 min-h-[550px] relative group shadow-sm hover:shadow-md transition-shadow">
+                      <div className="h-[240px] relative bg-white border-b border-dashed border-neutral-200">
                         <div className="absolute inset-0 rounded-t-xl overflow-hidden" style={{ 
                           background: 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)',
                         }}>
@@ -977,26 +982,26 @@ const AutoRegeneration = ({ onPageChange, autoRegenEnabled, onAutoRegenChange })
                           }}></div>
 
                           <div className="absolute inset-0 flex items-center justify-center scale-[0.7]">
-                            <div className="relative z-[20] w-32 h-32 bg-white/20 backdrop-blur-md border-2 border-white/40 rounded-[28px] flex flex-col items-center justify-center shadow-2xl animate-pulse-slow">
+                            <div className="relative z-[20] w-32 h-32 bg-white/20 backdrop-blur-md border-2 border-white/40 rounded-2xl flex flex-col items-center justify-center shadow-2xl animate-pulse-slow">
                               <Sparkles className="w-14 h-14 text-white" />
                               <div className="text-[15px] text-white font-black mt-2 whitespace-nowrap tracking-wider">Regenerating</div>
                             </div>
 
                             <div className="absolute inset-0 flex items-center justify-center">
                               {[
-                                { label: 'Ad copys', icon: 'fa-font', delay: '0s', r: '145px' },
-                                { label: 'Age', icon: 'fa-birthday-cake', delay: '-1.66s', r: '135px' },
-                                { label: 'Gender', icon: 'fa-venus-mars', delay: '-3.33s', r: '155px' },
-                                { label: 'Creatives', icon: 'fa-image', delay: '-5s', r: '125px' },
-                                { label: 'Locations', icon: 'fa-map-marker-alt', delay: '-6.66s', r: '150px' },
-                                { label: 'Products', icon: 'fa-shopping-bag', delay: '-8.33s', r: '140px' },
-                                { label: 'Cta', icon: 'fa-mouse-pointer', delay: '-10s', r: '160px' },
-                                { label: 'Interests', icon: 'fa-bullseye', delay: '-11.66s', r: '120px' },
-                                { label: 'Lookalike', icon: 'fa-user-friends', delay: '-13.33s', r: '165px' }
+                                { label: 'Ad copys', Icon: Type, delay: '0s', r: '145px' },
+                                { label: 'Age', Icon: Cake, delay: '-1.66s', r: '135px' },
+                                { label: 'Gender', Icon: Users, delay: '-3.33s', r: '155px' },
+                                { label: 'Creatives', Icon: Image, delay: '-5s', r: '125px' },
+                                { label: 'Locations', Icon: MapPin, delay: '-6.66s', r: '150px' },
+                                { label: 'Products', Icon: ShoppingBag, delay: '-8.33s', r: '140px' },
+                                { label: 'Cta', Icon: MousePointer, delay: '-10s', r: '160px' },
+                                { label: 'Interests', Icon: Target, delay: '-11.66s', r: '120px' },
+                                { label: 'Lookalike', Icon: Users, delay: '-13.33s', r: '165px' }
                               ].map((item, idx) => (
                                 <div key={idx} className="absolute animate-spiral-card" style={{ animationDelay: item.delay, '--radius': item.r }}>
                                   <div className="w-16 h-16 bg-white/15 backdrop-blur-md border border-white/30 rounded-2xl flex flex-col items-center justify-center text-white shadow-xl">
-                                    <i className={`fas ${item.icon} text-xl mb-1.5`}></i>
+                                    <item.Icon size={20} className="mb-1.5" />
                                     <span className="text-[11px] font-black tracking-tight leading-none">{item.label}</span>
                                   </div>
                                 </div>
@@ -1009,25 +1014,25 @@ const AutoRegeneration = ({ onPageChange, autoRegenEnabled, onAutoRegenChange })
                       </div>
 
                       <div className="flex-1 bg-[#f8faff] p-3 flex flex-col gap-3">
-                        <div className="bg-white border border-gray-100 rounded-xl p-2 shadow-sm space-y-2">
+                        <div className="bg-white border border-neutral-100 rounded-xl p-2 shadow-sm space-y-2">
                           <div className="flex items-center gap-1.5 px-1">
-                            <i className="fas fa-chart-line text-primary text-[8px]"></i>
-                            <span className="text-[12px] font-black text-gray-700 tracking-tight">AI Recommended Publishing</span>
+                            <TrendingUp size={8} className="text-primary" />
+                            <span className="text-[12px] font-black text-neutral-700 tracking-tight">AI Recommended Publishing</span>
                           </div>
                           <div className="flex gap-1.5 items-center px-0.5">
-                            <div className="flex-1 bg-gray-50 border border-gray-100 rounded-lg p-1.5 flex flex-col">
-                              <span className="text-[10px] font-bold text-gray-400 leading-none mb-1">Recommendations</span>
-                              <span className="text-sm font-black text-gray-900 leading-none">{totalRecommendationsCount}</span>
+                            <div className="flex-1 bg-neutral-50 border border-neutral-100 rounded-lg p-1.5 flex flex-col">
+                              <span className="text-[10px] font-bold text-neutral-400 leading-none mb-1">Recommendations</span>
+                              <span className="text-sm font-black text-neutral-900 leading-none">{totalRecommendationsCount}</span>
                             </div>
-                            <i className="fas fa-arrow-right text-[10px] text-gray-300"></i>
+                            <ArrowRight size={10} className="text-neutral-300" />
                             <div className="flex-1 bg-white border-2 border-primary rounded-lg p-1.5 flex flex-col relative shadow-sm">
                               <span className="text-[10px] font-bold text-primary leading-none mb-1">Published</span>
-                              <span className="text-sm font-black text-gray-900 leading-none text-center">{Object.keys(campaignStatus).length}</span>
+                              <span className="text-sm font-black text-neutral-900 leading-none text-center">{Object.keys(campaignStatus).length}</span>
                             </div>
                           </div>
                           <div className="px-0.5">
                             <div className="w-full bg-[#eff6ff] border border-primary/10 rounded-lg p-1.5 flex items-center justify-between">
-                              <span className="text-[10px] font-bold text-gray-500">Reserved</span>
+                              <span className="text-[10px] font-bold text-neutral-500">Reserved</span>
                               <span className="text-sm font-black text-primary leading-none">{aiRegenerationCount}</span>
                             </div>
                           </div>
@@ -1036,37 +1041,37 @@ const AutoRegeneration = ({ onPageChange, autoRegenEnabled, onAutoRegenChange })
                         <div className="flex gap-3 mt-auto pt-1 relative">
                           <div 
                             onClick={() => setAutoRegen(false)}
-                            className={`flex-1 border-2 rounded-2xl p-2 flex flex-col items-center text-center transition-all duration-300 cursor-pointer relative ${!autoRegen ? 'bg-blue-50 border-blue-500 shadow-[0_8px_16px_rgba(59,130,246,0.12)] scale-[1.05] z-10' : 'bg-white border-slate-100 hover:border-blue-200 opacity-80 grayscale hover:grayscale-0'}`}
+                            className={`flex-1 border-2 rounded-2xl p-2 flex flex-col items-center text-center transition-all duration-300 cursor-pointer relative ${!autoRegen ? 'bg-info-50 border-info-500 shadow-[0_8px_16px_rgba(59,130,246,0.12)] scale-[1.05] z-10' : 'bg-white border-neutral-100 hover:border-info-200 opacity-80 grayscale hover:grayscale-0'}`}
                           >
                             <div className="mb-1.5 relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 bg-white shadow-md">
-                              <svg viewBox="0 0 24 24" fill="none" className={`w-5 h-5 ${!autoRegen ? 'text-blue-600' : 'text-blue-400'}`}>
+                              <svg viewBox="0 0 24 24" fill="none" className={`w-5 h-5 ${!autoRegen ? 'text-info-600' : 'text-info-400'}`}>
                                 <rect x="3" y="4" width="18" height="18" rx="2" strokeWidth="2" stroke="currentColor" fill="none"/><path d="M16 2V6M8 2V6M3 10H21" strokeWidth="2" stroke="currentColor" strokeLinecap="round"/><circle cx="12" cy="16" r="1.5" fill="currentColor" className={!autoRegen ? 'animate-pulse' : ''}/>
                               </svg>
                             </div>
-                            <p className={`text-[14px] font-black mb-1.5 tracking-tight ${!autoRegen ? 'text-blue-700' : 'text-slate-800'}`}>Recommendations</p>
-                            <div className={`flex items-center gap-1 px-2 py-0.5 rounded-full border transition-all duration-300 ${!autoRegen ? 'bg-blue-600 border-blue-600 text-white shadow-sm' : 'bg-slate-50 border-slate-100 text-slate-300'}`}>
-                              <div className={`w-1 h-1 rounded-full ${!autoRegen ? 'bg-white animate-pulse' : 'bg-slate-300'}`} /><span className="text-[9px] font-black tracking-wider">{!autoRegen ? 'Running' : 'Standby'}</span>
+                            <p className={`text-[14px] font-black mb-1.5 tracking-tight ${!autoRegen ? 'text-info-700' : 'text-neutral-800'}`}>Recommendations</p>
+                            <div className={`flex items-center gap-1 px-2 py-0.5 rounded-full border transition-all duration-300 ${!autoRegen ? 'bg-info-600 border-info-600 text-white shadow-sm' : 'bg-neutral-50 border-neutral-100 text-neutral-300'}`}>
+                              <div className={`w-1 h-1 rounded-full ${!autoRegen ? 'bg-white animate-pulse' : 'bg-neutral-300'}`} /><span className="text-[9px] font-black tracking-wider">{!autoRegen ? 'Running' : 'Standby'}</span>
                             </div>
                           </div>
 
                           <div 
                             onClick={() => setAutoRegen(true)}
-                            className={`flex-1 border-2 rounded-2xl p-2 flex flex-col items-center text-center transition-all duration-300 cursor-pointer relative overflow-hidden ${autoRegen ? 'bg-slate-900 border-slate-800 shadow-[0_12px_24px_rgba(0,0,0,0.25)] scale-[1.05] z-10' : 'bg-white border-slate-100 hover:border-indigo-200 opacity-80 grayscale hover:grayscale-0'}`}
+                            className={`flex-1 border-2 rounded-2xl p-2 flex flex-col items-center text-center transition-all duration-300 cursor-pointer relative overflow-hidden ${autoRegen ? 'bg-neutral-900 border-neutral-800 shadow-[0_12px_24px_rgba(0,0,0,0.25)] scale-[1.05] z-10' : 'bg-white border-neutral-100 hover:border-primary-200 opacity-80 grayscale hover:grayscale-0'}`}
                           >
                             {autoRegen && (
                               <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden opacity-30">
                                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200%] h-[200%] bg-[conic-gradient(from_0deg,transparent_0deg,rgba(99,102,241,0.4)_20deg,transparent_40deg)] animate-[spin_3s_linear_infinite]" />
                               </div>
                             )}
-                            <div className={`mb-1.5 relative z-10 w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 ${autoRegen ? 'bg-slate-800 shadow-md border border-slate-700' : 'bg-white shadow-sm'}`}>
-                              <Infinity size={20} className={`${autoRegen ? 'text-indigo-400 animate-[spin_3s_linear_infinite]' : 'text-indigo-600'}`}/>
+                            <div className={`mb-1.5 relative z-10 w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 ${autoRegen ? 'bg-neutral-800 shadow-md border border-neutral-700' : 'bg-white shadow-sm'}`}>
+                              <Infinity size={20} className={`${autoRegen ? 'text-primary-400 animate-[spin_3s_linear_infinite]' : 'text-primary-600'}`}/>
                             </div>
-                            <p className={`text-[14px] font-black mb-1.5 tracking-tight relative z-10 ${autoRegen ? 'text-white' : 'text-slate-800'}`}>Auto Publish</p>
-                            <div className={`relative z-10 flex items-center gap-1 px-2 py-0.5 rounded-full border transition-all duration-300 ${autoRegen ? 'bg-indigo-600 border-indigo-500 text-white shadow-md' : 'bg-slate-50 border-slate-100 text-slate-300'}`}>
-                              <div className={`w-1 h-1 rounded-full ${autoRegen ? 'bg-green-400 animate-ping' : 'bg-slate-300'}`} /><span className="text-[9px] font-black tracking-wider">{autoRegen ? 'Running' : 'Standby'}</span>
+                            <p className={`text-[14px] font-black mb-1.5 tracking-tight relative z-10 ${autoRegen ? 'text-white' : 'text-neutral-800'}`}>Auto Publish</p>
+                            <div className={`relative z-10 flex items-center gap-1 px-2 py-0.5 rounded-full border transition-all duration-300 ${autoRegen ? 'bg-primary-600 border-primary-500 text-white shadow-md' : 'bg-neutral-50 border-neutral-100 text-neutral-300'}`}>
+                              <div className={`w-1 h-1 rounded-full ${autoRegen ? 'bg-success-400 animate-ping' : 'bg-neutral-300'}`} /><span className="text-[9px] font-black tracking-wider">{autoRegen ? 'Running' : 'Standby'}</span>
                             </div>
                             <div className="absolute top-1.5 right-1.5 z-20">
-                              <div className={`bg-slate-900 text-white text-[9px] font-black px-1.5 py-0.5 rounded-md leading-tight shadow-sm flex items-center gap-0.5 animate-pulse`}><ShieldCheck size={14} className="text-[#7033f5]" /><span>7*24H</span></div>
+                              <div className={`bg-neutral-900 text-white text-[9px] font-black px-1.5 py-0.5 rounded-md leading-tight shadow-sm flex items-center gap-0.5 animate-pulse`}><ShieldCheck size={14} className="text-[#7033f5]" /><span>7*24H</span></div>
                             </div>
                           </div>
                         </div>
@@ -1083,7 +1088,7 @@ const AutoRegeneration = ({ onPageChange, autoRegenEnabled, onAutoRegenChange })
             <div className="absolute left-0 top-0.5 bottom-0.5 w-1.5 rounded-full bg-gradient-to-b from-[#c3a2fe] via-[#7135f4] to-[#0d031f]"></div>
 
             <div className="pl-4 flex flex-col">
-              <h2 className="text-xl font-bold text-gray-900 leading-none">
+              <h2 className="text-xl font-bold text-neutral-900 leading-none">
                 More drafts awaiting publish
               </h2>
             </div>
@@ -1091,16 +1096,16 @@ const AutoRegeneration = ({ onPageChange, autoRegenEnabled, onAutoRegenChange })
           <div className="bg-white rounded-xl border border-border shadow-sm">
             <div>
               <table className="w-full">
-              <thead className="bg-gray-50">
+              <thead className="bg-neutral-50">
                 <tr>
-                  {selectedPlatform === 'Meta' && autoRegen && <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 min-w-[80px]">Order</th>}
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 min-w-[180px]">Campaign</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 min-w-[120px]">Daily Budget</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 min-w-[200px]">Audience</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 min-w-[150px]">Creatives</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 min-w-[100px]">Product</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 min-w-[180px]">Update Time</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 min-w-[200px]">{selectedPlatform === 'Google' ? 'Actions' : 'Auto publish & Actions'}</th>
+                  {selectedPlatform === 'Meta' && autoRegen && <th className="px-4 py-3 text-left text-xs font-medium text-neutral-600 min-w-[80px]">Order</th>}
+                  <th className="px-4 py-3 text-left text-xs font-medium text-neutral-600 min-w-[180px]">Campaign</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-neutral-600 min-w-[120px]">Daily Budget</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-neutral-600 min-w-[200px]">Audience</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-neutral-600 min-w-[150px]">Creatives</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-neutral-600 min-w-[100px]">Product</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-neutral-600 min-w-[180px]">Update Time</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-neutral-600 min-w-[200px]">{selectedPlatform === 'Google' ? 'Actions' : 'Auto publish & Actions'}</th>
                   </tr>
                 </thead>
               <tbody className="divide-y-0">
@@ -1119,11 +1124,11 @@ const AutoRegeneration = ({ onPageChange, autoRegenEnabled, onAutoRegenChange })
                       const isPublishing = !!campaignStatus[campaign.id];
 
                       if (isPublishing) {
-                        rowClass += 'opacity-50 pointer-events-none grayscale-[0.5] bg-gray-50/50 ';
+                        rowClass += 'opacity-50 pointer-events-none grayscale-[0.5] bg-neutral-50/50 ';
                       }
 
                       if (draggedIndex === actualIndex) {
-                        rowClass += 'opacity-40 bg-blue-50 border-2 border-dashed border-blue-200';
+                        rowClass += 'opacity-40 bg-info-50 border-2 border-dashed border-info-200';
                       } else if (animatingInfo.id === campaign.id) {
                         if (animatingInfo.phase === 'leaving') {
                           rowClass += 'row-pickup-fade';
@@ -1164,7 +1169,7 @@ const AutoRegeneration = ({ onPageChange, autoRegenEnabled, onAutoRegenChange })
                         <tr 
                           key={campaign.id} 
                           id={`campaign-row-${campaign.id}`}
-                          className={`hover:bg-gray-50 ${rowClass}`}
+                          className={`hover:bg-neutral-50 ${rowClass}`}
                           style={gapStyle}
                           draggable={((selectedPlatform !== 'Meta') || !autoRegen || !autoPublishCampaigns[campaign.id]) ? false : true}
                           onDragStart={(e) => ((selectedPlatform !== 'Meta') || !autoRegen || !autoPublishCampaigns[campaign.id]) || handleDragStart(e, actualIndex)}
@@ -1175,7 +1180,7 @@ const AutoRegeneration = ({ onPageChange, autoRegenEnabled, onAutoRegenChange })
                             <td className="px-4 py-4">
                               <div className="flex items-start gap-3">
                                 {autoRegen && autoPublishCampaigns[campaign.id] ? (
-                                  <div className="mt-1 cursor-grab active:cursor-grabbing text-gray-300 hover:text-gray-600 transition-colors">
+                                  <div className="mt-1 cursor-grab active:cursor-grabbing text-neutral-300 hover:text-neutral-600 transition-colors">
                                     <GripVertical size={16} />
                                   </div>
                                 ) : (
@@ -1183,7 +1188,7 @@ const AutoRegeneration = ({ onPageChange, autoRegenEnabled, onAutoRegenChange })
                                 )}
                                 <div className="flex flex-col gap-2 flex-1">
                                   {autoPublishCampaigns[campaign.id] && sequenceNumber > 0 && (
-                                    <div className="w-8 h-8 flex items-center justify-center bg-blue-50 text-blue-600 border-2 border-blue-100 rounded-lg text-sm font-black shadow-sm">
+                                    <div className="w-8 h-8 flex items-center justify-center bg-info-50 text-info-600 border-2 border-info-100 rounded-lg text-sm font-black shadow-sm">
                                       {sequenceNumber}
                                     </div>
                                   )}
@@ -1196,13 +1201,13 @@ const AutoRegeneration = ({ onPageChange, autoRegenEnabled, onAutoRegenChange })
                               <div className="flex items-center gap-2 mb-1">
                                 {getPlatformLogo(campaign.platform)}
                                 {campaign.isRecommendation && (
-                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-green-50 text-green-600 border border-green-100 text-[10px] font-bold rounded-full">
+                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-success-50 text-success-600 border border-success-100 text-[10px] font-bold rounded-full">
                                     <Sparkles size={10} /> AI Recommended
                                   </span>
                                 )}
                               </div>
                               <div 
-                                className="font-medium text-gray-900 text-sm mb-1 truncate max-w-[180px]" 
+                                className="font-medium text-neutral-900 text-sm mb-1 truncate max-w-[180px]" 
                                 title={campaign.campaignName}
                               >
                                 {campaign.campaignName}
@@ -1213,23 +1218,23 @@ const AutoRegeneration = ({ onPageChange, autoRegenEnabled, onAutoRegenChange })
                             {editingBudget === campaign.id ? (
                               <div className="flex items-center gap-2">
                                 <input type="number" value={tempBudget} onChange={(e) => setTempBudget(e.target.value)} className="w-24 px-2 py-1 border border-border rounded text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" autoFocus />
-                                <button onClick={() => handleBudgetSave(campaign.id)} className="text-green-600 hover:text-green-700 transition-colors"><Check size={16} /></button>
-                                <button onClick={handleBudgetCancel} className="text-gray-400 hover:text-gray-600 transition-colors"><X size={16} /></button>
+                                <button onClick={() => handleBudgetSave(campaign.id)} className="text-success-600 hover:text-success-700 transition-colors"><Check size={16} /></button>
+                                <button onClick={handleBudgetCancel} className="text-neutral-400 hover:text-neutral-600 transition-colors"><X size={16} /></button>
                               </div>
                             ) : (
                               <div className="flex items-center gap-2">
-                                <span className="font-medium text-gray-900 text-sm">{formatCurrency(campaign.dailyBudget)}</span>
-                                <button onClick={() => handleBudgetEditStart(campaign.id, campaign.dailyBudget)} className="text-gray-400 hover:text-primary transition-colors"><Edit size={14} /></button>
+                                <span className="font-medium text-neutral-900 text-sm">{formatCurrency(campaign.dailyBudget)}</span>
+                                <button onClick={() => handleBudgetEditStart(campaign.id, campaign.dailyBudget)} className="text-neutral-400 hover:text-primary transition-colors"><Edit size={14} /></button>
                               </div>
                             )}
                           </td>
-                          <td className="px-4 py-4"><div className="text-sm text-gray-600">{campaign.audience}</div></td>
+                          <td className="px-4 py-4"><div className="text-sm text-neutral-600">{campaign.audience}</div></td>
                           <td className="px-4 py-4">
                             <div className="flex items-center gap-2">
                               {campaign.creatives.slice(0, 3).map((creative) => (
                                 <div key={creative.id} className="relative group">{getCreativeIcon(creative.type)}</div>
                               ))}
-                              {campaign.creatives.length > 3 && <div className="text-xs text-gray-500">+{campaign.creatives.length - 3} more</div>}
+                              {campaign.creatives.length > 3 && <div className="text-xs text-neutral-500">+{campaign.creatives.length - 3} more</div>}
                             </div>
                           </td>
                           <td className="px-4 py-4">
@@ -1237,48 +1242,48 @@ const AutoRegeneration = ({ onPageChange, autoRegenEnabled, onAutoRegenChange })
                               campaign.product.type === 'url' ? (
                                 <a href={campaign.product.value} target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:text-primary-hover hover:underline">{campaign.product.value}</a>
                               ) : (
-                                <span className="text-sm text-gray-600">Feeds: {campaign.product.name}</span>
+                                <span className="text-sm text-neutral-600">Feeds: {campaign.product.name}</span>
                               )
                             ) : (
-                              <span className="text-sm text-gray-600">{campaign.product}</span>
+                              <span className="text-sm text-neutral-600">{campaign.product}</span>
                             )}
                           </td>
-                          <td className="px-4 py-4"><div className="text-sm text-gray-600">{campaign.updateTime}</div></td>
+                          <td className="px-4 py-4"><div className="text-sm text-neutral-600">{campaign.updateTime}</div></td>
                           <td className="px-4 py-4">
                             {campaignStatus[campaign.id] ? (
-                              <div className="flex items-center gap-1.5 px-3 py-2 bg-blue-50 text-blue-600 border border-blue-100 rounded-lg text-sm font-bold animate-pulse">
+                              <div className="flex items-center gap-1.5 px-3 py-2 bg-info-50 text-info-600 border border-info-100 rounded-lg text-sm font-bold animate-pulse">
                                 <RefreshCw size={14} className="animate-spin" />
                                 <span>Publishing...</span>
                               </div>
                             ) : (
                               <div className="flex items-center gap-3">
                                 {selectedPlatform === 'Meta' && (
-                                  <div className="flex items-center gap-2 border-r border-gray-100 pr-3 mr-1 relative group/column-tooltip">
+                                  <div className="flex items-center gap-2 border-r border-neutral-100 pr-3 mr-1 relative group/column-tooltip">
                                     {!autoRegen && (
-                                      <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-64 bg-gray-900 text-white text-[11px] font-medium rounded-lg p-3 opacity-0 group-hover/column-tooltip:opacity-100 transition-opacity duration-200 pointer-events-none z-50 shadow-xl leading-relaxed">
-                                        <div className="absolute bottom-full left-1/2 -translate-x-1/2 w-2 h-2 bg-gray-900 rotate-45 -mb-1"></div>
+                                      <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-64 bg-neutral-900 text-white text-[11px] font-medium rounded-lg p-3 opacity-0 group-hover/column-tooltip:opacity-100 transition-opacity duration-200 pointer-events-none z-50 shadow-xl leading-relaxed">
+                                        <div className="absolute bottom-full left-1/2 -translate-x-1/2 w-2 h-2 bg-neutral-900 rotate-45 -mb-1"></div>
                                         Currently, recommendations are in running state. AdsGo does not automatically publish campaigns, so this switch cannot be operated.
                                       </div>
                                     )}
                                     <div 
-                                      className={`w-8 h-4 rounded-full p-0.5 transition-colors ${autoPublishCampaigns[campaign.id] ? 'bg-green-500' : 'bg-gray-300'} ${!autoRegen ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
+                                      className={`w-8 h-4 rounded-full p-0.5 transition-colors ${autoPublishCampaigns[campaign.id] ? 'bg-success-500' : 'bg-neutral-300'} ${!autoRegen ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
                                       onClick={() => !autoRegen || handleToggleAutoPublish(campaign.id)}
                                     >
                                       <div className={`w-3 h-3 bg-white rounded-full transition-transform ${autoPublishCampaigns[campaign.id] ? 'translate-x-4' : 'translate-x-0'}`} />
                                     </div>
-                                    <span className={`text-[10px] font-bold w-12 ${autoPublishCampaigns[campaign.id] ? 'text-green-600' : 'text-red-600'} ${!autoRegen ? 'opacity-50' : ''}`}>
+                                    <span className={`text-[10px] font-bold w-12 ${autoPublishCampaigns[campaign.id] ? 'text-success-600' : 'text-danger-600'} ${!autoRegen ? 'opacity-50' : ''}`}>
                                       {autoPublishCampaigns[campaign.id] ? 'Waiting' : 'Forbidden'}
                                     </span>
                                   </div>
                                 )}
                                 <div className="flex items-center gap-2">
-                                  <button onClick={() => handleEditDraft(campaign.id)} className="flex items-center justify-center p-2 bg-white border border-gray-200 rounded-lg text-gray-400 hover:bg-gray-50 hover:border-gray-300 hover:text-primary transition-all duration-200 cursor-pointer" title="Edit">
+                                  <button onClick={() => handleEditDraft(campaign.id)} className="flex items-center justify-center p-2 bg-white border border-neutral-200 rounded-lg text-neutral-400 hover:bg-neutral-50 hover:border-neutral-300 hover:text-primary transition-all duration-200 cursor-pointer" title="Edit">
                                     <Edit size={14} />
                                   </button>
                                   <button onClick={() => handlePublishDraft(campaign.id)} className="flex items-center gap-1.5 px-3 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary-hover hover:shadow-md transition-all duration-200 cursor-pointer">
                                     <Send size={14} /> <span>Publish</span>
                                   </button>
-                                  <button onClick={() => handleDelete(campaign.id)} className="flex items-center justify-center p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 hover:text-red-700 transition-all duration-200 cursor-pointer">
+                                  <button onClick={() => handleDelete(campaign.id)} className="flex items-center justify-center p-2 bg-danger-50 text-danger-600 rounded-lg hover:bg-danger-100 hover:text-danger-700 transition-all duration-200 cursor-pointer">
                                     <Trash2 size={14} />
                                   </button>
                                 </div>
@@ -1293,26 +1298,26 @@ const AutoRegeneration = ({ onPageChange, autoRegenEnabled, onAutoRegenChange })
             </div>
 
           {filteredDrafts.length > 0 && (
-            <div className="px-4 py-3 bg-gray-50 border-t border-border flex items-center justify-between">
+            <div className="px-4 py-3 bg-neutral-50 border-t border-border flex items-center justify-between">
               <div className="flex-1 flex justify-between sm:hidden">
                   <button
                     onClick={() => goToPage(currentPage - 1)}
                     disabled={currentPage === 1}
-                    className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+                    className="relative inline-flex items-center px-4 py-2 border border-neutral-300 text-sm font-medium rounded-md text-neutral-700 bg-white hover:bg-neutral-50 disabled:opacity-50"
                   >
                     Previous
                   </button>
                   <button
                     onClick={() => goToPage(currentPage + 1)}
                     disabled={currentPage === totalPages}
-                    className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+                    className="ml-3 relative inline-flex items-center px-4 py-2 border border-neutral-300 text-sm font-medium rounded-md text-neutral-700 bg-white hover:bg-neutral-50 disabled:opacity-50"
                   >
                     Next
                   </button>
                 </div>
               <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
                 <div>
-                  <p className="text-sm text-gray-700">
+                  <p className="text-sm text-neutral-700">
                     Showing <span className="font-medium">{(currentPage - 1) * itemsPerPage + 1}</span> to <span className="font-medium">{Math.min(currentPage * itemsPerPage, filteredDrafts.length)}</span> of{' '}
                     <span className="font-medium">{filteredDrafts.length}</span> results
                   </p>
@@ -1322,19 +1327,19 @@ const AutoRegeneration = ({ onPageChange, autoRegenEnabled, onAutoRegenChange })
                       <button
                         onClick={() => goToPage(currentPage - 1)}
                         disabled={currentPage === 1}
-                        className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+                        className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-neutral-300 bg-white text-sm font-medium text-neutral-500 hover:bg-neutral-50 disabled:opacity-50"
                       >
                         <span className="sr-only">Previous</span>
-                        <i className="fas fa-chevron-left"></i>
+                        <ChevronLeft size={14} />
                       </button>
                       {[...Array(totalPages)].map((_, i) => (
                         <button
                           key={i + 1}
                           onClick={() => goToPage(i + 1)}
-                          className={`relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium ${
+                          className={`relative inline-flex items-center px-4 py-2 border border-neutral-300 text-sm font-medium ${
                             currentPage === i + 1
                               ? 'z-10 bg-primary border-primary text-white'
-                              : 'bg-white text-gray-700 hover:bg-gray-50'
+                              : 'bg-white text-neutral-700 hover:bg-neutral-50'
                           }`}
                         >
                           {i + 1}
@@ -1343,10 +1348,10 @@ const AutoRegeneration = ({ onPageChange, autoRegenEnabled, onAutoRegenChange })
                       <button
                         onClick={() => goToPage(currentPage + 1)}
                         disabled={currentPage === totalPages}
-                        className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+                        className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-neutral-300 bg-white text-sm font-medium text-neutral-500 hover:bg-neutral-50 disabled:opacity-50"
                       >
                         <span className="sr-only">Next</span>
-                        <i className="fas fa-chevron-right"></i>
+                        <ChevronRight size={14} />
                       </button>
                     </nav>
                   </div>
@@ -1356,7 +1361,7 @@ const AutoRegeneration = ({ onPageChange, autoRegenEnabled, onAutoRegenChange })
 
           {filteredDrafts.length === 0 && (
               <div className="p-12 text-center">
-                <div className="text-gray-400 mb-4">
+                <div className="text-neutral-400 mb-4">
                   <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
                     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
                     <polyline points="14 2 14 9 20 9"/>
@@ -1364,8 +1369,8 @@ const AutoRegeneration = ({ onPageChange, autoRegenEnabled, onAutoRegenChange })
                     <line x1="9" y1="15" x2="15" y2="15"/>
                   </svg>
                 </div>
-                <h3 className="text-lg font-medium text-gray-900 mb-2">No drafts found</h3>
-                <p className="text-sm text-gray-500">You haven't created any draft campaigns yet.</p>
+                <h3 className="text-lg font-medium text-neutral-900 mb-2">No drafts found</h3>
+                <p className="text-sm text-neutral-500">You haven't created any draft campaigns yet.</p>
               </div>
             )}
           </div>
@@ -1378,24 +1383,24 @@ const AutoRegeneration = ({ onPageChange, autoRegenEnabled, onAutoRegenChange })
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={handleDeleteCancel}></div>
           <div className="relative bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md transform transition-all animate-in fade-in zoom-in duration-200">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center text-red-600">
+              <div className="w-10 h-10 rounded-full bg-danger-50 flex items-center justify-center text-danger-600">
                 <AlertCircle size={20} />
               </div>
-              <h3 className="text-xl font-bold text-gray-900">Delete campaign draft</h3>
+              <h3 className="text-xl font-bold text-neutral-900">Delete campaign draft</h3>
             </div>
-            <p className="text-gray-600 mb-8 leading-relaxed">
-              Are you sure you want to delete this campaign draft? This action <span className="font-semibold text-gray-900">cannot be undone</span> and all associated data will be lost.
+            <p className="text-neutral-600 mb-8 leading-relaxed">
+              Are you sure you want to delete this campaign draft? This action <span className="font-semibold text-neutral-900">cannot be undone</span> and all associated data will be lost.
             </p>
             <div className="flex justify-end gap-3">
               <button 
                 onClick={handleDeleteCancel} 
-                className="flex-1 sm:flex-none px-6 py-2.5 text-sm font-bold text-gray-700 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-all active:scale-95"
+                className="flex-1 sm:flex-none px-6 py-2.5 text-sm font-bold text-neutral-700 bg-white border border-neutral-200 rounded-xl hover:bg-neutral-50 hover:border-neutral-300 transition-all active:scale-95"
               >
                 Cancel
               </button>
               <button 
                 onClick={handleDeleteConfirm} 
-                className="flex-1 sm:flex-none px-6 py-2.5 text-sm font-bold text-white bg-red-600 rounded-xl hover:bg-red-700 shadow-lg shadow-red-200 transition-all active:scale-95"
+                className="flex-1 sm:flex-none px-6 py-2.5 text-sm font-bold text-white bg-danger-600 rounded-xl hover:bg-danger-700 shadow-lg shadow-danger-200 transition-all active:scale-95"
               >
                 Delete
               </button>
@@ -1410,8 +1415,8 @@ const AutoRegeneration = ({ onPageChange, autoRegenEnabled, onAutoRegenChange })
           <div className="w-full max-w-full h-[95vh] bg-white rounded-t-2xl shadow-lg flex flex-col overflow-hidden animate-slide-up" onClick={(e) => e.stopPropagation()}>
             <div className="p-5 border-b flex justify-between items-center">
               <h3 className="text-lg font-bold">Edit Campaign</h3>
-              <button className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors" onClick={() => setEditDrawerOpen(false)}>
-                <i className="fas fa-times text-gray-600"></i>
+              <button className="w-8 h-8 rounded-full bg-neutral-100 flex items-center justify-center hover:bg-neutral-200 transition-colors" onClick={() => setEditDrawerOpen(false)}>
+                <X size={16} className="text-neutral-600" />
               </button>
             </div>
             <div className="flex-1 overflow-auto p-6 flex justify-center items-center">

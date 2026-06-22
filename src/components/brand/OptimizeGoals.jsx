@@ -12,7 +12,7 @@ const OptimizeGoals = ({ onGoalSave }) => {
   const [formData, setFormData] = useState({
     marketGroups: [
       {
-        id: crypto.randomUUID(),
+        id: (crypto.randomUUID?.() ?? `id_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`),
         targetLocations: [
           { value: 'us', label: 'United States' },
           { value: 'uk', label: 'United Kingdom' }
@@ -91,7 +91,7 @@ const OptimizeGoals = ({ onGoalSave }) => {
   }
 
   return (
-    <div className="min-h-full bg-slate-50 flex flex-col font-sans text-slate-900 selection:bg-indigo-100 relative pb-24">
+    <div className="min-h-full bg-neutral-50 flex flex-col font-sans text-neutral-900 selection:bg-primary-100 relative pb-24">
 
       <main className="flex-1 w-full py-12">
         <div className="space-y-10">
@@ -115,7 +115,7 @@ const OptimizeGoals = ({ onGoalSave }) => {
           />
 
           <div className="pt-4">
-            <p className="text-[11px] font-bold text-slate-400 text-center">
+            <p className="text-[11px] font-bold text-neutral-400 text-center">
               All configurations are processed by AdsGo AI engine
             </p>
           </div>
@@ -124,17 +124,17 @@ const OptimizeGoals = ({ onGoalSave }) => {
 
       {/* Sticky bottom save bar */}
       <div
-        className="fixed bottom-0 right-0 z-10 bg-white/90 backdrop-blur-sm border-t border-slate-200 px-10 py-4 flex items-center justify-between"
+        className="fixed bottom-0 right-0 z-10 bg-white/90 backdrop-blur-sm border-t border-neutral-200 px-10 py-4 flex items-center justify-between"
         style={{ left: 'var(--sidebar-w, 0px)' }}
       >
         <div className="text-xs">
           {isReadyToSave ? (
-            <span className="flex items-center gap-1.5 text-emerald-600 font-medium">
+            <span className="flex items-center gap-1.5 text-success-600 font-medium">
               <CheckCircle2 size={14} />
               配置已完成，可以保存
             </span>
           ) : (
-            <span className="text-slate-400">
+            <span className="text-neutral-400">
               Please fill in budget for each strategy group
             </span>
           )}
@@ -145,8 +145,8 @@ const OptimizeGoals = ({ onGoalSave }) => {
           disabled={!isReadyToSave}
           className={`px-8 py-3 rounded-2xl font-black text-xs flex items-center gap-2 transition-all duration-200 ${
             isReadyToSave
-              ? 'bg-slate-900 text-white hover:bg-black active:scale-95 shadow-2xl shadow-slate-900/20 border border-white/10'
-              : 'bg-slate-200 text-slate-400 cursor-not-allowed'
+              ? 'bg-neutral-900 text-white hover:bg-black active:scale-95 shadow-2xl shadow-neutral-900/20 border border-white/10'
+              : 'bg-neutral-200 text-neutral-400 cursor-not-allowed'
           }`}
         >
           <Save size={16} />

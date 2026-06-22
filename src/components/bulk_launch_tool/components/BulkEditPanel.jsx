@@ -77,8 +77,8 @@ const BulkEditPanel = ({ level, count, fieldDefs = [], getFieldState, draft, onD
           <Layers size={16} strokeWidth={2.2} />
         </div>
         <div className="min-w-0">
-          <p className="text-sm font-semibold text-gray-900">批量编辑 {count} 个 {levelLabel}</p>
-          <p className="text-[11px] text-gray-500 mt-0.5">改动后点击右上「保存」才会生效，可随时取消。</p>
+          <p className="text-sm font-semibold text-neutral-900">批量编辑 {count} 个 {levelLabel}</p>
+          <p className="text-[11px] text-neutral-500 mt-0.5">改动后点击右上「保存」才会生效，可随时取消。</p>
         </div>
       </div>
 
@@ -89,17 +89,17 @@ const BulkEditPanel = ({ level, count, fieldDefs = [], getFieldState, draft, onD
           return (
             <div key={def.name} className="flex flex-col gap-1.5">
               <div className="flex items-center gap-1.5">
-                <label className="text-xs font-medium text-gray-700">{def.label}</label>
+                <label className="text-xs font-medium text-neutral-700">{def.label}</label>
                 {def.helpText && (
-                  <span title={def.helpText} className="text-gray-300 cursor-help"><Info size={11} /></span>
+                  <span title={def.helpText} className="text-neutral-300 cursor-help"><Info size={11} /></span>
                 )}
                 {!inDraft && mixed && (
-                  <span className="ml-auto text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-amber-50 text-amber-600 font-semibold">
+                  <span className="ml-auto text-[9px] tracking-wider px-1.5 py-0.5 rounded bg-amber-50 text-amber-600 font-semibold">
                     Mixed
                   </span>
                 )}
                 {inDraft && (
-                  <span className="ml-auto text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-primary-50 text-primary-600 font-semibold">
+                  <span className="ml-auto text-[9px] tracking-wider px-1.5 py-0.5 rounded bg-primary-50 text-primary-600 font-semibold">
                     将更新
                   </span>
                 )}

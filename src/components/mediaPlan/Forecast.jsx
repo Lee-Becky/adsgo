@@ -94,10 +94,10 @@ const SENTIMENT_STYLES = {
     strokeColor: '#f59e0b',
   },
   neutral: {
-    border: 'border-gray-200',
-    bg: 'bg-gray-50/60',
-    iconBg: 'bg-gray-100 text-gray-500',
-    headlineColor: 'text-gray-700',
+    border: 'border-neutral-200',
+    bg: 'bg-neutral-50/60',
+    iconBg: 'bg-neutral-100 text-neutral-500',
+    headlineColor: 'text-neutral-700',
     strokeColor: '#6b7280',
   },
 }
@@ -120,7 +120,7 @@ export default function Forecast({ kpiTrend, kpiType, currentKPI, kpiTarget }) {
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-base font-semibold text-gray-900">Forecast</h3>
+        <h3 className="text-base font-semibold text-neutral-900">Forecast</h3>
         <DevGuideButton title="Forecast" content={DEV_GUIDES.forecast} />
       </div>
       <div className={`rounded-xl border ${style.border} ${style.bg} p-5 flex items-start gap-5`}>
@@ -134,7 +134,7 @@ export default function Forecast({ kpiTrend, kpiType, currentKPI, kpiTarget }) {
               {forecast.headline}
             </h4>
           </div>
-          <p className="text-xs text-gray-600 leading-relaxed">
+          <p className="text-xs text-neutral-600 leading-relaxed">
             {forecast.body}
           </p>
         </div>

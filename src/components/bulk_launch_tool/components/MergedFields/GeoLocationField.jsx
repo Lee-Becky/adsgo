@@ -74,20 +74,20 @@ const GeoLocationField = ({
     <div className="flex flex-col gap-1.5 md:col-span-2 lg:col-span-3">
       {/* Header */}
       <div className="flex items-center gap-1.5">
-        <label className="text-xs font-medium text-gray-700">
+        <label className="text-xs font-medium text-neutral-700">
           投放地区
           {required && <span className="text-rose-500 ml-0.5">*</span>}
         </label>
-        {helpText && <span title={helpText} className="text-gray-300 cursor-help"><Info size={11} /></span>}
+        {helpText && <span title={helpText} className="text-neutral-300 cursor-help"><Info size={11} /></span>}
       </div>
 
       {/* Include / Exclude Tabs */}
-      <div className="inline-flex p-0.5 bg-gray-100/80 rounded-base border border-gray-100 self-start">
+      <div className="inline-flex p-0.5 bg-neutral-100/80 rounded-base border border-neutral-100 self-start">
         <button
           type="button"
           onClick={() => setTab('include')}
           className={`px-3 py-1 rounded-base text-[11px] font-semibold transition-all ${
-            tab === 'include' ? 'bg-white text-primary-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+            tab === 'include' ? 'bg-white text-primary-600 shadow-sm' : 'text-neutral-500 hover:text-neutral-700'
           }`}
         >
           包含 {includeCount > 0 && <span className="ml-1 text-[10px] opacity-70">{includeCount}</span>}
@@ -99,7 +99,7 @@ const GeoLocationField = ({
           title={isTikTok ? 'TikTok 不支持地区排除（可在受众层做排除）' : undefined}
           className={`px-3 py-1 rounded-base text-[11px] font-semibold transition-all ${
             tab === 'exclude' && !isTikTok ? 'bg-white text-rose-600 shadow-sm' :
-            isTikTok ? 'text-gray-300 cursor-not-allowed' : 'text-gray-500 hover:text-gray-700'
+            isTikTok ? 'text-neutral-300 cursor-not-allowed' : 'text-neutral-500 hover:text-neutral-700'
           }`}
         >
           排除 {excludeCount > 0 && <span className="ml-1 text-[10px] opacity-70">{excludeCount}</span>}
@@ -130,12 +130,12 @@ const GeoLocationField = ({
       )}
 
       {isTikTok && (
-        <p className="text-[10px] text-gray-400 italic">
+        <p className="text-[10px] text-neutral-400 italic">
           TikTok 不支持地区排除；如需排除受众，请在「自定义受众-排除」字段配置。
         </p>
       )}
 
-      <span className="text-[10px] text-gray-300 font-mono truncate">
+      <span className="text-[10px] text-neutral-300 font-mono truncate">
         {isTikTok ? 'adgroup.location_ids' : 'adset.targeting.geo_locations / excluded_geo_locations'}
       </span>
       {error && <span className="text-[11px] text-rose-500">{error}</span>}

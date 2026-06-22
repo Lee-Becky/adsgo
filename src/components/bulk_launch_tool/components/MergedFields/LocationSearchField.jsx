@@ -21,11 +21,11 @@ const LocationSearchField = ({ channel, value, onChange, required, error, helpTe
     return (
       <div className="flex flex-col gap-1.5">
         <div className="flex items-center gap-1.5">
-          <label className="text-xs font-medium text-gray-700">
+          <label className="text-xs font-medium text-neutral-700">
             投放地区
             {required && <span className="text-rose-500 ml-0.5">*</span>}
           </label>
-          {helpText && <span title={helpText} className="text-gray-300 cursor-help"><Info size={11} /></span>}
+          {helpText && <span title={helpText} className="text-neutral-300 cursor-help"><Info size={11} /></span>}
         </div>
         <MultiSelect
           value={Array.isArray(value) ? value : []}
@@ -34,7 +34,7 @@ const LocationSearchField = ({ channel, value, onChange, required, error, helpTe
           placeholder="搜索地区..."
           error={error}
         />
-        <span className="text-[10px] text-gray-300 font-mono truncate">adgroup.location_ids</span>
+        <span className="text-[10px] text-neutral-300 font-mono truncate">adgroup.location_ids</span>
         {error && <span className="text-[11px] text-rose-500">{error}</span>}
       </div>
     );
@@ -83,11 +83,11 @@ const LocationSearchField = ({ channel, value, onChange, required, error, helpTe
   return (
     <div className="flex flex-col gap-1.5">
       <div className="flex items-center gap-1.5">
-        <label className="text-xs font-medium text-gray-700">
+        <label className="text-xs font-medium text-neutral-700">
           投放地区
           {required && <span className="text-rose-500 ml-0.5">*</span>}
         </label>
-        {helpText && <span title={helpText} className="text-gray-300 cursor-help"><Info size={11} /></span>}
+        {helpText && <span title={helpText} className="text-neutral-300 cursor-help"><Info size={11} /></span>}
       </div>
       <MultiSelect
         value={selected}
@@ -96,7 +96,7 @@ const LocationSearchField = ({ channel, value, onChange, required, error, helpTe
         placeholder="搜索国家 / 省 / 市 / 邮编..."
         error={error}
       />
-      <span className="text-[10px] text-gray-300 font-mono truncate">adset.targeting.geo_locations.[countries|regions|cities|zips]</span>
+      <span className="text-[10px] text-neutral-300 font-mono truncate">adset.targeting.geo_locations.[countries|regions|cities|zips]</span>
       {error && <span className="text-[11px] text-rose-500">{error}</span>}
     </div>
   );

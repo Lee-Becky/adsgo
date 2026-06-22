@@ -24,10 +24,10 @@ const EmptyState = ({
 
       <div className="max-w-[400px] text-center">
         {title && (
-          <h3 className="font-display text-xl font-bold text-gray-800">{title}</h3>
+          <h3 className="font-display text-xl font-bold text-neutral-800">{title}</h3>
         )}
         {description && (
-          <p className="text-sm text-gray-500 mt-2 leading-relaxed">{description}</p>
+          <p className="text-sm text-neutral-500 mt-2 leading-relaxed">{description}</p>
         )}
         {actionLabel && onAction && (
           <div className="mt-6">

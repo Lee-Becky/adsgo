@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+* { box-sizing:border-box; margin:0; padding:0; }
+body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; background:#f8fafc; padding:24px; min-height:100vh; }
+h2 { font-size:15px; font-weight:700; color:#111827; margin-bottom:4px; }
+.subtitle { font-size:11px; color:#9ca3af; margin-bottom:20px; }
+
+.arch-card {
+  background:#fff; border-radius:14px; border:1px solid #e5e7eb;
+  padding:24px 28px; box-shadow:0 2px 12px rgba(0,0,0,.06);
+}
+
+/* Campaign */
+.camp-row { display:flex; flex-direction:column; align-items:center; margin-bottom:20px; }
+.camp-icon {
+  width:44px; height:44px; background:#111827; border-radius:11px;
+  display:flex; align-items:center; justify-content:center;
+  color:#fff; font-size:20px; box-shadow:0 4px 14px rgba(0,0,0,.22);
+}
+.camp-line { width:1px; height:14px; background:#e5e7eb; margin-top:2px; }
+.camp-label { font-size:10px; color:#9ca3af; font-weight:500; margin-top:-12px; margin-bottom:4px; }
+
+/* Adset row */
+.adsets-row { display:flex; gap:32px; justify-content:center; align-items:flex-start; }
+.adset-col {
+  display:flex; flex-direction:column; align-items:center; gap:6px;
+  cursor:pointer; border-radius:10px; padding:6px 8px; transition:background .15s;
+}
+.adset-col:hover { background:#f9fafb; }
+.adset-col.active { background:#f5f3ff; }
+.adset-col.active-int { background:#fffbeb; }
+
+/* Audience toggle button */
+.aud-btn {
+  width:40px; height:40px; border-radius:10px;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  font-size:9px; font-weight:700; position:relative; user-select:none;
+  transition:transform .12s; border:1.5px solid;
+}
+.aud-btn:hover { transform:scale(1.08); }
+.adset-col.active .aud-btn, .adset-col.active-int .aud-btn { transform:scale(1.1); }
+.aud-adv { background:#ede9fe; color:#6d28d9; border-color:#ddd6fe; }
+.aud-lal { background:#ede9fe; color:#6d28d9; border-color:#6366f1; box-shadow:0 0 0 2px #c7d2fe; }
+.aud-int { background:#fffbeb; color:#b45309; border-color:#f59e0b; box-shadow:0 0 0 2px #fde68a; }
+.adset-col.active .aud-btn { box-shadow:0 0 0 3px #c7d2fe; }
+.adset-col.active-int .aud-btn { box-shadow:0 0 0 3px #fde68a; }
+.aud-idx {
+  position:absolute; top:-5px; right:-5px;
+  width:16px; height:16px; background:#111827; color:#fff;
+  font-size:8px; font-weight:700; border-radius:99px;
+  display:flex; align-items:center; justify-content:center; border:1.5px solid #fff;
+}
+.adset-name { font-size:10px; color:#6b7280; font-weight:500; }
+.adset-col.active .adset-name { color:#6366f1; font-weight:600; }
+.adset-col.active-int .adset-name { color:#b45309; font-weight:600; }
+.thumb-row { display:flex; gap:2px; flex-wrap:wrap; justify-content:center; max-width:88px; }
+.mini-thumb { width:20px; height:26px; border-radius:4px; border:1.5px solid #fff; box-shadow:0 1px 3px rgba(0,0,0,.1); }
+.t1{background:linear-gradient(135deg,#ddd6fe,#a5b4fc)}
+.t2{background:linear-gradient(135deg,#fde68a,#fca5a5)}
+.t3{background:linear-gradient(135deg,#a7f3d0,#6ee7b7)}
+.t4{background:linear-gradient(135deg,#fbcfe8,#f9a8d4)}
+.t5{background:linear-gradient(135deg,#bae6fd,#7dd3fc)}
+
+/* Divider */
+.divider { border:none; border-top:1px solid #f3f4f6; margin:18px 0 0; }
+
+/* Audience config section */
+.aud-config { padding-top:14px; animation:fadeIn .2s ease; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(-4px)} to{opacity:1;transform:translateY(0)} }
+
+.aud-config-header {
+  display:flex; align-items:center; gap:6px; margin-bottom:10px;
+}
+.aud-config-dot { width:8px; height:8px; border-radius:99px; }
+.dot-lal { background:#6366f1; }
+.dot-int { background:#f59e0b; }
+.dot-adv { background:#a78bfa; }
+.aud-config-title { font-size:11px; font-weight:600; }
+.title-lal { color:#6d28d9; }
+.title-int { color:#b45309; }
+.title-adv { color:#7c3aed; }
+.aud-config-badge {
+  margin-left:auto; font-size:9px; font-weight:600;
+  padding:2px 8px; border-radius:99px;
+}
+.badge-lal { background:#ede9fe; color:#6d28d9; }
+.badge-int { background:#fef3c7; color:#b45309; }
+.badge-adv { background:#ede9fe; color:#6d28d9; }
+
+/* ADV panel */
+.adv-panel {
+  font-size:11px; color:#6b7280; line-height:1.6;
+  background:#f9fafb; border-radius:8px; padding:12px 14px;
+  border:1px solid #f3f4f6;
+}
+
+/* LAL panel */
+.lal-panel {}
+.lal-trigger {
+  width:100%; padding:10px 14px; border:1.5px solid #ddd6fe; border-radius:8px 8px 0 0;
+  background:#fff; display:flex; align-items:center; justify-content:space-between;
+  cursor:pointer; font-size:11px; color:#9ca3af; transition:border-color .15s;
+}
+.lal-trigger:hover { border-color:#a5b4fc; }
+.seed-list { border:1.5px solid #ddd6fe; border-top:none; border-radius:0 0 8px 8px; overflow:hidden; }
+.seed-item {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:9px 14px; border-bottom:1px solid #f3f4f6; cursor:pointer; transition:background .1s;
+}
+.seed-item:last-child { border-bottom:none; }
+.seed-item:hover { background:#f5f3ff; }
+.seed-left { display:flex; align-items:center; gap:8px; }
+.seed-check {
+  width:15px; height:15px; border-radius:3px; border:1.5px solid #ddd6fe;
+  display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:all .1s;
+}
+.seed-check.on { background:#6366f1; border-color:#6366f1; }
+.seed-check.on::after { content:'✓'; color:#fff; font-size:9px; font-weight:800; }
+.seed-name { font-size:11px; color:#374151; font-weight:500; }
+.seed-tag { font-size:9px; color:#6366f1; font-weight:600; padding:1px 6px; background:#ede9fe; border-radius:99px; }
+
+/* INT panel */
+.int-tags { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; }
+.int-tag {
+  display:inline-flex; align-items:center; gap:4px; padding:3px 10px;
+  border-radius:99px; font-size:10px; font-weight:500;
+  background:#fef3c7; border:1px solid #fde68a; color:#92400e; cursor:pointer; transition:background .1s;
+}
+.int-tag:hover { background:#fde68a; }
+.int-tag-x { opacity:.5; font-size:10px; line-height:1; }
+.int-trigger {
+  width:100%; padding:10px 14px; border:1.5px solid #fde68a; border-radius:8px;
+  background:#fff; display:flex; align-items:center; justify-content:space-between;
+  cursor:pointer; font-size:11px; color:#9ca3af; transition:border-color .15s;
+}
+.int-trigger:hover { border-color:#f59e0b; }
+/* Dropdown for INT */
+.int-dropdown {
+  border:1.5px solid #fde68a; border-top:none; border-radius:0 0 8px 8px;
+  overflow:hidden; display:none;
+}
+.int-dropdown.open { display:block; }
+.int-result {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:8px 14px; border-bottom:1px solid #fef3c7; cursor:pointer; transition:background .1s;
+}
+.int-result:last-child { border-bottom:none; }
+.int-result:hover { background:#fffbeb; }
+.int-result-name { font-size:11px; color:#374151; font-weight:500; }
+.int-result-right { display:flex; align-items:center; gap:8px; }
+.int-result-size { font-size:9px; color:#9ca3af; }
+.int-add { font-size:10px; font-weight:700; color:#b45309; }
+
+/* Hint */
+.hint {
+  font-size:10px; color:#9ca3af; margin-top:14px; text-align:center;
+  display:flex; align-items:center; justify-content:center; gap:5px;
+}
+</style>
+</head>
+<body>
+<h2>每 Adset 独立受众 — 完整交互</h2>
+<p class="subtitle">点击 adset 节点 → 切换到该 adset；点击受众图标（Adv+/LAL/INT）→ 循环切换类型，下方实时更新</p>
+
+<div class="arch-card">
+  <!-- Campaign -->
+  <div class="camp-row">
+    <div class="camp-icon">💼</div>
+    <div class="camp-label">Target Campaign</div>
+    <div class="camp-line"></div>
+  </div>
+
+  <!-- Adsets -->
+  <div class="adsets-row" id="adsetsRow">
+    <div class="adset-col active" data-idx="0" onclick="selectAdset(0)">
+      <div class="aud-btn aud-lal" id="btn-0" onclick="cycleType(event,0)">
+        <span id="label-0">LAL</span>
+        <div class="aud-idx">1</div>
+      </div>
+      <div class="adset-name" id="name-0">素材组 1</div>
+      <div class="thumb-row">
+        <div class="mini-thumb t1"></div>
+        <div class="mini-thumb t2"></div>
+        <div class="mini-thumb t3"></div>
+      </div>
+    </div>
+
+    <div class="adset-col" data-idx="1" onclick="selectAdset(1)">
+      <div class="aud-btn aud-int" id="btn-1" onclick="cycleType(event,1)">
+        <span id="label-1">INT</span>
+        <div class="aud-idx">2</div>
+      </div>
+      <div class="adset-name" id="name-1">素材组 2</div>
+      <div class="thumb-row">
+        <div class="mini-thumb t2"></div>
+        <div class="mini-thumb t5"></div>
+      </div>
+    </div>
+
+    <div class="adset-col" data-idx="2" onclick="selectAdset(2)">
+      <div class="aud-btn aud-adv" id="btn-2" onclick="cycleType(event,2)">
+        <span id="label-2">Adv+</span>
+        <div class="aud-idx">3</div>
+      </div>
+      <div class="adset-name" id="name-2">素材组 3</div>
+      <div class="thumb-row">
+        <div class="mini-thumb t4"></div>
+        <div class="mini-thumb t1"></div>
+        <div class="mini-thumb t3"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Config panel below -->
+  <div id="configPanel"></div>
+</div>
+
+<div class="hint">
+  💡 点击受众图标切换类型 &nbsp;·&nbsp; 点击 adset 名称区域切换选中 adset
+</div>
+
+<script>
+const types = ['ADV', 'LAL', 'INT'];
+const state = {
+  selected: 0,
+  adsetTypes: ['LAL', 'INT', 'ADV'],
+  lalOptions: [
+    [{id:'a',label:'US Purchase 1%',on:true},{id:'b',label:'US Add to Cart 5%',on:true},{id:'c',label:'US Register Last 30 Days 1–3%',on:false}],
+    [{id:'a',label:'US Purchase 1%',on:false},{id:'b',label:'US Add to Cart 5%',on:false},{id:'c',label:'US Register Last 30 Days 1–3%',on:false}],
+    [{id:'a',label:'US Purchase 1%',on:false},{id:'b',label:'US Add to Cart 5%',on:false},{id:'c',label:'US Register Last 30 Days 1–3%',on:false}],
+  ],
+  intOptions: [
+    [],
+    [{id:'f',label:'Fitness',size:'600M-700M'},{id:'t',label:'Travel',size:'700M-800M'},{id:'sf',label:'Sustainable fashion',size:'150M-200M'},{id:'hd',label:'Home decor',size:'400M-500M'},{id:'tech',label:'Technology',size:'1B-1.2B'}],
+    [],
+  ],
+  intDropOpen: false,
+};
+
+const ALL_INTERESTS = [
+  {id:'os',label:'Online shopping',size:'900M-1B'},
+  {id:'fa',label:'Fashion accessories',size:'500M-600M'},
+  {id:'lg',label:'Luxury goods',size:'200M-300M'},
+  {id:'ec',label:'E-commerce',size:'800M-900M'},
+  {id:'be',label:'Beauty',size:'700M-800M'},
+];
+
+function selectAdset(idx) {
+  state.selected = idx;
+  state.intDropOpen = false;
+  render();
+}
+
+function cycleType(e, idx) {
+  e.stopPropagation();
+  const cur = state.adsetTypes[idx];
+  const next = types[(types.indexOf(cur) + 1) % types.length];
+  state.adsetTypes[idx] = next;
+  state.selected = idx;
+  state.intDropOpen = false;
+  render();
+}
+
+function toggleSeed(adsetIdx, seedId) {
+  const seed = state.lalOptions[adsetIdx].find(s => s.id === seedId);
+  if (seed) { seed.on = !seed.on; render(); }
+}
+
+function removeInt(adsetIdx, intId) {
+  state.intOptions[adsetIdx] = state.intOptions[adsetIdx].filter(i => i.id !== intId);
+  render();
+}
+
+function addInt(intId) {
+  const idx = state.selected;
+  const item = ALL_INTERESTS.find(i => i.id === intId);
+  if (item && !state.intOptions[idx].find(i => i.id === intId)) {
+    state.intOptions[idx] = [...state.intOptions[idx], item];
+  }
+  state.intDropOpen = false;
+  render();
+}
+
+function toggleIntDrop(e) {
+  e.stopPropagation();
+  state.intDropOpen = !state.intDropOpen;
+  render();
+}
+
+function render() {
+  // Update adset columns
+  document.querySelectorAll('.adset-col').forEach(col => {
+    const idx = parseInt(col.dataset.idx);
+    const type = state.adsetTypes[idx];
+    col.className = 'adset-col' + (idx === state.selected ? (type === 'INT' ? ' active-int' : ' active') : '');
+    const btn = col.querySelector('.aud-btn');
+    btn.className = 'aud-btn ' + {ADV:'aud-adv',LAL:'aud-lal',INT:'aud-int'}[type];
+    col.querySelector('span').textContent = type === 'ADV' ? 'Adv+' : type;
+  });
+
+  // Render config panel
+  const idx = state.selected;
+  const type = state.adsetTypes[idx];
+  const name = `素材组 ${idx + 1}`;
+  const panel = document.getElementById('configPanel');
+
+  if (type === 'ADV') {
+    panel.innerHTML = `
+      <div class="aud-config">
+        <div class="aud-config-header">
+          <div class="aud-config-dot dot-adv"></div>
+          <span class="aud-config-title title-adv">Advantage+ 受众</span>
+          <span class="aud-config-badge badge-adv">${name}</span>
+        </div>
+        <div class="adv-panel">
+          Advantage+ 受众无需手动配置。Meta 将自动寻找最合适的目标人群，在保持成本效益的前提下最大化覆盖范围。
+        </div>
+      </div>`;
+  } else if (type === 'LAL') {
+    const seeds = state.lalOptions[idx];
+    const selected = seeds.filter(s=>s.on).length;
+    panel.innerHTML = `
+      <div class="aud-config">
+        <div class="aud-config-header">
+          <div class="aud-config-dot dot-lal"></div>
+          <span class="aud-config-title title-lal">LAL 相似受众</span>
+          <span class="aud-config-badge badge-lal">${name}</span>
+        </div>
+        <div class="lal-panel">
+          <div class="lal-trigger">
+            <span>${selected > 0 ? `已选 ${selected} 个种子受众` : '选择 LAL 种子受众（可多选）'}</span>
+            <span style="color:#d1d5db">▾</span>
+          </div>
+          <div class="seed-list">
+            ${seeds.map(s => `
+              <div class="seed-item" onclick="toggleSeed(${idx},'${s.id}')">
+                <div class="seed-left">
+                  <div class="seed-check ${s.on?'on':''}"></div>
+                  <span class="seed-name">${s.label}</span>
+                </div>
+                ${s.on ? `<span class="seed-tag">已选</span>` : ''}
+              </div>`).join('')}
+          </div>
+        </div>
+      </div>`;
+  } else {
+    const interests = state.intOptions[idx];
+    const available = ALL_INTERESTS.filter(i => !interests.find(s=>s.id===i.id));
+    panel.innerHTML = `
+      <div class="aud-config">
+        <div class="aud-config-header">
+          <div class="aud-config-dot dot-int"></div>
+          <span class="aud-config-title title-int">INT 兴趣定向</span>
+          <span class="aud-config-badge badge-int">${name}</span>
+        </div>
+        <div>
+          ${interests.length > 0 ? `
+          <div class="int-tags">
+            ${interests.map(i=>`<div class="int-tag" onclick="removeInt(${idx},'${i.id}')">${i.label} <span class="int-tag-x">×</span></div>`).join('')}
+          </div>` : ''}
+          <div class="int-trigger" onclick="toggleIntDrop(event)">
+            <span>${interests.length === 0 ? '添加更多兴趣词...' : '继续添加...'}</span>
+            <span style="color:#d1d5db">${state.intDropOpen ? '▴' : '▾'}</span>
+          </div>
+          <div class="int-dropdown ${state.intDropOpen ? 'open' : ''}">
+            ${available.length === 0 ? `<div style="padding:10px 14px;font-size:11px;color:#9ca3af">没有更多选项了</div>` :
+              available.map(i=>`
+                <div class="int-result" onclick="addInt('${i.id}')">
+                  <span class="int-result-name">${i.label}</span>
+                  <div class="int-result-right">
+                    <span class="int-result-size">${i.size}</span>
+                    <span class="int-add">+ 添加</span>
+                  </div>
+                </div>`).join('')}
+          </div>
+        </div>
+      </div>`;
+  }
+}
+
+render();
+</script>
+</body>
+</html>

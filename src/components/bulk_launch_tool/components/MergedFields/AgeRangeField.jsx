@@ -17,12 +17,12 @@ const AgeRangeField = ({
   return (
     <div className="flex flex-col gap-1.5">
       <div className="flex items-center gap-1.5">
-        <label className="text-xs font-medium text-gray-700">
+        <label className="text-xs font-medium text-neutral-700">
           年龄
           {required && <span className="text-rose-500 ml-0.5">*</span>}
         </label>
         {helpText && (
-          <span title={helpText} className="text-gray-300 cursor-help">
+          <span title={helpText} className="text-neutral-300 cursor-help">
             <Info size={11} />
           </span>
         )}
@@ -32,14 +32,14 @@ const AgeRangeField = ({
           <NumberInput value={ageMin ?? ''} onChange={onChangeMin}
             placeholder="13" min={13} max={65} error={errorMin} />
         </div>
-        <span className="text-xs text-gray-400">—</span>
+        <span className="text-xs text-neutral-400">—</span>
         <div className="flex-1">
           <NumberInput value={ageMax ?? ''} onChange={onChangeMax}
             placeholder="65" min={13} max={65} error={errorMax} />
         </div>
-        <span className="text-xs text-gray-400 shrink-0">岁</span>
+        <span className="text-xs text-neutral-400 shrink-0">岁</span>
       </div>
-      <span className="text-[10px] text-gray-300 font-mono truncate">adset.targeting.age_min / age_max</span>
+      <span className="text-[10px] text-neutral-300 font-mono truncate">adset.targeting.age_min / age_max</span>
       {error && <span className="text-[11px] text-rose-500">{error}</span>}
     </div>
   );

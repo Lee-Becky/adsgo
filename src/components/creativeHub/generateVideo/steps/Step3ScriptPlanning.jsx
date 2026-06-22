@@ -98,14 +98,14 @@ export default function Step3ScriptPlanning() {
 
                       {/* Title with timestamp badge */}
                       <div className="flex items-center gap-2 mt-1">
-                        <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold bg-gray-900 text-white">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold bg-neutral-900 text-white">
                           0-8S
                         </span>
-                        <span className="text-sm font-bold text-gray-900">{s.title}</span>
+                        <span className="text-sm font-bold text-neutral-900">{s.title}</span>
                       </div>
 
                       {/* Script body */}
-                      <pre className="mt-3 text-sm text-gray-600 whitespace-pre-wrap font-sans leading-relaxed flex-1">
+                      <pre className="mt-3 text-sm text-neutral-600 whitespace-pre-wrap font-sans leading-relaxed flex-1">
                         {s.body}
                       </pre>
 
@@ -122,7 +122,7 @@ export default function Step3ScriptPlanning() {
             left={
               selectedScriptId
                 ? <span className="text-xs text-primary-600 font-medium">已选择脚本，点击右侧确认</span>
-                : <span className="text-xs text-gray-400">请从上方选择一套脚本</span>
+                : <span className="text-xs text-neutral-400">请从上方选择一套脚本</span>
             }
           >
             <BtnPrimary

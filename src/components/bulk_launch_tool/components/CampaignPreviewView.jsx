@@ -141,7 +141,7 @@ const VariableTextInput = ({ value, onChange, placeholder, multiline = false, va
         suppressContentEditableWarning
         onInput={handleInput}
         data-placeholder={placeholder}
-        className={`ce-input w-full ${multiline ? 'min-h-[8rem] p-5' : 'h-12 px-5 flex items-center'} pr-12 border border-gray-200 rounded-base bg-white text-sm font-medium focus:border-primary-500 outline-none transition-all whitespace-pre-wrap break-words`}
+        className={`ce-input w-full ${multiline ? 'min-h-[8rem] p-5' : 'h-12 px-5 flex items-center'} pr-12 border border-neutral-200 rounded-base bg-white text-sm font-medium focus:border-primary-500 outline-none transition-all whitespace-pre-wrap break-words`}
       />
       <button
         ref={insertBtnRef}
@@ -149,7 +149,7 @@ const VariableTextInput = ({ value, onChange, placeholder, multiline = false, va
         onMouseDown={e => e.preventDefault()}
         onClick={() => setShowDropdown(v => !v)}
         title="插入变量"
-        className={`absolute ${multiline ? 'right-2 top-2' : 'right-2 top-1/2 -translate-y-1/2'} w-8 h-8 flex items-center justify-center border border-gray-200 rounded text-gray-400 bg-white hover:border-primary-400 hover:text-primary-500`}
+        className={`absolute ${multiline ? 'right-2 top-2' : 'right-2 top-1/2 -translate-y-1/2'} w-8 h-8 flex items-center justify-center border border-neutral-200 rounded text-neutral-400 bg-white hover:border-primary-400 hover:text-primary-500`}
       >
         <Plus size={14} />
       </button>
@@ -158,7 +158,7 @@ const VariableTextInput = ({ value, onChange, placeholder, multiline = false, va
         anchorRef={insertBtnRef}
         placement="bottom-end"
         onClose={() => setShowDropdown(false)}
-        className="w-44 bg-white rounded-base border border-gray-200 shadow-xl max-h-64 overflow-auto py-1"
+        className="w-44 bg-white rounded-base border border-neutral-200 shadow-xl max-h-64 overflow-auto py-1"
       >
         {vars.map(v => (
           <button
@@ -166,7 +166,7 @@ const VariableTextInput = ({ value, onChange, placeholder, multiline = false, va
             type="button"
             onMouseDown={e => e.preventDefault()}
             onClick={() => { insertVarAtCursor(v.key); setShowDropdown(false); }}
-            className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-primary-50 hover:text-primary-600"
+            className="w-full text-left px-4 py-2 text-sm text-neutral-700 hover:bg-primary-50 hover:text-primary-600"
           >
             {v.label}
           </button>
@@ -240,36 +240,36 @@ const LAL_AUDIENCES = [
 // DPA Style Placeholder Component
 const DPAPreviewCard = () => {
   return (
-    <div className="w-full h-full bg-gray-200 p-4 flex flex-col gap-3 relative overflow-hidden group/dpa">
+    <div className="w-full h-full bg-neutral-200 p-4 flex flex-col gap-3 relative overflow-hidden group/dpa">
       <div className="grid grid-cols-2 grid-rows-2 gap-2 h-full">
         {/* Mock Product Items */}
         <div className="bg-white rounded-lg shadow-sm flex flex-col items-center justify-center p-2 transform transition-transform group-hover/dpa:scale-105 duration-500">
-          <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mb-1">
-            <ShoppingBag size={16} className="text-blue-500" />
+          <div className="w-8 h-8 bg-info-100 rounded-full flex items-center justify-center mb-1">
+            <ShoppingBag size={16} className="text-info-500" />
           </div>
-          <div className="w-8 h-1 bg-gray-100 rounded-full mb-0.5" />
-          <div className="w-5 h-1 bg-gray-50 rounded-full" />
+          <div className="w-8 h-1 bg-neutral-100 rounded-full mb-0.5" />
+          <div className="w-5 h-1 bg-neutral-50 rounded-full" />
         </div>
         <div className="bg-white rounded-lg shadow-sm flex flex-col items-center justify-center p-2 transform transition-transform group-hover/dpa:scale-105 delay-75 duration-500">
           <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center mb-1">
             <Monitor size={16} className="text-purple-500" />
           </div>
-          <div className="w-8 h-1 bg-gray-100 rounded-full mb-0.5" />
-          <div className="w-5 h-1 bg-gray-50 rounded-full" />
+          <div className="w-8 h-1 bg-neutral-100 rounded-full mb-0.5" />
+          <div className="w-5 h-1 bg-neutral-50 rounded-full" />
         </div>
         <div className="bg-white rounded-lg shadow-sm flex flex-col items-center justify-center p-2 transform transition-transform group-hover/dpa:scale-105 delay-150 duration-500">
-          <div className="w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center mb-1">
-            <Smartphone size={16} className="text-emerald-500" />
+          <div className="w-8 h-8 bg-success-100 rounded-full flex items-center justify-center mb-1">
+            <Smartphone size={16} className="text-success-500" />
           </div>
-          <div className="w-8 h-1 bg-gray-100 rounded-full mb-0.5" />
-          <div className="w-5 h-1 bg-gray-50 rounded-full" />
+          <div className="w-8 h-1 bg-neutral-100 rounded-full mb-0.5" />
+          <div className="w-5 h-1 bg-neutral-50 rounded-full" />
         </div>
         <div className="bg-white rounded-lg shadow-sm flex flex-col items-center justify-center p-2 transform transition-transform group-hover/dpa:scale-105 delay-200 duration-500">
           <div className="w-8 h-8 bg-rose-100 rounded-full flex items-center justify-center mb-1">
             <Layout size={16} className="text-rose-500" />
           </div>
-          <div className="w-8 h-1 bg-gray-100 rounded-full mb-0.5" />
-          <div className="w-5 h-1 bg-gray-50 rounded-full" />
+          <div className="w-8 h-1 bg-neutral-100 rounded-full mb-0.5" />
+          <div className="w-5 h-1 bg-neutral-50 rounded-full" />
         </div>
       </div>
       
@@ -326,17 +326,17 @@ const EditAdSetModal = ({ isOpen, adSet, onUpdateField, onToggleItem, onClose, a
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[200] p-4 animate-in fade-in">
       <div className="bg-white w-full max-w-2xl rounded-section shadow-xl overflow-hidden flex flex-col max-h-[90vh]" onClick={e => e.stopPropagation()}>
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 shrink-0">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-neutral-200 shrink-0">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 bg-primary-50 text-primary-500 rounded-inner flex items-center justify-center">
               <Users size={24} />
             </div>
             <div>
-              <h3 className="text-base font-semibold text-gray-900 leading-none">编辑广告组配置</h3>
-              <p className="text-xs font-medium text-gray-500 mt-2">Adset Level Configuration</p>
+              <h3 className="text-base font-semibold text-neutral-900 leading-none">编辑广告组配置</h3>
+              <p className="text-xs font-medium text-neutral-500 mt-2">Adset Level Configuration</p>
             </div>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-gray-50 rounded-full text-gray-300 transition-colors">
+          <button onClick={onClose} className="p-2 hover:bg-neutral-50 rounded-full text-neutral-300 transition-colors">
             <X size={24} />
           </button>
         </div>
@@ -344,51 +344,51 @@ const EditAdSetModal = ({ isOpen, adSet, onUpdateField, onToggleItem, onClose, a
         <div className="flex-1 overflow-y-auto p-10 space-y-10 no-scrollbar pb-32">
           {/* Adset Name */}
           <div className="space-y-3">
-            <label className="text-xs font-medium text-gray-500 px-1">广告组名称</label>
+            <label className="text-xs font-medium text-neutral-500 px-1">广告组名称</label>
             <div className="relative group">
-              <Edit3 size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-primary-500 transition-colors" />
+              <Edit3 size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-300 group-focus-within:text-primary-500 transition-colors" />
               <input
                 type="text"
                 value={adSet.name}
                 onChange={e => onUpdateField('name', e.target.value)}
-                className="w-full h-14 pl-12 pr-5 border border-gray-200 rounded-base px-3 py-2 text-sm text-gray-700 bg-white focus:outline-none focus:border-primary-500 focus:shadow-primary-focus transition-all duration-200"
+                className="w-full h-14 pl-12 pr-5 border border-neutral-200 rounded-base px-3 py-2 text-sm text-neutral-700 bg-white focus:outline-none focus:border-primary-500 focus:shadow-primary-focus transition-all duration-200"
               />
             </div>
           </div>
 
           {/* Daily Budget — CBO readonly, ABO editable */}
           <div className="space-y-3">
-            <label className="text-xs font-medium text-gray-500 px-1">Daily Budget</label>
+            <label className="text-xs font-medium text-neutral-500 px-1">Daily Budget</label>
             {budgetType === 'CBO' ? (
               <>
                 <div className="relative">
-                  <DollarSign size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300" />
+                  <DollarSign size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-300" />
                   <input
                     type="text"
                     readOnly
                     value="Campaign Budget Optimize"
-                    className="w-full h-14 pl-12 pr-5 border border-gray-200 rounded-base text-sm font-medium text-gray-500 bg-gray-50 cursor-not-allowed outline-none"
+                    className="w-full h-14 pl-12 pr-5 border border-neutral-200 rounded-base text-sm font-medium text-neutral-500 bg-neutral-50 cursor-not-allowed outline-none"
                   />
                 </div>
-                <p className="text-[11px] text-gray-400 px-1">
+                <p className="text-[11px] text-neutral-400 px-1">
                   当前 Campaign 采用 CBO，预算由广告系列统一分配，无法在广告组层级修改。
                 </p>
               </>
             ) : (
               <>
                 <div className="relative group">
-                  <DollarSign size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-primary-500 transition-colors" />
+                  <DollarSign size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-300 group-focus-within:text-primary-500 transition-colors" />
                   <input
                     type="number"
                     min="1"
                     step="1"
                     value={adSet.dailyBudget ?? dailyBudget}
                     onChange={e => onUpdateField('dailyBudget', Number(e.target.value))}
-                    className="w-full h-14 pl-12 pr-16 border border-gray-200 rounded-base text-sm text-gray-700 bg-white focus:outline-none focus:border-primary-500 focus:shadow-primary-focus transition-all duration-200"
+                    className="w-full h-14 pl-12 pr-16 border border-neutral-200 rounded-base text-sm text-neutral-700 bg-white focus:outline-none focus:border-primary-500 focus:shadow-primary-focus transition-all duration-200"
                   />
-                  <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-medium text-gray-400 pointer-events-none">/ day</span>
+                  <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-medium text-neutral-400 pointer-events-none">/ day</span>
                 </div>
-                <p className="text-[11px] text-gray-400 px-1">
+                <p className="text-[11px] text-neutral-400 px-1">
                   初始值取自预览页顶部 Daily Budget；可在此广告组独立覆盖。
                 </p>
               </>
@@ -398,7 +398,7 @@ const EditAdSetModal = ({ isOpen, adSet, onUpdateField, onToggleItem, onClose, a
           {/* Catalog — 仅 TikTok APP Sales 场景；含授权三态 */}
           {isTikTokAppSales && (
             <div className="space-y-3">
-              <label className="text-xs font-medium text-gray-500 px-1">Catalog（产品目录）</label>
+              <label className="text-xs font-medium text-neutral-500 px-1">Catalog（产品目录）</label>
               <div
                 ref={catalogTriggerRef}
                 onClick={() => {
@@ -406,26 +406,26 @@ const EditAdSetModal = ({ isOpen, adSet, onUpdateField, onToggleItem, onClose, a
                   if (!selectedAccount) { onOpenAccountPicker?.(); return; }
                   setShowCatalog(prev => !prev);
                 }}
-                className="bg-white rounded-base p-3 border border-gray-200 flex items-center justify-between gap-2 cursor-pointer hover:border-primary-500/30 transition-all"
+                className="bg-white rounded-base p-3 border border-neutral-200 flex items-center justify-between gap-2 cursor-pointer hover:border-primary-500/30 transition-all"
               >
                 <div className="flex items-center gap-2 min-w-0 flex-1">
                   <Database size={14} className="text-primary-500 shrink-0" />
                   {!authStatus?.tiktok ? (
-                    <span className="text-sm font-semibold text-gray-300 truncate">请连接 TikTok 加载 catalog</span>
+                    <span className="text-sm font-semibold text-neutral-300 truncate">请连接 TikTok 加载 catalog</span>
                   ) : !selectedAccount ? (
-                    <span className="text-sm font-semibold text-gray-300 truncate">请选择 TikTok 账号</span>
+                    <span className="text-sm font-semibold text-neutral-300 truncate">请选择 TikTok 账号</span>
                   ) : channelAuthLoading ? (
-                    <span className="text-sm font-semibold text-gray-400 flex items-center gap-2"><Loader2 size={12} className="animate-spin" /> 加载中…</span>
+                    <span className="text-sm font-semibold text-neutral-400 flex items-center gap-2"><Loader2 size={12} className="animate-spin" /> 加载中…</span>
                   ) : adSet.catalog ? (
                     <div className="min-w-0">
-                      <p className="text-sm font-semibold text-gray-700 truncate">{adSet.catalog.name}</p>
-                      <p className="text-[10px] text-gray-400 font-medium truncate">ID {adSet.catalog.id} · {adSet.catalog.productCount} 件</p>
+                      <p className="text-sm font-semibold text-neutral-700 truncate">{adSet.catalog.name}</p>
+                      <p className="text-[10px] text-neutral-400 font-medium truncate">ID {adSet.catalog.id} · {adSet.catalog.productCount} 件</p>
                     </div>
                   ) : (
-                    <span className="text-sm font-semibold text-gray-300">未选择</span>
+                    <span className="text-sm font-semibold text-neutral-300">未选择</span>
                   )}
                 </div>
-                <ChevronDown size={12} className={`text-gray-300 shrink-0 transition-transform ${showCatalog ? 'rotate-180' : ''}`} />
+                <ChevronDown size={12} className={`text-neutral-300 shrink-0 transition-transform ${showCatalog ? 'rotate-180' : ''}`} />
               </div>
               <Popover
                 open={showCatalog && !!authStatus?.tiktok && !!selectedAccount}
@@ -434,7 +434,7 @@ const EditAdSetModal = ({ isOpen, adSet, onUpdateField, onToggleItem, onClose, a
                 matchWidth
                 onClose={() => setShowCatalog(false)}
                 zIndex={Z_INDEX.MODAL_BASE + 500}
-                className="bg-white border border-gray-100 rounded-base shadow-xl overflow-hidden p-1"
+                className="bg-white border border-neutral-100 rounded-base shadow-xl overflow-hidden p-1"
               >
                 {catalogs.map(c => {
                   const isSel = adSet.catalog?.id === c.id;
@@ -442,16 +442,16 @@ const EditAdSetModal = ({ isOpen, adSet, onUpdateField, onToggleItem, onClose, a
                     <button
                       key={c.id}
                       onClick={() => { onUpdateField('catalog', c); setShowCatalog(false); }}
-                      className={`w-full flex items-center gap-3 px-3 py-2 rounded-base text-left transition-all ${isSel ? 'bg-primary-50' : 'hover:bg-gray-50'}`}
+                      className={`w-full flex items-center gap-3 px-3 py-2 rounded-base text-left transition-all ${isSel ? 'bg-primary-50' : 'hover:bg-neutral-50'}`}
                     >
                       <div className={`w-7 h-7 rounded-base flex items-center justify-center shrink-0 ${isSel ? 'bg-primary-500 text-white' : 'bg-primary-50 text-primary-500'}`}>
                         <Database size={12} />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className={`text-xs font-bold truncate ${isSel ? 'text-primary-600' : 'text-gray-800'}`}>{c.name}</p>
-                        <p className="text-[10px] text-gray-400 font-medium truncate">ID {c.id}</p>
+                        <p className={`text-xs font-bold truncate ${isSel ? 'text-primary-600' : 'text-neutral-800'}`}>{c.name}</p>
+                        <p className="text-[10px] text-neutral-400 font-medium truncate">ID {c.id}</p>
                       </div>
-                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-tag bg-emerald-50 text-emerald-600 border border-emerald-100 shrink-0">{c.productCount}</span>
+                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-tag bg-success-50 text-success-600 border border-success-100 shrink-0">{c.productCount}</span>
                       {isSel && <Check size={12} className="text-primary-500 shrink-0" />}
                     </button>
                   );
@@ -475,12 +475,12 @@ const EditAdSetModal = ({ isOpen, adSet, onUpdateField, onToggleItem, onClose, a
             const effectiveAmount = adSet?.bidAmount !== undefined ? adSet.bidAmount : globalBidAmount;
             return (
               <div className="space-y-3">
-                <label className="text-xs font-medium text-gray-500 px-1">{bidLabel}</label>
+                <label className="text-xs font-medium text-neutral-500 px-1">{bidLabel}</label>
                 <div className="relative group">
                   {bidValueType === 'roas' ? (
-                    <Target size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-primary-500 transition-colors" />
+                    <Target size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-300 group-focus-within:text-primary-500 transition-colors" />
                   ) : (
-                    <DollarSign size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-primary-500 transition-colors" />
+                    <DollarSign size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-300 group-focus-within:text-primary-500 transition-colors" />
                   )}
                   <input
                     type="number"
@@ -489,26 +489,26 @@ const EditAdSetModal = ({ isOpen, adSet, onUpdateField, onToggleItem, onClose, a
                     value={effectiveAmount ?? ''}
                     onChange={e => onUpdateField('bidAmount', e.target.value)}
                     placeholder={bidValueType === 'roas' ? '如 2.5' : '0.00'}
-                    className="w-full h-14 pl-12 pr-16 border border-gray-200 rounded-base text-sm text-gray-700 bg-white focus:outline-none focus:border-primary-500 focus:shadow-primary-focus transition-all duration-200"
+                    className="w-full h-14 pl-12 pr-16 border border-neutral-200 rounded-base text-sm text-neutral-700 bg-white focus:outline-none focus:border-primary-500 focus:shadow-primary-focus transition-all duration-200"
                   />
-                  <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-medium text-gray-400 pointer-events-none">
+                  <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-medium text-neutral-400 pointer-events-none">
                     {bidValueType === 'roas' ? '×' : 'USD'}
                   </span>
                 </div>
                 {isTikTokBid && (
-                  <p className="text-[11px] text-gray-400 px-1">留空 = 默认最大转化量</p>
+                  <p className="text-[11px] text-neutral-400 px-1">留空 = 默认最大转化量</p>
                 )}
               </div>
             );
           })()}
 
-          <div className="h-px bg-gray-100" />
+          <div className="h-px bg-neutral-100" />
 
           <div className="space-y-8">
             <div className="flex items-center justify-between px-1">
               <div className="flex items-center gap-2">
                 <Target size={16} className="text-primary-500" />
-                <h4 className="text-sm font-semibold text-gray-900">Audience 受众设置</h4>
+                <h4 className="text-sm font-semibold text-neutral-900">Audience 受众设置</h4>
               </div>
               
             </div>
@@ -516,27 +516,27 @@ const EditAdSetModal = ({ isOpen, adSet, onUpdateField, onToggleItem, onClose, a
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {/* Age */}
               <div className="space-y-3">
-                <label className="text-xs font-medium text-gray-500 px-1">年龄范围 (Age)</label>
+                <label className="text-xs font-medium text-neutral-500 px-1">年龄范围 (Age)</label>
                 <div className="flex items-center gap-3">
                   <div className="flex-1 relative">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xs font-medium text-gray-500">Min</span>
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xs font-medium text-neutral-500">Min</span>
                     <input 
                       type="number" 
                       placeholder="18"
                       value={adSet.ageMin || ''} 
                       onChange={e => onUpdateField('ageMin', Number(e.target.value))} 
-                      className="w-full h-12 pl-12 pr-4 border border-gray-200 rounded-base bg-white text-sm font-medium focus:border-primary-500 outline-none transition-all" 
+                      className="w-full h-12 pl-12 pr-4 border border-neutral-200 rounded-base bg-white text-sm font-medium focus:border-primary-500 outline-none transition-all" 
                     />
                   </div>
-                  <div className="w-4 h-0.5 bg-gray-200 rounded-full" />
+                  <div className="w-4 h-0.5 bg-neutral-200 rounded-full" />
                   <div className="flex-1 relative">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xs font-medium text-gray-500">Max</span>
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xs font-medium text-neutral-500">Max</span>
                     <input 
                       type="number" 
                       placeholder="65"
                       value={adSet.ageMax || ''} 
                       onChange={e => onUpdateField('ageMax', Number(e.target.value))} 
-                      className="w-full h-12 pl-12 pr-4 border border-gray-200 rounded-base bg-white text-sm font-medium focus:border-primary-500 outline-none transition-all" 
+                      className="w-full h-12 pl-12 pr-4 border border-neutral-200 rounded-base bg-white text-sm font-medium focus:border-primary-500 outline-none transition-all" 
                     />
                   </div>
                 </div>
@@ -544,13 +544,13 @@ const EditAdSetModal = ({ isOpen, adSet, onUpdateField, onToggleItem, onClose, a
 
               {/* Gender */}
               <div className="space-y-3">
-                <label className="text-xs font-medium text-gray-500 px-1">性别 (Gender)</label>
-                <div className="flex bg-gray-50 p-1 rounded-inner border border-gray-200">
+                <label className="text-xs font-medium text-neutral-500 px-1">性别 (Gender)</label>
+                <div className="flex bg-neutral-50 p-1 rounded-inner border border-neutral-200">
                   {['All', 'Men', 'Women'].map(g => (
                     <button 
                       key={g} 
                       onClick={() => onUpdateField('gender', g)} 
-                      className={`flex-1 py-2.5 rounded-lg text-xs font-semibold transition-all ${adSet.gender === g ? 'bg-white text-primary-500 shadow-sm border border-gray-100' : 'text-gray-400 hover:text-gray-600'}`}
+                      className={`flex-1 py-2.5 rounded-lg text-xs font-semibold transition-all ${adSet.gender === g ? 'bg-white text-primary-500 shadow-sm border border-neutral-100' : 'text-neutral-400 hover:text-neutral-600'}`}
                     >
                       {g === 'Men' ? '男' : g === 'Women' ? '女' : 'All'}
                     </button>
@@ -561,10 +561,10 @@ const EditAdSetModal = ({ isOpen, adSet, onUpdateField, onToggleItem, onClose, a
 
             {/* Locations (Multi-select with tags) */}
             <div className="space-y-3">
-              <label className="text-xs font-medium text-gray-500 px-1">地理位置 (Locations)</label>
+              <label className="text-xs font-medium text-neutral-500 px-1">地理位置 (Locations)</label>
               <div className="relative">
-                <div ref={locationTriggerRef} className="min-h-[3.5rem] p-2 border border-gray-200 rounded-base flex flex-wrap gap-2 items-center focus-within:border-primary-500 focus-within:bg-white transition-all cursor-text" onClick={() => setShowLocationDropdown(true)}>
-                  <Globe size={16} className="text-gray-300 ml-2" />
+                <div ref={locationTriggerRef} className="min-h-[3.5rem] p-2 border border-neutral-200 rounded-base flex flex-wrap gap-2 items-center focus-within:border-primary-500 focus-within:bg-white transition-all cursor-text" onClick={() => setShowLocationDropdown(true)}>
+                  <Globe size={16} className="text-neutral-300 ml-2" />
                   {adSet.locations?.map(loc => (
                     <span key={loc} className="px-3 py-1 bg-primary-50 text-primary-500 rounded-tag text-xs font-medium flex items-center gap-1.5 border border-primary-500/15 animate-in zoom-in-95">
                       {loc}
@@ -587,13 +587,13 @@ const EditAdSetModal = ({ isOpen, adSet, onUpdateField, onToggleItem, onClose, a
                   matchWidth
                   onClose={() => setShowLocationDropdown(false)}
                   zIndex={Z_INDEX.MODAL_BASE + 500}
-                  className="bg-white border border-gray-100 rounded-inner shadow-xl max-h-60 overflow-y-auto p-2"
+                  className="bg-white border border-neutral-100 rounded-inner shadow-xl max-h-60 overflow-y-auto p-2"
                 >
                   {AVAILABLE_LOCATIONS.filter(l => l.name.toLowerCase().includes(locationSearch.toLowerCase())).map(loc => {
                     const isSel = adSet.locations?.includes(loc.name);
                     return (
-                      <div key={loc.id} onClick={() => onToggleItem('locations', loc.name)} className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 rounded-inner cursor-pointer transition-colors group">
-                        <span className={`text-xs font-medium ${isSel ? 'text-primary-500' : 'text-gray-600'}`}>{loc.name}</span>
+                      <div key={loc.id} onClick={() => onToggleItem('locations', loc.name)} className="flex items-center justify-between px-4 py-3 hover:bg-neutral-50 rounded-inner cursor-pointer transition-colors group">
+                        <span className={`text-xs font-medium ${isSel ? 'text-primary-500' : 'text-neutral-600'}`}>{loc.name}</span>
                         {isSel && <Check size={14} className="text-primary-500" />}
                       </div>
                     );
@@ -604,14 +604,14 @@ const EditAdSetModal = ({ isOpen, adSet, onUpdateField, onToggleItem, onClose, a
 
             {/* Interests (Dual-panel: search + AI packs) */}
             <div className="space-y-3">
-              <label className="text-xs font-medium text-gray-500 px-1">兴趣词 (Interests)</label>
+              <label className="text-xs font-medium text-neutral-500 px-1">兴趣词 (Interests)</label>
               {/* Tags above trigger */}
               {adSet.interests?.length > 0 && (
                 <div className="flex flex-wrap gap-1.5 px-1">
                   {adSet.interests.map(name => (
-                    <span key={name} className="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-50 text-amber-600 rounded-tag text-xs font-medium border border-amber-100">
+                    <span key={name} className="inline-flex items-center gap-1 px-2 py-0.5 bg-warning-50 text-warning-600 rounded-tag text-xs font-medium border border-warning-100">
                       {name}
-                      <button onClick={(e) => { e.stopPropagation(); onToggleItem('interests', name); }} className="text-amber-300 hover:text-rose-500 transition-colors">
+                      <button onClick={(e) => { e.stopPropagation(); onToggleItem('interests', name); }} className="text-warning-300 hover:text-rose-500 transition-colors">
                         <X size={10} strokeWidth={3} />
                       </button>
                     </span>
@@ -622,16 +622,16 @@ const EditAdSetModal = ({ isOpen, adSet, onUpdateField, onToggleItem, onClose, a
                 {/* Trigger */}
                 <div
                   ref={interestTriggerRef}
-                  className="px-4 py-3 border border-gray-200 rounded-base flex items-center justify-between cursor-pointer hover:border-amber-300 transition-all"
+                  className="px-4 py-3 border border-neutral-200 rounded-base flex items-center justify-between cursor-pointer hover:border-warning-300 transition-all"
                   onClick={() => setShowInterestDropdown(!showInterestDropdown)}
                 >
                   <div className="flex items-center gap-2">
-                    <Target size={14} className="text-gray-300" />
-                    <span className="text-xs font-medium text-gray-300">
+                    <Target size={14} className="text-neutral-300" />
+                    <span className="text-xs font-medium text-neutral-300">
                       {adSet.interests?.length > 0 ? '添加更多兴趣词...' : '点击选择兴趣词...'}
                     </span>
                   </div>
-                  <ChevronDown size={14} className={`text-gray-300 transition-transform ${showInterestDropdown ? 'rotate-180' : ''}`} />
+                  <ChevronDown size={14} className={`text-neutral-300 transition-transform ${showInterestDropdown ? 'rotate-180' : ''}`} />
                 </div>
                 {/* Dual-panel dropdown */}
                 <Popover
@@ -640,15 +640,15 @@ const EditAdSetModal = ({ isOpen, adSet, onUpdateField, onToggleItem, onClose, a
                   placement="bottom-start"
                   onClose={() => setShowInterestDropdown(false)}
                   zIndex={Z_INDEX.MODAL_BASE + 500}
-                  className="w-[540px] bg-white rounded-section shadow-xl border border-gray-100 overflow-hidden flex"
+                  className="w-[540px] bg-white rounded-section shadow-xl border border-neutral-100 overflow-hidden flex"
                 >
                       {/* Left: Search & List */}
-                      <div className="w-[55%] border-r border-gray-100 flex flex-col">
-                        <div className="p-3 border-b border-gray-100">
+                      <div className="w-[55%] border-r border-neutral-100 flex flex-col">
+                        <div className="p-3 border-b border-neutral-100">
                           <div className="relative">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300 w-3.5 h-3.5" />
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-300 w-3.5 h-3.5" />
                             <input
-                              className="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-base text-sm text-gray-700 bg-white focus:outline-none focus:border-primary-500 transition-all duration-200"
+                              className="w-full pl-9 pr-3 py-2 border border-neutral-200 rounded-base text-sm text-neutral-700 bg-white focus:outline-none focus:border-primary-500 transition-all duration-200"
                               placeholder="搜索兴趣词..."
                               value={interestSearch}
                               onChange={e => setInterestSearch(e.target.value)}
@@ -659,7 +659,7 @@ const EditAdSetModal = ({ isOpen, adSet, onUpdateField, onToggleItem, onClose, a
                         <div className="flex-1 max-h-[320px] overflow-y-auto custom-scrollbar p-2 space-y-0.5">
                           {!interestSearch.trim() ? (
                             <div className="h-full flex items-center justify-center py-12">
-                              <p className="text-xs text-gray-300 font-medium">请输入关键词查询</p>
+                              <p className="text-xs text-neutral-300 font-medium">请输入关键词查询</p>
                             </div>
                           ) : (
                             AVAILABLE_INTERESTS
@@ -671,12 +671,12 @@ const EditAdSetModal = ({ isOpen, adSet, onUpdateField, onToggleItem, onClose, a
                                     key={interest.id}
                                     onClick={() => onToggleItem('interests', interest.name)}
                                     className={`w-full text-left px-3 py-2 rounded-base text-xs font-medium transition-all flex items-center justify-between ${
-                                      isSel ? 'bg-amber-50 text-amber-600' : 'text-gray-600 hover:bg-gray-50'
+                                      isSel ? 'bg-warning-50 text-warning-600' : 'text-neutral-600 hover:bg-neutral-50'
                                     }`}
                                   >
                                     <div>
                                       <span>{interest.name}</span>
-                                      <span className="ml-2 text-gray-400">{interest.size}</span>
+                                      <span className="ml-2 text-neutral-400">{interest.size}</span>
                                     </div>
                                     {isSel && <Check size={12} />}
                                   </button>
@@ -686,10 +686,10 @@ const EditAdSetModal = ({ isOpen, adSet, onUpdateField, onToggleItem, onClose, a
                         </div>
                       </div>
                       {/* Right: AI Recommended */}
-                      <div className="w-[45%] bg-gray-50/50 flex flex-col">
-                        <div className="px-4 py-3 border-b border-gray-100 flex items-center gap-2">
+                      <div className="w-[45%] bg-neutral-50/50 flex flex-col">
+                        <div className="px-4 py-3 border-b border-neutral-100 flex items-center gap-2">
                           <Sparkles size={12} className="text-primary-500" />
-                          <span className="text-xs font-semibold text-gray-700">AI Recommended</span>
+                          <span className="text-xs font-semibold text-neutral-700">AI Recommended</span>
                         </div>
                         <div className="flex-1 max-h-[320px] overflow-y-auto custom-scrollbar p-3 space-y-2">
                           {AI_INTEREST_PACKS.map(pack => {
@@ -711,16 +711,16 @@ const EditAdSetModal = ({ isOpen, adSet, onUpdateField, onToggleItem, onClose, a
                                 }}
                                 title={`${pack.name}: ${pack.interests.join(', ')}`}
                                 className={`w-full text-left p-3 rounded-inner border transition-all ${
-                                  allIn ? 'border-primary-500 bg-primary-50/50 shadow-sm' : 'border-gray-100 bg-white hover:border-gray-200 hover:shadow-sm'
+                                  allIn ? 'border-primary-500 bg-primary-50/50 shadow-sm' : 'border-neutral-100 bg-white hover:border-neutral-200 hover:shadow-sm'
                                 }`}
                               >
                                 <div className="flex items-center justify-between mb-1">
-                                  <span className="text-xs font-semibold text-gray-800 line-clamp-1">{pack.name}</span>
-                                  <div className={`w-4 h-4 rounded flex items-center justify-center flex-shrink-0 ml-2 ${allIn ? 'bg-primary-500 text-white' : 'border border-gray-200'}`}>
+                                  <span className="text-xs font-semibold text-neutral-800 line-clamp-1">{pack.name}</span>
+                                  <div className={`w-4 h-4 rounded flex items-center justify-center flex-shrink-0 ml-2 ${allIn ? 'bg-primary-500 text-white' : 'border border-neutral-200'}`}>
                                     {allIn && <Check size={10} />}
                                   </div>
                                 </div>
-                                <p className="text-xs text-gray-400 line-clamp-2">{pack.interests.join(', ')}</p>
+                                <p className="text-xs text-neutral-400 line-clamp-2">{pack.interests.join(', ')}</p>
                               </button>
                             );
                           })}
@@ -732,14 +732,14 @@ const EditAdSetModal = ({ isOpen, adSet, onUpdateField, onToggleItem, onClose, a
 
             {/* Language (Single search select) */}
             <div className="space-y-3">
-              <label className="text-xs font-medium text-gray-500 px-1">语言 (Language)</label>
+              <label className="text-xs font-medium text-neutral-500 px-1">语言 (Language)</label>
               <div>
-                <div ref={languageTriggerRef} onClick={() => setShowLanguageDropdown(!showLanguageDropdown)} className="w-full h-14 px-5 border border-gray-200 rounded-base flex items-center justify-between cursor-pointer hover:border-gray-300 transition-all">
+                <div ref={languageTriggerRef} onClick={() => setShowLanguageDropdown(!showLanguageDropdown)} className="w-full h-14 px-5 border border-neutral-200 rounded-base flex items-center justify-between cursor-pointer hover:border-neutral-300 transition-all">
                   <div className="flex items-center gap-3">
-                    <Languages size={18} className="text-gray-400" />
-                    <span className="text-sm font-medium text-gray-700">{adSet.language || 'All languages'}</span>
+                    <Languages size={18} className="text-neutral-400" />
+                    <span className="text-sm font-medium text-neutral-700">{adSet.language || 'All languages'}</span>
                   </div>
-                  <ChevronDown size={16} className={`text-gray-300 transition-transform duration-300 ${showLanguageDropdown ? 'rotate-180' : ''}`} />
+                  <ChevronDown size={16} className={`text-neutral-300 transition-transform duration-300 ${showLanguageDropdown ? 'rotate-180' : ''}`} />
                 </div>
                 <Popover
                   open={showLanguageDropdown}
@@ -748,13 +748,13 @@ const EditAdSetModal = ({ isOpen, adSet, onUpdateField, onToggleItem, onClose, a
                   matchWidth
                   onClose={() => setShowLanguageDropdown(false)}
                   zIndex={Z_INDEX.MODAL_BASE + 500}
-                  className="bg-white border border-gray-100 rounded-inner shadow-xl max-h-60 overflow-hidden flex flex-col"
+                  className="bg-white border border-neutral-100 rounded-inner shadow-xl max-h-60 overflow-hidden flex flex-col"
                 >
-                      <div className="p-3 border-b border-gray-50 bg-gray-50/50">
+                      <div className="p-3 border-b border-neutral-50 bg-neutral-50/50">
                         <input
                           autoFocus
                           type="text"
-                          className="w-full h-10 px-4 border border-gray-200 rounded-base text-xs text-gray-700 bg-white focus:outline-none focus:border-primary-500 focus:shadow-primary-focus transition-all duration-200"
+                          className="w-full h-10 px-4 border border-neutral-200 rounded-base text-xs text-neutral-700 bg-white focus:outline-none focus:border-primary-500 focus:shadow-primary-focus transition-all duration-200"
                           placeholder="搜索语言..."
                           value={languageSearch}
                           onChange={e => setLanguageSearch(e.target.value)}
@@ -762,7 +762,7 @@ const EditAdSetModal = ({ isOpen, adSet, onUpdateField, onToggleItem, onClose, a
                       </div>
                       <div className="overflow-y-auto p-2">
                         {LANGUAGES.filter(l => l.toLowerCase().includes(languageSearch.toLowerCase())).map(l => (
-                          <div key={l} onClick={() => { onUpdateField('language', l); setShowLanguageDropdown(false); setLanguageSearch(''); }} className={`px-4 py-3 rounded-inner text-xs font-medium cursor-pointer mb-1 last:mb-0 transition-colors ${adSet.language === l ? 'bg-primary-50 text-primary-500' : 'text-gray-600 hover:bg-gray-50'}`}>
+                          <div key={l} onClick={() => { onUpdateField('language', l); setShowLanguageDropdown(false); setLanguageSearch(''); }} className={`px-4 py-3 rounded-inner text-xs font-medium cursor-pointer mb-1 last:mb-0 transition-colors ${adSet.language === l ? 'bg-primary-50 text-primary-500' : 'text-neutral-600 hover:bg-neutral-50'}`}>
                             {l}
                           </div>
                         ))}
@@ -772,13 +772,13 @@ const EditAdSetModal = ({ isOpen, adSet, onUpdateField, onToggleItem, onClose, a
             </div>
           </div>
 
-          <div className="h-px bg-gray-100" />
+          <div className="h-px bg-neutral-100" />
 
           {/* 自定义受众 — 包含 / 排除（每个一个共享下拉，内部 Lookalike / Custom tab） */}
           <div className="space-y-6">
             <div className="flex items-center gap-2 px-1">
               <Sparkles size={16} className="text-purple-600" />
-              <h4 className="text-sm font-semibold text-gray-900">自定义受众编辑</h4>
+              <h4 className="text-sm font-semibold text-neutral-900">自定义受众编辑</h4>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <IncludeExcludeAudienceDropdown
@@ -816,7 +816,7 @@ const EditAdSetModal = ({ isOpen, adSet, onUpdateField, onToggleItem, onClose, a
 
         </div>
 
-        <div className="px-6 py-4 border-t border-gray-200 flex justify-end gap-3 shrink-0 z-[300]">
+        <div className="px-6 py-4 border-t border-neutral-200 flex justify-end gap-3 shrink-0 z-[300]">
           <button
             onClick={onClose}
             className="px-16 py-4 bg-primary-500 text-white rounded-base text-sm font-medium hover:bg-primary-600 active:bg-primary-700 transition-all duration-200 focus:outline-none focus:shadow-primary-focus flex items-center gap-3"
@@ -831,31 +831,31 @@ const EditAdSetModal = ({ isOpen, adSet, onUpdateField, onToggleItem, onClose, a
 };
 
 const AdSkeleton = () => (
-  <div className="bg-white rounded-section border border-gray-200 overflow-hidden shadow-adsgo-card relative">
+  <div className="bg-white rounded-section border border-neutral-200 overflow-hidden shadow-adsgo-card relative">
     <div className="p-4 space-y-4">
       <div className="flex items-center gap-2">
-        <div className="w-8 h-8 rounded-full bg-gray-100 relative overflow-hidden">
+        <div className="w-8 h-8 rounded-full bg-neutral-100 relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
         </div>
         <div className="space-y-2">
-          <div className="w-20 h-2 bg-gray-100 rounded relative overflow-hidden">
+          <div className="w-20 h-2 bg-neutral-100 rounded relative overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
           </div>
-          <div className="w-12 h-1.5 bg-gray-50 rounded relative overflow-hidden">
+          <div className="w-12 h-1.5 bg-neutral-50 rounded relative overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
           </div>
         </div>
       </div>
       <div className="space-y-2">
-        <div className="w-full h-2 bg-gray-50 rounded relative overflow-hidden">
+        <div className="w-full h-2 bg-neutral-50 rounded relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
         </div>
-        <div className="w-4/5 h-2 bg-gray-50 rounded relative overflow-hidden">
+        <div className="w-4/5 h-2 bg-neutral-50 rounded relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
         </div>
       </div>
     </div>
-    <div className="aspect-square bg-gray-50 relative overflow-hidden flex items-center justify-center">
+    <div className="aspect-square bg-neutral-50 relative overflow-hidden flex items-center justify-center">
       <div className="relative">
         <Sparkles className="text-primary-500/30 w-16 h-16 animate-[pulse_2s_infinite_ease-in-out]" />
         <Sparkles className="text-purple-500/40 w-12 h-12 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-[spin_4s_infinite_linear]" />
@@ -864,22 +864,22 @@ const AdSkeleton = () => (
     </div>
     <div className="p-4 flex items-center justify-between gap-4">
       <div className="flex-1 space-y-2">
-        <div className="w-24 h-1.5 bg-gray-50 rounded relative overflow-hidden">
+        <div className="w-24 h-1.5 bg-neutral-50 rounded relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
         </div>
-        <div className="w-32 h-2.5 bg-gray-100 rounded relative overflow-hidden">
+        <div className="w-32 h-2.5 bg-neutral-100 rounded relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
         </div>
       </div>
-      <div className="w-16 h-8 bg-gray-100 rounded-lg relative overflow-hidden">
+      <div className="w-16 h-8 bg-neutral-100 rounded-lg relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
       </div>
     </div>
-    <div className="p-3 bg-gray-50/50 flex items-center gap-2">
-      <div className="w-6 h-6 rounded-md bg-gray-100 relative overflow-hidden">
+    <div className="p-3 bg-neutral-50/50 flex items-center gap-2">
+      <div className="w-6 h-6 rounded-md bg-neutral-100 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
       </div>
-      <div className="w-20 h-2 bg-gray-100 rounded relative overflow-hidden">
+      <div className="w-20 h-2 bg-neutral-100 rounded relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
       </div>
     </div>
@@ -1262,17 +1262,17 @@ const CampaignPreviewView = ({
     return (
       <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[200] p-4 animate-in fade-in">
         <div className="bg-white w-full max-w-xl rounded-section shadow-xl overflow-hidden flex flex-col max-h-[90vh]">
-          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-            <h3 className="text-base font-semibold text-gray-900">编辑广告素材 (Ad)</h3>
-            <button onClick={() => setEditingAdInfo(null)} className="p-2 hover:bg-gray-50 rounded-full text-gray-300"><X size={24} /></button>
+          <div className="flex items-center justify-between px-6 py-4 border-b border-neutral-200">
+            <h3 className="text-base font-semibold text-neutral-900">编辑广告素材 (Ad)</h3>
+            <button onClick={() => setEditingAdInfo(null)} className="p-2 hover:bg-neutral-50 rounded-full text-neutral-300"><X size={24} /></button>
           </div>
           <div className="flex-1 overflow-y-auto p-10 space-y-8 no-scrollbar">
             {/* Headlines */}
             <div className="space-y-3">
               <div className="flex items-center justify-between px-1">
-                <label className="text-xs font-medium text-gray-400">广告标题 (Headline)</label>
+                <label className="text-xs font-medium text-neutral-400">广告标题 (Headline)</label>
                 {!isCatalog && (
-                  <span className="text-xs text-gray-400">{(Array.isArray(ad.headline) ? ad.headline : [ad.headline]).length}/{maxHeadlines}</span>
+                  <span className="text-xs text-neutral-400">{(Array.isArray(ad.headline) ? ad.headline : [ad.headline]).length}/{maxHeadlines}</span>
                 )}
               </div>
               {(Array.isArray(ad.headline) ? ad.headline : [ad.headline]).map((val, i) => {
@@ -1311,7 +1311,7 @@ const CampaignPreviewView = ({
                             setLocalAdSets(next);
                           }}
                           placeholder={`标题 ${i + 1}...`}
-                          className="w-full h-12 px-5 border border-gray-200 rounded-base bg-white text-sm font-medium focus:border-primary-500 outline-none transition-all"
+                          className="w-full h-12 px-5 border border-neutral-200 rounded-base bg-white text-sm font-medium focus:border-primary-500 outline-none transition-all"
                         />
                       )}
                     </div>
@@ -1322,7 +1322,7 @@ const CampaignPreviewView = ({
                           next[asIndex].ads[adIndex].headline = headlines.filter((_, j) => j !== i);
                           setLocalAdSets(next);
                         }}
-                        className="w-8 h-8 flex items-center justify-center rounded-full text-gray-400 hover:text-red-400 hover:bg-red-50 transition-colors shrink-0"
+                        className="w-8 h-8 flex items-center justify-center rounded-full text-neutral-400 hover:text-danger-400 hover:bg-danger-50 transition-colors shrink-0"
                       >
                         <X size={14} />
                       </button>
@@ -1350,9 +1350,9 @@ const CampaignPreviewView = ({
             {/* Primary Text */}
             <div className="space-y-3">
               <div className="flex items-center justify-between px-1">
-                <label className="text-xs font-medium text-gray-400">广告正文 (Primary Text)</label>
+                <label className="text-xs font-medium text-neutral-400">广告正文 (Primary Text)</label>
                 {!isCatalog && (
-                  <span className="text-xs text-gray-400">{(Array.isArray(ad.primaryText) ? ad.primaryText : [ad.primaryText]).length}/{maxPrimaryTexts}</span>
+                  <span className="text-xs text-neutral-400">{(Array.isArray(ad.primaryText) ? ad.primaryText : [ad.primaryText]).length}/{maxPrimaryTexts}</span>
                 )}
               </div>
               {(Array.isArray(ad.primaryText) ? ad.primaryText : [ad.primaryText]).map((val, i) => {
@@ -1390,7 +1390,7 @@ const CampaignPreviewView = ({
                             setLocalAdSets(next);
                           }}
                           placeholder={`正文 ${i + 1}...`}
-                          className="w-full p-5 border border-gray-200 rounded-base bg-white text-sm font-medium h-32 resize-none focus:border-primary-500 outline-none transition-all"
+                          className="w-full p-5 border border-neutral-200 rounded-base bg-white text-sm font-medium h-32 resize-none focus:border-primary-500 outline-none transition-all"
                         />
                       )}
                     </div>
@@ -1404,7 +1404,7 @@ const CampaignPreviewView = ({
                           next[asIndex].ads[adIndex].primaryText = texts2.filter((_, j) => j !== i);
                           setLocalAdSets(next);
                         }}
-                        className="w-8 h-8 mt-2 flex items-center justify-center rounded-full text-gray-400 hover:text-red-400 hover:bg-red-50 transition-colors shrink-0"
+                        className="w-8 h-8 mt-2 flex items-center justify-center rounded-full text-neutral-400 hover:text-danger-400 hover:bg-danger-50 transition-colors shrink-0"
                       >
                         <X size={14} />
                       </button>
@@ -1431,18 +1431,18 @@ const CampaignPreviewView = ({
             </div>
 
             <div className="space-y-3">
-              <label className="text-xs font-medium text-gray-400 px-1 flex items-center gap-2"><Megaphone size={12} className="text-primary-500"/> 行动号召 (CTA)</label>
+              <label className="text-xs font-medium text-neutral-400 px-1 flex items-center gap-2"><Megaphone size={12} className="text-primary-500"/> 行动号召 (CTA)</label>
               <div className="relative">
                 <select
                   value={ad.cta}
                   onChange={e => {
                     const next = [...localAdSets]; next[asIndex].ads[adIndex].cta = e.target.value; setLocalAdSets(next);
                   }}
-                  className="w-full h-12 px-5 border border-gray-200 rounded-base bg-white text-sm font-medium focus:border-primary-500 outline-none transition-all appearance-none"
+                  className="w-full h-12 px-5 border border-neutral-200 rounded-base bg-white text-sm font-medium focus:border-primary-500 outline-none transition-all appearance-none"
                 >
                   {CTA_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
                 </select>
-                <ChevronDown size={14} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-300 pointer-events-none" />
+                <ChevronDown size={14} className="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-300 pointer-events-none" />
               </div>
             </div>
 
@@ -1463,10 +1463,10 @@ const CampaignPreviewView = ({
               const selectedProductObjs = (ad.productIds || []).map(id => products.find(p => p.id === id)).filter(Boolean);
               return (
                 <div className="space-y-3">
-                  <label className="text-xs font-medium text-gray-400 px-1 flex items-center gap-2"><Layers size={12} className="text-primary-500"/> Product Range</label>
+                  <label className="text-xs font-medium text-neutral-400 px-1 flex items-center gap-2"><Layers size={12} className="text-primary-500"/> Product Range</label>
                   {!authStatus?.tiktok ? (
-                    <div className="bg-amber-50 border border-amber-100 px-3 py-2.5 rounded-base flex items-center justify-between gap-2">
-                      <span className="text-xs text-amber-700">请先连接 TikTok 加载 catalog</span>
+                    <div className="bg-warning-50 border border-warning-100 px-3 py-2.5 rounded-base flex items-center justify-between gap-2">
+                      <span className="text-xs text-warning-700">请先连接 TikTok 加载 catalog</span>
                       <button type="button" disabled={channelAuthLoading}
                         onClick={() => onAuthorizeChannel?.('tiktok')}
                         className="px-3 py-1 bg-primary-500 text-white text-xs font-semibold rounded-base hover:bg-primary-600 disabled:opacity-50">
@@ -1474,20 +1474,20 @@ const CampaignPreviewView = ({
                       </button>
                     </div>
                   ) : !selectedAccount ? (
-                    <div className="bg-amber-50 border border-amber-100 px-3 py-2.5 rounded-base flex items-center justify-between gap-2">
-                      <span className="text-xs text-amber-700">请选择 TikTok 账号</span>
+                    <div className="bg-warning-50 border border-warning-100 px-3 py-2.5 rounded-base flex items-center justify-between gap-2">
+                      <span className="text-xs text-warning-700">请选择 TikTok 账号</span>
                       <button type="button" onClick={() => onSelectAccount?.()} className="px-3 py-1 bg-primary-500 text-white text-xs font-semibold rounded-base hover:bg-primary-600">选择账号</button>
                     </div>
                   ) : !adsetCatalog ? (
-                    <div className="bg-amber-50 border border-amber-100 px-3 py-2.5 rounded-base flex items-center justify-between gap-2">
-                      <span className="text-xs text-amber-700">该 Adset 尚未配置 Catalog</span>
+                    <div className="bg-warning-50 border border-warning-100 px-3 py-2.5 rounded-base flex items-center justify-between gap-2">
+                      <span className="text-xs text-warning-700">该 Adset 尚未配置 Catalog</span>
                       <button type="button"
                         onClick={() => { setEditingAdInfo(null); setEditingAdSetIndex(asIndex); }}
                         className="px-3 py-1 bg-primary-500 text-white text-xs font-semibold rounded-base hover:bg-primary-600">去配置 Catalog</button>
                     </div>
                   ) : (
                     <>
-                      <div className="flex p-1 bg-gray-100 rounded-base w-fit">
+                      <div className="flex p-1 bg-neutral-100 rounded-base w-fit">
                         {[
                           { id: 'All', label: 'All Products' },
                           { id: 'ProductSet', label: 'Product Set' },
@@ -1497,7 +1497,7 @@ const CampaignPreviewView = ({
                             key={opt.id}
                             type="button"
                             onClick={() => { updateAd({ productRange: opt.id }); setAdRangeSearch(''); setAdRangeSetOpen(false); setAdRangeProductsOpen(false); }}
-                            className={`px-4 py-1.5 rounded-base text-xs font-semibold transition-all ${productRange === opt.id ? 'bg-white text-primary-500 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                            className={`px-4 py-1.5 rounded-base text-xs font-semibold transition-all ${productRange === opt.id ? 'bg-white text-primary-500 shadow-sm' : 'text-neutral-500 hover:text-neutral-700'}`}
                           >{opt.label}</button>
                         ))}
                       </div>
@@ -1507,27 +1507,27 @@ const CampaignPreviewView = ({
                           <button
                             type="button"
                             onClick={() => { setAdRangeSetOpen(v => !v); setAdRangeProductsOpen(false); setAdRangeSearch(''); }}
-                            className="w-full h-12 px-5 flex items-center justify-between border border-gray-200 rounded-base bg-white text-sm font-medium hover:border-primary-300 outline-none transition-all"
+                            className="w-full h-12 px-5 flex items-center justify-between border border-neutral-200 rounded-base bg-white text-sm font-medium hover:border-primary-300 outline-none transition-all"
                           >
-                            <span className={selectedSet ? 'text-gray-800' : 'text-gray-400'}>{selectedSet ? selectedSet.name : '搜索并选择 Product Set...'}</span>
-                            <ChevronDown size={14} className={`text-gray-400 transition-transform ${adRangeSetOpen ? 'rotate-180' : ''}`} />
+                            <span className={selectedSet ? 'text-neutral-800' : 'text-neutral-400'}>{selectedSet ? selectedSet.name : '搜索并选择 Product Set...'}</span>
+                            <ChevronDown size={14} className={`text-neutral-400 transition-transform ${adRangeSetOpen ? 'rotate-180' : ''}`} />
                           </button>
                           {adRangeSetOpen && (
                             <>
                               <div className="fixed inset-0 z-[290]" onClick={() => setAdRangeSetOpen(false)} />
-                              <div className="absolute left-0 right-0 top-full mt-1 bg-white rounded-base border border-gray-200 shadow-xl z-[300] max-h-72 overflow-hidden flex flex-col">
-                                <div className="p-2 border-b border-gray-100">
+                              <div className="absolute left-0 right-0 top-full mt-1 bg-white rounded-base border border-neutral-200 shadow-xl z-[300] max-h-72 overflow-hidden flex flex-col">
+                                <div className="p-2 border-b border-neutral-100">
                                   <input
                                     autoFocus
                                     value={adRangeSearch}
                                     onChange={e => setAdRangeSearch(e.target.value)}
                                     placeholder="搜索 product set..."
-                                    className="w-full h-8 px-3 bg-gray-50 border border-gray-100 rounded text-xs outline-none focus:border-primary-500"
+                                    className="w-full h-8 px-3 bg-neutral-50 border border-neutral-100 rounded text-xs outline-none focus:border-primary-500"
                                   />
                                 </div>
                                 <div className="overflow-y-auto custom-scrollbar p-1">
                                   {filteredSets.length === 0 ? (
-                                    <p className="text-center text-xs text-gray-400 py-4">无匹配 Product Set</p>
+                                    <p className="text-center text-xs text-neutral-400 py-4">无匹配 Product Set</p>
                                   ) : filteredSets.map(s => {
                                     const isSel = ad.productSetId === s.id;
                                     return (
@@ -1535,7 +1535,7 @@ const CampaignPreviewView = ({
                                         key={s.id}
                                         type="button"
                                         onClick={() => { updateAd({ productSetId: s.id }); setAdRangeSetOpen(false); setAdRangeSearch(''); }}
-                                        className={`w-full text-left px-3 py-2 rounded text-xs font-medium transition-all flex items-center justify-between ${isSel ? 'bg-primary-50 text-primary-600' : 'text-gray-700 hover:bg-gray-50'}`}
+                                        className={`w-full text-left px-3 py-2 rounded text-xs font-medium transition-all flex items-center justify-between ${isSel ? 'bg-primary-50 text-primary-600' : 'text-neutral-700 hover:bg-neutral-50'}`}
                                       >
                                         {s.name}
                                         {isSel && <Check size={12} />}
@@ -1570,27 +1570,27 @@ const CampaignPreviewView = ({
                             <button
                               type="button"
                               onClick={() => { setAdRangeProductsOpen(v => !v); setAdRangeSetOpen(false); setAdRangeSearch(''); }}
-                              className="w-full h-12 px-5 flex items-center justify-between border border-gray-200 rounded-base bg-white text-sm font-medium hover:border-primary-300 outline-none transition-all"
+                              className="w-full h-12 px-5 flex items-center justify-between border border-neutral-200 rounded-base bg-white text-sm font-medium hover:border-primary-300 outline-none transition-all"
                             >
-                              <span className="text-gray-400">{(ad.productIds || []).length > 0 ? `已选 ${(ad.productIds || []).length} / ${products.length}，继续添加...` : '搜索并多选 Products...'}</span>
-                              <ChevronDown size={14} className={`text-gray-400 transition-transform ${adRangeProductsOpen ? 'rotate-180' : ''}`} />
+                              <span className="text-neutral-400">{(ad.productIds || []).length > 0 ? `已选 ${(ad.productIds || []).length} / ${products.length}，继续添加...` : '搜索并多选 Products...'}</span>
+                              <ChevronDown size={14} className={`text-neutral-400 transition-transform ${adRangeProductsOpen ? 'rotate-180' : ''}`} />
                             </button>
                             {adRangeProductsOpen && (
                               <>
                                 <div className="fixed inset-0 z-[290]" onClick={() => setAdRangeProductsOpen(false)} />
-                                <div className="absolute left-0 right-0 top-full mt-1 bg-white rounded-base border border-gray-200 shadow-xl z-[300] max-h-80 overflow-hidden flex flex-col">
-                                  <div className="p-2 border-b border-gray-100">
+                                <div className="absolute left-0 right-0 top-full mt-1 bg-white rounded-base border border-neutral-200 shadow-xl z-[300] max-h-80 overflow-hidden flex flex-col">
+                                  <div className="p-2 border-b border-neutral-100">
                                     <input
                                       autoFocus
                                       value={adRangeSearch}
                                       onChange={e => setAdRangeSearch(e.target.value)}
                                       placeholder="搜索名称或 SKU..."
-                                      className="w-full h-8 px-3 bg-gray-50 border border-gray-100 rounded text-xs outline-none focus:border-primary-500"
+                                      className="w-full h-8 px-3 bg-neutral-50 border border-neutral-100 rounded text-xs outline-none focus:border-primary-500"
                                     />
                                   </div>
                                   <div className="overflow-y-auto custom-scrollbar p-1">
                                     {filteredProducts.length === 0 ? (
-                                      <p className="text-center text-xs text-gray-400 py-4">无匹配 Product</p>
+                                      <p className="text-center text-xs text-neutral-400 py-4">无匹配 Product</p>
                                     ) : filteredProducts.map(p => {
                                       const isSel = (ad.productIds || []).includes(p.id);
                                       return (
@@ -1601,14 +1601,14 @@ const CampaignPreviewView = ({
                                             const cur = ad.productIds || [];
                                             updateAd({ productIds: isSel ? cur.filter(id => id !== p.id) : [...cur, p.id] });
                                           }}
-                                          className={`w-full flex items-center gap-2 px-2 py-1.5 rounded text-left transition-all ${isSel ? 'bg-primary-50' : 'hover:bg-gray-50'}`}
+                                          className={`w-full flex items-center gap-2 px-2 py-1.5 rounded text-left transition-all ${isSel ? 'bg-primary-50' : 'hover:bg-neutral-50'}`}
                                         >
                                           <img src={p.imageUrl} className="w-7 h-7 rounded object-cover shrink-0" alt="" />
                                           <div className="min-w-0 flex-1">
-                                            <p className={`text-xs font-medium truncate ${isSel ? 'text-primary-700' : 'text-gray-800'}`}>{p.name}</p>
-                                            <p className="text-[10px] text-gray-400 font-medium truncate">{p.sku}</p>
+                                            <p className={`text-xs font-medium truncate ${isSel ? 'text-primary-700' : 'text-neutral-800'}`}>{p.name}</p>
+                                            <p className="text-[10px] text-neutral-400 font-medium truncate">{p.sku}</p>
                                           </div>
-                                          <div className={`w-4 h-4 rounded border-2 flex items-center justify-center shrink-0 ${isSel ? 'bg-primary-500 border-primary-500' : 'border-gray-200'}`}>
+                                          <div className={`w-4 h-4 rounded border-2 flex items-center justify-center shrink-0 ${isSel ? 'bg-primary-500 border-primary-500' : 'border-neutral-200'}`}>
                                             {isSel && <Check size={10} className="text-white" strokeWidth={3} />}
                                           </div>
                                         </button>
@@ -1630,31 +1630,31 @@ const CampaignPreviewView = ({
             {isCatalog ? (
               <>
                 <div className="space-y-3">
-                  <label className="text-xs font-medium text-gray-400 px-1 flex items-center gap-2"><Database size={12} className="text-primary-500"/> 目录</label>
+                  <label className="text-xs font-medium text-neutral-400 px-1 flex items-center gap-2"><Database size={12} className="text-primary-500"/> 目录</label>
                   <div className="relative">
                     <button
                       type="button"
                       onClick={() => { setEditAdCatalogOpen(v => !v); setEditAdSetOpen(false); }}
-                      className="w-full h-12 px-5 flex items-center justify-between border border-gray-200 rounded-base bg-white text-sm font-medium hover:border-primary-300 focus:border-primary-500 outline-none transition-all"
+                      className="w-full h-12 px-5 flex items-center justify-between border border-neutral-200 rounded-base bg-white text-sm font-medium hover:border-primary-300 focus:border-primary-500 outline-none transition-all"
                     >
-                      <span className={selectedCatalog ? 'text-gray-800' : 'text-gray-400'}>
+                      <span className={selectedCatalog ? 'text-neutral-800' : 'text-neutral-400'}>
                         {selectedCatalog?.name || '请选择目录'}
                       </span>
-                      <ChevronDown size={14} className={`text-gray-400 transition-transform ${editAdCatalogOpen ? 'rotate-180' : ''}`} />
+                      <ChevronDown size={14} className={`text-neutral-400 transition-transform ${editAdCatalogOpen ? 'rotate-180' : ''}`} />
                     </button>
                     {editAdCatalogOpen && (
                       <>
                         <div className="fixed inset-0 z-[290]" onClick={() => setEditAdCatalogOpen(false)} />
-                        <div className="absolute left-0 right-0 top-full mt-1 bg-white rounded-base border border-gray-200 shadow-xl z-[300] max-h-56 overflow-auto py-1">
+                        <div className="absolute left-0 right-0 top-full mt-1 bg-white rounded-base border border-neutral-200 shadow-xl z-[300] max-h-56 overflow-auto py-1">
                           {MOCK_CATALOGS.map(c => (
                             <button
                               key={c.id}
                               type="button"
                               onClick={() => { onSelectCatalog?.(c); setEditAdCatalogOpen(false); }}
-                              className={`w-full text-left px-4 py-2 text-sm hover:bg-primary-50 ${selectedCatalog?.id === c.id ? 'bg-primary-50 text-primary-600' : 'text-gray-700'}`}
+                              className={`w-full text-left px-4 py-2 text-sm hover:bg-primary-50 ${selectedCatalog?.id === c.id ? 'bg-primary-50 text-primary-600' : 'text-neutral-700'}`}
                             >
                               <div className="font-medium truncate">{c.name}</div>
-                              <div className="text-[11px] text-gray-400 mt-0.5">id: {c.id}</div>
+                              <div className="text-[11px] text-neutral-400 mt-0.5">id: {c.id}</div>
                             </button>
                           ))}
                         </div>
@@ -1664,28 +1664,28 @@ const CampaignPreviewView = ({
                 </div>
 
                 <div className="space-y-3">
-                  <label className="text-xs font-medium text-gray-400 px-1 flex items-center gap-2"><ListFilter size={12} className="text-primary-500"/> 产品系列</label>
+                  <label className="text-xs font-medium text-neutral-400 px-1 flex items-center gap-2"><ListFilter size={12} className="text-primary-500"/> 产品系列</label>
                   <div className="relative">
                     <button
                       type="button"
                       onClick={() => { setEditAdSetOpen(v => !v); setEditAdCatalogOpen(false); }}
-                      className="w-full h-12 px-5 flex items-center justify-between border border-gray-200 rounded-base bg-white text-sm font-medium hover:border-primary-300 focus:border-primary-500 outline-none transition-all"
+                      className="w-full h-12 px-5 flex items-center justify-between border border-neutral-200 rounded-base bg-white text-sm font-medium hover:border-primary-300 focus:border-primary-500 outline-none transition-all"
                     >
-                      <span className={selectedProductSet ? 'text-gray-800' : 'text-gray-400'}>
+                      <span className={selectedProductSet ? 'text-neutral-800' : 'text-neutral-400'}>
                         {selectedProductSet || '请选择产品系列'}
                       </span>
-                      <ChevronDown size={14} className={`text-gray-400 transition-transform ${editAdSetOpen ? 'rotate-180' : ''}`} />
+                      <ChevronDown size={14} className={`text-neutral-400 transition-transform ${editAdSetOpen ? 'rotate-180' : ''}`} />
                     </button>
                     {editAdSetOpen && (
                       <>
                         <div className="fixed inset-0 z-[290]" onClick={() => setEditAdSetOpen(false)} />
-                        <div className="absolute left-0 right-0 top-full mt-1 bg-white rounded-base border border-gray-200 shadow-xl z-[300] max-h-56 overflow-auto py-1">
+                        <div className="absolute left-0 right-0 top-full mt-1 bg-white rounded-base border border-neutral-200 shadow-xl z-[300] max-h-56 overflow-auto py-1">
                           {MOCK_PRODUCT_SETS.map(s => (
                             <button
                               key={s}
                               type="button"
                               onClick={() => { onSelectProductSet?.(s); setEditAdSetOpen(false); }}
-                              className={`w-full text-left px-4 py-2 text-sm hover:bg-primary-50 ${selectedProductSet === s ? 'bg-primary-50 text-primary-600' : 'text-gray-700'}`}
+                              className={`w-full text-left px-4 py-2 text-sm hover:bg-primary-50 ${selectedProductSet === s ? 'bg-primary-50 text-primary-600' : 'text-neutral-700'}`}
                             >
                               {s}
                             </button>
@@ -1698,20 +1698,20 @@ const CampaignPreviewView = ({
               </>
             ) : (
               <div className="space-y-3">
-                <label className="text-xs font-medium text-gray-400 px-1 flex items-center gap-2"><LinkIcon size={12} className="text-primary-500"/> 落地页 URL</label>
+                <label className="text-xs font-medium text-neutral-400 px-1 flex items-center gap-2"><LinkIcon size={12} className="text-primary-500"/> 落地页 URL</label>
                 <input
                   type="text"
                   value={ad.destinationUrl}
                   onChange={e => {
                     const next = [...localAdSets]; next[asIndex].ads[adIndex].destinationUrl = e.target.value; setLocalAdSets(next);
                   }}
-                  className="w-full h-12 px-5 border border-gray-200 rounded-base bg-white text-sm font-medium focus:border-primary-500 outline-none transition-all"
+                  className="w-full h-12 px-5 border border-neutral-200 rounded-base bg-white text-sm font-medium focus:border-primary-500 outline-none transition-all"
                 />
               </div>
             )}
 
             <div className="space-y-3">
-              <label className="text-xs font-medium text-gray-400 px-1 flex items-center gap-2"><Globe size={12} className="text-primary-500"/> UTM 参数 (Tracking)</label>
+              <label className="text-xs font-medium text-neutral-400 px-1 flex items-center gap-2"><Globe size={12} className="text-primary-500"/> UTM 参数 (Tracking)</label>
               <input
                 type="text"
                 placeholder="utm_source=meta&utm_medium=paid..."
@@ -1719,22 +1719,22 @@ const CampaignPreviewView = ({
                 onChange={e => {
                   const next = [...localAdSets]; next[asIndex].ads[adIndex].utmParams = e.target.value; setLocalAdSets(next);
                 }}
-                className="w-full h-12 px-5 border border-gray-200 rounded-base bg-white text-sm font-medium focus:border-primary-500 outline-none transition-all"
+                className="w-full h-12 px-5 border border-neutral-200 rounded-base bg-white text-sm font-medium focus:border-primary-500 outline-none transition-all"
               />
             </div>
 
             {platform?.id !== 'tiktok' && (
               <div className="space-y-3">
-                <label className="text-xs font-medium text-gray-400 px-1 flex items-center gap-2"><Tag size={12} className="text-primary-500"/> 突显优惠 (Promo Offer)</label>
-                <div className="p-5 bg-gray-50 rounded-inner border border-gray-100">
+                <label className="text-xs font-medium text-neutral-400 px-1 flex items-center gap-2"><Tag size={12} className="text-primary-500"/> 突显优惠 (Promo Offer)</label>
+                <div className="p-5 bg-neutral-50 rounded-inner border border-neutral-100">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className={`w-10 h-10 rounded-inner flex items-center justify-center transition-colors ${ad.offerType === 'AUTO' ? 'bg-primary-500 text-white shadow-lg shadow-primary-500/10' : 'bg-white text-gray-300 border border-gray-100'}`}>
+                      <div className={`w-10 h-10 rounded-inner flex items-center justify-center transition-colors ${ad.offerType === 'AUTO' ? 'bg-primary-500 text-white shadow-lg shadow-primary-500/10' : 'bg-white text-neutral-300 border border-neutral-100'}`}>
                         <Sparkles size={18} />
                       </div>
                       <div>
-                        <p className="text-xs font-semibold text-gray-800">自动获取品牌优惠码</p>
-                        <p className="text-xs font-medium text-gray-500 mt-0.5">Auto-fetch: 90% OFF active</p>
+                        <p className="text-xs font-semibold text-neutral-800">自动获取品牌优惠码</p>
+                        <p className="text-xs font-medium text-neutral-500 mt-0.5">Auto-fetch: 90% OFF active</p>
                       </div>
                     </div>
                     <button
@@ -1745,7 +1745,7 @@ const CampaignPreviewView = ({
                         next[asIndex].ads[adIndex].promoCode = next[asIndex].ads[adIndex].offerType === 'AUTO' ? '90%OFF' : '';
                         setLocalAdSets(next);
                       }}
-                      className={`w-12 h-6 rounded-full transition-all relative ${ad.offerType === 'AUTO' ? 'bg-primary-500' : 'bg-gray-200'}`}
+                      className={`w-12 h-6 rounded-full transition-all relative ${ad.offerType === 'AUTO' ? 'bg-primary-500' : 'bg-neutral-200'}`}
                     >
                       <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${ad.offerType === 'AUTO' ? 'left-7' : 'left-1'}`} />
                     </button>
@@ -1754,7 +1754,7 @@ const CampaignPreviewView = ({
               </div>
             )}
           </div>
-          <div className="px-6 py-4 border-t border-gray-200 flex justify-end gap-3">
+          <div className="px-6 py-4 border-t border-neutral-200 flex justify-end gap-3">
             <button onClick={() => setEditingAdInfo(null)} className="px-10 py-4 bg-primary-500 text-white rounded-base text-sm font-medium hover:bg-primary-600 active:bg-primary-700 transition-all duration-200 focus:outline-none focus:shadow-primary-focus">保存修改</button>
           </div>
         </div>
@@ -1876,14 +1876,14 @@ const CampaignPreviewView = ({
       <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[200] p-4 animate-in fade-in">
         <div className="bg-white w-full max-w-3xl rounded-section shadow-xl overflow-hidden flex flex-col" style={{ maxHeight: '85vh' }}>
           {/* Header */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-neutral-100">
             <div>
-              <h3 className="text-base font-semibold text-gray-900">Change Creative</h3>
-              <p className="text-xs text-gray-400 mt-0.5">
+              <h3 className="text-base font-semibold text-neutral-900">Change Creative</h3>
+              <p className="text-xs text-neutral-400 mt-0.5">
                 Current campaign supports up to {maxCount} creative{maxCount > 1 ? 's' : ''}
               </p>
             </div>
-            <button onClick={() => setChangeCreativeInfo(null)} className="p-2 hover:bg-gray-50 rounded-full text-gray-300">
+            <button onClick={() => setChangeCreativeInfo(null)} className="p-2 hover:bg-neutral-50 rounded-full text-neutral-300">
               <X size={20} />
             </button>
           </div>
@@ -1891,9 +1891,9 @@ const CampaignPreviewView = ({
           {/* Body */}
           <div className="flex flex-1 overflow-hidden">
             {/* Left: tabs + grid */}
-            <div className="flex-1 flex flex-col overflow-hidden border-r border-gray-100">
+            <div className="flex-1 flex flex-col overflow-hidden border-r border-neutral-100">
               {/* Tabs */}
-              <div className="flex items-center gap-1 px-4 pt-3 pb-0 border-b border-gray-100">
+              <div className="flex items-center gap-1 px-4 pt-3 pb-0 border-b border-neutral-100">
                 {tabs.map(tab => (
                   <button
                     key={tab.id}
@@ -1901,7 +1901,7 @@ const CampaignPreviewView = ({
                     className={`flex items-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-t-md border-b-2 transition-all -mb-px ${
                       activeTab === tab.id
                         ? 'border-primary-500 text-primary-600 bg-primary-50/50'
-                        : 'border-transparent text-gray-400 hover:text-gray-600'
+                        : 'border-transparent text-neutral-400 hover:text-neutral-600'
                     }`}
                   >
                     {tab.icon}
@@ -1923,7 +1923,7 @@ const CampaignPreviewView = ({
                             key={c.id || i}
                             onClick={() => toggle(c)}
                             className={`relative aspect-square rounded-md overflow-hidden cursor-pointer border-2 transition-all ${
-                              sel ? 'border-primary-500 shadow-md' : 'border-transparent hover:border-gray-300'
+                              sel ? 'border-primary-500 shadow-md' : 'border-transparent hover:border-neutral-300'
                             }`}
                           >
                             {c.mediaType === 'video' ? (
@@ -1947,25 +1947,25 @@ const CampaignPreviewView = ({
                       })}
                     </div>
                   ) : (
-                    <div className="flex flex-col items-center justify-center h-full text-gray-400 gap-2">
-                      <Layout size={32} className="text-gray-200" />
+                    <div className="flex flex-col items-center justify-center h-full text-neutral-400 gap-2">
+                      <Layout size={32} className="text-neutral-200" />
                       <p className="text-sm">暂无可用创意</p>
                     </div>
                   )
                 ) : activeTab === 'MEDIA' ? (
                   mediaState === 'NO_PLATFORM' ? (
-                    <div className="flex flex-col items-center justify-center h-full text-gray-400 gap-3 text-center px-6">
-                      <div className="w-16 h-16 bg-gray-50 rounded-xl flex items-center justify-center text-gray-300"><Monitor size={32} /></div>
-                      <p className="text-sm font-bold text-gray-500">尚未选择媒体渠道</p>
-                      <p className="text-xs text-gray-400 max-w-xs">请返回上一步在"投放渠道媒体"中选择媒体平台并连接账号。</p>
+                    <div className="flex flex-col items-center justify-center h-full text-neutral-400 gap-3 text-center px-6">
+                      <div className="w-16 h-16 bg-neutral-50 rounded-xl flex items-center justify-center text-neutral-300"><Monitor size={32} /></div>
+                      <p className="text-sm font-bold text-neutral-500">尚未选择媒体渠道</p>
+                      <p className="text-xs text-neutral-400 max-w-xs">请返回上一步在"投放渠道媒体"中选择媒体平台并连接账号。</p>
                     </div>
                   ) : mediaState === 'NEED_AUTH' ? (
                     <div className="flex flex-col items-center justify-center h-full gap-3 text-center px-6">
-                      <div className="w-16 h-16 bg-gray-50 rounded-xl flex items-center justify-center overflow-hidden">
-                        {platform.logo ? <img src={platform.logo} alt="" className="w-10 h-10 object-contain" /> : <Monitor size={32} className="text-gray-300" />}
+                      <div className="w-16 h-16 bg-neutral-50 rounded-xl flex items-center justify-center overflow-hidden">
+                        {platform.logo ? <img src={platform.logo} alt="" className="w-10 h-10 object-contain" /> : <Monitor size={32} className="text-neutral-300" />}
                       </div>
-                      <p className="text-sm font-bold text-gray-500">连接 {platform.name} 后查看媒体素材</p>
-                      <p className="text-xs text-gray-400 max-w-xs">连接成功后将自动弹出账号选择，再选择目标账号即可加载该账号下的媒体素材。</p>
+                      <p className="text-sm font-bold text-neutral-500">连接 {platform.name} 后查看媒体素材</p>
+                      <p className="text-xs text-neutral-400 max-w-xs">连接成功后将自动弹出账号选择，再选择目标账号即可加载该账号下的媒体素材。</p>
                       <button
                         onClick={() => onAuthorizeChannel?.(platform.id)}
                         disabled={channelAuthLoading}
@@ -1978,8 +1978,8 @@ const CampaignPreviewView = ({
                   ) : mediaState === 'NEED_PICK' ? (
                     <div className="flex flex-col items-center justify-center h-full gap-3 text-center px-6">
                       <div className="w-16 h-16 bg-primary-50 rounded-xl flex items-center justify-center text-primary-500"><Briefcase size={32} /></div>
-                      <p className="text-sm font-bold text-gray-500">已连接 {platform.name}，请选择广告账号</p>
-                      <p className="text-xs text-gray-400 max-w-xs">从已授权账户中选择一个，加载其媒体素材库。</p>
+                      <p className="text-sm font-bold text-neutral-500">已连接 {platform.name}，请选择广告账号</p>
+                      <p className="text-xs text-neutral-400 max-w-xs">从已授权账户中选择一个，加载其媒体素材库。</p>
                       <button
                         onClick={() => onOpenAccountPicker?.()}
                         className="mt-2 px-6 py-2.5 bg-primary-500 text-white rounded-full text-sm font-semibold hover:bg-primary-600 transition-all shadow-md flex items-center gap-2"
@@ -2005,7 +2005,7 @@ const CampaignPreviewView = ({
                                 key={`media-${c.id || i}`}
                                 onClick={() => toggle(c)}
                                 className={`relative aspect-square rounded-md overflow-hidden cursor-pointer border-2 transition-all ${
-                                  sel ? 'border-primary-500 shadow-md' : 'border-transparent hover:border-gray-300'
+                                  sel ? 'border-primary-500 shadow-md' : 'border-transparent hover:border-neutral-300'
                                 }`}
                               >
                                 {c.mediaType === 'video' ? (
@@ -2027,8 +2027,8 @@ const CampaignPreviewView = ({
                           })}
                         </div>
                       ) : (
-                        <div className="flex flex-col items-center justify-center py-12 text-gray-400 gap-2">
-                          <Monitor size={32} className="text-gray-200" />
+                        <div className="flex flex-col items-center justify-center py-12 text-neutral-400 gap-2">
+                          <Monitor size={32} className="text-neutral-200" />
                           <p className="text-sm">该账号下暂无媒体素材</p>
                         </div>
                       )}
@@ -2053,7 +2053,7 @@ const CampaignPreviewView = ({
                       className={`flex-1 min-h-[260px] flex flex-col items-center justify-center rounded-section border-2 border-dashed cursor-pointer transition-all ${
                         uploadDragOver
                           ? 'bg-primary-50/60 border-primary-500 scale-[1.01]'
-                          : 'bg-gray-50/40 border-gray-200 hover:border-primary-500/60 hover:bg-primary-50/30'
+                          : 'bg-neutral-50/40 border-neutral-200 hover:border-primary-500/60 hover:bg-primary-50/30'
                       }`}
                     >
                       <input
@@ -2067,15 +2067,15 @@ const CampaignPreviewView = ({
                       <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-4 transition-colors ${uploadDragOver ? 'bg-primary-500 text-white' : 'bg-white text-primary-500 shadow-sm'}`}>
                         <Plus size={28} />
                       </div>
-                      <p className="text-sm font-semibold text-gray-700 mb-1">{uploadDragOver ? '松开鼠标即可上传' : '点击或拖拽文件到此处'}</p>
-                      <p className="text-xs text-gray-400 font-medium">支持图片 (jpg/png/webp) 与视频 (mp4/mov/webm)，可批量</p>
-                      <p className="text-[11px] text-gray-400 mt-2">当前可再添加 <span className="font-bold text-primary-500">{Math.max(0, maxCount - selected.length)}</span> / {maxCount} 个</p>
+                      <p className="text-sm font-semibold text-neutral-700 mb-1">{uploadDragOver ? '松开鼠标即可上传' : '点击或拖拽文件到此处'}</p>
+                      <p className="text-xs text-neutral-400 font-medium">支持图片 (jpg/png/webp) 与视频 (mp4/mov/webm)，可批量</p>
+                      <p className="text-[11px] text-neutral-400 mt-2">当前可再添加 <span className="font-bold text-primary-500">{Math.max(0, maxCount - selected.length)}</span> / {maxCount} 个</p>
                     </div>
                     {uploadMessage && (
                       <div className={`px-3 py-2 rounded-base text-xs font-medium flex items-center gap-2 animate-in slide-in-from-bottom-2 fade-in duration-200 ${
                         uploadMessage.type === 'warn'
-                          ? 'bg-amber-50 text-amber-700 border border-amber-100'
-                          : 'bg-emerald-50 text-emerald-700 border border-emerald-100'
+                          ? 'bg-warning-50 text-warning-700 border border-warning-100'
+                          : 'bg-success-50 text-success-700 border border-success-100'
                       }`}>
                         {uploadMessage.type === 'warn' ? <Info size={12} /> : <Check size={12} />}
                         {uploadMessage.text}
@@ -2104,8 +2104,8 @@ const CampaignPreviewView = ({
                           <Sparkles size={36} />
                         </div>
                         <div className="space-y-1">
-                          <p className="text-base font-semibold text-gray-900">AI 一键生成创意</p>
-                          <p className="text-xs text-gray-400 font-medium">每点击一次按钮，立即往 Selected 添加一个生成中的占位，完成后自动替换为成品素材</p>
+                          <p className="text-base font-semibold text-neutral-900">AI 一键生成创意</p>
+                          <p className="text-xs text-neutral-400 font-medium">每点击一次按钮，立即往 Selected 添加一个生成中的占位，完成后自动替换为成品素材</p>
                         </div>
                         <button
                           type="button"
@@ -2113,22 +2113,22 @@ const CampaignPreviewView = ({
                           disabled={aiAtLimit}
                           className={`inline-flex items-center gap-2 px-8 py-3 rounded-full text-sm font-semibold transition-all shadow-lg ${
                             aiAtLimit
-                              ? 'bg-gray-100 text-gray-300 cursor-not-allowed shadow-none'
+                              ? 'bg-neutral-100 text-neutral-300 cursor-not-allowed shadow-none'
                               : 'bg-gradient-to-r from-primary-500 to-purple-500 text-white hover:shadow-xl hover:scale-[1.02] active:scale-95'
                           }`}
                         >
                           <Sparkles size={16} />
                           {aiAtLimit ? `已达上限 ${maxCount} 个` : '生成一张创意'}
                         </button>
-                        <p className="text-[11px] text-gray-400">已选 <span className="font-bold text-primary-500">{selected.length}</span> / {maxCount}</p>
+                        <p className="text-[11px] text-neutral-400">已选 <span className="font-bold text-primary-500">{selected.length}</span> / {maxCount}</p>
                       </div>
                     );
                   })()
                 ) : (
-                  <div className="flex flex-col items-center justify-center h-full text-gray-400 gap-2">
-                    <Sparkles size={32} className="text-gray-200" />
-                    <p className="text-sm font-medium text-gray-400">{tabs.find(t => t.id === activeTab)?.label}</p>
-                    <p className="text-xs text-gray-300">即将推出</p>
+                  <div className="flex flex-col items-center justify-center h-full text-neutral-400 gap-2">
+                    <Sparkles size={32} className="text-neutral-200" />
+                    <p className="text-sm font-medium text-neutral-400">{tabs.find(t => t.id === activeTab)?.label}</p>
+                    <p className="text-xs text-neutral-300">即将推出</p>
                   </div>
                 )}
               </div>
@@ -2136,22 +2136,22 @@ const CampaignPreviewView = ({
 
             {/* Right: selected panel */}
             <div className="w-52 shrink-0 flex flex-col">
-              <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
-                <span className="text-xs font-semibold text-gray-600">Selected</span>
+              <div className="flex items-center justify-between px-4 py-3 border-b border-neutral-100">
+                <span className="text-xs font-semibold text-neutral-600">Selected</span>
                 <span className="text-xs font-bold text-primary-500">{selected.length} / {maxCount}</span>
               </div>
               <div className="flex-1 overflow-y-auto p-3">
                 {selected.length === 0 ? (
                   <div className="flex flex-col items-center justify-center h-full gap-3 text-center px-2">
-                    <div className="w-16 h-16 border-2 border-dashed border-gray-200 rounded-xl flex items-center justify-center">
-                      <Plus size={20} className="text-gray-300" />
+                    <div className="w-16 h-16 border-2 border-dashed border-neutral-200 rounded-xl flex items-center justify-center">
+                      <Plus size={20} className="text-neutral-300" />
                     </div>
-                    <p className="text-xs text-gray-400">No creative selected</p>
+                    <p className="text-xs text-neutral-400">No creative selected</p>
                   </div>
                 ) : (
                   <div className="grid grid-cols-2 gap-1.5">
                     {selected.map((c, i) => (
-                      <div key={c.id || i} className="relative group/sel rounded-md overflow-hidden border border-gray-100">
+                      <div key={c.id || i} className="relative group/sel rounded-md overflow-hidden border border-neutral-100">
                         {c.isGenerating ? (
                           <div className="w-full aspect-square relative overflow-hidden flex items-center justify-center bg-gradient-to-br from-purple-100 via-primary-50 to-purple-50 animate-pulse">
                             <Sparkles size={18} className="text-primary-500/70" />
@@ -2181,10 +2181,10 @@ const CampaignPreviewView = ({
           </div>
 
           {/* Footer */}
-          <div className="px-6 py-3 border-t border-gray-100 flex justify-end gap-3">
+          <div className="px-6 py-3 border-t border-neutral-100 flex justify-end gap-3">
             <button
               onClick={() => setChangeCreativeInfo(null)}
-              className="px-6 py-2.5 border border-gray-200 text-gray-600 rounded-base text-sm font-medium hover:bg-gray-50 transition-all"
+              className="px-6 py-2.5 border border-neutral-200 text-neutral-600 rounded-base text-sm font-medium hover:bg-neutral-50 transition-all"
             >
               Discard
             </button>
@@ -2206,7 +2206,7 @@ const CampaignPreviewView = ({
     <div className="animate-fade-in space-y-10 pb-32">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-semibold text-gray-900">发布方案预览</h2>
+          <h2 className="text-xl font-semibold text-neutral-900">发布方案预览</h2>
         </div>
         <button onClick={onBack} className="border border-primary-500 text-primary-500 rounded-base text-sm font-medium hover:bg-primary-50 active:bg-primary-100 transition-all duration-200 px-6 py-3 flex items-center gap-2">
           <ChevronLeft size={16} /> 返回修改配置
@@ -2214,13 +2214,13 @@ const CampaignPreviewView = ({
       </div>
 
       {numCampaigns >= 2 && (
-        <div className="sticky top-0 z-10 -mx-4 px-4 py-3 bg-white/85 backdrop-blur border-b border-gray-100 flex items-center gap-2 flex-wrap">
-          <span className="text-xs font-medium text-gray-400 shrink-0">快速跳转：</span>
+        <div className="sticky top-0 z-10 -mx-4 px-4 py-3 bg-white/85 backdrop-blur border-b border-neutral-100 flex items-center gap-2 flex-wrap">
+          <span className="text-xs font-medium text-neutral-400 shrink-0">快速跳转：</span>
           {Array.from({ length: numCampaigns }, (_, i) => (
             <button
               key={i}
               onClick={() => document.getElementById(`campaign-block-${i}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
-              className="px-3 py-1.5 rounded-base text-xs font-medium text-gray-600 hover:bg-primary-50 hover:text-primary-500 transition-colors"
+              className="px-3 py-1.5 rounded-base text-xs font-medium text-neutral-600 hover:bg-primary-50 hover:text-primary-500 transition-colors"
             >
               Campaign {i + 1}
             </button>
@@ -2232,19 +2232,19 @@ const CampaignPreviewView = ({
         {Array.from({ length: numCampaigns }, (_, cIdx) => (
         <div id={`campaign-block-${cIdx}`} key={`campaign-block-${cIdx}`} className="space-y-16 scroll-mt-20">
         <div className={`flex items-center gap-3 px-1 ${cIdx === 0 ? 'mb-2' : '-my-4'}`} aria-hidden>
-          <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent" />
-          <span className="text-[10px] font-semibold tracking-wider text-gray-400 uppercase">
+          <div className="flex-1 h-px bg-gradient-to-r from-transparent via-neutral-300 to-transparent" />
+          <span className="text-[10px] font-semibold tracking-wider text-neutral-400">
             Campaign {cIdx + 1}
           </span>
-          <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent" />
+          <div className="flex-1 h-px bg-gradient-to-r from-transparent via-neutral-300 to-transparent" />
         </div>
-        <div className="bg-gray-900 p-6 rounded-section shadow-xl text-white relative overflow-visible">
+        <div className="bg-neutral-900 p-6 rounded-section shadow-xl text-white relative overflow-visible">
           <div className="absolute top-0 right-0 w-80 h-80 bg-primary-500/10 rounded-full blur-[100px] -translate-y-40 translate-x-40 pointer-events-none"></div>
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
               <div className="w-11 h-11 bg-primary-500 rounded-inner flex items-center justify-center shadow-lg border-2 border-white/10"><Briefcase size={22} /></div>
               <div>
-                <p className="text-xs font-medium text-gray-500">Campaign {cIdx + 1} Overview</p>
+                <p className="text-xs font-medium text-neutral-500">Campaign {cIdx + 1} Overview</p>
                 {!isExistingCampaign ? (
                   isEditingCampaignName ? (
                     <div className="flex items-center gap-2">
@@ -2255,13 +2255,13 @@ const CampaignPreviewView = ({
                         onChange={e => setLocalCampaignName(e.target.value)}
                         onKeyDown={e => { if (e.key === 'Enter') setIsEditingCampaignName(false); if (e.key === 'Escape') { setLocalCampaignName(campaignName); setIsEditingCampaignName(false); } }}
                       />
-                      <button onClick={() => setIsEditingCampaignName(false)} className="text-emerald-400 hover:text-emerald-300"><Check size={16} /></button>
-                      <button onClick={() => { setLocalCampaignName(campaignName); setIsEditingCampaignName(false); }} className="text-gray-400 hover:text-gray-300"><X size={16} /></button>
+                      <button onClick={() => setIsEditingCampaignName(false)} className="text-success-400 hover:text-success-300"><Check size={16} /></button>
+                      <button onClick={() => { setLocalCampaignName(campaignName); setIsEditingCampaignName(false); }} className="text-neutral-400 hover:text-neutral-300"><X size={16} /></button>
                     </div>
                   ) : (
                     <div className="flex items-center gap-2 group/name">
                       <h3 className="text-xl font-semibold">{localCampaignName}</h3>
-                      <button onClick={() => setIsEditingCampaignName(true)} className="opacity-0 group-hover/name:opacity-100 transition-opacity text-gray-400 hover:text-white">
+                      <button onClick={() => setIsEditingCampaignName(true)} className="opacity-0 group-hover/name:opacity-100 transition-opacity text-neutral-400 hover:text-white">
                         <Edit3 size={15} />
                       </button>
                     </div>
@@ -2272,28 +2272,28 @@ const CampaignPreviewView = ({
               </div>
             </div>
             <div className="text-right">
-              <p className="text-xs font-medium text-gray-500 tracking-widest">规模概览</p>
-              <p className="text-xl font-semibold text-emerald-400">{adSetGroupsCount || localAdSets.length} Adsets · {localAdSets.reduce((s, as) => s + (as.ads?.length || 0), 0)} Ads</p>
+              <p className="text-xs font-medium text-neutral-500 tracking-widest">规模概览</p>
+              <p className="text-xl font-semibold text-success-400">{adSetGroupsCount || localAdSets.length} Adsets · {localAdSets.reduce((s, as) => s + (as.ads?.length || 0), 0)} Ads</p>
             </div>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             <div className="bg-white/5 rounded-inner p-3 border border-white/5">
-              <p className="text-xs font-medium text-gray-500 mb-0.5">投放国家</p>
+              <p className="text-xs font-medium text-neutral-500 mb-0.5">投放国家</p>
               <p className="text-sm font-medium">{brand.country}</p>
             </div>
             <div className="bg-white/5 rounded-inner p-3 border border-white/5">
-              <p className="text-xs font-medium text-gray-500 mb-0.5">优化目标</p>
+              <p className="text-xs font-medium text-neutral-500 mb-0.5">优化目标</p>
               <p className="text-sm font-medium truncate">{optimizationEvent || '—'}</p>
             </div>
             <div className="bg-white/5 rounded-inner p-3 border border-white/5">
-              <p className="text-xs font-medium text-gray-500 mb-0.5">Daily Budget</p>
+              <p className="text-xs font-medium text-neutral-500 mb-0.5">Daily Budget</p>
               <div className="flex items-center gap-2">
                 <div className="flex items-center gap-1 shrink-0">
                   {['CBO', 'ABO'].map(mode => (
                     <button key={mode} disabled={isExistingCampaign}
                       onClick={() => { if (!isExistingCampaign && onBudgetTypeChange) onBudgetTypeChange(mode); }}
                       className={`px-1.5 py-0.5 rounded text-[10px] font-bold transition-all ${
-                        budgetType === mode ? 'bg-primary-500 text-white' : 'bg-white/10 text-gray-400 hover:bg-white/20'
+                        budgetType === mode ? 'bg-primary-500 text-white' : 'bg-white/10 text-neutral-400 hover:bg-white/20'
                       } ${isExistingCampaign ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>
                       {mode}
                     </button>
@@ -2309,22 +2309,22 @@ const CampaignPreviewView = ({
               </div>
             </div>
             <div ref={ctaTriggerRef} className="bg-white/5 rounded-inner p-3 border border-white/5">
-              <p className="text-xs font-medium text-gray-500 mb-0.5">CTA</p>
+              <p className="text-xs font-medium text-neutral-500 mb-0.5">CTA</p>
               <div className="flex items-center gap-1.5 cursor-pointer" onClick={() => setIsCtaOpen(!isCtaOpen)}>
                 <p className="text-sm font-medium">{selectedCta}</p>
-                <ChevronDown size={11} className={`text-gray-500 transition-transform ml-auto ${isCtaOpen ? 'rotate-180' : ''}`} />
+                <ChevronDown size={11} className={`text-neutral-500 transition-transform ml-auto ${isCtaOpen ? 'rotate-180' : ''}`} />
               </div>
               <Popover
                 open={isCtaOpen}
                 anchorRef={ctaTriggerRef}
                 placement="bottom-start"
                 onClose={() => setIsCtaOpen(false)}
-                className="w-44 bg-white rounded-base shadow-xl border border-gray-100 p-1.5"
+                className="w-44 bg-white rounded-base shadow-xl border border-neutral-100 p-1.5"
               >
                 {CTA_OPTIONS.map(opt => (
                   <button key={opt} onClick={() => { setSelectedCta(opt); setIsCtaOpen(false); }}
                     className={`w-full text-left px-3 py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-between ${
-                      selectedCta === opt ? 'bg-primary-50 text-primary-600' : 'text-gray-600 hover:bg-gray-50'
+                      selectedCta === opt ? 'bg-primary-50 text-primary-600' : 'text-neutral-600 hover:bg-neutral-50'
                     }`}>
                     {opt}
                     {selectedCta === opt && <Check size={12} />}
@@ -2337,16 +2337,16 @@ const CampaignPreviewView = ({
 
         <div className="space-y-12">
           {localAdSets.map((adSet, asIdx) => (
-            <div key={asIdx} className="bg-white border border-gray-100 rounded-section p-10 shadow-adsgo-card space-y-8 animate-in slide-in-from-bottom-4">
-              <div className="flex items-center justify-between border-b border-gray-50 pb-6">
+            <div key={asIdx} className="bg-white border border-neutral-100 rounded-section p-10 shadow-adsgo-card space-y-8 animate-in slide-in-from-bottom-4">
+              <div className="flex items-center justify-between border-b border-neutral-50 pb-6">
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-gray-100 text-gray-900 rounded-inner flex items-center justify-center font-semibold">AS{asIdx + 1}</div>
+                  <div className="w-12 h-12 bg-neutral-100 text-neutral-900 rounded-inner flex items-center justify-center font-semibold">AS{asIdx + 1}</div>
                   <div>
                     <div className="flex items-center gap-2">
-                       <p className="text-xs font-medium text-gray-500">Ad Set</p>
+                       <p className="text-xs font-medium text-neutral-500">Ad Set</p>
                        <span className="px-1.5 py-0.5 bg-primary-50 text-primary-500 text-xs font-semibold rounded-tag">{adSet.audienceType}</span>
                     </div>
-                    <h4 className="text-base font-semibold text-gray-800">{adSet.name}</h4>
+                    <h4 className="text-base font-semibold text-neutral-800">{adSet.name}</h4>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
@@ -2359,7 +2359,7 @@ const CampaignPreviewView = ({
                   {localAdSets.length > 1 && (
                     <button
                       onClick={() => setLocalAdSets(prev => prev.filter((_, i) => i !== asIdx))}
-                      className="border border-gray-200 text-gray-400 rounded-base text-sm font-medium hover:border-rose-300 hover:text-rose-500 hover:bg-rose-50 transition-all duration-200 px-3 py-2"
+                      className="border border-neutral-200 text-neutral-400 rounded-base text-sm font-medium hover:border-rose-300 hover:text-rose-500 hover:bg-rose-50 transition-all duration-200 px-3 py-2"
                       title="删除此广告组"
                     >
                       <Trash2 size={14} />
@@ -2384,34 +2384,34 @@ const CampaignPreviewView = ({
                     : ad.adFormat === 'CAROUSEL' ? 'Carousel'
                     : 'Single';
                   const adFormatBadgeCls = ad.adFormat === 'FLEXIBLE' ? 'bg-violet-50 text-violet-600 border-violet-100'
-                    : ad.adFormat === 'CAROUSEL' ? 'bg-amber-50 text-amber-600 border-amber-100'
-                    : 'bg-gray-100 text-gray-600 border-gray-200';
+                    : ad.adFormat === 'CAROUSEL' ? 'bg-warning-50 text-warning-600 border-warning-100'
+                    : 'bg-neutral-100 text-neutral-600 border-neutral-200';
                   const isSingleSplit = ad.adFormat === 'SINGLE' && adSet.ads.length > 1;
                   return (
                     <div key={aIdx} className="group relative">
-                      <div className="bg-white rounded-section border border-gray-200 overflow-hidden shadow-adsgo-card transition-all hover:shadow-xl hover:border-primary-500/20 relative animate-in fade-in zoom-in-95 duration-500">
+                      <div className="bg-white rounded-section border border-neutral-200 overflow-hidden shadow-adsgo-card transition-all hover:shadow-xl hover:border-primary-500/20 relative animate-in fade-in zoom-in-95 duration-500">
                         <div className="absolute top-3 right-3 z-10 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-all">
                           <button
                             onClick={() => setEditingAdInfo({ asIndex: asIdx, adIndex: aIdx })}
-                            className="w-7 h-7 bg-white/90 rounded-full flex items-center justify-center text-gray-400 hover:text-primary-500 shadow-lg transition-colors"
+                            className="w-7 h-7 bg-white/90 rounded-full flex items-center justify-center text-neutral-400 hover:text-primary-500 shadow-lg transition-colors"
                           >
                             <Edit3 size={12} />
                           </button>
                           {adSet.ads.length > 1 && (
                             <button
                               onClick={() => setLocalAdSets(prev => { const next = [...prev]; next[asIdx] = { ...next[asIdx], ads: next[asIdx].ads.filter((_, i) => i !== aIdx) }; return next; })}
-                              className="w-7 h-7 bg-white/90 rounded-full flex items-center justify-center text-gray-400 hover:text-rose-500 shadow-lg transition-colors"
+                              className="w-7 h-7 bg-white/90 rounded-full flex items-center justify-center text-neutral-400 hover:text-rose-500 shadow-lg transition-colors"
                               title="删除此广告"
                             >
                               <Trash2 size={12} />
                             </button>
                           )}
                         </div>
-                        <div className="p-4 bg-white border-b border-gray-50">
+                        <div className="p-4 bg-white border-b border-neutral-50">
                           <div className="flex items-center justify-between mb-3 gap-3">
                             <div className="flex items-center gap-2 min-w-0">
-                              <div className="w-8 h-8 rounded-full bg-gray-900 flex items-center justify-center text-xs font-medium text-white shrink-0">{brand.name.charAt(0)}</div>
-                              <div className="min-w-0"><p className="text-xs font-medium text-gray-900 truncate">{brand.name}</p><p className="text-xs text-gray-500">Sponsored</p></div>
+                              <div className="w-8 h-8 rounded-full bg-neutral-900 flex items-center justify-center text-xs font-medium text-white shrink-0">{brand.name.charAt(0)}</div>
+                              <div className="min-w-0"><p className="text-xs font-medium text-neutral-900 truncate">{brand.name}</p><p className="text-xs text-neutral-500">Sponsored</p></div>
                             </div>
                             {/* Ad Format 徽标：放在 brand 右侧、与 sponsored 一行齐平，hover 编辑按钮在更外侧 */}
                             <div className="relative group/badge shrink-0 mr-9">
@@ -2420,15 +2420,15 @@ const CampaignPreviewView = ({
                                 {isSingleSplit && <Info size={9} className="opacity-70" />}
                               </span>
                               {isSingleSplit && (
-                                <div className="absolute top-full right-0 mt-1 px-2.5 py-1.5 bg-gray-900 text-white text-[10px] font-medium rounded shadow-lg whitespace-nowrap opacity-0 group-hover/badge:opacity-100 pointer-events-none transition-opacity duration-150 z-20">
+                                <div className="absolute top-full right-0 mt-1 px-2.5 py-1.5 bg-neutral-900 text-white text-[10px] font-medium rounded shadow-lg whitespace-nowrap opacity-0 group-hover/badge:opacity-100 pointer-events-none transition-opacity duration-150 z-20">
                                   发布时将自动拆分为多个 Ad（adset 内每个素材独立成 ad）
                                 </div>
                               )}
                             </div>
                           </div>
-                          <p className="text-xs text-gray-700 leading-relaxed line-clamp-2">{Array.isArray(ad.primaryText) ? ad.primaryText[0] : ad.primaryText}</p>
+                          <p className="text-xs text-neutral-700 leading-relaxed line-clamp-2">{Array.isArray(ad.primaryText) ? ad.primaryText[0] : ad.primaryText}</p>
                         </div>
-                        <div className="aspect-square bg-gray-100 relative overflow-hidden group/img">
+                        <div className="aspect-square bg-neutral-100 relative overflow-hidden group/img">
                            {campaignType === 'CATALOG' ? (
                              <DPAPreviewCard />
                            ) : (
@@ -2439,7 +2439,7 @@ const CampaignPreviewView = ({
                              <div className="absolute inset-0 bg-black/0 group-hover/img:bg-black/30 transition-all flex items-center justify-center">
                                <button
                                  onClick={() => setChangeCreativeInfo({ asIndex: asIdx, adIndex: aIdx })}
-                                 className="opacity-0 group-hover/img:opacity-100 transition-all flex items-center gap-1.5 bg-white text-gray-800 text-xs font-semibold px-3 py-2 rounded-full shadow-lg hover:bg-primary-500 hover:text-white"
+                                 className="opacity-0 group-hover/img:opacity-100 transition-all flex items-center gap-1.5 bg-white text-neutral-800 text-xs font-semibold px-3 py-2 rounded-full shadow-lg hover:bg-primary-500 hover:text-white"
                                >
                                  <Layout size={12} />
                                  Change Creative
@@ -2447,12 +2447,12 @@ const CampaignPreviewView = ({
                              </div>
                            )}
                         </div>
-                        <div className="p-4 bg-gray-50 flex items-center justify-between gap-4">
+                        <div className="p-4 bg-neutral-50 flex items-center justify-between gap-4">
                           <div className="flex-1 min-w-0">
-                            <p className="text-xs text-gray-500 font-semibold truncate">{ad.destinationUrl.split('?')[0].split('/').slice(0,3).join('/')}</p>
-                            <h6 className="text-xs font-medium text-gray-900 truncate">{Array.isArray(ad.headline) ? ad.headline[0] : ad.headline}</h6>
+                            <p className="text-xs text-neutral-500 font-semibold truncate">{ad.destinationUrl.split('?')[0].split('/').slice(0,3).join('/')}</p>
+                            <h6 className="text-xs font-medium text-neutral-900 truncate">{Array.isArray(ad.headline) ? ad.headline[0] : ad.headline}</h6>
                           </div>
-                          <div className="px-3 py-1.5 bg-white border border-gray-200 rounded-md text-xs font-medium text-gray-800 shrink-0 tracking-tighter shadow-sm">{selectedCta}</div>
+                          <div className="px-3 py-1.5 bg-white border border-neutral-200 rounded-md text-xs font-medium text-neutral-800 shrink-0 tracking-tighter shadow-sm">{selectedCta}</div>
                         </div>
                         {product && (
                           <div className="p-2.5 bg-primary-50/50 border-t border-primary-500/15 flex items-center gap-2">
@@ -2461,9 +2461,9 @@ const CampaignPreviewView = ({
                           </div>
                         )}
                         {ad.isDynamic && (
-                           <div className="p-2.5 bg-emerald-50/50 border-t border-emerald-100 flex items-center gap-2">
-                              <Box size={14} className="text-emerald-400" />
-                              <p className="text-xs font-medium text-emerald-900">使用目录动态字段渲染</p>
+                           <div className="p-2.5 bg-success-50/50 border-t border-success-100 flex items-center gap-2">
+                              <Box size={14} className="text-success-400" />
+                              <p className="text-xs font-medium text-success-900">使用目录动态字段渲染</p>
                            </div>
                         )}
                       </div>
@@ -2478,16 +2478,16 @@ const CampaignPreviewView = ({
         ))}
       </div>
 
-      <div className="fixed bottom-0 left-0 right-0 bg-gray-900 text-white px-8 py-4 z-[100] border-t border-white/5 backdrop-blur-xl bg-opacity-95 shadow-[0_-20px_40px_rgba(0,0,0,0.1)]">
+      <div className="fixed bottom-0 left-0 right-0 bg-neutral-900 text-white px-8 py-4 z-[100] border-t border-white/5 backdrop-blur-xl bg-opacity-95 shadow-[0_-20px_40px_rgba(0,0,0,0.1)]">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-12">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-primary-500 rounded-base flex items-center justify-center shadow-lg"><Layers size={20} /></div>
-              <div><p className="text-xs font-medium text-gray-500">结构方案</p><p className="text-base font-semibold">{numCampaigns} Campaigns • {(adSetGroupsCount || localAdSets.length) * numCampaigns} Adsets • {campaignType === 'CATALOG' ? 'Dynamic' : localAdSets.reduce((acc, as) => acc + as.ads.length, 0) * numCampaigns} Ads</p></div>
+              <div><p className="text-xs font-medium text-neutral-500">结构方案</p><p className="text-base font-semibold">{numCampaigns} Campaigns • {(adSetGroupsCount || localAdSets.length) * numCampaigns} Adsets • {campaignType === 'CATALOG' ? 'Dynamic' : localAdSets.reduce((acc, as) => acc + as.ads.length, 0) * numCampaigns} Ads</p></div>
             </div>
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-emerald-600 rounded-base flex items-center justify-center shadow-lg"><DollarSign size={20} /></div>
-              <div><p className="text-xs font-medium text-gray-500">预估日消耗</p><p className="text-xl font-semibold text-emerald-400">${totalDailyBudget}</p></div>
+              <div className="w-10 h-10 bg-success-600 rounded-base flex items-center justify-center shadow-lg"><DollarSign size={20} /></div>
+              <div><p className="text-xs font-medium text-neutral-500">预估日消耗</p><p className="text-xl font-semibold text-success-400">${totalDailyBudget}</p></div>
             </div>
           </div>
           <button
@@ -2495,7 +2495,7 @@ const CampaignPreviewView = ({
             disabled={loadedAdsCount < totalAdsCount}
             className={`px-10 py-3.5 rounded-base text-sm font-medium transition-all duration-200 flex items-center gap-3 focus:outline-none focus:shadow-primary-focus ${
               loadedAdsCount < totalAdsCount
-                ? 'bg-gray-700 text-gray-400 cursor-not-allowed disabled:opacity-50 disabled:cursor-not-allowed'
+                ? 'bg-neutral-700 text-neutral-400 cursor-not-allowed disabled:opacity-50 disabled:cursor-not-allowed'
                 : 'bg-primary-500 text-white hover:bg-primary-600 active:bg-primary-700'
             }`}
           >

@@ -48,15 +48,15 @@ const BudgetField = ({ channel, level, value, onSetField, required, helpText }) 
   return (
     <div className="flex flex-col gap-1.5">
       <div className="flex items-center gap-1.5">
-        <label className="text-xs font-medium text-gray-700">
+        <label className="text-xs font-medium text-neutral-700">
           {levelLabel}预算
           {required && <span className="text-rose-500 ml-0.5">*</span>}
         </label>
-        {helpText && <span title={helpText} className="text-gray-300 cursor-help"><Info size={11} /></span>}
+        {helpText && <span title={helpText} className="text-neutral-300 cursor-help"><Info size={11} /></span>}
       </div>
       <div className="flex items-center gap-2">
         {isMeta && (
-          <div className="inline-flex p-0.5 bg-gray-100 rounded-base shrink-0">
+          <div className="inline-flex p-0.5 bg-neutral-100 rounded-base shrink-0">
             {[
               { id: 'daily',    label: '日预算' },
               { id: 'lifetime', label: '总预算' },
@@ -69,7 +69,7 @@ const BudgetField = ({ channel, level, value, onSetField, required, helpText }) 
                   onClick={() => handleSwitch(opt.id)}
                   className={[
                     'px-3 h-9 rounded-base text-xs font-medium transition-all',
-                    active ? 'bg-white text-primary-600 shadow-sm' : 'text-gray-500 hover:text-gray-700',
+                    active ? 'bg-white text-primary-600 shadow-sm' : 'text-neutral-500 hover:text-neutral-700',
                   ].join(' ')}
                 >
                   {opt.label}
@@ -88,7 +88,7 @@ const BudgetField = ({ channel, level, value, onSetField, required, helpText }) 
           />
         </div>
       </div>
-      <span className="text-[10px] text-gray-300 font-mono truncate">
+      <span className="text-[10px] text-neutral-300 font-mono truncate">
         {isMeta ? `${level}.${mode === 'daily' ? 'daily_budget' : 'lifetime_budget'}` : 'campaign.budget'}
       </span>
     </div>

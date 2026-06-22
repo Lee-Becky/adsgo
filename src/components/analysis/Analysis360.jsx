@@ -20,12 +20,12 @@ import {
   SCATTER_DATA,
 } from '../../constants/adInsightsData';
 import { Icon, SvgIcons } from '../AdInsightsIcons';
-import { Calendar, ChevronLeft, ChevronRight, BarChart3, Check } from 'lucide-react';
+import { Calendar, ChevronLeft, ChevronRight, BarChart3, Check, ThumbsUp, MessageSquare, Share2 } from 'lucide-react';
 
 // --- Sub Components ---
 
 const SectionTitle = ({ children }) => (
-  <div className="text-gray-900 text-xl font-bold mb-4 pl-4 relative before:content-[''] before:block before:w-1.5 before:h-6 before:rounded-full before:bg-gradient-to-b before:from-[#c3a2fe] before:via-[#7135f4] before:to-[#0d031f] before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2">
+  <div className="text-neutral-900 text-xl font-bold mb-4 pl-4 relative before:content-[''] before:block before:w-1.5 before:h-6 before:rounded-full before:bg-gradient-to-b before:from-[#c3a2fe] before:via-[#7135f4] before:to-[#0d031f] before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2">
     {children}
   </div>
 );
@@ -96,7 +96,7 @@ const PageListItem = ({ item, i }) => (
 
 const CreativeAdCard = ({ ad }) => (
   <div className="flex-1 min-w-[320px] max-w-[360px] relative first:before:hidden before:content-[''] before:block before:w-px before:h-[90%] before:border-l before:border-dashed before:border-[#d9d9d9] before:absolute before:top-1/2 before:left-[-24px] before:-translate-y-1/2">
-    <div className="flex items-center justify-center gap-2 mb-3 text-gray-500 text-sm">
+    <div className="flex items-center justify-center gap-2 mb-3 text-neutral-500 text-sm">
       <span className="text-[#78a100] font-medium">{ad.ctr} CTR</span>
       <span></span>
       <span>{ad.cpa} CPA</span>
@@ -104,7 +104,7 @@ const CreativeAdCard = ({ ad }) => (
       <span>{ad.campaigns} campaigns</span>
     </div>
     <div className="rounded-2xl border border-primary/30 overflow-hidden bg-white">
-      <div className="flex items-center gap-1.5 px-4 py-2 border-b border-border bg-gradient-to-r from-white to-[#f5f1ff] text-gray-900 text-base font-semibold">
+      <div className="flex items-center gap-1.5 px-4 py-2 border-b border-border bg-gradient-to-r from-white to-[#f5f1ff] text-neutral-900 text-base font-semibold">
         <Icon id="icon-Outlined_Eye" className="text-xl font-medium" />
         <span>Creative</span>
       </div>
@@ -114,8 +114,8 @@ const CreativeAdCard = ({ ad }) => (
             <img src="https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://meta.com&size=256" alt="" className="w-6 h-6 object-contain" />
           </div>
           <div className="flex flex-col gap-0.5">
-            <span className="text-gray-900 text-sm font-bold truncate max-w-[200px]">Goodkarma</span>
-            <span className="text-gray-500 text-xs">Sponsored •</span>
+            <span className="text-neutral-900 text-sm font-bold truncate max-w-[200px]">Goodkarma</span>
+            <span className="text-neutral-500 text-xs">Sponsored •</span>
           </div>
         </div>
         <div className="flex gap-2.5 text-xl font-semibold">
@@ -123,23 +123,23 @@ const CreativeAdCard = ({ ad }) => (
           <Icon id="icon-Outlined_Close01" />
         </div>
       </div>
-      <div className="px-2.5 pb-2 text-gray-900 text-xs font-medium leading-[17px] line-clamp-3">
+      <div className="px-2.5 pb-2 text-neutral-900 text-xs font-medium leading-[17px] line-clamp-3">
         {ad.primaryText}
       </div>
-      <div className="w-full aspect-square bg-gray-100 bg-cover bg-center" style={{ backgroundImage: `url(${ad.mediaUrl})` }} />
-      <div className="p-3 flex justify-between items-center border-t border-border bg-gray-50 gap-3">
-        <div className="flex-1 flex flex-col gap-1 text-gray-900 text-sm max-w-[240px]">
+      <div className="w-full aspect-square bg-neutral-100 bg-cover bg-center" style={{ backgroundImage: `url(${ad.mediaUrl})` }} />
+      <div className="p-3 flex justify-between items-center border-t border-border bg-neutral-50 gap-3">
+        <div className="flex-1 flex flex-col gap-1 text-neutral-900 text-sm max-w-[240px]">
           <div className="font-bold truncate">{ad.footerBrand}</div>
-          <div className="text-gray-500 text-xs font-medium truncate">{ad.footerDesc}</div>
+          <div className="text-neutral-500 text-xs font-medium truncate">{ad.footerDesc}</div>
         </div>
-        <div className="h-8 px-1.5 flex justify-center items-center text-gray-900 text-xs font-semibold rounded-md bg-gray-200">
+        <div className="h-8 px-1.5 flex justify-center items-center text-neutral-900 text-xs font-semibold rounded-md bg-neutral-200">
           Shop Now
         </div>
       </div>
       <div className="ad-social">
-        <span className="social-item"><i className="far fa-thumbs-up"></i> Like</span>
-        <span className="social-item"><i className="far fa-comment-alt"></i> Comment</span>
-        <span className="social-item"><i className="fas fa-share"></i> Share</span>
+        <span className="social-item"><ThumbsUp size={14} /> Like</span>
+        <span className="social-item"><MessageSquare size={14} /> Comment</span>
+        <span className="social-item"><Share2 size={14} /> Share</span>
       </div>
     </div>
   </div>
@@ -262,7 +262,7 @@ const Analysis360 = () => {
           </svg>
         );
       default:
-        return <span className="text-xs text-gray-600">{platform}</span>;
+        return <span className="text-xs text-neutral-600">{platform}</span>;
     }
   };
 
@@ -303,14 +303,14 @@ const Analysis360 = () => {
   const CustomTooltip = ({ active, payload, label }) => {
     if (!active || !payload?.length) return null;
     return (
-      <div className="bg-white rounded-xl shadow-xl border border-gray-100 p-4 min-w-[140px]">
-        <p className="text-xs font-semibold text-gray-500 mb-2 pb-2 border-b border-gray-100">{label}</p>
+      <div className="bg-white rounded-xl shadow-xl border border-neutral-100 p-4 min-w-[140px]">
+        <p className="text-xs font-semibold text-neutral-500 mb-2 pb-2 border-b border-neutral-100">{label}</p>
         <div className="space-y-1.5">
           {payload.map((entry, i) => (
             <div key={i} className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: entry.color }} />
-              <span className="text-xs text-gray-600">{entry.name}:</span>
-              <span className="text-xs font-bold text-gray-900 ml-auto">
+              <span className="text-xs text-neutral-600">{entry.name}:</span>
+              <span className="text-xs font-bold text-neutral-900 ml-auto">
                 {entry.name === 'Spend' || entry.name === 'CPM' || entry.name === 'Cost/conv.'
                   ? `$${entry.value}`
                   : entry.name === 'CTR' ? `${entry.value}%` : entry.value}
@@ -374,19 +374,19 @@ const Analysis360 = () => {
       <div className="flex-1 flex flex-col gap-4">
 
         {/* ── Platform / Date Header ── */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-4 transition-all">
+        <div className="bg-white rounded-2xl border border-neutral-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-4 transition-all">
           <div className="flex items-center justify-between gap-4">
             {/* Platform Selector */}
-            <div className="bg-gray-50 p-1 rounded-[20px] flex gap-1 w-fit border border-gray-100/50">
+            <div className="bg-neutral-50 p-1 rounded-2xl flex gap-1 w-fit border border-neutral-100/50">
               {['Meta', 'Google', 'TikTok', 'Bing'].map(p => (
                 <div key={p} className="relative group">
                   <button
                     onClick={() => p === 'Meta' && setSelectedPlatform(p)}
                     className={`
-                      relative px-7 py-2 rounded-[16px] text-sm font-black transition-all duration-300 flex items-center gap-3
+                      relative px-7 py-2 rounded-xl text-sm font-black transition-all duration-300 flex items-center gap-3
                       ${selectedPlatform === p
-                        ? 'bg-white shadow-[0_4px_12px_rgba(0,0,0,0.08)] text-gray-900 scale-[1.02] translate-y-[-1px]'
-                        : 'text-gray-400 opacity-60 grayscale hover:grayscale-0 hover:opacity-100 hover:bg-white/60 hover:translate-y-[-1px]'
+                        ? 'bg-white shadow-[0_4px_12px_rgba(0,0,0,0.08)] text-neutral-900 scale-[1.02] translate-y-[-1px]'
+                        : 'text-neutral-400 opacity-60 grayscale hover:grayscale-0 hover:opacity-100 hover:bg-white/60 hover:translate-y-[-1px]'
                       }
                       ${p !== 'Meta' ? 'cursor-not-allowed' : 'cursor-pointer active:scale-95'}
                     `}
@@ -398,9 +398,9 @@ const Analysis360 = () => {
                     )}
                   </button>
                   {p !== 'Meta' && (
-                    <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-3 px-3 py-2 bg-gray-900 text-white text-[10px] font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0 whitespace-nowrap z-10 shadow-xl pointer-events-none">
+                    <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-3 px-3 py-2 bg-neutral-900 text-white text-[10px] font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0 whitespace-nowrap z-10 shadow-xl pointer-events-none">
                       Coming soon
-                      <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1.5 w-3 h-3 bg-gray-900 rotate-45 rounded-sm" />
+                      <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1.5 w-3 h-3 bg-neutral-900 rotate-45 rounded-sm" />
                     </div>
                   )}
                 </div>
@@ -411,16 +411,16 @@ const Analysis360 = () => {
             <div className="relative">
               <button
                 onClick={() => setShowCalendar(!showCalendar)}
-                className="px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors flex items-center gap-2 min-w-[220px] justify-between"
+                className="px-4 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl text-sm font-medium text-neutral-700 hover:bg-neutral-100 transition-colors flex items-center gap-2 min-w-[220px] justify-between"
               >
                 <div className="flex items-center gap-2">
-                  <Calendar size={15} className="text-gray-400" />
+                  <Calendar size={15} className="text-neutral-400" />
                   <span>{customStartDate && customEndDate ? `${formatDate(customStartDate)} – ${formatDate(customEndDate)}` : dataPeriod}</span>
                 </div>
               </button>
 
               {showCalendar && (
-                <div className="absolute top-full right-0 mt-2 bg-white border border-gray-200 rounded-2xl shadow-xl p-4 z-20 w-96">
+                <div className="absolute top-full right-0 mt-2 bg-white border border-neutral-200 rounded-2xl shadow-xl p-4 z-20 w-96">
                   <div className="flex gap-4">
                     <div className="w-1/3 flex flex-col gap-1.5">
                       {periodOptions.map(opt => (
@@ -428,7 +428,7 @@ const Analysis360 = () => {
                           key={opt.value}
                           onClick={() => handlePeriodClick(opt.value)}
                           className={`px-3 py-2 text-xs rounded-lg text-left transition-colors font-semibold ${
-                            dataPeriod === opt.value ? 'bg-primary text-white' : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
+                            dataPeriod === opt.value ? 'bg-primary text-white' : 'bg-neutral-50 text-neutral-600 hover:bg-neutral-100'
                           }`}
                         >
                           {opt.label}
@@ -437,20 +437,20 @@ const Analysis360 = () => {
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center justify-between mb-2">
-                        <button className="p-1 hover:bg-gray-100 rounded-lg"><ChevronLeft size={16} /></button>
+                        <button className="p-1 hover:bg-neutral-100 rounded-lg"><ChevronLeft size={16} /></button>
                         <span className="font-semibold text-sm">
                           {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
                         </span>
-                        <button className="p-1 hover:bg-gray-100 rounded-lg"><ChevronRight size={16} /></button>
+                        <button className="p-1 hover:bg-neutral-100 rounded-lg"><ChevronRight size={16} /></button>
                       </div>
-                      <div className="grid grid-cols-7 gap-1 text-center text-xs text-gray-400 mb-1 font-medium">
+                      <div className="grid grid-cols-7 gap-1 text-center text-xs text-neutral-400 mb-1 font-medium">
                         {['Su','Mo','Tu','We','Th','Fr','Sa'].map(d => <div key={d}>{d}</div>)}
                       </div>
                       <div className="grid grid-cols-7 gap-1">{generateCalendar()}</div>
                     </div>
                   </div>
-                  <div className="flex gap-2 mt-4 pt-3 border-t border-gray-100">
-                    <button onClick={() => setShowCalendar(false)} className="flex-1 px-4 py-2 text-sm font-medium text-gray-600 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">Cancel</button>
+                  <div className="flex gap-2 mt-4 pt-3 border-t border-neutral-100">
+                    <button onClick={() => setShowCalendar(false)} className="flex-1 px-4 py-2 text-sm font-medium text-neutral-600 bg-neutral-50 rounded-xl hover:bg-neutral-100 transition-colors">Cancel</button>
                     <button onClick={() => setShowCalendar(false)} className="flex-1 px-4 py-2 text-sm font-medium text-white bg-primary rounded-xl hover:bg-primary/90 transition-colors">Confirm</button>
                   </div>
                 </div>
@@ -460,12 +460,12 @@ const Analysis360 = () => {
         </div>
 
         {/* ── Ad Performance Card ── */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-6 flex flex-col transition-all">
+        <div className="bg-white rounded-2xl border border-neutral-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-6 flex flex-col transition-all">
           <div className="flex items-center gap-3 mb-6">
             <div className="p-2 bg-primary/10 rounded-xl">
               <BarChart3 className="text-primary" size={22} />
             </div>
-            <h2 className="text-xl font-bold text-gray-900">Ad Performance</h2>
+            <h2 className="text-xl font-bold text-neutral-900">Ad Performance</h2>
           </div>
 
           {/* Metric Cards */}
@@ -477,7 +477,7 @@ const Analysis360 = () => {
                   key={metric.key}
                   onClick={() => handleMetricToggle(metric.key)}
                   className={`p-4 rounded-xl border-2 transition-all relative overflow-hidden text-left ${
-                    isSelected ? 'shadow-lg' : 'border-border bg-white hover:border-gray-300 hover:shadow-md'
+                    isSelected ? 'shadow-lg' : 'border-border bg-white hover:border-neutral-300 hover:shadow-md'
                   }`}
                   style={isSelected ? {
                     borderColor: metric.color,
@@ -486,12 +486,12 @@ const Analysis360 = () => {
                   } : {}}
                 >
                   <div className="flex items-start justify-between mb-2">
-                    <p className={`text-xs font-semibold uppercase tracking-wide ${isSelected ? 'text-gray-700' : 'text-gray-400'}`}>
+                    <p className={`text-xs font-semibold tracking-wide ${isSelected ? 'text-neutral-700' : 'text-neutral-400'}`}>
                       {metric.label}
                     </p>
                     <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: metric.color }} />
                   </div>
-                  <p className="text-2xl font-bold text-gray-900 leading-tight">{metric.value}</p>
+                  <p className="text-2xl font-bold text-neutral-900 leading-tight">{metric.value}</p>
                   {isSelected && (
                     <div
                       className="absolute top-3 right-3 w-5 h-5 rounded-full flex items-center justify-center shadow-md"
@@ -506,7 +506,7 @@ const Analysis360 = () => {
           </div>
 
           {/* Chart */}
-          <div className="bg-gray-50/60 rounded-xl border border-gray-100 p-5 h-[290px] min-h-[290px] min-w-0">
+          <div className="bg-neutral-50/60 rounded-xl border border-neutral-100 p-5 h-[290px] min-h-[290px] min-w-0">
             <ResponsiveContainer width="100%" height="85%">
               <AreaChart data={chartData} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
                 <defs>
@@ -551,7 +551,7 @@ const Analysis360 = () => {
                 return (
                   <div key={key} className="flex items-center gap-1.5">
                     <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: m.color }} />
-                    <span className="text-xs font-semibold text-gray-500">{m.label}</span>
+                    <span className="text-xs font-semibold text-neutral-500">{m.label}</span>
                   </div>
                 );
               })}
@@ -560,16 +560,16 @@ const Analysis360 = () => {
         </div>
 
         {/* ── Tab Section ── */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all">
+        <div className="bg-white rounded-2xl border border-neutral-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all">
 
           {/* Tab Header */}
-          <div className="border-b border-gray-100 px-6 pt-1 flex">
+          <div className="border-b border-neutral-100 px-6 pt-1 flex">
             {['分析', '日报'].map(tab => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
                 className={`relative px-5 py-4 text-sm font-bold transition-all mr-1 ${
-                  activeTab === tab ? 'text-gray-900' : 'text-gray-400 hover:text-gray-600'
+                  activeTab === tab ? 'text-neutral-900' : 'text-neutral-400 hover:text-neutral-600'
                 }`}
               >
                 {tab}
@@ -603,9 +603,9 @@ const Analysis360 = () => {
 
                 <div className="py-4 px-2">
                   <SectionTitle>Creative Insight</SectionTitle>
-                  <div className="flex flex-col p-2 gap-2 bg-gray-50 border border-border rounded-2xl">
+                  <div className="flex flex-col p-2 gap-2 bg-neutral-50 border border-border rounded-2xl">
                     <div className="w-full bg-white p-4 rounded-xl">
-                      <div className="text-gray-900 text-base font-bold mb-3">Creative Performance</div>
+                      <div className="text-neutral-900 text-base font-bold mb-3">Creative Performance</div>
                       <div className="w-full h-[280px] md:h-[320px]">
                         <ResponsiveContainer width="100%" height="100%">
                           <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
@@ -620,7 +620,7 @@ const Analysis360 = () => {
                     </div>
 
                     <div className="flex flex-col w-full p-4 gap-4 bg-white rounded-xl">
-                      <div className="text-gray-900 text-base font-bold">Top Ads</div>
+                      <div className="text-neutral-900 text-base font-bold">Top Ads</div>
                       <div className="flex gap-6 overflow-x-auto pb-4 no-scrollbar">
                         {TOP_ADS.map(ad => (
                           <CreativeAdCard key={ad.id} ad={ad} />
@@ -635,44 +635,44 @@ const Analysis360 = () => {
             {/* ── 日报 Tab ── */}
             {activeTab === '日报' && (
               <div>
-                <h2 className="text-lg font-bold text-gray-900 mb-5">Daily Performance</h2>
+                <h2 className="text-lg font-bold text-neutral-900 mb-5">Daily Performance</h2>
                 <div className="overflow-x-auto rounded-xl border border-border">
                   <table className="w-full text-sm">
                     <thead>
-                      <tr className="bg-gray-50 border-b border-border">
-                        <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 sticky top-0 bg-gray-50 whitespace-nowrap">Date</th>
-                        <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 sticky top-0 bg-gray-50 whitespace-nowrap">Daily Budget</th>
-                        <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 sticky top-0 bg-gray-50 whitespace-nowrap">Spend</th>
-                        <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 sticky top-0 bg-gray-50 whitespace-nowrap">Impressions</th>
-                        <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 sticky top-0 bg-gray-50 whitespace-nowrap">CPM</th>
-                        <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 sticky top-0 bg-gray-50 whitespace-nowrap">Clicks</th>
-                        <th className="text-left py-3 px-4 text-xs font-bold text-blue-500 sticky top-0 bg-gray-50 whitespace-nowrap">CPC <span className="font-normal text-gray-400 text-[10px]">(CTR)</span></th>
-                        <th className="text-left py-3 px-4 text-xs font-bold text-blue-500 sticky top-0 bg-gray-50 whitespace-nowrap">Event1s</th>
-                        <th className="text-left py-3 px-4 text-xs font-bold text-blue-500 sticky top-0 bg-gray-50 whitespace-nowrap">CPA-E1 <span className="font-normal text-gray-400 text-[10px]">(CVR)</span></th>
-                        <th className="text-left py-3 px-4 text-xs font-bold text-blue-500 sticky top-0 bg-gray-50 whitespace-nowrap">Event2s</th>
-                        <th className="text-left py-3 px-4 text-xs font-bold text-blue-500 sticky top-0 bg-gray-50 whitespace-nowrap">CPA-E2 <span className="font-normal text-gray-400 text-[10px]">(CVR)</span></th>
-                        <th className="text-left py-3 px-4 text-xs font-bold text-blue-500 sticky top-0 bg-gray-50 whitespace-nowrap">Event3s</th>
-                        <th className="text-left py-3 px-4 text-xs font-bold text-blue-500 sticky top-0 bg-gray-50 whitespace-nowrap">CPA-E3 <span className="font-normal text-gray-400 text-[10px]">(CVR)</span></th>
-                        <th className="text-left py-3 px-4 text-xs font-bold text-blue-500 sticky top-0 bg-gray-50 whitespace-nowrap">Purchase <span className="font-normal text-gray-400 text-[10px]">(ROAS)</span></th>
+                      <tr className="bg-neutral-50 border-b border-border">
+                        <th className="text-left py-3 px-4 text-xs font-semibold text-neutral-500 sticky top-0 bg-neutral-50 whitespace-nowrap">Date</th>
+                        <th className="text-left py-3 px-4 text-xs font-semibold text-neutral-500 sticky top-0 bg-neutral-50 whitespace-nowrap">Daily Budget</th>
+                        <th className="text-left py-3 px-4 text-xs font-semibold text-neutral-500 sticky top-0 bg-neutral-50 whitespace-nowrap">Spend</th>
+                        <th className="text-left py-3 px-4 text-xs font-semibold text-neutral-500 sticky top-0 bg-neutral-50 whitespace-nowrap">Impressions</th>
+                        <th className="text-left py-3 px-4 text-xs font-semibold text-neutral-500 sticky top-0 bg-neutral-50 whitespace-nowrap">CPM</th>
+                        <th className="text-left py-3 px-4 text-xs font-semibold text-neutral-500 sticky top-0 bg-neutral-50 whitespace-nowrap">Clicks</th>
+                        <th className="text-left py-3 px-4 text-xs font-bold text-info-500 sticky top-0 bg-neutral-50 whitespace-nowrap">CPC <span className="font-normal text-neutral-400 text-[10px]">(CTR)</span></th>
+                        <th className="text-left py-3 px-4 text-xs font-bold text-info-500 sticky top-0 bg-neutral-50 whitespace-nowrap">Event1s</th>
+                        <th className="text-left py-3 px-4 text-xs font-bold text-info-500 sticky top-0 bg-neutral-50 whitespace-nowrap">CPA-E1 <span className="font-normal text-neutral-400 text-[10px]">(CVR)</span></th>
+                        <th className="text-left py-3 px-4 text-xs font-bold text-info-500 sticky top-0 bg-neutral-50 whitespace-nowrap">Event2s</th>
+                        <th className="text-left py-3 px-4 text-xs font-bold text-info-500 sticky top-0 bg-neutral-50 whitespace-nowrap">CPA-E2 <span className="font-normal text-neutral-400 text-[10px]">(CVR)</span></th>
+                        <th className="text-left py-3 px-4 text-xs font-bold text-info-500 sticky top-0 bg-neutral-50 whitespace-nowrap">Event3s</th>
+                        <th className="text-left py-3 px-4 text-xs font-bold text-info-500 sticky top-0 bg-neutral-50 whitespace-nowrap">CPA-E3 <span className="font-normal text-neutral-400 text-[10px]">(CVR)</span></th>
+                        <th className="text-left py-3 px-4 text-xs font-bold text-info-500 sticky top-0 bg-neutral-50 whitespace-nowrap">Purchase <span className="font-normal text-neutral-400 text-[10px]">(ROAS)</span></th>
                       </tr>
                     </thead>
                     <tbody>
                       {dailyData.map((row, idx) => (
-                        <tr key={idx} className="border-b border-border hover:bg-gray-50/60 transition-colors">
-                          <td className="py-3 px-4 font-medium text-gray-900 whitespace-nowrap">{row.date}</td>
-                          <td className="py-3 px-4 text-gray-700">${row.dailyBudget}</td>
-                          <td className="py-3 px-4 text-gray-700">${row.spend}</td>
-                          <td className="py-3 px-4 text-gray-700">{row.impressions.toLocaleString()}</td>
-                          <td className="py-3 px-4 text-gray-700">${row.cpm}</td>
-                          <td className="py-3 px-4 text-gray-700">{row.clicks.toLocaleString()}</td>
-                          <td className="py-3 px-4 text-gray-700">${row.cpc}<br /><span className="text-gray-400 text-xs">{row.ctr}%</span></td>
-                          <td className="py-3 px-4 text-gray-700">{row.event1s}</td>
-                          <td className="py-3 px-4 text-gray-700">${row.cpaEvent1s}<br /><span className="text-gray-400 text-xs">{row.cvrEvent1s}%</span></td>
-                          <td className="py-3 px-4 text-gray-700">{row.event2s}</td>
-                          <td className="py-3 px-4 text-gray-700">${row.cpaEvent2s}<br /><span className="text-gray-400 text-xs">{row.cvrEvent2s}%</span></td>
-                          <td className="py-3 px-4 text-gray-700">{row.event3s}</td>
-                          <td className="py-3 px-4 text-gray-700">${row.cpaEvent3s}<br /><span className="text-gray-400 text-xs">{row.cvrEvent3s}%</span></td>
-                          <td className="py-3 px-4 text-gray-700">${row.purchaseValue}<br /><span className="text-gray-400 text-xs">{row.roas}</span></td>
+                        <tr key={idx} className="border-b border-border hover:bg-neutral-50/60 transition-colors">
+                          <td className="py-3 px-4 font-medium text-neutral-900 whitespace-nowrap">{row.date}</td>
+                          <td className="py-3 px-4 text-neutral-700">${row.dailyBudget}</td>
+                          <td className="py-3 px-4 text-neutral-700">${row.spend}</td>
+                          <td className="py-3 px-4 text-neutral-700">{row.impressions.toLocaleString()}</td>
+                          <td className="py-3 px-4 text-neutral-700">${row.cpm}</td>
+                          <td className="py-3 px-4 text-neutral-700">{row.clicks.toLocaleString()}</td>
+                          <td className="py-3 px-4 text-neutral-700">${row.cpc}<br /><span className="text-neutral-400 text-xs">{row.ctr}%</span></td>
+                          <td className="py-3 px-4 text-neutral-700">{row.event1s}</td>
+                          <td className="py-3 px-4 text-neutral-700">${row.cpaEvent1s}<br /><span className="text-neutral-400 text-xs">{row.cvrEvent1s}%</span></td>
+                          <td className="py-3 px-4 text-neutral-700">{row.event2s}</td>
+                          <td className="py-3 px-4 text-neutral-700">${row.cpaEvent2s}<br /><span className="text-neutral-400 text-xs">{row.cvrEvent2s}%</span></td>
+                          <td className="py-3 px-4 text-neutral-700">{row.event3s}</td>
+                          <td className="py-3 px-4 text-neutral-700">${row.cpaEvent3s}<br /><span className="text-neutral-400 text-xs">{row.cvrEvent3s}%</span></td>
+                          <td className="py-3 px-4 text-neutral-700">${row.purchaseValue}<br /><span className="text-neutral-400 text-xs">{row.roas}</span></td>
                         </tr>
                       ))}
                     </tbody>

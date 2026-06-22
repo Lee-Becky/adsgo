@@ -29,26 +29,26 @@ const SectionAdvancedFold = ({ channel, level, rootFormData, onFieldChange, defa
   if (!channel || visibleDefs.length === 0) return null;
 
   return (
-    <div className="bg-white rounded-xl border border-gray-100 overflow-hidden mt-5">
+    <div className="bg-white rounded-xl border border-neutral-100 overflow-hidden mt-5">
       <button
         type="button"
         onClick={() => setOpen(o => !o)}
-        className="w-full flex items-center gap-3 px-5 py-3.5 hover:bg-gray-50/40 transition-colors"
+        className="w-full flex items-center gap-3 px-5 py-3.5 hover:bg-neutral-50/40 transition-colors"
       >
-        <div className="w-8 h-8 rounded-lg bg-gray-100 text-gray-500 flex items-center justify-center shrink-0">
+        <div className="w-8 h-8 rounded-lg bg-neutral-100 text-neutral-500 flex items-center justify-center shrink-0">
           <Settings2 size={14} strokeWidth={2.2} />
         </div>
         <div className="flex-1 min-w-0 text-left">
-          <h4 className="text-sm font-semibold text-gray-800 leading-tight">高级设置</h4>
-          <p className="text-[11px] text-gray-500 mt-0.5">
-            可选 <span className="font-semibold text-gray-700">{visibleDefs.length}</span> 项 · 默认收起，按需展开调整
+          <h4 className="text-sm font-semibold text-neutral-800 leading-tight">高级设置</h4>
+          <p className="text-[11px] text-neutral-500 mt-0.5">
+            可选 <span className="font-semibold text-neutral-700">{visibleDefs.length}</span> 项 · 默认收起，按需展开调整
           </p>
         </div>
-        <ChevronDown size={14} className={`text-gray-400 shrink-0 transition-transform ${open ? 'rotate-180' : ''}`} />
+        <ChevronDown size={14} className={`text-neutral-400 shrink-0 transition-transform ${open ? 'rotate-180' : ''}`} />
       </button>
 
       {open && (
-        <div className="border-t border-gray-100 px-5 py-5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-5 bg-gray-50/30">
+        <div className="border-t border-neutral-100 px-5 py-5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-5 bg-neutral-50/30">
           {visibleDefs.map(def => (
             <DynamicFieldRenderer
               key={def.name}

@@ -29,16 +29,16 @@ const CompositeFieldRenderer = ({
   });
 
   return (
-    <div className="border border-gray-200 rounded-inner bg-white overflow-hidden">
+    <div className="border border-neutral-200 rounded-inner bg-white overflow-hidden">
       <button
         type="button"
         onClick={() => setOpen(o => !o)}
-        className="w-full flex items-center justify-between px-3 py-2 hover:bg-gray-50 transition-colors"
+        className="w-full flex items-center justify-between px-3 py-2 hover:bg-neutral-50 transition-colors"
       >
         <div className="flex items-center gap-2 min-w-0">
-          <span className="text-xs font-medium text-gray-700 truncate">{def.label}</span>
+          <span className="text-xs font-medium text-neutral-700 truncate">{def.label}</span>
           {def.required && <span className="text-rose-500 text-xs">*</span>}
-          <span className="text-[10px] text-gray-400 font-mono truncate">{def.sdkPath}</span>
+          <span className="text-[10px] text-neutral-400 font-mono truncate">{def.sdkPath}</span>
         </div>
         <div className="flex items-center gap-2 shrink-0">
           {filledKeys.length > 0 && (
@@ -46,11 +46,11 @@ const CompositeFieldRenderer = ({
               已填 {filledKeys.length} / {def.subFields.length}
             </span>
           )}
-          <ChevronDown size={14} className={`text-gray-400 transition-transform ${open ? 'rotate-180' : ''}`} />
+          <ChevronDown size={14} className={`text-neutral-400 transition-transform ${open ? 'rotate-180' : ''}`} />
         </div>
       </button>
       {open && (
-        <div className="border-t border-gray-100 px-3 py-3 bg-gray-50/40 grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-3">
+        <div className="border-t border-neutral-100 px-3 py-3 bg-neutral-50/40 grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-3">
           {(def.subFields || []).map(subDef => (
             <React.Fragment key={subDef.name}>
               {renderField(
@@ -66,7 +66,7 @@ const CompositeFieldRenderer = ({
         </div>
       )}
       {def.helpText && (
-        <div className="px-3 pb-2 text-[10px] text-gray-400">{def.helpText}</div>
+        <div className="px-3 pb-2 text-[10px] text-neutral-400">{def.helpText}</div>
       )}
     </div>
   );

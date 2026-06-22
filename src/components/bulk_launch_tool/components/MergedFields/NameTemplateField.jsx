@@ -97,7 +97,7 @@ const NameTemplateField = ({
         maxLength={maxLength}
         className={`w-full h-9 px-3 text-sm bg-white border rounded-base outline-none transition-all ${
           error ? 'border-rose-400 focus:border-rose-500'
-                : 'border-gray-200 hover:border-gray-300 focus:border-primary-500 focus:shadow-primary-focus'
+                : 'border-neutral-200 hover:border-neutral-300 focus:border-primary-500 focus:shadow-primary-focus'
         }`}
       />
 
@@ -120,13 +120,13 @@ const NameTemplateField = ({
             onChange={(e) => setCustomText(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleInsertCustom(); } }}
             placeholder="自定义文字"
-            className="h-7 px-2 text-[11px] w-28 bg-white border border-gray-200 rounded-base outline-none focus:border-primary-500 focus:shadow-primary-focus transition-all"
+            className="h-7 px-2 text-[11px] w-28 bg-white border border-neutral-200 rounded-base outline-none focus:border-primary-500 focus:shadow-primary-focus transition-all"
           />
           <button
             type="button"
             onClick={handleInsertCustom}
             disabled={!customText}
-            className="inline-flex items-center gap-1 h-7 px-2 text-[11px] font-semibold text-gray-700 bg-white border border-gray-200 hover:border-primary-500/60 hover:text-primary-600 rounded-base transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            className="inline-flex items-center gap-1 h-7 px-2 text-[11px] font-semibold text-neutral-700 bg-white border border-neutral-200 hover:border-primary-500/60 hover:text-primary-600 rounded-base transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             title={customText ? `插入字面文字「${customText}」（不会清空，可连续插入）` : '请先在左侧输入自定义文字'}
           >
             插入
@@ -151,9 +151,9 @@ const NameTemplateField = ({
       {safeValue && (
         <div className="flex items-center gap-1.5 text-[10px] leading-tight">
           <Wand2 size={10} className="text-primary-500/70 shrink-0" />
-          <span className="text-gray-400 shrink-0">预览：</span>
-          <span className={`truncate ${overMax ? 'text-rose-500 font-semibold' : previewSame ? 'text-gray-400' : 'text-primary-600 font-medium'}`}>
-            {preview || <span className="text-gray-300">（暂无字符）</span>}
+          <span className="text-neutral-400 shrink-0">预览：</span>
+          <span className={`truncate ${overMax ? 'text-rose-500 font-semibold' : previewSame ? 'text-neutral-400' : 'text-primary-600 font-medium'}`}>
+            {preview || <span className="text-neutral-300">（暂无字符）</span>}
           </span>
           {overMax && (
             <span className="shrink-0 text-rose-500 font-semibold">
@@ -169,9 +169,9 @@ const NameTemplateField = ({
         anchorRef={variableBtnRef}
         onClose={() => setShowVarPopover(false)}
         placement="bottom-start"
-        className="bg-white rounded-xl shadow-2xl border border-gray-100 py-2 min-w-[240px] max-h-[280px] overflow-auto"
+        className="bg-white rounded-xl shadow-2xl border border-neutral-100 py-2 min-w-[240px] max-h-[280px] overflow-auto"
       >
-        <p className="px-3 pb-1.5 mb-1 text-[10px] uppercase tracking-wider text-gray-400 border-b border-gray-100">默认变量</p>
+        <p className="px-3 pb-1.5 mb-1 text-[10px] uppercase tracking-wider text-neutral-400 border-b border-neutral-100">默认变量</p>
         {NAME_VARIABLES.map(v => (
           <button
             key={v.key}
@@ -181,8 +181,8 @@ const NameTemplateField = ({
           >
             <Plus size={11} className="text-primary-500/60 mt-0.5 group-hover:text-primary-600" />
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-medium text-gray-800">{v.label}</p>
-              <p className="text-[10px] text-gray-400 truncate mt-0.5">{`{${v.key}}`}{v.hint ? ` · ${v.hint}` : ''}</p>
+              <p className="text-xs font-medium text-neutral-800">{v.label}</p>
+              <p className="text-[10px] text-neutral-400 truncate mt-0.5">{`{${v.key}}`}{v.hint ? ` · ${v.hint}` : ''}</p>
             </div>
           </button>
         ))}
@@ -194,10 +194,10 @@ const NameTemplateField = ({
         anchorRef={saveBtnRef}
         onClose={() => setShowSavePopover(false)}
         placement="bottom-end"
-        className="bg-white rounded-xl shadow-2xl border border-gray-100 p-3 w-[280px]"
+        className="bg-white rounded-xl shadow-2xl border border-neutral-100 p-3 w-[280px]"
       >
-        <p className="text-xs font-semibold text-gray-800 mb-1.5">保存为命名策略</p>
-        <p className="text-[10px] text-gray-400 mb-2 font-mono truncate">{safeValue || '（空）'}</p>
+        <p className="text-xs font-semibold text-neutral-800 mb-1.5">保存为命名策略</p>
+        <p className="text-[10px] text-neutral-400 mb-2 font-mono truncate">{safeValue || '（空）'}</p>
         <input
           type="text"
           autoFocus
@@ -205,13 +205,13 @@ const NameTemplateField = ({
           onChange={(e) => setSaveName(e.target.value)}
           onKeyDown={(e) => { if (e.key === 'Enter') handleSave(); }}
           placeholder="例：Q4-促销系列"
-          className="w-full h-8 px-2 text-xs bg-white border border-gray-200 rounded-base outline-none focus:border-primary-500 focus:shadow-primary-focus transition-all"
+          className="w-full h-8 px-2 text-xs bg-white border border-neutral-200 rounded-base outline-none focus:border-primary-500 focus:shadow-primary-focus transition-all"
         />
         <div className="flex items-center justify-end gap-1.5 mt-2">
           <button
             type="button"
             onClick={() => setShowSavePopover(false)}
-            className="h-7 px-2 text-[11px] text-gray-500 hover:text-gray-800 hover:bg-gray-100 rounded-base transition-colors"
+            className="h-7 px-2 text-[11px] text-neutral-500 hover:text-neutral-800 hover:bg-neutral-100 rounded-base transition-colors"
           >
             取消
           </button>
@@ -219,7 +219,7 @@ const NameTemplateField = ({
             type="button"
             onClick={handleSave}
             disabled={!saveName.trim() || !safeValue}
-            className="inline-flex items-center gap-1 h-7 px-2.5 text-[11px] font-semibold text-white bg-primary-500 hover:bg-primary-600 rounded-base transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
+            className="inline-flex items-center gap-1 h-7 px-2.5 text-[11px] font-semibold text-white bg-primary-500 hover:bg-primary-600 rounded-base transition-colors disabled:bg-neutral-300 disabled:cursor-not-allowed"
           >
             <Check size={11} /> 保存
           </button>

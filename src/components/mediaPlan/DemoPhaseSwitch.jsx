@@ -10,10 +10,10 @@ const PHASES = [
 export default function DemoPhaseSwitch({ value, onChange }) {
   return (
     <div className="flex items-center gap-3 mb-6">
-      <span className="text-[11px] text-gray-500 font-semibold uppercase tracking-widest px-2 py-1 bg-gradient-to-r from-indigo-50 to-transparent rounded">
+      <span className="text-[11px] text-neutral-500 font-semibold uppercase tracking-widest px-2 py-1 bg-gradient-to-r from-indigo-50 to-transparent rounded">
         Demo Mode
       </span>
-      <div className="bg-white rounded-xl p-1 inline-flex shadow-md border border-gray-200">
+      <div className="bg-white rounded-xl p-1 inline-flex shadow-md border border-neutral-200">
         {PHASES.map(({ key, label }) => (
           <button
             key={key}
@@ -21,7 +21,7 @@ export default function DemoPhaseSwitch({ value, onChange }) {
             className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${
               value === key
                 ? 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-md scale-[1.02]'
-                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100'
             }`}
           >
             {label}

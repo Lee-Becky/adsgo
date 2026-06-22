@@ -3,9 +3,9 @@ import { Scissors, X } from 'lucide-react'
 import { SEPARATOR_PRESETS } from '../mockData'
 
 const COLORS = [
-  'bg-blue-100 text-blue-700',
-  'bg-emerald-100 text-emerald-700',
-  'bg-amber-100 text-amber-700',
+  'bg-info-100 text-info-700',
+  'bg-success-100 text-success-700',
+  'bg-warning-100 text-warning-700',
   'bg-purple-100 text-purple-700',
   'bg-rose-100 text-rose-700',
   'bg-cyan-100 text-cyan-700',
@@ -52,8 +52,8 @@ const SplitPatternConfig = ({ config, onChange, sampleNames = ['Product_US_Broad
     <div className="space-y-5">
       {/* Separator selection */}
       <div>
-        <h4 className="text-xs font-black text-slate-900 mb-2 flex items-center gap-2">
-          <Scissors size={14} className="text-slate-400" />
+        <h4 className="text-xs font-black text-neutral-900 mb-2 flex items-center gap-2">
+          <Scissors size={14} className="text-neutral-400" />
           Separator
         </h4>
         <div className="flex items-center gap-2">
@@ -63,8 +63,8 @@ const SplitPatternConfig = ({ config, onChange, sampleNames = ['Product_US_Broad
               onClick={() => handleSeparatorChange(sep)}
               className={`w-9 h-9 rounded-lg text-sm font-mono font-bold flex items-center justify-center transition-all ${
                 separator === sep
-                  ? 'bg-slate-900 text-white shadow-lg'
-                  : 'bg-slate-50 text-slate-600 border border-slate-200 hover:border-indigo-300'
+                  ? 'bg-neutral-900 text-white shadow-lg'
+                  : 'bg-neutral-50 text-neutral-600 border border-neutral-200 hover:border-primary-300'
               }`}
             >
               {sep}
@@ -75,7 +75,7 @@ const SplitPatternConfig = ({ config, onChange, sampleNames = ['Product_US_Broad
 
       {/* Preview */}
       <div>
-        <h4 className="text-xs font-black text-slate-900 mb-2">Preview</h4>
+        <h4 className="text-xs font-black text-neutral-900 mb-2">Preview</h4>
         <div className="space-y-2">
           {preview.map((segments, rowIdx) => (
             <div key={rowIdx} className="flex items-center gap-1 flex-wrap">
@@ -94,7 +94,7 @@ const SplitPatternConfig = ({ config, onChange, sampleNames = ['Product_US_Broad
 
       {/* Dimension naming */}
       <div>
-        <h4 className="text-xs font-black text-slate-900 mb-2">Dimension Names</h4>
+        <h4 className="text-xs font-black text-neutral-900 mb-2">Dimension Names</h4>
         <div className="grid grid-cols-2 gap-2">
           {Array.from({ length: maxSegments }, (_, i) => (
             <div key={i} className="flex items-center gap-2">
@@ -102,13 +102,13 @@ const SplitPatternConfig = ({ config, onChange, sampleNames = ['Product_US_Broad
                 {i + 1}
               </span>
               <input
-                className="flex-1 px-3 py-1.5 text-xs font-medium border border-slate-200 rounded-lg bg-white text-slate-700 outline-none focus:border-indigo-400 placeholder:text-slate-300"
+                className="flex-1 px-3 py-1.5 text-xs font-medium border border-neutral-200 rounded-lg bg-white text-neutral-700 outline-none focus:border-primary-400 placeholder:text-neutral-300"
                 placeholder={`Segment ${i + 1} name`}
                 value={getDimensionName(i)}
                 onChange={(e) => handleDimensionNameChange(i, e.target.value)}
               />
               {getDimensionName(i) && (
-                <button onClick={() => removeDimension(i)} className="p-1 text-slate-300 hover:text-red-500">
+                <button onClick={() => removeDimension(i)} className="p-1 text-neutral-300 hover:text-danger-500">
                   <X size={12} />
                 </button>
               )}

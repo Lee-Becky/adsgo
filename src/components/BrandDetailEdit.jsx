@@ -44,21 +44,21 @@ const BrandDetailEdit = ({ brand, onSave, onCancel }) => {
   }
 
   return (
-    <div className="min-h-screen bg-[#FDFDFD] flex flex-col font-sans text-slate-900 selection:bg-indigo-100 selection:text-indigo-900">
+    <div className="min-h-screen bg-[#FDFDFD] flex flex-col font-sans text-neutral-900 selection:bg-primary-100 selection:text-primary-900">
       {/* Precision Navigation Header */}
-      <nav className="sticky top-0 z-50 bg-white border-b border-slate-100 shrink-0">
+      <nav className="sticky top-0 z-50 bg-white border-b border-neutral-100 shrink-0">
         <div className="max-w-[1400px] mx-auto w-full px-10">
           {/* Breadcrumbs & Action Bar */}
-          <div className="h-14 flex items-center justify-between border-b border-slate-50">
+          <div className="h-14 flex items-center justify-between border-b border-neutral-50">
             <div className="flex items-center gap-4">
-              <button onClick={onCancel} className="p-1 hover:bg-slate-100 rounded-md transition-colors text-slate-400 hover:text-slate-900"><ArrowLeft size={18} /></button>
+              <button onClick={onCancel} className="p-1 hover:bg-neutral-100 rounded-md transition-colors text-neutral-400 hover:text-neutral-900"><ArrowLeft size={18} /></button>
               <div className="flex items-center gap-2">
-                <span className="text-xs font-bold text-slate-400 tracking-tight">Business Suite</span>
-                <ChevronRight size={12} className="text-slate-300" />
-                <span className="text-xs font-bold text-slate-900 tracking-tight">{formData.base.name}</span>
+                <span className="text-xs font-bold text-neutral-400 tracking-tight">Business Suite</span>
+                <ChevronRight size={12} className="text-neutral-300" />
+                <span className="text-xs font-bold text-neutral-900 tracking-tight">{formData.base.name}</span>
               </div>
             </div>
-            <button onClick={() => onSave(formData)} className="bg-slate-900 text-white px-5 py-1.5 rounded-lg font-bold text-[12px] hover:bg-black transition-all active:scale-95 shadow-sm">
+            <button onClick={() => onSave(formData)} className="bg-neutral-900 text-white px-5 py-1.5 rounded-lg font-bold text-[12px] hover:bg-black transition-all active:scale-95 shadow-sm">
               Save Assets
             </button>
           </div>
@@ -74,12 +74,12 @@ const BrandDetailEdit = ({ brand, onSave, onCancel }) => {
                   onClick={() => setActiveTab(tab.id)}
                   className={`relative h-full flex items-center gap-2 px-1 transition-all duration-300 group`}
                 >
-                  <Icon size={14} className={isActive ? 'text-indigo-600' : 'text-slate-400 group-hover:text-slate-600'} />
-                  <span className={`text-[13px] font-bold transition-colors ${isActive ? 'text-indigo-600' : 'text-slate-500 group-hover:text-slate-900'}`}>
+                  <Icon size={14} className={isActive ? 'text-primary-600' : 'text-neutral-400 group-hover:text-neutral-600'} />
+                  <span className={`text-[13px] font-bold transition-colors ${isActive ? 'text-primary-600' : 'text-neutral-500 group-hover:text-neutral-900'}`}>
                     {tab.label}
                   </span>
                   {isActive && (
-                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-indigo-600 rounded-full" />
+                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary-600 rounded-full" />
                   )}
                 </button>
               )
@@ -98,8 +98,8 @@ const BrandDetailEdit = ({ brand, onSave, onCancel }) => {
             <IdentityTab data={formData.kits} onChange={() => {}} />
           )}
           {activeTab !== 'base' && activeTab !== 'kits' && (
-            <div className="flex flex-col items-center justify-center py-32 text-slate-200 gap-4 animate-in fade-in duration-500">
-              <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center border border-slate-100 shadow-inner">
+            <div className="flex flex-col items-center justify-center py-32 text-neutral-200 gap-4 animate-in fade-in duration-500">
+              <div className="w-16 h-16 bg-neutral-50 rounded-2xl flex items-center justify-center border border-neutral-100 shadow-inner">
                 <Sparkles size={32} />
               </div>
               <p className="text-xs font-black tracking-widest">Section Syncing...</p>

@@ -211,7 +211,7 @@ export default function GeneratingAnimation() {
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 h-40 bg-[#5E26D6] opacity-10 blur-3xl rounded-full pointer-events-none" />
 
         {/* Left icon block */}
-        <div className="w-20 h-20 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-[24px] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-purple-100/50 flex items-center justify-center z-10 animate-gen-fade-in-left">
+        <div className="w-20 h-20 bg-gradient-to-br from-primary-50 to-purple-50 rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-purple-100/50 flex items-center justify-center z-10 animate-gen-fade-in-left">
           <ImageIcon className="w-8 h-8 text-[#8B6EE1]" strokeWidth={1.5} />
         </div>
 
@@ -254,7 +254,7 @@ export default function GeneratingAnimation() {
         </div>
 
         {/* Right icon block */}
-        <div className="w-20 h-20 bg-gradient-to-bl from-purple-50 to-fuchsia-50 rounded-[24px] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-purple-100/50 flex items-center justify-center z-10 animate-gen-fade-in-right">
+        <div className="w-20 h-20 bg-gradient-to-bl from-purple-50 to-fuchsia-50 rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-purple-100/50 flex items-center justify-center z-10 animate-gen-fade-in-right">
           <Sparkles className="w-8 h-8 text-[#8B6EE1]" strokeWidth={1.5} />
         </div>
       </div>
@@ -269,7 +269,7 @@ export default function GeneratingAnimation() {
             {LOADING_TEXTS[step]}
           </p>
         </div>
-        <p className="mt-3 text-sm text-slate-400 font-medium tracking-wide">
+        <p className="mt-3 text-sm text-neutral-400 font-medium tracking-wide">
           Creative in production. This usually takes 1-2 minutes.
         </p>
       </div>

@@ -10,23 +10,23 @@ export default function RegeneratePanel({
   onSubmit,
 }) {
   return (
-    <div className="w-[360px] shrink-0 min-h-0 bg-white rounded-[20px] border border-[#F0F0F0] card-shadow flex flex-col overflow-hidden">
+    <div className="w-[360px] shrink-0 min-h-0 bg-white rounded-2xl border border-[#F0F0F0] card-shadow flex flex-col overflow-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between px-5 py-4 border-b border-[#F5F5F5] bg-gray-50/50 shrink-0 z-10">
+      <div className="flex items-center justify-between px-5 py-4 border-b border-[#F5F5F5] bg-neutral-50/50 shrink-0 z-10">
         <div className="flex items-center gap-3 min-w-0">
           <div className="shrink-0">
             <AiAvatar uid="regen_hdr" />
           </div>
           <div>
-            <h3 className="text-[16px] font-semibold text-gray-900">AdsGo Creative Expert</h3>
-            <div className="flex items-center gap-1.5 text-[14px] text-gray-400 font-normal mt-0.5">
+            <h3 className="text-[16px] font-semibold text-neutral-900">AdsGo Creative Expert</h3>
+            <div className="flex items-center gap-1.5 text-[14px] text-neutral-400 font-normal mt-0.5">
               <span>Regenerate</span>
             </div>
           </div>
         </div>
         <button
           onClick={() => onSetShowRegenerateChat(false)}
-          className="p-2 hover:bg-gray-100 text-gray-400 rounded-full transition-all"
+          className="p-2 hover:bg-neutral-100 text-neutral-400 rounded-full transition-all"
         >
           <CloseIcon size={18} />
         </button>
@@ -66,7 +66,7 @@ export default function RegeneratePanel({
 
       {/* Input area */}
       <div className="shrink-0 px-5 pb-5 pt-2">
-        <div className="bg-[#F7F8FA] rounded-2xl border border-gray-200 focus-within:border-primary-400 focus-within:ring-2 focus-within:ring-primary-500/10 transition-all">
+        <div className="bg-[#F7F8FA] rounded-2xl border border-neutral-200 focus-within:border-primary-400 focus-within:ring-2 focus-within:ring-primary-500/10 transition-all">
           <textarea
             autoFocus
             placeholder="e.g. Make the background darker, add a discount badge..."
@@ -84,13 +84,13 @@ export default function RegeneratePanel({
               }
             }}
             style={{ minHeight: '76px', maxHeight: '160px', overflowY: 'auto' }}
-            className="w-full px-4 pt-3.5 pb-1 text-sm bg-transparent resize-none focus:outline-none placeholder:text-gray-400"
+            className="w-full px-4 pt-3.5 pb-1 text-sm bg-transparent resize-none focus:outline-none placeholder:text-neutral-400"
           />
           <div className="flex justify-end px-3 pb-3 pt-1">
             <button
               disabled={!regenChatInput.trim()}
               onClick={onSubmit}
-              className="w-8 h-8 flex items-center justify-center bg-primary-500 disabled:bg-gray-200 text-white disabled:text-gray-400 rounded-full transition-all hover:bg-primary-600 active:bg-primary-700 shadow-sm shadow-primary-500/20"
+              className="w-8 h-8 flex items-center justify-center bg-primary-500 disabled:bg-neutral-200 text-white disabled:text-neutral-400 rounded-full transition-all hover:bg-primary-600 active:bg-primary-700 shadow-sm shadow-primary-500/20"
             >
               <Send size={14} />
             </button>

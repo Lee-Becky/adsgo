@@ -1,15 +1,19 @@
-import { Bell, HelpCircle, Menu, Globe, Clock, ChevronDown } from 'lucide-react'
+import { Bell, Menu, Globe, ChevronDown, Sparkles } from 'lucide-react'
 import { getPageInfo } from '../constants/menuConfig'
 import { useState, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
+import useLunaStore from '@stores/lunaStore'
 
 const Header = ({ toggleSidebar, isMobile }) => {
   const location = useLocation()
-  // 获取路径的最后一部分作为页面 key
-  const path = location.pathname.slice(1) || 'mediaPlan'
-  const parts = path.split('/')
-  const currentPage = parts[parts.length - 1] || 'mediaPlan'
-  const pageInfo = getPageInfo(currentPage)
+  const toggleLuna = useLunaStore((s) => s.toggleChat)
+  const lunaIsOpen = useLunaStore((s) => s.isOpen)
+  const hasPendingSync = useLunaStore((s) => Object.keys(s.pendingSync).length > 0)
+  // Extract workspace-relative path for page info lookup
+  const rawPath = location.pathname
+  const workspacePath = rawPath.replace(/^\/workspace\/[^/]+\//, '')
+  const lastSegment = workspacePath.split('/').pop() || 'media-plan'
+  const pageInfo = getPageInfo(workspacePath) || getPageInfo(lastSegment)
   const [languageDropdownOpen, setLanguageDropdownOpen] = useState(false)
   const [selectedLanguage, setSelectedLanguage] = useState('English')
 
@@ -40,74 +44,100 @@ const Header = ({ toggleSidebar, isMobile }) => {
   const handleLanguageChange = (lang) => {
     setSelectedLanguage(lang.name)
     setLanguageDropdownOpen(false)
-    
+
     // Google 翻译 Cookie 切换逻辑 (格式: /源语言/目标语言)
     const cookieValue = lang.code === 'en' ? '' : `/en/${lang.code}`;
-    
+
     // 写入 Cookie，确保全路径生效
     document.cookie = `googtrans=${cookieValue}; path=/`;
     document.cookie = `googtrans=${cookieValue}; path=/; domain=${window.location.hostname}`;
-    
-    // 刷新页面触发 Google 脚本重翻译
+
+    // 保存当前路由，reload 后自动恢复
+    sessionStorage.setItem('adsgo_lang_redirect', location.pathname + location.search)
     window.location.reload();
   }
 
+  // reload 后恢复路由
+  useEffect(() => {
+    const savedPath = sessionStorage.getItem('adsgo_lang_redirect')
+    if (savedPath && savedPath !== location.pathname) {
+      sessionStorage.removeItem('adsgo_lang_redirect')
+    }
+  }, [])
+
   return (
-    <header className="sticky top-0 z-[50] w-full bg-white/80 backdrop-blur-xl border-b border-slate-100 transition-all duration-300">
+    <header className="sticky top-0 z-[500] w-full bg-white/80 backdrop-blur-xl border-b border-neutral-200/80 transition-all duration-300">
       <div className="px-6">
-        <div className="flex h-[72px] items-center justify-between">
-          <div className="flex items-center gap-4">
+        <div className="flex h-14 items-center justify-between">
+          {/* Left side — hamburger + page title */}
+          <div className="flex items-center gap-3">
             {isMobile && (
               <button
                 onClick={toggleSidebar}
-                className="flex h-10 w-10 items-center justify-center rounded-xl bg-gray-50 text-gray-600 transition-all hover:bg-gray-100 active:scale-95"
+                className="flex h-9 w-9 items-center justify-center rounded-lg bg-neutral-50 text-neutral-600 transition-all hover:bg-neutral-100 active:scale-95"
               >
-                <Menu size={20} />
+                <Menu size={18} />
               </button>
             )}
             <div>
-              <h1 className="text-xl font-bold tracking-tight text-slate-900">
+              <h1 className="font-heading text-lg font-semibold text-neutral-900 leading-tight">
                 {pageInfo.title}
               </h1>
-              <p className="hidden text-[13px] font-medium text-slate-500 sm:block mt-0.5">
+              <p className="hidden text-caption text-neutral-500 sm:block mt-0.5">
                 {pageInfo.subtitle}
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
-            {/* Timezone */}
-            <div className="hidden items-center gap-2 rounded-xl bg-slate-50 border border-slate-100 px-3 py-2 text-[13px] font-bold text-slate-600 transition-all hover:bg-slate-100 hover:text-slate-900 cursor-pointer sm:flex group">
-              <Clock size={15} className="text-slate-400 group-hover:text-slate-600" />
-              <span>UTC+8</span>
-            </div>
+          {/* Right side actions */}
+          <div className="flex items-center gap-2">
+            {/* Luna AI Toggle */}
+            <button
+              onClick={toggleLuna}
+              className={`hidden sm:flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition-all duration-normal active:scale-95 relative ${
+                lunaIsOpen
+                  ? 'text-white shadow-lg'
+                  : 'bg-luna-bg text-luna-violet border border-luna-border hover:shadow-luna'
+              }`}
+              style={lunaIsOpen ? { background: 'var(--luna-gradient)' } : undefined}
+            >
+              <Sparkles size={16} />
+              <span>Luna</span>
+              {hasPendingSync && !lunaIsOpen && (
+                <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-luna-amber opacity-75" />
+                  <span className="relative inline-flex h-3 w-3 rounded-full bg-luna-amber border-2 border-white" />
+                </span>
+              )}
+            </button>
+
 
             {/* Language Selector */}
             <div className="relative">
               <button
                 onClick={() => setLanguageDropdownOpen(!languageDropdownOpen)}
-                className="flex items-center gap-2 rounded-xl bg-slate-50 border border-slate-100 px-3 py-2 text-[13px] font-bold text-slate-600 transition-all hover:bg-slate-100 hover:text-slate-900 active:scale-95 group"
+                className="flex items-center gap-1.5 rounded-full bg-neutral-50 border border-neutral-200 px-3 py-1.5 text-caption font-medium text-neutral-600 transition-all hover:bg-neutral-100 hover:text-neutral-900 active:scale-95 group"
               >
-                <Globe size={15} className="text-slate-400 group-hover:text-slate-600" />
+                <Globe size={14} className="text-neutral-400 group-hover:text-neutral-600" />
                 <span className="hidden sm:inline">{selectedLanguage}</span>
                 <ChevronDown
-                  size={14}
-                  className={`transition-transform duration-200 text-slate-400 ${
+                  size={12}
+                  className={`transition-transform duration-200 text-neutral-400 ${
                     languageDropdownOpen ? "rotate-180" : ""
                   }`}
                 />
               </button>
 
               {languageDropdownOpen && (
-                <div className="absolute right-0 top-full mt-2 min-w-[160px] origin-top-right rounded-xl border border-slate-200 bg-white p-1.5 shadow-2xl animate-in fade-in slide-in-from-top-2 duration-200 z-[60]">
+                <div className="absolute right-0 top-full mt-2 min-w-[160px] origin-top-right rounded-lg border border-neutral-200 bg-surface p-1.5 shadow-xl animate-in fade-in slide-in-from-top-2 duration-200 z-[60]">
                   {languages.map((lang) => (
                     <button
                       key={lang.code}
                       onClick={() => handleLanguageChange(lang)}
-                      className={`flex w-full items-center gap-2 rounded-lg px-3 py-2 text-[13px] font-bold transition-all ${
+                      className={`flex w-full items-center gap-2 rounded-md px-3 py-2 text-caption font-medium transition-all ${
                         selectedLanguage === lang.name
-                          ? "bg-primary/10 text-primary"
-                          : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                          ? "bg-primary-50 text-primary-700"
+                          : "text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900"
                       }`}
                     >
                       {lang.name}
@@ -117,20 +147,10 @@ const Header = ({ toggleSidebar, isMobile }) => {
               )}
             </div>
 
-            <div className="h-8 w-px bg-slate-100 mx-1 hidden sm:block"></div>
-
             {/* Notification */}
-            <button className="group relative flex h-10 w-10 items-center justify-center rounded-xl transition-all hover:bg-slate-50 active:scale-95">
-              <Bell size={20} className="text-slate-500 transition-colors group-hover:text-slate-900" />
-              <span className="absolute right-2.5 top-2.5 flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-red-500 border-2 border-white"></span>
-              </span>
-            </button>
-
-            {/* Help Center */}
-            <button className="group flex h-10 w-10 items-center justify-center rounded-xl transition-all hover:bg-slate-50 active:scale-95">
-              <HelpCircle size={20} className="text-slate-500 transition-colors group-hover:text-slate-900" />
+            <button className="group relative flex h-9 w-9 items-center justify-center rounded-lg transition-all duration-fast text-neutral-400 hover:bg-neutral-50 hover:text-neutral-700 active:scale-95">
+              <Bell size={18} className="transition-colors duration-fast" />
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-danger-500 ring-2 ring-white" />
             </button>
           </div>
         </div>

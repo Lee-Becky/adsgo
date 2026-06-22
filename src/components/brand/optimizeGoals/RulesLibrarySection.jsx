@@ -71,17 +71,17 @@ const RulesLibrarySection = ({ formData, updateFormData }) => {
   return (
     <div className="animate-in fade-in duration-700">
       {/* Header */}
-      <header className="px-10 py-6 bg-slate-100 border-b border-slate-200 flex items-center justify-between rounded-t-[32px]">
+      <header className="px-10 py-6 bg-neutral-100 border-b border-neutral-200 flex items-center justify-between rounded-t-2xl">
         <div className="flex items-center gap-3">
-          <h2 className="text-sm font-black text-slate-900">Optimize Rules</h2>
-          <Info size={16} className="text-slate-400" />
+          <h2 className="text-sm font-black text-neutral-900">Optimize Rules</h2>
+          <Info size={16} className="text-neutral-400" />
         </div>
         <div className="flex items-center gap-4">
-          <span className="px-2.5 py-0.5 bg-emerald-50 text-emerald-600 text-xs font-bold rounded-full">
+          <span className="px-2.5 py-0.5 bg-success-50 text-success-600 text-xs font-bold rounded-full">
             {rules.length}/{MAX_RULES}
           </span>
           {rules.length > 0 && (
-            <div className="text-emerald-500 animate-in zoom-in duration-500">
+            <div className="text-success-500 animate-in zoom-in duration-500">
               <CheckCircle2 size={24} />
             </div>
           )}
@@ -91,31 +91,31 @@ const RulesLibrarySection = ({ formData, updateFormData }) => {
       <div className="p-10 space-y-8">
         {/* Active Rules */}
         <div className="space-y-3">
-          <h3 className="text-sm font-semibold text-gray-900">Active Rules</h3>
+          <h3 className="text-sm font-semibold text-neutral-900">Active Rules</h3>
 
           {rules.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-8 bg-gray-50 rounded-inner border border-dashed border-gray-200 text-gray-400">
-              <Info size={20} className="text-gray-300 mb-2" />
+            <div className="flex flex-col items-center justify-center py-8 bg-neutral-50 rounded-inner border border-dashed border-neutral-200 text-neutral-400">
+              <Info size={20} className="text-neutral-300 mb-2" />
               <p className="text-xs font-medium">No customize rules yet</p>
             </div>
           ) : (
             <div className="space-y-4 max-h-[280px] overflow-y-auto pl-3 pt-3 pr-1">
               {rules.map((rule, index) => (
-                <div key={index} className="relative bg-gray-50 border border-gray-100 rounded-inner p-4 pr-10 group transition-all duration-200 hover:border-gray-200">
+                <div key={index} className="relative bg-neutral-50 border border-neutral-100 rounded-inner p-4 pr-10 group transition-all duration-200 hover:border-neutral-200">
                   {/* Type tag — top-left corner */}
                   {rule.type === 'Rule' ? (
-                    <span className="absolute -top-2.5 -left-2.5 px-2.5 py-0.5 bg-blue-500 text-white text-[10px] font-bold rounded-full shadow-sm">Rule</span>
+                    <span className="absolute -top-2.5 -left-2.5 px-2.5 py-0.5 bg-info-500 text-white text-[10px] font-bold rounded-full shadow-sm">Rule</span>
                   ) : (
-                    <span className="absolute -top-2.5 -left-2.5 px-2.5 py-0.5 bg-amber-500 text-white text-[10px] font-bold rounded-full shadow-sm">Preference</span>
+                    <span className="absolute -top-2.5 -left-2.5 px-2.5 py-0.5 bg-warning-500 text-white text-[10px] font-bold rounded-full shadow-sm">Preference</span>
                   )}
                   {/* Delete button */}
                   <button
                     onClick={() => handleDeleteRule(index)}
-                    className="absolute top-3 right-3 p-1 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-base transition-all opacity-0 group-hover:opacity-100"
+                    className="absolute top-3 right-3 p-1 text-neutral-300 hover:text-danger-500 hover:bg-danger-50 rounded-base transition-all opacity-0 group-hover:opacity-100"
                   >
                     <Trash2 size={13} />
                   </button>
-                  <p className="text-sm text-gray-700 leading-relaxed">{rule.text}</p>
+                  <p className="text-sm text-neutral-700 leading-relaxed">{rule.text}</p>
                 </div>
               ))}
             </div>
@@ -125,14 +125,14 @@ const RulesLibrarySection = ({ formData, updateFormData }) => {
         {/* Add Rules */}
         <div className="space-y-2">
           <div className="flex items-center gap-1.5">
-            <h3 className="text-sm font-semibold text-gray-900">Add Rules</h3>
-            <Lightbulb size={14} className="text-amber-400" />
+            <h3 className="text-sm font-semibold text-neutral-900">Add Rules</h3>
+            <Lightbulb size={14} className="text-warning-400" />
           </div>
 
           <div className={`relative border rounded-inner transition-all duration-200 ${
             rules.length >= MAX_RULES
-              ? 'opacity-50 border-gray-200'
-              : 'border-gray-200 focus-within:border-primary-500 focus-within:shadow-primary-focus'
+              ? 'opacity-50 border-neutral-200'
+              : 'border-neutral-200 focus-within:border-primary-500 focus-within:shadow-primary-focus'
           }`}>
             <textarea
               value={newRule}
@@ -141,7 +141,7 @@ const RulesLibrarySection = ({ formData, updateFormData }) => {
               placeholder={rules.length >= MAX_RULES ? 'Maximum rules reached' : 'Add new optimization rules that you want...'}
               disabled={rules.length >= MAX_RULES || isValidating}
               rows={4}
-              className="w-full bg-transparent border-none p-4 pr-12 pb-8 resize-none focus:ring-0 focus:outline-none text-sm text-gray-700 placeholder:text-gray-400 disabled:cursor-not-allowed"
+              className="w-full bg-transparent border-none p-4 pr-12 pb-8 resize-none focus:ring-0 focus:outline-none text-sm text-neutral-700 placeholder:text-neutral-400 disabled:cursor-not-allowed"
             />
             {/* + button */}
             <button
@@ -149,8 +149,8 @@ const RulesLibrarySection = ({ formData, updateFormData }) => {
               disabled={rules.length >= MAX_RULES || !newRule.trim() || isValidating}
               className={`absolute top-3 right-3 w-8 h-8 rounded-base border flex items-center justify-center transition-all duration-200 ${
                 rules.length >= MAX_RULES || !newRule.trim() || isValidating
-                  ? 'border-gray-200 text-gray-300 cursor-not-allowed'
-                  : 'border-gray-300 text-gray-500 hover:border-primary-500 hover:text-primary-500 hover:bg-primary-50 active:scale-95'
+                  ? 'border-neutral-200 text-neutral-300 cursor-not-allowed'
+                  : 'border-neutral-300 text-neutral-500 hover:border-primary-500 hover:text-primary-500 hover:bg-primary-50 active:scale-95'
               }`}
             >
               <Plus size={16} />
@@ -159,13 +159,13 @@ const RulesLibrarySection = ({ formData, updateFormData }) => {
             <div className="absolute bottom-2.5 left-4 right-4 flex items-center justify-between">
               {isValidating ? (
                 <div className="flex items-center gap-1.5 animate-in fade-in duration-200">
-                  <Loader2 size={12} className="animate-spin text-gray-400" />
-                  <span className="text-xs text-gray-400">Verifying compliance with spec...</span>
+                  <Loader2 size={12} className="animate-spin text-neutral-400" />
+                  <span className="text-xs text-neutral-400">Verifying compliance with spec...</span>
                 </div>
               ) : (
                 <div />
               )}
-              <span className="text-[11px] text-gray-400 font-medium">
+              <span className="text-[11px] text-neutral-400 font-medium">
                 {newRule.length}/{MAX_CHARACTERS}
               </span>
             </div>
@@ -178,9 +178,9 @@ const RulesLibrarySection = ({ formData, updateFormData }) => {
             >
               <div className="flex items-center gap-1.5 mb-2">
                 <span className="text-xs font-bold text-primary-600">Recommend</span>
-                <Sparkles size={12} className="text-amber-400" />
+                <Sparkles size={12} className="text-warning-400" />
               </div>
-              <p className="text-sm text-gray-700 leading-relaxed">{recommend.improved}</p>
+              <p className="text-sm text-neutral-700 leading-relaxed">{recommend.improved}</p>
             </div>
           )}
         </div>

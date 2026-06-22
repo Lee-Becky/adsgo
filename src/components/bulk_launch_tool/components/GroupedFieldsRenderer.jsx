@@ -76,8 +76,8 @@ const GroupedFieldsRenderer = ({
     const fields = (buckets[groupName] || []).filter(d => evaluateDependsOn(d, formData, rootFormData));
     const slot = mergedSlots[groupName];
     const containerCls = compact
-      ? 'border-t border-gray-50 px-4 py-4 flex flex-col gap-y-4 bg-gray-50/30'
-      : 'border-t border-gray-50 px-5 py-5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-5 bg-gray-50/30';
+      ? 'border-t border-neutral-50 px-4 py-4 flex flex-col gap-y-4 bg-neutral-50/30'
+      : 'border-t border-neutral-50 px-5 py-5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-5 bg-neutral-50/30';
     return (
       <div className={containerCls}>
         {fields.map(def => (
@@ -95,7 +95,7 @@ const GroupedFieldsRenderer = ({
         ))}
         {slot}
         {fields.length === 0 && !slot && (
-          <p className={`text-xs text-gray-400 ${compact ? '' : 'col-span-full'}`}>该组暂无可见字段。</p>
+          <p className={`text-xs text-neutral-400 ${compact ? '' : 'col-span-full'}`}>该组暂无可见字段。</p>
         )}
       </div>
     );
@@ -130,18 +130,18 @@ const GroupedFieldsRenderer = ({
         const count = visibleCount(gName);
         if (count === 0) return null;
         return (
-          <section key={gName} className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+          <section key={gName} className="bg-white rounded-2xl border border-neutral-100 shadow-sm overflow-hidden">
             <button
               type="button"
               onClick={() => toggle(gName)}
-              className="w-full flex items-center gap-3 px-5 py-4 hover:bg-gray-50/40 transition-colors"
+              className="w-full flex items-center gap-3 px-5 py-4 hover:bg-neutral-50/40 transition-colors"
             >
               <div className={`w-9 h-9 rounded-xl ${accent.bg} ${accent.text} flex items-center justify-center shrink-0`}>
                 <Icon size={16} strokeWidth={2.2} />
               </div>
               <div className="flex-1 min-w-0 text-left">
-                <h3 className="text-sm font-semibold text-gray-900 leading-tight truncate">{meta.label}</h3>
-                {meta.desc && <p className="text-[11px] text-gray-500 mt-0.5 truncate">{meta.desc}</p>}
+                <h3 className="text-sm font-semibold text-neutral-900 leading-tight truncate">{meta.label}</h3>
+                {meta.desc && <p className="text-[11px] text-neutral-500 mt-0.5 truncate">{meta.desc}</p>}
               </div>
               {pending > 0 && (
                 <span
@@ -152,10 +152,10 @@ const GroupedFieldsRenderer = ({
                   待填 {pending}
                 </span>
               )}
-              <span className="text-[10px] text-gray-500 px-2 py-0.5 rounded-full bg-gray-50 border border-gray-100 shrink-0">
+              <span className="text-[10px] text-neutral-500 px-2 py-0.5 rounded-full bg-neutral-50 border border-neutral-100 shrink-0">
                 {count} 项
               </span>
-              <ChevronDown size={14} className={`text-gray-400 shrink-0 transition-transform ${open ? 'rotate-180' : ''}`} />
+              <ChevronDown size={14} className={`text-neutral-400 shrink-0 transition-transform ${open ? 'rotate-180' : ''}`} />
             </button>
             {open && renderFieldsOfGroup(gName)}
           </section>

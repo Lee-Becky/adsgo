@@ -86,7 +86,7 @@ export default function StatusBar({ campaigns, kpiType, kpiTarget, dailyBudget }
 
     const spendPercent = dailyBudget > 0 ? cappedSpend / dailyBudget : 0
     const spendColor =
-      spendPercent < 0.7 ? 'text-gray-700' :
+      spendPercent < 0.7 ? 'text-neutral-700' :
       spendPercent < 0.9 ? 'text-amber-600' :
       'text-rose-600'
 
@@ -121,16 +121,16 @@ export default function StatusBar({ campaigns, kpiType, kpiTarget, dailyBudget }
       </div>
 
       {/* Separator */}
-      <div className="w-px h-5 bg-gray-200" />
+      <div className="w-px h-5 bg-neutral-200" />
 
       {/* KPI */}
       <div className="flex items-center gap-1.5 text-sm">
-        <span className="font-medium text-gray-900">{kpiType}</span>
-        <span className="text-gray-500">{kpiText}</span>
+        <span className="font-medium text-neutral-900">{kpiType}</span>
+        <span className="text-neutral-500">{kpiText}</span>
       </div>
 
       {/* Separator */}
-      <div className="w-px h-5 bg-gray-200" />
+      <div className="w-px h-5 bg-neutral-200" />
 
       {/* Spend */}
       <div className={`text-sm font-medium ${spendColor}`}>

@@ -168,8 +168,8 @@ const FlatLevelRenderer = ({
             const v = formData?.[headerDef.name];
             headerExtra = (
               <div className="inline-flex items-center gap-1.5 ml-3">
-                <span className="text-[11px] text-gray-600">{headerDef.label}</span>
-                {headerDef.helpText && <span title={headerDef.helpText} className="text-gray-300 cursor-help">ⓘ</span>}
+                <span className="text-[11px] text-neutral-600">{headerDef.label}</span>
+                {headerDef.helpText && <span title={headerDef.helpText} className="text-neutral-300 cursor-help">ⓘ</span>}
                 <SwitchInline value={v} onChange={(next) => onFieldChange?.(headerDef.name, next)} />
               </div>
             );
@@ -179,8 +179,8 @@ const FlatLevelRenderer = ({
           blocks.push(
             <section key={`sub-${idx}`} className="pt-2">
               {/* 受众 / 版位 subtitle 行：独占一整行，带细底边和 mb-3 与下方字段网格清晰分离 */}
-              <div className="flex items-center gap-1 pb-1.5 mb-3 border-b border-gray-100">
-                <h4 className="text-sm font-semibold text-gray-800">{sec.label}</h4>
+              <div className="flex items-center gap-1 pb-1.5 mb-3 border-b border-neutral-100">
+                <h4 className="text-sm font-semibold text-neutral-800">{sec.label}</h4>
                 {headerExtra}
               </div>
               {grid}
@@ -205,19 +205,19 @@ const FlatLevelRenderer = ({
       {renderSections()}
 
       {visibleAdvancedFields.length > 0 && (
-        <div className="bg-white rounded-lg border border-gray-100 overflow-hidden">
+        <div className="bg-white rounded-lg border border-neutral-100 overflow-hidden">
           <button
             type="button"
             onClick={() => setAdvancedOpen(o => !o)}
-            className="w-full flex items-center gap-2 px-3 py-2 hover:bg-gray-50/40 transition-colors"
+            className="w-full flex items-center gap-2 px-3 py-2 hover:bg-neutral-50/40 transition-colors"
           >
-            <Settings2 size={12} className="text-gray-400 shrink-0" strokeWidth={2.2} />
-            <span className="text-xs font-semibold text-gray-700">高级设置</span>
-            <span className="text-[10px] text-gray-400">{visibleAdvancedFields.length} 项</span>
-            <ChevronDown size={12} className={`ml-auto text-gray-400 shrink-0 transition-transform ${advancedOpen ? 'rotate-180' : ''}`} />
+            <Settings2 size={12} className="text-neutral-400 shrink-0" strokeWidth={2.2} />
+            <span className="text-xs font-semibold text-neutral-700">高级设置</span>
+            <span className="text-[10px] text-neutral-400">{visibleAdvancedFields.length} 项</span>
+            <ChevronDown size={12} className={`ml-auto text-neutral-400 shrink-0 transition-transform ${advancedOpen ? 'rotate-180' : ''}`} />
           </button>
           {advancedOpen && (
-            <div className={`border-t border-gray-100 px-4 py-4 bg-gray-50/30 ${gridCls}`}>
+            <div className={`border-t border-neutral-100 px-4 py-4 bg-neutral-50/30 ${gridCls}`}>
               {visibleAdvancedFields.map(renderField)}
             </div>
           )}

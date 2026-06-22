@@ -29,7 +29,7 @@ function UserBubble({ onUndo, children }) {
         {onUndo && (
           <button
             onClick={onUndo}
-            className="absolute -bottom-8 right-0 w-6 h-6 flex items-center justify-center bg-white border border-gray-200 rounded-full shadow-sm text-gray-400 hover:text-primary-500 hover:border-primary-300 transition-colors opacity-0 group-hover/bubble:opacity-100"
+            className="absolute -bottom-8 right-0 w-6 h-6 flex items-center justify-center bg-white border border-neutral-200 rounded-full shadow-sm text-neutral-400 hover:text-primary-500 hover:border-primary-300 transition-colors opacity-0 group-hover/bubble:opacity-100"
           >
             <Undo2 size={12} />
           </button>
@@ -182,16 +182,16 @@ export default function ChatPanel({
   };
 
   return (
-    <main className="flex-1 min-h-0 bg-white rounded-[20px] border border-[#F0F0F0] card-shadow overflow-hidden flex flex-col relative">
+    <main className="flex-1 min-h-0 bg-white rounded-2xl border border-[#F0F0F0] card-shadow overflow-hidden flex flex-col relative">
       {/* Header */}
-      <div className="flex items-center justify-between px-5 py-4 border-b border-[#F5F5F5] bg-gray-50/50 shrink-0 z-10">
+      <div className="flex items-center justify-between px-5 py-4 border-b border-[#F5F5F5] bg-neutral-50/50 shrink-0 z-10">
         <div className="flex items-center gap-3 min-w-0">
           <div className="shrink-0">
             <AiAvatar uid="hdr" />
           </div>
           <div>
-            <h3 className="text-[16px] font-semibold text-gray-900">AdsGo Creative Expert</h3>
-            <div className="flex items-center gap-1.5 text-[14px] text-gray-400 font-normal mt-0.5">
+            <h3 className="text-[16px] font-semibold text-neutral-900">AdsGo Creative Expert</h3>
+            <div className="flex items-center gap-1.5 text-[14px] text-neutral-400 font-normal mt-0.5">
               <span>New AI Creative</span>
             </div>
           </div>

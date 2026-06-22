@@ -110,32 +110,32 @@ const AdAccountSearchModal = ({ isOpen, onClose, onAdd, existingIds = [] }) => {
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center">
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative w-full max-w-[600px] bg-white rounded-3xl shadow-2xl border border-slate-100 max-h-[84vh] flex flex-col">
+      <div className="relative w-full max-w-[600px] bg-white rounded-2xl shadow-2xl border border-neutral-100 max-h-[84vh] flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between px-8 py-5 border-b border-slate-100">
+        <div className="flex items-center justify-between px-8 py-5 border-b border-neutral-100">
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-lg bg-emerald-50 flex items-center justify-center">
-              <Check size={14} className="text-emerald-500" />
+            <div className="w-6 h-6 rounded-lg bg-success-50 flex items-center justify-center">
+              <Check size={14} className="text-success-500" />
             </div>
-            <h3 className="text-sm font-black text-slate-900">Bind Ad Accounts</h3>
+            <h3 className="text-sm font-black text-neutral-900">Bind Ad Accounts</h3>
           </div>
-          <button onClick={onClose} className="p-1.5 hover:bg-slate-100 rounded-lg transition-colors">
-            <X size={18} className="text-slate-400" />
+          <button onClick={onClose} className="p-1.5 hover:bg-neutral-100 rounded-lg transition-colors">
+            <X size={18} className="text-neutral-400" />
           </button>
         </div>
 
         {/* Body */}
         <div className="flex-1 overflow-auto flex flex-col gap-2.5 px-8 py-5">
           {/* Hint */}
-          <p className="text-[13px] text-slate-500 m-0">
+          <p className="text-[13px] text-neutral-500 m-0">
             Accounts below are from the CyberMedia permission system. Select the ones to bind with this customer.
           </p>
 
           {/* Search */}
           <div className="relative">
-            <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" />
             <input
-              className="w-full pl-9 pr-4 py-2 border border-slate-200 rounded-lg text-[13px] text-slate-900 outline-none focus:border-indigo-400"
+              className="w-full pl-9 pr-4 py-2 border border-neutral-200 rounded-lg text-[13px] text-neutral-900 outline-none focus:border-primary-400"
               placeholder="Search account name or ID..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -152,8 +152,8 @@ const AdAccountSearchModal = ({ isOpen, onClose, onAdd, existingIds = [] }) => {
                   onClick={() => setActivePlatformTab(tab.key)}
                   className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all border ${
                     isActive
-                      ? 'border-indigo-300 bg-indigo-50 text-indigo-700'
-                      : 'border-slate-200 bg-white text-slate-500 hover:bg-slate-50'
+                      ? 'border-primary-300 bg-primary-50 text-primary-700'
+                      : 'border-neutral-200 bg-white text-neutral-500 hover:bg-neutral-50'
                   }`}
                 >
                   {tab.icon && <img src={tab.icon} alt="" className="w-3.5 h-3.5" />}
@@ -164,12 +164,12 @@ const AdAccountSearchModal = ({ isOpen, onClose, onAdd, existingIds = [] }) => {
           </div>
 
           {/* Select All + Count */}
-          <div className="flex items-center justify-between text-[13px] text-slate-500">
+          <div className="flex items-center justify-between text-[13px] text-neutral-500">
             <label className="flex items-center gap-1.5 cursor-pointer select-none">
               <button onClick={handleSelectAll} className="flex items-center">
                 {allSelected
-                  ? <CheckSquare size={15} className="text-indigo-500" />
-                  : <Square size={15} className="text-slate-300" />
+                  ? <CheckSquare size={15} className="text-primary-500" />
+                  : <Square size={15} className="text-neutral-300" />
                 }
               </button>
               <span className="text-xs font-medium">Select all current results</span>
@@ -178,14 +178,14 @@ const AdAccountSearchModal = ({ isOpen, onClose, onAdd, existingIds = [] }) => {
           </div>
 
           {/* Account List */}
-          <div className="flex-1 overflow-auto min-h-[200px] border border-slate-200 rounded-xl bg-slate-50/50">
+          <div className="flex-1 overflow-auto min-h-[200px] border border-neutral-200 rounded-xl bg-neutral-50/50">
             {isLoading ? (
-              <div className="flex items-center justify-center py-10 text-slate-400 text-[13px]">
+              <div className="flex items-center justify-center py-10 text-neutral-400 text-[13px]">
                 <Loader2 size={16} className="animate-spin mr-2" />
                 Loading accounts...
               </div>
             ) : visibleAccounts.length === 0 ? (
-              <div className="flex items-center justify-center py-10 text-slate-400 text-[13px]">
+              <div className="flex items-center justify-center py-10 text-neutral-400 text-[13px]">
                 No accounts found.
               </div>
             ) : (
@@ -197,8 +197,8 @@ const AdAccountSearchModal = ({ isOpen, onClose, onAdd, existingIds = [] }) => {
                   return (
                     <label
                       key={account.id}
-                      className={`flex items-center gap-2.5 px-3.5 py-2.5 border-b border-slate-100 last:border-b-0 transition-colors cursor-pointer ${
-                        isExisting ? 'opacity-50 cursor-not-allowed' : 'hover:bg-slate-50'
+                      className={`flex items-center gap-2.5 px-3.5 py-2.5 border-b border-neutral-100 last:border-b-0 transition-colors cursor-pointer ${
+                        isExisting ? 'opacity-50 cursor-not-allowed' : 'hover:bg-neutral-50'
                       }`}
                       onClick={(e) => {
                         e.preventDefault()
@@ -207,11 +207,11 @@ const AdAccountSearchModal = ({ isOpen, onClose, onAdd, existingIds = [] }) => {
                     >
                       {/* Checkbox */}
                       {isExisting ? (
-                        <Check size={15} className="text-emerald-500 flex-shrink-0" />
+                        <Check size={15} className="text-success-500 flex-shrink-0" />
                       ) : isSelected ? (
-                        <CheckSquare size={15} className="text-indigo-500 flex-shrink-0" />
+                        <CheckSquare size={15} className="text-primary-500 flex-shrink-0" />
                       ) : (
-                        <Square size={15} className="text-slate-300 flex-shrink-0" />
+                        <Square size={15} className="text-neutral-300 flex-shrink-0" />
                       )}
 
                       {/* Platform icon */}
@@ -226,10 +226,10 @@ const AdAccountSearchModal = ({ isOpen, onClose, onAdd, existingIds = [] }) => {
 
                       {/* Account info */}
                       <div className="flex-1 min-w-0">
-                        <div className="text-[13px] font-medium text-slate-800 truncate">
+                        <div className="text-[13px] font-medium text-neutral-800 truncate">
                           {account.name}
                         </div>
-                        <div className="text-[11px] text-slate-400 mt-0.5">
+                        <div className="text-[11px] text-neutral-400 mt-0.5">
                           {account.id} · {platform?.name || 'Unknown'}
                         </div>
                       </div>
@@ -241,14 +241,14 @@ const AdAccountSearchModal = ({ isOpen, onClose, onAdd, existingIds = [] }) => {
           </div>
 
           {/* Batch Import Section */}
-          <div className="border-t border-dashed border-slate-200 pt-2.5">
-            <p className="text-[12px] text-slate-400 mb-2">
-              Need batch import? Upload Excel / CSV with column <code className="text-xs bg-slate-100 px-1 py-0.5 rounded">account_id</code> (max 1000 rows). Imported accounts will be merged into selection.
+          <div className="border-t border-dashed border-neutral-200 pt-2.5">
+            <p className="text-[12px] text-neutral-400 mb-2">
+              Need batch import? Upload Excel / CSV with column <code className="text-xs bg-neutral-100 px-1 py-0.5 rounded">account_id</code> (max 1000 rows). Imported accounts will be merged into selection.
             </p>
             <div className="flex items-center gap-2.5 flex-wrap">
               <button
                 onClick={() => alert('Template download (mock)')}
-                className="flex items-center gap-1.5 px-3 py-1.5 border border-slate-200 rounded-lg bg-white text-slate-600 text-[12px] font-medium hover:bg-slate-50 transition-colors"
+                className="flex items-center gap-1.5 px-3 py-1.5 border border-neutral-200 rounded-lg bg-white text-neutral-600 text-[12px] font-medium hover:bg-neutral-50 transition-colors"
               >
                 <Download size={13} />
                 Download Template
@@ -268,10 +268,10 @@ const AdAccountSearchModal = ({ isOpen, onClose, onAdd, existingIds = [] }) => {
                 onChange={handleFileUpload}
               />
               {importMeta && (
-                <span className="text-[12px] text-slate-500">
-                  Imported <span className="font-bold text-emerald-600">{importMeta.imported}</span>,
-                  not found <span className="font-bold text-amber-600">{importMeta.notFound}</span>,
-                  invalid <span className="font-bold text-red-500">{importMeta.invalid}</span>
+                <span className="text-[12px] text-neutral-500">
+                  Imported <span className="font-bold text-success-600">{importMeta.imported}</span>,
+                  not found <span className="font-bold text-warning-600">{importMeta.notFound}</span>,
+                  invalid <span className="font-bold text-danger-500">{importMeta.invalid}</span>
                 </span>
               )}
             </div>
@@ -279,10 +279,10 @@ const AdAccountSearchModal = ({ isOpen, onClose, onAdd, existingIds = [] }) => {
         </div>
 
         {/* Footer */}
-        <div className="px-8 py-4 border-t border-slate-100 flex items-center justify-end gap-2.5">
+        <div className="px-8 py-4 border-t border-neutral-100 flex items-center justify-end gap-2.5">
           <button
             onClick={onClose}
-            className="px-5 py-2.5 text-xs font-bold text-slate-500 border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors"
+            className="px-5 py-2.5 text-xs font-bold text-neutral-500 border border-neutral-200 rounded-xl hover:bg-neutral-50 transition-colors"
           >
             Cancel
           </button>

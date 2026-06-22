@@ -22,11 +22,26 @@ import {
 } from '../constants/adInsightsData';
 import { Icon, SvgIcons } from './AdInsightsIcons';
 import BrandDataOverlay from './BrandDataOverlay';
+import {
+  Pencil,
+  ChevronDown,
+  Cake,
+  User,
+  Target,
+  Asterisk,
+  Globe,
+  CloudUpload,
+  ThumbsUp,
+  MessageSquare,
+  Share2,
+  TrendingUp,
+  X,
+} from 'lucide-react';
 
 // --- Sub Components ---
 
 const SectionTitle = ({ children }) => (
-  <div className="text-gray-900 text-xl font-bold mb-4 pl-4 relative before:content-[''] before:block before:w-1.5 before:h-6 before:rounded-full before:bg-gradient-to-b before:from-[#c3a2fe] before:via-[#7135f4] before:to-[#0d031f] before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2">
+  <div className="text-neutral-900 text-xl font-bold mb-4 pl-4 relative before:content-[''] before:block before:w-1.5 before:h-6 before:rounded-full before:bg-gradient-to-b before:from-[#c3a2fe] before:via-[#7135f4] before:to-[#0d031f] before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2">
     {children}
   </div>
 );
@@ -34,9 +49,9 @@ const SectionTitle = ({ children }) => (
 const InsightBlock = ({ title, data, renderListItem, chartColors }) => (
   <div className="min-w-0">
     <SectionTitle>{title}</SectionTitle>
-    <div className="flex flex-col p-2 gap-2 bg-[#fafafa] border border-[#f5f5f5] rounded-2xl">
+    <div className="flex flex-col p-2 gap-2 bg-neutral-50 border border-neutral-100 rounded-2xl">
       <div className="flex flex-col p-3 px-4 gap-3 bg-white rounded-xl">
-        <div className="text-[#141414] text-base font-semibold">Spend Distribution</div>
+        <div className="text-neutral-900 text-base font-semibold">Spend Distribution</div>
         <div className="w-full h-[180px]">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
@@ -59,7 +74,7 @@ const InsightBlock = ({ title, data, renderListItem, chartColors }) => (
         </div>
       </div>
       <div className="flex flex-col p-3 px-4 gap-4 bg-white rounded-xl">
-        <div className="text-[#141414] text-base font-semibold">
+        <div className="text-neutral-900 text-base font-semibold">
           {title.includes('Audience') ? 'Top Audiences' : 'Top Pages'}
         </div>
         <div className="flex flex-col gap-5">
@@ -71,26 +86,26 @@ const InsightBlock = ({ title, data, renderListItem, chartColors }) => (
 );
 
 const AudienceListItem = ({ item, i }) => (
-  <div key={i} className="flex flex-col gap-2 pb-5 border-b border-dashed border-[#d9d9d9] last:border-none last:pb-0">
-    <div className="text-[#141414] text-sm font-medium">{item.name}</div>
+  <div key={i} className="flex flex-col gap-2 pb-5 border-b border-dashed border-neutral-300 last:border-none last:pb-0">
+    <div className="text-neutral-900 text-sm font-medium">{item.name}</div>
     <div className="flex gap-1 overflow-hidden">
       {item.tags.map((t, j) => (
-        <span key={j} className="px-3 py-1 bg-[#f5f5f5] text-[#666] rounded-full text-sm whitespace-nowrap">{t}</span>
+        <span key={j} className="px-3 py-1 bg-neutral-100 text-neutral-500 rounded-full text-sm whitespace-nowrap">{t}</span>
       ))}
     </div>
     <div className="flex items-center gap-2.5 text-sm">
-      <span className="text-[#7033f5] font-medium">{item.cpa} CPA</span>
-      <span className="text-[#8c8c8c]">${item.spend} spend · {item.campaigns} campaigns</span>
+      <span className="text-luna-violet font-medium">{item.cpa} CPA</span>
+      <span className="text-neutral-400">${item.spend} spend · {item.campaigns} campaigns</span>
     </div>
   </div>
 );
 
 const PageListItem = ({ item, i }) => (
-  <div key={i} className="flex flex-col gap-2 pb-5 border-b border-dashed border-[#d9d9d9] last:border-none last:pb-0">
-    <div className="text-[#141414] text-sm font-medium truncate">{item.url}</div>
+  <div key={i} className="flex flex-col gap-2 pb-5 border-b border-dashed border-neutral-300 last:border-none last:pb-0">
+    <div className="text-neutral-900 text-sm font-medium truncate">{item.url}</div>
     <div className="flex items-center gap-2.5 text-sm">
       <span className="text-[#5969f7] font-medium">{item.cvr} CVR</span>
-      <span className="text-[#8c8c8c]">${item.spend} spend · {item.campaigns} campaigns</span>
+      <span className="text-neutral-400">${item.spend} spend · {item.campaigns} campaigns</span>
     </div>
   </div>
 );
@@ -137,7 +152,7 @@ const RecommendationCard = ({ card, isExpanded, onToggle, onEdit, onPublish, sta
         ) : (
           <div className="external-actions">
             <button className="btn-edit-ghost" onClick={() => onEdit(card.id)}>
-              <i className="fas fa-pen"></i>
+              <Pencil size={14} />
             </button>
             <button 
               className="btn-publish-external"
@@ -191,7 +206,7 @@ const RecommendationCard = ({ card, isExpanded, onToggle, onEdit, onPublish, sta
                   className={`aud-expand-btn ${isExpanded ? 'rotated' : ''}`}
                   style={{ '--hover-color': colors.primary }}
                 >
-                  <i className="fas fa-chevron-down"></i>
+                  <ChevronDown size={14} />
                 </div>
               </div>
             </>
@@ -200,7 +215,7 @@ const RecommendationCard = ({ card, isExpanded, onToggle, onEdit, onPublish, sta
               <div className="flex items-center gap-3 mb-2 flex-wrap">
                 <span className="aud-name">{card.audience}</span>
                 <div className="aud-group">
-                  <i className="fas fa-birthday-cake aud-icon-standalone" style={{ color: colors.icon }}></i>
+                  <Cake size={14} style={{ color: colors.icon }} />
                   <span 
                     className="aud-content-tag"
                     style={{
@@ -213,10 +228,7 @@ const RecommendationCard = ({ card, isExpanded, onToggle, onEdit, onPublish, sta
                   </span>
                 </div>
                 <div className="aud-group">
-                  <i 
-                    className={`fas fa-${card.gender === 'Male' ? 'mars' : card.gender === 'Female' ? 'venus' : 'venus-mars'} aud-icon-standalone`}
-                    style={{ color: colors.icon }}
-                  ></i>
+                  <User size={14} style={{ color: colors.icon }} />
                   <span 
                     className="aud-content-tag"
                     style={{
@@ -230,7 +242,7 @@ const RecommendationCard = ({ card, isExpanded, onToggle, onEdit, onPublish, sta
                 </div>
               </div>
               <div className="aud-row-2">
-                <i className="fas fa-bullseye aud-icon-interest"></i>
+                <Target size={14} className="aud-icon-interest" />
                 <div className={`aud-tags-wrapper ${isExpanded ? 'expanded' : 'collapsed'}`}>
                   <div className="aud-tags-container">
                     {tagsArr.map((tag, idx) => (
@@ -254,7 +266,7 @@ const RecommendationCard = ({ card, isExpanded, onToggle, onEdit, onPublish, sta
                     className={`aud-expand-btn ${isExpanded ? 'rotated' : ''}`}
                     style={{ '--hover-color': colors.primary }}
                   >
-                    <i className="fas fa-chevron-down"></i>
+                    <ChevronDown size={14} />
                   </div>
                 )}
               </div>
@@ -272,11 +284,11 @@ const RecommendationCard = ({ card, isExpanded, onToggle, onEdit, onPublish, sta
                 color: colors.primary
               }}
             >
-              <i className="fas fa-asterisk"></i>
+              <Asterisk size={16} />
             </div>
             <div className="ad-text-box">
               <h4>AdsGo.ai</h4>
-              <p>Sponsored · <i className="fas fa-globe-americas"></i></p>
+              <p className="flex items-center gap-1">Sponsored · <Globe size={12} /></p>
             </div>
           </div>
         </div>
@@ -294,7 +306,7 @@ const RecommendationCard = ({ card, isExpanded, onToggle, onEdit, onPublish, sta
           </div>
         ) : (
           <div className="media-empty">
-            <i className="fas fa-cloud-upload-alt text-2xl mb-2"></i>
+            <CloudUpload size={24} className="mb-2" />
             <div className="text-[10px]">Click to upload</div>
           </div>
         )}
@@ -312,9 +324,9 @@ const RecommendationCard = ({ card, isExpanded, onToggle, onEdit, onPublish, sta
 
         {/* Social */}
         <div className="ad-social">
-          <span className="social-item"><i className="far fa-thumbs-up"></i> Like</span>
-          <span className="social-item"><i className="far fa-comment-alt"></i> Comment</span>
-          <span className="social-item"><i className="fas fa-share"></i> Share</span>
+          <span className="social-item"><ThumbsUp size={14} /> Like</span>
+          <span className="social-item"><MessageSquare size={14} /> Comment</span>
+          <span className="social-item"><Share2 size={14} /> Share</span>
         </div>
       </div>
     </div>
@@ -322,8 +334,8 @@ const RecommendationCard = ({ card, isExpanded, onToggle, onEdit, onPublish, sta
 };
 
 const CreativeAdCard = ({ ad, index }) => (
-  <div key={ad.id} className="flex-1 min-w-[320px] max-w-[360px] relative first:before:hidden before:content-[''] before:block before:w-px before:h-[90%] before:border-l before:border-dashed before:border-[#d9d9d9] before:absolute before:top-1/2 before:left-[-24px] before:-translate-y-1/2">
-    <div className="flex items-center justify-center gap-2 mb-3 text-gray-500 text-sm">
+  <div key={ad.id} className="flex-1 min-w-[320px] max-w-[360px] relative first:before:hidden before:content-[''] before:block before:w-px before:h-[90%] before:border-l before:border-dashed before:border-neutral-300 before:absolute before:top-1/2 before:left-[-24px] before:-translate-y-1/2">
+    <div className="flex items-center justify-center gap-2 mb-3 text-neutral-500 text-sm">
       <span className="text-[#78a100] font-medium">{ad.ctr} CTR</span>
       <span></span>
       <span>{ad.cpa} CPA</span>
@@ -331,18 +343,18 @@ const CreativeAdCard = ({ ad, index }) => (
       <span>{ad.campaigns} campaigns</span>
     </div>
     <div className="rounded-2xl border border-primary/30 overflow-hidden bg-white">
-      <div className="flex items-center gap-1.5 px-4 py-2 border-b border-border bg-gradient-to-r from-white to-[#f5f1ff] text-gray-900 text-base font-semibold">
+      <div className="flex items-center gap-1.5 px-4 py-2 border-b border-border bg-gradient-to-r from-white to-[#f5f1ff] text-neutral-900 text-base font-semibold">
         <Icon id="icon-Outlined_Eye" className="text-xl font-medium" />
         <span>Creative</span>
       </div>
       <div className="flex justify-between items-center px-2.5 py-1.5">
         <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 p-1.5 flex justify-center items-center rounded-full border border-[#f5f5f5] bg-[#fafafa]">
+          <div className="w-9 h-9 p-1.5 flex justify-center items-center rounded-full border border-neutral-100 bg-neutral-50">
             <img src="https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://meta.com&size=256" alt="" className="w-6 h-6 object-contain" />
           </div>
           <div className="flex flex-col gap-0.5">
-            <span className="text-gray-900 text-sm font-bold truncate max-w-[200px]">Goodkarma</span>
-            <span className="text-gray-500 text-xs">Sponsored •</span>
+            <span className="text-neutral-900 text-sm font-bold truncate max-w-[200px]">Goodkarma</span>
+            <span className="text-neutral-500 text-xs">Sponsored •</span>
           </div>
         </div>
         <div className="flex gap-2.5 text-xl font-semibold">
@@ -350,23 +362,23 @@ const CreativeAdCard = ({ ad, index }) => (
           <Icon id="icon-Outlined_Close01" />
         </div>
       </div>
-      <div className="px-2.5 pb-2 text-gray-900 text-xs font-medium leading-[17px] line-clamp-3">
+      <div className="px-2.5 pb-2 text-neutral-900 text-xs font-medium leading-[17px] line-clamp-3">
         {ad.primaryText}
       </div>
-      <div className="w-full aspect-square bg-gray-100 bg-cover bg-center" style={{ backgroundImage: `url(${ad.mediaUrl})` }} />
-      <div className="p-3 flex justify-between items-center border-t border-border bg-gray-50 gap-3">
-        <div className="flex-1 flex flex-col gap-1 text-gray-900 text-sm max-w-[240px]">
+      <div className="w-full aspect-square bg-neutral-100 bg-cover bg-center" style={{ backgroundImage: `url(${ad.mediaUrl})` }} />
+      <div className="p-3 flex justify-between items-center border-t border-border bg-neutral-50 gap-3">
+        <div className="flex-1 flex flex-col gap-1 text-neutral-900 text-sm max-w-[240px]">
           <div className="font-bold truncate">{ad.footerBrand}</div>
-          <div className="text-gray-500 text-xs font-medium truncate">{ad.footerDesc}</div>
+          <div className="text-neutral-500 text-xs font-medium truncate">{ad.footerDesc}</div>
         </div>
-        <div className="h-8 px-1.5 flex justify-center items-center text-gray-900 text-xs font-semibold rounded-md bg-gray-200">
+        <div className="h-8 px-1.5 flex justify-center items-center text-neutral-900 text-xs font-semibold rounded-md bg-neutral-200">
           Shop Now
         </div>
       </div>
       <div className="ad-social">
-        <span className="social-item"><i className="far fa-thumbs-up"></i> Like</span>
-        <span className="social-item"><i className="far fa-comment-alt"></i> Comment</span>
-        <span className="social-item"><i className="fas fa-share"></i> Share</span>
+        <span className="social-item"><ThumbsUp size={14} /> Like</span>
+        <span className="social-item"><MessageSquare size={14} /> Comment</span>
+        <span className="social-item"><Share2 size={14} /> Share</span>
       </div>
     </div>
   </div>
@@ -464,15 +476,15 @@ const AdInsights = ({ onPageChange }) => {
           {/* Platform Selector */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
             <div className="flex-1 flex justify-start">
-              <div className="bg-gray-100 p-0.5 rounded-full flex gap-1 flex-wrap justify-center sm:justify-start">
+              <div className="bg-neutral-100 p-0.5 rounded-full flex gap-1 flex-wrap justify-center sm:justify-start">
                 {['Meta', 'Google', 'TikTok', 'Bing'].map(p => (
                   <button
                     key={p}
                     onClick={() => setSelectedPlatform(p)}
                     className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all flex items-center gap-2 ${
                       selectedPlatform === p 
-                        ? 'bg-white shadow-sm text-[#141414]' 
-                        : 'text-[#8c8c8c] opacity-40 grayscale pointer-events-none'
+                        ? 'bg-white shadow-sm text-neutral-900' 
+                        : 'text-neutral-400 opacity-40 grayscale pointer-events-none'
                     }`}
                   >
                     <img src={PLATFORM_LOGOS[p]} alt={p} className="w-6 h-6" />
@@ -488,20 +500,20 @@ const AdInsights = ({ onPageChange }) => {
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 mb-8 px-2">
                 <div className="flex items-center gap-2.5 flex-shrink-0">
                   <div className="w-1 h-[18px] rounded" style={{ background: 'linear-gradient(180deg, #8B5CF6, #4F46E5)' }}></div>
-                  <h2 className="text-base md:text-lg font-bold text-gray-900 tracking-tight">Launch Recommendation</h2>
+                  <h2 className="text-base md:text-lg font-bold text-neutral-900 tracking-tight">Launch Recommendation</h2>
                 </div>
-                <div className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-gray-200 bg-gray-50 flex-shrink-0">
-                  <div className="flex items-center text-gray-700 text-sm font-semibold">
+                <div className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-neutral-200 bg-neutral-50 flex-shrink-0">
+                  <div className="flex items-center text-neutral-700 text-sm font-semibold">
                     <img src="https://www.adsgo.ai/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Frobot-active.7003b4d8.png&w=256&q=75" alt="AI Robot" className="w-5 h-5 mr-1.5" />
                     Auto-launch:
                   </div>
                   <div 
-                    className={`w-11 h-[22px] rounded-full p-[2px] cursor-pointer transition-colors ${autoRegen ? 'bg-[#7033f5]' : 'bg-gray-300'}`}
+                    className={`w-11 h-[22px] rounded-full p-[2px] cursor-pointer transition-colors ${autoRegen ? 'bg-luna-violet' : 'bg-neutral-300'}`}
                     onClick={() => setAutoRegen(!autoRegen)}
                   >
                     <div className={`w-[18px] h-[18px] bg-white rounded-full transition-transform ${autoRegen ? 'translate-x-5' : 'translate-x-0'}`} />
                   </div>
-                  <span className={`text-xs font-semibold ${autoRegen ? 'text-green-600' : 'text-gray-500'}`}>
+                  <span className={`text-xs font-semibold ${autoRegen ? 'text-success-600' : 'text-neutral-500'}`}>
                     {autoRegen 
                       ? 'Enabled - Recommended campaigns will be launched automatically.' 
                       : 'Disabled - Recommended campaigns need to be published manually.'
@@ -549,7 +561,7 @@ const AdInsights = ({ onPageChange }) => {
                       {/* 中心内容区域 - 螺旋运动系统 */}
                       <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
                         {/* 核心 AI Engine - 等比放大并确保文案不换行 */}
-                        <div className="relative z-[20] w-28 h-28 bg-white/20 backdrop-blur-md border-2 border-white/40 rounded-[24px] flex flex-col items-center justify-center shadow-2xl animate-pulse-slow -translate-y-[60px]">
+                        <div className="relative z-[20] w-28 h-28 bg-white/20 backdrop-blur-md border-2 border-white/40 rounded-xl flex flex-col items-center justify-center shadow-2xl animate-pulse-slow -translate-y-[60px]">
                           <svg className="w-12 h-12 text-white" viewBox="0 0 24 24" fill="currentColor">
                             <path d="M12 2L2 7l10 5 10-5M2 17l10 5 10-5M2 12l10 5 10-5"/>
                           </svg>
@@ -583,7 +595,7 @@ const AdInsights = ({ onPageChange }) => {
                           {/* 3. Copy */}
                           <div className="absolute animate-spiral-card" style={{ animationDelay: '-2s', '--radius': '90px', '--start-scale': '0.6' }}>
                             <div className="w-14 h-14 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl flex flex-col items-center justify-center">
-                              <svg className="w-5 h-5 text-green-300" viewBox="0 0 24 24" fill="currentColor">
+                              <svg className="w-5 h-5 text-success-300" viewBox="0 0 24 24" fill="currentColor">
                                 <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
                               </svg>
                               <div className="text-[10px] text-white/70 mt-1 font-medium">Ad Copys</div>
@@ -593,7 +605,7 @@ const AdInsights = ({ onPageChange }) => {
                           {/* 4. Landing */}
                           <div className="absolute animate-spiral-card" style={{ animationDelay: '-3s', '--radius': '105px', '--start-scale': '0.45' }}>
                             <div className="w-14 h-14 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl flex flex-col items-center justify-center">
-                              <svg className="w-5 h-5 text-amber-300" viewBox="0 0 24 24" fill="currentColor">
+                              <svg className="w-5 h-5 text-warning-300" viewBox="0 0 24 24" fill="currentColor">
                                 <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
                               </svg>
                               <div className="text-[10px] text-white/70 mt-1 font-medium">LandingPages</div>
@@ -613,7 +625,7 @@ const AdInsights = ({ onPageChange }) => {
                           {/* 6. Schedule */}
                           <div className="absolute animate-spiral-card" style={{ animationDelay: '-5s', '--radius': '115px', '--start-scale': '0.35' }}>
                             <div className="w-14 h-14 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl flex flex-col items-center justify-center">
-                              <svg className="w-5 h-5 text-indigo-300" viewBox="0 0 24 24" fill="currentColor">
+                              <svg className="w-5 h-5 text-primary-300" viewBox="0 0 24 24" fill="currentColor">
                                 <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
                               </svg>
                               <div className="text-[10px] text-white/70 mt-1 font-medium">Interests</div>
@@ -649,9 +661,9 @@ const AdInsights = ({ onPageChange }) => {
                     </div>
 
                     {/* 内容层 - 放在底部，白色背景 */}
-                    <div className="absolute bottom-0 left-0 right-0 z-[10] bg-white rounded-b-[16px] p-6 flex flex-col items-center justify-center border-t border-gray-100">
-                      <h3 className="text-base font-bold text-gray-900 mb-2 whitespace-nowrap">View More AI-auto campaigns</h3>
-                      <p className="text-sm text-gray-600 text-center mb-4">
+                    <div className="absolute bottom-0 left-0 right-0 z-[10] bg-white rounded-b-xl p-6 flex flex-col items-center justify-center border-t border-neutral-100">
+                      <h3 className="text-base font-bold text-neutral-900 mb-2 whitespace-nowrap">View More AI-auto campaigns</h3>
+                      <p className="text-sm text-neutral-600 text-center mb-4">
                         More AI regeneration campaigns in drafts
                       </p>
                       <button className="flex items-center gap-2 text-sm font-semibold text-white bg-gradient-to-r from-[#667eea] to-[#764ba2] px-6 py-2.5 rounded-full hover:shadow-lg transition-all hover:scale-105 group-hover:scale-110">
@@ -669,7 +681,7 @@ const AdInsights = ({ onPageChange }) => {
           {/* Section Divider - Full-width Bar */}
           <div className="section-divider-fullwidth">
             <div className="divider-bar-content">
-              <span className="divider-bar-icon"><i className="fas fa-chart-line"></i></span>
+              <span className="divider-bar-icon"><TrendingUp size={10} /></span>
               <span className="divider-bar-text">Last 3 days data analysis & insights</span>
             </div>
           </div>
@@ -693,9 +705,9 @@ const AdInsights = ({ onPageChange }) => {
           {/* Creative Insight */}
           <div className="py-4 md:py-6 px-2">
             <SectionTitle>Creative Insight</SectionTitle>
-            <div className="flex flex-col p-2 gap-2 bg-gray-50 border border-border rounded-2xl">
+            <div className="flex flex-col p-2 gap-2 bg-neutral-50 border border-border rounded-2xl">
               <div className="w-full bg-white p-3 md:p-4 rounded-xl">
-                <div className="text-gray-900 text-base font-bold mb-3">Creative Performance</div>
+                <div className="text-neutral-900 text-base font-bold mb-3">Creative Performance</div>
                 <div className="w-full h-[280px] md:h-[320px]">
                   <ResponsiveContainer width="100%" height="100%">
                     <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
@@ -710,7 +722,7 @@ const AdInsights = ({ onPageChange }) => {
               </div>
 
               <div className="flex flex-col w-full p-3 md:p-4 gap-4 bg-white rounded-xl">
-                <div className="text-gray-900 text-base font-bold">Top Ads</div>
+                <div className="text-neutral-900 text-base font-bold">Top Ads</div>
                 <div className="flex gap-6 md:gap-12 overflow-x-auto pb-4 no-scrollbar">
                   {TOP_ADS.map((ad, index) => (
                     <CreativeAdCard key={ad.id} ad={ad} index={index} />
@@ -729,10 +741,10 @@ const AdInsights = ({ onPageChange }) => {
             <div className="p-5 border-b flex justify-between items-center">
               <h3 className="text-lg font-bold">Edit Campaign</h3>
               <button 
-                className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors"
+                className="w-8 h-8 rounded-full bg-neutral-100 flex items-center justify-center hover:bg-neutral-200 transition-colors"
                 onClick={() => setEditDrawerOpen(false)}
               >
-                <i className="fas fa-times text-gray-600"></i>
+                <X size={16} className="text-neutral-600" />
               </button>
             </div>
             <div className="flex-1 overflow-auto p-6 flex justify-center items-center">
@@ -811,7 +823,6 @@ const AdInsights = ({ onPageChange }) => {
           font-weight: 500;
           color: #9CA3AF;
           letter-spacing: 0.08em;
-          text-transform: uppercase;
         }
 
         .external-actions {
@@ -1016,7 +1027,6 @@ const AdInsights = ({ onPageChange }) => {
           font-weight: 700;
           letter-spacing: 0.12em;
           color: #64748B;
-          text-transform: uppercase;
         }
 
         .more-recommendations-card {

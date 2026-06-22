@@ -15,20 +15,20 @@ const AdsetDetailModal = ({ isOpen, onClose, adset }) => {
       <div className="absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl shadow-2xl transform transition-transform">
         {/* Header with only X icon */}
         <div className="px-6 py-4 border-b border-border flex items-center justify-between">
-          <h2 className="text-lg font-bold text-gray-900">
+          <h2 className="text-lg font-bold text-neutral-900">
             {adset.name}
           </h2>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 hover:bg-neutral-100 rounded-lg transition-colors"
           >
-            <X size={20} className="text-gray-500" />
+            <X size={20} className="text-neutral-500" />
           </button>
         </div>
 
         {/* Content - Only Image */}
         <div className="p-6">
-          <div className="bg-gray-100 rounded-lg overflow-hidden">
+          <div className="bg-neutral-100 rounded-lg overflow-hidden">
             <img 
               src="/ad-preview.jpg" 
               alt="Ad Preview" 
@@ -38,7 +38,7 @@ const AdsetDetailModal = ({ isOpen, onClose, adset }) => {
               }}
             />
           </div>
-          <p className="text-xs text-gray-500 mt-2 text-center">
+          <p className="text-xs text-neutral-500 mt-2 text-center">
             Ad preview for {adset.name}
           </p>
         </div>

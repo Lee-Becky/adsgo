@@ -59,7 +59,7 @@ const BudgetEditModal = ({ isOpen, onClose, campaign, onSave, onUpdateBudgetStat
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
       {/* Dim Overlay */}
       <div 
-        className="absolute inset-0 bg-slate-900/60 backdrop-blur-[2px]"
+        className="absolute inset-0 bg-neutral-900/60 backdrop-blur-[2px]"
         onClick={onClose}
       />
       
@@ -67,20 +67,20 @@ const BudgetEditModal = ({ isOpen, onClose, campaign, onSave, onUpdateBudgetStat
       <div className="relative w-full max-w-[440px] bg-white rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-150">
         
         {/* Header */}
-        <div className="px-6 pt-6 pb-4 flex items-start justify-between border-b border-slate-50">
+        <div className="px-6 pt-6 pb-4 flex items-start justify-between border-b border-neutral-50">
           <div>
             <div className="flex items-center gap-2 mb-0.5">
-              <span className="text-[10px] font-bold text-indigo-500 uppercase tracking-widest">
+              <span className="text-[10px] font-bold text-primary-500 tracking-widest">
                 {currentEditMode === 'campaign' ? 'Campaign Budget' : 'Ad Set Budget'}
               </span>
             </div>
-            <h2 className="text-lg font-bold text-slate-800 line-clamp-1">
+            <h2 className="text-lg font-bold text-neutral-800 line-clamp-1">
               {campaign.campaign || campaign.name}
             </h2>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 hover:bg-slate-100 rounded-lg transition-colors text-slate-400"
+            className="p-1.5 hover:bg-neutral-100 rounded-lg transition-colors text-neutral-400"
           >
             <X size={18} />
           </button>
@@ -91,18 +91,18 @@ const BudgetEditModal = ({ isOpen, onClose, campaign, onSave, onUpdateBudgetStat
           {/* Budget Input Area */}
           <div className="mb-6">
             <div className="flex items-center justify-between mb-2">
-              <label className="text-sm font-semibold text-slate-600">Daily Budget</label>
-              <span className="text-xs text-slate-400">Current: {formatCurrency(campaign.dailyBudget)}</span>
+              <label className="text-sm font-semibold text-neutral-600">Daily Budget</label>
+              <span className="text-xs text-neutral-400">Current: {formatCurrency(campaign.dailyBudget)}</span>
             </div>
             
             <div 
               className={`relative flex items-center transition-all duration-200 rounded-xl border-2 ${
                 isFocused 
-                ? 'border-indigo-500 bg-white ring-4 ring-indigo-50' 
-                : 'border-slate-100 bg-slate-50 hover:border-slate-200'
+                ? 'border-primary-500 bg-white ring-4 ring-primary-50' 
+                : 'border-neutral-100 bg-neutral-50 hover:border-neutral-200'
               }`}
             >
-              <div className="pl-4 pr-2 text-slate-400">
+              <div className="pl-4 pr-2 text-neutral-400">
                 <DollarSign size={20} />
               </div>
               <input
@@ -113,13 +113,13 @@ const BudgetEditModal = ({ isOpen, onClose, campaign, onSave, onUpdateBudgetStat
                 onBlur={() => setIsFocused(false)}
                 step="0.01"
                 min="0"
-                className="w-full bg-transparent py-4 text-2xl font-bold text-slate-900 outline-none placeholder:text-slate-300"
+                className="w-full bg-transparent py-4 text-2xl font-bold text-neutral-900 outline-none placeholder:text-neutral-300"
                 placeholder="0.00"
                 required
                 autoFocus
               />
               {budgetDiff !== 0 && (
-                <div className={`absolute right-4 px-2 py-1 rounded text-[10px] font-bold ${budgetDiff > 0 ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'}`}>
+                <div className={`absolute right-4 px-2 py-1 rounded text-[10px] font-bold ${budgetDiff > 0 ? 'bg-success-50 text-success-600' : 'bg-warning-50 text-warning-600'}`}>
                   {budgetDiff > 0 ? '+' : ''}{formatCurrency(budgetDiff)}
                 </div>
               )}
@@ -128,14 +128,14 @@ const BudgetEditModal = ({ isOpen, onClose, campaign, onSave, onUpdateBudgetStat
             {/* AI Recommendation - Subtle Version - Hide for non-Meta platforms */}
             {campaign.suggestedBudget && !isNonMetaPlatform && (
               <div className="mt-3 flex items-center justify-between px-1">
-                <div className="flex items-center gap-1.5 text-slate-500">
-                  <Sparkles size={12} className="text-indigo-400" />
-                  <span className="text-xs">Recommended: <span className="font-semibold text-slate-700">{formatCurrency(campaign.suggestedBudget)}</span></span>
+                <div className="flex items-center gap-1.5 text-neutral-500">
+                  <Sparkles size={12} className="text-primary-400" />
+                  <span className="text-xs">Recommended: <span className="font-semibold text-neutral-700">{formatCurrency(campaign.suggestedBudget)}</span></span>
                 </div>
                 <button
                   type="button"
                   onClick={applyRecommendation}
-                  className="text-xs font-bold text-indigo-600 hover:text-indigo-700 hover:underline transition-colors"
+                  className="text-xs font-bold text-primary-600 hover:text-primary-700 hover:underline transition-colors"
                 >
                   Apply AI Suggestion
                 </button>
@@ -147,8 +147,8 @@ const BudgetEditModal = ({ isOpen, onClose, campaign, onSave, onUpdateBudgetStat
           {!isNonMetaPlatform && (
             <div className="mb-8">
               <div className="flex items-center gap-1.5 mb-2 px-1">
-                <Info size={13} className="text-slate-400" />
-                <label htmlFor="reason" className="text-xs font-medium text-slate-500">
+                <Info size={13} className="text-neutral-400" />
+                <label htmlFor="reason" className="text-xs font-medium text-neutral-500">
                   Reason (Optional)
                 </label>
               </div>
@@ -157,7 +157,7 @@ const BudgetEditModal = ({ isOpen, onClose, campaign, onSave, onUpdateBudgetStat
                 value={modificationReason}
                 onChange={(e) => setModificationReason(e.target.value)}
                 placeholder="Briefly state the reason for adjustment..."
-                className="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-sm text-slate-600 focus:bg-white focus:border-indigo-500 outline-none transition-all resize-none min-h-[70px]"
+                className="w-full px-4 py-3 bg-neutral-50 border border-neutral-100 rounded-xl text-sm text-neutral-600 focus:bg-white focus:border-primary-500 outline-none transition-all resize-none min-h-[70px]"
               />
             </div>
           )}
@@ -167,13 +167,13 @@ const BudgetEditModal = ({ isOpen, onClose, campaign, onSave, onUpdateBudgetStat
             <button
               type="button"
               onClick={onClose}
-              className="px-5 py-3 text-sm font-semibold text-slate-500 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors"
+              className="px-5 py-3 text-sm font-semibold text-neutral-500 bg-neutral-50 rounded-xl hover:bg-neutral-100 transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="flex-1 px-5 py-3 text-sm font-bold text-white bg-indigo-600 rounded-xl hover:bg-indigo-700 shadow-md shadow-indigo-100 transition-all active:scale-[0.98]"
+              className="flex-1 px-5 py-3 text-sm font-bold text-white bg-primary-600 rounded-xl hover:bg-primary-700 shadow-md shadow-primary-100 transition-all active:scale-[0.98]"
             >
               Save Changes
             </button>

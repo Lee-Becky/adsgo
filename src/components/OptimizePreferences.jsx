@@ -55,23 +55,23 @@ const OptimizePreferences = () => {
   console.log('Rendering, rules:', rules)
 
   return (
-    <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-lg shadow-md border-2 border-blue-600/30 h-full">
+    <div className="bg-gradient-to-br from-info-50 to-cyan-50 rounded-lg shadow-md border-2 border-info-600/30 h-full">
       {/* Header */}
-      <div className="px-6 py-4 border-b border-blue-600/20 flex items-center justify-between">
+      <div className="px-6 py-4 border-b border-info-600/20 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className="p-2 bg-blue-600/10 rounded-lg">
-            <ListChecks size={20} className="text-blue-600" />
+          <div className="p-2 bg-info-600/10 rounded-lg">
+            <ListChecks size={20} className="text-info-600" />
           </div>
           <div>
-            <h2 className="text-lg font-bold text-blue-600">Optimize preferences</h2>
-            <p className="text-sm text-gray-600 mt-0.5">
+            <h2 className="text-lg font-bold text-info-600">Optimize preferences</h2>
+            <p className="text-sm text-neutral-600 mt-0.5">
               Monitor and optimize according to your preferences
             </p>
           </div>
         </div>
         <button
           onClick={handleOpenConfig}
-          className="flex items-center gap-2 px-3 py-1.5 bg-blue-600 text-white text-xs rounded-lg hover:bg-blue-700 transition-colors shadow-md"
+          className="flex items-center gap-2 px-3 py-1.5 bg-info-600 text-white text-xs rounded-lg hover:bg-info-700 transition-colors shadow-md"
         >
           <Settings size={14} />
           Config
@@ -85,21 +85,21 @@ const OptimizePreferences = () => {
             {rules.map((rule, index) => (
               <div
                 key={index}
-                className="p-2 bg-white rounded-lg border border-blue-600/20 shadow-sm"
+                className="p-2 bg-white rounded-lg border border-info-600/20 shadow-sm"
               >
                 <div className="flex items-start gap-2">
-                  <span className="text-blue-600 mt-0.5 text-xs">•</span>
-                  <p className="text-xs text-gray-700 flex-1 leading-tight">{rule}</p>
+                  <span className="text-info-600 mt-0.5 text-xs">•</span>
+                  <p className="text-xs text-neutral-700 flex-1 leading-tight">{rule}</p>
                 </div>
               </div>
             ))}
           </div>
         ) : (
           <div className="text-center">
-            <p className="text-xs text-gray-700 leading-relaxed">
+            <p className="text-xs text-neutral-700 leading-relaxed">
               If you want adsgo to monitor and provide timely optimization suggestions for your trigger rules based on your optimization rules, please configure it now;
             </p>
-            <p className="text-xs text-red-700 leading-relaxed">
+            <p className="text-xs text-danger-700 leading-relaxed">
               eg: Pause when the campaign's 7-day ROAS is less than 200%.
             </p>
           </div>
@@ -119,21 +119,21 @@ const OptimizePreferences = () => {
           <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg shadow-2xl w-full max-w-2xl max-h-[80vh] overflow-hidden">
             {/* Header */}
             <div className="px-6 py-4 border-b border-border flex items-center justify-between">
-              <h2 className="text-lg font-bold text-gray-900">
+              <h2 className="text-lg font-bold text-neutral-900">
                 Configure Optimization Rules
               </h2>
               <button
                 onClick={() => setIsConfigOpen(false)}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                className="p-2 hover:bg-neutral-100 rounded-lg transition-colors"
               >
-                <X size={20} className="text-gray-500" />
+                <X size={20} className="text-neutral-500" />
               </button>
             </div>
 
             {/* Content */}
             <div className="p-6 overflow-y-auto max-h-[60vh]">
               {editingRules.length === 0 ? (
-                <div className="text-center py-4 text-gray-400 text-sm">
+                <div className="text-center py-4 text-neutral-400 text-sm">
                   No rules configured yet. Add your first rule below.
                 </div>
               ) : (
@@ -144,11 +144,11 @@ const OptimizePreferences = () => {
                         type="text"
                         value={rule}
                         onChange={(e) => handleUpdateRule(index, e.target.value)}
-                        className="flex-1 px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 text-sm"
+                        className="flex-1 px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-info-600/20 focus:border-info-600 text-sm"
                       />
                       <button
                         onClick={() => handleDeleteRule(index)}
-                        className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                        className="p-2 text-danger-500 hover:bg-danger-50 rounded-lg transition-colors"
                         title="Delete rule"
                       >
                         <Minus size={16} />
@@ -167,11 +167,11 @@ const OptimizePreferences = () => {
                     onChange={(e) => setNewRule(e.target.value)}
                     onKeyPress={(e) => e.key === 'Enter' && handleAddRule()}
                     placeholder="Add new optimization rule..."
-                    className="flex-1 px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 text-sm"
+                    className="flex-1 px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-info-600/20 focus:border-info-600 text-sm"
                   />
                   <button
                     onClick={handleAddRule}
-                    className="p-2 bg-blue-600 text-white hover:bg-blue-700 rounded-lg transition-colors"
+                    className="p-2 bg-info-600 text-white hover:bg-info-700 rounded-lg transition-colors"
                     title="Add rule"
                   >
                     <Plus size={16} />
@@ -181,10 +181,10 @@ const OptimizePreferences = () => {
             </div>
 
             {/* Footer */}
-            <div className="px-6 py-4 border-t border-border bg-gray-50">
+            <div className="px-6 py-4 border-t border-border bg-neutral-50">
               <button
                 onClick={handleSave}
-                className="w-full py-3 rounded-lg font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors"
+                className="w-full py-3 rounded-lg font-medium text-white bg-info-600 hover:bg-info-700 transition-colors"
               >
                 Save
               </button>

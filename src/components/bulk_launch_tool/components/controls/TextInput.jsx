@@ -7,16 +7,16 @@ const TextInput = ({
 }) => {
   const cls = [
     'w-full h-10 px-3 text-sm bg-white border rounded-base outline-none transition-all',
-    disabled ? 'border-gray-100 bg-gray-50 text-gray-400 cursor-not-allowed' :
+    disabled ? 'border-neutral-100 bg-neutral-50 text-neutral-400 cursor-not-allowed' :
     error ? 'border-rose-400 focus:border-rose-500 focus:shadow-[0_0_0_3px_rgba(244,63,94,0.1)]' :
-    'border-gray-200 text-gray-800 hover:border-gray-300 focus:border-primary-500 focus:shadow-primary-focus',
+    'border-neutral-200 text-neutral-800 hover:border-neutral-300 focus:border-primary-500 focus:shadow-primary-focus',
     prefix ? 'pl-9' : '',
     suffix ? 'pr-9' : '',
     className,
   ].join(' ');
   return (
     <div className="relative">
-      {prefix && <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-gray-400 pointer-events-none">{prefix}</span>}
+      {prefix && <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-neutral-400 pointer-events-none">{prefix}</span>}
       <input
         type={type}
         value={value ?? ''}
@@ -26,7 +26,7 @@ const TextInput = ({
         maxLength={maxLength}
         className={cls}
       />
-      {suffix && <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400 pointer-events-none">{suffix}</span>}
+      {suffix && <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-neutral-400 pointer-events-none">{suffix}</span>}
     </div>
   );
 };

@@ -16,7 +16,7 @@ const DataFetchingModal = ({ onGenerateCreative, onNewCampaign, onViewDemo }) =>
 
         {/* Title */}
         <div className="text-center mb-6">
-          <h1 className="text-4xl font-bold text-gray-900 mb-3">
+          <h1 className="text-4xl font-bold text-neutral-900 mb-3">
             Note
           </h1>
           <div className="w-24 h-1 bg-gradient-to-r from-primary to-purple-600 mx-auto rounded-full"></div>
@@ -24,10 +24,10 @@ const DataFetchingModal = ({ onGenerateCreative, onNewCampaign, onViewDemo }) =>
 
         {/* Content */}
         <div className="text-center mb-10">
-          <p className="text-xl text-gray-700 leading-relaxed mb-4">
+          <p className="text-xl text-neutral-700 leading-relaxed mb-4">
             Data is being fetched and analyzed for your linked ad accounts. Please wait!
           </p>
-          <p className="text-lg text-gray-600">
+          <p className="text-lg text-neutral-600">
             You can choose to generate new creatives or campaigns.
           </p>
         </div>
@@ -59,7 +59,7 @@ const DataFetchingModal = ({ onGenerateCreative, onNewCampaign, onViewDemo }) =>
             <span>View Demo Mode</span>
             <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
           </button>
-          <p className="text-sm text-gray-500 mt-2">
+          <p className="text-sm text-neutral-500 mt-2">
             Click to see the complete demo data and interactive effects
           </p>
         </div>

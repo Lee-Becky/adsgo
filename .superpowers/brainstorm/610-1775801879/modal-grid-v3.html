@@ -1,0 +1,290 @@
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+
+  .split { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .col-label {
+    font-size: 11px; font-weight: 700; color: #6b7280;
+    text-transform: uppercase; letter-spacing: 0.06em;
+    margin-bottom: 8px;
+  }
+
+  .modal-wrap {
+    background: #fff;
+    border-radius: 14px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 6px 28px rgba(0,0,0,0.09);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .modal-header {
+    padding: 14px 18px 12px;
+    border-bottom: 1px solid #f3f4f6;
+    display: flex; align-items: flex-start; justify-content: space-between;
+  }
+  .modal-title { font-size: 13px; font-weight: 700; color: #111827; }
+  .modal-sub { font-size: 10px; color: #9ca3af; margin-top: 2px; }
+  .close-btn {
+    width: 24px; height: 24px; border-radius: 99px;
+    background: #f3f4f6; border: none;
+    display: flex; align-items: center; justify-content: center;
+    color: #9ca3af; font-size: 12px; flex-shrink: 0;
+  }
+
+  /* Tabs */
+  .tabs-bar {
+    padding: 8px 16px; background: #f9fafb;
+    border-bottom: 1px solid #f3f4f6;
+    display: flex; gap: 5px;
+  }
+  .tab {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 3px 10px; border-radius: 99px; font-size: 10px; font-weight: 600;
+    border: 1.5px solid; cursor: pointer; white-space: nowrap;
+  }
+  .tab-active { background: #111827; color: #fff; border-color: #111827; }
+  .tab-plain  { background: #fff; color: #9ca3af; border-color: #e5e7eb; }
+  .tab-cnt { opacity: 0.55; font-weight: 500; }
+
+  /* Grid */
+  .creative-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    padding: 12px 16px;
+    overflow-y: auto;
+    max-height: 268px;
+  }
+  .creative-cell {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    cursor: pointer; border-radius: 8px; padding: 5px; transition: background 0.1s;
+  }
+  .creative-cell:hover { background: #f9fafb; }
+  .creative-cell.selected { background: #f3f4f6; }
+
+  .thumb-wrap {
+    width: 100%; aspect-ratio: 4/5;
+    border-radius: 7px; overflow: hidden; position: relative;
+    border: 2px solid #e5e7eb; transition: border-color 0.15s;
+  }
+  .creative-cell.selected .thumb-wrap { border-color: #374151; box-shadow: 0 0 0 2px #d1d5db; }
+  .thumb-img { width: 100%; height: 100%; display: block; }
+
+  .t1{background:linear-gradient(135deg,#ddd6fe,#a5b4fc)}
+  .t2{background:linear-gradient(135deg,#fde68a,#fca5a5)}
+  .t3{background:linear-gradient(135deg,#a7f3d0,#6ee7b7)}
+  .t4{background:linear-gradient(135deg,#fbcfe8,#f9a8d4)}
+  .t5{background:linear-gradient(135deg,#bae6fd,#7dd3fc)}
+  .t6{background:linear-gradient(135deg,#fed7aa,#fdba74)}
+  .t7{background:linear-gradient(135deg,#d1fae5,#6ee7b7)}
+  .t8{background:linear-gradient(135deg,#e0e7ff,#c7d2fe)}
+
+  .check-overlay {
+    position: absolute; top: 5px; left: 5px;
+    width: 15px; height: 15px; border-radius: 4px;
+    border: 1.5px solid rgba(255,255,255,0.9);
+    background: rgba(255,255,255,0.25); backdrop-filter: blur(2px);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .creative-cell.selected .check-overlay {
+    background: #374151; border-color: #374151;
+  }
+  .creative-cell.selected .check-overlay::after { content:'✓'; color:#fff; font-size:9px; font-weight:700; }
+
+  .creative-name {
+    font-size: 9.5px; color: #6b7280; font-weight: 500;
+    text-align: center; width: 100%;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+
+  /* Neutral group tag — NO color, just subtle text */
+  .group-tag-plain {
+    font-size: 9px; font-weight: 600; color: #9ca3af;
+    text-align: center; white-space: nowrap;
+    background: #f3f4f6;
+    border-radius: 4px;
+    padding: 1px 6px;
+    letter-spacing: 0.01em;
+  }
+
+  /* Footer */
+  .modal-footer {
+    padding: 10px 16px;
+    background: #111827;
+    display: flex; align-items: center; gap: 8px;
+    border-top: 1px solid #1f2937;
+  }
+  .footer-label { font-size: 11px; font-weight: 700; color: #fff; white-space: nowrap; flex-shrink: 0; }
+  .footer-hint  { font-size: 11px; color: rgba(255,255,255,0.3); }
+  .pills-fade { position: relative; flex: 1; overflow: hidden; }
+  .pills-fade::after {
+    content:''; position:absolute; right:0; top:0; bottom:0; width:24px;
+    background:linear-gradient(to right,transparent,#111827); pointer-events:none;
+  }
+  .pills-scroll { display:flex; gap:6px; overflow-x:auto; scrollbar-width:none; }
+  .pills-scroll::-webkit-scrollbar { display:none; }
+
+  .fpill {
+    display:inline-flex; align-items:center; gap:5px;
+    padding:4px 11px; border-radius:7px; font-size:11px; font-weight:600;
+    cursor:pointer; border:none; white-space:nowrap; flex-shrink:0;
+    background: rgba(255,255,255,0.12); color: #fff;
+    border: 1.5px solid rgba(255,255,255,0.18);
+  }
+  .fpill:hover { background: rgba(255,255,255,0.2); }
+  .fpill-new { background: transparent; border-style: dashed; color: rgba(255,255,255,0.6); }
+
+  /* annotation */
+  .annotation {
+    font-size: 10.5px; color: #6b7280; line-height: 1.6;
+    background: #f9fafb; border-radius: 8px; padding: 8px 12px;
+    border: 1px solid #f3f4f6; margin-top: 8px;
+  }
+  .annotation b { color: #374151; }
+  .pro { color: #059669; font-weight: 600; }
+  .con { color: #dc2626; font-weight: 600; }
+</style>
+
+<h2>无彩色方案 — 有 Tab vs 无 Tab</h2>
+<p class="subtitle">组标签改为中性灰色样式，不依赖颜色区分；探讨是否需要 Tab 筛选</p>
+
+<div class="split">
+
+  <!-- LEFT: 无 Tab，全量展示 + 组标签 -->
+  <div>
+    <div class="col-label">方案 A · 无 Tab，全量平铺 + 组标签</div>
+    <div class="modal-wrap">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title">素材分组管理</div>
+          <div class="modal-sub">点击素材可多选，移至指定组</div>
+        </div>
+        <button class="close-btn">✕</button>
+      </div>
+      <!-- No tabs, straight to grid -->
+      <div class="creative-grid">
+        <div class="creative-cell selected">
+          <div class="thumb-wrap"><div class="thumb-img t1"></div><div class="check-overlay"></div></div>
+          <div class="creative-name">春季主图.jpg</div>
+          <div class="group-tag-plain">组 1</div>
+        </div>
+        <div class="creative-cell selected">
+          <div class="thumb-wrap"><div class="thumb-img t2"></div><div class="check-overlay"></div></div>
+          <div class="creative-name">Banner_v2.png</div>
+          <div class="group-tag-plain">组 1</div>
+        </div>
+        <div class="creative-cell">
+          <div class="thumb-wrap"><div class="thumb-img t3"></div><div class="check-overlay"></div></div>
+          <div class="creative-name">产品展示.mp4</div>
+          <div class="group-tag-plain">组 2</div>
+        </div>
+        <div class="creative-cell">
+          <div class="thumb-wrap"><div class="thumb-img t4"></div><div class="check-overlay"></div></div>
+          <div class="creative-name">夏季新品.jpg</div>
+          <div class="group-tag-plain">组 3</div>
+        </div>
+        <div class="creative-cell">
+          <div class="thumb-wrap"><div class="thumb-img t5"></div><div class="check-overlay"></div></div>
+          <div class="creative-name">模特大图.jpg</div>
+          <div class="group-tag-plain">组 2</div>
+        </div>
+        <div class="creative-cell">
+          <div class="thumb-wrap"><div class="thumb-img t6"></div><div class="check-overlay"></div></div>
+          <div class="creative-name">活动海报.png</div>
+          <div class="group-tag-plain">组 1</div>
+        </div>
+        <div class="creative-cell">
+          <div class="thumb-wrap"><div class="thumb-img t7"></div><div class="check-overlay"></div></div>
+          <div class="creative-name">品牌故事.mp4</div>
+          <div class="group-tag-plain">组 1</div>
+        </div>
+        <div class="creative-cell">
+          <div class="thumb-wrap"><div class="thumb-img t8"></div><div class="check-overlay"></div></div>
+          <div class="creative-name">限定款KV.jpg</div>
+          <div class="group-tag-plain">组 2</div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <span class="footer-label">已选 2 个</span>
+        <div class="pills-fade">
+          <div class="pills-scroll">
+            <button class="fpill">组 1</button>
+            <button class="fpill">组 2</button>
+            <button class="fpill">组 3</button>
+          </div>
+        </div>
+        <button class="fpill fpill-new" style="margin-left:4px">＋ 新增组</button>
+      </div>
+    </div>
+    <div class="annotation">
+      <span class="pro">✓</span> 结构最简单，无 Tab 认知负担<br>
+      <span class="pro">✓</span> 能同时看到所有素材的归属状态<br>
+      <span class="con">↑</span> 素材多时（30+）需要大量滚动才能找到某组的素材<br>
+      <b>适合</b>：素材总量 ≤ 20 的场景
+    </div>
+  </div>
+
+  <!-- RIGHT: 有 Tab + 无组标签（当前组） -->
+  <div>
+    <div class="col-label">方案 B · 有 Tab 筛选，组内无标签</div>
+    <div class="modal-wrap">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title">素材分组管理</div>
+          <div class="modal-sub">点击素材可多选，移至指定组</div>
+        </div>
+        <button class="close-btn">✕</button>
+      </div>
+      <div class="tabs-bar">
+        <button class="tab tab-plain">全部 <span class="tab-cnt">10</span></button>
+        <button class="tab tab-active">组 1 <span class="tab-cnt">4</span></button>
+        <button class="tab tab-plain">组 2 <span class="tab-cnt">4</span></button>
+        <button class="tab tab-plain">组 3 <span class="tab-cnt">2</span></button>
+      </div>
+      <!-- Filtered to group 1 — no group tag shown -->
+      <div class="creative-grid">
+        <div class="creative-cell selected">
+          <div class="thumb-wrap"><div class="thumb-img t1"></div><div class="check-overlay"></div></div>
+          <div class="creative-name">春季主图.jpg</div>
+          <!-- no group tag -->
+        </div>
+        <div class="creative-cell selected">
+          <div class="thumb-wrap"><div class="thumb-img t2"></div><div class="check-overlay"></div></div>
+          <div class="creative-name">Banner_v2.png</div>
+        </div>
+        <div class="creative-cell">
+          <div class="thumb-wrap"><div class="thumb-img t6"></div><div class="check-overlay"></div></div>
+          <div class="creative-name">活动海报.png</div>
+        </div>
+        <div class="creative-cell">
+          <div class="thumb-wrap"><div class="thumb-img t7"></div><div class="check-overlay"></div></div>
+          <div class="creative-name">品牌故事.mp4</div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <span class="footer-label">已选 2 个</span>
+        <div class="pills-fade">
+          <div class="pills-scroll">
+            <button class="fpill">组 1</button>
+            <button class="fpill">组 2</button>
+            <button class="fpill">组 3</button>
+          </div>
+        </div>
+        <button class="fpill fpill-new" style="margin-left:4px">＋ 新增组</button>
+      </div>
+    </div>
+    <div class="annotation">
+      <span class="pro">✓</span> Tab 带数量，随时知道每组有几个素材<br>
+      <span class="pro">✓</span> 组内视图干净，缩略图更大、更聚焦<br>
+      <span class="pro">✓</span> 大量素材时可快速定位某组内容<br>
+      <span class="con">↑</span> 多一层 Tab 操作，结构稍复杂<br>
+      <b>适合</b>：素材多或组多的场景
+    </div>
+  </div>
+
+</div>
+
+<div style="margin-top:16px;padding:12px 16px;background:#f9fafb;border-radius:10px;border:1px solid #e5e7eb;font-size:11px;color:#374151;line-height:1.7">
+  <b>关于无彩色组标签：</b>方案中「组 1」「组 2」使用统一中性灰色背景，不做色彩区分。区分靠的是<b>数字</b>，不是颜色——生产环境中新增任意多组都不会出现配色问题。底部 pill 按钮同理，统一半透明白色风格。
+</div>

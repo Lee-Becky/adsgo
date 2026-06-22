@@ -31,10 +31,10 @@ const GlobalDemoOverlay = ({ onConnect, onCreate }) => {
               <Sparkles size={24} />
               <span className="text-2xl font-bold">Welcome to AdsGo</span>
             </div>
-            <h1 className="text-5xl font-bold text-gray-900 mb-4">
+            <h1 className="text-5xl font-bold text-neutral-900 mb-4">
               Unlock AI-Powered Campaign Optimization
             </h1>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-xl text-neutral-600 max-w-3xl mx-auto">
               You're currently viewing demo data. Choose your path to get started with real campaign insights.
             </p>
           </div>
@@ -42,32 +42,32 @@ const GlobalDemoOverlay = ({ onConnect, onCreate }) => {
           {/* Two Path Options */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Option 1: Connect Account */}
-            <div className="bg-white rounded-3xl shadow-2xl p-8 border-2 border-primary/20 hover:border-primary/40 transition-all hover:scale-[1.02]">
+            <div className="bg-white rounded-2xl shadow-2xl p-8 border-2 border-primary/20 hover:border-primary/40 transition-all hover:scale-[1.02]">
               <div className="flex items-center gap-4 mb-6">
                 <div className="bg-gradient-to-br from-primary to-purple-600 p-4 rounded-2xl shadow-lg">
                   <Database size={40} className="text-white" />
                 </div>
                 <div>
-                  <h2 className="text-2xl font-bold text-gray-900 mb-1">Connect Active Ad Account</h2>
-                  <p className="text-gray-500">Sync your existing campaigns</p>
+                  <h2 className="text-2xl font-bold text-neutral-900 mb-1">Connect Active Ad Account</h2>
+                  <p className="text-neutral-500">Sync your existing campaigns</p>
                 </div>
               </div>
               
-              <p className="text-gray-600 mb-6 leading-relaxed">
+              <p className="text-neutral-600 mb-6 leading-relaxed">
                 Already have ads running on Google, Meta, or TikTok? Connect your account to get real-time AI budget optimizations and performance insights.
               </p>
               
               <ul className="space-y-3 mb-8">
-                <li className="flex items-center gap-3 text-gray-700">
-                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                <li className="flex items-center gap-3 text-neutral-700">
+                  <div className="w-2 h-2 bg-success-500 rounded-full"></div>
                   <span>Import all active campaigns automatically</span>
                 </li>
-                <li className="flex items-center gap-3 text-gray-700">
-                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                <li className="flex items-center gap-3 text-neutral-700">
+                  <div className="w-2 h-2 bg-success-500 rounded-full"></div>
                   <span>AI analyzes your historical performance</span>
                 </li>
-                <li className="flex items-center gap-3 text-gray-700">
-                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                <li className="flex items-center gap-3 text-neutral-700">
+                  <div className="w-2 h-2 bg-success-500 rounded-full"></div>
                   <span>Get personalized budget suggestions</span>
                 </li>
               </ul>
@@ -92,31 +92,31 @@ const GlobalDemoOverlay = ({ onConnect, onCreate }) => {
             </div>
 
             {/* Option 2: Create New Campaign */}
-            <div className="bg-white rounded-3xl shadow-2xl p-8 border-2 border-primary/20 hover:border-primary/40 transition-all hover:scale-[1.02]">
+            <div className="bg-white rounded-2xl shadow-2xl p-8 border-2 border-primary/20 hover:border-primary/40 transition-all hover:scale-[1.02]">
               <div className="flex items-center gap-4 mb-6">
                 <div className="bg-gradient-to-br from-purple-600 to-pink-600 p-4 rounded-2xl shadow-lg">
                   <Rocket size={40} className="text-white" />
                 </div>
                 <div>
-                  <h2 className="text-2xl font-bold text-gray-900 mb-1">Create New Campaign</h2>
-                  <p className="text-gray-500">Start from scratch</p>
+                  <h2 className="text-2xl font-bold text-neutral-900 mb-1">Create New Campaign</h2>
+                  <p className="text-neutral-500">Start from scratch</p>
                 </div>
               </div>
               
-              <p className="text-gray-600 mb-6 leading-relaxed">
+              <p className="text-neutral-600 mb-6 leading-relaxed">
                 Ready to start fresh? Use our AI assistant to set up and launch your first optimized campaign in minutes.
               </p>
               
               <ul className="space-y-3 mb-8">
-                <li className="flex items-center gap-3 text-gray-700">
+                <li className="flex items-center gap-3 text-neutral-700">
                   <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
                   <span>AI-guided campaign setup wizard</span>
                 </li>
-                <li className="flex items-center gap-3 text-gray-700">
+                <li className="flex items-center gap-3 text-neutral-700">
                   <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
                   <span>Smart budget recommendations</span>
                 </li>
-                <li className="flex items-center gap-3 text-gray-700">
+                <li className="flex items-center gap-3 text-neutral-700">
                   <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
                   <span>Launch across multiple platforms</span>
                 </li>
@@ -144,7 +144,7 @@ const GlobalDemoOverlay = ({ onConnect, onCreate }) => {
 
           {/* Demo Notice */}
           <div className="text-center mt-12">
-            <div className="inline-flex items-center gap-2 bg-white border-2 border-primary/30 text-gray-700 px-6 py-3 rounded-full text-sm font-medium shadow-lg">
+            <div className="inline-flex items-center gap-2 bg-white border-2 border-primary/30 text-neutral-700 px-6 py-3 rounded-full text-sm font-medium shadow-lg">
               <span>👁️ Preview Mode: The data shown above is for demonstration purposes</span>
             </div>
           </div>

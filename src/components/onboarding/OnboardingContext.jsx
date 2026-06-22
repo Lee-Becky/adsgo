@@ -27,8 +27,10 @@ export function OnboardingProvider({ children }) {
   )
 }
 
+const NOOP = () => {}
+const FALLBACK = { activeTourStep: null, tourSubStep: 0, startTour: NOOP, endTour: NOOP, advanceTourSubStep: NOOP }
+
 export function useOnboardingContext() {
   const ctx = useContext(OnboardingContext)
-  if (!ctx) throw new Error('useOnboardingContext must be used within OnboardingProvider')
-  return ctx
+  return ctx || FALLBACK
 }

@@ -1,0 +1,161 @@
+<h2>统一分隔符选择器放哪里？</h2>
+<p class="subtitle">3 个方案对比。左侧保持 3 个命名输入框，右侧是变量面板。分隔符选中后，所有后续插入的变量都会使用它。</p>
+
+<div class="cards" style="grid-template-columns: repeat(3, 1fr); gap: 16px;">
+
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding: 14px; background: #f8fafc;">
+      <div style="display:flex; gap:10px; font-size:11px;">
+        <div style="flex:1; display:flex; flex-direction:column; gap:6px;">
+          <div style="background:white; border:1px solid #e5e7eb; border-radius:4px; padding:6px; font-weight:600;">Campaign 命名</div>
+          <div style="background:white; border:1px solid #e5e7eb; border-radius:4px; height:24px;"></div>
+          <div style="background:white; border:1px solid #e5e7eb; border-radius:4px; padding:6px; font-weight:600;">Adset 命名</div>
+          <div style="background:white; border:1px solid #e5e7eb; border-radius:4px; height:24px;"></div>
+          <div style="background:white; border:1px solid #e5e7eb; border-radius:4px; padding:6px; font-weight:600;">Ad 命名</div>
+          <div style="background:white; border:1px solid #e5e7eb; border-radius:4px; height:24px;"></div>
+        </div>
+        <div style="width:110px; background:white; border:1px solid #e5e7eb; border-radius:4px; padding:6px; display:flex; flex-direction:column; gap:4px;">
+          <div style="background:#eef2ff; border:1px solid #c7d2fe; border-radius:4px; padding:4px 6px; font-size:10px;">
+            <div style="color:#6366f1; font-weight:600; margin-bottom:2px;">分隔符</div>
+            <div style="display:flex; gap:3px; flex-wrap:wrap;">
+              <span style="background:#6366f1; color:white; border-radius:3px; padding:1px 5px;">-</span>
+              <span style="border:1px solid #d1d5db; border-radius:3px; padding:1px 5px;">_</span>
+              <span style="border:1px solid #d1d5db; border-radius:3px; padding:1px 5px;">空格</span>
+              <span style="border:1px solid #d1d5db; border-radius:3px; padding:1px 5px;">无</span>
+              <span style="border:1px dashed #9ca3af; border-radius:3px; padding:1px 5px;">自定义</span>
+            </div>
+          </div>
+          <div style="border-top:1px dashed #e5e7eb; margin:3px 0;"></div>
+          <div style="color:#6b7280; font-size:10px; font-weight:600;">变量</div>
+          <div style="display:flex; flex-wrap:wrap; gap:3px;">
+            <span style="background:#f3f4f6; border-radius:3px; padding:2px 5px; font-size:10px;">国家</span>
+            <span style="background:#f3f4f6; border-radius:3px; padding:2px 5px; font-size:10px;">产品</span>
+            <span style="background:#f3f4f6; border-radius:3px; padding:2px 5px; font-size:10px;">日期</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A：变量面板顶部</h3>
+      <p>分隔符作为变量面板的第一个模块，与变量列表同列。视觉上"分隔符 + 变量"是一个完整工具。</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding: 14px; background: #f8fafc;">
+      <div style="display:flex; flex-direction:column; gap:6px; font-size:11px;">
+        <div style="background:#eef2ff; border:1px solid #c7d2fe; border-radius:4px; padding:5px 8px; display:flex; align-items:center; gap:6px;">
+          <span style="color:#6366f1; font-weight:600; font-size:10px;">分隔符：</span>
+          <span style="background:#6366f1; color:white; border-radius:3px; padding:1px 6px; font-size:10px;">-</span>
+          <span style="border:1px solid #d1d5db; border-radius:3px; padding:1px 6px; font-size:10px;">_</span>
+          <span style="border:1px solid #d1d5db; border-radius:3px; padding:1px 6px; font-size:10px;">空格</span>
+          <span style="border:1px solid #d1d5db; border-radius:3px; padding:1px 6px; font-size:10px;">无</span>
+          <span style="border:1px dashed #9ca3af; border-radius:3px; padding:1px 6px; font-size:10px;">自定义</span>
+        </div>
+        <div style="display:flex; gap:10px;">
+          <div style="flex:1; display:flex; flex-direction:column; gap:6px;">
+            <div style="background:white; border:1px solid #e5e7eb; border-radius:4px; padding:6px; font-weight:600;">Campaign 命名</div>
+            <div style="background:white; border:1px solid #e5e7eb; border-radius:4px; height:24px;"></div>
+            <div style="background:white; border:1px solid #e5e7eb; border-radius:4px; padding:6px; font-weight:600;">Adset 命名</div>
+            <div style="background:white; border:1px solid #e5e7eb; border-radius:4px; height:24px;"></div>
+            <div style="background:white; border:1px solid #e5e7eb; border-radius:4px; padding:6px; font-weight:600;">Ad 命名</div>
+            <div style="background:white; border:1px solid #e5e7eb; border-radius:4px; height:24px;"></div>
+          </div>
+          <div style="width:110px; background:white; border:1px solid #e5e7eb; border-radius:4px; padding:6px; display:flex; flex-direction:column; gap:4px;">
+            <div style="color:#6b7280; font-size:10px; font-weight:600;">变量</div>
+            <div style="display:flex; flex-wrap:wrap; gap:3px;">
+              <span style="background:#f3f4f6; border-radius:3px; padding:2px 5px; font-size:10px;">国家</span>
+              <span style="background:#f3f4f6; border-radius:3px; padding:2px 5px; font-size:10px;">产品</span>
+              <span style="background:#f3f4f6; border-radius:3px; padding:2px 5px; font-size:10px;">日期</span>
+              <span style="background:#f3f4f6; border-radius:3px; padding:2px 5px; font-size:10px;">目标</span>
+              <span style="background:#f3f4f6; border-radius:3px; padding:2px 5px; font-size:10px;">平台</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B：顶部独立工具栏</h3>
+      <p>分隔符横跨模块顶部，独立一行。视觉强调"全局设置"，和所有输入框、所有变量都相关。</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding: 14px; background: #f8fafc;">
+      <div style="display:flex; gap:10px; font-size:11px;">
+        <div style="flex:1; display:flex; flex-direction:column; gap:6px;">
+          <div style="background:white; border:1px solid #e5e7eb; border-radius:4px; padding:6px; font-weight:600;">Campaign 命名</div>
+          <div style="background:white; border:1px solid #e5e7eb; border-radius:4px; height:24px;"></div>
+          <div style="background:white; border:1px solid #e5e7eb; border-radius:4px; padding:6px; font-weight:600;">Adset 命名</div>
+          <div style="background:white; border:1px solid #e5e7eb; border-radius:4px; height:24px;"></div>
+          <div style="background:white; border:1px solid #e5e7eb; border-radius:4px; padding:6px; font-weight:600;">Ad 命名</div>
+          <div style="background:white; border:1px solid #e5e7eb; border-radius:4px; height:24px;"></div>
+        </div>
+        <div style="width:110px; background:white; border:1px solid #e5e7eb; border-radius:4px; padding:6px; display:flex; flex-direction:column; gap:4px;">
+          <div style="display:flex; align-items:center; justify-content:space-between; font-size:10px;">
+            <span style="color:#6b7280; font-weight:600;">变量</span>
+            <span style="background:#eef2ff; color:#6366f1; border-radius:3px; padding:1px 5px; font-size:9px; border:1px solid #c7d2fe;">- ▾</span>
+          </div>
+          <div style="display:flex; flex-wrap:wrap; gap:3px;">
+            <span style="background:#f3f4f6; border-radius:3px; padding:2px 5px; font-size:10px;">国家</span>
+            <span style="background:#f3f4f6; border-radius:3px; padding:2px 5px; font-size:10px;">产品</span>
+            <span style="background:#f3f4f6; border-radius:3px; padding:2px 5px; font-size:10px;">日期</span>
+            <span style="background:#f3f4f6; border-radius:3px; padding:2px 5px; font-size:10px;">目标</span>
+            <span style="background:#f3f4f6; border-radius:3px; padding:2px 5px; font-size:10px;">平台</span>
+            <span style="background:#f3f4f6; border-radius:3px; padding:2px 5px; font-size:10px;">媒体</span>
+            <span style="background:#f3f4f6; border-radius:3px; padding:2px 5px; font-size:10px;">版位</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C：变量面板标题内联</h3>
+      <p>分隔符以小下拉形式贴在"变量"标题右侧，占用空间最小。</p>
+    </div>
+  </div>
+
+</div>
+
+<div class="section" style="margin-top: 24px;">
+  <h3 style="font-size:14px;">三方案对比</h3>
+  <table style="width:100%; font-size:12px; border-collapse:collapse;">
+    <thead>
+      <tr style="background:#f9fafb; border-bottom:1px solid #e5e7eb;">
+        <th style="text-align:left; padding:8px;">维度</th>
+        <th style="text-align:left; padding:8px;">A 面板顶部</th>
+        <th style="text-align:left; padding:8px;">B 独立工具栏</th>
+        <th style="text-align:left; padding:8px;">C 标题内联</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr style="border-bottom:1px solid #f3f4f6;">
+        <td style="padding:8px; color:#6b7280;">可发现性</td>
+        <td style="padding:8px;">中</td>
+        <td style="padding:8px;">★ 高（显眼）</td>
+        <td style="padding:8px;">低（容易忽略）</td>
+      </tr>
+      <tr style="border-bottom:1px solid #f3f4f6;">
+        <td style="padding:8px; color:#6b7280;">与变量的关联性</td>
+        <td style="padding:8px;">★ 强（同列）</td>
+        <td style="padding:8px;">中</td>
+        <td style="padding:8px;">强（同行）</td>
+      </tr>
+      <tr style="border-bottom:1px solid #f3f4f6;">
+        <td style="padding:8px; color:#6b7280;">占用空间</td>
+        <td style="padding:8px;">中</td>
+        <td style="padding:8px;">大（多一行）</td>
+        <td style="padding:8px;">★ 最小</td>
+      </tr>
+      <tr>
+        <td style="padding:8px; color:#6b7280;">实现改动</td>
+        <td style="padding:8px;">★ 小</td>
+        <td style="padding:8px;">中（改容器结构）</td>
+        <td style="padding:8px;">中（需要弹层）</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="section" style="margin-top: 16px; padding: 12px; background:#fef9c3; border-left:3px solid #facc15; border-radius:4px;">
+  <p style="font-size:12px; margin:0; color:#713f12;"><strong>我的推荐：A</strong> ——  分隔符与变量在同一列，视觉上是"配一起用的工具"，也最容易和现有的变量面板高度保持一致。"自定义"作为第五个预设项，点击后展开一个小输入框。</p>
+</div>

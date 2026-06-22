@@ -27,7 +27,7 @@ const LevelFieldsEditor = ({
   showAllFields = false,
 }) => {
   if (!channel) {
-    return <p className="text-xs text-gray-400 py-4">请先在页面顶部选择投放渠道。</p>;
+    return <p className="text-xs text-neutral-400 py-4">请先在页面顶部选择投放渠道。</p>;
   }
 
   // 字段集 = 全部 schema 字段（含 advanced），过滤 hideInUi

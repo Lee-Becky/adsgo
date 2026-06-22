@@ -55,7 +55,7 @@ const CreativeGallery = ({ creatives, onAdd, onRemove, selectedProductName }) =>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <button
           onClick={() => setShowLibraryModal(true)}
-          className="flex flex-col items-center justify-center p-6 rounded-section border-2 border-dashed bg-white border-gray-200 text-gray-400 hover:border-primary-200 hover:bg-gray-50 transition-all duration-200 group"
+          className="flex flex-col items-center justify-center p-6 rounded-section border-2 border-dashed bg-white border-neutral-200 text-neutral-400 hover:border-primary-200 hover:bg-neutral-50 transition-all duration-200 group"
         >
           <ImageIcon size={28} className="mb-2 group-hover:scale-110 transition-transform" />
           <span className="text-xs font-medium">从素材库选择</span>
@@ -63,7 +63,7 @@ const CreativeGallery = ({ creatives, onAdd, onRemove, selectedProductName }) =>
 
         <button
           onClick={handleUpload}
-          className="flex flex-col items-center justify-center p-6 rounded-section border-2 border-dashed bg-white border-gray-200 text-gray-400 hover:border-primary-200 hover:bg-gray-50 transition-all duration-200 group"
+          className="flex flex-col items-center justify-center p-6 rounded-section border-2 border-dashed bg-white border-neutral-200 text-neutral-400 hover:border-primary-200 hover:bg-neutral-50 transition-all duration-200 group"
         >
           <Upload size={28} className="mb-2 group-hover:scale-110 transition-transform" />
           <span className="text-xs font-medium">本地上传素材</span>
@@ -92,29 +92,29 @@ const CreativeGallery = ({ creatives, onAdd, onRemove, selectedProductName }) =>
         <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/40 animate-in fade-in">
           <div className="bg-white w-full max-w-4xl rounded-section shadow-xl flex flex-col max-h-[85vh] overflow-hidden">
             {/* Header */}
-            <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+            <div className="px-6 py-4 border-b border-neutral-200 flex items-center justify-between">
               <div>
-                <h3 className="text-base font-semibold text-gray-900">公司素材库</h3>
-                <p className="text-sm text-gray-500 mt-0.5">选择已有的优质营销资产</p>
+                <h3 className="text-base font-semibold text-neutral-900">公司素材库</h3>
+                <p className="text-sm text-neutral-500 mt-0.5">选择已有的优质营销资产</p>
               </div>
-              <button onClick={() => setShowLibraryModal(false)} className="text-gray-400 hover:text-gray-600 transition-colors duration-200">
+              <button onClick={() => setShowLibraryModal(false)} className="text-neutral-400 hover:text-neutral-600 transition-colors duration-200">
                 <X size={20} />
               </button>
             </div>
 
             {/* Filter bar */}
-            <div className="px-6 py-3 bg-gray-50 border-b border-gray-100 flex items-center justify-between">
+            <div className="px-6 py-3 bg-neutral-50 border-b border-neutral-100 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Filter size={14} className="text-gray-400" />
-                <span className="text-xs font-medium text-gray-500">过滤选项</span>
+                <Filter size={14} className="text-neutral-400" />
+                <span className="text-xs font-medium text-neutral-500">过滤选项</span>
               </div>
               <label className="flex items-center gap-3 cursor-pointer group">
-                <span className={`text-xs font-medium transition-colors duration-200 ${showOnlyRelated ? 'text-primary-500' : 'text-gray-400'}`}>仅显示关联素材</span>
+                <span className={`text-xs font-medium transition-colors duration-200 ${showOnlyRelated ? 'text-primary-500' : 'text-neutral-400'}`}>仅显示关联素材</span>
                 <button
                   role="switch"
                   aria-checked={showOnlyRelated}
                   onClick={() => setShowOnlyRelated(!showOnlyRelated)}
-                  className={`relative inline-flex w-10 h-6 rounded-full transition-all duration-200 focus:outline-none focus:shadow-primary-focus ${showOnlyRelated ? 'bg-primary-500' : 'bg-gray-200'}`}
+                  className={`relative inline-flex w-10 h-6 rounded-full transition-all duration-200 focus:outline-none focus:shadow-primary-focus ${showOnlyRelated ? 'bg-primary-500' : 'bg-neutral-200'}`}
                 >
                   <span className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-transform duration-200 ${showOnlyRelated ? 'translate-x-5' : 'translate-x-1'}`} />
                 </button>
@@ -130,11 +130,11 @@ const CreativeGallery = ({ creatives, onAdd, onRemove, selectedProductName }) =>
                     <div
                       key={item.id}
                       onClick={() => toggleLibraryItem(item)}
-                      className={`relative aspect-[3/4] rounded-inner overflow-hidden cursor-pointer group ring-offset-2 transition-all duration-200 ${isSelected ? 'ring-2 ring-primary-500' : 'hover:ring-2 hover:ring-gray-300'}`}
+                      className={`relative aspect-[3/4] rounded-inner overflow-hidden cursor-pointer group ring-offset-2 transition-all duration-200 ${isSelected ? 'ring-2 ring-primary-500' : 'hover:ring-2 hover:ring-neutral-300'}`}
                     >
                       <img src={item.url} className="w-full h-full object-cover" />
                       <div className={`absolute inset-0 flex items-center justify-center transition-opacity duration-200 ${isSelected ? 'bg-primary-500/20 opacity-100' : 'bg-black/40 opacity-0 group-hover:opacity-100'}`}>
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center shadow-xl ${isSelected ? 'bg-primary-500 text-white' : 'bg-white text-gray-900'}`}>
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center shadow-xl ${isSelected ? 'bg-primary-500 text-white' : 'bg-white text-neutral-900'}`}>
                           {isSelected ? <Check size={20} /> : <Plus size={20} />}
                         </div>
                       </div>
@@ -145,7 +145,7 @@ const CreativeGallery = ({ creatives, onAdd, onRemove, selectedProductName }) =>
             </div>
 
             {/* Footer */}
-            <div className="px-6 py-4 border-t border-gray-200 flex justify-end">
+            <div className="px-6 py-4 border-t border-neutral-200 flex justify-end">
                <button
                  onClick={() => setShowLibraryModal(false)}
                  className="inline-flex items-center justify-center bg-primary-500 text-white px-4 py-2 rounded-base text-sm font-medium hover:bg-primary-600 active:bg-primary-700 transition-all duration-200 focus:outline-none focus:shadow-primary-focus"
@@ -159,8 +159,8 @@ const CreativeGallery = ({ creatives, onAdd, onRemove, selectedProductName }) =>
 
       <div className="space-y-4 pt-4">
         <div className="flex items-center justify-between px-2">
-          <h4 className="text-sm font-semibold text-gray-900">待投放素材列表</h4>
-          <span className="text-xs font-medium text-gray-500">已选 {creatives.length} 个资产</span>
+          <h4 className="text-sm font-semibold text-neutral-900">待投放素材列表</h4>
+          <span className="text-xs font-medium text-neutral-500">已选 {creatives.length} 个资产</span>
         </div>
 
         {creatives.length === 0 ? (
@@ -168,12 +168,12 @@ const CreativeGallery = ({ creatives, onAdd, onRemove, selectedProductName }) =>
             <div className="w-12 h-12 rounded-section bg-primary-50 flex items-center justify-center mb-4">
               <ImageIcon className="w-6 h-6 text-primary-300" />
             </div>
-            <p className="text-sm text-gray-500">尚未添加任何素材</p>
+            <p className="text-sm text-neutral-500">尚未添加任何素材</p>
           </div>
         ) : (
           <div className="flex gap-4 overflow-x-auto pb-4 no-scrollbar scroll-smooth snap-x">
             {creatives.map((c, idx) => (
-              <div key={c.id} className="relative group shrink-0 w-36 h-48 rounded-inner overflow-hidden border border-gray-100 shadow-adsgo-card snap-start bg-white">
+              <div key={c.id} className="relative group shrink-0 w-36 h-48 rounded-inner overflow-hidden border border-neutral-100 shadow-adsgo-card snap-start bg-white">
                 <img src={c.url} alt="Creative" className="w-full h-full object-cover" />
                 <div className="absolute top-2 left-2 flex gap-1">
                   {idx === 0 && (
@@ -185,7 +185,7 @@ const CreativeGallery = ({ creatives, onAdd, onRemove, selectedProductName }) =>
                 </div>
                 <button
                   onClick={() => onRemove(c.id)}
-                  className="absolute top-2 right-2 p-1.5 bg-white/90 rounded-full text-gray-700 shadow-adsgo-card opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                  className="absolute top-2 right-2 p-1.5 bg-white/90 rounded-full text-neutral-700 shadow-adsgo-card opacity-0 group-hover:opacity-100 transition-opacity duration-200"
                 >
                   <X size={12} />
                 </button>

@@ -49,17 +49,17 @@ const PublishConfirmModal = ({
     >
       <div className="bg-white rounded-2xl shadow-2xl w-[520px] max-w-[92vw] overflow-hidden animate-in zoom-in-95">
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-neutral-100">
           <div className="flex items-center gap-3 min-w-0">
             <div className="w-9 h-9 rounded-xl bg-primary-50 text-primary-600 flex items-center justify-center shrink-0">
               <Rocket size={18} strokeWidth={2.2} />
             </div>
             <div className="min-w-0">
-              <h3 className="text-base font-semibold text-gray-900 truncate">确认发布</h3>
-              <p className="text-[11px] text-gray-400 mt-0.5">发布前请确认结构与初始状态</p>
+              <h3 className="text-base font-semibold text-neutral-900 truncate">确认发布</h3>
+              <p className="text-[11px] text-neutral-400 mt-0.5">发布前请确认结构与初始状态</p>
             </div>
           </div>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-700 p-1 rounded-base hover:bg-gray-50">
+          <button onClick={onClose} className="text-neutral-400 hover:text-neutral-700 p-1 rounded-base hover:bg-neutral-50">
             <X size={16} />
           </button>
         </div>
@@ -72,8 +72,8 @@ const PublishConfirmModal = ({
               <CheckCircle2 size={18} strokeWidth={2.2} />
             </div>
             <div className="min-w-0">
-              <p className="text-sm font-semibold text-gray-900">即将发布到 {channelName}</p>
-              <p className="text-xs text-gray-500 mt-0.5 tabular-nums">
+              <p className="text-sm font-semibold text-neutral-900">即将发布到 {channelName}</p>
+              <p className="text-xs text-neutral-500 mt-0.5 tabular-nums">
                 {counts.campaigns} Campaign · {counts.adsets} AdSet · {counts.ads} Ad
               </p>
             </div>
@@ -81,7 +81,7 @@ const PublishConfirmModal = ({
 
           {/* 状态选择 */}
           <div>
-            <p className="text-xs font-medium text-gray-700 mb-2">发布后初始状态</p>
+            <p className="text-xs font-medium text-neutral-700 mb-2">发布后初始状态</p>
             <div className="grid grid-cols-2 gap-2">
               <button
                 type="button"
@@ -89,15 +89,15 @@ const PublishConfirmModal = ({
                 className={`relative flex flex-col items-start gap-1 p-3 rounded-base border-2 transition-all text-left ${
                   statusUi === 'PAUSED'
                     ? 'border-primary-500 bg-primary-50/40 shadow-sm'
-                    : 'border-gray-200 bg-white hover:border-gray-300'
+                    : 'border-neutral-200 bg-white hover:border-neutral-300'
                 }`}
               >
                 <div className="flex items-center gap-1.5">
-                  <Pause size={13} className={statusUi === 'PAUSED' ? 'text-primary-600' : 'text-gray-500'} strokeWidth={2.4} />
-                  <span className={`text-xs font-semibold ${statusUi === 'PAUSED' ? 'text-primary-700' : 'text-gray-800'}`}>已暂停 PAUSED</span>
+                  <Pause size={13} className={statusUi === 'PAUSED' ? 'text-primary-600' : 'text-neutral-500'} strokeWidth={2.4} />
+                  <span className={`text-xs font-semibold ${statusUi === 'PAUSED' ? 'text-primary-700' : 'text-neutral-800'}`}>已暂停 PAUSED</span>
                   <span className="ml-1 text-[9px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded-tag">推荐</span>
                 </div>
-                <p className="text-[11px] text-gray-500 leading-snug">发布后人工 review，确认无误再启动</p>
+                <p className="text-[11px] text-neutral-500 leading-snug">发布后人工 review，确认无误再启动</p>
               </button>
               <button
                 type="button"
@@ -105,17 +105,17 @@ const PublishConfirmModal = ({
                 className={`relative flex flex-col items-start gap-1 p-3 rounded-base border-2 transition-all text-left ${
                   statusUi === 'ACTIVE'
                     ? 'border-primary-500 bg-primary-50/40 shadow-sm'
-                    : 'border-gray-200 bg-white hover:border-gray-300'
+                    : 'border-neutral-200 bg-white hover:border-neutral-300'
                 }`}
               >
                 <div className="flex items-center gap-1.5">
-                  <Play size={13} className={statusUi === 'ACTIVE' ? 'text-primary-600' : 'text-gray-500'} strokeWidth={2.4} />
-                  <span className={`text-xs font-semibold ${statusUi === 'ACTIVE' ? 'text-primary-700' : 'text-gray-800'}`}>已激活 ACTIVE</span>
+                  <Play size={13} className={statusUi === 'ACTIVE' ? 'text-primary-600' : 'text-neutral-500'} strokeWidth={2.4} />
+                  <span className={`text-xs font-semibold ${statusUi === 'ACTIVE' ? 'text-primary-700' : 'text-neutral-800'}`}>已激活 ACTIVE</span>
                 </div>
-                <p className="text-[11px] text-gray-500 leading-snug">发布即开始投放，预算开始消耗</p>
+                <p className="text-[11px] text-neutral-500 leading-snug">发布即开始投放，预算开始消耗</p>
               </button>
             </div>
-            <p className="text-[10px] text-gray-400 mt-2">
+            <p className="text-[10px] text-neutral-400 mt-2">
               SDK 字段：{channel === 'tiktok' ? 'operation_status' : 'status'} = <span className="font-mono">{sdkStatusLabel}</span>
             </p>
           </div>
@@ -133,15 +133,15 @@ const PublishConfirmModal = ({
         </div>
 
         {/* Footer */}
-        <div className="px-5 py-3 bg-gray-50/50 border-t border-gray-100 flex items-center justify-end gap-2">
+        <div className="px-5 py-3 bg-neutral-50/50 border-t border-neutral-100 flex items-center justify-end gap-2">
           <button onClick={onClose}
-            className="px-4 h-9 text-xs font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-base transition-colors">
+            className="px-4 h-9 text-xs font-medium text-neutral-600 hover:text-neutral-800 hover:bg-neutral-100 rounded-base transition-colors">
             取消
           </button>
           <button
             onClick={() => canConfirm && onConfirm?.(statusUi)}
             disabled={!canConfirm}
-            className="px-4 h-9 text-xs font-semibold text-white bg-primary-500 hover:bg-primary-600 rounded-base transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center gap-1.5 shadow-sm"
+            className="px-4 h-9 text-xs font-semibold text-white bg-primary-500 hover:bg-primary-600 rounded-base transition-colors disabled:bg-neutral-300 disabled:cursor-not-allowed flex items-center gap-1.5 shadow-sm"
           >
             <Rocket size={12} /> 确认发布
           </button>

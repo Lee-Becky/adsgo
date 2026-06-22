@@ -28,9 +28,9 @@ const DatasetsPage = () => {
   return (
     <div className="space-y-6">
       {/* Tab bar */}
-      <div className="bg-white rounded-[32px] border border-slate-200 shadow-[0_4px_24px_rgba(0,0,0,0.04)]">
+      <div className="bg-white rounded-2xl border border-neutral-200 shadow-[0_4px_24px_rgba(0,0,0,0.04)]">
         <div className="px-10 py-4 flex items-center gap-2">
-          <Database size={16} className="text-slate-400 mr-2" />
+          <Database size={16} className="text-neutral-400 mr-2" />
           {TABS.map(tab => {
             const Icon = tab.icon
             const isActive = activeTab === tab.id
@@ -40,8 +40,8 @@ const DatasetsPage = () => {
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-bold transition-all duration-200 ${
                   isActive
-                    ? 'bg-slate-900 text-white shadow-lg'
-                    : 'bg-slate-50 text-slate-500 hover:bg-slate-100 hover:text-slate-700'
+                    ? 'bg-neutral-900 text-white shadow-lg'
+                    : 'bg-neutral-50 text-neutral-500 hover:bg-neutral-100 hover:text-neutral-700'
                 }`}
               >
                 <Icon size={14} />

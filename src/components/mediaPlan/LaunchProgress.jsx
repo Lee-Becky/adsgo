@@ -66,8 +66,8 @@ export default function LaunchProgress() {
                   <Icon className="w-3.5 h-3.5 text-white" />
                 </div>
               ) : (
-                <div className="w-6 h-6 rounded-full border-2 border-gray-200 bg-white flex items-center justify-center flex-shrink-0">
-                  <Icon className="w-3 h-3 text-gray-300" />
+                <div className="w-6 h-6 rounded-full border-2 border-neutral-200 bg-white flex items-center justify-center flex-shrink-0">
+                  <Icon className="w-3 h-3 text-neutral-300" />
                 </div>
               )}
 
@@ -79,7 +79,7 @@ export default function LaunchProgress() {
                       ? 'bg-emerald-300'
                       : step.status === 'in_progress'
                         ? 'bg-primary-200'
-                        : 'border-l border-dashed border-gray-200'
+                        : 'border-l border-dashed border-neutral-200'
                   }`}
                 />
               )}
@@ -91,10 +91,10 @@ export default function LaunchProgress() {
                 <span
                   className={`text-xs font-semibold ${
                     step.status === 'completed'
-                      ? 'text-gray-800'
+                      ? 'text-neutral-800'
                       : step.status === 'in_progress'
-                        ? 'text-gray-800'
-                        : 'text-gray-400'
+                        ? 'text-neutral-800'
+                        : 'text-neutral-400'
                   }`}
                 >
                   {step.label}
@@ -104,7 +104,7 @@ export default function LaunchProgress() {
                     className={`text-[10px] px-1.5 py-0.5 rounded-full ${
                       step.status === 'in_progress'
                         ? 'bg-primary-50 text-primary-600'
-                        : 'bg-gray-100 text-gray-400'
+                        : 'bg-neutral-100 text-neutral-400'
                     }`}
                   >
                     {step.estimatedTime}
@@ -113,7 +113,7 @@ export default function LaunchProgress() {
               </div>
               <p
                 className={`text-xs mt-0.5 leading-relaxed ${
-                  step.status === 'upcoming' ? 'text-gray-300' : 'text-gray-500'
+                  step.status === 'upcoming' ? 'text-neutral-300' : 'text-neutral-500'
                 }`}
               >
                 {step.description}

@@ -60,7 +60,7 @@ const UnitFollowInput = ({ value, onChange, placeholder, unit, className = '', c
       </span>
 
       {!value && (
-        <span className={`absolute ${align === 'right' ? 'right-2' : 'left-4'} text-slate-300 font-black pointer-events-none animate-in fade-in duration-300`}>
+        <span className={`absolute ${align === 'right' ? 'right-2' : 'left-4'} text-neutral-300 font-black pointer-events-none animate-in fade-in duration-300`}>
           {unit}
         </span>
       )}
@@ -76,7 +76,7 @@ const UnitFollowInput = ({ value, onChange, placeholder, unit, className = '', c
 
       {value && (
         <span
-          className="absolute text-slate-400 font-black pointer-events-none transition-all duration-200 animate-in fade-in slide-in-from-left-1 flex items-center h-full"
+          className="absolute text-neutral-400 font-black pointer-events-none transition-all duration-200 animate-in fade-in slide-in-from-left-1 flex items-center h-full"
           style={{
             left: align === 'right' ? 'auto' : `${textWidth + 26}px`,
             right: align === 'right' ? '8px' : 'auto',
@@ -93,7 +93,7 @@ const UnitFollowInput = ({ value, onChange, placeholder, unit, className = '', c
 
 // Operator label (display only, not configurable)
 const OperatorLabel = ({ op }) => (
-  <span className="px-2.5 py-2 bg-slate-100 border-r border-slate-200 text-xs font-black text-slate-500 rounded-l-xl flex items-center justify-center w-10 shrink-0">
+  <span className="px-2.5 py-2 bg-neutral-100 border-r border-neutral-200 text-xs font-black text-neutral-500 rounded-l-xl flex items-center justify-center w-10 shrink-0">
     {op}
   </span>
 )
@@ -118,15 +118,15 @@ const PlatformSelector = ({ group, updateGroup }) => {
             onClick={() => togglePlatform(p.id)}
             className={`flex items-center gap-2 px-3 py-2 rounded-xl text-[11px] font-bold border transition-all ${
               isSelected
-                ? 'border-indigo-200 bg-indigo-50 text-indigo-700 shadow-sm'
-                : 'border-slate-100 bg-white text-slate-400 hover:border-indigo-200'
+                ? 'border-primary-200 bg-primary-50 text-primary-700 shadow-sm'
+                : 'border-neutral-100 bg-white text-neutral-400 hover:border-primary-200'
             }`}
           >
             <div className="w-4 h-4 rounded-sm overflow-hidden bg-white">
               <img src={p.icon} alt={p.id} className="w-full h-full object-contain" />
             </div>
             {p.label}
-            {isSelected && <CheckCircle2 size={11} className="text-indigo-500" />}
+            {isSelected && <CheckCircle2 size={11} className="text-primary-500" />}
           </button>
         )
       })}
@@ -173,40 +173,40 @@ const ObjectiveSelector = ({ group, updateGroup }) => {
       <div
         onClick={() => { setIsOpen(!isOpen); setStage('objective') }}
         className={`flex items-center justify-between px-4 py-3 bg-white border rounded-xl cursor-pointer transition-all ${
-          isOpen ? 'border-indigo-500 shadow-lg' : 'border-slate-200 hover:border-indigo-200'
+          isOpen ? 'border-primary-500 shadow-lg' : 'border-neutral-200 hover:border-primary-200'
         }`}
       >
         <div className="flex flex-col">
-          <span className="text-[12px] font-black text-slate-900">
+          <span className="text-[12px] font-black text-neutral-900">
             {group.event || currentGoal?.label || 'Select Objective'}
           </span>
           {currentObjective && (
             <div className="flex items-center gap-1 mt-0.5">
-              <span className="text-[10px] font-bold text-slate-400">{currentObjective.label}</span>
+              <span className="text-[10px] font-bold text-neutral-400">{currentObjective.label}</span>
               {group.event && <>
-                <ChevronRight size={8} className="text-slate-300" />
-                <span className="text-[10px] font-bold text-slate-400">{currentGoal?.label}</span>
+                <ChevronRight size={8} className="text-neutral-300" />
+                <span className="text-[10px] font-bold text-neutral-400">{currentGoal?.label}</span>
               </>}
             </div>
           )}
         </div>
-        <ChevronRight size={14} className={`text-slate-300 transition-transform ${isOpen ? 'rotate-90 text-indigo-500' : ''}`} />
+        <ChevronRight size={14} className={`text-neutral-300 transition-transform ${isOpen ? 'rotate-90 text-primary-500' : ''}`} />
       </div>
 
       {isOpen && (
-        <div className="absolute z-[110] mt-2 w-full bg-white border border-slate-100 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] p-3 animate-in fade-in zoom-in-95 duration-200">
+        <div className="absolute z-[110] mt-2 w-full bg-white border border-neutral-100 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] p-3 animate-in fade-in zoom-in-95 duration-200">
           {stage === 'objective' && (
             <div className="space-y-1">
-              <p className="text-[10px] font-black text-slate-400 mb-2 px-2">1. Campaign Objective</p>
+              <p className="text-[10px] font-black text-neutral-400 mb-2 px-2">1. Campaign Objective</p>
               {campaignObjectives.map(obj => (
                 <button
                   key={obj.value}
                   onClick={() => handleObjectiveSelect(obj)}
                   className={`w-full text-left px-3 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-3 ${
-                    group.campaignObjective === obj.value ? 'bg-slate-900 text-white shadow-md' : 'hover:bg-slate-50 text-slate-600'
+                    group.campaignObjective === obj.value ? 'bg-neutral-900 text-white shadow-md' : 'hover:bg-neutral-50 text-neutral-600'
                   }`}
                 >
-                  <div className={`w-6 h-6 rounded-lg flex items-center justify-center ${group.campaignObjective === obj.value ? 'bg-indigo-500 text-white' : `${obj.bg} ${obj.color}`}`}>
+                  <div className={`w-6 h-6 rounded-lg flex items-center justify-center ${group.campaignObjective === obj.value ? 'bg-primary-500 text-white' : `${obj.bg} ${obj.color}`}`}>
                     <obj.icon size={14} />
                   </div>
                   <span>{obj.label}</span>
@@ -218,15 +218,15 @@ const ObjectiveSelector = ({ group, updateGroup }) => {
           {stage === 'goal' && (
             <div className="space-y-1">
               <div className="flex items-center gap-2 mb-2 px-1">
-                <button onClick={() => setStage('objective')} className="p-1 hover:bg-slate-100 rounded-md text-slate-400"><ChevronLeft size={14} /></button>
-                <p className="text-[10px] font-black text-slate-400">2. Conversion Goal</p>
+                <button onClick={() => setStage('objective')} className="p-1 hover:bg-neutral-100 rounded-md text-neutral-400"><ChevronLeft size={14} /></button>
+                <p className="text-[10px] font-black text-neutral-400">2. Conversion Goal</p>
               </div>
               {adsetGoals.map(goal => (
                 <button
                   key={goal.value}
                   onClick={() => handleGoalSelect(goal)}
                   className={`w-full text-left px-3 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-between ${
-                    group.adsetGoal === goal.value ? 'bg-slate-900 text-white shadow-md' : 'hover:bg-slate-50 text-slate-600'
+                    group.adsetGoal === goal.value ? 'bg-neutral-900 text-white shadow-md' : 'hover:bg-neutral-50 text-neutral-600'
                   }`}
                 >
                   <span>{goal.label}</span>
@@ -239,13 +239,13 @@ const ObjectiveSelector = ({ group, updateGroup }) => {
           {stage === 'event' && (
             <div className="space-y-2">
               <div className="flex items-center gap-2 px-1">
-                <button onClick={() => setStage('goal')} className="p-1 hover:bg-slate-100 rounded-md text-slate-400"><ChevronLeft size={14} /></button>
-                <p className="text-[10px] font-black text-slate-400">3. Pixel Event</p>
+                <button onClick={() => setStage('goal')} className="p-1 hover:bg-neutral-100 rounded-md text-neutral-400"><ChevronLeft size={14} /></button>
+                <p className="text-[10px] font-black text-neutral-400">3. Pixel Event</p>
               </div>
               <div className="relative px-1">
-                <Search size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" />
+                <Search size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-300" />
                 <input
-                  className="w-full pl-9 pr-3 py-2 bg-slate-50 border-none rounded-lg text-xs font-bold text-slate-900 focus:ring-2 focus:ring-indigo-500/20"
+                  className="w-full pl-9 pr-3 py-2 bg-neutral-50 border-none rounded-lg text-xs font-bold text-neutral-900 focus:ring-2 focus:ring-primary-500/20"
                   placeholder="Search events..."
                   value={eventSearch}
                   onChange={(e) => setEventSearch(e.target.value)}
@@ -258,7 +258,7 @@ const ObjectiveSelector = ({ group, updateGroup }) => {
                     key={ev}
                     onClick={() => handleEventSelect(ev)}
                     className={`w-full text-left px-3 py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-between ${
-                      group.event === ev ? 'bg-indigo-600 text-white shadow-md' : 'hover:bg-slate-50 text-slate-600'
+                      group.event === ev ? 'bg-primary-600 text-white shadow-md' : 'hover:bg-neutral-50 text-neutral-600'
                     }`}
                   >
                     {ev}
@@ -310,7 +310,7 @@ const BudgetKPISection = ({ formData, updateFormData, updateFormDataDeep, valida
 
   const addGroup = () => {
     const newGroup = {
-      id: crypto.randomUUID(),
+      id: (crypto.randomUUID?.() ?? `id_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`),
       targetLocations: [],
       platforms: ['meta', 'google'],
       os: 'all',
@@ -329,7 +329,7 @@ const BudgetKPISection = ({ formData, updateFormData, updateFormDataDeep, valida
   const duplicateGroup = (groupToCopy) => {
     const newGroup = {
       ...JSON.parse(JSON.stringify(groupToCopy)),
-      id: crypto.randomUUID()
+      id: (crypto.randomUUID?.() ?? `id_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`)
     }
     updateFormData('marketGroups', [...formData.marketGroups, newGroup])
   }
@@ -367,18 +367,18 @@ const BudgetKPISection = ({ formData, updateFormData, updateFormDataDeep, valida
     setValidation(prev => ({ ...prev, marketGroups: allGroupsValid }))
   }, [formData.marketGroups, setValidation])
 
-  const colors = ['bg-indigo-500', 'bg-emerald-500', 'bg-rose-500', 'bg-amber-500', 'bg-sky-500']
+  const colors = ['bg-primary-500', 'bg-success-500', 'bg-rose-500', 'bg-warning-500', 'bg-sky-500']
 
   return (
-    <div className="bg-white rounded-[32px] border border-slate-200 shadow-[0_4px_24px_rgba(0,0,0,0.04)] relative z-10 overflow-visible animate-in fade-in duration-700">
+    <div className="bg-white rounded-2xl border border-neutral-200 shadow-[0_4px_24px_rgba(0,0,0,0.04)] relative z-10 overflow-visible animate-in fade-in duration-700">
 
-      <header className="px-10 py-6 bg-slate-100 border-b border-slate-200 flex items-center justify-between rounded-t-[32px]">
+      <header className="px-10 py-6 bg-neutral-100 border-b border-neutral-200 flex items-center justify-between rounded-t-2xl">
         <div className="flex items-center gap-3">
-          <Layers size={20} className="text-slate-900" />
-          <h2 className="text-sm font-black text-slate-900">Strategy Group <span className="text-rose-500 ml-1">*</span></h2>
+          <Layers size={20} className="text-neutral-900" />
+          <h2 className="text-sm font-black text-neutral-900">Strategy Group <span className="text-rose-500 ml-1">*</span></h2>
         </div>
         {validation.marketGroups && (
-          <div className="text-emerald-500 animate-in zoom-in duration-500">
+          <div className="text-success-500 animate-in zoom-in duration-500">
             <CheckCircle2 size={24} />
           </div>
         )}
@@ -390,15 +390,15 @@ const BudgetKPISection = ({ formData, updateFormData, updateFormDataDeep, valida
           const accentColor = colors[index % colors.length]
 
           return (
-            <div key={group.id} className={`relative rounded-3xl border border-slate-100 transition-all ${index > 0 ? 'mt-10' : ''} overflow-visible`}>
+            <div key={group.id} className={`relative rounded-2xl border border-neutral-100 transition-all ${index > 0 ? 'mt-10' : ''} overflow-visible`}>
               {/* Group header */}
-              <div className="flex items-center justify-between px-6 py-4 bg-slate-50/50 border-b border-slate-100 rounded-t-3xl">
+              <div className="flex items-center justify-between px-6 py-4 bg-neutral-50/50 border-b border-neutral-100 rounded-t-2xl">
                 <div className="flex items-center gap-2.5">
                   <div className={`w-1.5 h-6 rounded-full ${accentColor}`} />
-                  <h3 className="text-sm font-black text-slate-900">Strategy {index + 1}</h3>
+                  <h3 className="text-sm font-black text-neutral-900">Strategy {index + 1}</h3>
                 </div>
                 <div className="flex items-center gap-1">
-                  <button onClick={() => duplicateGroup(group)} className="p-1.5 text-indigo-500 hover:bg-indigo-50 rounded-lg transition-all" title="Duplicate">
+                  <button onClick={() => duplicateGroup(group)} className="p-1.5 text-primary-500 hover:bg-primary-50 rounded-lg transition-all" title="Duplicate">
                     <Copy size={14} />
                   </button>
                   {formData.marketGroups.length > 1 && (
@@ -409,15 +409,15 @@ const BudgetKPISection = ({ formData, updateFormData, updateFormDataDeep, valida
                 </div>
               </div>
 
-              <div className="flex flex-col lg:flex-row rounded-b-3xl border border-slate-200/60 shadow-sm bg-white hover:shadow-md transition-all overflow-visible">
+              <div className="flex flex-col lg:flex-row rounded-b-3xl border border-neutral-200/60 shadow-sm bg-white hover:shadow-md transition-all overflow-visible">
                 {/* ===== LEFT SIDE: Group Definition ===== */}
-                <div className="lg:w-[42%] bg-slate-50/30 border-r border-slate-100 p-6 flex flex-col space-y-5 overflow-visible relative z-[50]">
+                <div className="lg:w-[42%] bg-neutral-50/30 border-r border-neutral-100 p-6 flex flex-col space-y-5 overflow-visible relative z-[50]">
 
                   {/* 1. Ad Platforms */}
                   <div className="space-y-2.5">
                     <div className="flex items-center gap-2">
-                      <Monitor size={14} className="text-slate-400" />
-                      <span className="text-[10px] font-black text-slate-500 ">Ad Platforms</span>
+                      <Monitor size={14} className="text-neutral-400" />
+                      <span className="text-[10px] font-black text-neutral-500 ">Ad Platforms</span>
                     </div>
                     <PlatformSelector group={group} updateGroup={updateGroup} />
                   </div>
@@ -425,23 +425,23 @@ const BudgetKPISection = ({ formData, updateFormData, updateFormDataDeep, valida
                   {/* 2. Locations */}
                   <div className="space-y-2.5">
                     <div className="flex items-center gap-2">
-                      <Globe size={14} className="text-slate-400" />
-                      <span className="text-[10px] font-black text-slate-500 ">Locations</span>
+                      <Globe size={14} className="text-neutral-400" />
+                      <span className="text-[10px] font-black text-neutral-500 ">Locations</span>
                     </div>
                     <div className="relative">
-                      <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-300" />
+                      <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-300" />
                       <input
                         type="text"
                         value={activeSearchGroupId === group.id ? searchQuery : ''}
                         onChange={(e) => { setSearchQuery(e.target.value); setActiveSearchGroupId(group.id); setShowLocationDropdown(true) }}
                         onFocus={() => { setActiveSearchGroupId(group.id); setShowLocationDropdown(true) }}
                         placeholder="Add locations..."
-                        className={`w-full pl-9 pr-4 py-2.5 bg-white border rounded-xl text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all ${
-                          isOnboarding && !locValid ? 'border-red-400 bg-red-50/20' : 'border-slate-200'
+                        className={`w-full pl-9 pr-4 py-2.5 bg-white border rounded-xl text-xs font-bold text-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary-500/10 focus:border-primary-500 transition-all ${
+                          isOnboarding && !locValid ? 'border-danger-400 bg-danger-50/20' : 'border-neutral-200'
                         }`}
                       />
                       {showLocationDropdown && activeSearchGroupId === group.id && (
-                        <div className="absolute z-[100] mt-1.5 w-full bg-white border border-slate-200 rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.2)] max-h-52 overflow-y-auto animate-in zoom-in-95 duration-200">
+                        <div className="absolute z-[100] mt-1.5 w-full bg-white border border-neutral-200 rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.2)] max-h-52 overflow-y-auto animate-in zoom-in-95 duration-200">
                           {filteredLocations.map(location => {
                             const isSelected = group.targetLocations.find(l => l.value === location.value)
                             const isUsedElsewhere = formData.marketGroups.some(g => g.id !== group.id && g.targetLocations.find(l => l.value === location.value))
@@ -450,15 +450,15 @@ const BudgetKPISection = ({ formData, updateFormData, updateFormDataDeep, valida
                                 key={location.value}
                                 onClick={() => addLocation(group.id, location)}
                                 disabled={isSelected || isUsedElsewhere}
-                                className={`w-full px-4 py-2.5 text-left hover:bg-slate-50 transition-all flex items-center justify-between border-b border-slate-50 last:border-0 ${
-                                  isSelected || isUsedElsewhere ? 'bg-slate-50/50 cursor-not-allowed' : ''
+                                className={`w-full px-4 py-2.5 text-left hover:bg-neutral-50 transition-all flex items-center justify-between border-b border-neutral-50 last:border-0 ${
+                                  isSelected || isUsedElsewhere ? 'bg-neutral-50/50 cursor-not-allowed' : ''
                                 }`}
                               >
                                 <div className="flex items-center gap-2">
-                                  <p className={`text-xs font-bold ${isSelected || isUsedElsewhere ? 'text-slate-300' : 'text-slate-900'}`}>{location.label}</p>
-                                  {isUsedElsewhere && <span className="text-[8px] bg-slate-100 text-slate-400 px-1.5 py-0.5 rounded-full font-black">Occupied</span>}
+                                  <p className={`text-xs font-bold ${isSelected || isUsedElsewhere ? 'text-neutral-300' : 'text-neutral-900'}`}>{location.label}</p>
+                                  {isUsedElsewhere && <span className="text-[8px] bg-neutral-100 text-neutral-400 px-1.5 py-0.5 rounded-full font-black">Occupied</span>}
                                 </div>
-                                {isSelected && <CheckCircle2 size={14} className="text-emerald-500" />}
+                                {isSelected && <CheckCircle2 size={14} className="text-success-500" />}
                               </button>
                             )
                           })}
@@ -467,15 +467,15 @@ const BudgetKPISection = ({ formData, updateFormData, updateFormDataDeep, valida
                     </div>
                     <div className="flex flex-wrap gap-1.5">
                       {group.targetLocations.map((location, locIdx) => (
-                        <span key={location.value || `${location}-${locIdx}`} className="px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-[11px] font-bold text-slate-700 flex items-center gap-1.5 shadow-sm">
+                        <span key={location.value || `${location}-${locIdx}`} className="px-2.5 py-1.5 bg-white border border-neutral-200 rounded-lg text-[11px] font-bold text-neutral-700 flex items-center gap-1.5 shadow-sm">
                           {location.label || location}
                           <X size={10} className="cursor-pointer hover:text-rose-500" onClick={() => removeLocation(group.id, location.value || location)} />
                         </span>
                       ))}
                       {!locValid && (
-                        <div className="w-full py-6 flex flex-col items-center justify-center border border-dashed border-slate-200 rounded-xl bg-white/50 space-y-1">
-                          <Globe size={20} className="text-slate-200" />
-                          <p className="text-[10px] font-bold text-slate-300">No locations added</p>
+                        <div className="w-full py-6 flex flex-col items-center justify-center border border-dashed border-neutral-200 rounded-xl bg-white/50 space-y-1">
+                          <Globe size={20} className="text-neutral-200" />
+                          <p className="text-[10px] font-bold text-neutral-300">No locations added</p>
                         </div>
                       )}
                     </div>
@@ -484,18 +484,18 @@ const BudgetKPISection = ({ formData, updateFormData, updateFormDataDeep, valida
                   {/* 3. Device Type */}
                   <div className="space-y-2.5">
                     <div className="flex items-center gap-2">
-                      <Smartphone size={14} className="text-slate-400" />
-                      <span className="text-[10px] font-black text-slate-500 ">Device Type</span>
+                      <Smartphone size={14} className="text-neutral-400" />
+                      <span className="text-[10px] font-black text-neutral-500 ">Device Type</span>
                     </div>
-                    <div className="flex items-center bg-slate-100/60 rounded-xl p-0.5 w-fit">
+                    <div className="flex items-center bg-neutral-100/60 rounded-xl p-0.5 w-fit">
                       {OS_OPTIONS.map(opt => (
                         <button
                           key={opt.id}
                           onClick={() => updateGroup(group.id, { os: opt.id })}
                           className={`px-4 py-2 rounded-lg text-[11px] font-black tracking-wide transition-all ${
                             (group.os || 'all') === opt.id
-                              ? 'bg-white text-slate-900 shadow-sm'
-                              : 'text-slate-400 hover:text-slate-600'
+                              ? 'bg-white text-neutral-900 shadow-sm'
+                              : 'text-neutral-400 hover:text-neutral-600'
                           }`}
                         >
                           {opt.label}
@@ -507,8 +507,8 @@ const BudgetKPISection = ({ formData, updateFormData, updateFormDataDeep, valida
                   {/* 4. Promote Objective */}
                   <div className="space-y-2.5">
                     <div className="flex items-center gap-2">
-                      <Target size={14} className="text-slate-400" />
-                      <span className="text-[10px] font-black text-slate-500 ">Promote Objective</span>
+                      <Target size={14} className="text-neutral-400" />
+                      <span className="text-[10px] font-black text-neutral-500 ">Promote Objective</span>
                     </div>
                     <ObjectiveSelector group={group} updateGroup={updateGroup} />
                   </div>
@@ -519,8 +519,8 @@ const BudgetKPISection = ({ formData, updateFormData, updateFormDataDeep, valida
                   {!locValid && (
                     <div className="absolute inset-0 z-10 bg-white/95 flex items-center justify-center rounded-br-3xl backdrop-blur-sm">
                       <div className="text-center space-y-2 px-8">
-                        <Layers size={28} className="text-indigo-300 mx-auto" />
-                        <p className="text-xs font-medium text-slate-400">Select target locations to configure targets</p>
+                        <Layers size={28} className="text-primary-300 mx-auto" />
+                        <p className="text-xs font-medium text-neutral-400">Select target locations to configure targets</p>
                       </div>
                     </div>
                   )}
@@ -528,16 +528,16 @@ const BudgetKPISection = ({ formData, updateFormData, updateFormDataDeep, valida
                   {/* Daily Budget */}
                   <div className="space-y-2.5">
                     <div className="flex items-center gap-2">
-                      <DollarSign size={14} className="text-indigo-500" />
-                      <span className="text-[10px] font-black text-slate-500 ">Daily Budget</span>
+                      <DollarSign size={14} className="text-primary-500" />
+                      <span className="text-[10px] font-black text-neutral-500 ">Daily Budget</span>
                     </div>
                     <UnitFollowInput
                       value={group.budget ?? group.unifiedBudget ?? ''}
                       unit="$"
                       onChange={(e) => updateGroup(group.id, { budget: e.target.value })}
                       placeholder="0.00"
-                      className={`w-full pr-12 py-3 bg-slate-50 border rounded-xl text-sm font-black text-slate-900 focus:outline-none focus:border-indigo-500 transition-all ${
-                        isOnboarding && !(group.budget || group.unifiedBudget) ? 'border-red-400 bg-red-50/20' : 'border-slate-200'
+                      className={`w-full pr-12 py-3 bg-neutral-50 border rounded-xl text-sm font-black text-neutral-900 focus:outline-none focus:border-primary-500 transition-all ${
+                        isOnboarding && !(group.budget || group.unifiedBudget) ? 'border-danger-400 bg-danger-50/20' : 'border-neutral-200'
                       }`}
                     />
                   </div>
@@ -545,15 +545,15 @@ const BudgetKPISection = ({ formData, updateFormData, updateFormDataDeep, valida
                   {/* ROAS */}
                   <div className="space-y-2.5">
                     <div className="flex items-center gap-2">
-                      <TrendingUp size={14} className="text-emerald-500" />
-                      <span className="text-[10px] font-black text-slate-500 ">ROAS</span>
-                      <span className="text-[9px] font-bold text-slate-300 ml-1">Optional</span>
+                      <TrendingUp size={14} className="text-success-500" />
+                      <span className="text-[10px] font-black text-neutral-500 ">ROAS</span>
+                      <span className="text-[9px] font-bold text-neutral-300 ml-1">Optional</span>
                     </div>
                     <div className="grid grid-cols-2 gap-3">
                       {/* Target: ≥ */}
                       <div>
-                        <span className="text-[9px] font-bold text-emerald-500 mb-1 block">Target</span>
-                        <div className="flex items-center rounded-xl border border-slate-200 overflow-hidden focus-within:border-emerald-500 transition-all">
+                        <span className="text-[9px] font-bold text-success-500 mb-1 block">Target</span>
+                        <div className="flex items-center rounded-xl border border-neutral-200 overflow-hidden focus-within:border-success-500 transition-all">
                           <OperatorLabel op="≥" />
                           <UnitFollowInput
                             value={group.roasTarget || ''}
@@ -561,7 +561,7 @@ const BudgetKPISection = ({ formData, updateFormData, updateFormDataDeep, valida
                             onChange={(e) => updateGroup(group.id, { roasTarget: e.target.value })}
                             placeholder="e.g. 3.0"
                             containerClassName="flex-1"
-                            className="w-full py-2.5 bg-white border-none text-sm font-black text-slate-900 focus:outline-none"
+                            className="w-full py-2.5 bg-white border-none text-sm font-black text-neutral-900 focus:outline-none"
                           />
                         </div>
                       </div>
@@ -571,7 +571,7 @@ const BudgetKPISection = ({ formData, updateFormData, updateFormDataDeep, valida
                           <ShieldAlert size={10} />
                           Redline
                         </span>
-                        <div className="flex items-center rounded-xl border border-slate-200 overflow-hidden focus-within:border-rose-400 transition-all">
+                        <div className="flex items-center rounded-xl border border-neutral-200 overflow-hidden focus-within:border-rose-400 transition-all">
                           <OperatorLabel op="≤" />
                           <UnitFollowInput
                             value={group.roasRedline || ''}
@@ -579,7 +579,7 @@ const BudgetKPISection = ({ formData, updateFormData, updateFormDataDeep, valida
                             onChange={(e) => updateGroup(group.id, { roasRedline: e.target.value })}
                             placeholder="e.g. 1.5"
                             containerClassName="flex-1"
-                            className="w-full py-2.5 bg-white border-none text-sm font-black text-slate-900 focus:outline-none"
+                            className="w-full py-2.5 bg-white border-none text-sm font-black text-neutral-900 focus:outline-none"
                           />
                         </div>
                       </div>
@@ -589,15 +589,15 @@ const BudgetKPISection = ({ formData, updateFormData, updateFormDataDeep, valida
                   {/* CPA */}
                   <div className="space-y-2.5">
                     <div className="flex items-center gap-2">
-                      <Zap size={14} className="text-amber-500" />
-                      <span className="text-[10px] font-black text-slate-500 ">CPA</span>
-                      <span className="text-[9px] font-bold text-slate-300 ml-1">Optional</span>
+                      <Zap size={14} className="text-warning-500" />
+                      <span className="text-[10px] font-black text-neutral-500 ">CPA</span>
+                      <span className="text-[9px] font-bold text-neutral-300 ml-1">Optional</span>
                     </div>
                     <div className="grid grid-cols-2 gap-3">
                       {/* Target: ≤ */}
                       <div>
-                        <span className="text-[9px] font-bold text-emerald-500 mb-1 block">Target</span>
-                        <div className="flex items-center rounded-xl border border-slate-200 overflow-hidden focus-within:border-emerald-500 transition-all">
+                        <span className="text-[9px] font-bold text-success-500 mb-1 block">Target</span>
+                        <div className="flex items-center rounded-xl border border-neutral-200 overflow-hidden focus-within:border-success-500 transition-all">
                           <OperatorLabel op="≤" />
                           <UnitFollowInput
                             value={group.cpaTarget || ''}
@@ -605,7 +605,7 @@ const BudgetKPISection = ({ formData, updateFormData, updateFormDataDeep, valida
                             onChange={(e) => updateGroup(group.id, { cpaTarget: e.target.value })}
                             placeholder="e.g. 25.00"
                             containerClassName="flex-1"
-                            className="w-full py-2.5 bg-white border-none text-sm font-black text-slate-900 focus:outline-none"
+                            className="w-full py-2.5 bg-white border-none text-sm font-black text-neutral-900 focus:outline-none"
                           />
                         </div>
                       </div>
@@ -615,7 +615,7 @@ const BudgetKPISection = ({ formData, updateFormData, updateFormDataDeep, valida
                           <ShieldAlert size={10} />
                           Redline
                         </span>
-                        <div className="flex items-center rounded-xl border border-slate-200 overflow-hidden focus-within:border-rose-400 transition-all">
+                        <div className="flex items-center rounded-xl border border-neutral-200 overflow-hidden focus-within:border-rose-400 transition-all">
                           <OperatorLabel op="≥" />
                           <UnitFollowInput
                             value={group.cpaRedline || ''}
@@ -623,7 +623,7 @@ const BudgetKPISection = ({ formData, updateFormData, updateFormDataDeep, valida
                             onChange={(e) => updateGroup(group.id, { cpaRedline: e.target.value })}
                             placeholder="e.g. 50.00"
                             containerClassName="flex-1"
-                            className="w-full py-2.5 bg-white border-none text-sm font-black text-slate-900 focus:outline-none"
+                            className="w-full py-2.5 bg-white border-none text-sm font-black text-neutral-900 focus:outline-none"
                           />
                         </div>
                       </div>
@@ -639,9 +639,9 @@ const BudgetKPISection = ({ formData, updateFormData, updateFormDataDeep, valida
         {!isOnboarding && (
           <button
             onClick={addGroup}
-            className="w-full py-5 rounded-2xl flex items-center justify-center gap-2.5 border-2 border-indigo-600 text-indigo-600 hover:bg-indigo-50 transition-all active:scale-[0.99] group"
+            className="w-full py-5 rounded-2xl flex items-center justify-center gap-2.5 border-2 border-primary-600 text-primary-600 hover:bg-primary-50 transition-all active:scale-[0.99] group"
           >
-            <PlusCircle size={20} className="text-indigo-600 group-hover:scale-110 transition-transform" />
+            <PlusCircle size={20} className="text-primary-600 group-hover:scale-110 transition-transform" />
             <span className="text-sm font-black tracking-tight">Add another strategy group</span>
           </button>
         )}

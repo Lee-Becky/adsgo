@@ -48,21 +48,21 @@ const SetupCompetitorModal = ({ isOpen, onClose, onSave }) => {
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
       <div 
-        className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300" 
+        className="absolute inset-0 bg-neutral-900/60 backdrop-blur-sm animate-in fade-in duration-300" 
         onClick={onClose} 
       />
       
-      <div className="relative bg-white w-full max-w-xl rounded-[40px] shadow-[0_32px_64px_-12px_rgba(0,0,0,0.14)] overflow-hidden animate-in zoom-in-95 duration-300">
+      <div className="relative bg-white w-full max-w-xl rounded-2xl shadow-[0_32px_64px_-12px_rgba(0,0,0,0.14)] overflow-hidden animate-in zoom-in-95 duration-300">
         {/* Header Area */}
-        <div className="bg-slate-50/50 px-10 py-8 border-b border-slate-100/80">
+        <div className="bg-neutral-50/50 px-10 py-8 border-b border-neutral-100/80">
           <div className="flex items-center justify-between">
             <div className="space-y-1">
-              <h2 className="text-2xl font-black text-slate-900 tracking-tight">Add Competitor</h2>
-              <p className="text-[13px] font-semibold text-slate-400">Track and analyze your market rivals.</p>
+              <h2 className="text-2xl font-black text-neutral-900 tracking-tight">Add Competitor</h2>
+              <p className="text-[13px] font-semibold text-neutral-400">Track and analyze your market rivals.</p>
             </div>
             <button 
               onClick={onClose}
-              className="p-3 bg-white border border-slate-100 rounded-2xl shadow-sm text-slate-400 hover:text-slate-900 hover:border-slate-200 transition-all active:scale-95"
+              className="p-3 bg-white border border-neutral-100 rounded-2xl shadow-sm text-neutral-400 hover:text-neutral-900 hover:border-neutral-200 transition-all active:scale-95"
             >
               <X size={20} />
             </button>
@@ -74,12 +74,12 @@ const SetupCompetitorModal = ({ isOpen, onClose, onSave }) => {
           <div className="flex gap-10 items-start">
             {/* Logo Column */}
             <div className="space-y-3 shrink-0">
-              <label className="flex items-center gap-2 text-[11px] font-black text-slate-400 ml-1">
-                <ImageIcon size={12} className="text-indigo-400" />
+              <label className="flex items-center gap-2 text-[11px] font-black text-neutral-400 ml-1">
+                <ImageIcon size={12} className="text-primary-400" />
                 Logo
               </label>
               <label className="cursor-pointer group block">
-                <div className="w-[120px] h-[120px] rounded-[36px] bg-slate-50 border-2 border-dashed border-slate-200 group-hover:border-indigo-400 group-hover:bg-indigo-50 transition-all flex items-center justify-center overflow-hidden shadow-inner relative">
+                <div className="w-[120px] h-[120px] rounded-2xl bg-neutral-50 border-2 border-dashed border-neutral-200 group-hover:border-primary-400 group-hover:bg-primary-50 transition-all flex items-center justify-center overflow-hidden shadow-inner relative">
                   {formData.logo ? (
                     <>
                       <img src={formData.logo} alt="Preview" className="w-full h-full object-contain p-2" />
@@ -88,7 +88,7 @@ const SetupCompetitorModal = ({ isOpen, onClose, onSave }) => {
                       </div>
                     </>
                   ) : (
-                    <div className="flex flex-col items-center gap-1.5 text-slate-300 group-hover:text-indigo-500 transition-colors">
+                    <div className="flex flex-col items-center gap-1.5 text-neutral-300 group-hover:text-primary-500 transition-colors">
                       <Plus size={32} strokeWidth={2.5} />
                       <span className="text-[11px] font-bold tracking-tight">Upload</span>
                     </div>
@@ -111,14 +111,14 @@ const SetupCompetitorModal = ({ isOpen, onClose, onSave }) => {
             {/* Fields Column */}
             <div className="flex-1 space-y-6">
               <div className="space-y-2.5">
-                <label className="flex items-center gap-2 text-[11px] font-black text-slate-400 ml-1">
-                  <Globe size={12} className="text-indigo-400" />
+                <label className="flex items-center gap-2 text-[11px] font-black text-neutral-400 ml-1">
+                  <Globe size={12} className="text-primary-400" />
                   Competitor Name <span className="text-rose-500 font-bold">*</span>
                 </label>
                 <div className="relative">
                   <input
                     type="text"
-                    className={`w-full h-[54px] bg-slate-50 border-none rounded-[18px] px-5 text-sm font-bold text-slate-700 placeholder:text-slate-300 focus:ring-[6px] focus:ring-indigo-500/10 transition-all shadow-inner ${errors.name ? 'ring-2 ring-rose-500/30' : ''}`}
+                    className={`w-full h-[54px] bg-neutral-50 border-none rounded-xl px-5 text-sm font-bold text-neutral-700 placeholder:text-neutral-300 focus:ring-[6px] focus:ring-primary-500/10 transition-all shadow-inner ${errors.name ? 'ring-2 ring-rose-500/30' : ''}`}
                     placeholder="e.g. Acme Corp"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -128,14 +128,14 @@ const SetupCompetitorModal = ({ isOpen, onClose, onSave }) => {
               </div>
 
               <div className="space-y-2.5">
-                <label className="flex items-center gap-2 text-[11px] font-black text-slate-400 ml-1">
-                  <Link size={12} className="text-indigo-400" />
+                <label className="flex items-center gap-2 text-[11px] font-black text-neutral-400 ml-1">
+                  <Link size={12} className="text-primary-400" />
                   Website URL <span className="text-rose-500 font-bold">*</span>
                 </label>
                 <div className="relative">
                   <input
                     type="url"
-                    className={`w-full h-[54px] bg-slate-50 border-none rounded-[18px] px-5 text-sm font-bold text-slate-700 placeholder:text-slate-300 focus:ring-[6px] focus:ring-indigo-500/10 transition-all shadow-inner ${errors.link ? 'ring-2 ring-rose-500/30' : ''}`}
+                    className={`w-full h-[54px] bg-neutral-50 border-none rounded-xl px-5 text-sm font-bold text-neutral-700 placeholder:text-neutral-300 focus:ring-[6px] focus:ring-primary-500/10 transition-all shadow-inner ${errors.link ? 'ring-2 ring-rose-500/30' : ''}`}
                     placeholder="https://www.competitor.com"
                     value={formData.link}
                     onChange={(e) => setFormData({ ...formData, link: e.target.value })}
@@ -148,12 +148,12 @@ const SetupCompetitorModal = ({ isOpen, onClose, onSave }) => {
 
           {/* Description Section */}
           <div className="space-y-3">
-            <label className="flex items-center gap-2 text-[11px] font-black text-slate-400 ml-1">
-              <FileText size={12} className="text-indigo-400" />
+            <label className="flex items-center gap-2 text-[11px] font-black text-neutral-400 ml-1">
+              <FileText size={12} className="text-primary-400" />
               Description
             </label>
             <textarea
-              className="w-full bg-slate-50 border-none rounded-[24px] px-6 py-5 text-sm font-bold text-slate-600 placeholder:text-slate-300 focus:ring-[6px] focus:ring-indigo-500/10 transition-all shadow-inner min-h-[140px] resize-none leading-relaxed"
+              className="w-full bg-neutral-50 border-none rounded-xl px-6 py-5 text-sm font-bold text-neutral-600 placeholder:text-neutral-300 focus:ring-[6px] focus:ring-primary-500/10 transition-all shadow-inner min-h-[140px] resize-none leading-relaxed"
               placeholder="What do they do differently? Note their strengths..."
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
@@ -165,13 +165,13 @@ const SetupCompetitorModal = ({ isOpen, onClose, onSave }) => {
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 h-[60px] rounded-[20px] font-black text-sm text-slate-500 hover:bg-slate-50 hover:text-slate-900 transition-all active:scale-95"
+              className="flex-1 h-[60px] rounded-2xl font-black text-sm text-neutral-500 hover:bg-neutral-50 hover:text-neutral-900 transition-all active:scale-95"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="flex-[2] h-[60px] rounded-[20px] bg-slate-900 text-white font-black text-sm hover:bg-black transition-all shadow-[0_16px_32px_-8px_rgba(0,0,0,0.3)] active:scale-95 flex items-center justify-center gap-2"
+              className="flex-[2] h-[60px] rounded-2xl bg-neutral-900 text-white font-black text-sm hover:bg-black transition-all shadow-[0_16px_32px_-8px_rgba(0,0,0,0.3)] active:scale-95 flex items-center justify-center gap-2"
             >
               Add Competitor
             </button>

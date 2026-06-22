@@ -114,22 +114,22 @@ export default function HistoryDetailPanel({
   const allSelected = selCount === count;
 
   return (
-    <main className="flex-1 min-w-0 min-h-0 bg-white rounded-[20px] border border-[#F0F0F0] card-shadow overflow-hidden flex flex-col relative">
+    <main className="flex-1 min-w-0 min-h-0 bg-white rounded-2xl border border-[#F0F0F0] card-shadow overflow-hidden flex flex-col relative">
       {/* Header */}
-      <div className="flex items-center justify-between px-5 py-4 border-b border-[#F5F5F5] bg-gray-50/50 shrink-0 relative z-20">
+      <div className="flex items-center justify-between px-5 py-4 border-b border-[#F5F5F5] bg-neutral-50/50 shrink-0 relative z-20">
         <div className="flex items-center gap-3 min-w-0">
           <div className="p-2 bg-primary-50 text-primary-600 rounded-xl shrink-0">
             <ImageIcon size={20} />
           </div>
           <div className="min-w-0 flex-1">
-            <h3 className="text-[16px] font-semibold text-gray-900 truncate">
+            <h3 className="text-[16px] font-semibold text-neutral-900 truncate">
               {selectedHistory?.productTitle || displayPrompt}
             </h3>
-            <div className="flex items-center gap-2 text-[14px] text-gray-400 font-normal mt-0.5">
+            <div className="flex items-center gap-2 text-[14px] text-neutral-400 font-normal mt-0.5">
               <span>{count} Image{count !== 1 ? 's' : ''}</span>
-              <span className="text-gray-200">•</span>
+              <span className="text-neutral-200">•</span>
               <span>{selectedHistory?.ratio}</span>
-              <span className="text-gray-200">•</span>
+              <span className="text-neutral-200">•</span>
               <span>{formatHistoryDateTime(selectedHistory)}</span>
             </div>
           </div>
@@ -142,17 +142,17 @@ export default function HistoryDetailPanel({
               <button
                 onClick={() => onSetShowVersionDropdown(v => !v)}
                 className={cn(
-                  'flex items-center gap-2 px-4 py-2 bg-white border rounded-full text-sm font-medium hover:bg-gray-50 hover:border-primary-500 hover:text-primary-600 transition-all shadow-sm',
-                  showVersionDropdown ? 'border-primary-500 ring-2 ring-primary-500/20 text-primary-600' : 'border-gray-300 text-gray-700'
+                  'flex items-center gap-2 px-4 py-2 bg-white border rounded-full text-sm font-medium hover:bg-neutral-50 hover:border-primary-500 hover:text-primary-600 transition-all shadow-sm',
+                  showVersionDropdown ? 'border-primary-500 ring-2 ring-primary-500/20 text-primary-600' : 'border-neutral-300 text-neutral-700'
                 )}
               >
                 {versions[activeVersionIdx]?.label ?? `Version ${activeVersionIdx + 1}`}
-                <ChevronDown size={14} className={cn('transition-transform duration-200 text-gray-400', showVersionDropdown && 'rotate-180')} />
+                <ChevronDown size={14} className={cn('transition-transform duration-200 text-neutral-400', showVersionDropdown && 'rotate-180')} />
               </button>
               {showVersionDropdown && (
                 <>
                   <div className="fixed inset-0 z-[90]" onClick={() => onSetShowVersionDropdown(false)} />
-                  <div className="absolute top-full right-0 mt-1 bg-white rounded-xl shadow-lg border border-gray-200 py-1 z-[100] max-h-60 overflow-y-auto" style={{ minWidth: '16rem' }}>
+                  <div className="absolute top-full right-0 mt-1 bg-white rounded-xl shadow-lg border border-neutral-200 py-1 z-[100] max-h-60 overflow-y-auto" style={{ minWidth: '16rem' }}>
                     {versions.map((v, idx) => {
                       const isSelected = activeVersionIdx === idx;
                       return (
@@ -167,7 +167,7 @@ export default function HistoryDetailPanel({
                           }}
                           className={cn(
                             'w-full flex items-center gap-2 px-3 py-2 text-left text-sm transition-colors',
-                            isSelected ? 'bg-primary-50 text-primary-600 font-medium' : 'text-gray-700 hover:bg-gray-50'
+                            isSelected ? 'bg-primary-50 text-primary-600 font-medium' : 'text-neutral-700 hover:bg-neutral-50'
                           )}
                         >
                           {v.status === 'processing' && (
@@ -175,7 +175,7 @@ export default function HistoryDetailPanel({
                           )}
                           <div className="min-w-0 flex-1">
                             <p className="font-medium truncate">{v.label}</p>
-                            <div className={cn('flex items-center gap-1.5 mt-0.5 text-xs whitespace-nowrap overflow-hidden', isSelected ? 'text-primary-400' : 'text-gray-400')}>
+                            <div className={cn('flex items-center gap-1.5 mt-0.5 text-xs whitespace-nowrap overflow-hidden', isSelected ? 'text-primary-400' : 'text-neutral-400')}>
                               <span>{count} Image{count !== 1 ? 's' : ''}</span>
                               {selectedHistory.ratio && <><span className="opacity-40">·</span><span>{selectedHistory.ratio}</span></>}
                               <span className="opacity-40">·</span>
@@ -197,15 +197,15 @@ export default function HistoryDetailPanel({
       {/* Filmstrip */}
       {isShowingFilmstrip && (
         <div className="shrink-0 flex items-center justify-center px-4 pt-5 pb-1">
-          <div className="inline-flex items-center gap-2 px-3 py-2 bg-white/60 border border-gray-100 rounded-2xl max-w-full overflow-x-auto">
+          <div className="inline-flex items-center gap-2 px-3 py-2 bg-white/60 border border-neutral-100 rounded-2xl max-w-full overflow-x-auto">
             {/* Select All / Deselect All */}
             <button
               onClick={() => onSetSelectedVariations(allSelected ? new Set() : new Set(Array.from({ length: count }, (_, i) => i)))}
-              className="text-xs font-medium text-gray-500 hover:text-primary-500 transition-colors px-1 shrink-0 whitespace-nowrap"
+              className="text-xs font-medium text-neutral-500 hover:text-primary-500 transition-colors px-1 shrink-0 whitespace-nowrap"
             >
               {allSelected ? 'Deselect All' : 'Select All'}
             </button>
-            <span className="w-px h-5 bg-gray-200 shrink-0" />
+            <span className="w-px h-5 bg-neutral-200 shrink-0" />
 
             {/* Thumbnails */}
             {Array.from({ length: count }, (_, i) => {
@@ -220,7 +220,7 @@ export default function HistoryDetailPanel({
                       'w-16 h-16 rounded-xl border-2 transition-all overflow-hidden block',
                       isActive
                         ? 'border-primary-500 ring-2 ring-primary-500/20'
-                        : 'border-transparent hover:border-gray-300 opacity-70 hover:opacity-100'
+                        : 'border-transparent hover:border-neutral-300 opacity-70 hover:opacity-100'
                     )}
                   >
                     <img src={urls[i] || displayPreview || ''} className="w-full h-full object-cover" alt={`Variation ${i + 1}`} />
@@ -239,7 +239,7 @@ export default function HistoryDetailPanel({
                       'absolute top-1 right-1 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all shadow-sm',
                       isChecked
                         ? 'bg-primary-500 border-primary-500 opacity-100'
-                        : 'bg-white/90 border-gray-300 opacity-0 group-hover:opacity-100'
+                        : 'bg-white/90 border-neutral-300 opacity-0 group-hover:opacity-100'
                     )}
                   >
                     {isChecked && <Check size={10} strokeWidth={3} className="text-white" />}
@@ -251,10 +251,10 @@ export default function HistoryDetailPanel({
             {/* N selected */}
             {selCount > 0 && (
               <>
-                <span className="w-px h-5 bg-gray-200 shrink-0" />
+                <span className="w-px h-5 bg-neutral-200 shrink-0" />
                 <div className="flex items-center gap-1.5 px-1">
                   <span className="text-xs font-medium text-primary-600 shrink-0">{selCount} selected</span>
-                  <button onClick={() => onSetSelectedVariations(new Set())} className="text-gray-400 hover:text-gray-600 transition-colors">
+                  <button onClick={() => onSetSelectedVariations(new Set())} className="text-neutral-400 hover:text-neutral-600 transition-colors">
                     <CloseIcon size={11} />
                   </button>
                 </div>
@@ -314,7 +314,7 @@ export default function HistoryDetailPanel({
                       'absolute top-2.5 right-2.5 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all shadow-md',
                       selectedVariations.has(selectedHistoryVariationIndex)
                         ? 'bg-primary-500 border-primary-500 opacity-100'
-                        : 'bg-white/90 border-gray-300 opacity-0 group-hover/preview:opacity-100'
+                        : 'bg-white/90 border-neutral-300 opacity-0 group-hover/preview:opacity-100'
                     )}
                   >
                     {selectedVariations.has(selectedHistoryVariationIndex) && <Check size={13} strokeWidth={3} className="text-white" />}
@@ -332,8 +332,8 @@ export default function HistoryDetailPanel({
                 <CloseIcon size={36} className="text-red-300" />
               </div>
               <div className="space-y-2">
-                <p className="text-lg font-bold text-gray-900">Generation Failed</p>
-                <p className="text-sm text-gray-400 leading-relaxed">
+                <p className="text-lg font-bold text-neutral-900">Generation Failed</p>
+                <p className="text-sm text-neutral-400 leading-relaxed">
                   Something went wrong during generation. Please retry.
                 </p>
               </div>
@@ -347,10 +347,10 @@ export default function HistoryDetailPanel({
             </div>
           ) : (
             <div className="text-center space-y-4">
-              <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center text-gray-300 mx-auto">
+              <div className="w-20 h-20 bg-neutral-100 rounded-full flex items-center justify-center text-neutral-300 mx-auto">
                 <ImageIcon size={40} />
               </div>
-              <p className="text-sm font-bold text-gray-400">Select a creative from history to preview</p>
+              <p className="text-sm font-bold text-neutral-400">Select a creative from history to preview</p>
             </div>
           )}
 
@@ -360,17 +360,17 @@ export default function HistoryDetailPanel({
               {selectedHistoryVariationIndex > 0 && (
                 <button
                   onClick={() => onSetSelectedHistoryVariationIndex(i => i - 1)}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 flex items-center justify-center bg-white/90 backdrop-blur-md border border-gray-200/80 rounded-full shadow-md hover:bg-white hover:shadow-lg transition-all"
+                  className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 flex items-center justify-center bg-white/90 backdrop-blur-md border border-neutral-200/80 rounded-full shadow-md hover:bg-white hover:shadow-lg transition-all"
                 >
-                  <ChevronLeft size={18} className="text-gray-600" />
+                  <ChevronLeft size={18} className="text-neutral-600" />
                 </button>
               )}
               {selectedHistoryVariationIndex < count - 1 && (
                 <button
                   onClick={() => onSetSelectedHistoryVariationIndex(i => i + 1)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 flex items-center justify-center bg-white/90 backdrop-blur-md border border-gray-200/80 rounded-full shadow-md hover:bg-white hover:shadow-lg transition-all"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 flex items-center justify-center bg-white/90 backdrop-blur-md border border-neutral-200/80 rounded-full shadow-md hover:bg-white hover:shadow-lg transition-all"
                 >
-                  <ChevronRight size={18} className="text-gray-600" />
+                  <ChevronRight size={18} className="text-neutral-600" />
                 </button>
               )}
             </>
@@ -380,7 +380,7 @@ export default function HistoryDetailPanel({
 
       {/* Bottom action bar */}
       {showActions && (
-        <div className="shrink-0 px-5 py-3 border-t border-[#F5F5F5] bg-gray-50/50 flex items-center justify-center gap-2 flex-wrap">
+        <div className="shrink-0 px-5 py-3 border-t border-[#F5F5F5] bg-neutral-50/50 flex items-center justify-center gap-2 flex-wrap">
           {/* Download */}
           <div className="relative group/tip">
             <button
@@ -388,16 +388,16 @@ export default function HistoryDetailPanel({
               className={cn(
                 'flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all focus:outline-none',
                 needsSelection
-                  ? 'bg-gray-100 border border-gray-200 text-gray-400 cursor-not-allowed'
-                  : 'bg-white border border-gray-300 text-gray-700 shadow-sm hover:bg-gray-50 hover:text-primary-600 hover:border-primary-500'
+                  ? 'bg-neutral-100 border border-neutral-200 text-neutral-400 cursor-not-allowed'
+                  : 'bg-white border border-neutral-300 text-neutral-700 shadow-sm hover:bg-neutral-50 hover:text-primary-600 hover:border-primary-500'
               )}
             >
               <Download size={16} />
               Download
             </button>
             {needsSelection && (
-              <div className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover/tip:block w-max max-w-[260px] bg-gray-900/90 text-white text-xs rounded-lg px-2.5 py-1.5 shadow-lg leading-relaxed z-[200]">
-                <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900/90" />
+              <div className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover/tip:block w-max max-w-[260px] bg-neutral-900/90 text-white text-xs rounded-lg px-2.5 py-1.5 shadow-lg leading-relaxed z-[200]">
+                <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-neutral-900/90" />
                 {disabledTip}
               </div>
             )}
@@ -410,16 +410,16 @@ export default function HistoryDetailPanel({
               className={cn(
                 'flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all focus:outline-none',
                 needsSelection
-                  ? 'bg-gray-100 border border-gray-200 text-gray-400 cursor-not-allowed'
-                  : 'bg-white border border-gray-300 text-gray-700 shadow-sm hover:bg-gray-50 hover:text-primary-600 hover:border-primary-500'
+                  ? 'bg-neutral-100 border border-neutral-200 text-neutral-400 cursor-not-allowed'
+                  : 'bg-white border border-neutral-300 text-neutral-700 shadow-sm hover:bg-neutral-50 hover:text-primary-600 hover:border-primary-500'
               )}
             >
               <FolderPlus size={16} />
               Save to My Creatives
             </button>
             {needsSelection && (
-              <div className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover/tip:block w-max max-w-[260px] bg-gray-900/90 text-white text-xs rounded-lg px-2.5 py-1.5 shadow-lg leading-relaxed z-[200]">
-                <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900/90" />
+              <div className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover/tip:block w-max max-w-[260px] bg-neutral-900/90 text-white text-xs rounded-lg px-2.5 py-1.5 shadow-lg leading-relaxed z-[200]">
+                <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-neutral-900/90" />
                 {disabledTip}
               </div>
             )}
@@ -444,16 +444,16 @@ export default function HistoryDetailPanel({
               className={cn(
                 'flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all focus:outline-none',
                 needsSelection
-                  ? 'bg-gray-100 border border-gray-200 text-gray-400 cursor-not-allowed'
-                  : 'bg-white border border-gray-300 text-gray-700 shadow-sm hover:bg-gray-50 hover:text-primary-600 hover:border-primary-500'
+                  ? 'bg-neutral-100 border border-neutral-200 text-neutral-400 cursor-not-allowed'
+                  : 'bg-white border border-neutral-300 text-neutral-700 shadow-sm hover:bg-neutral-50 hover:text-primary-600 hover:border-primary-500'
               )}
             >
               <Sparkles size={14} />
               Regenerate
             </button>
             {needsSelection && (
-              <div className="pointer-events-none absolute bottom-full right-0 mb-2 hidden group-hover/tip:block w-max max-w-[260px] bg-gray-900/90 text-white text-xs rounded-lg px-2.5 py-1.5 shadow-lg leading-relaxed z-[200]">
-                <div className="absolute top-full right-3 border-4 border-transparent border-t-gray-900/90" />
+              <div className="pointer-events-none absolute bottom-full right-0 mb-2 hidden group-hover/tip:block w-max max-w-[260px] bg-neutral-900/90 text-white text-xs rounded-lg px-2.5 py-1.5 shadow-lg leading-relaxed z-[200]">
+                <div className="absolute top-full right-3 border-4 border-transparent border-t-neutral-900/90" />
                 {disabledTip}
               </div>
             )}

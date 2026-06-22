@@ -1,19 +1,32 @@
 import { forwardRef } from 'react'
 import { Loader2 } from 'lucide-react'
 
-const variants = {
-  primary:   'bg-primary-500 text-white hover:bg-primary-600 hover:-translate-y-px hover:shadow-primary-soft active:bg-primary-700 active:translate-y-0 active:scale-[0.97] active:shadow-xs',
-  secondary: 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300 active:bg-gray-100',
-  ghost:     'bg-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-800 active:bg-gray-100',
-  danger:    'bg-red-500 text-white hover:bg-red-600 active:bg-red-700',
-  link:      'bg-transparent text-primary-500 hover:text-primary-600 hover:underline p-0 h-auto',
+/* ── Variant styles ─────────────────────────────────────────── */
+const variantStyles = {
+  primary:
+    'bg-primary-500 text-white shadow-xs hover:bg-primary-600 hover:shadow-sm focus-visible:ring-2 focus-visible:ring-primary-500/40 active:bg-primary-700',
+  secondary:
+    'bg-white border border-neutral-200 text-neutral-800 shadow-xs hover:bg-neutral-50 hover:border-neutral-300 focus-visible:ring-2 focus-visible:ring-primary-500/30 active:bg-neutral-100',
+  ghost:
+    'bg-transparent text-neutral-600 hover:bg-neutral-100 hover:text-neutral-800 focus-visible:ring-2 focus-visible:ring-primary-500/30 active:bg-neutral-200',
+  danger:
+    'bg-danger-500 text-white shadow-xs hover:bg-danger-600 hover:shadow-sm focus-visible:ring-2 focus-visible:ring-danger-500/40 active:bg-danger-700',
+  luna:
+    'relative bg-white text-luna-violet shadow-xs hover:shadow-luna focus-visible:ring-2 focus-visible:ring-luna-violet/40 active:bg-luna-bg',
+  /* 1.0 backward-compat */
+  link:
+    'bg-transparent text-primary-500 hover:text-primary-600 hover:underline !p-0 !h-auto',
 }
 
-const sizes = {
-  sm: 'h-7 text-xs px-3 gap-1.5 rounded-md',
-  md: 'h-9 text-sm px-4 gap-2 rounded-lg',
-  lg: 'h-11 text-base px-5 gap-2.5 rounded-lg',
+/* ── Size styles ────────────────────────────────────────────── */
+const sizeStyles = {
+  sm: 'h-8 text-caption px-3 gap-1.5 rounded-md',
+  md: 'h-9 text-body px-4 gap-2 rounded-md',
+  lg: 'h-11 text-body-lg px-5 gap-2.5 rounded-lg',
 }
+
+/* ── Icon sizes per button size ─────────────────────────────── */
+const iconSizes = { sm: 14, md: 16, lg: 18 }
 
 const Button = forwardRef(({
   variant = 'primary',
@@ -21,6 +34,8 @@ const Button = forwardRef(({
   loading = false,
   disabled = false,
   icon: Icon,
+  iconPosition = 'left',
+  /* backward-compat aliases */
   iconRight: IconRight,
   iconOnly = false,
   className = '',
@@ -28,27 +43,62 @@ const Button = forwardRef(({
   ...props
 }, ref) => {
   const isDisabled = disabled || loading
+  const iconPx = iconSizes[size] || iconSizes.md
+  const isIconOnly = iconOnly || (!children && Icon)
+  const isLuna = variant === 'luna'
+  const isLink = variant === 'link'
 
   return (
     <button
       ref={ref}
       disabled={isDisabled}
-      className={`
-        inline-flex items-center justify-center font-semibold
-        transition-all duration-200
-        ${variants[variant] || variants.primary}
-        ${variant !== 'link' ? sizes[size] || sizes.md : ''}
-        ${iconOnly ? `!px-0 ${size === 'sm' ? 'w-7' : size === 'lg' ? 'w-11' : 'w-9'}` : ''}
-        ${isDisabled ? 'opacity-40 pointer-events-none' : ''}
-        ${className}
-      `.trim()}
-      style={{ transitionTimingFunction: 'cubic-bezier(0.34, 1.56, 0.64, 1)' }}
+      className={[
+        'inline-flex items-center justify-center font-semibold',
+        'select-none outline-none',
+        'transition-all duration-fast ease-default',
+        'active:scale-[0.98]',
+        variantStyles[variant] || variantStyles.primary,
+        !isLink ? (sizeStyles[size] || sizeStyles.md) : '',
+        isIconOnly ? `!px-0 ${size === 'sm' ? 'w-8' : size === 'lg' ? 'w-11' : 'w-9'}` : '',
+        isDisabled ? 'opacity-50 pointer-events-none cursor-not-allowed' : 'cursor-pointer',
+        className,
+      ].filter(Boolean).join(' ')}
       {...props}
     >
-      {loading && <Loader2 size={14} className="animate-spin" />}
-      {!loading && Icon && <Icon size={size === 'sm' ? 14 : 16} />}
-      {!iconOnly && children}
-      {IconRight && <IconRight size={size === 'sm' ? 14 : 16} />}
+      {/* Loading spinner replaces left icon */}
+      {loading && (
+        <Loader2 size={iconPx} className="animate-spin shrink-0" />
+      )}
+
+      {/* Left icon */}
+      {!loading && Icon && (iconPosition === 'left' || isIconOnly) && (
+        <Icon size={iconPx} className="shrink-0" />
+      )}
+
+      {/* Label */}
+      {!isIconOnly && children}
+
+      {/* Right icon (new prop or backward-compat iconRight) */}
+      {!loading && Icon && iconPosition === 'right' && !isIconOnly && (
+        <Icon size={iconPx} className="shrink-0" />
+      )}
+      {!loading && IconRight && (
+        <IconRight size={iconPx} className="shrink-0" />
+      )}
+
+      {/* Luna gradient border effect (CSS pseudo-element driven) */}
+      {isLuna && (
+        <span
+          aria-hidden
+          className="pointer-events-none absolute inset-0 rounded-[inherit] p-px"
+          style={{
+            background: 'var(--luna-gradient)',
+            WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+            WebkitMaskComposite: 'xor',
+            maskComposite: 'exclude',
+          }}
+        />
+      )}
     </button>
   )
 })

@@ -81,19 +81,19 @@ const RunSettingModal = ({ isOpen, onClose, onSave }) => {
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-neutral-200">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 bg-[#7033F5] rounded-xl flex items-center justify-center shadow-lg shadow-purple-200/50">
               <Settings size={18} className="text-white" />
             </div>
             <div>
-              <h2 className="text-base font-semibold text-gray-900 leading-none mb-1">Run Setting</h2>
-              <p className="text-[11px] font-medium text-gray-400">Set when and how often the brand is provided budget optimization.</p>
+              <h2 className="text-base font-semibold text-neutral-900 leading-none mb-1">Run Setting</h2>
+              <p className="text-[11px] font-medium text-neutral-400">Set when and how often the brand is provided budget optimization.</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-xl transition-all duration-200 text-gray-400 hover:text-gray-600"
+            className="p-2 hover:bg-neutral-100 rounded-xl transition-all duration-200 text-neutral-400 hover:text-neutral-600"
           >
             <X size={18} />
           </button>
@@ -102,8 +102,8 @@ const RunSettingModal = ({ isOpen, onClose, onSave }) => {
         {/* Body */}
         <div className="px-6 py-5 space-y-4">
           {/* Frequency Selector */}
-          <div className="bg-gray-50/80 border border-gray-100 rounded-xl p-4">
-            <label className="text-xs font-semibold text-gray-400 tracking-wide mb-3 flex items-center gap-2">
+          <div className="bg-neutral-50/80 border border-neutral-100 rounded-xl p-4">
+            <label className="text-xs font-semibold text-neutral-400 tracking-wide mb-3 flex items-center gap-2">
               <span className="w-1 h-4 rounded-full bg-[#7033F5] shrink-0"></span>
               Frequency
             </label>
@@ -115,9 +115,9 @@ const RunSettingModal = ({ isOpen, onClose, onSave }) => {
                     name="frequency"
                     checked={frequency === key}
                     onChange={() => setFrequency(key)}
-                    className="w-4 h-4 border-2 border-gray-200 text-[#7033F5] accent-[#7033F5] focus:ring-0 transition-all duration-200 cursor-pointer"
+                    className="w-4 h-4 border-2 border-neutral-200 text-[#7033F5] accent-[#7033F5] focus:ring-0 transition-all duration-200 cursor-pointer"
                   />
-                  <span className={`text-sm transition-all duration-200 ${frequency === key ? 'font-semibold text-[#7033F5]' : 'font-medium text-gray-500'}`}>{label}</span>
+                  <span className={`text-sm transition-all duration-200 ${frequency === key ? 'font-semibold text-[#7033F5]' : 'font-medium text-neutral-500'}`}>{label}</span>
                 </label>
               ))}
             </div>
@@ -125,13 +125,13 @@ const RunSettingModal = ({ isOpen, onClose, onSave }) => {
 
           {/* Custom: Every X days */}
           {frequency === 'custom' && (
-            <div className="animate-in fade-in slide-in-from-top-2 duration-200 bg-gray-50/80 border border-gray-100 rounded-xl p-4">
-              <label className="text-xs font-semibold text-gray-400 tracking-wide mb-3 flex items-center gap-2">
+            <div className="animate-in fade-in slide-in-from-top-2 duration-200 bg-neutral-50/80 border border-neutral-100 rounded-xl p-4">
+              <label className="text-xs font-semibold text-neutral-400 tracking-wide mb-3 flex items-center gap-2">
                 <span className="w-1 h-4 rounded-full bg-[#7033F5] shrink-0"></span>
                 Interval
               </label>
               <div className="flex items-center gap-2.5 pl-3">
-                <span className="text-sm text-gray-600">Every</span>
+                <span className="text-sm text-neutral-600">Every</span>
                 <input
                   type="number"
                   min={2}
@@ -145,16 +145,16 @@ const RunSettingModal = ({ isOpen, onClose, onSave }) => {
                   onBlur={() => {
                     if (!customDays || customDays < 2) setCustomDays(2);
                   }}
-                  className="w-16 text-center px-2 py-2 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 focus:outline-none focus:border-[#7033F5] focus:shadow-[0_4px_14px_0_rgba(112,51,245,0.2)] transition-all duration-200"
+                  className="w-16 text-center px-2 py-2 border border-neutral-200 rounded-lg text-sm font-medium text-neutral-700 focus:outline-none focus:border-[#7033F5] focus:shadow-[0_4px_14px_0_rgba(112,51,245,0.2)] transition-all duration-200"
                 />
-                <span className="text-sm text-gray-600">days</span>
+                <span className="text-sm text-neutral-600">days</span>
               </div>
             </div>
           )}
 
           {/* Execution Time */}
-          <div className="bg-gray-50/80 border border-gray-100 rounded-xl p-4">
-            <label className="text-xs font-semibold text-gray-400 tracking-wide mb-3 flex items-center gap-2">
+          <div className="bg-neutral-50/80 border border-neutral-100 rounded-xl p-4">
+            <label className="text-xs font-semibold text-neutral-400 tracking-wide mb-3 flex items-center gap-2">
               <span className="w-1 h-4 rounded-full bg-[#7033F5] shrink-0"></span>
               Execution Time
             </label>
@@ -189,34 +189,34 @@ const RunSettingModal = ({ isOpen, onClose, onSave }) => {
                 <div className="relative flex-1" ref={timeDropdownRef}>
                   <button
                     onClick={() => setShowTimeDropdown(!showTimeDropdown)}
-                    className={`w-full flex items-center justify-between px-3 py-2.5 border rounded-lg text-sm text-gray-700 bg-white transition-all duration-200 ${
+                    className={`w-full flex items-center justify-between px-3 py-2.5 border rounded-lg text-sm text-neutral-700 bg-white transition-all duration-200 ${
                       timeError
-                        ? 'border-red-500 shadow-[0_4px_14px_0_rgba(239,68,68,0.15)]'
+                        ? 'border-danger-500 shadow-[0_4px_14px_0_rgba(239,68,68,0.15)]'
                         : showTimeDropdown
                           ? 'border-[#7033F5] shadow-[0_4px_14px_0_rgba(112,51,245,0.2)]'
-                          : 'border-gray-200 hover:border-gray-300'
+                          : 'border-neutral-200 hover:border-neutral-300'
                     }`}
                   >
                     <div className="flex items-center gap-2">
-                      <Clock size={14} className="text-gray-400" />
-                      <span className={`font-medium ${selectedTime ? '' : 'text-gray-400'}`}>
+                      <Clock size={14} className="text-neutral-400" />
+                      <span className={`font-medium ${selectedTime ? '' : 'text-neutral-400'}`}>
                         {selectedTime || 'Select execution time'}
                       </span>
                     </div>
                     {selectedTime ? (
                       <button
                         onClick={(e) => { e.stopPropagation(); setSelectedTime(''); setTimeError(false); }}
-                        className="p-0.5 rounded-md text-gray-400 hover:text-gray-600 transition-colors"
+                        className="p-0.5 rounded-md text-neutral-400 hover:text-neutral-600 transition-colors"
                       >
                         <X size={14} />
                       </button>
                     ) : (
-                      <ChevronDown size={14} className={`text-gray-400 transition-transform duration-200 ${showTimeDropdown ? 'rotate-180' : ''}`} />
+                      <ChevronDown size={14} className={`text-neutral-400 transition-transform duration-200 ${showTimeDropdown ? 'rotate-180' : ''}`} />
                     )}
                   </button>
 
                   {showTimeDropdown && (
-                    <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-10 max-h-48 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent">
+                    <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-neutral-200 rounded-xl shadow-lg z-10 max-h-48 overflow-y-auto scrollbar-thin scrollbar-thumb-neutral-200 scrollbar-track-transparent">
                       {TIME_SLOTS.map(slot => {
                         const isAdded = frequency === 'daily' && timeSlots.includes(slot);
                         return (
@@ -226,14 +226,14 @@ const RunSettingModal = ({ isOpen, onClose, onSave }) => {
                             onClick={() => { if (!isAdded) { setSelectedTime(slot); setShowTimeDropdown(false); setTimeError(false); } }}
                             className={`w-full px-3 py-2 text-left text-sm flex items-center justify-between transition-colors duration-150 ${
                               isAdded
-                                ? 'text-gray-300 cursor-not-allowed'
+                                ? 'text-neutral-300 cursor-not-allowed'
                                 : selectedTime === slot
                                   ? 'bg-[#f3f0ff] text-[#7033F5] font-semibold'
-                                  : 'text-gray-700 hover:bg-gray-50'
+                                  : 'text-neutral-700 hover:bg-neutral-50'
                             }`}
                           >
                             <span>{slot}</span>
-                            {isAdded && <span className="text-[10px] font-semibold text-gray-300">Added</span>}
+                            {isAdded && <span className="text-[10px] font-semibold text-neutral-300">Added</span>}
                           </button>
                         );
                       })}
@@ -253,19 +253,19 @@ const RunSettingModal = ({ isOpen, onClose, onSave }) => {
                 )}
               </div>
               ) : (
-                <span className="text-xs text-gray-400">Maximum 6 execution times reached</span>
+                <span className="text-xs text-neutral-400">Maximum 6 execution times reached</span>
               )}
 
-              <span className="text-[11px] font-medium text-gray-400 block">(UTC+08:00) Brand Time Zone</span>
+              <span className="text-[11px] font-medium text-neutral-400 block">(UTC+08:00) Brand Time Zone</span>
             </div>
           </div>
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t border-gray-200 flex justify-end gap-3">
+        <div className="px-6 py-4 border-t border-neutral-200 flex justify-end gap-3">
           <button
             onClick={onClose}
-            className="px-5 py-2.5 text-sm font-semibold text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 transition-all duration-200"
+            className="px-5 py-2.5 text-sm font-semibold text-neutral-600 border border-neutral-200 rounded-lg hover:bg-neutral-50 transition-all duration-200"
           >
             Cancel
           </button>

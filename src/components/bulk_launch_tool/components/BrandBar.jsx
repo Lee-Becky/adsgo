@@ -14,7 +14,7 @@ const BrandBar = ({ brand, onSave, onIgnore, isSaved }) => {
             <span className="mx-2 text-primary-500/40">|</span>
             <span className="text-xs text-primary-500 font-mono">{brand.url}</span>
           </div>
-          <div className="flex items-center bg-green-50 px-2 py-0.5 rounded-tag text-xs text-green-700 font-medium">
+          <div className="flex items-center bg-success-50 px-2 py-0.5 rounded-tag text-xs text-success-700 font-medium">
             <ShieldCheck size={12} className="mr-1" />
             品牌已加密保护
           </div>
@@ -27,18 +27,18 @@ const BrandBar = ({ brand, onSave, onIgnore, isSaved }) => {
   }
 
   return (
-    <div className="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between sticky top-0 z-50 adsgo-card-shadow animate-slide-down">
+    <div className="bg-white border-b border-neutral-200 px-6 py-3 flex items-center justify-between sticky top-0 z-50 adsgo-card-shadow animate-slide-down">
       <div className="flex items-center space-x-4">
         <img src={brand.logo} alt="Brand" className="w-10 h-10 rounded-base shadow-adsgo-card object-cover" />
         <div>
-          <h4 className="text-sm font-semibold text-gray-900">检测到品牌: {brand.name}</h4>
-          <p className="text-xs text-gray-500">{brand.url} • {brand.goal} • {brand.country}</p>
+          <h4 className="text-sm font-semibold text-neutral-900">检测到品牌: {brand.name}</h4>
+          <p className="text-xs text-neutral-500">{brand.url} • {brand.goal} • {brand.country}</p>
         </div>
       </div>
       <div className="flex items-center space-x-3">
         <button
           onClick={onIgnore}
-          className="p-2 text-gray-400 hover:text-gray-600 transition-colors duration-200"
+          className="p-2 text-neutral-400 hover:text-neutral-600 transition-colors duration-200"
         >
           <X size={18} />
         </button>

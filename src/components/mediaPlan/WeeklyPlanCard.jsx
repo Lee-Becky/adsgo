@@ -25,15 +25,15 @@ function getWeekRange(offsetWeeks) {
 
 function WeekCard({ week, isCurrentWeek }) {
   const statusStyles = {
-    completed: 'bg-emerald-50/50 border-emerald-200/60 opacity-65 saturate-[0.6]',
+    completed: 'bg-success-50/50 border-success-200/60 opacity-65 saturate-[0.6]',
     current: 'bg-gradient-to-br from-primary-50 via-white to-primary-50/30 border-primary-300 ring-2 ring-primary-200',
-    upcoming: 'bg-gray-50/40 border-dashed border-gray-200 opacity-60',
+    upcoming: 'bg-neutral-50/40 border-dashed border-neutral-200 opacity-60',
   }
 
   const statusLabelStyles = {
-    completed: 'bg-emerald-100 text-emerald-700',
+    completed: 'bg-success-100 text-success-700',
     current: 'bg-primary-100 text-primary-700',
-    upcoming: 'bg-gray-100 text-gray-600',
+    upcoming: 'bg-neutral-100 text-neutral-600',
   }
 
   return (
@@ -55,17 +55,17 @@ function WeekCard({ week, isCurrentWeek }) {
       </div>
 
       {/* Date Range */}
-      <p className={`${isCurrentWeek ? 'text-xs' : 'text-[11px]'} font-medium text-gray-700 mb-2`}>
+      <p className={`${isCurrentWeek ? 'text-xs' : 'text-[11px]'} font-medium text-neutral-700 mb-2`}>
         {week.dateRange.startStr} - {week.dateRange.endStr}
       </p>
 
       {/* Core Objective */}
       <div className="mb-2">
         <div className="flex items-center gap-1 mb-1">
-          <Target className="w-3 h-3 text-gray-500" />
-          <span className="text-[9px] font-semibold text-gray-600 tracking-wide">Core Objective</span>
+          <Target className="w-3 h-3 text-neutral-500" />
+          <span className="text-[9px] font-semibold text-neutral-600 tracking-wide">Core Objective</span>
         </div>
-        <p className={`${isCurrentWeek ? 'text-xs' : 'text-[11px]'} font-medium text-gray-800 leading-snug`}>{week.coreObjective}</p>
+        <p className={`${isCurrentWeek ? 'text-xs' : 'text-[11px]'} font-medium text-neutral-800 leading-snug`}>{week.coreObjective}</p>
       </div>
 
       {/* AI Plan */}
@@ -76,7 +76,7 @@ function WeekCard({ week, isCurrentWeek }) {
         </div>
         <ul className="space-y-0.5">
           {week.aiPlan.slice(0, 3).map((item, idx) => (
-            <li key={idx} className="text-[11px] text-gray-600 leading-snug flex items-start gap-1">
+            <li key={idx} className="text-[11px] text-neutral-600 leading-snug flex items-start gap-1">
               <span className="text-primary-400 mt-0.5 flex-shrink-0">•</span>
               <span className="line-clamp-2">{item}</span>
             </li>
@@ -93,7 +93,7 @@ function WeekCard({ week, isCurrentWeek }) {
           {week.youNeedToDo.map((todo) => (
             <li
               key={todo.id}
-              className={`text-[11px] leading-snug ${todo.completed ? 'text-gray-400 line-through' : 'text-gray-700'}`}
+              className={`text-[11px] leading-snug ${todo.completed ? 'text-neutral-400 line-through' : 'text-neutral-700'}`}
             >
               {todo.text}
             </li>
@@ -143,22 +143,22 @@ export default function WeeklyPlanCard({ weeksData, hideTitle }) {
     <div>
       {!hideTitle && (
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-base font-semibold text-gray-900">Weekly Strategy</h3>
+          <h3 className="text-base font-semibold text-neutral-900">Weekly Strategy</h3>
           <div className="flex items-center gap-2">
             <button
               onClick={() => scrollBy(-1)}
-              className="lg:hidden w-7 h-7 rounded-lg border border-gray-200 flex items-center justify-center hover:bg-gray-50 disabled:opacity-30 transition-colors"
+              className="lg:hidden w-7 h-7 rounded-lg border border-neutral-200 flex items-center justify-center hover:bg-neutral-50 disabled:opacity-30 transition-colors"
               style={{ display: canScrollLeft ? undefined : 'none' }}
             >
-              <ChevronLeft className="w-4 h-4 text-gray-600" />
+              <ChevronLeft className="w-4 h-4 text-neutral-600" />
             </button>
             <DevGuideButton title="Weekly Strategy" content={DEV_GUIDES.weeklyPlan} />
             <button
               onClick={() => scrollBy(1)}
-              className="lg:hidden w-7 h-7 rounded-lg border border-gray-200 flex items-center justify-center hover:bg-gray-50 disabled:opacity-30 transition-colors"
+              className="lg:hidden w-7 h-7 rounded-lg border border-neutral-200 flex items-center justify-center hover:bg-neutral-50 disabled:opacity-30 transition-colors"
               style={{ display: canScrollRight ? undefined : 'none' }}
             >
-              <ChevronRight className="w-4 h-4 text-gray-600" />
+              <ChevronRight className="w-4 h-4 text-neutral-600" />
             </button>
           </div>
         </div>

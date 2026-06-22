@@ -15,12 +15,12 @@ export const ACCENT = {
   violet:  { bg: 'bg-violet-50',   text: 'text-violet-600',  dot: 'bg-violet-500'  },
   sky:     { bg: 'bg-sky-50',      text: 'text-sky-600',     dot: 'bg-sky-500'     },
   amber:   { bg: 'bg-amber-50',    text: 'text-amber-600',   dot: 'bg-amber-500'   },
-  emerald: { bg: 'bg-emerald-50',  text: 'text-emerald-600', dot: 'bg-emerald-500' },
+  emerald: { bg: 'bg-success-50',  text: 'text-success-600', dot: 'bg-success-500' },
   rose:    { bg: 'bg-rose-50',     text: 'text-rose-600',    dot: 'bg-rose-500'    },
   orange:  { bg: 'bg-orange-50',   text: 'text-orange-600',  dot: 'bg-orange-500'  },
   fuchsia: { bg: 'bg-fuchsia-50',  text: 'text-fuchsia-600', dot: 'bg-fuchsia-500' },
   cyan:    { bg: 'bg-cyan-50',     text: 'text-cyan-600',    dot: 'bg-cyan-500'    },
-  slate:   { bg: 'bg-slate-50',    text: 'text-slate-600',   dot: 'bg-slate-500'   },
+  slate:   { bg: 'bg-neutral-50',    text: 'text-neutral-600',   dot: 'bg-neutral-500'   },
 };
 
 /**
