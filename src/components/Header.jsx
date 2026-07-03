@@ -17,6 +17,8 @@ const Header = ({ toggleSidebar, isMobile }) => {
   const [languageDropdownOpen, setLanguageDropdownOpen] = useState(false)
   const [selectedLanguage, setSelectedLanguage] = useState('English')
 
+  const globalBriefing = '美国 ROAS 1.82，3 个 Campaign 待处理，1 条素材待换新。'
+
   const languages = [
     { name: 'English', code: 'en' },
     { name: '中文', code: 'zh-CN' },
@@ -66,7 +68,7 @@ const Header = ({ toggleSidebar, isMobile }) => {
   }, [])
 
   return (
-    <header className="sticky top-0 z-[500] w-full bg-white/80 backdrop-blur-xl border-b border-neutral-200/80 transition-all duration-300">
+    <header className="sticky top-0 z-[500] w-full bg-white/90 backdrop-blur-xl border-b border-neutral-200/80 transition-all duration-300">
       <div className="px-6">
         <div className="flex h-14 items-center justify-between">
           {/* Left side — hamburger + page title */}
@@ -90,7 +92,17 @@ const Header = ({ toggleSidebar, isMobile }) => {
           </div>
 
           {/* Right side actions */}
-          <div className="flex items-center gap-2">
+          <div className="flex min-w-0 items-center gap-2">
+            <div
+              className="hidden min-w-0 max-w-[min(440px,36vw)] items-center gap-2 md:flex"
+              title={globalBriefing}
+            >
+              <span className="shrink-0 rounded-full bg-slate-950 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-white">
+                今日待办
+              </span>
+              <p className="truncate text-xs text-neutral-500">{globalBriefing}</p>
+            </div>
+
             {/* Luna AI Toggle */}
             <button
               onClick={toggleLuna}

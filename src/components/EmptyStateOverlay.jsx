@@ -16,33 +16,32 @@ const EmptyStateOverlay = ({ onConnectAccount }) => {
 
         {/* Title */}
         <h2 className="text-4xl font-bold text-neutral-900 mb-4">
-          Ready to Optimize Your Campaigns?
+          先处理今日美国市场异常
         </h2>
 
         {/* Subtitle */}
         <p className="text-xl text-neutral-600 mb-8 leading-relaxed">
-          Connect your ad accounts to unlock AI-powered budget optimizations, 
-          real-time performance insights, and automated recommendations.
+          LumaFit 美国 ROAS 1.82，冷启动预算、再营销曝光和疲劳素材需要今天完成处理。
         </p>
 
         {/* Features */}
         <div className="grid grid-cols-3 gap-6 mb-10">
           <div className="bg-gradient-to-br from-primary/10 to-purple-100/30 p-6 rounded-xl border border-primary/20">
             <Zap size={32} className="text-primary mb-3 mx-auto" />
-            <h3 className="font-semibold text-neutral-900 mb-2">AI Insights</h3>
-            <p className="text-sm text-neutral-600">Get intelligent budget suggestions based on performance data</p>
+            <h3 className="font-semibold text-neutral-900 mb-2">预算动作</h3>
+            <p className="text-sm text-neutral-600">US Prospecting 从 $140 调整到 $95</p>
           </div>
           
           <div className="bg-gradient-to-br from-primary/10 to-purple-100/30 p-6 rounded-xl border border-primary/20">
             <Sparkles size={32} className="text-primary mb-3 mx-auto" />
-            <h3 className="font-semibold text-neutral-900 mb-2">Real-time Analytics</h3>
-            <p className="text-sm text-neutral-600">Monitor your campaigns with live performance metrics</p>
+            <h3 className="font-semibold text-neutral-900 mb-2">素材换新</h3>
+            <p className="text-sm text-neutral-600">Core Legging Video V12 进入疲劳换新</p>
           </div>
           
           <div className="bg-gradient-to-br from-primary/10 to-purple-100/30 p-6 rounded-xl border border-primary/20">
             <Link size={32} className="text-primary mb-3 mx-auto" />
-            <h3 className="font-semibold text-neutral-900 mb-2">Easy Integration</h3>
-            <p className="text-sm text-neutral-600">Connect Google, Meta, and TikTok in minutes</p>
+            <h3 className="font-semibold text-neutral-900 mb-2">客户日报</h3>
+            <p className="text-sm text-neutral-600">记录今日异常、处理动作和观察点</p>
           </div>
         </div>
 
@@ -52,17 +51,17 @@ const EmptyStateOverlay = ({ onConnectAccount }) => {
             onClick={onConnectAccount}
             className="px-8 py-4 bg-gradient-to-r from-primary to-purple-600 text-white text-lg font-semibold rounded-xl hover:from-purple-600 hover:to-pink-600 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
           >
-            Connect Ad Account
+            进入广告管理
           </button>
           
           <button className="px-8 py-4 bg-white text-neutral-700 text-lg font-semibold rounded-xl border-2 border-neutral-200 hover:border-primary hover:text-primary transition-all">
-            Create New Campaign
+            创建换新草稿
           </button>
         </div>
 
-        {/* Demo Notice */}
+        {/* Business notice */}
         <div className="mt-8 text-sm text-neutral-500">
-          <p>Preview Mode: Data shown above is for demonstration purposes</p>
+          <p>预算变更需优化师确认后才会生效</p>
         </div>
       </div>
     </div>

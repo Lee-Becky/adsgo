@@ -14,25 +14,25 @@ export const PLATFORM_ID_MAP = {
 
 // Mock account pool for CyberMedia search
 export const mockAccountPool = [
-  { id: 'act_123456789', name: 'AdsGo Main Campaign', platform: 'meta', source: 'cybermedia', status: 'active' },
-  { id: 'act_987654321', name: 'AdsGo Retargeting', platform: 'meta', source: 'cybermedia', status: 'active' },
-  { id: 'act_111222333', name: 'Brand Awareness US', platform: 'meta', source: 'cybermedia', status: 'active' },
-  { id: 'act_444555666', name: 'EU Expansion', platform: 'meta', source: 'cybermedia', status: 'paused' },
-  { id: '123-456-7890', name: 'AdsGo Search Ads', platform: 'google', source: 'cybermedia', status: 'active' },
-  { id: '098-765-4321', name: 'AdsGo Shopping', platform: 'google', source: 'cybermedia', status: 'active' },
-  { id: '111-222-3333', name: 'Performance Max US', platform: 'google', source: 'cybermedia', status: 'active' },
-  { id: 'tt_001122334', name: 'TikTok Viral Campaign', platform: 'tiktok', source: 'cybermedia', status: 'active' },
-  { id: 'tt_556677889', name: 'TikTok Shop Ads', platform: 'tiktok', source: 'cybermedia', status: 'active' },
-  { id: 'bing_12345', name: 'Bing Search US', platform: 'bing', source: 'cybermedia', status: 'active' },
-  { id: 'snap_00112', name: 'Snapchat Story Ads', platform: 'snapchat', source: 'cybermedia', status: 'active' },
+  { id: 'act_luma_us_001', name: 'LumaFit Meta US Main', platform: 'meta', source: 'cybermedia', status: 'active' },
+  { id: 'act_luma_rt_002', name: 'LumaFit Meta Retargeting', platform: 'meta', source: 'cybermedia', status: 'active' },
+  { id: 'act_luma_lookalike_003', name: 'LumaFit Meta Lookalike', platform: 'meta', source: 'cybermedia', status: 'active' },
+  { id: 'act_luma_eu_004', name: 'LumaFit EU Expansion', platform: 'meta', source: 'cybermedia', status: 'paused' },
+  { id: '456-110-9283', name: 'LumaFit Google Search', platform: 'google', source: 'cybermedia', status: 'active' },
+  { id: '456-110-9284', name: 'LumaFit Shopping Backup', platform: 'google', source: 'cybermedia', status: 'active' },
+  { id: '456-110-9285', name: 'LumaFit Performance Max', platform: 'google', source: 'cybermedia', status: 'paused' },
+  { id: 'tt_luma_ca_001', name: 'LumaFit TikTok CA Test', platform: 'tiktok', source: 'cybermedia', status: 'active' },
+  { id: 'tt_luma_ugc_002', name: 'LumaFit TikTok UGC Hooks', platform: 'tiktok', source: 'cybermedia', status: 'active' },
+  { id: 'bing_luma_001', name: 'LumaFit Bing Search US', platform: 'bing', source: 'cybermedia', status: 'active' },
+  { id: 'snap_luma_001', name: 'LumaFit Snapchat Story Test', platform: 'snapchat', source: 'cybermedia', status: 'paused' },
 ]
 
 // Initial linked accounts (pre-populated)
 export const mockLinkedAccounts = [
-  { id: 'act_123456789', name: 'AdsGo Main Campaign', platform: 'meta', source: 'cybermedia', status: 'active' },
-  { id: 'act_987654321', name: 'AdsGo Retargeting', platform: 'meta', source: 'cybermedia', status: 'active' },
-  { id: '123-456-7890', name: 'AdsGo Search Ads', platform: 'google', source: 'cybermedia', status: 'active' },
-  { id: 'tt_001122334', name: 'TikTok Viral Campaign', platform: 'tiktok', source: 'cybermedia', status: 'active' },
+  { id: 'act_luma_us_001', name: 'LumaFit Meta US Main', platform: 'meta', source: 'cybermedia', status: 'active' },
+  { id: 'act_luma_rt_002', name: 'LumaFit Meta Retargeting', platform: 'meta', source: 'cybermedia', status: 'active' },
+  { id: '456-110-9283', name: 'LumaFit Google Search', platform: 'google', source: 'cybermedia', status: 'active' },
+  { id: 'tt_luma_ca_001', name: 'LumaFit TikTok CA Test', platform: 'tiktok', source: 'cybermedia', status: 'active' },
 ]
 
 // Connect methods

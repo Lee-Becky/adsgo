@@ -11,43 +11,43 @@ import {
 const INITIAL_SKILLS = [
   {
     id: 'auto-budget',
-    name: 'Auto Budget Optimization',
-    description: 'Luna automatically reallocates budget across campaigns based on real-time ROAS signals.',
+    name: '预算红线检查',
+    description: '每天 10:00 检查 ROAS、CPA 和预算上限，发现 US Prospecting 浪费后生成降预算建议。',
     icon: DollarSign,
     enabled: true,
   },
   {
     id: 'creative-refresh',
-    name: 'Auto Creative Refresh',
-    description: 'Detects creative fatigue and triggers new variant generation before performance degrades.',
+    name: '素材疲劳检查',
+    description: '监控素材频次、CTR 和 CVR，Core Legging Video V12 频次超过 4.5 后进入换新。',
     icon: Palette,
     enabled: true,
   },
   {
     id: 'audience-expansion',
-    name: 'Auto Audience Expansion',
-    description: 'Discovers new high-intent audience segments by analyzing conversion patterns.',
+    name: '受众扩量建议',
+    description: '当 Lookalike 学习期稳定且 CPA 低于红线时，生成扩量建议；当前保持关闭。',
     icon: Users,
     enabled: false,
   },
   {
     id: 'question-mode',
-    name: 'Luna Question Mode',
-    description: 'When you change settings manually, Luna asks why — building context for smarter future suggestions.',
+    name: '客户偏好追问',
+    description: '当优化师保留再营销预算高于建议值时，追问是否因为促销周需要保留曝光。',
     icon: MessageSquare,
     enabled: true,
   },
   {
     id: 'auto-report',
-    name: 'Auto Report Generation',
-    description: 'Generates daily and weekly performance briefs without manual setup.',
+    name: '客户日报草稿',
+    description: '每天 19:00 汇总异常、预算动作、素材换新和明日观察点，发送前仍需人工确认。',
     icon: FileBarChart,
     enabled: true,
   },
   {
     id: 'anomaly-detection',
-    name: 'Anomaly Detection',
-    description: 'Monitors spend, CPA, and impression spikes in real time and alerts you immediately.',
+    name: '异常波动提醒',
+    description: '监控花费、CPA、CVR 和频次异常，触发后同步到广告管理和策略。',
     icon: ShieldAlert,
     enabled: true,
   },
@@ -69,10 +69,10 @@ const SkillsPage = () => {
       {/* ── Summary bar ─────────────────────────────────────── */}
       <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-luna-bg/50 border border-luna-border">
         <span className="text-caption font-semibold text-luna-violet tabular-nums">
-          {activeCount}/{skills.length} skills active
+          {activeCount}/{skills.length} 条规则开启
         </span>
         <span className="text-caption text-neutral-400">
-          — Luna operates within enabled skills only
+          — 预算生效仍需要优化师确认
         </span>
       </div>
 

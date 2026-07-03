@@ -9,12 +9,12 @@ import MetricCard from '@components/ui/MetricCard'
    ═══════════════════════════════════════════════════════════ */
 
 const RECENT_REPORTS = [
-  { id: 1, name: 'Demo Brand — Weekly Brief (Jun 9-15)', period: 'Jun 9-15, 2025', createdAt: '2 hours ago', type: 'Weekly' },
-  { id: 2, name: 'EcoHome Living — Daily Brief', period: 'Jun 16, 2025', createdAt: '3 hours ago', type: 'Daily' },
-  { id: 3, name: 'Luxe Fashion — Monthly Performance', period: 'May 2025', createdAt: '2 days ago', type: 'Monthly' },
-  { id: 4, name: 'TechGear Pro — Campaign Analysis', period: 'Jun 1-14, 2025', createdAt: '3 days ago', type: 'Campaign' },
-  { id: 5, name: 'Demo Brand — Daily Brief', period: 'Jun 14, 2025', createdAt: '4 days ago', type: 'Daily' },
-  { id: 6, name: 'EcoHome Living — Weekly Brief (Jun 2-8)', period: 'Jun 2-8, 2025', createdAt: '1 week ago', type: 'Weekly' },
+  { id: 1, name: 'LumaFit — 美国 ROAS 下滑日报', period: '2026-06-29', createdAt: '10:30', type: 'Daily' },
+  { id: 2, name: 'LumaFit — 素材疲劳处理记录', period: '2026-06-29', createdAt: '10:18', type: 'Campaign' },
+  { id: 3, name: 'EcoHome Living — 周预算复盘', period: '2026-06-22 至 06-28', createdAt: '3 小时前', type: 'Weekly' },
+  { id: 4, name: 'Luxe Fashion — 月度表现报告', period: '2026 年 6 月', createdAt: '2 天前', type: 'Monthly' },
+  { id: 5, name: 'TechGear Pro — Campaign 分析', period: '2026-06-15 至 06-28', createdAt: '3 天前', type: 'Campaign' },
+  { id: 6, name: 'EcoHome Living — 客户日报', period: '2026-06-28', createdAt: '4 天前', type: 'Daily' },
 ]
 
 const TYPE_COLORS = {
@@ -30,32 +30,32 @@ const StatsPage = () => {
       {/* KPI cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <MetricCard
-          label="Active Clients"
+          label="活跃客户"
           value={4}
           format="number"
           trend={{ value: 1, direction: 'up' }}
-          trendLabel="this month"
+          trendLabel="本月"
         />
         <MetricCard
-          label="Total Campaigns"
+          label="Campaign 总数"
           value={44}
           format="number"
           trend={{ value: 12, direction: 'up' }}
-          trendLabel="vs last month"
+          trendLabel="较上月"
         />
         <MetricCard
-          label="Reports Generated"
+          label="已生成报告"
           value={28}
           format="number"
           trend={{ value: 8, direction: 'up' }}
-          trendLabel="this month"
+          trendLabel="本月"
         />
         <MetricCard
-          label="Avg. Client ROAS"
+          label="客户平均 ROAS"
           value={3.54}
           format="number"
           trend={{ value: 6.2, direction: 'up' }}
-          trendLabel="vs last month"
+          trendLabel="较上月"
         />
       </div>
 
@@ -64,9 +64,9 @@ const StatsPage = () => {
         <div className="px-5 py-4 border-b border-neutral-100 flex items-center justify-between">
           <h3 className="font-heading text-sm font-semibold text-neutral-900 flex items-center gap-2">
             <FileBarChart size={16} className="text-neutral-400" />
-            Recent Reports
+            近期报告
           </h3>
-          <span className="text-caption text-neutral-400">{RECENT_REPORTS.length} reports</span>
+          <span className="text-caption text-neutral-400">{RECENT_REPORTS.length} 份报告</span>
         </div>
         <div className="divide-y divide-neutral-50">
           {RECENT_REPORTS.map(report => (

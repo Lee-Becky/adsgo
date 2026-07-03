@@ -362,13 +362,13 @@ export const mockJoinedDatasetRows = Object.fromEntries(
 
 // Mock account list for dataset wizard account selection
 export const mockAccountsForDataset = [
-  { id: 'act_123456789', name: 'AdsGo Main Campaign', platform: 'meta' },
-  { id: 'act_987654321', name: 'AdsGo Retargeting', platform: 'meta' },
-  { id: 'act_111222333', name: 'Brand Awareness US', platform: 'meta' },
-  { id: '123-456-7890', name: 'AdsGo Search Ads', platform: 'google' },
-  { id: '098-765-4321', name: 'AdsGo Shopping', platform: 'google' },
-  { id: 'tt_001122334', name: 'TikTok Viral Campaign', platform: 'tiktok' },
-  { id: 'tt_556677889', name: 'TikTok Shop Ads', platform: 'tiktok' },
-  { id: 'bing_12345', name: 'Bing Search US', platform: 'bing' },
-  { id: 'snap_00112', name: 'Snapchat Story Ads', platform: 'snapchat' },
+  { id: 'act_luma_us_001', name: 'LumaFit Meta US Main', platform: 'meta' },
+  { id: 'act_luma_rt_002', name: 'LumaFit Meta Retargeting', platform: 'meta' },
+  { id: 'act_luma_lookalike_003', name: 'LumaFit Meta Lookalike', platform: 'meta' },
+  { id: '456-110-9283', name: 'LumaFit Google Search', platform: 'google' },
+  { id: '456-110-9284', name: 'LumaFit Shopping Backup', platform: 'google' },
+  { id: 'tt_luma_ca_001', name: 'LumaFit TikTok CA Test', platform: 'tiktok' },
+  { id: 'tt_luma_ugc_002', name: 'LumaFit TikTok UGC Hooks', platform: 'tiktok' },
+  { id: 'bing_luma_001', name: 'LumaFit Bing Search US', platform: 'bing' },
+  { id: 'snap_luma_001', name: 'LumaFit Snapchat Story Test', platform: 'snapchat' },
 ]

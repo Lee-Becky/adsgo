@@ -4,35 +4,35 @@
 
 /* ── KPI Summary ───────────────────────────────────────────── */
 export const KPI_SUMMARY = [
-  { key: 'spend',     label: 'Total Spend',   value: 12847.50,  trend: { value: 8.3, direction: 'up' },   format: 'currency' },
-  { key: 'roas',      label: 'Blended ROAS',  value: 3.42,      trend: { value: 5.1, direction: 'up' },   format: 'number' },
-  { key: 'cpa',       label: 'Avg. CPA',      value: 24.18,     trend: { value: 3.2, direction: 'down' }, format: 'currency' },
-  { key: 'ctr',       label: 'CTR',            value: 2.87,      trend: { value: 0.4, direction: 'up' },   format: 'percentage' },
-  { key: 'cpc',       label: 'Avg. CPC',       value: 0.82,      trend: { value: 1.1, direction: 'down' }, format: 'currency' },
-  { key: 'addToCart', label: 'Add to Cart',    value: 1243,      trend: { value: 12.5, direction: 'up' },  format: 'number' },
+  { key: 'spend',     label: '美国花费',   value: 303.10,  trend: { value: 22.4, direction: 'up' },   format: 'currency' },
+  { key: 'roas',      label: '美国 ROAS',  value: 1.82,    trend: { value: 30.0, direction: 'down' }, format: 'number' },
+  { key: 'cpa',       label: '美国 CPA',   value: 42.80,   trend: { value: 18.6, direction: 'up' },   format: 'currency' },
+  { key: 'ctr',       label: 'CTR',        value: 1.74,    trend: { value: 0.2, direction: 'up' },    format: 'percentage' },
+  { key: 'cpc',       label: 'CPC',        value: 0.96,    trend: { value: 1.1, direction: 'down' },  format: 'currency' },
+  { key: 'addToCart', label: '加购',       value: 84,      trend: { value: 6.0, direction: 'down' },  format: 'number' },
 ]
 
 /* ── Trend data (7-day) for sparklines / charts ───────────── */
 export const TREND_DATA = [
-  { date: 'Jun 10', spend: 1720, roas: 3.1, cpa: 26.5, ctr: 2.6, purchases: 65 },
-  { date: 'Jun 11', spend: 1890, roas: 3.3, cpa: 25.2, ctr: 2.7, purchases: 72 },
-  { date: 'Jun 12', spend: 1650, roas: 2.9, cpa: 27.1, ctr: 2.5, purchases: 58 },
-  { date: 'Jun 13', spend: 1940, roas: 3.5, cpa: 23.8, ctr: 2.9, purchases: 81 },
-  { date: 'Jun 14', spend: 2010, roas: 3.7, cpa: 22.4, ctr: 3.1, purchases: 89 },
-  { date: 'Jun 15', spend: 1850, roas: 3.4, cpa: 24.6, ctr: 2.8, purchases: 75 },
-  { date: 'Jun 16', spend: 1787, roas: 3.42, cpa: 24.18, ctr: 2.87, purchases: 72 },
+  { date: '6/23', spend: 244, roas: 2.60, cpa: 31.2, ctr: 1.68, purchases: 13 },
+  { date: '6/24', spend: 256, roas: 2.44, cpa: 33.8, ctr: 1.71, purchases: 12 },
+  { date: '6/25', spend: 271, roas: 2.21, cpa: 36.4, ctr: 1.75, purchases: 11 },
+  { date: '6/26', spend: 286, roas: 2.05, cpa: 39.2, ctr: 1.78, purchases: 10 },
+  { date: '6/27', spend: 298, roas: 1.94, cpa: 40.6, ctr: 1.72, purchases: 9 },
+  { date: '6/28', spend: 306, roas: 1.88, cpa: 41.5, ctr: 1.69, purchases: 9 },
+  { date: '6/29', spend: 303, roas: 1.82, cpa: 42.8, ctr: 1.74, purchases: 9 },
 ]
 
 /* ── Luna AI Brief ─────────────────────────────────────────── */
 export const LUNA_BRIEF = {
-  summary: `Overall performance improved compared to yesterday. ROAS climbed to 3.42x (+5.1%), driven primarily by strong results from the Summer Sale campaign on Meta. CPA decreased to $24.18 — below the $28 red line target.`,
+  summary: '美国市场今日 ROAS 1.82，低于 2.40 目标。CTR 基本稳定，主要问题是冷启动转化效率下降和主视频疲劳。',
   highlights: [
-    { type: 'positive', text: 'Summer Sale campaign delivered ROAS 4.2x — highest in the past 14 days.' },
-    { type: 'positive', text: 'New creative variant "Lifestyle-B" achieved CTR 3.8%, outperforming the average by 32%.' },
-    { type: 'warning',  text: 'TikTok CPA spiked to $31.50 for Retargeting Warm audience — approaching red line.' },
-    { type: 'negative', text: 'Google Search campaign ROAS dropped to 1.9x — below the 2.5x target for 3 consecutive days.' },
+    { type: 'negative', text: 'US Prospecting Broad ROAS 1.54，花费 +22.4%，购买量 -6.1%。' },
+    { type: 'warning',  text: 'Core Legging Video V12 频次 4.7，CTR 较峰值下降 28.4%。' },
+    { type: 'positive', text: 'Customer Proof Carousel 在再营销中 ROAS 2.04，仍高于账户平均。' },
+    { type: 'warning',  text: 'US Retargeting 因促销周保留 $180/day，进入 48 小时观察。' },
   ],
-  recommendation: 'Consider reallocating 15% of Google Search budget to Meta Prospecting, which is showing strong unit economics. Luna has prepared a budget adjustment draft in Ads > Campaigns.',
+  recommendation: '今日执行：US Prospecting Broad 从 $140 降到 $95；US Retargeting 保留 $180；冷启动主视频进入换新草稿。',
 }
 
 /* ── Platform breakdown for pie chart ─────────────────────── */
@@ -45,15 +45,10 @@ export const PLATFORM_SPEND = [
 
 /* ── Campaign-level performance (for table) ───────────────── */
 export const CAMPAIGN_PERFORMANCE = [
-  { id: 1,  name: 'Summer Sale 2025 - Meta',        platform: 'Meta',   status: 'Active', spend: 3250, impressions: 485200, clicks: 14556, ctr: 3.00, cpc: 0.22, cpa: 19.80, roas: 4.20, purchases: 164, addToCart: 412, date: '2025-06-16' },
-  { id: 2,  name: 'Retargeting - Warm Audience',     platform: 'Meta',   status: 'Active', spend: 2180, impressions: 312000, clicks: 8736,  ctr: 2.80, cpc: 0.25, cpa: 22.40, roas: 3.60, purchases: 97,  addToCart: 245, date: '2025-06-16' },
-  { id: 3,  name: 'Lookalike - US Tier 1',           platform: 'Meta',   status: 'Active', spend: 1990, impressions: 267400, clicks: 6956,  ctr: 2.60, cpc: 0.29, cpa: 26.80, roas: 3.10, purchases: 74,  addToCart: 186, date: '2025-06-16' },
-  { id: 4,  name: 'Performance Max - All Products',  platform: 'Google', status: 'Active', spend: 1820, impressions: 198300, clicks: 4958,  ctr: 2.50, cpc: 0.37, cpa: 28.10, roas: 2.80, purchases: 65,  addToCart: 132, date: '2025-06-16' },
-  { id: 5,  name: 'Brand Search - Exact Match',      platform: 'Google', status: 'Active', spend: 890,  impressions: 42100,  clicks: 3368,  ctr: 8.00, cpc: 0.26, cpa: 14.20, roas: 5.20, purchases: 63,  addToCart: 89,  date: '2025-06-16' },
-  { id: 6,  name: 'Shopping - Feed Optimized',       platform: 'Google', status: 'Paused', spend: 500,  impressions: 65800,  clicks: 1316,  ctr: 2.00, cpc: 0.38, cpa: 35.70, roas: 1.90, purchases: 14,  addToCart: 42,  date: '2025-06-16' },
-  { id: 7,  name: 'Spark Ads - UGC Collection',      platform: 'TikTok', status: 'Active', spend: 1240, impressions: 387500, clicks: 9300,  ctr: 2.40, cpc: 0.13, cpa: 24.80, roas: 3.40, purchases: 50,  addToCart: 118, date: '2025-06-16' },
-  { id: 8,  name: 'Retargeting - TikTok Warm',       platform: 'TikTok', status: 'Active', spend: 600,  impressions: 142000, clicks: 3550,  ctr: 2.50, cpc: 0.17, cpa: 31.50, roas: 2.60, purchases: 19,  addToCart: 48,  date: '2025-06-16' },
-  { id: 9,  name: 'Bing Shopping - US',              platform: 'Bing',   status: 'Active', spend: 377,  impressions: 28900,  clicks: 751,   ctr: 2.60, cpc: 0.50, cpa: 25.10, roas: 2.90, purchases: 15,  addToCart: 31,  date: '2025-06-16' },
+  { id: 1, name: 'US Retargeting Purchase', platform: 'Meta', status: '投放中', spend: 126, impressions: 31200, clicks: 543, ctr: 1.74, cpc: 0.23, cpa: 42.80, roas: 1.82, purchases: 9, addToCart: 31, date: '2026-06-29' },
+  { id: 2, name: 'US Prospecting Broad', platform: 'Meta', status: '待降预算', spend: 118, impressions: 47800, clicks: 578, ctr: 1.21, cpc: 0.20, cpa: 58.60, roas: 1.54, purchases: 6, addToCart: 24, date: '2026-06-29' },
+  { id: 3, name: 'US 3 Percent Lookalike', platform: 'Meta', status: '学习期', spend: 97, impressions: 28100, clicks: 458, ctr: 1.63, cpc: 0.21, cpa: 34.20, roas: 2.18, purchases: 11, addToCart: 29, date: '2026-06-29' },
+  { id: 4, name: 'CA Expansion Test', platform: 'TikTok', status: '投放中', spend: 63, impressions: 19600, clicks: 404, ctr: 2.06, cpc: 0.16, cpa: 29.40, roas: 2.71, purchases: 7, addToCart: 18, date: '2026-06-29' },
 ]
 
 /* ── Daily historical data (for PerformanceTable) ─────────── */

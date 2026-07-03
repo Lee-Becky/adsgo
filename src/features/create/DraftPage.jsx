@@ -3,7 +3,7 @@ import useFeatureFlagsStore from '@stores/featureFlagsStore'
 import { AutoRegeneration } from '@components/autoRegeneration'
 
 /* ═══════════════════════════════════════════════════════════
-   DraftPage — Wraps AutoRegeneration (drafts + AI recommendations)
+   DraftPage — AI 推荐 Top3 卡片 + 草稿表格 + 结构审核
    ═══════════════════════════════════════════════════════════ */
 
 const DraftPage = () => {
@@ -11,11 +11,13 @@ const DraftPage = () => {
   const { autoRegenEnabled, setAutoRegenEnabled } = useFeatureFlagsStore()
 
   return (
-    <AutoRegeneration
-      onPageChange={(p) => nav(`/${p}`)}
-      autoRegenEnabled={autoRegenEnabled}
-      onAutoRegenChange={setAutoRegenEnabled}
-    />
+    <div className="-mx-6 min-h-[100dvh] bg-background">
+      <AutoRegeneration
+        onPageChange={(p) => nav(`/${p}`)}
+        autoRegenEnabled={autoRegenEnabled}
+        onAutoRegenChange={setAutoRegenEnabled}
+      />
+    </div>
   )
 }
 

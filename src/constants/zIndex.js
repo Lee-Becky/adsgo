@@ -6,6 +6,7 @@ export const Z_INDEX = {
   HEADER: 500,
   SIDEBAR: 600,
   FLOATING_ACTION: 700,    // 右下角悬浮按钮（探索 / 聊天）
+  GLOBAL_LUNA_BAR: 550,    // 全局 Luna 建议条（高于 Header 500）
   OVERLAY: 1000,
   POPOVER: 1500,           // 用户实时交互的 dropdown / popover / menu，永远高于 FLOATING_ACTION
   MODAL_BASE: 2000,

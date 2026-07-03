@@ -77,7 +77,7 @@ const MainLayout = ({ children, showDemoOverlay, onDemoConnect, onDemoCreate,
 
   return (
     // <OnboardingProvider>
-    <div className="flex h-screen overflow-hidden bg-background">
+    <div className="flex min-h-[100dvh] overflow-hidden bg-background">
       {/* Mobile Sidebar Overlay */}
       {isMobile && isSidebarOpen && (
         <div
@@ -111,7 +111,7 @@ const MainLayout = ({ children, showDemoOverlay, onDemoConnect, onDemoCreate,
       {/* Main Content Wrapper */}
       <div
         className={`
-          flex-1 flex flex-col h-full relative min-w-0 transition-all duration-300
+          flex-1 flex flex-col min-h-[100dvh] relative min-w-0 transition-all duration-300
           ${!isMobile ? (isPinned ? 'ml-64' : 'ml-[68px]') : ''}
         `}
         style={{ '--sidebar-w': !isMobile ? (isPinned ? '256px' : '68px') : '0px' }}

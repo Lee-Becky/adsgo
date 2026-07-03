@@ -1,6 +1,8 @@
-import { useCallback } from 'react'
-import useLunaStore from '@stores/lunaStore'
-import { sendToLuna, sendQuickPrompt } from './mockLunaService'
+import { useCallback, useMemo } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
+import useLunaStore, { formatLunaLearningAck } from '@stores/lunaStore'
+import { sendToLuna, sendQuickPrompt, QUICK_PROMPTS } from './mockLunaService'
+import { buildWorkspaceSyncPath, getSyncPayload, normalizeSyncKey } from './lunaSyncPayloads'
 
 /* ═══════════════════════════════════════════════════════════
    useLunaChat — Hook for Luna Chat interactions
@@ -8,6 +10,13 @@ import { sendToLuna, sendQuickPrompt } from './mockLunaService'
    ═══════════════════════════════════════════════════════════ */
 
 const useLunaChat = () => {
+  const navigate = useNavigate()
+  const location = useLocation()
+  const brandId = useMemo(() => {
+    const match = location.pathname.match(/\/workspace\/([^/]+)/)
+    return match ? decodeURIComponent(match[1]) : 'default'
+  }, [location.pathname])
+
   const {
     isOpen,
     chatHistory,
@@ -30,19 +39,57 @@ const useLunaChat = () => {
     clearPendingQuestion,
   } = useLunaStore()
 
+  const pushSync = useCallback((response) => {
+    if (!response.syncTarget) return
+    const moduleKey = normalizeSyncKey(response.syncTarget)
+    const payload = response.payload || getSyncPayload(response.syncTarget)
+    setSyncData(moduleKey, {
+      text: response.text,
+      type: response.type,
+      actionCard: response.actionCard,
+      syncTarget: response.syncTarget,
+      payload,
+      timestamp: new Date().toISOString(),
+    })
+  }, [setSyncData])
+
+  const navigateToSyncTarget = useCallback((syncTarget) => {
+    if (!syncTarget) return
+    navigate(buildWorkspaceSyncPath(brandId, syncTarget))
+  }, [brandId, navigate])
+
   /* ── Send a user message ───────────────────────────────── */
-  const sendMessage = useCallback(async (text) => {
-    if (!text.trim()) return
+  const sendMessage = useCallback(async (text, attachments = []) => {
+    const trimmed = text.trim()
+    const hasAttachments = attachments.length > 0
+    if (!trimmed && !hasAttachments) return
 
-    // Add user message
-    addMessage({ role: 'user', text: text.trim() })
+    const activeQuestion = useLunaStore.getState().pendingQuestion
+    if (activeQuestion && trimmed && !hasAttachments) {
+      addMessage({ role: 'user', text: trimmed })
+      clearPendingQuestion()
+      setThinking(true)
+      setTimeout(() => {
+        setThinking(false)
+        addMessage({
+          role: 'luna',
+          text: formatLunaLearningAck(activeQuestion, trimmed),
+          type: 'learning',
+        })
+      }, 700)
+      return
+    }
 
-    // Show thinking indicator
+    addMessage({
+      role: 'user',
+      text: trimmed || '（已上传附件）',
+      attachments,
+    })
+
     setThinking(true)
 
     try {
-      // Get Luna response (with streaming)
-      const response = await sendToLuna(text, activeDataSources)
+      const response = await sendToLuna(trimmed, activeDataSources, attachments)
 
       setThinking(false)
 
@@ -54,33 +101,26 @@ const useLunaChat = () => {
         dataCard: response.dataCard || null,
         actionCard: response.actionCard || null,
         syncTarget: response.syncTarget || null,
+        synced: !!response.syncTarget,
       })
 
-      // If response has a sync target, store the sync data
-      if (response.syncTarget) {
-        setSyncData(response.syncTarget, {
-          text: response.text,
-          type: response.type,
-          actionCard: response.actionCard,
-          timestamp: new Date().toISOString(),
-        })
-      }
+      pushSync(response)
     } catch {
       setThinking(false)
       addMessage({
         role: 'luna',
-        text: 'Sorry, I encountered an issue processing your request. Please try again.',
+        text: '处理请求时出现问题，请重试。',
         type: 'error',
       })
     }
-  }, [activeDataSources, addMessage, setThinking, setSyncData])
+  }, [activeDataSources, addMessage, setThinking, pushSync])
 
   /* ── Send a quick prompt ───────────────────────────────── */
   const handleQuickPrompt = useCallback(async (promptId) => {
-    const prompt = useLunaStore.getState().quickPrompts.find((p) => p.id === promptId)
-    if (!prompt) return
+    const prompt = QUICK_PROMPTS.find((p) => p.id === promptId)
+    const label = prompt?.label || promptId
 
-    addMessage({ role: 'user', text: prompt.label })
+    addMessage({ role: 'user', text: label })
     setThinking(true)
 
     try {
@@ -94,34 +134,24 @@ const useLunaChat = () => {
         dataCard: response.dataCard || null,
         actionCard: response.actionCard || null,
         syncTarget: response.syncTarget || null,
+        synced: !!response.syncTarget,
       })
 
-      if (response.syncTarget) {
-        setSyncData(response.syncTarget, {
-          text: response.text,
-          type: response.type,
-          actionCard: response.actionCard,
-          timestamp: new Date().toISOString(),
-        })
-      }
+      pushSync(response)
     } catch {
       setThinking(false)
       addMessage({
         role: 'luna',
-        text: 'Sorry, I encountered an issue. Please try again.',
+        text: '处理请求时出现问题，请重试。',
         type: 'error',
       })
     }
-  }, [activeDataSources, addMessage, setThinking, setSyncData])
+  }, [activeDataSources, addMessage, setThinking, pushSync])
 
-  /* ── Sync: apply to module ─────────────────────────────── */
-  const applySyncToModule = useCallback((moduleKey) => {
-    const data = getSyncData(moduleKey)
-    if (data) {
-      // In a real app this would dispatch the data to the module
-      clearSyncData(moduleKey)
-    }
-  }, [getSyncData, clearSyncData])
+  /* ── Sync: navigate to module (keep pending until user applies on page) ─ */
+  const applySyncToModule = useCallback((syncTarget) => {
+    navigateToSyncTarget(syncTarget)
+  }, [navigateToSyncTarget])
 
   /* ── Question mechanism ────────────────────────────────── */
   const askLunaAboutChange = useCallback((field, oldValue, newValue, context) => {
@@ -141,12 +171,12 @@ const useLunaChat = () => {
     // Record the Q&A in chat
     addMessage({
       role: 'user',
-      text: `[Re: ${question.field} change] ${answer}`,
+      text: `[关于${question.field}调整] ${answer}`,
     })
 
     addMessage({
       role: 'luna',
-      text: `Thanks for explaining the ${question.field} change from ${question.oldValue} to ${question.newValue}. I've noted this for future optimizations — I'll factor in your reasoning when making similar recommendations.`,
+      text: formatLunaLearningAck(question, answer),
       type: 'learning',
     })
 
@@ -173,6 +203,7 @@ const useLunaChat = () => {
     setActiveDataSources,
     // Sync
     applySyncToModule,
+    navigateToSyncTarget,
     getSyncData,
     clearSyncData,
     // Question mechanism

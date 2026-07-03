@@ -14,8 +14,8 @@ export const V1_REDIRECT_MAP = {
   '/drafts':              '/workspace/default/create/draft',
 
   // Create
-  '/batchGenerateAds':    '/workspace/default/create/campaign-gen',
-  '/campaignGenerator':   '/workspace/default/create/campaign-gen',
+  '/batchGenerateAds':    '/workspace/default/create/bulk-launch',
+  '/campaignGenerator':   '/workspace/default/create/bulk-launch',
   '/bulkLaunchTool':      '/workspace/default/create/bulk-launch',
 
   // Creative

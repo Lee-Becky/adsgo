@@ -19,7 +19,7 @@ const STEPS = [
       '智能匹配目标受众，精准触达潜在客户',
     ],
     ctaText: '立即创建Campaign',
-    route: 'create/campaign-gen',
+    route: 'create/bulk-launch',
     icon: Megaphone,
   },
   {

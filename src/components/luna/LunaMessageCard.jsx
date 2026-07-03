@@ -9,12 +9,29 @@ import LunaBadge from './LunaBadge'
    ═══════════════════════════════════════════════════════════ */
 
 /* ── User message (right-aligned) ─────────────────────────── */
-export const UserMessage = ({ text, timestamp, className = '' }) => (
+export const UserMessage = ({ text, timestamp, attachments = [], className = '' }) => (
   <div className={`flex justify-end ${className}`}>
     <div className="max-w-[85%]">
-      <div className="px-4 py-3 rounded-2xl rounded-br-md bg-primary-500 text-white text-body">
-        {text}
-      </div>
+      {attachments.length > 0 && (
+        <div className="mb-2 flex flex-wrap justify-end gap-2">
+          {attachments.map((file) => (
+            <div key={file.id} className="overflow-hidden rounded-lg border border-primary-200 bg-white">
+              {file.previewUrl ? (
+                <img src={file.previewUrl} alt={file.name} className="h-20 w-20 object-cover" />
+              ) : (
+                <div className="flex h-16 max-w-[140px] items-center gap-2 px-3 text-xs text-neutral-600">
+                  <span className="truncate">{file.name}</span>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+      {text && (
+        <div className="px-4 py-3 rounded-2xl rounded-br-md bg-primary-500 text-white text-body">
+          {text}
+        </div>
+      )}
       {timestamp && (
         <p className="text-[10px] text-neutral-400 mt-1 text-right">{timestamp}</p>
       )}

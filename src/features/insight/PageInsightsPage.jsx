@@ -10,11 +10,11 @@ import { getChartColors, chartTooltip } from '@/lib/chartTheme'
    ═══════════════════════════════════════════════════════════ */
 
 const PAGE_DATA = [
-  { page: 'Homepage',            spend: 3800, cvr: 4.2,  clicks: 12400, conversions: 521 },
-  { page: 'Product Collection',  spend: 3200, cvr: 3.6,  clicks: 9800,  conversions: 353 },
-  { page: 'Summer Sale LP',      spend: 2400, cvr: 5.1,  clicks: 7600,  conversions: 388 },
-  { page: 'Brand Story',         spend: 1600, cvr: 2.8,  clicks: 5200,  conversions: 146 },
-  { page: 'Checkout',            spend: 900,  cvr: 6.8,  clicks: 2100,  conversions: 143 },
+  { page: 'Core Legging PDP', spend: 126.4, cvr: 2.1, clicks: 543, conversions: 9 },
+  { page: 'Compression Fit LP', spend: 118.2, cvr: 1.4, clicks: 578, conversions: 6 },
+  { page: 'Customer Proof LP', spend: 42.3, cvr: 2.5, clicks: 198, conversions: 5 },
+  { page: 'Morning Routine LP', spend: 31.5, cvr: 1.8, clicks: 162, conversions: 3 },
+  { page: 'CA Product Page', spend: 62.9, cvr: 2.9, clicks: 404, conversions: 7 },
 ]
 
 const totalSpend = PAGE_DATA.reduce((s, d) => s + d.spend, 0)
@@ -33,7 +33,7 @@ const PageInsightsPage = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Donut */}
         <div className="bg-white rounded-xl border border-neutral-200 p-5">
-          <h3 className="font-heading text-sm font-semibold text-neutral-900 mb-4">Spend by Page</h3>
+          <h3 className="font-heading text-sm font-semibold text-neutral-900 mb-4">落地页花费分布</h3>
           <ResponsiveContainer width="100%" height={260}>
             <PieChart>
               <Pie
@@ -53,7 +53,7 @@ const PageInsightsPage = () => {
                 ))}
               </Pie>
               <Tooltip
-                formatter={(val) => [`$${val.toLocaleString()}`, 'Spend']}
+                formatter={(val) => [`$${val.toLocaleString()}`, '花费']}
                 contentStyle={chartTooltip}
               />
             </PieChart>
@@ -63,26 +63,26 @@ const PageInsightsPage = () => {
         {/* Summary cards */}
         <div className="lg:col-span-2 grid grid-cols-2 sm:grid-cols-4 gap-3 content-start">
           <div className="bg-white rounded-xl border border-neutral-200 p-4">
-            <p className="text-caption text-neutral-500 mb-1">Total Spend</p>
+            <p className="text-caption text-neutral-500 mb-1">总花费</p>
             <p className="font-heading text-lg font-bold text-neutral-900 tabular-nums">
               ${totalSpend.toLocaleString()}
             </p>
           </div>
           <div className="bg-white rounded-xl border border-neutral-200 p-4">
-            <p className="text-caption text-neutral-500 mb-1">Avg CVR</p>
+            <p className="text-caption text-neutral-500 mb-1">平均 CVR</p>
             <p className="font-heading text-lg font-bold text-neutral-900 tabular-nums">
               {(PAGE_DATA.reduce((s, d) => s + d.cvr, 0) / PAGE_DATA.length).toFixed(1)}%
             </p>
           </div>
           <div className="bg-white rounded-xl border border-neutral-200 p-4">
-            <p className="text-caption text-neutral-500 mb-1">Best CVR</p>
+            <p className="text-caption text-neutral-500 mb-1">最高 CVR</p>
             <p className="font-heading text-lg font-bold text-success-600 tabular-nums">
               {sortedByCvr[0].cvr.toFixed(1)}%
             </p>
             <p className="text-[10px] text-neutral-400 mt-0.5 truncate">{sortedByCvr[0].page}</p>
           </div>
           <div className="bg-white rounded-xl border border-neutral-200 p-4">
-            <p className="text-caption text-neutral-500 mb-1">Total Conversions</p>
+            <p className="text-caption text-neutral-500 mb-1">总转化</p>
             <p className="font-heading text-lg font-bold text-neutral-900 tabular-nums">
               {PAGE_DATA.reduce((s, d) => s + d.conversions, 0).toLocaleString()}
             </p>
@@ -94,21 +94,21 @@ const PageInsightsPage = () => {
       <div className="bg-white rounded-xl border border-neutral-200 overflow-hidden">
         <div className="px-5 py-4 border-b border-neutral-100 flex items-center justify-between">
           <h3 className="font-heading text-sm font-semibold text-neutral-900">
-            Top Pages by CVR
+            落地页 CVR 排名
           </h3>
-          <span className="text-caption text-neutral-400">{PAGE_DATA.length} pages</span>
+          <span className="text-caption text-neutral-400">{PAGE_DATA.length} 个页面</span>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-caption">
             <thead>
               <tr className="bg-neutral-50 border-b border-neutral-100">
                 <th className="text-left px-4 py-3 font-semibold text-neutral-600 whitespace-nowrap">#</th>
-                <th className="text-left px-4 py-3 font-semibold text-neutral-600 whitespace-nowrap">Landing Page</th>
-                <th className="text-right px-3 py-3 font-semibold text-neutral-600 whitespace-nowrap">Spend</th>
-                <th className="text-right px-3 py-3 font-semibold text-neutral-600 whitespace-nowrap">Share</th>
+                <th className="text-left px-4 py-3 font-semibold text-neutral-600 whitespace-nowrap">落地页</th>
+                <th className="text-right px-3 py-3 font-semibold text-neutral-600 whitespace-nowrap">花费</th>
+                <th className="text-right px-3 py-3 font-semibold text-neutral-600 whitespace-nowrap">占比</th>
                 <th className="text-right px-3 py-3 font-semibold text-neutral-600 whitespace-nowrap">CVR</th>
-                <th className="text-right px-3 py-3 font-semibold text-neutral-600 whitespace-nowrap">Clicks</th>
-                <th className="text-right px-3 py-3 font-semibold text-neutral-600 whitespace-nowrap">Conversions</th>
+                <th className="text-right px-3 py-3 font-semibold text-neutral-600 whitespace-nowrap">点击</th>
+                <th className="text-right px-3 py-3 font-semibold text-neutral-600 whitespace-nowrap">转化</th>
               </tr>
             </thead>
             <tbody>

@@ -1,126 +1,151 @@
 /* ═══════════════════════════════════════════════════════════
    Mock Luna AI Service
-   Keyword-matching → preset responses with 1-2s delay.
-   Simulates streaming via chunked callbacks.
+   Keyword-matching → preset responses with sync payloads.
    ═══════════════════════════════════════════════════════════ */
+
+import { getSyncPayload } from './lunaSyncPayloads'
 
 /* ── Response templates ──────────────────────────────────── */
 
 const RESPONSES = {
   /* ── Performance / Analysis ────────────────────────────── */
   performance: {
-    text: `Here's your performance overview for the past 7 days:\n\n• Total Spend: $12,450 (+8.2% WoW)\n• ROAS: 3.82 (target: 3.5 ✓)\n• CPA: $18.40 (-5.1% WoW)\n• CTR: 2.14% (+0.3pp)\n• CVR: 4.8% (stable)\n\nKey insight: Your top-performing campaign "Summer Collection - Lookalike" is driving 42% of total purchases at a CPA 35% below average. Consider scaling its budget by 20-30%.`,
+    text: `美国市场近 7 天表现：\n\n• 花费：$303.1（+22.4%）\n• ROAS：1.82（目标 2.40）\n• CPA：$42.80（高于红线）\n• CTR：1.74%（基本稳定）\n• 购买：26\n\n核心判断：点击没有明显变差，问题主要是冷启动转化效率下降和主视频疲劳。`,
     type: 'analysis',
     syncTarget: null,
     dataCard: {
-      title: 'Top Campaigns by ROAS',
+      title: '美国 Campaign 表现',
       rows: [
-        { name: 'Summer Collection - Lookalike', spend: '$3,240', roas: '5.12', status: 'active' },
-        { name: 'Retargeting - Cart Abandon', spend: '$1,890', roas: '4.67', status: 'active' },
-        { name: 'Brand Awareness - US', spend: '$2,100', roas: '3.21', status: 'active' },
-        { name: 'New Audience - Interest', spend: '$1,680', roas: '2.84', status: 'warning' },
+        { name: 'US Retargeting Purchase', spend: '$126.4', roas: '1.82', status: 'watch' },
+        { name: 'US Prospecting Broad', spend: '$118.2', roas: '1.54', status: 'cut' },
+        { name: 'US 3 Percent Lookalike', spend: '$96.7', roas: '2.18', status: 'hold' },
       ],
     },
   },
 
   budget: {
-    text: `Based on current performance data, here are my budget optimization recommendations:\n\n1. **Increase** "Summer Collection - Lookalike" by $500/day → ROAS 5.12 is well above target\n2. **Decrease** "New Audience - Interest" by $200/day → CPA trending 18% above target\n3. **Maintain** "Retargeting - Cart Abandon" → Performing at optimal efficiency\n\nProjected impact: +12% total ROAS, -8% blended CPA over next 7 days.`,
+    text: `今日预算动作：\n\n1. **US Prospecting Broad**：$140 → $95，先减少冷启动浪费\n2. **US Retargeting Purchase**：保持 $180，促销周保留高意向曝光\n3. **US 3 Percent Lookalike**：保持 $120，等待新素材学习完成\n\n预计日预算净减少 $45，午间后继续观察购买量和 CPA。`,
     type: 'optimization',
     syncTarget: 'ads/campaigns',
     actionCard: {
-      title: 'Apply Budget Changes',
-      description: 'Apply these 3 budget adjustments to your campaigns',
+      title: '查看预算处理',
+      description: '进入广告管理确认 3 个 Campaign 的预算动作',
     },
   },
 
   roas: {
-    text: `ROAS Analysis for the past 30 days:\n\nYour overall ROAS is 3.82, which is 9% above your target of 3.5.\n\n• Best day: June 8 (ROAS 4.91) — coincided with your flash sale creative\n• Worst day: June 2 (ROAS 2.14) — audience fatigue detected on broad targeting\n• Weekend ROAS averages 15% higher than weekdays\n\nRecommendation: Shift 10-15% of weekday budget to Friday-Sunday to capitalize on higher weekend conversion rates.`,
+    text: `美国 ROAS 连续 7 天下滑：\n\n• 6/23：2.60\n• 6/25：2.21\n• 6/27：1.94\n• 6/29：1.82\n\nCTR 基本稳定，说明不是点击兴趣突然下降；主要风险来自转化效率和疲劳素材。`,
     type: 'analysis',
     syncTarget: 'insight/dashboard',
   },
 
   /* ── Campaign Creation ─────────────────────────────────── */
   campaign: {
-    text: `I'll draft a campaign structure for you. Based on your brand profile and historical data:\n\n**Campaign: Summer Sale 2025**\n├── Ad Set 1: Lookalike (Purchase, 1%)\n│   ├── Ad: Carousel — Top 4 products\n│   └── Ad: Video — 15s product showcase\n├── Ad Set 2: Interest (Fashion + Shopping)\n│   ├── Ad: Single Image — Hero product\n│   └── Ad: Collection — Summer lookbook\n└── Ad Set 3: Retargeting (Website 7d)\n    ├── Ad: Dynamic — Viewed products\n    └── Ad: Video — Customer testimonial\n\nEstimated daily budget: $800 | Projected ROAS: 3.5-4.2`,
+    text: `已准备美国冷启动换新结构：\n\n**Campaign: US Prospecting Refresh**\n├── Broad Fitness Buyers Refresh：$55/day\n│   ├── UGC Hook 01 - Compression Fit\n│   └── UGC Hook 02 - Morning Routine\n└── Visitors 30D Proof Refresh：$40/day\n    └── Customer Proof Carousel Holdout\n\n总预算 $95/day，发布前还有 1 条文案需要确认。`,
     type: 'creation',
-    syncTarget: 'create/campaign-gen',
+    syncTarget: 'create/draft',
     actionCard: {
-      title: 'Create Campaign Draft',
-      description: 'Save this campaign structure as a draft for review',
+      title: '打开草稿中心',
+      description: '检查 UGC Hook、预算和发布前审核',
     },
   },
 
   creative: {
-    text: `Creative performance insights:\n\n**Top Performers (by CTR):**\n1. Video 15s — "Summer Vibes" → CTR 3.8%, CVR 6.2%\n2. Carousel — "Best Sellers" → CTR 3.2%, CVR 5.1%\n3. Single Image — "Hero Banner" → CTR 2.9%, CVR 4.8%\n\n**Fatigue Alert:**\n• "Spring Collection" carousel has been running 21 days — CTR dropped 40% from peak\n• Recommend refreshing with new imagery or testing UGC variants\n\n**AI Suggestion:** I can generate 3 new creative variants based on your top-performing assets. Want me to proceed?`,
+    text: `素材风险：\n\n• Core Legging Video V12：频次 4.7，CTR 下降 28.4%，需要从冷启动下线\n• Customer Proof Carousel：再营销 ROAS 2.04，继续保留\n• Studio Static Set A：CPA 上升，进入 48 小时观察\n\n建议：优先补两条 UGC Hook 替换冷启动主视频。`,
     type: 'analysis',
     syncTarget: 'creative/library',
   },
 
   /* ── Audience ──────────────────────────────────────────── */
   audience: {
-    text: `Audience analysis summary:\n\n**Highest-Value Segments:**\n1. Women 25-34, Fashion Interest → CPA $12.30, ROAS 5.4\n2. Lookalike (Purchase 1%) → CPA $15.80, ROAS 4.8\n3. Men 25-44, Shopping → CPA $19.20, ROAS 3.9\n\n**Underperforming:**\n• Broad targeting 18-65 → CPA $34.50 (88% above avg)\n• Recommend pausing and reallocating to top segments\n\n**New Opportunity:** Based on your customer data, a "High-Value Repeat Buyers" seed audience could yield an estimated 2.3x ROAS improvement.`,
+    text: `美国受众拆解：\n\n• Broad Fitness Buyers：ROAS 1.54，CPA $58.60，今日先降预算\n• Visitors 7D Purchase Intent：ROAS 1.76，促销周保留曝光\n• Visitors 30D Value Stack：ROAS 1.88，进入 48 小时观察\n• US 3 Percent Lookalike：ROAS 2.18，CPC -11.8%，学习期继续保留\n\n结论：不要平均削减美国预算，先削减 Broad，保留再营销和 Lookalike 学习量。`,
     type: 'analysis',
-    syncTarget: 'insight/audience',
+    syncTarget: 'insight/dashboard',
   },
 
   /* ── Report ────────────────────────────────────────────── */
   report: {
-    text: `Daily Performance Brief — June 16, 2025\n\n📊 **KPI Summary**\n• Spend: $1,780 (budget pacing: 92%)\n• Revenue: $6,810 (ROAS: 3.83)\n• Purchases: 94 (CPA: $18.94)\n• Clicks: 4,210 (CTR: 2.1%, CPC: $0.42)\n\n📈 **Trends**\n• ROAS trending up 3 consecutive days\n• CPA decreased 5% vs yesterday\n• New creative "Summer Sale V2" outperforming control by 28%\n\n⚠️ **Alerts**\n• Campaign "Broad Reach" approaching daily budget cap (96%)\n• Ad Set "Retargeting 30d" frequency at 4.2 (fatigue risk)\n\nWant me to generate a client-ready report with these insights?`,
+    text: `客户日报要点：\n\n• 美国 ROAS 1.82，低于 2.40 目标\n• 冷启动预算从 $140 降到 $95\n• 再营销因促销周保留 $180，并观察 48 小时\n• 疲劳主视频进入换新草稿\n\n日报已包含今日异常、已执行动作和明日观察点。`,
     type: 'report',
     syncTarget: 'report/daily-brief',
     actionCard: {
-      title: 'Generate Client Report',
-      description: 'Create a shareable performance report for your client',
+      title: '打开客户日报',
+      description: '查看今日异常、处理结果和明日观察点',
     },
   },
 
   /* ── Strategy ──────────────────────────────────────────── */
   strategy: {
-    text: `Weekly Strategy Recommendation (W25):\n\n**Current Phase:** Growth\n**Overall Goal:** ROAS ≥ 3.5, Purchase ROAS ≥ 2.8\n\n**This Week's Focus:**\n1. ✅ Scale "Summer Collection - Lookalike" budget (+20%)\n2. 🔄 Test 3 new UGC video creatives\n3. ⏳ Launch "High-Value Buyers" lookalike audience\n4. 📊 Monitor CPA red line ($25) on new campaigns\n\n**Auto Tasks (scheduled):**\n• Daily 10:00 — Budget optimization check\n• Wed 09:00 — Mid-week performance review\n• Fri 17:00 — Weekly close-out analysis\n\nShall I add these tasks to your Strategy Cycle?`,
+    text: `本周策略任务：\n\n1. 确认 US Prospecting Broad 降到 $95\n2. US Retargeting 观察 48 小时\n3. 替换 Core Legging Video V12\n4. 确认 UGC Hook 02 首句卖点\n5. 周五给客户复盘预算调整结果\n\n这些任务已出现在策略中。`,
     type: 'strategy',
-    syncTarget: 'plan/strategy-cycle',
+    syncTarget: 'plan/media-plan?tab=cycle',
     actionCard: {
-      title: 'Apply to Strategy Cycle',
-      description: 'Add these tasks and goals to your weekly PDCA cycle',
+      title: '打开策略',
+      description: '查看本周预算动作和观察任务',
     },
   },
 
   /* ── Goals / Settings ──────────────────────────────────── */
   goal: {
-    text: `Based on your historical performance (last 90 days), here are my recommended goal settings:\n\n• **Target ROAS:** 3.5 (current avg: 3.82)\n• **CPA Red Line:** $25.00 (current avg: $18.40)\n• **Daily Budget Cap:** $2,000\n• **Frequency Cap:** 3.0 per 7 days\n• **CTR Floor:** 1.5% (pause below this)\n\nThese are conservative targets that account for seasonal variations. Want me to apply these to your Goals & Red Lines settings?`,
+    text: `LumaFit 当前目标红线：\n\n• Purchase ROAS 目标：2.40\n• 美国 CPA 红线：$42\n• 美国日预算红线：$300\n• 冷启动素材频次红线：4.5\n• CTR 观察线：1.2%\n\n今天 US Prospecting 同时触发 ROAS、CPA 和素材频次风险，应优先降预算并换新素材。`,
     type: 'settings',
     syncTarget: 'settings/goals',
     actionCard: {
-      title: 'Apply Goal Settings',
-      description: 'Update your optimization goals with these recommended values',
+      title: '打开目标与阶段',
+      description: '查看今日触发的 ROAS、CPA 和频次红线',
     },
   },
 
   /* ── Generic / Greeting ────────────────────────────────── */
   greeting: {
-    text: `Hi! I'm Luna, your AI advertising assistant. I can help you with:\n\n• **Analyze** — Performance data, trends, and anomalies\n• **Optimize** — Budget allocation, audience targeting, bidding\n• **Create** — Campaign structures, ad copy, creative briefs\n• **Report** — Daily briefs, client reports, insights\n• **Strategize** — Weekly PDCA cycles, goal setting\n\nWhat would you like to explore today?`,
+    text: `今日重点：美国 ROAS 已低于目标。\n\n我可以直接处理：\n• 查美国 Campaign 表现\n• 确认预算调整\n• 查看疲劳素材\n• 生成客户日报\n• 跟踪本周任务\n\n你要先看哪一项？`,
     type: 'greeting',
   },
 
   fallback: {
-    text: `I understand you're asking about that. Let me analyze the relevant data...\n\nBased on your current campaign performance:\n• Your overall account health is good (score: 82/100)\n• 3 campaigns are performing above target\n• 1 campaign needs attention (rising CPA)\n\nCould you be more specific? I can help with:\n1. Performance deep-dive for specific campaigns\n2. Budget optimization recommendations\n3. Creative refresh suggestions\n4. Audience analysis\n5. Strategy planning`,
+    text: `当前最需要处理的是美国 ROAS 下滑。\n\n可继续查看：\n1. 哪些 Campaign 拉低 ROAS\n2. 今天该怎么调预算\n3. 哪个素材需要换新\n4. 客户日报怎么写\n5. 本周后续任务`,
     type: 'general',
   },
 }
 
+const buildAttachmentResponse = (attachments, userMessage) => {
+  const names = attachments.map((a) => a.name).join('、')
+  const hasImage = attachments.some((a) => a.type?.startsWith('image/'))
+  return {
+    text: `已收到 ${attachments.length} 个附件：${names}。\n\n${hasImage ? '我从图片中识别到素材/落地页相关元素，建议与 Core Legging Video V12 疲劳问题一并处理。' : '我会结合附件内容与账户数据继续分析。'}\n\n${userMessage ? `关于「${userMessage}」：` : ''}如需写入广告管理或策略待办，告诉我具体动作即可。`,
+    type: 'analysis',
+    syncTarget: hasImage ? 'creative/library' : null,
+    actionCard: hasImage ? {
+      title: '打开创意库',
+      description: '查看 Luna 标记的疲劳素材与替换建议',
+    } : null,
+  }
+}
+
 /* ── Keyword → response mapping ──────────────────────────── */
 const KEYWORD_MAP = [
-  { keywords: ['hello', 'hi', 'hey', 'start', 'help', 'what can you'], key: 'greeting' },
-  { keywords: ['performance', 'overview', 'how are', 'how is', 'stats', 'summary', 'kpi'], key: 'performance' },
-  { keywords: ['budget', 'spend', 'spending', 'allocat', 'increase budget', 'decrease budget', 'optimize budget'], key: 'budget' },
-  { keywords: ['roas', 'return on ad', 'return on spend'], key: 'roas' },
-  { keywords: ['campaign', 'create campaign', 'new campaign', 'launch', 'draft'], key: 'campaign' },
-  { keywords: ['creative', 'image', 'video', 'ad copy', 'fatigue', 'refresh'], key: 'creative' },
-  { keywords: ['audience', 'targeting', 'segment', 'lookalike', 'retarget'], key: 'audience' },
-  { keywords: ['report', 'brief', 'daily', 'client report', 'share'], key: 'report' },
-  { keywords: ['strategy', 'plan', 'pdca', 'cycle', 'weekly', 'schedule', 'task'], key: 'strategy' },
-  { keywords: ['goal', 'target', 'red line', 'threshold', 'setting', 'configure'], key: 'goal' },
+  { keywords: ['hello', 'hi', 'hey', 'start', 'help', 'what can you', '你好', '帮助'], key: 'greeting' },
+  { keywords: ['performance', 'overview', 'how are', 'how is', 'stats', 'summary', 'kpi', '表现', '今日', '美国'], key: 'performance' },
+  { keywords: ['budget', 'spend', 'spending', 'allocat', 'increase budget', 'decrease budget', 'optimize budget', '预算', '花费'], key: 'budget' },
+  { keywords: ['roas', 'return on ad', 'return on spend', '下滑', '衰退'], key: 'roas' },
+  { keywords: ['campaign', 'create campaign', 'new campaign', 'launch', 'draft', '草稿', '创编', '结构'], key: 'campaign' },
+  { keywords: ['creative', 'image', 'video', 'ad copy', 'fatigue', 'refresh', '素材', '疲劳', '换新'], key: 'creative' },
+  { keywords: ['audience', 'targeting', 'segment', 'lookalike', 'retarget', '受众'], key: 'audience' },
+  { keywords: ['report', 'brief', 'daily', 'client report', 'share', '日报', '客户', '报告'], key: 'report' },
+  { keywords: ['strategy', 'plan', 'pdca', 'cycle', 'weekly', 'schedule', 'task', '策略', '任务', '本周'], key: 'strategy' },
+  { keywords: ['goal', 'target', 'red line', 'threshold', 'setting', 'configure', '目标', '红线'], key: 'goal' },
 ]
+
+const PROMPT_INTENT_MAP = {
+  'perf-overview': 'performance',
+  'budget-opt': 'budget',
+  'campaign-draft': 'campaign',
+  'daily-report': 'report',
+  'creative-perf': 'creative',
+  'audience-insights': 'audience',
+  'weekly-strategy': 'strategy',
+  'goal-recommend': 'goal',
+}
 
 /**
  * Match user input to a response key
@@ -137,24 +162,24 @@ const matchIntent = (input) => {
 
 /* ── Data sources that add context to responses ──────────── */
 export const DATA_SOURCES = [
-  { id: 'adPerformance', label: 'Ad Performance', icon: 'BarChart3' },
-  { id: 'creativeLibrary', label: 'Creative Library', icon: 'Palette' },
-  { id: 'brandProfile', label: 'Brand Profile', icon: 'Building2' },
-  { id: 'audienceData', label: 'Audience Data', icon: 'Users' },
-  { id: 'competitorData', label: 'Competitor Intel', icon: 'Eye' },
-  { id: 'marketTrends', label: 'Market Trends', icon: 'TrendingUp' },
+  { id: 'adPerformance', label: '广告表现', icon: 'BarChart3' },
+  { id: 'creativeLibrary', label: '素材表现', icon: 'Palette' },
+  { id: 'brandProfile', label: '品牌约束', icon: 'Building2' },
+  { id: 'audienceData', label: '受众表现', icon: 'Users' },
+  { id: 'competitorData', label: '竞品动态', icon: 'Eye' },
+  { id: 'marketTrends', label: '市场趋势', icon: 'TrendingUp' },
 ]
 
 /* ── Quick prompts by category ───────────────────────────── */
 export const QUICK_PROMPTS = [
-  { id: 'perf-overview', label: "Today's performance overview", category: 'analysis', icon: 'BarChart3' },
-  { id: 'budget-opt', label: 'Optimize my budgets', category: 'optimize', icon: 'DollarSign' },
-  { id: 'campaign-draft', label: 'Draft a new campaign', category: 'create', icon: 'Zap' },
-  { id: 'daily-report', label: 'Generate daily report', category: 'report', icon: 'FileBarChart' },
-  { id: 'creative-perf', label: 'Creative performance check', category: 'analysis', icon: 'Palette' },
-  { id: 'audience-insights', label: 'Audience insights', category: 'analysis', icon: 'Users' },
-  { id: 'weekly-strategy', label: 'Weekly strategy plan', category: 'strategy', icon: 'Target' },
-  { id: 'goal-recommend', label: 'Recommend goal settings', category: 'optimize', icon: 'Settings' },
+  { id: 'perf-overview', label: '今日美国表现', category: 'analysis', icon: 'BarChart3' },
+  { id: 'budget-opt', label: '预算怎么调', category: 'optimize', icon: 'DollarSign' },
+  { id: 'campaign-draft', label: '生成换新草稿', category: 'create', icon: 'Zap' },
+  { id: 'daily-report', label: '生成客户日报', category: 'report', icon: 'FileBarChart' },
+  { id: 'creative-perf', label: '查看疲劳素材', category: 'analysis', icon: 'Palette' },
+  { id: 'audience-insights', label: '受众问题', category: 'analysis', icon: 'Users' },
+  { id: 'weekly-strategy', label: '本周任务', category: 'strategy', icon: 'Target' },
+  { id: 'goal-recommend', label: '目标红线', category: 'optimize', icon: 'Settings' },
 ]
 
 /* ── Public API ───────────────────────────────────────────── */
@@ -168,41 +193,47 @@ export const QUICK_PROMPTS = [
  * @param {function} [onChunk] — Optional streaming callback (receives partial text)
  * @returns {Promise<object>} — { text, type, syncTarget?, dataCard?, actionCard? }
  */
-export const sendToLuna = async (userMessage, dataSources = [], onChunk) => {
-  const intentKey = matchIntent(userMessage)
-  const response = RESPONSES[intentKey]
-
-  // Simulate thinking delay (800-1800ms)
-  const thinkDelay = 800 + Math.random() * 1000
-  await sleep(thinkDelay)
-
-  // Simulate streaming if callback provided
-  if (onChunk) {
-    const words = response.text.split(' ')
-    let accumulated = ''
-    for (let i = 0; i < words.length; i++) {
-      accumulated += (i === 0 ? '' : ' ') + words[i]
-      onChunk(accumulated)
-      await sleep(15 + Math.random() * 25) // 15-40ms per word
-    }
-  }
-
-  return {
-    text: response.text,
-    type: response.type,
-    syncTarget: response.syncTarget || null,
-    dataCard: response.dataCard || null,
-    actionCard: response.actionCard || null,
-  }
+export const sendToLuna = async (userMessage, dataSources = [], attachments = [], onChunk) => {
+  const intentKey = attachments.length > 0 ? 'attachment' : matchIntent(userMessage)
+  const response = attachments.length > 0
+    ? buildAttachmentResponse(attachments, userMessage)
+    : RESPONSES[intentKey] || RESPONSES.fallback
+  return sendToLunaWithResponse(response, dataSources, onChunk)
 }
 
 /**
  * Get a quick-prompt response (same as sendToLuna but maps prompt ID → text)
  */
 export const sendQuickPrompt = (promptId, dataSources, onChunk) => {
+  const intentKey = PROMPT_INTENT_MAP[promptId]
+  if (intentKey) {
+    const response = RESPONSES[intentKey]
+    return sendToLunaWithResponse(response, dataSources, onChunk)
+  }
   const prompt = QUICK_PROMPTS.find((p) => p.id === promptId)
-  const text = prompt ? prompt.label : 'Help me'
-  return sendToLuna(text, dataSources, onChunk)
+  return sendToLuna(prompt ? prompt.label : 'Help me', dataSources, [], onChunk)
+}
+
+const sendToLunaWithResponse = async (response, _dataSources, onChunk) => {
+  const thinkDelay = 800 + Math.random() * 1000
+  await sleep(thinkDelay)
+  if (onChunk) {
+    const words = response.text.split(' ')
+    let accumulated = ''
+    for (let i = 0; i < words.length; i++) {
+      accumulated += (i === 0 ? '' : ' ') + words[i]
+      onChunk(accumulated)
+      await sleep(15 + Math.random() * 25)
+    }
+  }
+  return {
+    text: response.text,
+    type: response.type,
+    syncTarget: response.syncTarget || null,
+    dataCard: response.dataCard || null,
+    actionCard: response.actionCard || null,
+    payload: response.syncTarget ? getSyncPayload(response.syncTarget) : null,
+  }
 }
 
 /* ── Helpers ──────────────────────────────────────────────── */

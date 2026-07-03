@@ -11,6 +11,7 @@ import BrandSwitchLoading from './components/brand/BrandSwitchLoading'
 import ZIndexObserver from './components/ZIndexObserver'
 import { resetModalCounter } from './constants/zIndex'
 import LunaChatPanel from './features/chat/LunaChatPanel'
+import GlobalLunaBar from './components/luna/GlobalLunaBar'
 
 /* ═══════════════════════════════════════════════════════════
    App — Thin shell: providers, global modals, router
@@ -83,6 +84,7 @@ function App() {
 
       {/* Global Luna Chat Panel */}
       <LunaChatPanel />
+      <GlobalLunaBar />
     </>
   )
 }

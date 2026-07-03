@@ -6,8 +6,7 @@ import useLunaStore from '@stores/lunaStore'
 
 /* ── Onboarding tour: sidebar step → menu key mapping (disabled) ── */
 // const STEP_SIDEBAR_CONFIG = {
-//   0: { key: 'campaign-gen', title: '这里是 Campaign Generator', body: '...', endOnClick: true, stepLabel: null },
-//   1: { key: 'goals', title: '这里是 Goals & Red Lines', body: '...', endOnClick: false, stepLabel: '1/3' },
+//   1: { key: 'goals', title: '这里是目标与阶段', body: '...', endOnClick: false, stepLabel: '1/3' },
 //   2: { key: 'campaigns', title: '这里是 Campaigns', body: '...', endOnClick: false, stepLabel: '1/4' },
 //   3: { key: 'draft', title: '这里是 Drafts & Preview', body: '...', endOnClick: false, stepLabel: '1/3' },
 //   5: { key: 'media-plan', title: '这里是 Media Plan', body: '...', endOnClick: true, stepLabel: null },
@@ -33,6 +32,8 @@ const Sidebar = ({ isMobile, isPinned, onTogglePinned, onClose, selectedBrand, o
   const lunaIsOpen = useLunaStore((s) => s.isOpen)
   const toggleLuna = useLunaStore((s) => s.toggleChat)
   const hasPendingSync = useLunaStore((s) => Object.keys(s.pendingSync).length > 0)
+  const pendingSync = useLunaStore((s) => s.pendingSync)
+  const menuHasLunaSync = (path) => path && !!pendingSync[path?.split('?')[0]]
 
   // Extract current path segment for active detection
   // e.g. /workspace/default/plan/media-plan → plan/media-plan
@@ -182,6 +183,11 @@ const Sidebar = ({ isMobile, isPinned, onTogglePinned, onClose, selectedBrand, o
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-luna-amber opacity-75" />
                 <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-luna-amber" />
               </span>
+            )}
+
+            {/* Module pending Luna sync */}
+            {!item.isLuna && menuHasLunaSync(item.path) && (
+              <span className="ml-auto shrink-0 h-2 w-2 rounded-full bg-luna-violet" title="Luna 有待处理建议" />
             )}
           </>
         )}
@@ -440,8 +446,8 @@ const Sidebar = ({ isMobile, isPinned, onTogglePinned, onClose, selectedBrand, o
               <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-success-500 border-2 border-white rounded-full shadow-sm" />
             </div>
             <div className={`flex-1 text-left min-w-0 transition-all duration-normal ${isCollapsed ? 'opacity-0 w-0' : 'opacity-100 w-auto ml-1'}`}>
-              <p className="font-semibold text-neutral-800 text-[13px] truncate leading-tight">User</p>
-              <p className="text-[10px] text-neutral-400 truncate mt-0.5 font-medium">Professional Plan</p>
+              <p className="font-semibold text-neutral-800 text-[13px] truncate leading-tight">优化师</p>
+              <p className="text-[10px] text-neutral-400 truncate mt-0.5 font-medium">{selectedBrand} 今日值班</p>
             </div>
             {!isCollapsed && <ChevronsUpDown size={14} className="text-neutral-400 shrink-0" />}
           </button>

@@ -7,8 +7,8 @@ import { Users, BarChart3, ChevronLeft } from 'lucide-react'
    ═══════════════════════════════════════════════════════════ */
 
 const USER_NAV = [
-  { path: 'clients', label: 'My Clients', icon: Users },
-  { path: 'stats', label: 'My Stats', icon: BarChart3 },
+  { path: 'clients', label: '客户账户', icon: Users },
+  { path: 'stats', label: '客户报告', icon: BarChart3 },
 ]
 
 const UserLayout = () => {
@@ -23,14 +23,14 @@ const UserLayout = () => {
             className="flex items-center gap-2 text-ink-300 hover:text-white transition-colors"
           >
             <ChevronLeft size={16} />
-            <span className="text-caption font-semibold">Back to Workspace</span>
+            <span className="text-caption font-semibold">返回工作台</span>
           </NavLink>
         </div>
 
         {/* Title */}
         <div className="px-5 py-4">
-          <h2 className="font-heading text-sm font-semibold text-white">User Management</h2>
-          <p className="text-[11px] text-ink-300 mt-0.5">Manage clients and view stats</p>
+          <h2 className="font-heading text-sm font-semibold text-white">客户账户</h2>
+          <p className="text-[11px] text-ink-300 mt-0.5">查看客户投放状态和报告</p>
         </div>
 
         {/* Nav items */}
@@ -62,8 +62,8 @@ const UserLayout = () => {
               U
             </div>
             <div>
-              <p className="text-sm font-semibold text-ink-100">User</p>
-              <p className="text-[10px] text-ink-300">Professional Plan</p>
+              <p className="text-sm font-semibold text-ink-100">优化师</p>
+              <p className="text-[10px] text-ink-300">LumaFit 今日值班</p>
             </div>
           </div>
         </div>

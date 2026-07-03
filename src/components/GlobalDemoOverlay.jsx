@@ -29,13 +29,13 @@ const GlobalDemoOverlay = ({ onConnect, onCreate }) => {
           <div className="text-center mb-12">
             <div className="inline-flex items-center gap-3 bg-gradient-to-r from-primary to-purple-600 text-white px-6 py-3 rounded-full mb-6 shadow-lg">
               <Sparkles size={24} />
-              <span className="text-2xl font-bold">Welcome to AdsGo</span>
+              <span className="text-2xl font-bold">LumaFit 今日工作台</span>
             </div>
             <h1 className="text-5xl font-bold text-neutral-900 mb-4">
-              Unlock AI-Powered Campaign Optimization
+              美国 ROAS 1.82，先处理预算和素材
             </h1>
             <p className="text-xl text-neutral-600 max-w-3xl mx-auto">
-              You're currently viewing demo data. Choose your path to get started with real campaign insights.
+              当前已有 3 个 Campaign 待处理，Core Legging Video V12 需要换新。
             </p>
           </div>
 
@@ -48,27 +48,27 @@ const GlobalDemoOverlay = ({ onConnect, onCreate }) => {
                   <Database size={40} className="text-white" />
                 </div>
                 <div>
-                  <h2 className="text-2xl font-bold text-neutral-900 mb-1">Connect Active Ad Account</h2>
-                  <p className="text-neutral-500">Sync your existing campaigns</p>
+                  <h2 className="text-2xl font-bold text-neutral-900 mb-1">继续处理今日异常</h2>
+                  <p className="text-neutral-500">查看预算动作和处理记录</p>
                 </div>
               </div>
               
               <p className="text-neutral-600 mb-6 leading-relaxed">
-                Already have ads running on Google, Meta, or TikTok? Connect your account to get real-time AI budget optimizations and performance insights.
+                进入广告管理，确认 US Prospecting 降预算、US Retargeting 保留曝光，以及 Lookalike 学习期观察。
               </p>
               
               <ul className="space-y-3 mb-8">
                 <li className="flex items-center gap-3 text-neutral-700">
                   <div className="w-2 h-2 bg-success-500 rounded-full"></div>
-                  <span>Import all active campaigns automatically</span>
+                  <span>US Prospecting Broad：$140 调整到 $95</span>
                 </li>
                 <li className="flex items-center gap-3 text-neutral-700">
                   <div className="w-2 h-2 bg-success-500 rounded-full"></div>
-                  <span>AI analyzes your historical performance</span>
+                  <span>US Retargeting Purchase：促销周保留 $180</span>
                 </li>
                 <li className="flex items-center gap-3 text-neutral-700">
                   <div className="w-2 h-2 bg-success-500 rounded-full"></div>
-                  <span>Get personalized budget suggestions</span>
+                  <span>US 3 Percent Lookalike：学习期继续保留</span>
                 </li>
               </ul>
 
@@ -80,11 +80,11 @@ const GlobalDemoOverlay = ({ onConnect, onCreate }) => {
                 {isConnecting ? (
                   <>
                     <Loader2 className="animate-spin" size={20} />
-                    <span>Connecting...</span>
+                    <span>处理中...</span>
                   </>
                 ) : (
                   <>
-                    <span>Connect Now</span>
+                    <span>进入广告管理</span>
                     <ArrowRight size={20} />
                   </>
                 )}
@@ -98,27 +98,27 @@ const GlobalDemoOverlay = ({ onConnect, onCreate }) => {
                   <Rocket size={40} className="text-white" />
                 </div>
                 <div>
-                  <h2 className="text-2xl font-bold text-neutral-900 mb-1">Create New Campaign</h2>
-                  <p className="text-neutral-500">Start from scratch</p>
+                  <h2 className="text-2xl font-bold text-neutral-900 mb-1">创建换新草稿</h2>
+                  <p className="text-neutral-500">替换疲劳冷启动素材</p>
                 </div>
               </div>
               
               <p className="text-neutral-600 mb-6 leading-relaxed">
-                Ready to start fresh? Use our AI assistant to set up and launch your first optimized campaign in minutes.
+                为美国冷启动准备两条 UGC Hook，保留再营销客户证言轮播，发布前确认预算和文案。
               </p>
               
               <ul className="space-y-3 mb-8">
                 <li className="flex items-center gap-3 text-neutral-700">
                   <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                  <span>AI-guided campaign setup wizard</span>
+                  <span>UGC Hook 01：Compression Fit</span>
                 </li>
                 <li className="flex items-center gap-3 text-neutral-700">
                   <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                  <span>Smart budget recommendations</span>
+                  <span>UGC Hook 02：Morning Routine</span>
                 </li>
                 <li className="flex items-center gap-3 text-neutral-700">
                   <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                  <span>Launch across multiple platforms</span>
+                  <span>日预算合计 $95，低于美国红线</span>
                 </li>
               </ul>
 
@@ -130,11 +130,11 @@ const GlobalDemoOverlay = ({ onConnect, onCreate }) => {
                 {isCreating ? (
                   <>
                     <Loader2 className="animate-spin" size={20} />
-                    <span>Creating...</span>
+                    <span>生成中...</span>
                   </>
                 ) : (
                   <>
-                    <span>Get Started</span>
+                    <span>打开草稿中心</span>
                     <ArrowRight size={20} />
                   </>
                 )}
@@ -142,10 +142,10 @@ const GlobalDemoOverlay = ({ onConnect, onCreate }) => {
             </div>
           </div>
 
-          {/* Demo Notice */}
+          {/* Business status */}
           <div className="text-center mt-12">
             <div className="inline-flex items-center gap-2 bg-white border-2 border-primary/30 text-neutral-700 px-6 py-3 rounded-full text-sm font-medium shadow-lg">
-              <span>👁️ Preview Mode: The data shown above is for demonstration purposes</span>
+              <span>预算变更需优化师确认后生效，客户日报会记录本次处理结果</span>
             </div>
           </div>
         </div>
