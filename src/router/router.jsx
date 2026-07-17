@@ -46,7 +46,7 @@ const V1Redirect = () => {
   const location = useLocation()
   const redirect = getV2Redirect(location.pathname)
   if (redirect) return <Navigate to={redirect} replace />
-  return <Navigate to="/workspace/default/ads/campaigns" replace />
+  return <Navigate to="/workspace/default/chat" replace />
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -55,7 +55,7 @@ const V1Redirect = () => {
 const AppRoutes = () => (
   <Routes>
     {/* Root redirect */}
-    <Route path="/" element={<Navigate to="/workspace/default/ads/campaigns" replace />} />
+    <Route path="/" element={<Navigate to="/workspace/default/chat" replace />} />
 
     {/* Workspace routes */}
     <Route path="/workspace/:brandId" element={<WorkspaceLayout />}>
@@ -111,7 +111,7 @@ const AppRoutes = () => (
       <Route path="notifications" element={<NotificationsPage />} />
 
       {/* Workspace index */}
-      <Route index element={<Navigate to="ads/campaigns" replace />} />
+      <Route index element={<Navigate to="chat" replace />} />
     </Route>
 
     <Route path="/admin" element={<PlatformAdminGuard><PlatformAdminLayout /></PlatformAdminGuard>}>
@@ -155,7 +155,7 @@ const AppRoutes = () => (
     <Route path="/brandCenter/*" element={<V1Redirect />} />
 
     {/* Catch-all */}
-    <Route path="*" element={<Navigate to="/workspace/default/ads/campaigns" replace />} />
+    <Route path="*" element={<Navigate to="/workspace/default/chat" replace />} />
   </Routes>
 )
 
