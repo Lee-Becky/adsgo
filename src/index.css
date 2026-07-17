@@ -5,7 +5,7 @@
 @tailwind utilities;
 
 /* ═══════════════════════════════════════════════════════════
-   AdsGo 2.0 — "Luminous Precision" Base Styles
+   AdsGo 2.0 — "Operational Canvas" Base Styles
    ═══════════════════════════════════════════════════════════ */
 
 /* ── Base Reset ──────────────────────────────────────────── */
@@ -26,6 +26,16 @@ body {
   font-feature-settings: 'cv11' 1; /* DM Sans stylistic alternate */
 }
 
+button, input, select, textarea {
+  font: inherit;
+}
+
+button:focus-visible, a:focus-visible, input:focus-visible,
+select:focus-visible, textarea:focus-visible, [tabindex]:focus-visible {
+  outline: 2px solid var(--primary-500);
+  outline-offset: 2px;
+}
+
 #root {
   min-height: 100vh;
 }
@@ -42,7 +52,7 @@ body {
 }
 
 .gradient-text {
-  background: var(--luna-gradient);
+  background: linear-gradient(135deg, var(--primary-600), var(--luna-violet));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -236,7 +246,73 @@ body {
 }
 .card-hover-effect:hover {
   box-shadow: var(--shadow-card-hover);
-  transform: translateY(-1px);
+}
+
+/* ── Shared operational workspace primitives ───────────── */
+.workspace-page {
+  width: 100%;
+  max-width: 1600px;
+  margin-inline: auto;
+}
+
+.workspace-section {
+  overflow: hidden;
+  border: 1px solid var(--neutral-200);
+  border-radius: var(--radius-xl);
+  background: var(--surface-card);
+}
+
+.workspace-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 64px;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--neutral-200);
+}
+
+.workspace-kicker {
+  font-size: 11px;
+  line-height: 1.3;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--neutral-500);
+}
+
+.workspace-muted {
+  color: var(--neutral-500);
+}
+
+.operational-tabs {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid var(--neutral-200);
+  border-radius: var(--radius-lg);
+  background: var(--neutral-50);
+}
+
+.operational-tabs > button {
+  min-height: 36px;
+  border-radius: 7px;
+}
+
+@media (max-width: 767px) {
+  .workspace-section-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 /* ── Sidebar premium utilities ──────────────────────────── */

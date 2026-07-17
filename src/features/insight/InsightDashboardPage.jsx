@@ -84,7 +84,7 @@ const lunaAnalysis = [
 ]
 
 const Card = ({ title, children, action }) => (
-  <section className="rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
+  <section className="workspace-section p-5">
     <div className="mb-4 flex items-start justify-between gap-3">
       <h2 className="text-base font-semibold text-neutral-950">{title}</h2>
       {action}
@@ -154,11 +154,12 @@ const DonutInsight = ({ title, data, valueKey, valueLabel }) => {
 
 const InsightDashboardPage = () => {
   const [dateRange, setDateRange] = useState('7d')
+  const [analysisTab, setAnalysisTab] = useState('trend')
 
   return (
-    <div className="-mx-6 min-h-[100dvh] bg-neutral-50 px-6 py-6 text-neutral-900 lg:px-8">
-      <div className="w-full space-y-5">
-        <header className="flex flex-col gap-4 rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm sm:flex-row sm:items-center sm:justify-end">
+    <div className="workspace-page space-y-4 text-neutral-900">
+        <header className="flex flex-col gap-4 rounded-xl border border-neutral-200 bg-white p-5 sm:flex-row sm:items-end sm:justify-between">
+          <div><p className="workspace-kicker">Business health</p><h1 className="mt-1 text-xl font-semibold text-neutral-950">经营健康诊断</h1><p className="mt-2 text-sm text-neutral-500">先看目标差距和异常，再进入对应维度定位原因。</p></div>
           <div className="flex rounded-lg border border-neutral-200 overflow-hidden">
             {['7d', '14d', '30d'].map((range) => (
               <button
@@ -166,7 +167,7 @@ const InsightDashboardPage = () => {
                 onClick={() => setDateRange(range)}
                 className={`px-3 py-1.5 text-xs font-semibold transition-colors ${
                   dateRange === range
-                    ? 'bg-neutral-900 text-white'
+                    ? 'bg-primary-600 text-white'
                     : 'bg-white text-neutral-500 hover:bg-neutral-50'
                 }`}
               >
@@ -176,28 +177,28 @@ const InsightDashboardPage = () => {
           </div>
         </header>
 
-        <section className="grid grid-cols-2 gap-3 md:grid-cols-4 xl:grid-cols-8">
+        <section className="grid grid-cols-2 overflow-hidden rounded-xl border border-neutral-200 bg-white md:grid-cols-4 xl:grid-cols-8">
           {kpis.map(([label, value, delta, , isBad]) => (
-            <div key={label} className={`rounded-xl border p-3 shadow-sm ${isBad ? 'border-danger-200 bg-danger-50/30' : 'border-neutral-200 bg-white'}`}>
-              <p className="text-[11px] text-neutral-500">{label}</p>
-              <p className="mt-0.5 font-mono text-lg font-semibold text-neutral-950">{value}</p>
-              <p className={`mt-0.5 text-[10px] font-semibold ${isBad ? 'text-danger-600' : 'text-neutral-500'}`}>{delta}</p>
+            <div key={label} className={`border-b border-r border-neutral-200 p-4 ${isBad ? 'bg-danger-50/30' : 'bg-white'}`}>
+              <p className="text-xs text-neutral-500">{label}</p>
+              <p className="mt-1 font-mono text-lg font-semibold text-neutral-950">{value}</p>
+              <p className={`mt-1 text-xs font-semibold ${isBad ? 'text-danger-600' : 'text-neutral-500'}`}>{delta}</p>
             </div>
           ))}
         </section>
 
         <Card
-          title="Luna 深度分析"
+          title="Luna 诊断摘要"
           action={
-            <span className="inline-flex items-center gap-1 rounded-full bg-luna-bg px-2.5 py-1 text-[10px] font-semibold text-luna-violet">
+            <span className="inline-flex items-center gap-1 rounded-lg bg-primary-50 px-2.5 py-1 text-xs font-semibold text-primary-700">
               <Sparkles size={12} /> Luna
             </span>
           }
         >
-          <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
+          <div className="grid grid-cols-1 divide-y divide-neutral-200 lg:grid-cols-2 lg:divide-x lg:divide-y-0">
             {lunaAnalysis.map((item) => (
-              <div key={item.dimension} className="rounded-xl border border-neutral-100 p-4">
-                <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">{item.dimension}</p>
+              <div key={item.dimension} className="px-4 py-3 first:pl-0 last:pr-0">
+                <p className="text-xs font-semibold text-neutral-500">{item.dimension}</p>
                 <p className="mt-2 text-sm leading-6 text-neutral-800">{item.finding}</p>
                 <p className="mt-2 text-xs font-medium text-primary-700">→ {item.action}</p>
               </div>
@@ -205,19 +206,19 @@ const InsightDashboardPage = () => {
           </div>
         </Card>
 
-        <section className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+        <div className="operational-tabs max-w-full overflow-x-auto">{[['trend','核心趋势'],['dimensions','受众与落地页'],['creative','素材诊断']].map(([id,label])=><button key={id} onClick={()=>setAnalysisTab(id)} className={`whitespace-nowrap px-4 text-sm font-semibold ${analysisTab===id?'bg-white text-neutral-950 shadow-xs':'text-neutral-500'}`}>{label}</button>)}</div>
+
+        {analysisTab === 'trend' && <section className="grid grid-cols-1 gap-4 xl:grid-cols-2">
           <TrendCard title="ROAS 趋势" dataKey="roas" color="var(--primary-500)" unit="x" target={2.4} avg={2.31} />
           <TrendCard title="花费趋势" dataKey="spend" color="var(--chart-2)" unit="$" />
-          <TrendCard title="购买量趋势" dataKey="purchases" color="var(--chart-3)" />
-          <TrendCard title="CTR 趋势" dataKey="ctr" color="var(--chart-4)" unit="%" />
-        </section>
+        </section>}
 
-        <section className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+        {analysisTab === 'dimensions' && <section className="grid grid-cols-1 gap-4 xl:grid-cols-2">
           <DonutInsight title="受众：花费分布与 CPA" data={audienceData} valueKey="cpa" valueLabel="CPA" />
           <DonutInsight title="落地页：花费分布与 CVR" data={pageData} valueKey="cvr" valueLabel="CVR" />
-        </section>
+        </section>}
 
-        <Card title="素材：CPA vs 花费">
+        {analysisTab === 'creative' && <Card title="素材：CPA vs 花费">
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1fr_300px]">
             <div className="h-[280px]">
               <ResponsiveContainer width="100%" height="100%">
@@ -247,8 +248,7 @@ const InsightDashboardPage = () => {
               ))}
             </div>
           </div>
-        </Card>
-      </div>
+        </Card>}
     </div>
   )
 }

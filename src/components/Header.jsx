@@ -27,8 +27,6 @@ const Header = ({ toggleSidebar, isMobile }) => {
   const unreadCount = notifications.filter(item => !item.read).length
   const visibleNotifications = notifications.filter(item => notificationFilter === 'all' || (notificationFilter === 'unread' ? !item.read : item.category === 'alert'))
 
-  const globalBriefing = '美国 ROAS 1.82，3 个 Campaign 待处理，1 条素材待换新。'
-
   const languages = [
     { name: 'English', code: 'en' },
     { name: '中文', code: 'zh-CN' },
@@ -78,9 +76,9 @@ const Header = ({ toggleSidebar, isMobile }) => {
   }, [])
 
   return (
-    <header className="sticky top-0 z-[500] w-full bg-white/90 backdrop-blur-xl border-b border-neutral-200/80 transition-all duration-300">
-      <div className="px-6">
-        <div className="flex h-14 items-center justify-between">
+    <header className="sticky top-0 z-[500] w-full border-b border-neutral-200 bg-white/95 backdrop-blur-lg">
+      <div className="px-4 sm:px-6 xl:px-8">
+        <div className="flex h-16 items-center justify-between">
           {/* Left side — hamburger + page title */}
           <div className="flex items-center gap-3">
             {isMobile && (
@@ -92,40 +90,25 @@ const Header = ({ toggleSidebar, isMobile }) => {
               </button>
             )}
             <div>
-              <p className="hidden text-[10px] font-semibold uppercase tracking-[0.14em] text-neutral-400 sm:block">
+              <p className="hidden text-[11px] font-semibold text-neutral-500 sm:block">
                 {pageInfo.section}
               </p>
-              <h1 className="font-heading text-lg font-semibold text-neutral-900 leading-tight">
+              <h1 className="font-heading text-[17px] font-semibold leading-tight text-neutral-950">
                 {pageInfo.title}
               </h1>
-              <p className="hidden text-caption text-neutral-500 sm:block mt-0.5">
-                {pageInfo.subtitle}
-              </p>
             </div>
           </div>
 
           {/* Right side actions */}
           <div className="flex min-w-0 items-center gap-2">
-            <button
-              onClick={() => navigate(`/workspace/${rawPath.split('/')[2] || 'default'}/chat`)}
-              className="hidden min-w-0 max-w-[min(440px,36vw)] cursor-pointer items-center gap-2 rounded-full px-2 py-1 transition-colors hover:bg-neutral-50 md:flex"
-              title={globalBriefing}
-            >
-              <span className="shrink-0 rounded-full bg-slate-950 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-white">
-                今日待办
-              </span>
-              <p className="truncate text-xs text-neutral-500">{globalBriefing}</p>
-            </button>
-
             {/* Luna AI Toggle */}
             <button
               onClick={toggleLuna}
-              className={`hidden sm:flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition-all duration-normal active:scale-95 relative ${
+              className={`relative hidden h-9 items-center gap-2 rounded-lg border px-3 text-sm font-semibold transition-colors sm:flex ${
                 lunaIsOpen
-                  ? 'text-white shadow-lg'
-                  : 'bg-luna-bg text-luna-violet border border-luna-border hover:shadow-luna'
+                  ? 'border-primary-600 bg-primary-600 text-white'
+                  : 'border-neutral-200 bg-white text-neutral-700 hover:border-primary-300 hover:bg-primary-50 hover:text-primary-700'
               }`}
-              style={lunaIsOpen ? { background: 'var(--luna-gradient)' } : undefined}
             >
               <Sparkles size={16} />
               <span>Luna</span>
@@ -142,7 +125,7 @@ const Header = ({ toggleSidebar, isMobile }) => {
             <div className="relative">
               <button
                 onClick={() => setLanguageDropdownOpen(!languageDropdownOpen)}
-                className="flex items-center gap-1.5 rounded-full bg-neutral-50 border border-neutral-200 px-3 py-1.5 text-caption font-medium text-neutral-600 transition-all hover:bg-neutral-100 hover:text-neutral-900 active:scale-95 group"
+                className="flex h-9 items-center gap-1.5 rounded-lg border border-neutral-200 bg-white px-3 text-caption font-medium text-neutral-600 transition-colors hover:bg-neutral-50 hover:text-neutral-900 group"
               >
                 <Globe size={14} className="text-neutral-400 group-hover:text-neutral-600" />
                 <span className="hidden sm:inline">{selectedLanguage}</span>
@@ -187,7 +170,7 @@ const Header = ({ toggleSidebar, isMobile }) => {
               {notificationOpen && (
                 <>
                   <button aria-label="关闭通知中心" className="fixed inset-0 z-[540] cursor-default" onClick={() => setNotificationOpen(false)} />
-                  <section className="fixed left-3 right-3 top-16 z-[550] overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-2xl sm:absolute sm:left-auto sm:right-0 sm:top-full sm:mt-2 sm:w-[390px]">
+                  <section className="fixed left-3 right-3 top-16 z-[550] overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-xl sm:absolute sm:left-auto sm:right-0 sm:top-full sm:mt-2 sm:w-[390px]">
                     <div className="flex items-center justify-between border-b border-neutral-100 px-5 py-4">
                       <div><h2 className="text-sm font-bold text-neutral-900">通知中心</h2><p className="mt-0.5 text-xs text-neutral-500">{unreadCount} 条未读预警</p></div>
                       <button onClick={markAllNotificationsRead} className="cursor-pointer text-xs font-medium text-primary-600 hover:text-primary-700">全部已读</button>

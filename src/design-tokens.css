@@ -1,8 +1,8 @@
 /* ═══════════════════════════════════════════════════════════
-   AdsGo 2.0 Design Tokens — "Luminous Precision"
+   AdsGo 2.0 Design Tokens — "Operational Canvas"
 
-   Luna (moon) illuminates the data landscape.
-   Professional precision meets warm AI personality.
+   A calm, information-dense workspace for daily decisions.
+   Luna is an assistant accent, not a decorative theme.
    ═══════════════════════════════════════════════════════════ */
 
 :root {
@@ -20,30 +20,30 @@
   --primary-950: #1E1B4B;
 
   /* ── Luna AI Identity ──────────────────────────────────── */
-  --luna-violet:      #8B5CF6;
-  --luna-violet-light: #A78BFA;
-  --luna-violet-pale: #DDD6FE;
-  --luna-amber:       #F59E0B;
-  --luna-amber-light: #FBBF24;
-  --luna-amber-pale:  #FDE68A;
-  --luna-gradient:    linear-gradient(135deg, #8B5CF6 0%, #6366F1 40%, #F59E0B 100%);
-  --luna-gradient-subtle: linear-gradient(135deg, rgba(139,92,246,0.08) 0%, rgba(99,102,241,0.04) 40%, rgba(245,158,11,0.08) 100%);
-  --luna-bg:          #FAF5FF;
-  --luna-bg-warm:     #FFFBEB;
-  --luna-border:      rgba(139, 92, 246, 0.2);
+  --luna-violet:      #5B5BD6;
+  --luna-violet-light: #7474E8;
+  --luna-violet-pale: #E4E4FF;
+  --luna-amber:       #D97706;
+  --luna-amber-light: #F59E0B;
+  --luna-amber-pale:  #FEF3C7;
+  --luna-gradient:    linear-gradient(135deg, #5B5BD6 0%, #4F46E5 100%);
+  --luna-gradient-subtle: linear-gradient(135deg, rgba(91,91,214,0.08) 0%, rgba(79,70,229,0.025) 100%);
+  --luna-bg:          #F5F5FF;
+  --luna-bg-warm:     #F8F8FF;
+  --luna-border:      rgba(91, 91, 214, 0.18);
 
-  /* ── Neutral (Warm Stone) ──────────────────────────────── */
-  --neutral-50:  #FAFAF8;
-  --neutral-100: #F5F4F0;
-  --neutral-200: #E8E6E1;
-  --neutral-300: #D4D1CA;
-  --neutral-400: #A8A29E;
-  --neutral-500: #78716C;
-  --neutral-600: #57534E;
-  --neutral-700: #44403C;
-  --neutral-800: #292524;
-  --neutral-900: #1C1917;
-  --neutral-950: #0C0A09;
+  /* ── Neutral (Cool Slate) ──────────────────────────────── */
+  --neutral-50:  #F8F9FB;
+  --neutral-100: #F1F3F6;
+  --neutral-200: #E2E5EA;
+  --neutral-300: #CDD2DA;
+  --neutral-400: #98A0AE;
+  --neutral-500: #697386;
+  --neutral-600: #4B5565;
+  --neutral-700: #364152;
+  --neutral-800: #202938;
+  --neutral-900: #121926;
+  --neutral-950: #0B0F17;
 
   /* ── Ink (Dark UI — Sidebar, Overlays) ─────────────────── */
   --ink-50:  #E8EAF0;
@@ -129,25 +129,25 @@
   --chart-10: #06B6D4;
 
   /* ── Surface Layers ────────────────────────────────────── */
-  --surface-page:    #FAFAF8;
+  --surface-page:    #F6F7F9;
   --surface-card:    #FFFFFF;
-  --surface-nested:  #F5F4F0;
-  --surface-hover:   #F0EFEB;
-  --surface-active:  #E8E6E1;
-  --surface-sidebar: #0F1120;
+  --surface-nested:  #F8F9FB;
+  --surface-hover:   #F1F3F6;
+  --surface-active:  #E9ECF1;
+  --surface-sidebar: #FFFFFF;
   --surface-overlay: rgba(12, 15, 29, 0.6);
 
   /* ── Elevation / Shadows ───────────────────────────────── */
-  --shadow-ring:       0 0 0 1px rgba(0,0,0,0.04);
-  --shadow-xs:         0 1px 2px rgba(0,0,0,0.03);
-  --shadow-sm:         0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02);
-  --shadow-md:         0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -2px rgba(0,0,0,0.03);
-  --shadow-lg:         0 10px 15px -3px rgba(0,0,0,0.05), 0 4px 6px -4px rgba(0,0,0,0.03);
+  --shadow-ring:       0 0 0 1px rgba(18,25,38,0.05);
+  --shadow-xs:         0 1px 2px rgba(18,25,38,0.035);
+  --shadow-sm:         0 1px 2px rgba(18,25,38,0.04);
+  --shadow-md:         0 8px 20px -12px rgba(18,25,38,0.2);
+  --shadow-lg:         0 16px 36px -18px rgba(18,25,38,0.28);
   --shadow-xl:         0 20px 25px -5px rgba(0,0,0,0.06), 0 8px 10px -6px rgba(0,0,0,0.03);
   --shadow-2xl:        0 25px 50px -12px rgba(0,0,0,0.12);
-  --shadow-glow:       0 0 20px rgba(99, 102, 241, 0.15);
-  --shadow-luna:       0 0 24px rgba(139, 92, 246, 0.18), 0 0 8px rgba(245, 158, 11, 0.1);
-  --shadow-card-hover: 0 8px 30px -4px rgba(99, 102, 241, 0.1), 0 4px 12px -2px rgba(0,0,0,0.04);
+  --shadow-glow:       0 0 0 3px rgba(79, 70, 229, 0.12);
+  --shadow-luna:       0 8px 20px -12px rgba(91, 91, 214, 0.5);
+  --shadow-card-hover: 0 10px 24px -16px rgba(18,25,38,0.35);
   --shadow-focus:      0 0 0 2px var(--surface-card), 0 0 0 4px var(--primary-500);
 
   /* ── Border Radius ─────────────────────────────────────── */
@@ -155,9 +155,9 @@
   --radius-sm:   4px;
   --radius-base: 6px;
   --radius-md:   8px;
-  --radius-lg:   12px;
-  --radius-xl:   16px;
-  --radius-2xl:  20px;
+  --radius-lg:   10px;
+  --radius-xl:   12px;
+  --radius-2xl:  14px;
   --radius-full: 9999px;
 
   /* ── Spacing (4px base grid) ───────────────────────────── */

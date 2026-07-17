@@ -131,21 +131,21 @@ const Sidebar = ({ isMobile, isPinned, onTogglePinned, onClose, selectedBrand, o
         className={`w-full flex items-center rounded-lg transition-all duration-normal ease-default group relative text-left ${
           item.isLuna
             ? (lunaIsOpen
-              ? 'bg-primary-50 text-luna-violet'
-              : 'text-neutral-700 hover:text-luna-violet hover:bg-neutral-100')
+              ? 'bg-primary-50 text-primary-700'
+              : 'text-neutral-700 hover:text-primary-700 hover:bg-neutral-100')
             : (itemActive && !tourOverride)
-              ? 'bg-neutral-100 text-primary-700 shadow-sm'
+              ? 'bg-primary-50 text-primary-700'
               : 'text-neutral-700 hover:text-neutral-900 hover:bg-neutral-100'
         } ${isCollapsed ? 'justify-center px-0 py-2' : 'gap-3 px-4 py-2'} ${isSubItem && !isCollapsed ? 'ml-1' : ''}`}
       >
         {/* Active accent bar */}
         {(itemActive && !tourOverride && !item.isLuna) && (
-          <div className={`absolute left-0 top-1/2 -translate-y-1/2 w-[3px] rounded-full ${isCollapsed ? 'h-6' : 'h-4'}`} style={{ background: 'linear-gradient(180deg, var(--primary-300), var(--primary-500))' }} />
+          <div className={`absolute left-0 top-1/2 -translate-y-1/2 w-[3px] rounded-full bg-primary-600 ${isCollapsed ? 'h-6' : 'h-5'}`} />
         )}
 
         {/* Luna accent bar */}
         {item.isLuna && lunaIsOpen && (
-          <div className={`absolute left-0 top-1/2 -translate-y-1/2 w-[3px] rounded-full ${isCollapsed ? 'h-6' : 'h-4'}`} style={{ background: 'var(--luna-gradient)' }} />
+          <div className={`absolute left-0 top-1/2 -translate-y-1/2 w-[3px] rounded-full bg-primary-600 ${isCollapsed ? 'h-6' : 'h-5'}`} />
         )}
 
         <div className={`flex flex-col items-center justify-center shrink-0 transition-all duration-normal ${isCollapsed ? 'w-full' : 'w-5'}`}>
@@ -232,21 +232,16 @@ const Sidebar = ({ isMobile, isPinned, onTogglePinned, onClose, selectedBrand, o
           <button
             ref={ref}
             onClick={() => item.isLunaWorkspace ? navigate(buildWorkspacePath(item.path)) : handleMenuClick(item)}
-            className={`w-full flex items-center gap-3 rounded-xl transition-all duration-normal group relative overflow-hidden ${
+            className={`w-full flex items-center gap-3 rounded-lg border transition-colors group relative overflow-hidden ${
               isCollapsed ? 'justify-center p-2' : 'px-3 py-2.5'
             } ${
               lunaIsOpen || lunaWorkspaceActive
-                ? 'border border-luna-violet/50 text-luna-violet shadow-luna'
-                : 'border border-neutral-200 text-neutral-800 hover:border-luna-violet/30 hover:text-luna-violet-light'
+                ? 'border-primary-200 bg-primary-50 text-primary-700'
+                : 'border-neutral-200 bg-white text-neutral-800 hover:border-primary-200 hover:bg-neutral-50 hover:text-primary-700'
             }`}
-            style={{
-              background: lunaIsOpen || lunaWorkspaceActive
-                ? 'linear-gradient(135deg, rgba(139,92,246,0.15) 0%, rgba(99,102,241,0.10) 50%, rgba(245,158,11,0.08) 100%)'
-                : 'linear-gradient(135deg, rgba(255,255,255,1) 0%, rgba(139,92,246,0.04) 100%)'
-            }}
           >
             <div className="relative shrink-0">
-              <LunaIcon size={18} className={lunaIsOpen || lunaWorkspaceActive ? 'text-luna-violet' : 'text-neutral-700 group-hover:text-luna-violet'} />
+              <LunaIcon size={18} className={lunaIsOpen || lunaWorkspaceActive ? 'text-primary-600' : 'text-neutral-600 group-hover:text-primary-600'} />
             </div>
             {!isCollapsed && (
               <div className="flex-1 min-w-0">
@@ -303,7 +298,7 @@ const Sidebar = ({ isMobile, isPinned, onTogglePinned, onClose, selectedBrand, o
       )}
 
       {/* Logo Section */}
-      <div className={`h-16 px-4 flex items-center justify-center border-b border-neutral-200 shrink-0 transition-all duration-normal sidebar-logo-divider ${isCollapsed ? 'overflow-hidden' : ''}`}>
+      <div className={`h-16 px-4 flex items-center justify-center border-b border-neutral-200 shrink-0 transition-all duration-normal ${isCollapsed ? 'overflow-hidden' : ''}`}>
         <img
           src={isCollapsed ? MINI_LOGO : "https://www.adsgo.ai/_next/static/media/logo.ecc9c90c.svg"}
           alt="AdsGo"
@@ -316,7 +311,7 @@ const Sidebar = ({ isMobile, isPinned, onTogglePinned, onClose, selectedBrand, o
         <div className="relative">
           <button
             onClick={() => setIsBrandDropdownOpen(!isBrandDropdownOpen)}
-            className="w-full flex items-center justify-between gap-3 px-3 py-2 bg-neutral-50 border border-neutral-200 rounded-xl hover:bg-neutral-100 transition-all duration-fast group"
+            className="w-full flex items-center justify-between gap-3 px-3 py-2 bg-neutral-50 border border-neutral-200 rounded-lg hover:border-neutral-300 transition-colors group"
           >
             <div className="flex items-center gap-2.5 min-w-0">
               <div className="w-7 h-7 bg-primary-500 rounded-md flex items-center justify-center text-white font-semibold text-xs shrink-0">

@@ -8,7 +8,6 @@ import GlobalDemoOverlay from './GlobalDemoOverlay'
 import SupportBubble from './support/SupportBubble'
 import useBrandStore from '@stores/brandStore'
 import useFeatureFlagsStore from '@stores/featureFlagsStore'
-import WorkspaceContextBar from './WorkspaceContextBar'
 
 const MainLayout = ({ children, showDemoOverlay, onDemoConnect, onDemoCreate,
   /* Legacy props — still accepted for backward compat but stores are preferred */
@@ -118,10 +117,9 @@ const MainLayout = ({ children, showDemoOverlay, onDemoConnect, onDemoCreate,
         style={{ '--sidebar-w': !isMobile ? (isPinned ? '256px' : '68px') : '0px' }}
       >
         <Header toggleSidebar={toggleSidebar} isMobile={isMobile} />
-        <WorkspaceContextBar />
 
         <div className="flex-1 relative flex flex-col min-w-0 overflow-hidden">
-          <main className="flex-1 overflow-y-auto scroll-smooth px-6 py-5">
+          <main className="flex-1 overflow-y-auto scroll-smooth px-4 py-4 sm:px-6 sm:py-5 xl:px-8">
             {children}
           </main>
 
