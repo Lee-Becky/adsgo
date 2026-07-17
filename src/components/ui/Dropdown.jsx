@@ -98,7 +98,7 @@ const Dropdown = ({
           <div
             ref={menuRef}
             className={`
-              fixed z-[100]
+              fixed z-[10000]
               transition-all duration-fast
               ${entered
                 ? 'opacity-100 scale-100'

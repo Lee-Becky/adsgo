@@ -1,271 +1,75 @@
 import { useState } from 'react'
-import { Calendar, ChevronDown, Copy, Download, Share2 } from 'lucide-react'
-import useLunaSync from '@features/chat/useLunaSync'
-import { CAMPAIGN_PERFORMANCE } from './reportMockData'
+import { CalendarDays, CheckCircle2, Copy, Download, Eye, FileBarChart, Mail, MoreHorizontal, Play, Plus, RefreshCw, Send, Star, X } from 'lucide-react'
+import useMarketingOpsStore from '@stores/marketingOpsStore'
+import ReportPreferencePanel from './ReportPreferencePanel'
 
-const REPORT_DATE = '2026年6月29日'
-const BRAND = 'LumaFit'
-const MARKET = '美国市场'
-
-const snapshot = [
-  { label: '花费', value: '$303', target: '预算内', delta: '较昨日 +22%', tone: 'neutral' },
-  { label: 'ROAS', value: '1.82x', target: '目标 2.40', delta: '低于目标', tone: 'bad' },
-  { label: 'CPA', value: '$42.80', target: '红线 $45', delta: '接近红线', tone: 'warn' },
-  { label: '购买', value: '26', target: '昨日 28', delta: '较昨日 -7%', tone: 'bad' },
-]
-
-const whatHappened = [
-  '美国市场整体 ROAS 下滑至 1.82，主要受冷启动 Campaign 转化效率下降影响。',
-  '主视频 Core Legging Video V12 出现疲劳信号，CTR 较上周下降约 28%。',
-  '再营销 Campaign 表现相对稳定，ROAS 1.88，促销周期间继续保留曝光。',
-]
-
-const whatWeDid = [
-  {
-    action: '下调冷启动预算',
-    detail: 'US Prospecting Broad 日预算由 $140 调整为 $95，减少无效花费。',
-  },
-  {
-    action: '保留再营销预算',
-    detail: 'US Retargeting Purchase 维持 $180/日，保障促销周高意向用户触达。',
-  },
-  {
-    action: '启动素材换新',
-    detail: '两条 UGC Hook 素材已进入草稿，计划本周内替换疲劳主视频。',
-  },
-]
-
-const watchTomorrow = [
-  '冷启动降预算后，CPA 是否回落至 $45 以内。',
-  '再营销 ROAS 能否稳定在 1.90 以上。',
-  '新 UGC 素材发布后，冷启动 CTR 是否回升。',
-]
-
-const toneStyle = {
-  bad: 'text-danger-700 bg-danger-50 border-danger-100',
-  warn: 'text-warning-700 bg-warning-50 border-warning-100',
-  good: 'text-success-700 bg-success-50 border-success-100',
-  neutral: 'text-neutral-600 bg-neutral-50 border-neutral-100',
-}
-
-const ReportDashboardPage = () => {
-  const [showDetail, setShowDetail] = useState(false)
-  const [copied, setCopied] = useState(false)
-  const [actionNotice, setActionNotice] = useState('')
-  const { hasApplied } = useLunaSync('report/daily-brief')
-  const lunaHighlight = hasApplied
-
-  const handleCopy = () => {
-    const text = [
-      `${BRAND} 投放日报 · ${REPORT_DATE}`,
-      '',
-      `今日 ${MARKET} ROAS 1.82，低于目标 2.40。已下调冷启动预算，保留再营销曝光，并启动素材换新。`,
-      '',
-      '今日情况：',
-      ...whatHappened.map((item, i) => `${i + 1}. ${item}`),
-      '',
-      '今日处理：',
-      ...whatWeDid.map((item, i) => `${i + 1}. ${item.action}：${item.detail}`),
-      '',
-      '明日观察：',
-      ...watchTomorrow.map((item, i) => `${i + 1}. ${item}`),
-    ].join('\n')
-    navigator.clipboard?.writeText(text)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
+const ReportDashboardContent = () => {
+  const [tab, setTab] = useState('templates')
+  const templates = useMarketingOpsStore((state) => state.reportTemplates)
+  const addReportTemplate = useMarketingOpsStore((state) => state.addReportTemplate)
+  const updateReportTemplate = useMarketingOpsStore((state) => state.updateReportTemplate)
+  const addNotification = useMarketingOpsStore((state) => state.addNotification)
+  const history = useMarketingOpsStore((state) => state.reportHistory)
+  const addReportHistory = useMarketingOpsStore((state) => state.addReportHistory)
+  const rateReport = useMarketingOpsStore((state) => state.rateReport)
+  const createDeliverable = useMarketingOpsStore((state) => state.createDeliverable)
+  const [modal, setModal] = useState(null)
+  const [generating, setGenerating] = useState(null)
+  const [notice, setNotice] = useState('')
+  const flash = message => { setNotice(message); setTimeout(()=>setNotice(''),1800) }
+  const generate = template => {
+    setGenerating(template.id)
+    setTimeout(() => {
+      addReportHistory({ name: `${template.name} · 2026/07/16`, template: template.name, snapshot: `${template.source} · 生成时快照${template.viewSnapshots?.length ? ` · 含 ${template.viewSnapshots.length} 个视图区块` : ''}` })
+      createDeliverable({ name: `${template.name} · 2026-07-16.pdf`, type: '报告', source: template.name, generatedBy: 'Luna' })
+      addNotification({ title: '报告生成完成', detail: `${template.name} 已生成，可预览或发送` })
+      setGenerating(null); setTab('history'); flash('报告已生成，可预览或发送')
+    }, 900)
+  }
+  const addTemplate = e => {
+    e.preventDefault(); const data = new FormData(e.currentTarget)
+    addReportTemplate({name:data.get('name'),type:data.get('type'),source:data.get('source'),schedule:data.get('schedule'),recipients:data.get('recipients') || '未配置'})
+    setModal(null); flash('报告模板已创建')
   }
 
-  const flashAction = (message) => {
-    setActionNotice(message)
-    setTimeout(() => setActionNotice(''), 2200)
-  }
-
-  return (
-    <div className="-mx-6 min-h-[100dvh] bg-neutral-100 px-6 py-6 lg:px-8">
-      <article className="w-full space-y-6">
-        {/* 报头 */}
-        <header className="flex flex-col gap-4 border-b border-neutral-200 pb-6 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <p className="text-sm text-neutral-500">{MARKET}</p>
-            <p className="mt-1 text-sm text-neutral-500">{REPORT_DATE}</p>
-          </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <button
-              type="button"
-              onClick={() => flashAction('日期切换将在接入真实数据后开放')}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm text-neutral-600 hover:bg-neutral-50"
-            >
-              <Calendar size={14} />
-              今日
-              <ChevronDown size={12} />
-            </button>
-            <button
-              onClick={handleCopy}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm text-neutral-600 hover:bg-neutral-50"
-            >
-              <Copy size={14} />
-              {copied ? '已复制' : '复制全文'}
-            </button>
-            <button
-              type="button"
-              onClick={() => flashAction('分享链接已复制到剪贴板（演示）')}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm text-neutral-600 hover:bg-neutral-50"
-            >
-              <Share2 size={14} />
-              分享
-            </button>
-            <button
-              type="button"
-              onClick={() => flashAction('PDF 导出任务已加入队列（演示）')}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-neutral-900 px-3 py-2 text-sm font-medium text-white hover:bg-neutral-800"
-            >
-              <Download size={14} />
-              导出 PDF
-            </button>
-          </div>
-          {actionNotice && (
-            <p className="text-xs font-medium text-primary-600">{actionNotice}</p>
-          )}
-        </header>
-
-        {/* 今日结论 */}
-        <section className={`rounded-xl border bg-white p-6 shadow-sm ${lunaHighlight ? 'border-luna-border ring-1 ring-luna-violet/20' : 'border-neutral-200'}`}>
-          <h2 className="text-base font-semibold text-neutral-950">今日结论</h2>
-          <p className="mt-3 max-w-5xl text-[15px] leading-7 text-neutral-800">
-            今日 {MARKET} ROAS 为 <strong>1.82</strong>，低于月度目标 2.40。
-            主要问题是冷启动转化效率下降，叠加主视频疲劳。
-            我们已将冷启动日预算从 $140 下调至 $95，再营销预算维持 $180 以保障促销周曝光，
-            并启动 UGC 素材换新。
-          </p>
-        </section>
-
-        {/* 核心指标 */}
-        <section className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {snapshot.map((item) => (
-            <div key={item.label} className="rounded-xl border border-neutral-200 bg-white p-4 shadow-sm">
-              <p className="text-xs text-neutral-500">{item.label}</p>
-              <p className="mt-1 text-2xl font-semibold tabular-nums text-neutral-950">{item.value}</p>
-              <p className="mt-1 text-xs text-neutral-400">{item.target}</p>
-              <span className={`mt-2 inline-block rounded-md border px-2 py-0.5 text-[11px] font-medium ${toneStyle[item.tone]}`}>
-                {item.delta}
-              </span>
-            </div>
-          ))}
-        </section>
-
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        {/* 今日情况 */}
-        <section className="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
-          <h2 className="text-base font-semibold text-neutral-950">今日情况</h2>
-          <ul className="mt-4 space-y-3">
-            {whatHappened.map((item) => (
-              <li key={item} className="flex gap-3 text-[15px] leading-6 text-neutral-700">
-                <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-neutral-400" />
-                {item}
-              </li>
-            ))}
-          </ul>
-        </section>
-
-        {/* 今日处理 */}
-        <section className="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
-          <h2 className="text-base font-semibold text-neutral-950">今日处理</h2>
-          <div className="mt-4 space-y-4">
-            {whatWeDid.map((item) => (
-              <div key={item.action} className="border-l-2 border-neutral-900 pl-4">
-                <p className="text-sm font-semibold text-neutral-950">{item.action}</p>
-                <p className="mt-1 text-sm leading-6 text-neutral-600">{item.detail}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* 明日观察 */}
-        <section className="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
-          <h2 className="text-base font-semibold text-neutral-950">明日观察</h2>
-          <ol className="mt-4 list-decimal space-y-2 pl-5 text-[15px] leading-6 text-neutral-700">
-            {watchTomorrow.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ol>
-        </section>
-        </div>
-
-        {/* Campaign 简表 */}
-        <section className="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
-          <h2 className="text-base font-semibold text-neutral-950">Campaign 表现</h2>
-          <div className="mt-4 overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-neutral-100 text-left text-xs text-neutral-500">
-                  <th className="pb-3 pr-4 font-medium">Campaign</th>
-                  <th className="pb-3 pr-4 text-right font-medium">花费</th>
-                  <th className="pb-3 pr-4 text-right font-medium">ROAS</th>
-                  <th className="pb-3 text-right font-medium">CPA</th>
-                </tr>
-              </thead>
-              <tbody>
-                {CAMPAIGN_PERFORMANCE.map((row) => (
-                  <tr key={row.id} className="border-b border-neutral-50 last:border-0">
-                    <td className="py-3 pr-4 font-medium text-neutral-900">{row.name}</td>
-                    <td className="py-3 pr-4 text-right tabular-nums text-neutral-700">${row.spend}</td>
-                    <td className={`py-3 pr-4 text-right tabular-nums font-medium ${row.roas >= 2.4 ? 'text-success-600' : row.roas >= 1.8 ? 'text-warning-600' : 'text-danger-600'}`}>
-                      {row.roas.toFixed(2)}x
-                    </td>
-                    <td className="py-3 text-right tabular-nums text-neutral-700">${row.cpa.toFixed(2)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        {/* 附录：明细数据（可展开） */}
-        <section className="rounded-xl border border-neutral-200 bg-white shadow-sm">
-          <button
-            onClick={() => setShowDetail(!showDetail)}
-            className="flex w-full items-center justify-between px-6 py-4 text-left text-sm font-medium text-neutral-600 hover:text-neutral-900"
-          >
-            <span>附录：每日明细数据</span>
-            <ChevronDown size={16} className={`transition-transform ${showDetail ? 'rotate-180' : ''}`} />
-          </button>
-          {showDetail && (
-            <div className="border-t border-neutral-100 px-6 pb-6">
-              <p className="py-3 text-xs text-neutral-400">以下为内部核对用明细，一般不放入客户分享版本。</p>
-              <table className="w-full text-xs">
-                <thead>
-                  <tr className="border-b border-neutral-100 text-left text-neutral-500">
-                    <th className="pb-2 pr-3">Campaign</th>
-                    <th className="pb-2 pr-3 text-right">曝光</th>
-                    <th className="pb-2 pr-3 text-right">点击</th>
-                    <th className="pb-2 pr-3 text-right">CTR</th>
-                    <th className="pb-2 pr-3 text-right">加购</th>
-                    <th className="pb-2 text-right">购买</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {CAMPAIGN_PERFORMANCE.map((row) => (
-                    <tr key={row.id} className="border-b border-neutral-50">
-                      <td className="py-2 pr-3 text-neutral-800">{row.name}</td>
-                      <td className="py-2 pr-3 text-right tabular-nums text-neutral-600">{row.impressions.toLocaleString()}</td>
-                      <td className="py-2 pr-3 text-right tabular-nums text-neutral-600">{row.clicks}</td>
-                      <td className="py-2 pr-3 text-right tabular-nums text-neutral-600">{row.ctr}%</td>
-                      <td className="py-2 pr-3 text-right tabular-nums text-neutral-600">{row.addToCart}</td>
-                      <td className="py-2 text-right tabular-nums text-neutral-600">{row.purchases}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </section>
-
-        <footer className="pb-8 text-center text-xs text-neutral-400">
-          由 AdsGo 自动生成 · {REPORT_DATE}
-        </footer>
-      </article>
+  return <div className="space-y-5">
+    <div className="flex flex-col gap-4 rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+      <div><h2 className="text-lg font-bold">报告中心</h2><p className="mt-1 text-sm text-neutral-500">基于数据视图生成日报、周报与月报，支持定时发送</p></div>
+      <button onClick={()=>setModal('create')} className="flex items-center justify-center gap-2 rounded-lg bg-neutral-900 px-4 py-2.5 text-sm font-semibold text-white"><Plus size={15}/>新建报告模板</button>
     </div>
-  )
+    <div className="flex w-fit rounded-xl border bg-white p-1 shadow-sm">{[['templates','报告模板'],['history','生成历史']].map(([id,label])=><button key={id} onClick={()=>setTab(id)} className={`rounded-lg px-4 py-2 text-sm font-semibold ${tab===id?'bg-neutral-900 text-white':'text-neutral-500'}`}>{label}{id==='history' && ` · ${history.length}`}</button>)}</div>
+
+    {tab === 'templates' ? <div className="grid gap-4 lg:grid-cols-2 2xl:grid-cols-3">{templates.map(template=><article key={template.id} className="rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
+      <div className="flex items-start justify-between"><div className="grid h-10 w-10 place-items-center rounded-xl bg-primary-50 text-primary-600"><FileBarChart size={19}/></div><button><MoreHorizontal size={18} className="text-neutral-400"/></button></div>
+      <div className="mt-4 flex items-center gap-2"><h3 className="font-bold">{template.name}</h3><span className="rounded bg-neutral-100 px-2 py-0.5 text-[10px]">{template.type}</span></div>
+      <p className="mt-2 text-xs text-neutral-500">数据来源：{template.source}{template.viewSnapshots?.length ? ` · ${template.viewSnapshots.length} 个视图快照` : ''}</p>
+      <div className="mt-4 grid grid-cols-2 gap-3 rounded-xl bg-neutral-50 p-3 text-xs"><div><p className="text-neutral-400">生成计划</p><p className="mt-1 font-medium">{template.schedule}</p></div><div><p className="text-neutral-400">接收人</p><p className="mt-1 font-medium">{template.recipients}</p></div></div>
+      <div className="mt-4 flex items-center justify-between"><button onClick={()=>updateReportTemplate(template.id,{enabled:!template.enabled})} className={`text-xs font-medium ${template.enabled?'text-success-700':'text-neutral-400'}`}>{template.enabled?'● 定时发送已启用':'○ 定时发送未启用'}</button><span className="text-[11px] text-neutral-400">{template.updated}</span></div>
+      <div className="mt-4 flex gap-2 border-t pt-4"><button onClick={()=>setModal(template)} className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border px-3 py-2 text-xs"><Eye size={14}/>预览</button><button onClick={()=>generate(template)} disabled={generating===template.id} className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-neutral-900 px-3 py-2 text-xs text-white">{generating===template.id?<RefreshCw size={14} className="animate-spin"/>:<Play size={14}/>}立即生成</button></div>
+    </article>)}</div> : <section className="overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm">
+      <div className="overflow-x-auto"><table className="w-full min-w-[760px] text-sm"><thead className="bg-neutral-50 text-xs text-neutral-500"><tr>{['报告','模板','生成时间','状态','质量反馈','操作'].map(h=><th key={h} className="px-5 py-3 text-left font-medium">{h}</th>)}</tr></thead><tbody>{history.map(item=><tr key={item.id} className="border-t">
+        <td className="px-5 py-4 font-semibold">{item.name}<p className="mt-1 text-[11px] font-normal text-neutral-400">{item.snapshot}</p></td><td className="px-5 py-4 text-neutral-600">{item.template}</td><td className="px-5 py-4 text-neutral-500">{item.time}</td><td className="px-5 py-4"><span className="inline-flex items-center gap-1 text-xs text-success-700"><CheckCircle2 size={13}/>{item.status}</span></td>
+        <td className="px-5 py-4"><div className="flex">{[1,2,3,4,5].map(n=><button key={n} onClick={()=>rateReport(item.id,n)}><Star size={14} className={n<=item.rating?'fill-warning-400 text-warning-400':'text-neutral-200'}/></button>)}</div></td>
+        <td className="px-5 py-4"><div className="flex gap-1"><button onClick={()=>setModal(item)} className="rounded-lg border p-2"><Eye size={14}/></button><button onClick={()=>flash('测试邮件已发送（演示）')} className="rounded-lg border p-2"><Send size={14}/></button><button onClick={()=>{createDeliverable({name:`${item.name}.pdf`,type:'报告',source:item.template});flash('报告已加入 Luna 交付物')}} className="rounded-lg border p-2"><Download size={14}/></button></div></td>
+      </tr>)}</tbody></table></div>
+    </section>}
+
+    {notice && <div className="fixed bottom-6 right-6 z-50 rounded-lg bg-neutral-900 px-4 py-3 text-sm text-white shadow-xl">{notice}</div>}
+    {modal === 'create' && <div className="fixed inset-0 z-[9998] grid place-items-center overflow-y-auto bg-neutral-950/40 p-4" onMouseDown={()=>setModal(null)}><form onSubmit={addTemplate} onMouseDown={e=>e.stopPropagation()} className="my-auto flex max-h-[calc(100vh-2rem)] w-full max-w-xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
+      <div className="flex justify-between border-b p-5"><div><h3 className="font-bold">新建报告模板</h3><p className="mt-1 text-xs text-neutral-500">选择报告结构、数据来源和发送计划</p></div><button type="button" onClick={()=>setModal(null)}><X size={18}/></button></div>
+      <div className="grid overflow-y-auto gap-4 p-5 sm:grid-cols-2"><label className="sm:col-span-2 text-sm">模板名称<input required name="name" className="mt-1.5 w-full rounded-lg border px-3 py-2.5"/></label><label className="text-sm">报告类型<select name="type" className="mt-1.5 w-full rounded-lg border bg-white px-3 py-2.5"><option>日报</option><option>周报</option><option>月报</option></select></label><label className="text-sm">数据来源<select name="source" className="mt-1.5 w-full rounded-lg border bg-white px-3 py-2.5"><option>渠道经营总览</option><option>Campaign 效率拆解</option><option>归因数据集</option></select></label><label className="text-sm">生成计划<select name="schedule" className="mt-1.5 w-full rounded-lg border bg-white px-3 py-2.5"><option>每天 09:30</option><option>每周一 10:00</option><option>每月 1 日</option></select></label><label className="text-sm">接收人<input name="recipients" placeholder="客户邮箱或成员组" className="mt-1.5 w-full rounded-lg border px-3 py-2.5"/></label></div>
+      <div className="flex justify-end gap-2 border-t p-4"><button type="button" onClick={()=>setModal(null)} className="rounded-lg border px-4 py-2 text-sm">取消</button><button className="rounded-lg bg-neutral-900 px-4 py-2 text-sm font-semibold text-white">创建模板</button></div>
+    </form></div>}
+    {modal && modal !== 'create' && <div className="fixed inset-0 z-[9998] grid place-items-center bg-neutral-950/40 p-4" onMouseDown={()=>setModal(null)}><div onMouseDown={e=>e.stopPropagation()} className="max-h-[calc(100vh-2rem)] w-full max-w-3xl overflow-auto rounded-2xl bg-neutral-100 shadow-2xl">
+      <div className="sticky top-0 flex items-center justify-between border-b bg-white p-4"><div><h3 className="font-bold">{modal.name}</h3><p className="text-xs text-neutral-500">客户可分享版本 · 自动生成预览</p></div><div className="flex gap-2"><button onClick={()=>flash('分享链接已复制（演示）')} className="rounded-lg border p-2"><Copy size={15}/></button><button onClick={()=>flash('邮件已发送（演示）')} className="rounded-lg border p-2"><Mail size={15}/></button><button onClick={()=>setModal(null)} className="p-2"><X size={18}/></button></div></div>
+      <div className="m-5 space-y-5 rounded-xl bg-white p-7"><div className="flex justify-between border-b pb-5"><div><p className="text-xs text-neutral-400">LumaFit · 美国市场</p><h2 className="mt-2 text-2xl font-bold">投放经营报告</h2></div><div className="text-right text-xs text-neutral-500"><CalendarDays size={16} className="ml-auto mb-2"/>2026/07/16</div></div>
+        <div className="grid grid-cols-4 gap-3">{[['花费','$9,846'],['收入','$20,480'],['ROAS','2.08x'],['转化','296']].map(([l,v])=><div key={l} className="rounded-lg bg-neutral-50 p-3"><p className="text-xs text-neutral-400">{l}</p><p className="mt-1 text-lg font-bold">{v}</p></div>)}</div>
+        <section><h3 className="font-bold">核心结论</h3><p className="mt-2 text-sm leading-7 text-neutral-600">整体收入环比增长 9.8%，Meta 德国市场贡献主要增量；TikTok 英国市场 ROAS 低于目标，建议收紧预算并替换连续三日衰退的素材。</p></section>
+        <section><h3 className="font-bold">下一步动作</h3><div className="mt-3 space-y-2">{['将 TikTok 英国市场日预算下调 15%','保留 Meta 德国高回报广告组','启动 2 组 UGC 素材换新测试'].map((x,i)=><div key={x} className="flex gap-3 rounded-lg bg-neutral-50 p-3 text-sm"><span className="font-bold text-primary-600">0{i+1}</span>{x}</div>)}</div></section>
+      </div>
+    </div></div>}
+  </div>
 }
 
+const ReportDashboardPage = () => <div className="space-y-5"><ReportDashboardContent /><ReportPreferencePanel /></div>
 export default ReportDashboardPage

@@ -5,6 +5,7 @@ import useLunaSync from '@features/chat/useLunaSync'
 import useStrategyTaskStore from '@stores/strategyTaskStore'
 import MediaPlanPanel from './MediaPlanPage'
 import StrategyCyclePanel from './StrategyCycle'
+import StrategyEvidencePanel from './StrategyEvidencePanel'
 import { MEDIA_PLAN_MONTH, WEEKLY_PLAN } from './mediaPlanMockData'
 import { MOCK_STRATEGY_CYCLE } from './strategyCycleMockData'
 
@@ -144,6 +145,7 @@ const PlanWorkspacePage = () => {
           </div>
         </header>
 
+        {tab === 'cycle' && <StrategyEvidencePanel />}
         {tab === 'plan' ? (
           <MediaPlanPanel onSwitchToCycle={() => switchTab('cycle')} />
         ) : (

@@ -1,0 +1,10 @@
+import { AlertTriangle, ArrowRight, CheckCircle2, Clock3, FileText, Layers3 } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+
+const priorities=[
+ {brand:'LumaFit',issue:'ROAS 低于目标，2 条建议待确认',kind:'高风险',owner:'Mia Chen',path:'/workspace/LumaFit/chat'},
+ {brand:'Luxe Fashion Co.',issue:'周报等待发送，1 个动作待验证',kind:'待交付',owner:'Alex Wu',path:'/workspace/Luxe%20Fashion%20Co./insight/reports'},
+ {brand:'TechGear Pro',issue:'行业 Skill v1.2 等待品牌升级',kind:'能力升级',owner:'品牌管理员',path:'/workspace/TechGear%20Pro/settings/skills'},
+]
+const MultiBrandCockpit=()=>{const navigate=useNavigate();return <section className="overflow-hidden rounded-2xl border bg-white shadow-sm"><header className="flex flex-col gap-4 border-b bg-neutral-950 p-5 text-white sm:flex-row sm:items-center sm:justify-between"><div className="flex gap-3"><span className="grid h-10 w-10 place-items-center rounded-xl bg-white/10"><Layers3 size={18}/></span><div><h2 className="font-bold">今日跨品牌服务台</h2><p className="mt-1 text-xs text-neutral-400">只汇总服务状态与优先级，不展示或迁移品牌私有知识</p></div></div><div className="flex gap-5 text-center">{[[AlertTriangle,'3','需判断'],[Clock3,'4','待验证'],[FileText,'2','待交付']].map(([Icon,v,l])=><div key={l}><p className="flex items-center justify-center gap-1 text-lg font-bold"><Icon size={13}/>{v}</p><p className="text-[10px] text-neutral-400">{l}</p></div>)}</div></header><div className="divide-y">{priorities.map((x,i)=><button key={x.brand} onClick={()=>navigate(x.path)} className="group grid w-full gap-3 p-4 text-left hover:bg-neutral-50 sm:grid-cols-[32px_150px_1fr_110px_24px] sm:items-center"><span className="grid h-8 w-8 place-items-center rounded-lg bg-neutral-100 text-xs font-bold">0{i+1}</span><strong className="text-sm">{x.brand}</strong><span className="text-sm text-neutral-600">{x.issue}</span><span className="text-xs text-neutral-400">{x.owner}</span><ArrowRight size={14} className="text-neutral-300 group-hover:text-primary-600"/></button>)}</div><footer className="flex items-center gap-2 border-t bg-success-50 px-5 py-3 text-xs text-success-700"><CheckCircle2 size={14}/>其余 2 个品牌今日无阻塞事项</footer></section>}
+export default MultiBrandCockpit

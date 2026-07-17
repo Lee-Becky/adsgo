@@ -166,5 +166,4 @@ Skeleton.Avatar = SkeletonAvatar
 Skeleton.TableRow = SkeletonTableRow
 Skeleton.Custom = SkeletonCustom
 
-export { SkeletonChart }
 export default Skeleton

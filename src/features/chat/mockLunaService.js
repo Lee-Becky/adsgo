@@ -65,13 +65,43 @@ const RESPONSES = {
 
   /* ── Report ────────────────────────────────────────────── */
   report: {
-    text: `客户日报要点：\n\n• 美国 ROAS 1.82，低于 2.40 目标\n• 冷启动预算从 $140 降到 $95\n• 再营销因促销周保留 $180，并观察 48 小时\n• 疲劳主视频进入换新草稿\n\n日报已包含今日异常、已执行动作和明日观察点。`,
+    text: `我已根据「渠道经营总览」准备客户经营日报模板：\n\n• 指标：花费、收入、ROAS、转化\n• 内容：异常概览、渠道拆解、已执行动作、下一步建议\n• 计划：每天 09:30 生成\n\n确认后会写入报告中心。`,
     type: 'report',
-    syncTarget: 'report/daily-brief',
+    syncTarget: 'insight/reports',
     actionCard: {
-      title: '打开客户日报',
-      description: '查看今日异常、处理结果和明日观察点',
+      title: '创建客户经营日报模板',
+      description: '每天 09:30 基于渠道经营总览生成',
+      confirmLabel: '确认创建',
+      operation: { kind: 'report', data: { name: 'Luna 客户经营日报', type: '日报', source: '渠道经营总览', schedule: '每天 09:30', recipients: '品牌所有者、管理员' } },
     },
+  },
+
+  scheduledTask: {
+    text: `我已整理为定时任务：\n\n• 每天 09:00 检查美国市场\n• 调用「预算红线检查」Skill\n• 输出异常摘要与建议动作\n\n确认后会写入任务配置页。`,
+    type: 'automation',
+    syncTarget: 'automation/tasks',
+    actionCard: { title: '创建定时任务', description: '每天 09:00 自动检查美国市场', confirmLabel: '确认创建', operation: { kind: 'task', data: { name: '每日美国市场健康检查', skill: '预算红线检查', schedule: '每天 09:00' } } },
+  },
+
+  alertRule: {
+    text: `我已生成预警规则草稿：\n\n• 美国市场 ROAS < 1.8\n• 持续 2 小时\n• 高风险，站内与邮件通知\n\n确认后会启用；触发消息进入右上角通知中心。`,
+    type: 'automation',
+    syncTarget: 'automation/alerts',
+    actionCard: { title: '创建 ROAS 预警规则', description: 'ROAS < 1.8 且持续 2 小时', confirmLabel: '确认启用', operation: { kind: 'alert', data: { title: '美国市场 ROAS 低于 1.8', level: '高', rule: 'ROAS < 1.8，持续 2 小时', scope: '美国市场', channel: '站内 + 邮件' } } },
+  },
+
+  dataView: {
+    text: `我已整理为多维视图：\n\n• 名称：美国渠道 ROAS 诊断\n• 数据源：归因数据集\n• 维度：渠道、市场\n• 指标：花费、收入、ROAS、CPA\n\n确认后会保存到「多维分析」。`,
+    type: 'analysis',
+    syncTarget: 'insight/multidimensional',
+    actionCard: { title: '保存多维分析视图', description: '美国渠道 ROAS 诊断', confirmLabel: '确认保存', operation: { kind: 'view', data: { name: '美国渠道 ROAS 诊断', source: '归因数据集', dimensions: ['渠道', '市场'], metrics: ['花费', '收入', 'ROAS', 'CPA'] } } },
+  },
+
+  knowledge: {
+    text: `本次判断已引用：\n\n• 行业 Skill：电商预算健康检查\n• 品牌 Skill：预算红线检查\n• L2：广告投放基准与最佳实践\n• L4：品牌 KPI 与预算红线\n\nLuna 会优先使用已启用的行业 Skill、品牌私有 Skill 与 L1–L4 知识。`,
+    type: 'knowledge',
+    syncTarget: 'settings/skills',
+    actionCard: { title: '查看 Skill 与知识库', description: '检查 Luna 当前可使用的品牌认知' },
   },
 
   /* ── Strategy ──────────────────────────────────────────── */
@@ -131,6 +161,10 @@ const KEYWORD_MAP = [
   { keywords: ['campaign', 'create campaign', 'new campaign', 'launch', 'draft', '草稿', '创编', '结构'], key: 'campaign' },
   { keywords: ['creative', 'image', 'video', 'ad copy', 'fatigue', 'refresh', '素材', '疲劳', '换新'], key: 'creative' },
   { keywords: ['audience', 'targeting', 'segment', 'lookalike', 'retarget', '受众'], key: 'audience' },
+  { keywords: ['alert rule', 'warning', '预警规则', '告警规则', '低于1.8', '低于 1.8'], key: 'alertRule' },
+  { keywords: ['scheduled task', 'schedule task', '定时任务', '每天检查', '自动检查'], key: 'scheduledTask' },
+  { keywords: ['data view', 'multidimensional', '多维视图', '保存视图', '分析视图'], key: 'dataView' },
+  { keywords: ['skill', 'knowledge', '知识库', '品牌知识', '行业知识'], key: 'knowledge' },
   { keywords: ['report', 'brief', 'daily', 'client report', 'share', '日报', '客户', '报告'], key: 'report' },
   { keywords: ['strategy', 'plan', 'pdca', 'cycle', 'weekly', 'schedule', 'task', '策略', '任务', '本周'], key: 'strategy' },
   { keywords: ['goal', 'target', 'red line', 'threshold', 'setting', 'configure', '目标', '红线'], key: 'goal' },
@@ -145,6 +179,9 @@ const PROMPT_INTENT_MAP = {
   'audience-insights': 'audience',
   'weekly-strategy': 'strategy',
   'goal-recommend': 'goal',
+  'create-task': 'scheduledTask',
+  'create-alert': 'alertRule',
+  'create-view': 'dataView',
 }
 
 /**
@@ -168,6 +205,10 @@ export const DATA_SOURCES = [
   { id: 'audienceData', label: '受众表现', icon: 'Users' },
   { id: 'competitorData', label: '竞品动态', icon: 'Eye' },
   { id: 'marketTrends', label: '市场趋势', icon: 'TrendingUp' },
+  { id: 'savedViews', label: '已保存视图', icon: 'BarChart3' },
+  { id: 'brandSkills', label: '品牌 Skill', icon: 'Zap' },
+  { id: 'industrySkills', label: '行业 Skill', icon: 'Sparkles' },
+  { id: 'knowledgeBase', label: '知识库 L1–L4', icon: 'Database' },
 ]
 
 /* ── Quick prompts by category ───────────────────────────── */
@@ -175,7 +216,10 @@ export const QUICK_PROMPTS = [
   { id: 'perf-overview', label: '今日美国表现', category: 'analysis', icon: 'BarChart3' },
   { id: 'budget-opt', label: '预算怎么调', category: 'optimize', icon: 'DollarSign' },
   { id: 'campaign-draft', label: '生成换新草稿', category: 'create', icon: 'Zap' },
-  { id: 'daily-report', label: '生成客户日报', category: 'report', icon: 'FileBarChart' },
+  { id: 'daily-report', label: '创建日报模板', category: 'report', icon: 'FileBarChart' },
+  { id: 'create-task', label: '创建定时任务', category: 'strategy', icon: 'Target' },
+  { id: 'create-alert', label: '创建预警规则', category: 'optimize', icon: 'Settings' },
+  { id: 'create-view', label: '保存分析视图', category: 'analysis', icon: 'BarChart3' },
   { id: 'creative-perf', label: '查看疲劳素材', category: 'analysis', icon: 'Palette' },
   { id: 'audience-insights', label: '受众问题', category: 'analysis', icon: 'Users' },
   { id: 'weekly-strategy', label: '本周任务', category: 'strategy', icon: 'Target' },
@@ -232,6 +276,7 @@ const sendToLunaWithResponse = async (response, _dataSources, onChunk) => {
     syncTarget: response.syncTarget || null,
     dataCard: response.dataCard || null,
     actionCard: response.actionCard || null,
+    operation: response.actionCard?.operation || null,
     payload: response.syncTarget ? getSyncPayload(response.syncTarget) : null,
   }
 }

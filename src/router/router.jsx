@@ -10,14 +10,26 @@ import FeatureDraftPage from '@features/create/DraftPage'
 import CreativeLibraryPrototype from '@features/creative/CreativeLibraryPrototype'
 import BusinessModulePage from '@features/prototype/BusinessModulePage'
 import InsightDashboardPage from '@features/insight/InsightDashboardPage'
-import BrandProfile from '@components/brand/BrandProfile'
+import BrandProfileSummaryPage from '@features/settings/BrandProfileSummaryPage'
+import ProductLibraryPage from '@features/settings/ProductLibraryPage'
+import MarketCompetitorPage from '@features/insight/MarketCompetitorPage'
 import { AdAccounts } from '@components/brand/adAccounts'
+import ViewsAndDatasetsPage from '@features/settings/ViewsAndDatasetsPage'
 import { DatasetsPage } from '@components/brand/datasets'
+import TasksAlertsPage from '@features/settings/TasksAlertsPage'
 import FeatureGoalsPage from '@features/settings/GoalsPage'
 import SkillsPage from '@features/settings/SkillsPage'
+import MembersPage from '@features/settings/MembersPage'
+import BrandPermissionGuard from '@features/settings/BrandPermissionGuard'
+import SkillAdminPage from '@features/settings/SkillAdminPage'
+import PlatformAdminGuard from '@features/settings/PlatformAdminGuard'
+import PlatformAdminLayout from '@features/settings/PlatformAdminLayout'
 import UserLayout from '@features/user/UserLayout'
 import ClientsPage from '@features/user/ClientsPage'
 import StatsPage from '@features/user/StatsPage'
+import NotificationsPage from '@features/notifications/NotificationsPage'
+import OperationsClosurePage from '@features/insight/OperationsClosurePage'
+import LunaWorkspacePage from '@features/chat/LunaWorkspacePage'
 import useFeatureFlagsStore from '@stores/featureFlagsStore'
 import { useNavigate } from 'react-router-dom'
 
@@ -75,19 +87,36 @@ const AppRoutes = () => (
       <Route path="insight/page" element={<InsightDashboardPage />} />
       <Route path="insight/creative" element={<InsightDashboardPage />} />
       <Route path="insight/ai-analysis" element={<InsightDashboardPage />} />
+      <Route path="insight/reports" element={<ReportDashboardPage />} />
+      <Route path="insight/operations-closure" element={<OperationsClosurePage />} />
+      <Route path="insight/multidimensional" element={<ViewsAndDatasetsPage initialTab="views" analysisMode />} />
+      <Route path="insight/market-competitor" element={<MarketCompetitorPage />} />
 
       {/* Settings */}
-      <Route path="settings/brand-info" element={<BrandProfile />} />
+      <Route path="settings/brand-info" element={<BrandProfileSummaryPage />} />
+      <Route path="settings/products" element={<ProductLibraryPage />} />
       <Route path="settings/accounts" element={<AdAccounts />} />
       <Route path="settings/goals" element={<FeatureGoalsPage />} />
       <Route path="settings/datasets" element={<DatasetsPage />} />
-      <Route path="settings/skills" element={<SkillsPage />} />
+      <Route path="settings/automation" element={<TasksAlertsPage />} />
+      <Route path="settings/tasks-alerts" element={<TasksAlertsPage />} />
+      <Route path="automation/tasks" element={<TasksAlertsPage initialTab="tasks" />} />
+      <Route path="automation/alerts" element={<TasksAlertsPage initialTab="alerts" />} />
+      <Route path="settings/skills" element={<BrandPermissionGuard><SkillsPage /></BrandPermissionGuard>} />
+      <Route path="settings/members" element={<BrandPermissionGuard><MembersPage /></BrandPermissionGuard>} />
+      <Route path="settings/skill-admin" element={<Navigate to="/admin/capabilities" replace />} />
 
       {/* Chat (Phase 3) */}
-      <Route path="chat" element={<BusinessModulePage type="performance" />} />
+      <Route path="chat" element={<LunaWorkspacePage />} />
+      <Route path="notifications" element={<NotificationsPage />} />
 
       {/* Workspace index */}
       <Route index element={<Navigate to="ads/campaigns" replace />} />
+    </Route>
+
+    <Route path="/admin" element={<PlatformAdminGuard><PlatformAdminLayout /></PlatformAdminGuard>}>
+      <Route path="capabilities" element={<SkillAdminPage />} />
+      <Route index element={<Navigate to="capabilities" replace />} />
     </Route>
 
     {/* User management (independent layout) */}

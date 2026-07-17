@@ -75,6 +75,7 @@ const ChatContent = ({ onClose }) => {
     setActiveDataSources,
     applySyncToModule,
     clearSyncData,
+    confirmOperation,
   } = useLunaChat()
 
   const [inputText, setInputText] = useState('')
@@ -217,8 +218,10 @@ const ChatContent = ({ onClose }) => {
                     title={msg.actionCard.title}
                     description={msg.actionCard.description}
                     primaryAction={{
-                      label: '打开并查看',
-                      onClick: () => msg.syncTarget && applySyncToModule(msg.syncTarget),
+                      label: msg.actionCard.confirmLabel || '打开并查看',
+                      onClick: () => msg.operation
+                        ? confirmOperation(msg.operation, msg.syncTarget)
+                        : msg.syncTarget && applySyncToModule(msg.syncTarget),
                     }}
                     secondaryAction={{
                       label: '稍后处理',

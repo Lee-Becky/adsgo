@@ -1,0 +1,25 @@
+import { Activity, Bot, CheckCircle2, Clock3, FileDown, History, MessageSquareText, Sparkles } from 'lucide-react'
+import useLunaStore from '@stores/lunaStore'
+import useMarketingOpsStore from '@stores/marketingOpsStore'
+import TodayWorkQueue from './TodayWorkQueue'
+import LunaCommandCenter from './LunaCommandCenter'
+import LunaDecisionWorkspace from './LunaDecisionWorkspace'
+import RoleWorkSummary from './RoleWorkSummary'
+
+const LunaWorkspaceContent = () => {
+  const openChat = useLunaStore(state => state.openChat)
+  const chatHistory = useLunaStore(state => state.chatHistory)
+  const pendingSync = useLunaStore(state => state.pendingSync)
+  const activity = useMarketingOpsStore(state => state.activityLog)
+  const tasks = useMarketingOpsStore(state => state.tasks)
+  const notifications = useMarketingOpsStore(state => state.notifications)
+  const deliverables = useMarketingOpsStore(state => state.deliverables)
+  return <div className="space-y-5">
+    <section className="relative overflow-hidden rounded-2xl border border-luna-border bg-white p-6 shadow-sm"><div className="pointer-events-none absolute inset-y-0 right-0 w-80 luna-gradient-bg"/><div className="relative flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between"><div><div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-luna-violet"><Sparkles size={14}/>Luna Workspace</div><h2 className="mt-2 text-2xl font-bold text-neutral-950">AI 工作台</h2><p className="mt-2 max-w-2xl text-sm leading-6 text-neutral-500">集中管理会话、待确认操作、自动任务和 Luna 生成的交付结果。</p></div><button onClick={openChat} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-luna-violet px-5 text-sm font-semibold text-white shadow-luna"><MessageSquareText size={17}/>开始新对话</button></div></section>
+    <section className="grid grid-cols-2 gap-3 lg:grid-cols-4">{[['历史消息',chatHistory.length,History],['待确认操作',Object.keys(pendingSync).length,CheckCircle2],['运行中任务',tasks.filter(t=>t.enabled).length,Clock3],['未读消息',notifications.filter(n=>!n.read).length,Activity]].map(([label,value,Icon])=><div key={label} className="rounded-xl border bg-white p-4 shadow-sm"><Icon size={16} className="text-luna-violet"/><p className="mt-3 text-2xl font-bold">{value}</p><p className="mt-1 text-xs text-neutral-500">{label}</p></div>)}</section>
+    <div className="grid gap-5 lg:grid-cols-2"><section className="rounded-2xl border bg-white shadow-sm"><div className="border-b p-5"><h3 className="font-bold">最近会话</h3></div><div className="divide-y">{chatHistory.slice(-5).reverse().map(item=><div key={item.id} className="flex gap-3 p-4"><span className={`grid h-8 w-8 shrink-0 place-items-center rounded-lg ${item.role==='luna'?'bg-luna-bg text-luna-violet':'bg-neutral-100'}`}>{item.role==='luna'?<Bot size={15}/>:<MessageSquareText size={15}/>}</span><div className="min-w-0"><p className="line-clamp-2 text-sm text-neutral-700">{item.text}</p><p className="mt-1 text-[11px] text-neutral-400">{item.timestamp}</p></div></div>)}{chatHistory.length===0&&<p className="py-14 text-center text-sm text-neutral-400">暂无会话记录</p>}</div></section><section className="rounded-2xl border bg-white shadow-sm"><div className="border-b p-5"><h3 className="font-bold">Luna 操作轨迹</h3></div><div className="divide-y">{activity.filter(a=>a.actor==='Luna').slice(0,5).map(item=><div key={item.id} className="flex gap-3 p-4"><span className="grid h-8 w-8 place-items-center rounded-lg bg-luna-bg text-luna-violet"><Sparkles size={14}/></span><div><p className="text-sm font-medium">{item.action}</p><p className="mt-1 text-xs text-neutral-500">{item.object}</p><p className="mt-1 text-[11px] text-neutral-400">{item.time} · {item.module}</p></div></div>)}</div></section></div>
+    <section className="overflow-hidden rounded-2xl border bg-white shadow-sm"><div className="flex items-center gap-3 border-b p-5"><FileDown size={19} className="text-luna-violet"/><div><h3 className="text-sm font-bold">交付物</h3><p className="mt-1 text-xs text-neutral-500">报告、数据导出和 Luna 生成文件统一保留在当前品牌空间</p></div></div><div className="divide-y">{deliverables.map(item=><div key={item.id} className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center"><span className="grid h-10 w-10 place-items-center rounded-xl bg-luna-bg text-luna-violet"><FileDown size={17}/></span><div className="min-w-0 flex-1"><p className="truncate text-sm font-semibold">{item.name}</p><p className="mt-1 text-xs text-neutral-400">{item.type} · {item.source} · {item.generatedBy} · {item.time}</p></div><button className="rounded-lg border px-3 py-2 text-xs font-semibold hover:bg-neutral-50">模拟下载</button></div>)}{deliverables.length===0&&<p className="py-12 text-center text-sm text-neutral-400">暂无交付物</p>}</div></section>
+  </div>
+}
+const LunaWorkspacePage = () => <div className="space-y-5"><RoleWorkSummary /><div id="luna-decision"><LunaDecisionWorkspace /></div><TodayWorkQueue /><LunaCommandCenter /><LunaWorkspaceContent /></div>
+export default LunaWorkspacePage

@@ -92,7 +92,7 @@ const Modal = ({
 
   return createPortal(
     <div
-      className="fixed inset-0 z-[9998] flex items-center justify-center p-4"
+      className="fixed inset-0 z-[9998] flex items-center justify-center overflow-y-auto p-4"
       onClick={handleBackdropClick}
       onKeyDown={handleTabTrap}
     >
@@ -115,7 +115,7 @@ const Modal = ({
         aria-labelledby={title ? 'modal-title' : undefined}
         className={`
           relative w-full
-          bg-surface rounded-lg shadow-xl
+          my-auto overflow-hidden bg-surface rounded-2xl shadow-xl
           animate-scale-in
           outline-none
           flex flex-col max-h-[90vh]

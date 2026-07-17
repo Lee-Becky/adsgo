@@ -1,11 +1,13 @@
-import { Bell, Menu, Globe, ChevronDown, Sparkles } from 'lucide-react'
+import { Bell, Menu, Globe, ChevronDown, Sparkles, AlertTriangle, CheckCircle2, Clock3, X } from 'lucide-react'
 import { getPageInfo } from '../constants/menuConfig'
 import { useState, useEffect } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import useLunaStore from '@stores/lunaStore'
+import useMarketingOpsStore from '@stores/marketingOpsStore'
 
 const Header = ({ toggleSidebar, isMobile }) => {
   const location = useLocation()
+  const navigate = useNavigate()
   const toggleLuna = useLunaStore((s) => s.toggleChat)
   const lunaIsOpen = useLunaStore((s) => s.isOpen)
   const hasPendingSync = useLunaStore((s) => Object.keys(s.pendingSync).length > 0)
@@ -16,6 +18,14 @@ const Header = ({ toggleSidebar, isMobile }) => {
   const pageInfo = getPageInfo(workspacePath) || getPageInfo(lastSegment)
   const [languageDropdownOpen, setLanguageDropdownOpen] = useState(false)
   const [selectedLanguage, setSelectedLanguage] = useState('English')
+  const [notificationOpen, setNotificationOpen] = useState(false)
+  const [notificationFilter, setNotificationFilter] = useState('all')
+  const notifications = useMarketingOpsStore((state) => state.notifications)
+  const markNotificationRead = useMarketingOpsStore((state) => state.markNotificationRead)
+  const markAllNotificationsRead = useMarketingOpsStore((state) => state.markAllNotificationsRead)
+  const deleteNotification = useMarketingOpsStore((state) => state.deleteNotification)
+  const unreadCount = notifications.filter(item => !item.read).length
+  const visibleNotifications = notifications.filter(item => notificationFilter === 'all' || (notificationFilter === 'unread' ? !item.read : item.category === 'alert'))
 
   const globalBriefing = '美国 ROAS 1.82，3 个 Campaign 待处理，1 条素材待换新。'
 
@@ -82,6 +92,9 @@ const Header = ({ toggleSidebar, isMobile }) => {
               </button>
             )}
             <div>
+              <p className="hidden text-[10px] font-semibold uppercase tracking-[0.14em] text-neutral-400 sm:block">
+                {pageInfo.section}
+              </p>
               <h1 className="font-heading text-lg font-semibold text-neutral-900 leading-tight">
                 {pageInfo.title}
               </h1>
@@ -93,15 +106,16 @@ const Header = ({ toggleSidebar, isMobile }) => {
 
           {/* Right side actions */}
           <div className="flex min-w-0 items-center gap-2">
-            <div
-              className="hidden min-w-0 max-w-[min(440px,36vw)] items-center gap-2 md:flex"
+            <button
+              onClick={() => navigate(`/workspace/${rawPath.split('/')[2] || 'default'}/chat`)}
+              className="hidden min-w-0 max-w-[min(440px,36vw)] cursor-pointer items-center gap-2 rounded-full px-2 py-1 transition-colors hover:bg-neutral-50 md:flex"
               title={globalBriefing}
             >
               <span className="shrink-0 rounded-full bg-slate-950 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-white">
                 今日待办
               </span>
               <p className="truncate text-xs text-neutral-500">{globalBriefing}</p>
-            </div>
+            </button>
 
             {/* Luna AI Toggle */}
             <button
@@ -159,11 +173,50 @@ const Header = ({ toggleSidebar, isMobile }) => {
               )}
             </div>
 
-            {/* Notification */}
-            <button className="group relative flex h-9 w-9 items-center justify-center rounded-lg transition-all duration-fast text-neutral-400 hover:bg-neutral-50 hover:text-neutral-700 active:scale-95">
-              <Bell size={18} className="transition-colors duration-fast" />
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-danger-500 ring-2 ring-white" />
-            </button>
+            {/* Notification center */}
+            <div className="relative">
+              <button
+                aria-label={`通知中心，${unreadCount} 条未读`}
+                aria-expanded={notificationOpen}
+                onClick={() => setNotificationOpen(open => !open)}
+                className="group relative flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg text-neutral-400 transition-all duration-fast hover:bg-neutral-50 hover:text-neutral-700 active:scale-95"
+              >
+                <Bell size={18} className="transition-colors duration-fast" />
+                {unreadCount > 0 && <span className="absolute right-0.5 top-0.5 grid min-h-4 min-w-4 place-items-center rounded-full bg-danger-500 px-1 text-[9px] font-bold text-white ring-2 ring-white">{unreadCount}</span>}
+              </button>
+              {notificationOpen && (
+                <>
+                  <button aria-label="关闭通知中心" className="fixed inset-0 z-[540] cursor-default" onClick={() => setNotificationOpen(false)} />
+                  <section className="fixed left-3 right-3 top-16 z-[550] overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-2xl sm:absolute sm:left-auto sm:right-0 sm:top-full sm:mt-2 sm:w-[390px]">
+                    <div className="flex items-center justify-between border-b border-neutral-100 px-5 py-4">
+                      <div><h2 className="text-sm font-bold text-neutral-900">通知中心</h2><p className="mt-0.5 text-xs text-neutral-500">{unreadCount} 条未读预警</p></div>
+                      <button onClick={markAllNotificationsRead} className="cursor-pointer text-xs font-medium text-primary-600 hover:text-primary-700">全部已读</button>
+                    </div>
+                    <div className="flex gap-1 border-b border-neutral-100 px-4 py-2">
+                      {[['all','全部'],['unread','未读'],['alert','预警']].map(([id,label]) => <button key={id} onClick={() => setNotificationFilter(id)} className={`cursor-pointer rounded-lg px-3 py-1.5 text-xs font-medium ${notificationFilter === id ? 'bg-neutral-900 text-white' : 'text-neutral-500 hover:bg-neutral-100'}`}>{label}</button>)}
+                    </div>
+                    <div className="max-h-[min(62vh,440px)] overflow-y-auto">
+                      {visibleNotifications.map(item => (
+                        <div
+                          key={item.id}
+                          className={`flex w-full cursor-pointer gap-3 border-b border-neutral-100 px-5 py-4 text-left transition-colors last:border-0 hover:bg-neutral-50 ${item.read ? 'bg-white' : 'bg-primary-50/35'}`}
+                        >
+                          <span className={`mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-lg ${item.level === 'high' ? 'bg-danger-50 text-danger-600' : item.level === 'medium' ? 'bg-warning-50 text-warning-600' : 'bg-primary-50 text-primary-600'}`}>
+                            {item.read ? <CheckCircle2 size={17}/> : <AlertTriangle size={17}/>}
+                          </span>
+                          <button onClick={() => markNotificationRead(item.id)} className="min-w-0 flex-1 cursor-pointer text-left"><span className="flex items-start justify-between gap-3"><strong className="text-sm text-neutral-900">{item.title}</strong>{!item.read && <i className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-danger-500"/>}</span><span className="mt-1 block text-xs leading-5 text-neutral-500">{item.detail}</span><span className="mt-1.5 flex items-center gap-1 text-[11px] text-neutral-400"><Clock3 size={11}/>{item.time}</span></button>
+                          <button onClick={() => deleteNotification(item.id)} aria-label={`删除${item.title}`} className="h-8 w-8 shrink-0 cursor-pointer rounded-lg text-neutral-300 hover:bg-danger-50 hover:text-danger-600"><X size={14} className="mx-auto"/></button>
+                        </div>
+                      ))}
+                      {visibleNotifications.length === 0 && <p className="py-10 text-center text-xs text-neutral-400">暂无此类通知</p>}
+                    </div>
+                    <div className="border-t border-neutral-100 bg-neutral-50/80 p-3">
+                      <button onClick={() => { setNotificationOpen(false); navigate(`/workspace/${rawPath.split('/')[2] || 'default'}/notifications`) }} className="w-full cursor-pointer rounded-lg py-2 text-xs font-semibold text-neutral-600 hover:bg-white hover:text-neutral-900">查看全部通知</button>
+                    </div>
+                  </section>
+                </>
+              )}
+            </div>
           </div>
         </div>
       </div>

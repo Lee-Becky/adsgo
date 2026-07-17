@@ -6,7 +6,9 @@ import {
   Play,
   Target,
   User,
+  Settings2,
 } from 'lucide-react'
+import { useNavigate, useParams } from 'react-router-dom'
 import {
   GLOBAL_GOALS,
   MARKET_ANALYSIS,
@@ -37,6 +39,8 @@ const weekStatusStyle = {
 
 export const MediaPlanPanel = ({ onSwitchToCycle }) => {
   const [jobs, setJobs] = useState(SCHEDULED_JOBS)
+  const navigate = useNavigate()
+  const { brandId = 'default' } = useParams()
 
   const toggleJob = (id) => {
     setJobs((prev) => prev.map((job) => (
@@ -171,11 +175,22 @@ export const MediaPlanPanel = ({ onSwitchToCycle }) => {
 
         {/* 定时任务调度 */}
         <section className="rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
-          <div className="flex items-center gap-2">
-            <Clock size={16} className="text-neutral-500" />
-            <h2 className="text-base font-semibold text-neutral-950">定时任务调度</h2>
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-2">
+                <Clock size={16} className="text-neutral-500" />
+                <h2 className="text-base font-semibold text-neutral-950">定时任务调度</h2>
+              </div>
+              <p className="mt-1 text-sm text-neutral-500">Luna 自动执行的任务带具体日期和时间；人工任务在策略中确认</p>
+            </div>
+            <button
+              onClick={() => navigate(`/workspace/${brandId}/settings/automation?tab=tasks`)}
+              className="inline-flex min-h-9 shrink-0 cursor-pointer items-center gap-1.5 rounded-lg border border-neutral-200 bg-white px-3 py-2 text-xs font-semibold text-neutral-600 transition-colors hover:border-neutral-300 hover:bg-neutral-50 hover:text-neutral-900"
+            >
+              <Settings2 size={14} />
+              管理定时任务
+            </button>
           </div>
-          <p className="mt-1 text-sm text-neutral-500">Luna 自动执行的任务带具体日期和时间；人工任务在策略中确认</p>
           <div className="mt-4 space-y-3">
             {jobs.map((job) => (
               <div

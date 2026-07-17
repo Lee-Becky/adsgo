@@ -3,6 +3,7 @@ import { useNavigate, useLocation, useParams } from 'react-router-dom'
 // import { useOnboardingContext } from './onboarding/OnboardingContext'
 // import OnboardingSpotlight from './onboarding/OnboardingSpotlight'
 import useLunaStore from '@stores/lunaStore'
+import useBrandStore from '@stores/brandStore'
 
 /* ── Onboarding tour: sidebar step → menu key mapping (disabled) ── */
 // const STEP_SIDEBAR_CONFIG = {
@@ -34,6 +35,7 @@ const Sidebar = ({ isMobile, isPinned, onTogglePinned, onClose, selectedBrand, o
   const hasPendingSync = useLunaStore((s) => Object.keys(s.pendingSync).length > 0)
   const pendingSync = useLunaStore((s) => s.pendingSync)
   const menuHasLunaSync = (path) => path && !!pendingSync[path?.split('?')[0]]
+  const canManageBrand = useBrandStore((s) => s.canManageBrand)()
 
   // Extract current path segment for active detection
   // e.g. /workspace/default/plan/media-plan → plan/media-plan
@@ -100,7 +102,7 @@ const Sidebar = ({ isMobile, isPinned, onTogglePinned, onClose, selectedBrand, o
     }
 
     // Luna Chat: toggle panel instead of navigating
-    if (item.isLuna) {
+    if (item.isLuna && !item.isLunaWorkspace) {
       toggleLuna()
       return
     }
@@ -111,9 +113,11 @@ const Sidebar = ({ isMobile, isPinned, onTogglePinned, onClose, selectedBrand, o
 
   /* ── Render a single menu item ──────────────────────────── */
   const renderMenuItem = (item, isSubItem = false) => {
+    if (item.hiddenInSidebar) return null
+    if (item.requiresManageBrand && !canManageBrand) return null
     const ItemIcon = ICON_MAP[item.icon] || Sparkles
     const itemActive = isActive(item) ||
-      (item.isLuna && lunaIsOpen) // Luna Chat shows active when panel is open
+      (item.isLuna && !item.isLunaWorkspace && lunaIsOpen)
     const ref = getRef(item.key)
 
     // Skip highlight during tour step 4 sub-step 2 on library
@@ -222,31 +226,32 @@ const Sidebar = ({ isMobile, isPinned, onTogglePinned, onClose, selectedBrand, o
     if (item.isLuna) {
       const LunaIcon = ICON_MAP[item.icon] || Sparkles
       const ref = getRef(item.key)
+      const lunaWorkspaceActive = workspacePath === item.path
       return (
         <div key={item.key} className="mb-3 px-1">
           <button
             ref={ref}
-            onClick={() => handleMenuClick(item)}
+            onClick={() => item.isLunaWorkspace ? navigate(buildWorkspacePath(item.path)) : handleMenuClick(item)}
             className={`w-full flex items-center gap-3 rounded-xl transition-all duration-normal group relative overflow-hidden ${
               isCollapsed ? 'justify-center p-2' : 'px-3 py-2.5'
             } ${
-              lunaIsOpen
+              lunaIsOpen || lunaWorkspaceActive
                 ? 'border border-luna-violet/50 text-luna-violet shadow-luna'
                 : 'border border-neutral-200 text-neutral-800 hover:border-luna-violet/30 hover:text-luna-violet-light'
             }`}
             style={{
-              background: lunaIsOpen
+              background: lunaIsOpen || lunaWorkspaceActive
                 ? 'linear-gradient(135deg, rgba(139,92,246,0.15) 0%, rgba(99,102,241,0.10) 50%, rgba(245,158,11,0.08) 100%)'
                 : 'linear-gradient(135deg, rgba(255,255,255,1) 0%, rgba(139,92,246,0.04) 100%)'
             }}
           >
             <div className="relative shrink-0">
-              <LunaIcon size={18} className={lunaIsOpen ? 'text-luna-violet' : 'text-neutral-700 group-hover:text-luna-violet'} />
+              <LunaIcon size={18} className={lunaIsOpen || lunaWorkspaceActive ? 'text-luna-violet' : 'text-neutral-700 group-hover:text-luna-violet'} />
             </div>
             {!isCollapsed && (
               <div className="flex-1 min-w-0">
-                <span className="font-semibold text-[13.5px]">Luna AI</span>
-                <p className="text-[10px] text-neutral-400 mt-0.5 leading-none">AI assistant</p>
+                <span className="font-semibold text-[13.5px]">今日工作台</span>
+                <p className="text-[10px] text-neutral-400 mt-0.5 leading-none">判断 · 执行 · 验证 · 交付</p>
               </div>
             )}
             {!isCollapsed && hasPendingSync && !lunaIsOpen && (
@@ -367,7 +372,18 @@ const Sidebar = ({ isMobile, isPinned, onTogglePinned, onClose, selectedBrand, o
 
       {/* Main Navigation */}
       <nav className="flex-1 px-3 py-1 flex flex-col overflow-y-auto sidebar-light-scrollbar text-sm">
-        {MENU_ITEMS_V2.map((item) => renderNavSection(item))}
+        {MENU_ITEMS_V2.map((item, index) => (
+          <React.Fragment key={item.key}>
+            {(index === 1 || item.key === 'brand-foundation') && (
+              isCollapsed
+                ? <div className="mx-2 my-2 h-px bg-neutral-200" />
+                : <p className="mb-1 mt-3 px-3 text-[10px] font-bold uppercase tracking-[0.14em] text-neutral-400">
+                    {index === 1 ? '日常运营' : '品牌管理'}
+                  </p>
+            )}
+            {renderNavSection(item)}
+          </React.Fragment>
+        ))}
       </nav>
 
       {/* User Profile Section */}

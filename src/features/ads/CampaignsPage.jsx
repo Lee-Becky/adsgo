@@ -12,11 +12,7 @@ const CampaignsPage = () => {
     nav('../settings/brand-info')
   }
 
-  return (
-    <AdsManagerPrototype
-      onEditBrandConfig={handleEditBrandConfig}
-    />
-  )
+  return <AdsManagerPrototype onEditBrandConfig={handleEditBrandConfig} />
 }
 
 export default CampaignsPage

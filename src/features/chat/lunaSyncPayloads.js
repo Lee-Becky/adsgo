@@ -31,9 +31,9 @@ export const LUNA_SYNC_PAYLOADS = {
     source: 'Luna · 本周策略 · 2026-06-29 10:22',
   },
 
-  'report/daily-brief': {
-    moduleLabel: '客户日报',
-    summary: 'Luna 已更新今日客户日报草稿',
+  'insight/reports': {
+    moduleLabel: '报告',
+    summary: 'Luna 已创建客户经营日报模板',
     effects: [
       { label: '今日结论', detail: '补充 ROAS 1.82 低于目标的原因说明' },
       { label: '今日处理', detail: '写入冷启动降预算、保留再营销、素材换新' },

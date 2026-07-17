@@ -4,6 +4,7 @@ import { ChevronDown, Minus, TrendingDown, TrendingUp } from 'lucide-react'
 import useLunaSync from '@features/chat/useLunaSync'
 import useStrategyTaskStore from '@stores/strategyTaskStore'
 import useLunaStore from '@stores/lunaStore'
+import useMarketingOpsStore from '@stores/marketingOpsStore'
 import {
   demoAds,
   demoAdsets,
@@ -934,6 +935,8 @@ const AdsManagerPrototype = () => {
   const importBudgetTasksFromAds = useStrategyTaskStore((s) => s.importBudgetTasksFromAds)
   const triggerManualChangeFollowUp = useLunaStore((s) => s.triggerManualChangeFollowUp)
   const triggerRejectFollowUp = useLunaStore((s) => s.triggerRejectFollowUp)
+  const createAction = useMarketingOpsStore((s) => s.createAction)
+  const executeAction = useMarketingOpsStore((s) => s.executeAction)
   const {
     payload,
     appliedEffect,
@@ -1083,6 +1086,17 @@ const AdsManagerPrototype = () => {
     if (!recommendation) return
     handleSetStatus(row.id, '已采纳')
     handleApplyBudget(row.id, recommendation.suggestedBudget)
+    const actionId = createAction({
+      type: '预算调整',
+      source: 'Luna 建议',
+      target: row.name,
+      before: `日预算 ${formatCurrency(recommendation.currentBudget ?? row.dailyBudget)}${row.roas ? ` · ROAS ${row.roas}` : ''}`,
+      action: `${recommendation.action}至 ${formatCurrency(recommendation.suggestedBudget)}`,
+      status: '待执行',
+      proposedBy: 'Luna',
+      approvedBy: '优化师',
+    })
+    executeAction(actionId)
   }
 
   const handleRejectRecommendation = (row) => {
@@ -1109,6 +1123,16 @@ const AdsManagerPrototype = () => {
     } else {
       setAdSuggestionStatuses((current) => ({ ...current, [row.id]: '已确认' }))
     }
+    const actionId = createAction({
+      type: '素材处理',
+      source: 'Luna 建议',
+      target: row.name,
+      before: `当前状态：${row.status || '投放中'}`,
+      action: suggestion.action,
+      approvedBy: '优化师',
+      verificationWindow: '72 小时',
+    })
+    executeAction(actionId)
   }
 
   const handleRejectAdSuggestion = (row) => {
@@ -1132,6 +1156,16 @@ const AdsManagerPrototype = () => {
 
     handleApplyBudget(row.id, newBudget)
     handleSetStatus(row.id, '人工调整')
+    const actionId = createAction({
+      type: '预算调整',
+      source: '人工操作',
+      target: row.name,
+      before: `日预算 ${formatCurrency(oldBudget)}`,
+      action: `日预算调整为 ${formatCurrency(newBudget)}`,
+      proposedBy: '优化师',
+      approvedBy: '优化师',
+    })
+    executeAction(actionId)
 
     const recommendation = getBudgetRecommendationForRow(row, activeLevel)
     triggerManualChangeFollowUp({
@@ -1156,6 +1190,19 @@ const AdsManagerPrototype = () => {
 
     setRecommendationStatuses((current) => ({ ...current, ...nextStatuses }))
     setBudgetOverrides((current) => ({ ...current, ...nextBudgets }))
+    selectedRows.forEach((row) => {
+      const recommendation = getBudgetRecommendationForRow(row, activeLevel)
+      if (!recommendation) return
+      const actionId = createAction({
+        type: '预算调整',
+        source: 'Luna 批量建议',
+        target: row.name,
+        before: `日预算 ${formatCurrency(recommendation.currentBudget ?? row.dailyBudget)}`,
+        action: `${recommendation.action}至 ${formatCurrency(recommendation.suggestedBudget)}`,
+        approvedBy: '优化师',
+      })
+      executeAction(actionId)
+    })
     setSelectedIds([])
   }
 

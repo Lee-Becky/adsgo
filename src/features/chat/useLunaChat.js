@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import useLunaStore, { formatLunaLearningAck } from '@stores/lunaStore'
 import { sendToLuna, sendQuickPrompt, QUICK_PROMPTS } from './mockLunaService'
 import { buildWorkspaceSyncPath, getSyncPayload, normalizeSyncKey } from './lunaSyncPayloads'
+import useMarketingOpsStore from '@stores/marketingOpsStore'
 
 /* ═══════════════════════════════════════════════════════════
    useLunaChat — Hook for Luna Chat interactions
@@ -58,6 +59,13 @@ const useLunaChat = () => {
     navigate(buildWorkspaceSyncPath(brandId, syncTarget))
   }, [brandId, navigate])
 
+  const confirmOperation = useCallback((operation, syncTarget) => {
+    const label = useMarketingOpsStore.getState().executeLunaOperation(operation)
+    if (!label) return
+    addMessage({ role: 'luna', text: `${label}已创建并同步到对应页面。你可以继续让我调整频率、指标或通知范围。`, type: 'success' })
+    if (syncTarget) navigateToSyncTarget(syncTarget)
+  }, [addMessage, navigateToSyncTarget])
+
   /* ── Send a user message ───────────────────────────────── */
   const sendMessage = useCallback(async (text, attachments = []) => {
     const trimmed = text.trim()
@@ -102,6 +110,7 @@ const useLunaChat = () => {
         actionCard: response.actionCard || null,
         syncTarget: response.syncTarget || null,
         synced: !!response.syncTarget,
+        operation: response.operation || response.actionCard?.operation || null,
       })
 
       pushSync(response)
@@ -135,6 +144,7 @@ const useLunaChat = () => {
         actionCard: response.actionCard || null,
         syncTarget: response.syncTarget || null,
         synced: !!response.syncTarget,
+        operation: response.operation || response.actionCard?.operation || null,
       })
 
       pushSync(response)
@@ -206,6 +216,7 @@ const useLunaChat = () => {
     navigateToSyncTarget,
     getSyncData,
     clearSyncData,
+    confirmOperation,
     // Question mechanism
     askLunaAboutChange,
     answerQuestion,

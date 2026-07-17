@@ -83,7 +83,7 @@ export const ToastProvider = ({ children }) => {
     <ToastContext.Provider value={toast}>
       {children}
       {createPortal(
-        <div className="fixed top-4 right-4 z-[600] flex flex-col gap-2 pointer-events-none">
+        <div className="pointer-events-none fixed left-4 right-4 top-4 z-[10000] flex flex-col items-end gap-2 sm:left-auto">
           {toasts.map((t) => (
             <ToastItem
               key={t.id}
@@ -125,7 +125,7 @@ const ToastItem = ({ toast, onDismiss }) => {
   return (
     <div
       className={[
-        'relative w-[380px] bg-white rounded-lg overflow-hidden pointer-events-auto',
+        'relative w-full max-w-[380px] bg-white rounded-lg overflow-hidden pointer-events-auto',
         'flex items-start gap-3 p-4',
         'shadow-lg border border-neutral-100',
         !isLuna ? `border-l-[3px] ${cfg.border}` : '',

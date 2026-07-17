@@ -159,13 +159,15 @@ const analysisSteps = [
 
 const BrandProfile = () => {
   const location = useLocation();
-  const [profile, setProfile] = useState(emptyProfile);
+  // Default brand opens with a completed analysis; newly-created brands still
+  // enter the URL analysis flow via location.state.newBrand below.
+  const [profile, setProfile] = useState(() => ({ ...mockProfile }));
   const [isEditMode, setIsEditMode] = useState(false);
   const [domainAtEditStart, setDomainAtEditStart] = useState("");
   const [selectedLogoIndex, setSelectedLogoIndex] = useState(0);
   const [currentAudienceIndex, setCurrentAudienceIndex] = useState(0);
   const [showBackToTop, setShowBackToTop] = useState(false);
-  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(true);
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [updateDomain, setUpdateDomain] = useState(mockProfile.domain || '');
   const [isUpdating, setIsUpdating] = useState(false);
   const [elapsedTime, setElapsedTime] = useState(0);

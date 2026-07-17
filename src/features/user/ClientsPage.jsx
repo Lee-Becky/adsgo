@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import {
   Search, Users, ExternalLink, Clock, MoreHorizontal,
 } from 'lucide-react'
+import MultiBrandCockpit from './MultiBrandCockpit'
 
 /* ═══════════════════════════════════════════════════════════
    ClientsPage — Multi-workspace client overview
@@ -78,6 +79,7 @@ const ClientsPage = () => {
 
   return (
     <div className="space-y-6">
+      <MultiBrandCockpit />
       {/* Search */}
       <div className="flex justify-end">
         <div className="relative">

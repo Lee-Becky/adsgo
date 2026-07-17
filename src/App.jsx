@@ -12,6 +12,8 @@ import ZIndexObserver from './components/ZIndexObserver'
 import { resetModalCounter } from './constants/zIndex'
 import LunaChatPanel from './features/chat/LunaChatPanel'
 import GlobalLunaBar from './components/luna/GlobalLunaBar'
+import CapabilitySetupWizard from './features/settings/CapabilitySetupWizard'
+import ProductStoryGuide from './components/ProductStoryGuide'
 
 /* ═══════════════════════════════════════════════════════════
    App — Thin shell: providers, global modals, router
@@ -76,15 +78,16 @@ function App() {
         onClose={() => setIsCreateBrandModalOpen(false)}
         onCreate={createBrand}
       />
+      <CapabilitySetupWizard />
 
       {/* Brand switching overlay */}
       {isBrandSwitching && (
         <BrandSwitchLoading brandName={selectedBrand} />
       )}
 
-      {/* Global Luna Chat Panel */}
-      <LunaChatPanel />
-      <GlobalLunaBar />
+      <ProductStoryGuide />
+      {/* Brand-side Luna is intentionally hidden in the independent platform backend. */}
+      {!location.pathname.startsWith('/admin') && <><LunaChatPanel /><GlobalLunaBar /></>}
     </>
   )
 }
